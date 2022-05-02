@@ -1,0 +1,68 @@
+@main("Sign Up Form"){
+    <div class="container">
+        <div class="form-container">
+            <div class="main-container">
+                <div class="forms">
+                    <div class="form">
+                        <div class="form-top">
+                            <div class="form-title">Sign Up</div>
+                            <a class="form-close-btn" href="#"></a>
+                        </div>
+                        <div class="msg-4">
+                            Enter your details to get started.
+                        </div>
+                        <form>
+                            <div class="card">
+                                <div class="input username_field">
+                                    <input class="input__field" type="text" placeholder=" " id="username" oninput="checkUserAvailability()" autocomplete="off"/>
+                                    <span class="input__label">Username</span>
+                                    <i class="fa-regular fa-circle-check" id="btn"></i>
+                                </div>
+                                <div class="error-message">
+                                    <div class="error-info">
+                                        <img src="@routes.Assets.versioned("images/error.png")"/>
+                                        <lable>Username already exists.</lable>
+                                    </div>
+                                    <div class="available-username">
+                                        <span>Available:</span>
+                                        <ul>
+                                            <li>John Doe1</li>
+                                            <li>John Doe2</li>
+                                            <li>John Doe3</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="input password_field">
+                                    <input class="input__field password_input" type="password" placeholder=" " id="password" autocomplete="off"/>
+                                    <span class="input__label">Password</span>
+                                </div>
+                                <br>
+                                <div class="input confirm_password">
+                                    <input class="input__field password_input" type="password" placeholder=" " id="confirm_password" oninput="matchConfirmPassword()" autocomplete="off"/>
+                                    <span class="input__label">Confirm Password</span>
+                                    <i class="fa fa-eye-slash btn" id="btn" onclick="togglePassword()"></i>
+                                </div>
+                                <div class="error-message">
+                                    <div class="error-info">
+                                        <img src="@routes.Assets.versioned("images/error.png")"/>
+                                        <lable>Password mismatched. Please check the password and try again.</lable>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-footer">
+                                <div class="msg-2">
+                                    Already have an account? <a class="link" href="#">Sign In</a>
+                                </div>
+                            </div>
+                            <div class="form-button">
+                                <button class="form-next-button">Sign Up</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

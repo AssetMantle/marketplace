@@ -1,0 +1,169 @@
+@main("Profile My NFTs") {
+    <div class="wrapper">
+        <nav>
+            <input type="checkbox" id="show-search">
+            <input type="checkbox" id="show-menu">
+            <label for="show-menu" class="menu-icon"><i class="uil uil-bars"></i></label>
+            <div class="content">
+                <div class="logo"><a href="#"><img src="@routes.Assets.versioned("images/Mantle Place Logo.png")"/></a></div>
+                <ul class="links">
+                    <li class="active"><a href="#">Explore</a></li>
+                    <li>
+                        <a href="#" class="desktop-link">Create</a>
+                        <input type="checkbox" id="show-features">
+                        <label for="show-features">Create</label>
+                        <ul>
+                            <li>
+                                <a href="#">
+                                    <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                    Create new collection
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <img src="@routes.Assets.versioned("images/createNFT.svg")"/>
+                                    Create new NFT
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+
+            <div class="right-menu">
+                <label for="show-search" class="search-icon"><i class="uil uil-search"></i></label>
+                <div class="account-menu">
+                        <nav id="submenu-main" class="submenu-main">
+                            <ul class="menu">
+                                <li class="user-profile">
+                                    <a href="#">
+                                        <img src="@routes.Assets.versioned("images/Profile.svg")" class="profile"/>
+                                    </a>
+                                    <ul class="submenu">
+                                        <li class="user-profile-data">
+                                            <div class="user-profile-image">
+                                                <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                            </div>
+                                            <div class="user-profile-information">
+                                                <div class="user-profile-name">User568</div>
+                                                <div class="user-profile-token">0.459930 $MNTL</div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <img src="@routes.Assets.versioned("images/NFT.svg")"/>
+                                                My NFTs
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <img src="@routes.Assets.versioned("images/Collection.svg")"/>
+                                                My Collections
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <img src="@routes.Assets.versioned("images/Favourites.svg")"/>
+                                                Favourites
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <img src="@routes.Assets.versioned("images/listing.svg")"/>
+                                                Listings
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <img src="@routes.Assets.versioned("images/whitelist.svg")"/>
+                                                Whitelist
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <img src="@routes.Assets.versioned("images/Settings.svg")"/>
+                                                Settings
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <img src="@routes.Assets.versioned("images/logout.svg")"/>
+                                                Sign out
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="user-wallet">
+                                    <a href="#">
+                                       <img src="@routes.Assets.versioned("images/Wallet.svg")" class="wallet"/>
+                                    </a>
+                                    <ul class="submenu">
+                                        <li>
+                                            <a href="#">
+                                                <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                                Home 01
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                                Home 01
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                                Home 01
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                                Home 01
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                                Home 01
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </nav>
+@*                    </div>*@
+@*                    <input type="checkbox" id="show-profile">*@
+@*                    <label for="show-profile">Profile</label>*@
+@*                    <div class="popup-menu">*@
+@*                        <ul>*@
+@*                            <li>*@
+@*                                <a href="#">*@
+@*                                    <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>*@
+@*                                    Create new collection*@
+@*                                </a>*@
+@*                            </li>*@
+@*                            <li>*@
+@*                                <a href="#">*@
+@*                                    <img src="@routes.Assets.versioned("images/createNFT.svg")"/>*@
+@*                                    Create new NFT*@
+@*                                </a>*@
+@*                            </li>*@
+@*                        </ul>*@
+@*                    </div>*@
+@*                    <img src="@routes.Assets.versioned("images/Wallet.svg")"/>*@
+                </div>
+            </div>
+
+            <form action="#" class="search-box">
+                <input type="text" placeholder="Type Something to Search..." required>
+                <button type="submit" class="go-icon"></button>
+            </form>
+
+
+
+
+        </nav>
+    </div>
+}

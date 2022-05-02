@@ -1,0 +1,953 @@
+@main("Home") {
+    <div class="intro">
+        <div class="preloader">
+            <div class="container">
+                <div class="box">
+
+                    <div class="title">
+                        <span class="block"></span>
+                        <h1>MantlePlace<span></span></h1>
+                    </div>
+
+                    <div class="role">
+                        <p>NFT Market</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wrapper">
+        <nav>
+            <input type="checkbox" id="show-search">
+            <input type="checkbox" id="show-menu">
+            <label for="show-menu" class="menu-icon"><i class="uil uil-bars"></i></label>
+            <div class="content">
+                <div class="logo"><a href="#"><img src="@routes.Assets.versioned("images/Mantle Place Logo.png")"/></a></div>
+                <ul class="links">
+@*                    <li class="active"><a href="#">Explore</a></li>*@
+                    <li><a href="#">Explore</a></li>
+                    <li>
+                        <a href="#" class="desktop-link">Create</a>
+                        <input type="checkbox" id="show-features">
+                        <label for="show-features">Create</label>
+                        <ul>
+                            <li>
+                                <a href="#">
+                                    <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                    Create new collection
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <img src="@routes.Assets.versioned("images/createNFT.svg")"/>
+                                    Create new NFT
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+
+            <div class="right-menu">
+                <label for="show-search" class="search-icon"><i class="uil uil-search"></i></label>
+                <div class="account-menu">
+                    <nav id="submenu-main" class="submenu-main">
+                        <ul class="menu">
+                            <li class="user-profile">
+                                <a href="#">
+                                    <img src="@routes.Assets.versioned("images/Profile.svg")" class="profile"/>
+                                </a>
+                                <ul class="submenu">
+                                    <li class="user-profile-data">
+                                        <div class="user-profile-image">
+                                            <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                        </div>
+                                        <div class="user-profile-information">
+                                            <div class="user-profile-name">User568</div>
+                                            <div class="user-profile-token">0.459930 $MNTL</div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img src="@routes.Assets.versioned("images/NFT.svg")"/>
+                                            My NFTs
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img src="@routes.Assets.versioned("images/Collection.svg")"/>
+                                            My Collections
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img src="@routes.Assets.versioned("images/Favourites.svg")"/>
+                                            Favourites
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img src="@routes.Assets.versioned("images/listing.svg")"/>
+                                            Listings
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img src="@routes.Assets.versioned("images/whitelist.svg")"/>
+                                            Whitelist
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img src="@routes.Assets.versioned("images/Settings.svg")"/>
+                                            Settings
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img src="@routes.Assets.versioned("images/logout.svg")"/>
+                                            Sign out
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="user-wallet">
+                                <a href="#">
+                                    <img src="@routes.Assets.versioned("images/Wallet.svg")" class="wallet"/>
+                                </a>
+                                <ul class="submenu">
+                                    <li>
+                                        <a href="#">
+                                            <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                            Home 01
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                            Home 01
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                            Home 01
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                            Home 01
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                            Home 01
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </nav>
+                    @*                    </div>*@
+                    @*                    <input type="checkbox" id="show-profile">*@
+                    @*                    <label for="show-profile">Profile</label>*@
+                    @*                    <div class="popup-menu">*@
+                    @*                        <ul>*@
+                    @*                            <li>*@
+                    @*                                <a href="#">*@
+                    @*                                    <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>*@
+                    @*                                    Create new collection*@
+                    @*                                </a>*@
+                    @*                            </li>*@
+                    @*                            <li>*@
+                    @*                                <a href="#">*@
+                    @*                                    <img src="@routes.Assets.versioned("images/createNFT.svg")"/>*@
+                    @*                                    Create new NFT*@
+                    @*                                </a>*@
+                    @*                            </li>*@
+                    @*                        </ul>*@
+                    @*                    </div>*@
+                    @*                    <img src="@routes.Assets.versioned("images/Wallet.svg")"/>*@
+                </div>
+            </div>
+
+            <form action="#" class="search-box">
+                <input type="text" placeholder="Type Something to Search..." required>
+                <button type="submit" class="go-icon"></button>
+            </form>
+
+
+
+
+        </nav>
+    </div>
+@*    <div id="fullpage">*@
+    <div class="hero-section section">
+        <div class="row">
+            <div class="col-1">
+                <h2>Welcome To MantlePlace</h2>
+@*                <h3>Digital Asset Ownership<br>Like Never Before.</h3>*@
+                <p>MantlePlace reimagines the NFT trading and owning experience with never-seen-before features and capabilities.</p>
+                <div class="buttons">
+                    <button class="button-1">Explore</button>
+                    <button class="button-2">Sign Up</button>
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="swiper mySwiper2">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <img src="@routes.Assets.versioned("images/temp/1.png")"/>
+                        </div>
+                        <div class="swiper-slide">
+                            <img src="@routes.Assets.versioned("images/temp/2.png")"/>
+                        </div>
+                        <div class="swiper-slide">
+                            <img src="@routes.Assets.versioned("images/temp/3.png")"/>
+                        </div>
+                        <div class="swiper-slide">
+                            <img src="@routes.Assets.versioned("images/temp/4.png")"/>
+                        </div>
+                    </div>
+                </div>
+            @* <img src="@routes.Assets.versioned("images/Hero Section Test.png")" class="hero-img"/>*@
+            </div>
+        </div>
+    </div>
+
+        <!-- Featured Section -->
+    <div class="featured-section section">
+        <div class="landing-page-heading">Featured</div>
+        <section class="featured-container">
+            <div class="swiper swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="featured-card">
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/11.png")" />
+                            </div>
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/12.png")" />
+                            </div>
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/13.png")" />
+                            </div>
+                            <div class="creator-main">
+                                <div class="creator-data">
+                                    <div class="creator-img">
+                                        <img src="@routes.Assets.versioned("images/temp/slide-1.jpg")"/>
+                                    </div>
+                                    <div class="creator-detail">
+                                        <div class="creator-name">Lorem ipsum dolor Sit</div>
+                                        <div class="creator-sub-name">Consectetur adipiscing amet</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="featured-card">
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/21.png")" />
+                            </div>
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/22.png")" />
+                            </div>
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/23.png")" />
+                            </div>
+                            <div class="creator-main">
+                                <div class="creator-data">
+                                    <div class="creator-img">
+                                        <img src="@routes.Assets.versioned("images/temp/slide-1.jpg")"/>
+                                    </div>
+                                    <div class="creator-detail">
+                                        <div class="creator-name">Lorem ipsum dolor Sit</div>
+                                        <div class="creator-sub-name">Consectetur adipiscing amet</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="featured-card">
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/31.png")" />
+                            </div>
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/32.png")" />
+                            </div>
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/33.png")" />
+                            </div>
+                            <div class="creator-main">
+                                <div class="creator-data">
+                                    <div class="creator-img">
+                                        <img src="@routes.Assets.versioned("images/temp/slide-1.jpg")"/>
+                                    </div>
+                                    <div class="creator-detail">
+                                        <div class="creator-name">Lorem ipsum dolor Sit</div>
+                                        <div class="creator-sub-name">Consectetur adipiscing amet</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="featured-card">
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/41.png")" />
+                            </div>
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/42.png")" />
+                            </div>
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/43.png")" />
+                            </div>
+                            <div class="creator-main">
+                                <div class="creator-data">
+                                    <div class="creator-img">
+                                        <img src="@routes.Assets.versioned("images/temp/slide-1.jpg")"/>
+                                    </div>
+                                    <div class="creator-detail">
+                                        <div class="creator-name">Lorem ipsum dolor Sit</div>
+                                        <div class="creator-sub-name">Consectetur adipiscing amet</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="featured-card">
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/51.png")" />
+                            </div>
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/52.png")" />
+                            </div>
+                            <div class="featured-card-img">
+                                <img src="@routes.Assets.versioned("images/temp/53.png")" />
+                            </div>
+                            <div class="creator-main">
+                                <div class="creator-data">
+                                    <div class="creator-img">
+                                        <img src="@routes.Assets.versioned("images/temp/slide-1.jpg")"/>
+                                    </div>
+                                    <div class="creator-detail">
+                                        <div class="creator-name">Lorem ipsum dolor Sit</div>
+                                        <div class="creator-sub-name">Consectetur adipiscing amet</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-button-next">
+                    <img src="@routes.Assets.versioned("images/temp/right-arrow.svg")"/>
+                </div>
+                <div class="swiper-button-prev">
+                    <img src="@routes.Assets.versioned("images/temp/left-arrow.svg")"/>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+        <!-- Popular Section -->
+    <div class="popular-section section">
+        <section class="popular-container">
+            <div class="landing-page-heading">Popular</div>
+            <div class="swiper swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="nft-card">
+                            <div class="nft-card-image">
+                                <img src="@routes.Assets.versioned("images/temp/1.png")"/>
+                            </div>
+                            <div class="nft-card-bottom-section">
+                                <div class="nft-creator-info">
+                                    <div class="nft-creator-profile">
+                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                    </div>
+                                    <div class="nft-creator-data">
+                                        <h4>Lorem ipsum dolor Sit</h4>
+                                        <p>Consectetur adipiscing amet</p>
+                                    </div>
+                                </div>
+                                <div class="nft-card-bottom">
+                                    <div class="nft-card-token">
+                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                    </div>
+                                    <div class="nft-card-price">
+                                        <h2>00.9100</h2>
+                                        <p>($0.2)</p>
+                                    </div>
+                                    <div class="nft-card-like">
+                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <p>150</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="nft-card">
+                            <div class="nft-card-image">
+                                <img src="@routes.Assets.versioned("images/temp/2.png")"/>
+                            </div>
+                            <div class="nft-card-bottom-section">
+                                <div class="nft-creator-info">
+                                    <div class="nft-creator-profile">
+                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                    </div>
+                                    <div class="nft-creator-data">
+                                        <h4>Lorem ipsum dolor Sit</h4>
+                                        <p>Consectetur adipiscing amet</p>
+                                    </div>
+                                </div>
+                                <div class="nft-card-bottom">
+                                    <div class="nft-card-token">
+                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                    </div>
+                                    <div class="nft-card-price">
+                                        <h2>00.9100</h2>
+                                        <p>($0.2)</p>
+                                    </div>
+                                    <div class="nft-card-like">
+                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <p>150</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="nft-card">
+                            <div class="nft-card-image">
+                                <img src="@routes.Assets.versioned("images/temp/3.png")"/>
+                            </div>
+                            <div class="nft-card-bottom-section">
+                                <div class="nft-creator-info">
+                                    <div class="nft-creator-profile">
+                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                    </div>
+                                    <div class="nft-creator-data">
+                                        <h4>Lorem ipsum dolor Sit</h4>
+                                        <p>Consectetur adipiscing amet</p>
+                                    </div>
+                                </div>
+                                <div class="nft-card-bottom">
+                                    <div class="nft-card-token">
+                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                    </div>
+                                    <div class="nft-card-price">
+                                        <h2>00.9100</h2>
+                                        <p>($0.2)</p>
+                                    </div>
+                                    <div class="nft-card-like">
+                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <p>150</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="nft-card">
+                            <div class="nft-card-image">
+                                <img src="@routes.Assets.versioned("images/temp/4.png")"/>
+                            </div>
+                            <div class="nft-card-bottom-section">
+                                <div class="nft-creator-info">
+                                    <div class="nft-creator-profile">
+                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                    </div>
+                                    <div class="nft-creator-data">
+                                        <h4>Lorem ipsum dolor Sit</h4>
+                                        <p>Consectetur adipiscing amet</p>
+                                    </div>
+                                </div>
+                                <div class="nft-card-bottom">
+                                    <div class="nft-card-token">
+                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                    </div>
+                                    <div class="nft-card-price">
+                                        <h2>00.9100</h2>
+                                        <p>($0.2)</p>
+                                    </div>
+                                    <div class="nft-card-like">
+                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <p>150</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="nft-card">
+                            <div class="nft-card-image">
+                                <img src="@routes.Assets.versioned("images/temp/5.png")"/>
+                            </div>
+                            <div class="nft-card-bottom-section">
+                                <div class="nft-creator-info">
+                                    <div class="nft-creator-profile">
+                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                    </div>
+                                    <div class="nft-creator-data">
+                                        <h4>Lorem ipsum dolor Sit</h4>
+                                        <p>Consectetur adipiscing amet</p>
+                                    </div>
+                                </div>
+                                <div class="nft-card-bottom">
+                                    <div class="nft-card-token">
+                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                    </div>
+                                    <div class="nft-card-price">
+                                        <h2>00.9100</h2>
+                                        <p>($0.2)</p>
+                                    </div>
+                                    <div class="nft-card-like">
+                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <p>150</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="nft-card">
+                            <div class="nft-card-image">
+                                <img src="@routes.Assets.versioned("images/temp/6.png")"/>
+                            </div>
+                            <div class="nft-card-bottom-section">
+                                <div class="nft-creator-info">
+                                    <div class="nft-creator-profile">
+                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                    </div>
+                                    <div class="nft-creator-data">
+                                        <h4>Lorem ipsum dolor Sit</h4>
+                                        <p>Consectetur adipiscing amet</p>
+                                    </div>
+                                </div>
+                                <div class="nft-card-bottom">
+                                    <div class="nft-card-token">
+                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                    </div>
+                                    <div class="nft-card-price">
+                                        <h2>00.9100</h2>
+                                        <p>($0.2)</p>
+                                    </div>
+                                    <div class="nft-card-like">
+                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <p>150</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </section>
+    </div>
+
+        <!-- New Drops Section -->
+    <div class="popular-section new-drop-section section">
+        <section class="popular-container">
+            <div class="landing-page-heading">New Drops</div>
+            <div class="swiper swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="nft-card">
+                            <div class="nft-card-image">
+                                <img src="@routes.Assets.versioned("images/temp/1.png")"/>
+                            </div>
+                            <div class="nft-card-bottom-section">
+                                <div class="nft-creator-info">
+                                    <div class="nft-creator-profile">
+                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                    </div>
+                                    <div class="nft-creator-data">
+                                        <h4>Lorem ipsum dolor Sit</h4>
+                                        <p>Consectetur adipiscing amet</p>
+                                    </div>
+                                </div>
+                                <div class="nft-card-bottom">
+                                    <div class="nft-card-token">
+                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                    </div>
+                                    <div class="nft-card-price">
+                                        <h2>00.9100</h2>
+                                        <p>($0.2)</p>
+                                    </div>
+                                    <div class="nft-card-like">
+                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <p>150</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="nft-card">
+                            <div class="nft-card-image">
+                                <img src="@routes.Assets.versioned("images/temp/2.png")"/>
+                            </div>
+                            <div class="nft-card-bottom-section">
+                                <div class="nft-creator-info">
+                                    <div class="nft-creator-profile">
+                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                    </div>
+                                    <div class="nft-creator-data">
+                                        <h4>Lorem ipsum dolor Sit</h4>
+                                        <p>Consectetur adipiscing amet</p>
+                                    </div>
+                                </div>
+                                <div class="nft-card-bottom">
+                                    <div class="nft-card-token">
+                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                    </div>
+                                    <div class="nft-card-price">
+                                        <h2>00.9100</h2>
+                                        <p>($0.2)</p>
+                                    </div>
+                                    <div class="nft-card-like">
+                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <p>150</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="nft-card">
+                            <div class="nft-card-image">
+                                <img src="@routes.Assets.versioned("images/temp/3.png")"/>
+                            </div>
+                            <div class="nft-card-bottom-section">
+                                <div class="nft-creator-info">
+                                    <div class="nft-creator-profile">
+                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                    </div>
+                                    <div class="nft-creator-data">
+                                        <h4>Lorem ipsum dolor Sit</h4>
+                                        <p>Consectetur adipiscing amet</p>
+                                    </div>
+                                </div>
+                                <div class="nft-card-bottom">
+                                    <div class="nft-card-token">
+                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                    </div>
+                                    <div class="nft-card-price">
+                                        <h2>00.9100</h2>
+                                        <p>($0.2)</p>
+                                    </div>
+                                    <div class="nft-card-like">
+                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <p>150</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="nft-card">
+                            <div class="nft-card-image">
+                                <img src="@routes.Assets.versioned("images/temp/4.png")"/>
+                            </div>
+                            <div class="nft-card-bottom-section">
+                                <div class="nft-creator-info">
+                                    <div class="nft-creator-profile">
+                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                    </div>
+                                    <div class="nft-creator-data">
+                                        <h4>Lorem ipsum dolor Sit</h4>
+                                        <p>Consectetur adipiscing amet</p>
+                                    </div>
+                                </div>
+                                <div class="nft-card-bottom">
+                                    <div class="nft-card-token">
+                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                    </div>
+                                    <div class="nft-card-price">
+                                        <h2>00.9100</h2>
+                                        <p>($0.2)</p>
+                                    </div>
+                                    <div class="nft-card-like">
+                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <p>150</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="nft-card">
+                            <div class="nft-card-image">
+                                <img src="@routes.Assets.versioned("images/temp/5.png")"/>
+                            </div>
+                            <div class="nft-card-bottom-section">
+                                <div class="nft-creator-info">
+                                    <div class="nft-creator-profile">
+                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                    </div>
+                                    <div class="nft-creator-data">
+                                        <h4>Lorem ipsum dolor Sit</h4>
+                                        <p>Consectetur adipiscing amet</p>
+                                    </div>
+                                </div>
+                                <div class="nft-card-bottom">
+                                    <div class="nft-card-token">
+                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                    </div>
+                                    <div class="nft-card-price">
+                                        <h2>00.9100</h2>
+                                        <p>($0.2)</p>
+                                    </div>
+                                    <div class="nft-card-like">
+                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <p>150</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="nft-card">
+                            <div class="nft-card-image">
+                                <img src="@routes.Assets.versioned("images/temp/6.png")"/>
+                            </div>
+                            <div class="nft-card-bottom-section">
+                                <div class="nft-creator-info">
+                                    <div class="nft-creator-profile">
+                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                    </div>
+                                    <div class="nft-creator-data">
+                                        <h4>Lorem ipsum dolor Sit</h4>
+                                        <p>Consectetur adipiscing amet</p>
+                                    </div>
+                                </div>
+                                <div class="nft-card-bottom">
+                                    <div class="nft-card-token">
+                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                    </div>
+                                    <div class="nft-card-price">
+                                        <h2>00.9100</h2>
+                                        <p>($0.2)</p>
+                                    </div>
+                                    <div class="nft-card-like">
+                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <p>150</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </section>
+    </div>
+
+
+
+    <!-- Landing Page Info Section -->
+   <div class="landing-page-info-section section">
+       <div class="info-title">
+           <h2>How It Works</h2>
+           <p>Get started in 5 minutes or less.</p>
+       </div>
+       <div class="info-steps-container">
+           <div class="info-steps">
+               <div class="info-step">
+                   <div class="info-image">
+                       <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Create account.gif")" class="create-account-img"/>
+
+                   </div>
+                   <div class="info-label">
+                       Create Account
+                   </div>
+               </div>
+               <div class="info-next-step-image">
+                   <img src="@routes.Assets.versioned("images/Union.svg")"/>
+               </div>
+               <div class="info-step">
+                   <div class="info-image">
+                       <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Mint NFTs.gif")" class="mint-nfts-img"/>
+
+                   </div>
+                   <div class="info-label">
+                       Mint NFTs
+                   </div>
+               </div>
+               <div class="info-next-step-image">
+                   <img src="@routes.Assets.versioned("images/Union.svg")"/>
+               </div>
+               <div class="info-step">
+                   <div class="info-image">
+                       <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Sell.gif")" class="buy-sell-img"/>
+
+                   </div>
+                   <div class="info-label">
+                       Buy/Sell
+                   </div>
+               </div>
+               <div class="info-next-step-image">
+                   <img src="@routes.Assets.versioned("images/Union.svg")"/>
+               </div>
+               <div class="info-step">
+                   <div class="info-image">
+                       <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Engage.gif")" class="engage-img"/>
+
+                   </div>
+                   <div class="info-label">
+                       Engage
+                   </div>
+               </div>
+           </div>
+       </div>
+       <div class="info-step-button">
+           <button>Get Started!</button>
+       </div>
+   </div>
+
+    <!-- Landing Page Info Section 2 -->
+    <div class="landing-page-info-section-2 section">
+        <div class="info-title">
+            <h2>The AssetMantle Difference</h2>
+            <p>Powerful features to enhance the NFT experience for all.</p>
+        </div>
+        <div class="info-card-container">
+            <div class="cards">
+                <div class="card c1">
+                    <div class="card-image">
+                        <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multi chain access.gif")"/>
+                    </div>
+                    <div class="card-detail">
+                        <h2>Multi-chain access</h2>
+                        <p>Trade NFTs on other chains or show them off across metaverses!</p>
+                    </div>
+                </div>
+                <div class="card c2">
+                    <div class="card-image">
+                        <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Negligible minting fee final.gif")" />
+                    </div>
+                    <div class="card-detail">
+                        <h2>Negligible Minting Fee</h2>
+                        <p>Enjoy negligible minting fees and gas fees in the Cosmos ecosystem.</p>
+                    </div>
+                </div>
+                <div class="card c3">
+                    <div class="card-image">
+                        <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multiple payments.gif")"/>
+                    </div>
+                    <div class="card-detail">
+                        <h2>Multiple payment modes</h2>
+                        <p>Experience AssetMantle with fiat currency, coins or stablecoins!</p>
+                    </div>
+                </div>
+                <div class="card c4">
+                    <div class="card-image">
+                        <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Complete customisation.gif")"/>
+                    </div>
+                    <div class="card-detail">
+                        <h2>Complete customization</h2>
+                        <p>Build fully customized NFT marketplaces from scratch without coding.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Landing Page Info Section 3 -->
+    <div class="landing-page-info-section-3 section">
+        <div class="row">
+            <div class="column column-1">
+                <div class="info-box">
+                    <h3>Coming Soon!</h3>
+                    <h2>Fractional NFTs</h2>
+                    <p>Co-own NFTs.<br>Own a share of rare collectibles along with several others!</p>
+                </div>
+                <div class="info-mail-box">
+                    <div class="form-field">
+                        <div class="form-field-top">
+                            <label for="comingSoonEmail">Your Email ID</label>
+                        </div>
+                        <div class="form-field-bottom">
+                            <div class="input">
+                                <input type="text" id="comingSoonEmail" placeholder="example@@gmail.com"/>
+                            </div>
+                            <button>Notify Me</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column column-2">
+                <img src="@routes.Assets.versioned("images/Coming Soon.png")"/>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- Footer 1 -->
+    <footer class="section">
+        <div class="row row-1">
+            <div class="col">
+                <div class="logo-container">
+                    <img src="@routes.Assets.versioned("images/Mantle Place Logo.png")" class="logo"/>
+                </div>
+            </div>
+        </div>
+        <div class="row row2">
+@*            <div class="col">*@
+@*                <div class="logo-container">*@
+@*                    <img src="@routes.Assets.versioned("images/Mantle Place Logo without Text.png")" class="logo"/>*@
+@*                    <h2>MantlePlace</h2>*@
+@*                </div>*@
+@*            </div>*@
+            <div class="col">
+                <h3>MantlePlace<div class="underline"><span></span></div></h3>
+                <ul>
+                    <li><a href="">Home</a></li>
+                    <li><a href="">Explore</a></li>
+                    <li><a href="">Support</a></li>
+                    <li><a href="">Profile</a></li>
+                    <li><a href="">Wallet</a></li>
+                </ul>
+            </div>
+
+            <div class="col">
+                <h3>Newsletter<div class="underline"><span></span></div></h3>
+                <form>
+                    <input type="email" placeholder="Enter Email ID"/>
+                    <button>
+                        <i class="uil uil-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="social-icons">
+                    <h3>Social Media<div class="underline"><span></span></div></h3>
+                    <i class="uil uil-discord"></i>
+                    <i class="uil uil-instagram"></i>
+                    <i class="uil uil-telegram-alt"></i>
+                    <i class="uil uil-twitter-alt"></i>
+                    <i class="uil uil-github-alt"></i>
+                </div>
+            </div>
+            <div class="col">
+                <p>Spotted something wrong? <a href="#">Bug Bounty</a></p>
+                <p>Have something in mind? <a href="#">Suggest a Feature</a></p>
+                <p>Want to know what we’re up to? <a href="#">Blog</a></p>
+                <p>Want to know more? <a herf="#">Docs</a></p>
+                <p>Interested in transaction activities? <a href="#">Explorer</a></p>
+            </div>
+            <hr>
+            <div class="copyright">MantlePlace © 2021 - All Rights Reserved</div>
+        </div>
+    </footer>
+    </div>
+}

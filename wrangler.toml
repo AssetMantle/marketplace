@@ -1,0 +1,8 @@
+name = "assetmantle-mantleplace"
+type = "javascript"
+account_id = "836c05827fa0848727d0098b0073e209"
+zone_id = '4d52f36b396dad8cddd83b3d5e0fbda4'
+workers_dev = true
+
+[env.mantleplace]
+routes = ["https://staging.mantleplace.assetmantle.one"]
