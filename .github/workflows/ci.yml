@@ -16,7 +16,7 @@ jobs:
 
       - name: Test sbt dist
         uses: docker/build-push-action@v2
-        if: ${{ github.ref_type != 'tag' || (github.ref_type == 'branch' && (github.ref != 'refs/heads/main' || github.ref != 'refs/heads/master')) }}
+        if: ${{ !(github.ref_type == 'tag' || (github.ref_type == 'branch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'))) }}
         with:
           target: build
           push: false
