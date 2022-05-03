@@ -12,6 +12,7 @@ WORKDIR /app
 COPY . .
 RUN --mount=type=cache,target=/root/.sbt \
   --mount=type=cache,target=/root/.cache \
+  --mount=type=cache,target=/root/.ivy2 \
   sbt dist
 
 FROM ubuntu:20.04 as extract
