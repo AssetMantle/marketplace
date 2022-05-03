@@ -7,12 +7,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Set branch variable
-        id: branch_var
-        run: |
-          echo "::set-env name=is_prod_branch::${{ github.ref_type == 'branch' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' ) }}"
-          echo "::set-env name=is_tag_ref::${{ github.ref_type == 'tag' }}"
-
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -30,7 +24,7 @@ jobs:
       - name: Prepare production release tags
         id: meta
         uses: docker/metadata-action@v3
-        if: ${{ steps.branch_var.outputs.is_tag_ref }}
+        if: ${{ github.ref_type == 'tag' }}
         with:
           images: |
             assetmantle/mantleplace
@@ -41,7 +35,7 @@ jobs:
       - name: Prepare staging release ragas
         id: meta-branch
         uses: docker/metadata-action@v3
-        if: ${{ steps.branch_var.outputs.is_prod_branch }}
+        if: ${{ github.ref_type == 'branch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') }}
         with:
           images: |
             assetmantle/mantleplace
@@ -51,14 +45,14 @@ jobs:
 
       - name: Login to docker registry
         uses: docker/login-action@v1
-        if: ${{ steps.branch_var.outputs.is_tag_ref || steps.branch_var.outputs.is_prod_branch }}
+        if: ${{ github.ref_type == 'tag' || (github.ref_type == 'branch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')) }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build production docker image
         uses: docker/build-push-action@v2
-        if: ${{ steps.branch_var.outputs.is_tag_ref }}
+        if: ${{ github.ref_type == 'tag' }}
         with:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -67,7 +61,7 @@ jobs:
 
       - name: Build staging docker image
         uses: docker/build-push-action@v2
-        if: ${{ steps.branch_var.outputs.is_prod_branch }}
+        if: ${{ github.ref_type == 'branch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') }}
         with:
           push: true
           tags: ${{ steps.meta-branch.outputs.tags }}
