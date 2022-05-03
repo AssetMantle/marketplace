@@ -39,7 +39,7 @@ GET        /NFTCreatedSuccess                          controllers.HomeControlle
 GET        /mintNFT                                    controllers.HomeController.mintNFT()
 GET        /mintNFTSuccess                             controllers.HomeController.mintNFTSuccess()
 
-GET        /                             controllers.HomeController.marketPlaceHome()
+GET        /                                           controllers.HomeController.marketPlaceHome()
 
 
 

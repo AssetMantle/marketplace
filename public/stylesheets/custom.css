@@ -2545,7 +2545,7 @@ footer{
     line-height: 20px;
 }
 footer.section{
-    /*height: 500px !important;*/
+    height: 500px !important;
     overflow: hidden;
     padding: 0 0 30px 0;
 }
@@ -2764,6 +2764,9 @@ footer.section{
     }
     footer .col:nth-child(3){
         flex-basis: 30%;
+    }
+    footer.section{
+        height: 715px !important;
     }
 }
 @media (max-width: 700px){
@@ -3045,5 +3048,9 @@ footer.section{
     .featured-container .swiper-button-next img,
     .featured-container .swiper-button-prev img{
         width: 25px;
+    }
+    footer.section{
+        margin-top: -40px;
+        height: 1000px !important;
     }
 }
