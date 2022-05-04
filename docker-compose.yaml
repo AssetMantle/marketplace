@@ -1,0 +1,14 @@
+---
+version: "3"
+services:
+  mantleplace:
+    image: assetmantle/mantleplace:edge
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mantleplace
+    command:
+     - '-Dplay.http.secret.key=APPLICATION_SECRET=slw2FnBTONgZq_tOtflOzKoAglFj@AHr=>KTDSQnWNXyZBB>b?les^A:UQIO[9b[ -Xmx2048m -XX:+UseContainerSupport'
+    ports:
+      - 9000:9000
+    restart: "no"
