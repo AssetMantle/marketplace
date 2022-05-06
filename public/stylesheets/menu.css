@@ -1,7 +1,7 @@
 /* Responsive Navbar */
 .wrapper {
     background: var(--header-bg);
-    border-bottom: 1px solid rgb(52, 52, 52);
+    border-bottom: 1px solid rgb(42, 42, 42);
     position: fixed;
     width: 100%;
     z-index: 999;
