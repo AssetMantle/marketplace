@@ -50,7 +50,25 @@ nav .content .links {
     border-radius: 5px;
     transition: all 0.3s ease;
 }
+.content .links li .disable{
+    line-height: 30px;
+    border-radius: 0px !important;
+    clear: both;
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 10px;
+    color:var(--mantle-off-white);
+}
+.submenu{
+    width: 180px !important;
 
+}
+.submenu .disable{
+    color:var(--mantle-off-white);
+}
 .content .links li label {
     display: none;
 }
