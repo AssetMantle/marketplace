@@ -319,7 +319,7 @@ var swiper = new Swiper(".featured-container .swiper-container", {
     centeredSlides: true,
     slidesPerView: "auto",
     autoplay: {
-        delay: 3000,
+        delay: 6000,
         disableOnInteraction: false
     },
     speed: 1000,
@@ -393,10 +393,10 @@ var swiper = new Swiper(".popular-container .swiper-container", {
 
 
 // Title tag marquee
-(function titleMarquee() {
-    document.title = document.title.substring(1)+document.title.substring(0,1);
-    setTimeout(titleMarquee, 200);
-})();
+// (function titleMarquee() {
+//     document.title = document.title.substring(1)+document.title.substring(0,1);
+//     setTimeout(titleMarquee, 200);
+// })();
 
 // var currentLocation = 'firstPage';
 // // No need to set these inside the event listener since they are always the same.
