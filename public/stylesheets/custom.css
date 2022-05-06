@@ -1803,7 +1803,7 @@ article:first-child{
     color: #9D9D9D;
     font-weight: 400;
     margin-top: 40px;
-    padding: 0 30px 0 0;
+    padding: 0 150px 0 0;
 }
 .hero-section .row .col-1 .buttons{
     display: flex;
@@ -2010,6 +2010,14 @@ article:first-child{
     width: 45px;
     border-radius: 50%;
 }
+.featured-container .creator-main .creator-detail a{
+    display: flex;
+    gap: 5px;
+}
+.featured-container .creator-main .creator-detail a img{
+    width: 17px;
+    height: 17px;
+}
 .featured-container .creator-main .creator-detail .creator-name{
     font-family: arial;
     font-size: 16px;
@@ -2102,6 +2110,14 @@ article:first-child{
     /*background: var(--dark);*/
     border-radius: 50%;
     overflow: hidden;
+}
+.nft-card .nft-creator-info .nft-creator-data a{
+    display: flex;
+    gap:5px;
+}
+.nft-card .nft-creator-info .nft-creator-data a img{
+    width: 17px;
+    height: 17px;
 }
 .nft-card .nft-creator-info .nft-creator-data h4{
     font-family: var(--font-type-2);
@@ -2259,6 +2275,7 @@ article:first-child{
     font-size: 22px;
     font-weight: 400;
     color: var(--gray);
+    margin-top:15px;
 }
 .landing-page-info-section .info-steps-container{
     width: calc(100vw - 180px);
@@ -2333,10 +2350,10 @@ article:first-child{
     /*display: inline-table;*/
 }
 .landing-page-info-section-2.section{
-    padding: 120px 0px;
+    padding: 150px 0px;
 }
 .landing-page-info-section-2 .info-card-container{
-    height: 60vh;
+    height: 70vh;
     display: flex;
     align-items: center;
 }
@@ -2352,6 +2369,7 @@ article:first-child{
     font-size: 22px;
     font-weight: 400;
     color: var(--gray);
+    margin-top:15px;
 }
 .landing-page-info-section-2 .info-card-container .card{
     padding: 1rem;
