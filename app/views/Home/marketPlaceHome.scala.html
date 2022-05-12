@@ -1,4 +1,6 @@
-@main("") {
+@import views.html.base.commonImage
+@()(implicit messagesProvider: MessagesProvider)
+@main(""){
     <div class="intro">
         <div class="preloader">
             <div class="container">
@@ -6,11 +8,11 @@
 
                     <div class="title">
                         <span class="block"></span>
-                        <h1>MantlePlace<span></span></h1>
+                        <h1>@Messages(constants.View.MANTLE_PLACE)<span></span></h1>
                     </div>
 
                     <div class="role">
-                        <p>NFT Market</p>
+                        <p>@Messages(constants.View.NFT_MARKET)</p>
                     </div>
 
                 </div>
@@ -23,44 +25,44 @@
             <input type="checkbox" id="show-menu">
             <label for="show-menu" class="menu-icon"><i class="uil uil-bars"></i></label>
             <div class="content">
-                <div class="logo"><a href="#"><img src="@routes.Assets.versioned("images/Mantle Place Logo.png")"/></a></div>
+                <div class="logo"><a href="#"><img class="lazyload" src="@routes.Assets.versioned("images/MantlePlace-Logo.svg")" data-src="@routes.Assets.versioned("images/MantlePlace-Logo.svg")" class="logo"/></a></div>
                 <ul class="links">
 @*                    <li class="active"><a href="#">Explore</a></li>*@
-                    <li><a href="#">Explore</a>
+                    <li><a href="#">@Messages(constants.View.EXPLORE)</a>
                         <ul>
                             <li>
-                                <div class="disable">Coming Soon</div>
+                                <div class="disable">@Messages(constants.View.COMING_SOON)</div>
                             </li>
                         </ul>
                     </li>
                     <li>
-                        <a href="#" class="desktop-link">Create</a>
+                        <a href="#" class="desktop-link">@Messages(constants.View.CREATE)</a>
                         <input type="checkbox" id="show-features">
-                        <label for="show-features">Create</label>
+                        <label for="show-features">@Messages(constants.View.CREATE)</label>
                         <ul>
                             <li>
-                                <div class="disable">Coming Soon</div>
+                                <div class="disable">@Messages(constants.View.COMING_SOON)</div>
                             </li>
                         </ul>
                         <!--<ul>
                             <li>
                                 <a href="#">
-                                    <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                    <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Createcollection.svg")"/>
                                     Create new collection
                                 </a>
                             </li>
                             <li>
                                 <a href="#">
-                                    <img src="@routes.Assets.versioned("images/createNFT.svg")"/>
+                                    <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/createNFT.svg")"/>
                                     Create new NFT
                                 </a>
                             </li>
                         </ul>-->
                     </li>
-                    <li><a href="#">Support</a>
+                    <li><a href="#">@Messages(constants.View.SUPPORT)</a>
                         <ul>
                             <li>
-                                <div class="disable">Coming Soon</div>
+                                <div class="disable">@Messages(constants.View.COMING_SOON)</div>
                             </li>
                         </ul>
                     </li>
@@ -74,17 +76,17 @@
                         <ul class="menu">
                             <li class="user-profile">
                                 <a href="#">
-                                    <img src="@routes.Assets.versioned("images/Profile.png")" class="profile"/>
+                                    <img class="lazyload" src="@routes.Assets.versioned("images/Profile.png")" class="profile"/>
                                 </a>
                                 <ul class="submenu">
                                     <li>
-                                        <div class="disable">Coming Soon</div>
+                                        <div class="disable">@Messages(constants.View.COMING_SOON)</div>
                                     </li>
                                 </ul>
                                 <!--<ul class="submenu">
                                     <li class="user-profile-data">
                                         <div class="user-profile-image">
-                                            <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
                                         </div>
                                         <div class="user-profile-information">
                                             <div class="user-profile-name">User568</div>
@@ -93,43 +95,43 @@
                                     </li>
                                     <li>
                                         <a href="#">
-                                            <img src="@routes.Assets.versioned("images/NFT.svg")"/>
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/NFT.svg")"/>
                                             My NFTs
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#">
-                                            <img src="@routes.Assets.versioned("images/Collection.svg")"/>
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Collection.svg")"/>
                                             My Collections
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#">
-                                            <img src="@routes.Assets.versioned("images/Favourites.svg")"/>
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Favourites.svg")"/>
                                             Favourites
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#">
-                                            <img src="@routes.Assets.versioned("images/listing.svg")"/>
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/listing.svg")"/>
                                             Listings
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#">
-                                            <img src="@routes.Assets.versioned("images/whitelist.svg")"/>
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/whitelist.svg")"/>
                                             Whitelist
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#">
-                                            <img src="@routes.Assets.versioned("images/Settings.svg")"/>
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Settings.svg")"/>
                                             Settings
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#">
-                                            <img src="@routes.Assets.versioned("images/logout.svg")"/>
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/logout.svg")"/>
                                             Sign out
                                         </a>
                                     </li>
@@ -137,41 +139,41 @@
                             </li>
                             <li class="user-wallet">
                                 <a href="#">
-                                    <img src="@routes.Assets.versioned("images/Wallet.png")" class="wallet"/>
+                                    <img class="lazyload" src="@routes.Assets.versioned("images/Wallet.png")" class="wallet"/>
                                 </a>
                                 <ul class="submenu">
                                     <li>
-                                        <div class="disable">Coming Soon</div>
+                                        <div class="disable">@Messages(constants.View.COMING_SOON)</div>
                                     </li>
                                 </ul>
                                 <!--<ul class="submenu">
                                     <li>
                                         <a href="#">
-                                            <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Createcollection.svg")"/>
                                             Home 01
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#">
-                                            <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Createcollection.svg")"/>
                                             Home 01
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#">
-                                            <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Createcollection.svg")"/>
                                             Home 01
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#">
-                                            <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Createcollection.svg")"/>
                                             Home 01
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#">
-                                            <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Createcollection.svg")"/>
                                             Home 01
                                         </a>
                                     </li>
@@ -186,19 +188,19 @@
                     @*                        <ul>*@
                     @*                            <li>*@
                     @*                                <a href="#">*@
-                    @*                                    <img src="@routes.Assets.versioned("images/Createcollection.svg")"/>*@
+                    @*                                    <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Createcollection.svg")"/>*@
                     @*                                    Create new collection*@
                     @*                                </a>*@
                     @*                            </li>*@
                     @*                            <li>*@
                     @*                                <a href="#">*@
-                    @*                                    <img src="@routes.Assets.versioned("images/createNFT.svg")"/>*@
+                    @*                                    <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/createNFT.svg")"/>*@
                     @*                                    Create new NFT*@
                     @*                                </a>*@
                     @*                            </li>*@
                     @*                        </ul>*@
                     @*                    </div>*@
-                    @*                    <img src="@routes.Assets.versioned("images/Wallet.svg")"/>*@
+                    @*                    <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Wallet.svg")"/>*@
                 </div>
             </div>
 
@@ -216,9 +218,9 @@
     <div class="hero-section section">
         <div class="row">
             <div class="col-1">
-                <h2>Welcome To MantlePlace</h2>
+                <h2>@Messages(constants.View.HERO_SECTION_TITLE)</h2>
 @*                <h3>Digital Asset Ownership<br>Like Never Before.</h3>*@
-                <p>Experience the first NFT marketplace with blockchain-based identity.</p>
+                <p>@Messages(constants.View.HERO_SECTION_PARAGRAPH)</p>
                 <div class="buttons">
                     <button class="button-1"></button>
                     <button class="button-2"></button>
@@ -228,24 +230,25 @@
                 <div class="swiper mySwiper2">
                     <div class="swiper-wrapper">
                         <div class="swiper-slide">
-                            <img src="@routes.Assets.versioned("images/NFT/Hero 1.jpg")"/>
+                            @commonImage("Hero 1.jpg");
                         </div>
                         <div class="swiper-slide">
-                            <img src="@routes.Assets.versioned("images/NFT/Hero 2.jpg")"/>
+                            @commonImage("Hero 2.jpg");
                         </div>
                         <div class="swiper-slide">
-                            <img src="@routes.Assets.versioned("images/NFT/Hero 3.jpg")"/>
+                            @commonImage("Hero 3.jpg");
                         </div>
                     </div>
                 </div>
-            @* <img src="@routes.Assets.versioned("images/Hero Section Test.png")" class="hero-img"/>*@
+            @* <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Hero Section Test.png")" class="hero-img"/>*@
             </div>
         </div>
     </div>
 
+
         <!-- Featured Section -->
-    <div class="featured-section section">
-        <div class="landing-page-heading">Featured</div>
+    <div id="featured-section" class="featured-section section">
+        <div class="landing-page-heading">@Messages(constants.View.FEATURED_SECTION_TITLE)</div>
         <section class="featured-container">
             <div class="swiper swiper-container">
                 <div class="swiper-wrapper">
@@ -253,20 +256,28 @@
                         <div class="featured-card">
                             <div class="featured-card-img">
                                 <div class="image-container">
-                                    <img src="@routes.Assets.versioned("images/NFT/TENDERMIND_2.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/TENDERMIND_1.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/TENDERMIND_3.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/TENDERMIND_2.jpg")" />
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_2.jpg" width="350px" height="550px"/>
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_1.jpg" width="350px" height="550px"/>
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_3.jpg" width="350px" height="550px"/>
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_2.jpg" width="350px" height="550px"/>
+                                    <!--<img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_2.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_1.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_3.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_2.jpg" width="350px" height="550px"/>-->
+                                    @* @commonImage("TENDERMIND_2.jpg")
+                                    @commonImage("TENDERMIND_1.jpg")
+                                    @commonImage("TENDERMIND_3.jpg")
+                                    @commonImage("TENDERMIND_2.jpg") *@
                                 </div>
                             </div>
                             <div class="creator-main">
                                 <div class="creator-data">
                                     <div class="creator-img">
-                                        <img src="@routes.Assets.versioned("images/NFT/LOGO PROJEKTU - How Rare.png")"/>
+                                        @commonImage("LOGO PROJEKTU - How Rare.png");
                                     </div>
                                     <div class="creator-detail">
-                                        <a href="https://twitter.com/how_rare_" target="_blank"><div class="creator-name">HowRareIsYourCosmos</div><img src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
-                                        <div class="creator-sub-name">TENDERMIND</div>
+                                        <a href="https://twitter.com/how_rare_" target="_blank"><div class="creator-name">@Messages(constants.View.FEATURED_COLLECTION_NAME_1)</div><img class="lazyload" data-src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
+                                        <div class="creator-sub-name">@Messages(constants.View.FEATURED_CREATOR_NAME_1)</div>
                                     </div>
                                 </div>
                             </div>
@@ -276,20 +287,28 @@
                         <div class="featured-card">
                             <div class="featured-card-img">
                                 <div class="image-container">
-                                    <img src="@routes.Assets.versioned("images/NFT/ORBICs_2.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/ORBICs_1.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/ORBICs_3.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/ORBICs_2.jpg")" />
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_2.jpg" width="350px" height="550px"/>
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_1.jpg" width="350px" height="550px"/>
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_3.jpg" width="350px" height="550px"/>
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_2.jpg" width="350px" height="550px"/>
+                                    <!--<img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_2.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_1.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_3.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_2.jpg" width="350px" height="550px"/>-->
+                                    @* @commonImage("ORBICs_2.jpg")
+                                   @commonImage("ORBICs_1.jpg")
+                                    @commonImage("ORBICs_3.jpg")
+                                    @commonImage("ORBICs_2.jpg") *@
                                 </div>
                             </div>
                             <div class="creator-main">
                                 <div class="creator-data">
                                     <div class="creator-img">
-                                        <img src="@routes.Assets.versioned("images/NFT/Orbics.jpg")"/>
+                                        @commonImage("Orbics.jpg")
                                     </div>
                                     <div class="creator-detail">
-                                        <a href="https://twitter.com/OrbicsNFT" target="_blank"><div class="creator-name">ORBICS</div><img src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
-                                        <div class="creator-sub-name">Orbics</div>
+                                        <a href="https://twitter.com/OrbicsNFT" target="_blank"><div class="creator-name">@Messages(constants.View.FEATURED_COLLECTION_NAME_2)</div><img class="lazyload" data-src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
+                                        <div class="creator-sub-name">@Messages(constants.View.FEATURED_CREATOR_NAME_2)</div>
                                     </div>
                                 </div>
                             </div>
@@ -299,20 +318,28 @@
                         <div class="featured-card">
                             <div class="featured-card-img">
                                 <div class="image-container">
-                                    <img src="@routes.Assets.versioned("images/NFT/EZZYLAND_1.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/EZZYLAND_2.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/EZZYLAND_3.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/EZZYLAND_1.jpg")" />
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_1.jpg" width="350px" height="550px"/>
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_2.jpg" width="350px" height="550px"/>
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_3.jpg" width="350px" height="550px"/>
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_1.jpg" width="350px" height="550px"/>
+                                    <!--<img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_1.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_2.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_3.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_1.jpg" width="350px" height="550px"/>-->
+                                   @* @commonImage("EZZYLAND_1.jpg")
+                                  @commonImage("EZZYLAND_2.jpg")
+                                    @commonImage("EZZYLAND_3.jpg")
+                                    @commonImage("EZZYLAND_1.jpg") *@
                                 </div>
                             </div>
                             <div class="creator-main">
                                 <div class="creator-data">
                                     <div class="creator-img">
-                                        <img src="@routes.Assets.versioned("images/NFT/Ezzy.jpg")"/>
+                                        @commonImage("Ezzy.jpg")
                                     </div>
                                     <div class="creator-detail">
-                                        <a href="https://twitter.com/ezzyland/" target="_blank"><div class="creator-name">EzzyLand</div><img src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
-                                        <div class="creator-sub-name">Artefacts</div>
+                                        <a href="https://twitter.com/ezzyland/" target="_blank"><div class="creator-name">@Messages(constants.View.FEATURED_COLLECTION_NAME_3)</div><img class="lazyload" data-src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
+                                        <div class="creator-sub-name">@Messages(constants.View.FEATURED_CREATOR_NAME_3)</div>
                                     </div>
                                 </div>
                             </div>
@@ -322,20 +349,28 @@
                         <div class="featured-card">
                             <div class="featured-card-img">
                                 <div class="image-container">
-                                    <img src="@routes.Assets.versioned("images/NFT/OsmoNot_1.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/OsmoNot_2.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/OsmoNot_3.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/OsmoNot_1.jpg")" />
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_1.jpg" width="350px" height="550px"/>
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_2.jpg" width="350px" height="550px"/>
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_3.jpg" width="350px" height="550px"/>
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_1.jpg" width="350px" height="550px"/>
+                                    <!-- <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_1.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_2.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_3.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_1.jpg" width="350px" height="550px"/>-->
+                                    @* @commonImage("OsmoNot_1.jpg")
+                                   @commonImage("OsmoNot_2.jpg")
+                                    @commonImage("OsmoNot_3.jpg")
+                                    @commonImage("OsmoNot_1.jpg") *@
                                 </div>
                             </div>
                             <div class="creator-main">
                                 <div class="creator-data">
                                     <div class="creator-img">
-                                        <img src="@routes.Assets.versioned("images/NFT/Nots NFTs.jpg")"/>
+                                        @commonImage("Nots NFTs.jpg")
                                     </div>
                                     <div class="creator-detail">
-                                        <a href="https://twitter.com/NotsNfts" target="_blank"><div class="creator-name">OsmoNOT</div><img src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
-                                        <div class="creator-sub-name">NOTs</div>
+                                        <a href="https://twitter.com/NotsNfts" target="_blank"><div class="creator-name">@Messages(constants.View.FEATURED_COLLECTION_NAME_4)</div><img class="lazyload" data-src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
+                                        <div class="creator-sub-name">@Messages(constants.View.FEATURED_CREATOR_NAME_4)</div>
                                     </div>
                                 </div>
                             </div>
@@ -345,20 +380,28 @@
                         <div class="featured-card">
                             <div class="featured-card-img">
                                 <div class="image-container">
-                                    <img src="@routes.Assets.versioned("images/NFT/IGOR_1.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/IGOR_2.jpg")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/IGOR_3.png")" />
-                                    <img src="@routes.Assets.versioned("images/NFT/IGOR_1.jpg")" />
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_1.jpg" width="350px" height="550px"/>
+                                    <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_2.jpg" width="350px" height="550px"/>
+                                    <img data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_3.png" width="350px" height="550px"/>
+                                    <img data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_1.jpg" width="350px" height="550px"/>
+                                    <!--<img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_1.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_2.jpg" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_3.png" width="350px" height="550px"/>
+                                    <img loading="lazy" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_1.jpg" width="350px" height="550px"/>-->
+                                   @* @commonImage("IGOR_1.jpg")
+                                @commonImage("IGOR_2.jpg")
+                                    @commonImage("IGOR_3.png")
+                                    @commonImage("IGOR_1.jpg") *@
                                 </div>
                             </div>
                             <div class="creator-main">
                                 <div class="creator-data">
                                     <div class="creator-img">
-                                        <img src="@routes.Assets.versioned("images/NFT/Igor PFP.png")"/>
+                                        @commonImage("Igor PFP.png")
                                     </div>
                                     <div class="creator-detail">
-                                        <a href="https://twitter.com/Igor211988189" target="_blank"><div class="creator-name">Igor Kozhanov</div><img src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
-                                        <div class="creator-sub-name">Dark Side</div>
+                                        <a href="https://twitter.com/Igor211988189" target="_blank"><div class="creator-name">@Messages(constants.View.FEATURED_COLLECTION_NAME_5)</div><img class="lazyload" data-src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
+                                        <div class="creator-sub-name">@Messages(constants.View.FEATURED_CREATOR_NAME_5)</div>
                                     </div>
                                 </div>
                             </div>
@@ -366,10 +409,10 @@
                     </div>
                 </div>
                 <div class="swiper-button-next">
-                    <img src="@routes.Assets.versioned("images/temp/right-arrow.svg")"/>
+                    <img class="lazyload" data-src="@routes.Assets.versioned("images/temp/right-arrow.svg")"/>
                 </div>
                 <div class="swiper-button-prev">
-                    <img src="@routes.Assets.versioned("images/temp/left-arrow.svg")"/>
+                    <img class="lazyload" data-src="@routes.Assets.versioned("images/temp/left-arrow.svg")"/>
                 </div>
 
             </div>
@@ -385,12 +428,12 @@
                     <div class="swiper-slide">
                         <div class="nft-card">
                             <div class="nft-card-image">
-                                <img src="@routes.Assets.versioned("images/temp/1.png")"/>
+                                <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/temp/1.png")"/>
                             </div>
                             <div class="nft-card-bottom-section">
                                 <div class="nft-creator-info">
                                     <div class="nft-creator-profile">
-                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
                                     </div>
                                     <div class="nft-creator-data">
                                         <h4>Lorem ipsum dolor Sit</h4>
@@ -399,14 +442,14 @@
                                 </div>
                                 <div class="nft-card-bottom">
                                     <div class="nft-card-token">
-                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
                                     </div>
                                     <div class="nft-card-price">
                                         <h2>00.9100</h2>
                                         <p>($0.2)</p>
                                     </div>
                                     <div class="nft-card-like">
-                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Like.svg")"/>
                                         <p>150</p>
                                     </div>
                                 </div>
@@ -416,12 +459,12 @@
                     <div class="swiper-slide">
                         <div class="nft-card">
                             <div class="nft-card-image">
-                                <img src="@routes.Assets.versioned("images/temp/2.png")"/>
+                                <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/temp/2.png")"/>
                             </div>
                             <div class="nft-card-bottom-section">
                                 <div class="nft-creator-info">
                                     <div class="nft-creator-profile">
-                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
                                     </div>
                                     <div class="nft-creator-data">
                                         <h4>Lorem ipsum dolor Sit</h4>
@@ -430,14 +473,14 @@
                                 </div>
                                 <div class="nft-card-bottom">
                                     <div class="nft-card-token">
-                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
                                     </div>
                                     <div class="nft-card-price">
                                         <h2>00.9100</h2>
                                         <p>($0.2)</p>
                                     </div>
                                     <div class="nft-card-like">
-                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Like.svg")"/>
                                         <p>150</p>
                                     </div>
                                 </div>
@@ -447,12 +490,12 @@
                     <div class="swiper-slide">
                         <div class="nft-card">
                             <div class="nft-card-image">
-                                <img src="@routes.Assets.versioned("images/temp/3.png")"/>
+                                <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/temp/3.png")"/>
                             </div>
                             <div class="nft-card-bottom-section">
                                 <div class="nft-creator-info">
                                     <div class="nft-creator-profile">
-                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
                                     </div>
                                     <div class="nft-creator-data">
                                         <h4>Lorem ipsum dolor Sit</h4>
@@ -461,14 +504,14 @@
                                 </div>
                                 <div class="nft-card-bottom">
                                     <div class="nft-card-token">
-                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
                                     </div>
                                     <div class="nft-card-price">
                                         <h2>00.9100</h2>
                                         <p>($0.2)</p>
                                     </div>
                                     <div class="nft-card-like">
-                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Like.svg")"/>
                                         <p>150</p>
                                     </div>
                                 </div>
@@ -478,12 +521,12 @@
                     <div class="swiper-slide">
                         <div class="nft-card">
                             <div class="nft-card-image">
-                                <img src="@routes.Assets.versioned("images/temp/4.png")"/>
+                                <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/temp/4.png")"/>
                             </div>
                             <div class="nft-card-bottom-section">
                                 <div class="nft-creator-info">
                                     <div class="nft-creator-profile">
-                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
                                     </div>
                                     <div class="nft-creator-data">
                                         <h4>Lorem ipsum dolor Sit</h4>
@@ -492,14 +535,14 @@
                                 </div>
                                 <div class="nft-card-bottom">
                                     <div class="nft-card-token">
-                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
                                     </div>
                                     <div class="nft-card-price">
                                         <h2>00.9100</h2>
                                         <p>($0.2)</p>
                                     </div>
                                     <div class="nft-card-like">
-                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Like.svg")"/>
                                         <p>150</p>
                                     </div>
                                 </div>
@@ -509,12 +552,12 @@
                     <div class="swiper-slide">
                         <div class="nft-card">
                             <div class="nft-card-image">
-                                <img src="@routes.Assets.versioned("images/temp/5.png")"/>
+                                <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/temp/5.png")"/>
                             </div>
                             <div class="nft-card-bottom-section">
                                 <div class="nft-creator-info">
                                     <div class="nft-creator-profile">
-                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
                                     </div>
                                     <div class="nft-creator-data">
                                         <h4>Lorem ipsum dolor Sit</h4>
@@ -523,14 +566,14 @@
                                 </div>
                                 <div class="nft-card-bottom">
                                     <div class="nft-card-token">
-                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
                                     </div>
                                     <div class="nft-card-price">
                                         <h2>00.9100</h2>
                                         <p>($0.2)</p>
                                     </div>
                                     <div class="nft-card-like">
-                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Like.svg")"/>
                                         <p>150</p>
                                     </div>
                                 </div>
@@ -540,12 +583,12 @@
                     <div class="swiper-slide">
                         <div class="nft-card">
                             <div class="nft-card-image">
-                                <img src="@routes.Assets.versioned("images/temp/6.png")"/>
+                                <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/temp/6.png")"/>
                             </div>
                             <div class="nft-card-bottom-section">
                                 <div class="nft-creator-info">
                                     <div class="nft-creator-profile">
-                                        <img src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
                                     </div>
                                     <div class="nft-creator-data">
                                         <h4>Lorem ipsum dolor Sit</h4>
@@ -554,14 +597,14 @@
                                 </div>
                                 <div class="nft-card-bottom">
                                     <div class="nft-card-token">
-                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
                                     </div>
                                     <div class="nft-card-price">
                                         <h2>00.9100</h2>
                                         <p>($0.2)</p>
                                     </div>
                                     <div class="nft-card-like">
-                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Like.svg")"/>
                                         <p>150</p>
                                     </div>
                                 </div>
@@ -577,34 +620,35 @@
         <!-- New Drops Section -->
     <div class="popular-section new-drop-section section">
         <section class="popular-container">
-            <div class="landing-page-heading">New Drops</div>
+            <div class="landing-page-heading">@Messages(constants.View.NEW_DROPS_SECTION_TITLE)</div>
             <div class="swiper swiper-container">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide">
                         <div class="nft-card">
                             <div class="nft-card-image">
-                                <img src="@routes.Assets.versioned("images/NFT/New Drop 1.png")"/>
+                                <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=avif/assets/images/NFT/New Drop 1.png" width="296px" height="296px"/>
                             </div>
                             <div class="nft-card-bottom-section">
                                 <div class="nft-creator-info">
                                     <div class="nft-creator-profile">
-                                        <img src="@routes.Assets.versioned("images/NFT/BitSavage.gif")"/>
+                                        <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=avif/assets/images/NFT/BitSavage.jpg" width="45px" height="45px"/>
+                                      @*  @commonImage("BitSavage.gif") *@
                                     </div>
                                     <div class="nft-creator-data">
-                                        <a href="https://twitter.com/PhenomenalMark" target="_blank"><h4>Bitsavage</h4><img src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
-                                        <p>Cross Chain Crystals</p>
+                                        <a href="https://twitter.com/PhenomenalMark" target="_blank"><h4>@Messages(constants.View.NEW_DROPS_CREATOR_NAME_1)</h4><img data-src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
+                                        <p>@Messages(constants.View.NEW_DROPS_COLLECTION_NAME_1)</p>
                                     </div>
                                 </div>
                                 <div class="nft-card-bottom">
                                     <div class="nft-card-token">
-                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                        <img data-src="@routes.Assets.versioned("images/MantlePlace Token.png")"/>
                                     </div>
                                     <div class="nft-card-price">
                                         <h2>00.9100</h2>
                                         <p>($0.2)</p>
                                     </div>
                                     <div class="nft-card-like">
-                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <img data-src="@routes.Assets.versioned("images/like.png")"/>
                                         <p>150</p>
                                     </div>
                                 </div>
@@ -614,28 +658,29 @@
                     <div class="swiper-slide">
                         <div class="nft-card">
                             <div class="nft-card-image">
-                                <img src="@routes.Assets.versioned("images/NFT/New Drop 2.png")"/>
+                                <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=avif/assets/images/NFT/New Drop 2.png" width="296px" height="296px"/>
                             </div>
                             <div class="nft-card-bottom-section">
                                 <div class="nft-creator-info">
                                     <div class="nft-creator-profile">
-                                        <img src="@routes.Assets.versioned("images/NFT/ALLONE.jpg")"/>
+                                        <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=avif/assets/images/NFT/ALLONE.jpg" width="45px" height="45px"/>
+                                        @* @commonImage("ALLONE.jpg") *@
                                     </div>
                                     <div class="nft-creator-data">
-                                        <a href="https://twitter.com/Jeremytitusart" target="_blank"><h4>Artis.love</h4><img src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
-                                        <p>ALLONE</p>
+                                        <a href="https://twitter.com/Jeremytitusart" target="_blank"><h4>@Messages(constants.View.NEW_DROPS_CREATOR_NAME_2)</h4><img data-src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
+                                        <p>@Messages(constants.View.NEW_DROPS_COLLECTION_NAME_2)</p>
                                     </div>
                                 </div>
                                 <div class="nft-card-bottom">
                                     <div class="nft-card-token">
-                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                        <img data-src="@routes.Assets.versioned("images/MantlePlace Token.png")"/>
                                     </div>
                                     <div class="nft-card-price">
                                         <h2>00.9100</h2>
                                         <p>($0.2)</p>
                                     </div>
                                     <div class="nft-card-like">
-                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <img data-src="@routes.Assets.versioned("images/like.png")"/>
                                         <p>150</p>
                                     </div>
                                 </div>
@@ -645,28 +690,30 @@
                     <div class="swiper-slide">
                         <div class="nft-card">
                             <div class="nft-card-image">
-                                <img src="@routes.Assets.versioned("images/NFT/New_Drop_3.png")"/>
+                                <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=avif/assets/images/NFT/New_Drop_3.png" width="296px" height="296px"/>
+                                @* @commonImage("New_Drop_3.png") *@
                             </div>
                             <div class="nft-card-bottom-section">
                                 <div class="nft-creator-info">
                                     <div class="nft-creator-profile">
-                                        <img src="@routes.Assets.versioned("images/NFT/Ancientruins.jpg")"/>
+                                        <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=avif/assets/images/NFT/Ancientruins.jpg" width="45px" height="45px"/>
+                                        @* @commonImage("Ancientruins.jpg") *@
                                     </div>
                                     <div class="nft-creator-data">
-                                        <a href="https://twitter.com/dreamyvisualz" target="_blank"><h4>Dreamy Visuals</h4><img src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
-                                        <p>Forest Ruins</p>
+                                        <a href="https://twitter.com/dreamyvisualz" target="_blank"><h4>@Messages(constants.View.NEW_DROPS_CREATOR_NAME_3)</h4><img data-src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
+                                        <p>@Messages(constants.View.NEW_DROPS_COLLECTION_NAME_3)</p>
                                     </div>
                                 </div>
                                 <div class="nft-card-bottom">
                                     <div class="nft-card-token">
-                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                        <img data-src="@routes.Assets.versioned("images/MantlePlace Token.png")"/>
                                     </div>
                                     <div class="nft-card-price">
                                         <h2>00.9100</h2>
                                         <p>($0.2)</p>
                                     </div>
                                     <div class="nft-card-like">
-                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <img data-src="@routes.Assets.versioned("images/like.png")"/>
                                         <p>150</p>
                                     </div>
                                 </div>
@@ -676,28 +723,30 @@
                     <div class="swiper-slide">
                         <div class="nft-card">
                             <div class="nft-card-image">
-                                <img src="@routes.Assets.versioned("images/NFT/New Drop.jpg")"/>
+                                <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=avif/assets/images/NFT/New Drop.jpg" width="296px" height="296px"/>
+                                @* @commonImage("New Drop.jpg") *@
                             </div>
                             <div class="nft-card-bottom-section">
                                 <div class="nft-creator-info">
                                     <div class="nft-creator-profile">
-                                        <img src="@routes.Assets.versioned("images/NFT/Shainefer.jpg")"/>
+                                        <img  data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=avif/assets/images/NFT/Shainefer.jpg" width="45px" height="45px"/>
+                                        @* @commonImage("Shainefer.jpg") *@
                                     </div>
                                     <div class="nft-creator-data">
-                                        <a href="https://twitter.com/Shai_Nefer_" target="_blank"><h4>Shainefer</h4><img src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
-                                        <p>Break</p>
+                                        <a href="https://twitter.com/Shai_Nefer_" target="_blank"><h4>@Messages(constants.View.NEW_DROPS_CREATOR_NAME_4)</h4><img data-src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
+                                        <p>@Messages(constants.View.NEW_DROPS_COLLECTION_NAME_4)</p>
                                     </div>
                                 </div>
                                 <div class="nft-card-bottom">
                                     <div class="nft-card-token">
-                                        <img src="@routes.Assets.versioned("images/MantlePlace Token.svg")"/>
+                                        <img data-src="@routes.Assets.versioned("images/MantlePlace Token.png")"/>
                                     </div>
                                     <div class="nft-card-price">
                                         <h2>00.9100</h2>
                                         <p>($0.2)</p>
                                     </div>
                                     <div class="nft-card-like">
-                                        <img src="@routes.Assets.versioned("images/Like.svg")"/>
+                                        <img  data-src="@routes.Assets.versioned("images/like.png")"/>
                                         <p>150</p>
                                     </div>
                                 </div>
@@ -715,54 +764,54 @@
     <!-- Landing Page Info Section -->
    <div class="landing-page-info-section section">
        <div class="info-title">
-           <h2>How It Works</h2>
-           <p>Get started in 5 minutes or less.</p>
+           <h2>@Messages(constants.View.HOW_IT_WORKS_SECTION_TITLE)</h2>
+           <p>@Messages(constants.View.HOW_IT_WORKS_SECTION_SUBTITLE)</p>
        </div>
        <div class="info-steps-container">
            <div class="info-steps">
                <div class="info-step">
                    <div class="info-image">
-                       <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Create account.gif")" class="create-account-img"/>
+                       <img class="lazyload" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Create account.gif" data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Create account.gif" class="create-account-img"/>
 
                    </div>
                    <div class="info-label">
-                       Create Account
+                       @Messages(constants.View.CREATE_ACCOUNT)
                    </div>
                </div>
                <div class="info-next-step-image">
-                   <img src="@routes.Assets.versioned("images/Union.svg")"/>
+                   <img src="@routes.Assets.versioned("images/Union.png")" data-src="@routes.Assets.versioned("images/Union.png")"/>
                </div>
                <div class="info-step">
                    <div class="info-image">
-                       <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Mint NFTs.gif")" class="mint-nfts-img"/>
+                       <img class="lazyload" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Mint NFTs.gif" data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Mint NFTs.gif" class="mint-nfts-img"/>
 
                    </div>
                    <div class="info-label">
-                       Mint NFTs
+                       @Messages(constants.View.MINT_NFTS)
                    </div>
                </div>
                <div class="info-next-step-image">
-                   <img src="@routes.Assets.versioned("images/Union.svg")"/>
+                   <img src="@routes.Assets.versioned("images/Union.png")" data-src="@routes.Assets.versioned("images/Union.png")"/>
                </div>
                <div class="info-step">
                    <div class="info-image">
-                       <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Sell.gif")" class="buy-sell-img"/>
+                       <img class="lazyload" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Sell.gif" data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Sell.gif" class="buy-sell-img"/>
 
                    </div>
                    <div class="info-label">
-                       Buy/Sell
+                       @Messages(constants.View.BUY_SELL)
                    </div>
                </div>
                <div class="info-next-step-image">
-                   <img src="@routes.Assets.versioned("images/Union.svg")"/>
+                   <img src="@routes.Assets.versioned("images/Union.png")" data-src="@routes.Assets.versioned("images/Union.png")"/>
                </div>
                <div class="info-step">
                    <div class="info-image">
-                       <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Engage.gif")" class="engage-img"/>
+                       <img class="lazyload" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Engage.gif" data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Engage.gif" class="engage-img"/>
 
                    </div>
                    <div class="info-label">
-                       Engage
+                       @Messages(constants.View.ENGAGE)
                    </div>
                </div>
            </div>
@@ -775,45 +824,45 @@
     <!-- Landing Page Info Section 2 -->
     <div class="landing-page-info-section-2 section">
         <div class="info-title">
-            <h2>The AssetMantle Difference</h2>
-            <p>Powerful features to enhance the NFT experience for all.</p>
+            <h2>@Messages(constants.View.ASSETMANTLE_DIFFERENCE_SECTION_TITLE)</h2>
+            <p>@Messages(constants.View.ASSETMANTLE_DIFFERENCE_SECTION_SUBTITLE)</p>
         </div>
         <div class="info-card-container">
             <div class="cards">
                 <div class="card c1">
                     <div class="card-image">
-                        <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multi chain access.gif")"/>
+                        <img class="lazyload" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Multi chain access.gif" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multi chain access.gif")"/>
                     </div>
                     <div class="card-detail">
-                        <h2>Multi-chain access</h2>
-                        <p>Trade NFTs on other chains or show them off across metaverses!</p>
+                        <h2>@Messages(constants.View.FEATURE_BLOCK_TITLE_1)</h2>
+                        <p>@Messages(constants.View.FEATURE_BLOCK_PARAGRAPH_1)</p>
                     </div>
                 </div>
                 <div class="card c2">
                     <div class="card-image">
-                        <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Negligible minting fee final.gif")" />
+                        <img class="lazyload" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Negligible minting fee final.gif" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Negligible minting fee final.gif")" />
                     </div>
                     <div class="card-detail">
-                        <h2>Negligible Minting Fee</h2>
-                        <p>Enjoy negligible minting fees and gas fees in the Cosmos ecosystem.</p>
+                        <h2>@Messages(constants.View.FEATURE_BLOCK_TITLE_2)</h2>
+                        <p>@Messages(constants.View.FEATURE_BLOCK_PARAGRAPH_2)</p>
                     </div>
                 </div>
                 <div class="card c3">
                     <div class="card-image">
-                        <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multiple payments.gif")"/>
+                        <img class="lazyload" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Multiple payments.gif" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multiple payments.gif")"/>
                     </div>
                     <div class="card-detail">
-                        <h2>Multiple payment modes</h2>
-                        <p>Experience AssetMantle with fiat currency, coins or stablecoins!</p>
+                        <h2>@Messages(constants.View.FEATURE_BLOCK_TITLE_3)</h2>
+                        <p>@Messages(constants.View.FEATURE_BLOCK_PARAGRAPH_3)</p>
                     </div>
                 </div>
                 <div class="card c4">
                     <div class="card-image">
-                        <img src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Complete customisation.gif")"/>
+                        <img class="lazyload" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Complete customisation.gif" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Complete customisation.gif")"/>
                     </div>
                     <div class="card-detail">
-                        <h2>Complete customization</h2>
-                        <p>Build fully customized NFT marketplaces from scratch without coding.</p>
+                        <h2>@Messages(constants.View.FEATURE_BLOCK_TITLE_4)</h2>
+                        <p>@Messages(constants.View.FEATURE_BLOCK_PARAGRAPH_4)</p>
                     </div>
                 </div>
             </div>
@@ -844,7 +893,7 @@
                 </div>
             </div>
             <div class="column column-2">
-                <img src="@routes.Assets.versioned("images/Coming Soon.png")"/>
+                <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Coming Soon.png")"/>
             </div>
         </div>
     </div>-->
@@ -855,30 +904,30 @@
         <div class="row row-1">
             <div class="col">
                 <div class="logo-container">
-                    <img src="@routes.Assets.versioned("images/Mantle Place Logo.png")" class="logo"/>
+                    <img class="lazyload" data-src="@routes.Assets.versioned("images/MantlePlace-Logo.svg")" class="logo"/>
                 </div>
             </div>
         </div>
         <div class="row row2">
 @*            <div class="col">*@
 @*                <div class="logo-container">*@
-@*                    <img src="@routes.Assets.versioned("images/Mantle Place Logo without Text.png")" class="logo"/>*@
+@*                    <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" src="no-thumbnail-medium.png" data-src="@routes.Assets.versioned("images/Mantle Place Logo without Text.png")" class="logo"/>*@
 @*                    <h2>MantlePlace</h2>*@
 @*                </div>*@
 @*            </div>*@
             <div class="col">
-                <h3>MantlePlace<div class="underline"><span></span></div></h3>
+                <h3>@Messages(constants.View.MANTLE_PLACE)<div class="underline"><span></span></div></h3>
                 <ul>
-                    <li><a href="">Home</a></li>
-                    <li><a href="">Explore</a></li>
-                    <li><a href="">Support</a></li>
-                    <li><a href="">Profile</a></li>
-                    <li><a href="">Wallet</a></li>
+                    <li><a href="">@Messages(constants.View.HOME)</a></li>
+                    <li><a href="">@Messages(constants.View.EXPLORE)</a></li>
+                    <li><a href="">@Messages(constants.View.SUPPORT)</a></li>
+                    <li><a href="">@Messages(constants.View.PROFILE)</a></li>
+                    <li><a href="">@Messages(constants.View.WALLET)</a></li>
                 </ul>
             </div>
 
             <div class="col">
-                <h3>Newsletter<div class="underline"><span></span></div></h3>
+                <h3>@Messages(constants.View.NEWSLETTER)<div class="underline"><span></span></div></h3>
                 <form>
                     <input type="email" placeholder="Enter Email ID"/>
                     <button>
@@ -887,7 +936,7 @@
                 </form>
 
                 <div class="social-icons">
-                    <h3>Social Media<div class="underline"><span></span></div></h3>
+                    <h3>@Messages(constants.View.SOCIAL_MEDIA)<div class="underline"><span></span></div></h3>
                     <i class="uil uil-discord"></i>
                     <i class="uil uil-instagram"></i>
                     <i class="uil uil-telegram-alt"></i>
@@ -896,14 +945,14 @@
                 </div>
             </div>
             <div class="col">
-                <p>Spotted something wrong? <a href="#">Bug Bounty</a></p>
-                <p>Have something in mind? <a href="#">Suggest a Feature</a></p>
-                <p>Want to know what we’re up to? <a href="#">Blog</a></p>
-                <p>Want to know more? <a herf="#">Docs</a></p>
-                <p>Interested in transaction activities? <a href="#">Explorer</a></p>
+                <p>@Messages(constants.View.FOOTER_FAQ_1) <a href="#">@Messages(constants.View.FOOTER_FAQ_LINK_1)</a></p>
+                <p>@Messages(constants.View.FOOTER_FAQ_2) <a href="#">@Messages(constants.View.FOOTER_FAQ_LINK_2)</a></p>
+                <p>@Messages(constants.View.FOOTER_FAQ_3) <a href="#">@Messages(constants.View.FOOTER_FAQ_LINK_3)</a></p>
+                <p>@Messages(constants.View.FOOTER_FAQ_4) <a herf="#">@Messages(constants.View.FOOTER_FAQ_LINK_4)</a></p>
+                <p>@Messages(constants.View.FOOTER_FAQ_5) <a href="#">@Messages(constants.View.FOOTER_FAQ_LINK_5)</a></p>
             </div>
             <hr>
-            <div class="copyright">MantlePlace © 2021 - All Rights Reserved</div>
+            <div class="copyright">@Messages(constants.View.COPYRIGHT)</div>
         </div>
     </footer>
     </div>

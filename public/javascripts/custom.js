@@ -282,23 +282,6 @@ function checkPhrase(e){
 }
 
 
-
-// Hero Section Swiper/Slider 1
-var swiper = new Swiper(".mySwiper",{
-    effect:"cards",
-    grabCursor:true,
-    centeredSlides: true,
-    slidesPerView: "auto",
-    watchSlidesProgress: true,
-    // speed: 200,
-    // allowTouchMove:false,
-    loop: true,
-    autoplay: {
-        delay: 2000,
-        disableOnInteraction: false
-    },
-});
-
 // Hero Section Swiper/Slider 2
 var swiper = new Swiper(".mySwiper2", {
     effect: "coverflow",
@@ -311,8 +294,8 @@ var swiper = new Swiper(".mySwiper2", {
 });
 
 // Featured Swiper/Slider
-var swiper = new Swiper(".featured-container .swiper-container", {
-    // autoplay: true,
+var featuredSwiper = new Swiper(".featured-container .swiper-container", {
+    autoplay: true,
     // speed:1000,
     effect: "coverflow",
     grabCursor: true,
@@ -336,8 +319,8 @@ var swiper = new Swiper(".featured-container .swiper-container", {
         nextEl: ".swiper-button-next",
         prevEl: ".swiper-button-prev",
     },
-
 });
+
 
 // Popular Swiper/Slider
 var swiper = new Swiper(".popular-container .swiper-container", {
@@ -441,11 +424,7 @@ var swiper = new Swiper(".popular-container .swiper-container", {
 // document.addEventListener("mousewheel", this.mousewheel.bind(this), { passive: false });
 
 
-$('#fullpage').fullpage({
-    autoScrolling:true,
-    scrollHorizontally: true,
-     scrollBar: false,
-});
+
 
 
 // const scrollElement =
@@ -560,3 +539,4 @@ $('#fullpage').fullpage({
 window.onbeforeunload = function () {
     window.scrollTo(0, 0);
 }
+

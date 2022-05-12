@@ -1,3 +1,4 @@
+@()(implicit messagesProvider: MessagesProvider)
 @main("Profile My NFTs") {
     <div class="wrapper">
         <nav>
@@ -9,9 +10,9 @@
                 <ul class="links">
                     <li class="active"><a href="#">Explore</a></li>
                     <li>
-                        <a href="#" class="desktop-link">Create</a>
+                        <a href="#" class="desktop-link">@Messages(constants.View.CREATE)</a>
                         <input type="checkbox" id="show-features">
-                        <label for="show-features">Create</label>
+                        <label for="show-features">@Messages(constants.View.CREATE)</label>
                         <ul>
                             <li>
                                 <a href="#">
@@ -27,7 +28,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li><a href="#">Support</a></li>
+                    <li><a href="#">@Messages(constants.View.SUPPORT)</a></li>
                 </ul>
             </div>
 
