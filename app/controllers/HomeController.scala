@@ -131,7 +131,4 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     Ok(views.html.Home.marketPlaceHome())
   }
 
-  def homeTest() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.homeTest())
-  }
 }
