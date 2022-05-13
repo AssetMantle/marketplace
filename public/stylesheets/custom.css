@@ -1856,7 +1856,6 @@ article:first-child{
 .hero-section .row .col-1 .button-1:hover::after {
     top: 0;
 }
-
 .hero-section .row .col-1 .buttons .button-2{
     background:transparent;
     border: 2px solid var(--dark);
