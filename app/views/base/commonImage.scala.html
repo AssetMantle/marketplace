@@ -1,0 +1,4 @@
+@(id: String = "")
+@*<img class="lazyload" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=20,f=avif,blur=10/assets/images/NFT/@id" data-src="@routes.Assets.versioned("images/NFT/"+id+"")"/>*@
+@*<img src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/@id" data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/@id"/>*@
+<img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/${id}")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/${id}")"/>
