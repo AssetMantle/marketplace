@@ -41,5 +41,7 @@ GET        /mintNFTSuccess                             controllers.HomeControlle
 
 GET        /                                           controllers.HomeController.marketPlaceHome()
 
+GET        /test                                       controllers.HomeController.testSignUp()
+
 
 

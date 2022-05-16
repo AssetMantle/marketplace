@@ -131,4 +131,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     Ok(views.html.Home.marketPlaceHome())
   }
 
+  def testSignUp() = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.signInSignUp.signUpTest())
+  }
 }
