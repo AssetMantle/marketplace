@@ -1,4 +1,9 @@
-@(arguments: (Symbol, Any)*)
+@(label:String = "",subHeading:String = "")
+
 <div class="header">
-    <h2>Modal Header</h2>
+    <div class="form-top">
+        <div class="form-title">@label</div>
+        <a class="form-close-btn close-modal"></a>
+    </div>
+    <div class="form-sub-title">@subHeading</div>
 </div>
