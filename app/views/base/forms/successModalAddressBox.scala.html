@@ -1,0 +1,17 @@
+@(userName:String = "", address:String = "")
+
+<div class="form-address-box">
+    <div class="form-address-box-item">
+        <span class="address-box-label">Username:</span>
+        <span class="address-box-text">
+            <span>@userName</span>
+            <span class="form-copy-icon"><img src="@routes.Assets.versioned("images/copy.png")"/></span>
+        </span>
+
+        <span class="address-box-label">Address:</span>
+        <span class="address-box-text">
+            <span>@address</span>
+            <span class="form-copy-icon"><img src="@routes.Assets.versioned("images/copy.png")"/></span>
+        </span>
+    </div>
+</div>

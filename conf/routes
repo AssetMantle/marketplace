@@ -9,14 +9,14 @@
 # Map static resources from the /public folder to the /assets URL path
 GET        /assets/*file                               controllers.Assets.versioned(path="/public", file: Asset)
 
-GET        /signup                                     controllers.HomeController.signup()
-GET        /createwallet                               controllers.HomeController.createWallet()
+#GET        /signup                                     controllers.HomeController.signup()
+#GET        /createwallet                               controllers.HomeController.createWallet()
 GET        /seedPhraseVerification                     controllers.HomeController.seedPhraseVerification()
 GET        /assetMantleWalletSuccessfull               controllers.HomeController.assetMantleWalletSuccessfull()
-GET        /connectConfirmation                        controllers.HomeController.connectConfirmation()
+#GET        /connectConfirmation                        controllers.HomeController.connectConfirmation()
 GET        /connectConfirmationRedirectToKeplrn        controllers.HomeController.connectConfirmationRedirectToKeplrn()
-GET        /connectedSuccessToKeplr                    controllers.HomeController.connectedSuccessToKeplr()
-GET        /importWalletSuccess                        controllers.HomeController.importWalletSuccess()
+#GET        /connectedSuccessToKeplr                    controllers.HomeController.connectedSuccessToKeplr()
+#GET        /importWalletSuccess                        controllers.HomeController.importWalletSuccess()
 GET        /signUpForm                                 controllers.HomeController.signUpForm()
 GET        /signIn                                     controllers.HomeController.signIn()
 GET        /signUpCompleteConnectedWallet              controllers.HomeController.signUpCompleteConnectedWallet()
@@ -39,9 +39,24 @@ GET        /NFTCreatedSuccess                          controllers.HomeControlle
 GET        /mintNFT                                    controllers.HomeController.mintNFT()
 GET        /mintNFTSuccess                             controllers.HomeController.mintNFTSuccess()
 
+# Home
 GET        /                                           controllers.HomeController.marketPlaceHome()
+GET        /home                                       controllers.HomeController.home()
 
+# SignIn-SignUp
+
+# Option 1: Connect Wallet
 GET        /test                                       controllers.HomeController.testSignUp()
+GET        /connectWallet                              controllers.HomeController.connectWallet()
+GET        /connectConfirmation                        controllers.HomeController.connectConfirmation()
+GET        /redirectingToKeplr                         controllers.HomeController.redirectingToKeplr()
+GET        /connectedSuccessToKeplr                    controllers.HomeController.connectedSuccessToKeplr()
+
+# Option 2: Import Wallet
+GET        /importWalletSuccess                        controllers.HomeController.importWalletSuccess()
+
+# Option 3: Create AssetMantle Wallet
+GET        /createwallet                               controllers.HomeController.createWallet()
 
 
 

@@ -2,7 +2,9 @@
 
 <div class="header-with-icon">
     <div class="form-top">
-        <div class="title-icon"><img src="@routes.Assets.versioned("images/Keplr Wallet Icon.png")"/></div>
+        @if(icon != "") {
+            <div class="title-icon"><img src="@routes.Assets.versioned("" + icon + "")"/></div>
+        }
         <div class="title-text">@heading</div>
         <a class="form-close-btn close-modal"></a>
     </div>

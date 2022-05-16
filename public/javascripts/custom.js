@@ -12,6 +12,7 @@ function ShowScrollbar() {
     style.innerHTML = `body::-webkit-scrollbar {display: block;}`;
     document.head.appendChild(style);
 }
+
 let intro = document.querySelector('.intro');
 
 window.addEventListener('DOMContentLoaded', ()=>{
@@ -300,7 +301,7 @@ var featuredSwiper = new Swiper(".featured-container .swiper-container", {
     effect: "coverflow",
     grabCursor: true,
     centeredSlides: true,
-    slidesPerView: "auto",
+    slidesPerView: 4,
     autoplay: {
         delay: 6000,
         disableOnInteraction: false

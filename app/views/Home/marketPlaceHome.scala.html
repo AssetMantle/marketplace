@@ -1,183 +1,10 @@
 @import views.html.base.commonImage
+@import views.html.Home._
 @()(implicit messagesProvider: MessagesProvider)
 @main(""){
-    <div class="intro">
-        <div class="preloader">
-            <div class="container">
-                <div class="box">
+    @opener()
+    @menu()
 
-                    <div class="title">
-                        <span class="block"></span>
-                        <h1>@Messages(constants.View.MANTLE_PLACE)<span></span></h1>
-                    </div>
-
-                    <div class="role">
-                        <p>@Messages(constants.View.NFT_MARKET)</p>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="wrapper">
-        <nav>
-            <input type="checkbox" id="show-search">
-            <input type="checkbox" id="show-menu">
-            <label for="show-menu" class="menu-icon"><i class="uil uil-bars"></i></label>
-            <div class="content">
-                <div class="logo"><a href="#"><img class="lazyload" src="@routes.Assets.versioned("images/MantlePlace-Logo.svg")" data-src="@routes.Assets.versioned("images/MantlePlace-Logo.svg")" class="logo"/></a></div>
-                <ul class="links">
-@*                    <li class="active"><a href="#">Explore</a></li>*@
-                    <li><a href="#">@Messages(constants.View.EXPLORE)</a>
-                        <ul>
-                            <li>
-                                <div class="disable">@Messages(constants.View.COMING_SOON)</div>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#" class="desktop-link">@Messages(constants.View.CREATE)</a>
-                        <input type="checkbox" id="show-features">
-                        <label for="show-features">@Messages(constants.View.CREATE)</label>
-                        <ul>
-                            <li>
-                                <div class="disable">@Messages(constants.View.COMING_SOON)</div>
-                            </li>
-                        </ul>
-                        <!--<ul>
-                            <li>
-                                <a href="#">
-                                    <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Createcollection.svg")"/>
-                                    Create new collection
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/createNFT.svg")"/>
-                                    Create new NFT
-                                </a>
-                            </li>
-                        </ul>-->
-                    </li>
-                    <li><a href="#">@Messages(constants.View.SUPPORT)</a>
-                        <ul>
-                            <li>
-                                <div class="disable">@Messages(constants.View.COMING_SOON)</div>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="right-menu">
-                <label for="show-search" class="search-icon"><i class="uil uil-search"></i></label>
-                <div class="account-menu">
-                    <nav id="submenu-main" class="submenu-main">
-                        <ul class="menu">
-                            <li class="user-profile">
-                                <a href="#">
-                                    <img class="lazyload" src="@routes.Assets.versioned("images/Profile.png")" class="profile"/>
-                                </a>
-                                <ul class="submenu">
-                                    <li>
-                                        <div class="disable">@Messages(constants.View.COMING_SOON)</div>
-                                    </li>
-                                </ul>
-                                <!--<ul class="submenu">
-                                    <li class="user-profile-data">
-                                        <div class="user-profile-image">
-                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
-                                        </div>
-                                        <div class="user-profile-information">
-                                            <div class="user-profile-name">User568</div>
-                                            <div class="user-profile-token">0.459930 $MNTL</div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/NFT.svg")"/>
-                                            My NFTs
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Collection.svg")"/>
-                                            My Collections
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Favourites.svg")"/>
-                                            Favourites
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/listing.svg")"/>
-                                            Listings
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/whitelist.svg")"/>
-                                            Whitelist
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Settings.svg")"/>
-                                            Settings
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/logout.svg")"/>
-                                            Sign out
-                                        </a>
-                                    </li>
-                                </ul>-->
-                            </li>
-                            <li class="user-wallet">
-                                <a href="#">
-                                    <img class="lazyload" src="@routes.Assets.versioned("images/Wallet.png")" class="wallet"/>
-                                </a>
-                                <ul class="submenu">
-                                    <li>
-                                        <div class="disable">@Messages(constants.View.COMING_SOON)</div>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </nav>
-                    @*                    </div>*@
-                    @*                    <input type="checkbox" id="show-profile">*@
-                    @*                    <label for="show-profile">Profile</label>*@
-                    @*                    <div class="popup-menu">*@
-                    @*                        <ul>*@
-                    @*                            <li>*@
-                    @*                                <a href="#">*@
-                    @*                                    <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Createcollection.svg")"/>*@
-                    @*                                    Create new collection*@
-                    @*                                </a>*@
-                    @*                            </li>*@
-                    @*                            <li>*@
-                    @*                                <a href="#">*@
-                    @*                                    <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/createNFT.svg")"/>*@
-                    @*                                    Create new NFT*@
-                    @*                                </a>*@
-                    @*                            </li>*@
-                    @*                        </ul>*@
-                    @*                    </div>*@
-                    @*                    <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Wallet.svg")"/>*@
-                </div>
-            </div>
-
-            <form action="#" class="search-box">
-                <input type="text" placeholder="Type Something to Search..." required>
-                <button type="submit" class="go-icon"></button>
-            </form>
-        </nav>
-    </div>
     <div id="fullpage">
     <div class="hero-section section">
         <div class="row">
@@ -211,6 +38,7 @@
 
         <!-- Featured Section -->
     <div id="featured-section" class="featured-section section">
+        <div class="featured-container-main">
         <div class="landing-page-heading">@Messages(constants.View.FEATURED_SECTION_TITLE)</div>
         <section class="featured-container">
             <div class="swiper swiper-container">
@@ -340,6 +168,7 @@
 
             </div>
         </section>
+        </div>
     </div>
 
         <!-- Popular Section -->
@@ -566,12 +395,12 @@
                                         <img data-src="@routes.Assets.versioned("images/MantlePlace Token.png")"/>
                                     </div>
                                     <div class="nft-card-price">
-                                        <h2>00.9100</h2>
-                                        <p>($0.2)</p>
+                                        <h2>--</h2>
+                                        <p>($--)</p>
                                     </div>
                                     <div class="nft-card-like">
                                         <img data-src="@routes.Assets.versioned("images/like.png")"/>
-                                        <p>150</p>
+                                        <p>--</p>
                                     </div>
                                 </div>
                             </div>
@@ -597,12 +426,12 @@
                                         <img data-src="@routes.Assets.versioned("images/MantlePlace Token.png")"/>
                                     </div>
                                     <div class="nft-card-price">
-                                        <h2>00.9100</h2>
-                                        <p>($0.2)</p>
+                                        <h2>--</h2>
+                                        <p>($--)</p>
                                     </div>
                                     <div class="nft-card-like">
                                         <img data-src="@routes.Assets.versioned("images/like.png")"/>
-                                        <p>150</p>
+                                        <p>--</p>
                                     </div>
                                 </div>
                             </div>
@@ -628,12 +457,12 @@
                                         <img data-src="@routes.Assets.versioned("images/MantlePlace Token.png")"/>
                                     </div>
                                     <div class="nft-card-price">
-                                        <h2>00.9100</h2>
-                                        <p>($0.2)</p>
+                                        <h2>--</h2>
+                                        <p>($--)</p>
                                     </div>
                                     <div class="nft-card-like">
                                         <img data-src="@routes.Assets.versioned("images/like.png")"/>
-                                        <p>150</p>
+                                        <p>--</p>
                                     </div>
                                 </div>
                             </div>
@@ -659,12 +488,12 @@
                                         <img data-src="@routes.Assets.versioned("images/MantlePlace Token.png")"/>
                                     </div>
                                     <div class="nft-card-price">
-                                        <h2>00.9100</h2>
-                                        <p>($0.2)</p>
+                                        <h2>--</h2>
+                                        <p>($--)</p>
                                     </div>
                                     <div class="nft-card-like">
                                         <img  data-src="@routes.Assets.versioned("images/like.png")"/>
-                                        <p>150</p>
+                                        <p>--</p>
                                     </div>
                                 </div>
                             </div>
@@ -858,8 +687,8 @@
             <div class="col">
                 <p>@Messages(constants.View.FOOTER_FAQ_1) <a href="#">@Messages(constants.View.FOOTER_FAQ_LINK_1)</a></p>
                 <p>@Messages(constants.View.FOOTER_FAQ_2) <a href="#">@Messages(constants.View.FOOTER_FAQ_LINK_2)</a></p>
-                <p>@Messages(constants.View.FOOTER_FAQ_3) <a href="#">@Messages(constants.View.FOOTER_FAQ_LINK_3)</a></p>
-                <p>@Messages(constants.View.FOOTER_FAQ_4) <a herf="#">@Messages(constants.View.FOOTER_FAQ_LINK_4)</a></p>
+                <p>@Messages(constants.View.FOOTER_FAQ_3) <a href="https://blog.assetmantle.one/" target="_blank">@Messages(constants.View.FOOTER_FAQ_LINK_3)</a></p>
+                <p>@Messages(constants.View.FOOTER_FAQ_4) <a href="https://docs.assetmantle.one/" target="_blank">@Messages(constants.View.FOOTER_FAQ_LINK_4)</a></p>
                 <p>@Messages(constants.View.FOOTER_FAQ_5) <a href="#">@Messages(constants.View.FOOTER_FAQ_LINK_5)</a></p>
             </div>
             <hr>

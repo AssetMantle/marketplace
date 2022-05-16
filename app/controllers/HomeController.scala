@@ -27,9 +27,9 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     Ok(views.html.SignUp())
   }
 
-  def createWallet() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.createWallet())
-  }
+//  def createWallet() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.createWallet())
+//  }
 
   def seedPhraseVerification() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.seedPhraseVerification())
@@ -39,21 +39,21 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     Ok(views.html.assetMantleWalletSuccessfull())
   }
 
-  def connectConfirmation() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.connectConfirmation())
-  }
+//  def connectConfirmation() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.connectConfirmation())
+//  }
 
   def connectConfirmationRedirectToKeplrn() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.connectConfirmationRedirectToKeplr())
   }
 
-  def connectedSuccessToKeplr() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.connectedSuccessToKeplr())
-  }
+//  def connectedSuccessToKeplr() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.connectedSuccessToKeplr())
+//  }
 
-  def importWalletSuccess() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.importWalletSuccess())
-  }
+//  def importWalletSuccess() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.importWalletSuccess())
+//  }
 
   def signUpForm() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.signUpForm())
@@ -127,11 +127,19 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     Ok(views.html.createCollection.mintNFTSuccess())
   }
 
-  def marketPlaceHome() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.Home.marketPlaceHome())
-  }
+  // Home
+  def marketPlaceHome() = Action { implicit request: Request[AnyContent] => Ok(views.html.Home.marketPlaceHome()) }
+  def home() = Action { implicit request: Request[AnyContent] => Ok(views.html.Home.homeTest()) }
 
-  def testSignUp() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.signInSignUp.signUpTest())
-  }
+  // SignIn-SignUp
+  // Option 1: Connect Wallet
+  def testSignUp() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.signUpTest()) }
+  def connectWallet() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.connectWallet()) }
+  def connectConfirmation() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.connectConfirmation()) }
+  def redirectingToKeplr() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.redirectingToKeplr()) }
+  def connectedSuccessToKeplr() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.connectedSuccessToKeplr()) }
+  // Option 2: Import Wallet
+  def importWalletSuccess() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.importWalletSuccess()) }
+  // Option 3: Create AM Wallet
+  def createWallet() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.createWallet()) }
 }
