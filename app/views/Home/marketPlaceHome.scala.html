@@ -1,4 +1,4 @@
-@import views.html.base.commonImage
+@import views.html.base._
 @import views.html.Home._
 @()(implicit messagesProvider: MessagesProvider)
 @main(""){
@@ -47,10 +47,14 @@
                         <div class="featured-card">
                             <div class="featured-card-img">
                                 <div class="image-container">
-                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_2.jpg")" width="350px" height="550px"/>
-                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_1.jpg")" width="350px" height="550px"/>
+                                    @commonFeaturedImage("TENDERMIND_2.jpg")
+                                    @commonFeaturedImage("TENDERMIND_1.jpg")
+                                    @commonFeaturedImage("TENDERMIND_3.jpg")
+                                    @commonFeaturedImage("TENDERMIND_2.jpg")
+                                   <!-- <img src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_2.jpg")" width="350px" height="550px"/>
+                                    <img src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_1.jpg")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_1.jpg")" width="350px" height="550px"/>
                                     <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_3.jpg")" width="350px" height="550px"/>
-                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_2.jpg")" width="350px" height="550px"/>
+                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/TENDERMIND_2.jpg")" width="350px" height="550px"/>-->
                                 </div>
                             </div>
                             <div class="creator-main">
@@ -70,10 +74,14 @@
                         <div class="featured-card">
                             <div class="featured-card-img">
                                 <div class="image-container">
-                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_2.jpg")" width="350px" height="550px"/>
+                                    @commonFeaturedImage("ORBICs_2.jpg")
+                                    @commonFeaturedImage("ORBICs_1.jpg")
+                                    @commonFeaturedImage("ORBICs_3.jpg")
+                                    @commonFeaturedImage("ORBICs_2.jpg")
+                                    <!--<img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_2.jpg")" width="350px" height="550px"/>
                                     <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_1.jpg")" width="350px" height="550px"/>
                                     <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_3.jpg")" width="350px" height="550px"/>
-                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_2.jpg")" width="350px" height="550px"/>
+                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/ORBICs_2.jpg")" width="350px" height="550px"/>-->
                                 </div>
                             </div>
                             <div class="creator-main">
@@ -93,10 +101,14 @@
                         <div class="featured-card">
                             <div class="featured-card-img">
                                 <div class="image-container">
-                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_1.jpg")" width="350px" height="550px"/>
-                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_2.jpg")" width="350px" height="550px"/>
-                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_3.jpg")" width="350px" height="550px"/>
-                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_1.jpg")" width="350px" height="550px"/>
+                                    @commonFeaturedImage("EZZYLAND_1.jpg")
+                                    @commonFeaturedImage("EZZYLAND_2.jpg")
+                                    @commonFeaturedImage("EZZYLAND_3.jpg")
+                                    @commonFeaturedImage("EZZYLAND_1.jpg")
+                                   <!-- <img src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_1.jpg")"  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_1.jpg")" width="350px" height="550px"/>
+                                    <img src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_2.jpg")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_2.jpg")" width="350px" height="550px"/>
+                                    <img src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_3.jpg")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_3.jpg")" width="350px" height="550px"/>
+                                    <img src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_1.jpg")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/EZZYLAND_1.jpg")" width="350px" height="550px"/>-->
                                 </div>
                             </div>
                             <div class="creator-main">
@@ -105,7 +117,7 @@
                                         @commonImage("Ezzy.jpg")
                                     </div>
                                     <div class="creator-detail">
-                                        <a href="https://twitter.com/ezzyland/" target="_blank"><div class="creator-name">@Messages(constants.View.FEATURED_COLLECTION_NAME_3)</div><img class="lazyload" data-src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
+                                        <a href="https://twitter.com/ezzyland/" target="_blank"><div class="creator-name">@Messages(constants.View.FEATURED_COLLECTION_NAME_3)</div><img src="@routes.Assets.versioned("images/NFT/Frame.svg")" data-src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
                                         <div class="creator-sub-name">@Messages(constants.View.FEATURED_CREATOR_NAME_3)</div>
                                     </div>
                                 </div>
@@ -116,10 +128,14 @@
                         <div class="featured-card">
                             <div class="featured-card-img">
                                 <div class="image-container">
-                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_1.jpg")" width="350px" height="550px"/>
+                                    @commonFeaturedImage("OsmoNot_1.jpg")
+                                    @commonFeaturedImage("OsmoNot_2.jpg")
+                                    @commonFeaturedImage("OsmoNot_3.jpg")
+                                    @commonFeaturedImage("OsmoNot_1.jpg")
+                                    <!--<img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_1.jpg")" width="350px" height="550px"/>
                                     <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_2.jpg")" width="350px" height="550px"/>
                                     <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_3.jpg")" width="350px" height="550px"/>
-                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_1.jpg")" width="350px" height="550px"/>
+                                    <img  data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/OsmoNot_1.jpg")" width="350px" height="550px"/>-->
                                 </div>
                             </div>
                             <div class="creator-main">
@@ -139,10 +155,14 @@
                         <div class="featured-card">
                             <div class="featured-card-img">
                                 <div class="image-container">
-                                    <img data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_1.jpg")" width="350px" height="550px"/>
+                                    @commonFeaturedImage("IGOR_1.jpg")
+                                    @commonFeaturedImage("IGOR_2.jpg")
+                                    @commonFeaturedImage("IGOR_3.png")
+                                    @commonFeaturedImage("IGOR_1.jpg")
+                                    <!--<img data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_1.jpg")" width="350px" height="550px"/>
                                     <img data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_2.jpg")" width="350px" height="550px"/>
                                     <img data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_3.png")" width="350px" height="550px"/>
-                                    <img data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_1.jpg")" width="350px" height="550px"/>
+                                    <img data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/IGOR_1.jpg")" width="350px" height="550px"/>-->
                                 </div>
                             </div>
                             <div class="creator-main">
@@ -151,7 +171,7 @@
                                         @commonImage("Igor PFP.png")
                                     </div>
                                     <div class="creator-detail">
-                                        <a href="https://twitter.com/Igor211988189" target="_blank"><div class="creator-name">@Messages(constants.View.FEATURED_COLLECTION_NAME_5)</div><img class="lazyload" data-src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
+                                        <a href="https://twitter.com/Igor211988189" target="_blank"><div class="creator-name">@Messages(constants.View.FEATURED_COLLECTION_NAME_5)</div><img class="lazyload" src="@routes.Assets.versioned("images/NFT/Frame.svg")" data-src="@routes.Assets.versioned("images/NFT/Frame.svg")"/></a>
                                         <div class="creator-sub-name">@Messages(constants.View.FEATURED_CREATOR_NAME_5)</div>
                                     </div>
                                 </div>
@@ -160,10 +180,10 @@
                     </div>
                 </div>
                 <div class="swiper-button-next">
-                    <img class="lazyload" data-src="@routes.Assets.versioned("images/temp/right-arrow.svg")"/>
+                    <img class="lazyload" src="@routes.Assets.versioned("images/temp/right-arrow.svg")"/>
                 </div>
                 <div class="swiper-button-prev">
-                    <img class="lazyload" data-src="@routes.Assets.versioned("images/temp/left-arrow.svg")"/>
+                    <img class="lazyload" src="@routes.Assets.versioned("images/temp/left-arrow.svg")"/>
                 </div>
 
             </div>
@@ -677,11 +697,11 @@
 
                 <div class="social-icons">
                     <h3>@Messages(constants.View.SOCIAL_MEDIA)<div class="underline"><span></span></div></h3>
-                    <i class="uil uil-discord"></i>
-                    <i class="uil uil-instagram"></i>
-                    <i class="uil uil-telegram-alt"></i>
-                    <i class="uil uil-twitter-alt"></i>
-                    <i class="uil uil-github-alt"></i>
+                    <i class="fa-brands fa-discord"></i>
+                    <i class="fa-brands fa-instagram"></i>
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <i class="fa-brands fa-twitter"></i>
+                    <i class="fa-brands fa-github"></i>
                 </div>
             </div>
             <div class="col">
@@ -689,7 +709,7 @@
                 <p>@Messages(constants.View.FOOTER_FAQ_2) <a href="#">@Messages(constants.View.FOOTER_FAQ_LINK_2)</a></p>
                 <p>@Messages(constants.View.FOOTER_FAQ_3) <a href="https://blog.assetmantle.one/" target="_blank">@Messages(constants.View.FOOTER_FAQ_LINK_3)</a></p>
                 <p>@Messages(constants.View.FOOTER_FAQ_4) <a href="https://docs.assetmantle.one/" target="_blank">@Messages(constants.View.FOOTER_FAQ_LINK_4)</a></p>
-                <p>@Messages(constants.View.FOOTER_FAQ_5) <a href="#">@Messages(constants.View.FOOTER_FAQ_LINK_5)</a></p>
+                <p>@Messages(constants.View.FOOTER_FAQ_5) <a href="https://explorer.assetmantle.one/">@Messages(constants.View.FOOTER_FAQ_LINK_5)</a></p>
             </div>
             <hr>
             <div class="copyright">@Messages(constants.View.COPYRIGHT)</div>

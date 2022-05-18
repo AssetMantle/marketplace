@@ -1,9 +1,9 @@
-@import views.html.base.forms.commonForm
+@import views.html.base.forms.commonFormTest
 @import views.companion.SignUp
 @import views.html.base.forms.commonInputText
 
 @(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@commonForm(constants.Form.SIGN_UP,signUpForm){
+@commonFormTest(constants.Form.SIGN_UP,signUpForm){
     @commonInputText(signUpForm,constants.FormField.USERNAME)
     @commonInputText(signUpForm,constants.FormField.PASSWORD)
     @commonInputText(signUpForm,constants.FormField.CONFIRM_PASSWORD)

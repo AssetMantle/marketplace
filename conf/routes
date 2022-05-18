@@ -11,8 +11,8 @@ GET        /assets/*file                               controllers.Assets.versio
 
 #GET        /signup                                     controllers.HomeController.signup()
 #GET        /createwallet                               controllers.HomeController.createWallet()
-GET        /seedPhraseVerification                     controllers.HomeController.seedPhraseVerification()
-GET        /assetMantleWalletSuccessfull               controllers.HomeController.assetMantleWalletSuccessfull()
+#GET        /seedPhraseVerification                     controllers.HomeController.seedPhraseVerification()
+#GET        /assetMantleWalletSuccessfull               controllers.HomeController.assetMantleWalletSuccessfull()
 #GET        /connectConfirmation                        controllers.HomeController.connectConfirmation()
 GET        /connectConfirmationRedirectToKeplrn        controllers.HomeController.connectConfirmationRedirectToKeplrn()
 #GET        /connectedSuccessToKeplr                    controllers.HomeController.connectedSuccessToKeplr()
@@ -57,6 +57,9 @@ GET        /importWalletSuccess                        controllers.HomeControlle
 
 # Option 3: Create AssetMantle Wallet
 GET        /createwallet                               controllers.HomeController.createWallet()
+GET        /seedPhraseVerification                     controllers.HomeController.seedPhraseVerification()
+GET        /assetMantleWalletSuccessfull               controllers.HomeController.assetMantleWalletSuccessfull()
+GET        /signUpMantleplaceCredentials               controllers.HomeController.signUpMantleplaceCredentials()
 
 
 

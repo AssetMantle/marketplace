@@ -3,7 +3,7 @@
     <button>Click For Modal</button>
     @formModal() {
         @successModal(heading = "Wallet Imported Successfully", subHeading = "Keplr wallet has been successfully imported. Account details are as follows.")
-        @successModalAddressBox(userName = "Username", address = "dwafegrtefdvfhresv -39i539w0rej")
+        @successModalAddressBox(Symbol("userName") -> "Username", Symbol("address") -> "dwafegrtefdvfhresv -39i539w0rej")
         <div class="form-button">
         @formPrimaryButton(message = "Proceed to Sign up")
         </div>

@@ -426,7 +426,7 @@
 .form-address-box .address-box-text{
     color: var(--mantle-off-white);
     display: flex;
-    align-items: start;
+    align-items: center;
 
 }
 @media (max-width: 425px){
@@ -439,10 +439,233 @@
 }
 
 /* Create Wallet */
-.sub-heading{
+.sub-heading-link{
+    font-family: var(--font-type-2);
     text-align: left;
-    margin-top: 10px;
-    font-size: 16px;
+    font-style: normal;
     font-weight: 400;
+    font-size: 14px;
+    margin-top: 10px;
     color: var(--inactive-gray);
+}
+.sub-heading-link .link{
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--dark);
+    margin-left: 5px;
+    position: relative;
+}
+
+/* Form Heading */
+.form-heading{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--inactive-gray);
+    margin-top: 25px;
+}
+
+/* Form Bullet List*/
+.form-bullet-list{
+    margin: 15px 25px;
+}
+.form-bullet-list ul{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    list-style: disc;
+    color: var(--inactive-gray);
+}
+.form-bullet-list ul li{
+    margin: 15px 0;
+}
+
+/* Form Copy Item */
+.form-copy-item,
+.form-input-text{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: capitalize;
+    color: var(--text-medium);
+    display: flex;
+    align-items: center;
+    margin-top: 40px;
+    gap: 5px;
+}
+.form-input-text{
+    font-weight: 400;
+}
+.form-copy-icon{
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    padding: 4px 0 0 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.form-copy-icon:hover{
+    background-color: var(--popup-stroke);
+}
+
+/* Form Seed Box */
+.form-seed-box-list{
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+    margin-top: 10px;
+    font-family: var(--font-type-2);
+    color: var(--mantle-off-white);
+    gap: 10px;
+}
+.form-seed-box-list .form-seed-box{
+    flex: 1 1 0;
+}
+.form-seed-box-list .form-seed-box .form-seed-box-number{
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    margin-left: 5px;
+}
+.form-seed-box-list .form-seed-box .form-seed-box-phrase{
+    text-align: center;
+    color: var(--mantle-off-white);
+    background: transparent;
+    width: 100%;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    border: 1px solid var(--inactive-gray);
+    box-sizing: border-box;
+    border-radius: 8px;
+    margin-top:5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: capitalize;
+    padding: 9px 0;
+    outline:none;
+}
+.form-seed-box-list .form-seed-box .form-seed-box-phrase.disable{
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+    pointer-events: none;
+}
+.form-seed-box-list .form-seed-box .form-seed-box-phrase:focus-within{
+    border-color: var(--dark);
+}
+.form-seed-box-list .form-seed-box .form-seed-box-phrase input{
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+    border:none;
+    outline: none;
+    background-color: transparent;
+    text-align: center;
+    font-family: var(--font-type-2);
+    color: var(--mantle-off-white);
+    font-size: 16px;
+}
+.form-seed-box-list .form-seed-box .form-seed-box-phrase input:focus{
+    color: var(--dark);
+}
+
+/* Form Information Message */
+.form-information-message{
+    display: flex;
+    margin-top: 15px;
+    gap: 5px;
+}
+.form-information-message .form-information-icon img{
+    width: 18px;
+}
+.form-information-message .form-information-text{
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    font-family: var(--font-type-2);
+    color: var(--mantle-off-white);
+}
+
+/* Form Accordion */
+.accordion-toggle {
+    cursor:pointer;
+    display: flex;
+    align-items: center;
+}
+.accordion-toggle h4{
+    font-family: var(--font-type-1);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--dark);
+}
+.accordion-toggle .icon {
+    color: var(--dark);
+    margin-left: 5px;
+}
+.accordion-toggle .icon:before {
+    display: inline-block;
+    content: url('../images/Down-arrow.png');;
+    font-size: 25px;
+    line-height: 12px;
+    -moz-transform:rotate(0deg);
+    -o-transform:rotate(0deg);
+    -webkit-transform:rotate(0deg);
+    transform:rotate(0deg);
+    transition: .2s ease;
+}
+.accordion-toggle.open .icon:before {
+    -moz-transform:rotate(180deg);
+    -o-transform:rotate(180deg);
+    -webkit-transform:rotate(180deg);
+    transform:rotate(180deg);
+}
+.accordion-content {
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    display:none;
+    word-break: break-word;
+}
+.accordion-content .accordion-item{
+    display: flex;
+    margin: 15px 0;
+}
+.accordion-content.default {
+    display:block;
+}
+.accordion-box {
+    padding: 1.5em 0em 0em 0;
+}
+.accordion-box p {
+    text-align: right;
+    flex: 15%;
+    margin-right: 10px;
+    color: var(--inactive-gray);
+}
+.accordion-box span {
+    flex: 85%;
+    color: var(--mantle-off-white);
+}
+@media (max-width:425px){
+    .accordion-content{
+        font-size: 14px;
+    }
+}
+
+
+.form-heading{
+    color:red;
 }

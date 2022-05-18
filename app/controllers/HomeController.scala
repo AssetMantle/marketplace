@@ -23,21 +23,21 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     Ok(views.html.index())
   }
 
-  def signup() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.SignUp())
-  }
+//  def signup() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.SignUp())
+//  }
 
 //  def createWallet() = Action { implicit request: Request[AnyContent] =>
 //    Ok(views.html.createWallet())
 //  }
 
-  def seedPhraseVerification() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.seedPhraseVerification())
-  }
+//  def seedPhraseVerification() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.seedPhraseVerification())
+//  }
 
-  def assetMantleWalletSuccessfull() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.assetMantleWalletSuccessfull())
-  }
+//  def assetMantleWalletSuccessfull() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.assetMantleWalletSuccessfull())
+//  }
 
 //  def connectConfirmation() = Action { implicit request: Request[AnyContent] =>
 //    Ok(views.html.connectConfirmation())
@@ -138,8 +138,13 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
   def connectConfirmation() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.connectConfirmation()) }
   def redirectingToKeplr() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.redirectingToKeplr()) }
   def connectedSuccessToKeplr() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.connectedSuccessToKeplr()) }
+
   // Option 2: Import Wallet
   def importWalletSuccess() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.importWalletSuccess()) }
+
   // Option 3: Create AM Wallet
   def createWallet() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.createWallet()) }
+  def seedPhraseVerification() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.seedPhraseVerification()) }
+  def assetMantleWalletSuccessfull() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.assetMantleWalletSuccessfull()) }
+  def signUpMantleplaceCredentials() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.signUpMantleplaceCredentials()) }
 }

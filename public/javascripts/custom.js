@@ -301,7 +301,7 @@ var featuredSwiper = new Swiper(".featured-container .swiper-container", {
     effect: "coverflow",
     grabCursor: true,
     centeredSlides: true,
-    slidesPerView: 4,
+    slidesPerView: "auto",
     autoplay: {
         delay: 6000,
         disableOnInteraction: false
@@ -320,6 +320,23 @@ var featuredSwiper = new Swiper(".featured-container .swiper-container", {
         nextEl: ".swiper-button-next",
         prevEl: ".swiper-button-prev",
     },
+    breakpoints: {
+        // when window width is >= 499px
+        100: {
+            slidesPerView: 1,
+            // spaceBetweenSlides: 50
+        },
+        // // when window width is >= 499px
+        499: {
+            slidesPerView: 3,
+            // spaceBetweenSlides: 50
+        },
+        // // when window width is >= 999px
+        999: {
+            slidesPerView: 4,
+            // spaceBetweenSlides: 50
+        }
+    }
 });
 
 

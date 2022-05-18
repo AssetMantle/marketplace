@@ -1708,7 +1708,7 @@ article:first-child{
     text-align: center;
     letter-spacing: 0.08em;
     color:var(--default);
-    /*margin-top:50px;*/
+    padding-top: 20px;
 }
 
 /* Swiper 1 */
@@ -1824,6 +1824,10 @@ article:first-child{
     padding-bottom: 50px;
     overflow: hidden;
 }
+.swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal, .swiper-pagination-custom, .swiper-pagination-fraction{
+    height: 40px;
+}
+
 .featured-container .swiper-slide img{
     display: block;
     width: 100%;
@@ -1831,7 +1835,7 @@ article:first-child{
 .featured-container .swiper-slide{
     background-position: center;
     background-size: cover;
-    width: 200px;
+    width: 350px;
     /* box-shadow: 0 0 15px 50px rgba(0,0,0,0.2); */
     border-radius: 10px;
     position: relative;
@@ -1844,14 +1848,7 @@ article:first-child{
     height: 500px;
     color: #999;
 }
-@media (max-width: 1440px){
-    .featured-container .swiper-slide{
-        width: 350px;
-    }
-    .featured-container .featured-card{
-        height: 550px;
-    }
-}
+
 .featured-container .featured-card > .featured-card-img{
     height: calc(100% / 1);
     display: flex;
@@ -1906,14 +1903,14 @@ article:first-child{
     height: 17px;
 }
 .featured-container .creator-main .creator-detail .creator-name{
-    font-family: arial;
+    font-family: var(--font-type-2);
     font-size: 16px;
     font-weight: 700;
     color: #FFC640;
     margin-bottom: 5px;
 }
 .featured-container .creator-main .creator-detail .creator-sub-name{
-    font-family: arial;
+    font-family: var(--font-type-1);
     font-size: 14px;
     font-weight: 400;
     color: #B0B0B0;
@@ -1929,7 +1926,7 @@ article:first-child{
 
 /* Popular Swiper */
 .popular-container{
-    /*margin-top:50px;*/
+    /*margin-top:60px !important;*/
     display: block;
 }
 .popular-section,
@@ -2135,9 +2132,11 @@ article:first-child{
     object-fit: cover;
 }
 .new-drops-section .swiper-horizontal>.swiper-pagination-bullets{
-    bottom: 0px;
+    bottom: 0px !important;
 }
-
+.new-drops-section .swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal, .swiper-pagination-custom, .swiper-pagination-fraction{
+    bottom: -10px !important;
+}
 /* Landing Page Info Section */
 .landing-page-info-section{
     /*width: 100vw;*/
@@ -2167,7 +2166,7 @@ article:first-child{
 }
 .landing-page-info-section .info-steps-container{
     width: calc(100vw - 180px);
-    height: 60vh;
+    height: 55vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2812,8 +2811,13 @@ footer.section{
     }
 }
 @media (max-width: 768px) {
+    .fp-tableCell{
+        height: fit-content !important;
+    }
     .section {
-        padding: 120px 0;
+        height: fit-content !important;
+        /*padding: 120px 0;*/
+        padding: 50px 0px !important;
     }
     .hero-section .row .col-1{
         margin-top: 50px;
@@ -2821,9 +2825,18 @@ footer.section{
     .hero-section .row{
         flex-direction: column-reverse;
     }
+    .landing-page-info-section-2.section{
+        /*padding: 0px !important;*/
+    }
+    .landing-page-info-section-3{
+        display: block;
+    }
     .landing-page-info-section-3 .row{
         flex-direction: column-reverse;
         margin-top: 100px;
+    }
+    .landing-page-info-section-3 .row .column-2 img{
+        width: 200px;
     }
     .landing-page-info-section .info-steps-container{
         height: 50vh;
@@ -2859,14 +2872,29 @@ footer.section{
     }
 }
 @media (max-width: 425px){
+    .featured-container .swiper-slide{
+        width: 300px;
+    }
+    .featured-container .featured-card{
+        height: 450px;
+    }
+    .featured-container-main,
+    .popular-container{
+        margin-top: 0px;
+       transform: none;
+    }
     .featured-container{
         margin-top: 50px;
+        padding:0 30px;
     }
     .landing-page-heading{
         font-size: 24px;
     }
     .section{
         padding: 120px 0;
+    }
+    .featured-section{
+        padding: 0px !important;
     }
     .hero-section .row .col-1{
         margin-top: 0px;
@@ -2982,8 +3010,9 @@ footer.section{
     }
     .landing-page-info-section-2 .info-card-container .card{
         height: 0rem;
-        padding: 30px 10px;
+        padding: 60px 10px;
         gap:10px;
+        margin-top: 0px !important;
     }
     .landing-page-info-section-2 .info-card-container .card .card-image img{
         width: 70px;
@@ -2994,8 +3023,9 @@ footer.section{
         width: 25px;
     }
     footer.section{
-        margin-top: -40px;
+        /*margin-top: -40px;*/
         height: 1000px !important;
+        padding: 0px !important;
     }
 }
 .imagesContainer {
@@ -3017,41 +3047,41 @@ footer.section{
 .featured-section .swiper-slide-active .image-container img {
     height: 100%;
     position: absolute;
-    /*animation-name: multiple-image-crossfade;*/
-    /*animation-timing-function: ease-in-out;*/
-    /*animation-iteration-count: infinite;*/
-    /*animation-duration: 8s;*/
+    animation-name: multiple-image-crossfade;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-duration: 8s;
 }
-/*.image-container img:nth-of-type(1) {*/
-/*    animation-delay: 6s;*/
-/*}*/
-/*.image-container img:nth-of-type(2) {*/
-/*    animation-delay: 4s;*/
-/*}*/
-/*.image-container img:nth-of-type(3) {*/
-/*    animation-delay: 2s;*/
-/*}*/
-/*.image-container img:nth-of-type(4) {*/
-/*    animation-delay: 0s;*/
-/*}*/
+.image-container img:nth-of-type(1) {
+    animation-delay: 6s;
+}
+.image-container img:nth-of-type(2) {
+    animation-delay: 4s;
+}
+.image-container img:nth-of-type(3) {
+    animation-delay: 2s;
+}
+.image-container img:nth-of-type(4) {
+    animation-delay: 0s;
+}
 
-/*@keyframes multiple-image-crossfade {*/
-/*    0% {*/
-/*        opacity: 1;*/
-/*    }*/
-/*    17% {*/
-/*        opacity: 1;*/
-/*    }*/
-/*    50% {*/
-/*        opacity: 0;*/
-/*    }*/
-/*    75% {*/
-/*        opacity: 0;*/
-/*    }*/
-/*    100% {*/
-/*        opacity: 1;*/
-/*    }*/
-/*}*/
+@keyframes multiple-image-crossfade {
+    0% {
+        opacity: 1;
+    }
+    17% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
 
 .home-container{
     scroll-snap-points-y: repeat(100vh);

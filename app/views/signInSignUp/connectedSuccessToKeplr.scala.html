@@ -1,9 +1,10 @@
 @import views.html.base.forms._
+
 @main("Connected Success To Keplr") {
     <button>Click For Modal</button>
     @formModal() {
         @successModal(heading = "Keplr Wallet Connected", subHeading = "You have connected your Keplr wallet. Your details are as followed.")
-        @successModalAddressBox(userName = "Username", address = "dwafegrtefdvfhresv -39i539w0rej")
+        @successModalAddressBox(Symbol("userName") -> "Username", Symbol("address") -> "dwafegrtefdvfhresv -39i539w0rej")
         <div class="form-button">
             @formPrimaryButton(message = "Proceed to Sign up")
         </div>
