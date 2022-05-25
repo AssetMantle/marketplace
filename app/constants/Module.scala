@@ -1,0 +1,8 @@
+package constants
+
+object Module {
+  val HOME_CONTROLLER = "HOME_CONTROLLER"
+  val ACCOUNT_CONTROLLER = "ACCOUNT_CONTROLLER"
+
+  val MASTER_ACCOUNT = "MASTER_ACCOUNT"
+}

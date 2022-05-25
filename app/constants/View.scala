@@ -63,4 +63,17 @@ object View{
   val FOOTER_FAQ_5 = "FOOTER_FAQ_5"
   val FOOTER_FAQ_LINK_5 = "FOOTER_FAQ_LINK_5"
   val COPYRIGHT = "COPYRIGHT"
+  val META_DESCRIPTION = "META_DESCRIPTION"
+  val APP_NAME = "APP_NAME"
+  val FAILURE = "FAILURE"
+  val WARNING = "WARNING"
+  val INFORMATION = "INFORMATION"
+  val SUCCESS = "SUCCESS"
+  val INDEX = "INDEX"
+  val UNKNOWN = "UNKNOWN"
+
+  object Button {
+    val NEXT = "Next"
+    val CANCEL = "Cancel"
+  }
 }

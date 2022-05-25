@@ -1,31 +1,34 @@
 package controllers
 
-import javax.inject._
-import play.api._
+import controllers.actions._
+import play.api.Logger
+import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 
-/**
- * This controller creates an `Action` to handle HTTP requests to the
- * application's home page.
- */
+import javax.inject._
+import scala.concurrent.ExecutionContext
+
 @Singleton
-class HomeController @Inject()(val controllerComponents: ControllerComponents) extends BaseController with I18nSupport {
+class HomeController @Inject()(
+                                messagesControllerComponents: MessagesControllerComponents,
+                                cached: Cached,
+                                withoutLoginActionAsync: WithoutLoginActionAsync,
+                                withoutLoginAction: WithoutLoginAction
+                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  /**
-   * Create an Action to render an HTML page.
-   *
-   * The configuration in the `routes` file means that this method
-   * will be called when the application receives a `GET` request with
-   * a path of `/`.
-   */
-  def index() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.index())
+  private implicit val logger: Logger = Logger(this.getClass)
+
+  private implicit val module: String = constants.Module.HOME_CONTROLLER
+
+  def index: EssentialAction = cached.apply(req => req.path, constants.CommonConfig.webAppCacheDuration) {
+    withoutLoginAction { implicit request =>
+      Ok(views.html.index())
+    }
   }
 
-  def signup() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.SignUp())
-  }
+
+
 
   def createWallet() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.createWallet())
