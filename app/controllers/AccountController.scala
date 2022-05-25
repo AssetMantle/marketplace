@@ -39,7 +39,8 @@ class AccountController @Inject()(
 
         (for {
           _ <- addAccount
-        } yield Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL)))) {
+        } yield Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL)))
+          ).recover {
           case baseException: BaseException => BadRequest(views.html.account.signUp(SignUp.form.withGlobalError(baseException.failure.message)))
         }
       }

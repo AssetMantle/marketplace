@@ -95,39 +95,39 @@ class HomeController @Inject()(
   }
 
   def selectCollection() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.createCollection.selectCollection())
+    Ok(views.html.collection.selectCollection())
   }
 
   def createNewCollection() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.createCollection.createNewCollection())
+    Ok(views.html.collection.createNewCollection())
   }
 
   def createNewCollectionSuccessful() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.createCollection.createNewCollectionSuccessful())
+    Ok(views.html.collection.createNewCollectionSuccessful())
   }
 
   def createNewCollectionSaveDraft() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.createCollection.createNewCollectionSaveDraft())
+    Ok(views.html.collection.createNewCollectionSaveDraft())
   }
 
   def createNewCollectionDraftSaved() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.createCollection.createNewCollectionDraftSaved())
+    Ok(views.html.collection.createNewCollectionDraftSaved())
   }
 
   def createNewNFT() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.createCollection.createNewNFT())
+    Ok(views.html.collection.createNewNFT())
   }
 
   def NFTCreatedSuccess() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.createCollection.NFTCreatedSuccess())
+    Ok(views.html.collection.NFTCreatedSuccess())
   }
 
   def mintNFT() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.createCollection.mintNFT())
+    Ok(views.html.collection.mintNFT())
   }
 
   def mintNFTSuccess() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.createCollection.mintNFTSuccess())
+    Ok(views.html.collection.mintNFTSuccess())
   }
 
   def marketPlaceHome() = Action { implicit request: Request[AnyContent] =>
