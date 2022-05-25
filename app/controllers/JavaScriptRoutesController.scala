@@ -16,6 +16,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
         routes.javascript.Assets.versioned,
+
+        routes.javascript.AccountController.signUpForm,
       )
     ).as(MimeTypes.JAVASCRIPT)
 

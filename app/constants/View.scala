@@ -73,7 +73,9 @@ object View{
   val UNKNOWN = "UNKNOWN"
 
   object Button {
-    val NEXT = "Next"
-    val CANCEL = "Cancel"
+    val NEXT = "NEXT"
+    val CANCEL = "CANCEL"
+    val APPROVE = "APPROVE"
+    val REJECT = "REJECT"
   }
 }

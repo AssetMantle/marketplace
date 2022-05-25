@@ -1,0 +1,3 @@
+
+@(name: String, arguments: (Symbol, Any)*)
+<button class="@arguments.toMap.get(Symbol("class")).map(_.toString).getOrElse("infoRowValue")">@name</button>

@@ -4,17 +4,12 @@ import play.api.routing.JavaScriptReverseRoute
 
 object Response {
 
-  val PREFIX = "RESPONSE."
-  val FAILURE_PREFIX = "FAILURE."
-  val WARNING_PREFIX = "WARNING."
-  val SUCCESS_PREFIX = "SUCCESS."
-  val INFO_PREFIX = "INFO."
-  val LOG_PREFIX = "LOG."
-  val KEY_ASSET = "asset"
-  val KEY_FIAT = "fiat"
-  val KEY_NEGOTIATION_ID = "negotiation_id"
-  val KEY_ORDER_ID = "order_id"
-  val KEY_EXECUTED = "executed"
+  private val PREFIX = "RESPONSE."
+  private val FAILURE_PREFIX = "FAILURE."
+  private val WARNING_PREFIX = "WARNING."
+  private val SUCCESS_PREFIX = "SUCCESS."
+  private val INFO_PREFIX = "INFO."
+  private val LOG_PREFIX = "LOG."
 
   val ACCOUNT_INSERT_FAILED = new Failure("ACCOUNT_INSERT_FAILED")
   val ACCOUNT_UPSERT_FAILED = new Failure("ACCOUNT_UPSERT_FAILED")
@@ -24,6 +19,8 @@ object Response {
   val INVALID_PASSWORD = new Failure("INVALID_PASSWORD")
   val PASSWORDS_DO_NOT_MATCH = new Failure("PASSWORDS_DO_NOT_MATCH")
   val USERNAME_UNAVAILABLE = new Failure("USERNAME_UNAVAILABLE")
+
+  val SIGN_UP_SUCCESSFUL = new Success("SIGN_UP_SUCCESSFUL")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

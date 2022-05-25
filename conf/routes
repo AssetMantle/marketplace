@@ -7,39 +7,43 @@
 # GET        /                                           controllers.HomeController.index()
 
 # Map static resources from the /public folder to the /assets URL path
-GET        /assets/*file                               controllers.Assets.versioned(path="/public", file: Asset)
-GET        /javascriptRoutes                           controllers.JavaScriptRoutesController.javascriptRoutes
+GET         /assets/*file                               controllers.Assets.versioned(path="/public", file: Asset)
+GET         /javascriptRoutes                           controllers.JavaScriptRoutesController.javascriptRoutes
 
-GET        /createwallet                               controllers.HomeController.createWallet()
-GET        /seedPhraseVerification                     controllers.HomeController.seedPhraseVerification()
-GET        /assetMantleWalletSuccessfull               controllers.HomeController.assetMantleWalletSuccessfull()
-GET        /connectConfirmation                        controllers.HomeController.connectConfirmation()
-GET        /connectConfirmationRedirectToKeplrn        controllers.HomeController.connectConfirmationRedirectToKeplrn()
-GET        /connectedSuccessToKeplr                    controllers.HomeController.connectedSuccessToKeplr()
-GET        /importWalletSuccess                        controllers.HomeController.importWalletSuccess()
-GET        /signUpForm                                 controllers.HomeController.signUpForm()
-GET        /signIn                                     controllers.HomeController.signIn()
-GET        /signUpCompleteConnectedWallet              controllers.HomeController.signUpCompleteConnectedWallet()
-GET        /forgotPasswordUsername                     controllers.HomeController.forgotPasswordUsername()
-GET        /forgotPasswordConfirmPassword              controllers.HomeController.forgotPasswordConfirmPassword()
-GET        /resetPasswordStep1                         controllers.HomeController.resetPasswordStep1()
-GET        /resetPasswordStep2                         controllers.HomeController.resetPasswordStep2()
-GET        /resetPasswordStep3                         controllers.HomeController.resetPasswordStep3()
 
-GET        /profileMyNFTs                              controllers.HomeController.profileMyNFTs()
+GET         /createwallet                               controllers.HomeController.createWallet()
+GET         /seedPhraseVerification                     controllers.HomeController.seedPhraseVerification()
+GET         /assetMantleWalletSuccessfull               controllers.HomeController.assetMantleWalletSuccessfull()
+GET         /connectConfirmation                        controllers.HomeController.connectConfirmation()
+GET         /connectConfirmationRedirectToKeplrn        controllers.HomeController.connectConfirmationRedirectToKeplrn()
+GET         /connectedSuccessToKeplr                    controllers.HomeController.connectedSuccessToKeplr()
+GET         /importWalletSuccess                        controllers.HomeController.importWalletSuccess()
+GET         /signUpForm                                 controllers.HomeController.signUpForm()
+GET         /signIn                                     controllers.HomeController.signIn()
+GET         /signUpCompleteConnectedWallet              controllers.HomeController.signUpCompleteConnectedWallet()
+GET         /forgotPasswordUsername                     controllers.HomeController.forgotPasswordUsername()
+GET         /forgotPasswordConfirmPassword              controllers.HomeController.forgotPasswordConfirmPassword()
+GET         /resetPasswordStep1                         controllers.HomeController.resetPasswordStep1()
+GET         /resetPasswordStep2                         controllers.HomeController.resetPasswordStep2()
+GET         /resetPasswordStep3                         controllers.HomeController.resetPasswordStep3()
 
-GET        /selectCollection                           controllers.HomeController.selectCollection()
-GET        /createNewCollection                        controllers.HomeController.createNewCollection()
-GET        /createNewCollectionSuccessful              controllers.HomeController.createNewCollectionSuccessful()
-GET        /createNewCollectionSaveDraft               controllers.HomeController.createNewCollectionSaveDraft()
-GET        /createNewCollectionDraftSaved              controllers.HomeController.createNewCollectionDraftSaved()
+GET         /profileMyNFTs                              controllers.HomeController.profileMyNFTs()
 
-GET        /createNewNFT                               controllers.HomeController.createNewNFT()
-GET        /NFTCreatedSuccess                          controllers.HomeController.NFTCreatedSuccess()
-GET        /mintNFT                                    controllers.HomeController.mintNFT()
-GET        /mintNFTSuccess                             controllers.HomeController.mintNFTSuccess()
+GET         /selectCollection                           controllers.HomeController.selectCollection()
+GET         /createNewCollection                        controllers.HomeController.createNewCollection()
+GET         /createNewCollectionSuccessful              controllers.HomeController.createNewCollectionSuccessful()
+GET         /createNewCollectionSaveDraft               controllers.HomeController.createNewCollectionSaveDraft()
+GET         /createNewCollectionDraftSaved              controllers.HomeController.createNewCollectionDraftSaved()
 
-GET        /                                           controllers.HomeController.marketPlaceHome()
+GET         /createNewNFT                               controllers.HomeController.createNewNFT()
+GET         /NFTCreatedSuccess                          controllers.HomeController.NFTCreatedSuccess()
+GET         /mintNFT                                    controllers.HomeController.mintNFT()
+GET         /mintNFTSuccess                             controllers.HomeController.mintNFTSuccess()
+
+GET         /                                           controllers.HomeController.marketPlaceHome()
+
+GET         /signUp                                     controllers.AccountController.signUpForm
+POST        /signUp                                     controllers.AccountController.signUp
 
 
 

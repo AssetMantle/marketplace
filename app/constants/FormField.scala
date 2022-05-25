@@ -19,6 +19,7 @@ object FormField {
   //BooleanFormField
   val RECEIVE_NOTIFICATIONS = new BooleanFormField("RECEIVE_NOTIFICATIONS")
   val USERNAME_AVAILABLE = new BooleanFormField("USERNAME_AVAILABLE")
+  val STATUS = new BooleanFormField("STATUS")
 
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName
