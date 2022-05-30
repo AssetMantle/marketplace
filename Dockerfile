@@ -30,11 +30,11 @@ RUN cp *.zip mantleplace.zip; \
   rm *.zip; \
   ls -alt; \
   mv mantleplace* mantleplace; \
-  ls -alt
-  # mv persistenceclient* persistenceclient; \
-  # awk 'NR==1{print; print "set -x"} NR!=1' persistenceclient/bin/persistenceclient > persistenceclient/bin/persistenceclient.tmp; \
-  # mv persistenceclient/bin/persistenceclient.tmp persistenceclient/bin/persistenceclient; \
-  # chmod +x persistenceclient/bin/persistenceclient
+  ls -alt; \
+  awk 'NR==1{print; print "set -x"} NR!=1' mantleplace/bin/mantleplace > mantleplace/bin/mantleplace.tmp; \
+  mv mantleplace/bin/mantleplace.tmp mantleplace/bin/mantleplace; \
+  chmod +x mantleplace/bin/mantleplace; \
+  head -n 10 mantleplace/bin/mantleplace
 
 FROM openjdk:11-jre-slim
 LABEL org.opencontainers.image.title=mantleplace
