@@ -4,15 +4,17 @@
         @if(arguments.toMap.get('userName).map(_.toString).isDefined){
                 <span class="address-box-label">Username:</span>
                 <span class="address-box-text">
-                    <span>@arguments.toMap.get('userName).map(_.toString).getOrElse("")</span>
+                    <span class="username-data">@arguments.toMap.get('userName).map(_.toString).getOrElse("")</span>
                     <span class="form-copy-icon"><img src="@routes.Assets.versioned("images/copy.png")"/></span>
+                    <span class="form-copy-message">Copied</span>
                 </span>
         }
         @if(arguments.toMap.get('address).map(_.toString).isDefined){
             <span class="address-box-label">Address:</span>
             <span class="address-box-text">
-                <span>@arguments.toMap.get('address).map(_.toString).getOrElse("")</span>
+                <span class="username-data">@arguments.toMap.get('address).map(_.toString).getOrElse("")</span>
                 <span class="form-copy-icon"><img src="@routes.Assets.versioned("images/copy.png")"/></span>
+                <span class="form-copy-message">Copied</span>
             </span>
         }
     </div>

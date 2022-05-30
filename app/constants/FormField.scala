@@ -7,7 +7,7 @@ import play.api.data.validation.Constraints
 import scala.util.matching.Regex
 
 object FormField {
-  val USERNAME = new StringFormField("USERNAME",4, 10)
+  val USERNAME = new StringFormField("username",4, 10)
   val PASSWORD = new StringFormField("PASSWORD",6,20,RegularExpression.PASSWORD)
   val CONFIRM_PASSWORD = new StringFormField("CONFIRM_PASSWORD",6,20,RegularExpression.PASSWORD)
   val NAME = new StringFormField("NAME",4,40)

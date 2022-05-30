@@ -67,7 +67,7 @@
     opacity: 1;
 }
 .modal.active .close-modal {
-    transform: translateY(10px);
+    transform: translateY(0px);
     opacity: 1;
 }
 
@@ -87,6 +87,7 @@
 /* Large Header */
 .modal .header .form-top{
     display: flex;
+    align-items: center;
     justify-content: space-between;
 }
 .modal .header .form-top .form-title{
@@ -115,13 +116,13 @@
     margin-right: 10px;
 }
 .modal .header-with-icon .form-top .title-text{
+    flex-grow: 2;
     font-family: var(--font-type-1);
     font-style: normal;
     font-weight: 600;
     font-size: 20px;
     text-transform: capitalize;
     color: var(--dark);
-    padding-bottom: 5px;
     margin-right: 20px;
 }
 .modal .header-with-icon .form-sub-title{
@@ -132,13 +133,25 @@
     margin:12px 0 0 0;
     color: var(--text-medium);
 }
+.modal .header-with-icon .form-top .back-button-icon{
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    cursor: pointer;
+}
+.modal .header-with-icon .form-top .back-button-icon:hover{
+    background-color: var(--popup-stroke);
+}
 
 /* Close Button */
 .modal .form-close-btn{
-    position: absolute;
+    /*position: absolute;*/
     cursor: pointer;
-    top: 5px;
-    right: 15px;
+    /*top: 5px;*/
+    /*right: 15px;*/
     opacity: 0;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
@@ -319,24 +332,6 @@
     transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
     border: 1px solid var(--dark);
 }
-.form-button .form-primary-button::before {
-    content: '';
-    position: absolute;
-    top:0;
-    background-color: var(--popup-bg);
-    width: 105%;
-    left: -115%;
-    height: 100%;
-    transform: skew(30deg);
-    transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
-    z-index: -1;
-}
-.form-button .form-primary-button:hover{
-    color: var(--dark);
-}
-.form-button .form-primary-button:hover::before{
-    transform: translateX(105%);
-}
 .form-button .form-secondary-button{
     color: var(--dark);
     background-color: transparent;
@@ -346,27 +341,17 @@
     z-index: 950;
     transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
 }
-.form-button .form-secondary-button::before{
-    content: '';
-    position: absolute;
-    top:0;
-    background-color: var(--dark);
-    width: 105%;
-    left: -115%;
-    height: 100%;
-    transform: skew(30deg);
-    transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
-    z-index: -1;
-}
-.form-button .form-secondary-button:hover{
-    color: var(--button-text);
-}
-.form-button .form-secondary-button:hover::before{
-    transform: translateX(105%);
-    box-shadow: inset -4px -4px 8px rgba(0, 0, 0, 0.2), inset 4px 4px 8px #FFD365;
+
+/* Successful Modal */
+.header-success .form-top{
+    display: flex;
 }
 
-/* Successful Modal Icon Animation */
+/* Successful Modal Icon */
+.form-success-icon{
+    flex-grow: 2;
+    padding-left: 40px;
+}
 .header-success .form-success-icon{
     text-align: center;
 }
@@ -422,21 +407,57 @@
     text-align: right;
     color: var(--inactive-gray);
     margin-right:10px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
 }
 .form-address-box .address-box-text{
     color: var(--mantle-off-white);
     display: flex;
     align-items: center;
-
+}
+.form-address-box .form-copy-icon{
+    margin-left: 5px;
+}
+.form-address-box .form-copy-message.active{
+    animation: msg-copied 2s ease-in-out forwards;
+}
+.form-address-box .form-copy-message{
+    margin-left:5px;
+    font-size: 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: var(--popup-bg);
+    color: var(--inactive-gray);
+    position: relative;
+    top: 10px;
+    opacity: 0;
+}
+@keyframes msg-copied {
+    0%{
+        top:10px;
+        opacity: 0;
+    }
+    20%{
+        top:0px;
+        opacity: 1;
+    }
+    80%{
+        top:0px;
+        opacity: 1;
+    }
+    100%{
+        top:-10px;
+        opacity: 0;
+    }
 }
 @media (max-width: 425px){
     .form-address-box{
         font-size: 14px;
     }
 }
-.form-address-box .form-copy-icon{
-    margin-left: 5px;
-}
+
+
 
 /* Create Wallet */
 .sub-heading-link{
@@ -503,6 +524,7 @@
 .form-copy-icon{
     height: 40px;
     width: 40px;
+    aspect-ratio: 1;
     border-radius: 50%;
     padding: 4px 0 0 0;
     display: flex;
@@ -666,6 +688,173 @@
 }
 
 
-.form-heading{
-    color:red;
+/* Multi Step */
+.progress-bar {
+    width: 100%;
+    list-style-type: none;
+    display: flex;
+    padding: 0;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+.progress-bar:before {
+    content: '';
+    width: 9px;
+    height: 9px;
+    background: var(--button-text);
+    box-shadow: 1.41818px 1.41818px 2.83636px rgba(0, 0, 0, 0.2), inset -1.41818px -1.41818px 2.83636px rgba(0, 0, 0, 0.2), inset 1.41818px 1.41818px 2.83636px #3F3F3F;
+    border-radius: 50%;
+    position: absolute;
+    left:-1px;
+    top:6px;
+}
+.progress-bar:after {
+    content: '';
+    width: 9px;
+    height: 9px;
+    background: var(--button-text);
+    box-shadow: 1.41818px 1.41818px 2.83636px rgba(0, 0, 0, 0.2), inset -1.41818px -1.41818px 2.83636px rgba(0, 0, 0, 0.2), inset 1.41818px 1.41818px 2.83636px #3F3F3F;
+    border-radius: 50%;
+    position: absolute;
+    right:-1px;
+    top:6px;
+}
+.progress-bar li.progress-bar__dot {
+    display: block;
+    width: 20px;
+    border-radius: 10px;
+    height: 20px;
+    aspect-ratio: 1;
+    /*border: 2px solid #ff8552;*/
+    /*background-color: white;*/
+    cursor: pointer;
+    transition: all 0.5s ease;
+    background: var(--popup-bg);
+    box-shadow: inset 0px 0px 0px 2px var(--popup-bg), 0px 0px 0px 2px var(--mantle-off-white);
+    z-index: 99;
+}
+.progress-bar li.progress-bar__dot.full {
+    background: var(--radial);
+    box-shadow: inset 0px 0px 0px 2px var(--popup-bg), 0px 0px 0px 2px var(--dark);
+}
+.progress-bar li.progress-bar__connector {
+    display: block;
+    width: 15em;
+    height: 2px;
+    background-color: #383838;
+    margin-top: 10px;
+}
+
+/* Common Form Field */
+.commonField{
+    /*background-color: red;*/
+}
+.commonField label {
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 700;
+    font-size: var(--field-label);
+    text-transform: capitalize;
+    white-space: nowrap;
+    color: var(--inactive-gray);
+}
+.commonField input{
+    height: 36px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid var(--inactive-gray);
+    border-radius: var(--size-radius);
+    padding: 10px 12px;
+    color: var(--mantle-off-white);
+    background: transparent;
+    margin-top: 8px;
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: var(--field-text);
+    letter-spacing: 1px;
+    outline: none;
+}
+.commonField input::placeholder{
+    color: var(--inactive-gray);
+    text-transform: capitalize;
+}
+.commonField input:focus{
+    border-color: var(--dark);
+}
+.commonField input:not(:focus){
+    color: var(--inactive-gray);
+}
+
+.hero-wrapper{
+    width: 100%;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 60% auto;
+    position: relative;
+    overflow: hidden;
+}
+.hero-wrapper .lwrap{
+    width: 90%;
+    margin-top: 100px;
+    padding: 50px 30px;
+}
+.hero-wrapper .lwrap h1{
+    font-size: 50px;
+    font-weight: 300;
+    text-transform: capitalize;
+    line-height: 110%;
+    font-family: var(--font-type-1);
+    color: var(--dark);
+    margin-top: 40px;
+}
+.hero-wrapper .lwrap h1 span{
+    font-weight: bold;
+}
+.hero-wrapper .lwrap p{
+    font-family: var(--font-type-2);
+    color: var(--mantle-off-white);
+    padding: 20px 80px 30px 0px;
+}
+.hero-wrapper .lwrap .button{
+    display: grid;
+    grid-template-columns: 30% auto;
+    grid-gap: 20px;
+    margin-top: 30px;
+}
+.hero-wrapper .lwrap .button a{
+    display: grid;
+    place-items: center;
+    background: #000;
+    color: #fff;
+    width: 100%;
+    height: 50px;
+    font-size: 18px;
+    position: relative;
+    font-weight: 500;
+    border-radius: 20px;
+}
+.hero-wrapper .lwrap .button .vdbtn{
+    display: flex;
+    place-items: center;
+    cursor: pointer;
+}
+.hero-wrapper .lwrap .button .vdbtn p{
+    font-size: 20px;
+    padding: 0px 10px;
+}
+.hero-wrapper .rwrap{
+    margin-top:50px;
+    display: flex;
+}
+.hero-wrapper .rwrap .img1{
+    transform: rotate(20deg) translate(-200px, -65px);
+    transform-origin: center center;
+}
+.hero-wrapper .rwrap .img1 img{
+    width: 235px;
+    height: 300px;
+    object-fit: cover;
+    margin: 3px 15px;
 }

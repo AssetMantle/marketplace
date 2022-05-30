@@ -7,11 +7,11 @@ function HideScrollbar() {
 }
 HideScrollbar()
 
-function ShowScrollbar() {
-    var style = document.createElement("style");
-    style.innerHTML = `body::-webkit-scrollbar {display: block;}`;
-    document.head.appendChild(style);
-}
+// function ShowScrollbar() {
+//     var style = document.createElement("style");
+//     style.innerHTML = `body::-webkit-scrollbar {display: block;}`;
+//     document.head.appendChild(style);
+// }
 
 let intro = document.querySelector('.intro');
 
@@ -20,7 +20,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
         setTimeout(()=>{
             intro.style.top = '-100vh';
             intro.style.visibility = 'hidden';
-            ShowScrollbar();
+            // ShowScrollbar();
         },3500);
     });
 });
@@ -269,17 +269,18 @@ function setDateRange(){
 
 // Check Phrase
 function checkPhrase(e){
-    if(e.className === "input-phrase-1"){
-        if(e.value === "Monkey"){
-            e.parentNode.style.borderColor = "var(--connected)";
+    console.log(e.value);
+    // if(e.className === "input-phrase-1"){
+        if(e.value.toLowerCase() === "monkey"){
+            e.style.borderColor = "var(--connected)";
         }
         else if(e.value.length !== 0){
-            e.parentNode.style.borderColor = "var(--error)";
+            e.style.borderColor = "var(--error)";
         }
         else{
-            e.parentNode.style.borderColor = "var(--dark)";
+            e.style.borderColor = "var(--dark)";
         }
-    }
+    // }
 }
 
 
@@ -558,3 +559,152 @@ window.onbeforeunload = function () {
     window.scrollTo(0, 0);
 }
 
+// Custom Cursor
+var cursor = $(".cursor"),
+    follower = $(".cursor-follower");
+
+var posX = 0,
+    posY = 0;
+
+var mouseX = 0,
+    mouseY = 0;
+
+TweenMax.to({}, 0.016, {
+    repeat: -1,
+    onRepeat: function() {
+        posX += (mouseX - posX) / 9;
+        posY += (mouseY - posY) / 9;
+
+        TweenMax.set(follower, {
+            css: {
+                left: posX - 12,
+                top: posY - 12
+            }
+        });
+
+        TweenMax.set(cursor, {
+            css: {
+                left: mouseX,
+                top: mouseY
+            }
+        });
+    }
+});
+
+$(document).on("mousemove", function(e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+$(".links li").on("mouseenter", function() {
+    cursor.addClass("hovered");
+    follower.addClass("hovered");
+});
+$(".links li").on("mouseleave", function() {
+    cursor.removeClass("hovered");
+    follower.removeClass("hovered");
+});
+$(document).on("mousedown", function(e) {
+    TweenMax.to(cursor, 1, {
+        css: {
+            scale: 4.5
+        }
+    });
+    TweenMax.to(follower, 1, {
+        css: {
+            scale: .2
+        }
+    });
+});
+
+$(document).on("mouseup", function(e) {
+    TweenMax.to(cursor, 1, {
+        css: {
+            scale: 1
+        }
+    });
+    TweenMax.to(follower, 1, {
+        css: {
+            scale: 1
+        }
+    });
+});
+$(document).on("mouseenter", function(e) {
+    TweenMax.to(cursor, 1, {
+        opacity:1, display:"block"
+    });
+    TweenMax.to(follower, 1, {
+        opacity:0.5, display:"block"
+    });
+});
+
+$(document).on("mouseleave", function(e) {
+    TweenMax.to(cursor, 1, {
+        opacity:0, display:"none"
+    });
+    TweenMax.to(follower, 1, {
+        opacity:0, display:"none"
+    });
+});
+
+// Text Copy to Clipboard
+$(".form-address-box .form-copy-icon").on("click",function (){
+    var element = $(this).next('.form-copy-message');
+    var copyText = $(this).prevAll('.username-data');
+
+    element.addClass("active");
+    element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function() {
+        element.removeClass('active');
+    });
+
+    navigator.clipboard.writeText(copyText.text());
+});
+
+
+// Multi Step
+const dots = document.getElementsByClassName('progress-bar__dot')
+const numberOfSteps = 3
+let currentStep = 1
+
+for(let i = 0 ; i < dots.length ; ++i){
+    dots[i].addEventListener('click', ()=>{
+        goToStep(i+1)
+    })
+}
+
+function goToStep(stepNumber){
+    currentStep = stepNumber
+
+    let indicators = document.getElementsByClassName('progress-bar__dot')
+
+    for(let i = indicators.length-1; i >= currentStep ; --i){
+        indicators[i].classList.remove('full')
+    }
+
+    for(let i = 0; i < currentStep; ++i){
+        indicators[i].classList.add('full')
+    }
+}
+
+// Reveal Navbar on Scroll
+// const body = document.body;
+// let lastScroll = 0;
+//
+// window.addEventListener("scroll", () => {
+//     const currentScroll = window.pageYOffset;
+//     if (currentScroll <= 0) {
+//         body.classList.remove("scroll-up");
+//         return;
+//     }
+//
+//     if (currentScroll > lastScroll && !body.classList.contains("scroll-down")) {
+//         body.classList.remove("scroll-up");
+//         body.classList.add("scroll-down");
+//     } else if (
+//         currentScroll < lastScroll &&
+//         body.classList.contains("scroll-down")
+//     ) {
+//         body.classList.remove("scroll-down");
+//         body.classList.add("scroll-up");
+//     }
+//     lastScroll = currentScroll;
+// });

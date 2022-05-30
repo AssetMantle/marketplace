@@ -182,27 +182,88 @@
 }
 
 /* Smooth Scroll */
-.scroll-container{
+/*.parent {*/
+/*    overflow: scroll;*/
+/*    height: 100vh;*/
+/*    scroll-snap-points-y: repeat(100vh);*/
+/*    scroll-snap-type: y mandatory;*/
+/*}*/
+
+/*section {*/
+/*    height: 100vh;*/
+/*    scroll-snap-align: start;*/
+/*    position: relative;*/
+/*}*/
+
+/*.one {*/
+/*    background-color: red;*/
+/*}*/
+
+/*.two {*/
+/*    background-color: blue;*/
+/*}*/
+
+/*.three {*/
+/*    background-color: grey;*/
+/*}*/
+
+/*.four {*/
+/*    background-color: green;*/
+/*}*/
+
+html {
+    height: 100vh;
+    overflow-y: scroll;
     font-family: sans-serif;
-    scroll-snap-type: mandatory;
     scroll-snap-points-y: repeat(100vh);
     scroll-snap-type: y mandatory;
+    /*cursor: none;*/
 }
-.scroll-container section {
-    border-bottom: 1px solid white;
-    padding: 1rem;
+
+/* Smooth Scroll */
+.smooth-scroll-section {
     height: 100vh;
     scroll-snap-align: start;
-    text-align: center;
     position: relative;
 }
-.scroll-container h1{
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    text-align: center;
-    color: white;
-    width: 100%;
-    left: 0;
-    font-size: calc(1rem + 3vw);
+.section-footer{
+    padding: 0rem;
+    /*height: 360px;*/
+    height: 185px;
 }
+
+/* Custom Cursor */
+/*.cursor{*/
+/*    width: 8px;*/
+/*    height: 8px;*/
+/*    border-radius: 50%;*/
+/*    background: white;*/
+/*    position: fixed;*/
+/*    z-index: 999;*/
+/*    pointer-events: none;*/
+/*    mix-blend-mode: difference;*/
+/*    opacity: 0;*/
+/*    display: none;*/
+/*}*/
+/*.cursor.hovered{*/
+/*    opacity: 0.08;*/
+/*}*/
+/*.cursor-follower{*/
+/*    width: 36px;*/
+/*    height: 36px;*/
+/*    position: fixed;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    border:2px solid white;*/
+/*    background-size: cover;*/
+/*    mix-blend-mode: difference;*/
+/*    pointer-events: none;*/
+/*    transform: translate(-3px, -3px);*/
+/*    border-radius: 10px;*/
+/*    z-index: 999;*/
+/*    opacity: 0;*/
+/*    display: none;*/
+/*}*/
+/*.cursor-follower.hovered{*/
+/*    opacity: 0.08;*/
+/*}*/

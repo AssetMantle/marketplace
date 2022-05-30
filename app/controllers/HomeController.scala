@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject._
 import play.api._
+import constants.CommonConfig._
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 
@@ -19,9 +20,9 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
    * will be called when the application receives a `GET` request with
    * a path of `/`.
    */
-  def index() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.index())
-  }
+//  def index() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.index())
+//  }
 
 //  def signup() = Action { implicit request: Request[AnyContent] =>
 //    Ok(views.html.SignUp())
@@ -43,9 +44,9 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
 //    Ok(views.html.connectConfirmation())
 //  }
 
-  def connectConfirmationRedirectToKeplrn() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.connectConfirmationRedirectToKeplr())
-  }
+//  def connectConfirmationRedirectToKeplrn() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.connectConfirmationRedirectToKeplr())
+//  }
 
 //  def connectedSuccessToKeplr() = Action { implicit request: Request[AnyContent] =>
 //    Ok(views.html.connectedSuccessToKeplr())
@@ -87,17 +88,13 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     Ok(views.html.resetPasswordStep3())
   }
 
-  def profileMyNFTs() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.profile.profileMyNFTs())
-  }
-
   def selectCollection() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.createCollection.selectCollection())
   }
 
-  def createNewCollection() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.createCollection.createNewCollection())
-  }
+//  def createNewCollection() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.createCollection.createNewCollection())
+//  }
 
   def createNewCollectionSuccessful() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.createCollection.createNewCollectionSuccessful())
@@ -147,4 +144,11 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
   def seedPhraseVerification() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.seedPhraseVerification()) }
   def assetMantleWalletSuccessfull() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.assetMantleWalletSuccessfull()) }
   def signUpMantleplaceCredentials() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.signUpMantleplaceCredentials()) }
+
+  // Create Collection & NFT
+  def createNewCollection() = Action { implicit request: Request[AnyContent] => Ok(views.html.collection.createNewCollection()) }
+
+  // Profile
+  // Visitor's POV
+  def creatorsProfile() = Action { implicit request: Request[AnyContent] => Ok(views.html.userProfile.creatorsProfile()) }
 }

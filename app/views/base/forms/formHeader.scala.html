@@ -5,5 +5,7 @@
         <div class="form-title">@label</div>
         <a class="form-close-btn close-modal"></a>
     </div>
-    <div class="form-sub-title">@subHeading</div>
+    @if(subHeading != ""){
+        <div class="form-sub-title">@subHeading</div>
+    }
 </div>

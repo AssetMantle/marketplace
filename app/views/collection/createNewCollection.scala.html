@@ -1,0 +1,9 @@
+@import views.html.base.forms._
+
+@main("Create New Collection") {
+    <button>Click For Modal</button>
+    @formModal() {
+        @formHeaderWithBackButton(heading = "Create New Collection")
+        @multiStepNavigator()
+    }
+}

@@ -1,5 +1,5 @@
 @(phraseNumber: String, arguments: (Symbol, Any)*)
 <div class="form-seed-box">
     <div class="form-seed-box-number">@phraseNumber</div>
-    <input type="text" value="@arguments.toMap.get('phrase).map(_.toString)" class="form-seed-box-phrase @arguments.toMap.get('class).map(_.toString).getOrElse("")"  />
+    <input type="text" value="@arguments.toMap.get('phrase).map(_.toString)" class="form-seed-box-phrase @arguments.toMap.get('class).map(_.toString).getOrElse("")" oninput="checkPhrase(this)" />
 </div>
