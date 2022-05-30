@@ -1,0 +1,11 @@
+@(arguments: (Symbol, Any)*)(content: Html)
+@*<div class="@arguments.toMap.get(Symbol("class")).map(_.toString).getOrElse("model-container")">*@
+<div class="modal-overlay active">
+    <div class="modal active">
+        <div class="modal-content">
+            @content
+        </div>
+    </div>
+</div>
+
+

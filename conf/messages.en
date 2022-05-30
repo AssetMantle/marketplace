@@ -45,8 +45,10 @@ FEATURE_BLOCK_TITLE_3=Multiple payment modes
 FEATURE_BLOCK_PARAGRAPH_3=Experience AssetMantle with fiat currency, coins or stablecoins!
 FEATURE_BLOCK_TITLE_4=Complete customization
 FEATURE_BLOCK_PARAGRAPH_4=Build fully customized NFT marketplaces from scratch without coding.
-NEWSLETTER=Newsletter
+QUICK_LINKS=Quick Links
+NEWSLETTER=Subscribe to MantleLetter
 SOCIAL_MEDIA=Social Media
+ABOUT_ASSETMANTLE=About
 FOOTER_FAQ_1=Spotted something wrong?
 FOOTER_FAQ_LINK_1=Bug Bounty
 FOOTER_FAQ_2=Have something in mind?
@@ -58,3 +60,6 @@ FOOTER_FAQ_LINK_4=Docs
 FOOTER_FAQ_5=Interested in transaction activities?
 FOOTER_FAQ_LINK_5=Explorer
 COPYRIGHT=MantlePlace © 2021 - All Rights Reserved
+
+#//Sign Up
+FORM.SIGN_UP.LEGEND = Sign Up

@@ -1,0 +1,269 @@
+/* Opener */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;200;300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Krona+One&display=swap');
+
+.intro{
+    position: fixed;
+    /*z-index: 1;*/
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    transition: 1s cubic-bezier(0.74, 0.06, 0.4, 0.92);
+    z-index: 9999;
+}
+.intro .container {
+    width: 100%;
+    height: 100vh;
+    background: #030303;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.intro .container .box {
+    width: 200px;
+    height: 250px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+.intro .container .box .title {
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 50px;
+
+}
+.intro .container .box .title .block {
+    width: 0%;
+    height: inherit;
+    background: #FFC640;
+    position: absolute;
+    animation: mainBlock 2s cubic-bezier(0.74, 0.06, 0.4, 0.92) forwards;
+    display: flex;
+}
+.intro .container .box .title h1 {
+    font-family: 'Josefin Sans', sans-serif;
+    color: #fff;
+    font-size: 32px;
+    -webkit-animation: mainFadeIn 2s forwards;
+    -o-animation: mainFadeIn 2s forwards;
+    animation: mainFadeIn 2s forwards;
+    animation-delay: 1.6s;
+    opacity: 0;
+    display: flex;
+    align-items: baseline;
+    position: relative;
+}
+.intro .container .box .title h1 span {
+    width: 0px;
+    height: 0px;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    background: #FFC640;
+    animation: popIn 0.8s cubic-bezier(0.74, 0.06, 0.4, 0.92) forwards;
+    animation-delay: 2s;
+    margin-left: 5px;
+    margin-top: -10px;
+    position: absolute;
+    bottom: 13px;
+    right: -8px;
+}
+.intro .container .box .role {
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 30px;
+    margin-top: -15px;
+    overflow: hidden;
+}
+.intro .container .box .role p {
+    animation: secFadeIn 0.9s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation-delay: 2.5s;
+    font-weight: 400;
+    font-family: 'Barlow Condensed', sans-serif;
+    color: #ffffff;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    position: absolute;
+    top: -25px;
+    right: 5px;
+}
+@keyframes mainBlock {
+    0% {
+        width: 0%;
+        left: 0;
+    }
+    50% {
+        width: 100%;
+        left: 0;
+    }
+    100% {
+        width: 0;
+        left: 100%;
+    }
+}
+@keyframes secBlock {
+    0% {
+        width: 0%;
+        left: 0;
+    }
+    50% {
+        width: 100%;
+        left: 0;
+    }
+    100% {
+        width: 0;
+        left: 100%;
+    }
+}
+@keyframes mainFadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+@keyframes popIn {
+    0% {
+        width: 0px;
+        height: 0px;
+        background: #FFC640;
+        border: 0px solid #ddd;
+        opacity: 0;
+    }
+    50% {
+        width: 10px;
+        height: 10px;
+        background: #FFC640;
+        opacity: 1;
+        bottom: 45px;
+    }
+    65% {
+        width: 7px;
+        height: 7px;
+        bottom: 0px;
+        width: 15px;
+    }
+    80% {
+        width: 10px;
+        height: 10px;
+        bottom: 20px;
+    }
+    100% {
+        width: 7px;
+        height: 7px;
+        background: #FFC640;
+        border: 0px solid #222;
+        bottom: 5px;
+    }
+}
+@keyframes secFadeIn {
+    0% {
+        top: -25px;
+    }
+    50%{
+        top: 10px;
+    }
+
+    100% {
+        top: 5px;
+    }
+}
+
+/* Smooth Scroll */
+/*.parent {*/
+/*    overflow: scroll;*/
+/*    height: 100vh;*/
+/*    scroll-snap-points-y: repeat(100vh);*/
+/*    scroll-snap-type: y mandatory;*/
+/*}*/
+
+/*section {*/
+/*    height: 100vh;*/
+/*    scroll-snap-align: start;*/
+/*    position: relative;*/
+/*}*/
+
+/*.one {*/
+/*    background-color: red;*/
+/*}*/
+
+/*.two {*/
+/*    background-color: blue;*/
+/*}*/
+
+/*.three {*/
+/*    background-color: grey;*/
+/*}*/
+
+/*.four {*/
+/*    background-color: green;*/
+/*}*/
+
+html {
+    height: 100vh;
+    overflow-y: scroll;
+    font-family: sans-serif;
+    scroll-snap-points-y: repeat(100vh);
+    scroll-snap-type: y mandatory;
+    /*cursor: none;*/
+}
+
+/* Smooth Scroll */
+.smooth-scroll-section {
+    height: 100vh;
+    scroll-snap-align: start;
+    position: relative;
+}
+.section-footer{
+    padding: 0rem;
+    /*height: 360px;*/
+    height: 185px;
+}
+
+/* Custom Cursor */
+/*.cursor{*/
+/*    width: 8px;*/
+/*    height: 8px;*/
+/*    border-radius: 50%;*/
+/*    background: white;*/
+/*    position: fixed;*/
+/*    z-index: 999;*/
+/*    pointer-events: none;*/
+/*    mix-blend-mode: difference;*/
+/*    opacity: 0;*/
+/*    display: none;*/
+/*}*/
+/*.cursor.hovered{*/
+/*    opacity: 0.08;*/
+/*}*/
+/*.cursor-follower{*/
+/*    width: 36px;*/
+/*    height: 36px;*/
+/*    position: fixed;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    border:2px solid white;*/
+/*    background-size: cover;*/
+/*    mix-blend-mode: difference;*/
+/*    pointer-events: none;*/
+/*    transform: translate(-3px, -3px);*/
+/*    border-radius: 10px;*/
+/*    z-index: 999;*/
+/*    opacity: 0;*/
+/*    display: none;*/
+/*}*/
+/*.cursor-follower.hovered{*/
+/*    opacity: 0.08;*/
+/*}*/

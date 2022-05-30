@@ -1,0 +1,23 @@
+@import views.html.base.forms._
+@main("Create AssetMantle Wallet") {
+    <button>Click For Modal</button>
+    @formModal() {
+        @formHeaderWithBackButton(heading = "Create a Wallet", subHeading = "Confirm seed phrase.")
+        <div class="form-input-text">
+            <div class="form-phrase-text">Enter your Seed Phrase</div>
+        </div>
+        <div class="form-seed-box-list">
+            @seedInput("1")
+            @seedInput("12")
+            @seedInput("18")
+            @seedInput("24")
+        </div>
+        <div class="form-information-message">
+            <div class="form-information-icon"><img src="@routes.Assets.versioned("images/info.png")"/></div>
+            <div class="form-information-text">Do not share seed phrase with anyone.</div>
+        </div>
+        <div class="form-button">
+            @formPrimaryButton(message = "Next")
+        </div>
+    }
+}
