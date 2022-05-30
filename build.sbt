@@ -18,6 +18,12 @@ lazy val root = (project in file("."))
   .configs(GatlingTest)
   .settings(inConfig(GatlingTest)(Defaults.testSettings): _*)
 
+resolvers += "Akka Snapshot Repository" at "https://repo.akka.io/snapshots/"
+
+resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/"
+
+resolvers += "Maven Central Server" at "https://repo1.maven.org/maven2"
+
 libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
 libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.7.6" % "test"
@@ -29,3 +35,5 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0",
   "org.postgresql" % "postgresql" % "42.3.4"
 )
+
+libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.3"
