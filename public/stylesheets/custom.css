@@ -2021,12 +2021,13 @@ footer .col{
 }
 footer .col:nth-child(1){
     flex-basis: 15%;
+    margin-left: 15px;
 }
 footer .col:nth-child(2){
-    flex-basis: 30%;
+    flex-basis: 26%;
 }
 footer .col:nth-child(3){
-    flex-basis: 25%;
+    flex-basis: 22%;
 }
 footer .logo-container{
     text-align: center;
@@ -2040,8 +2041,11 @@ footer .footerLogo{
     width: 200px;
     margin-top: 10px;
 }
+footer .social-icons{
+    text-align: center;
+}
 footer .col h3{
-    width: fit-content;
+    /*width: fit-content;*/
     margin-bottom: 15px;
     position: relative;
     font-family: var(--font-type-1);
@@ -2158,7 +2162,7 @@ footer .col .social-icons i:active {
     text-decoration: none;
 }
 footer hr{
-    width: 95%;
+    width: 100%;
     border: 0;
     border-bottom: 1px solid var(--tooltip-bg);
     margin: 0px auto 15px auto;

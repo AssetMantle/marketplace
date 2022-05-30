@@ -13,5 +13,6 @@ class Form(template: String, val route: Call, val get: JavaScriptReverseRoute) {
 }
 
 object Form {
-  val SIGN_UP = new Form("SIGN_UP", routes.HomeController.signUpMantleplaceCredentials(), routes.javascript.HomeController.signUpMantleplaceCredentials)
+//  val SIGN_UP = new Form("SIGN_UP", routes.HomeController.signUpMantleplaceCredentialssignUpMantleplaceCredentials(), routes.javascript.HomeController.signUpMantleplaceCredentials)
+  val SIGN_UP = new Form("SIGN_UP", routes.HomeController.marketPlaceHome(), routes.javascript.HomeController.marketPlaceHome)
 }
