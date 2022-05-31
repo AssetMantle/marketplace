@@ -2046,8 +2046,8 @@ footer .logo-container h2{
     margin-top: 10px;
 }
 footer .footerLogo{
-    width: 200px;
-    margin-top: 10px;
+    /*width: 200px;*/
+    /*margin-top: 10px;*/
 }
 footer .social-icons{
     text-align: center;
@@ -2253,6 +2253,9 @@ footer.section{
     }
     footer .col{
         flex-basis: 100%;
+    }
+    footer .col:nth-child(1){
+        text-align: center;
     }
     footer .col:nth-child(2),
     footer .col:nth-child(3){
@@ -2496,6 +2499,7 @@ footer.section{
         height: 50px;
     }
     .hero-section .row .col-1 .buttons{
+        gap: 20px;
         justify-content: center;
     }
     .hero-section .row .col-1 button{
