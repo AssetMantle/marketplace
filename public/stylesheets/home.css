@@ -229,7 +229,8 @@ html {
 .section-footer{
     padding: 0rem;
     /*height: 360px;*/
-    height: 185px;
+    /*height: 185px;*/
+    height: fit-content;
 }
 
 /* Custom Cursor */
