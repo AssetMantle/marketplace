@@ -7,7 +7,28 @@
 # GET        /                                           controllers.HomeController.index()
 
 # Map static resources from the /public folder to the /assets URL path
-GET        /assets/*file                         controllers.Assets.versioned(path="/public", file: Asset)
+GET        /assets/*file        controllers.Assets.versioned(path="/public", file: Asset)
 
 # Home
-GET        /                                     controllers.HomeController.marketPlaceHome()
+GET        /                    controllers.HomeController.marketPlaceHome()
+
+# SignIn-SignUp
+
+# Option 1: Connect Wallet
+GET        /test                                 controllers.HomeController.testSignUp()
+GET        /connectWallet                        controllers.HomeController.connectWallet()
+GET        /connectConfirmation                  controllers.HomeController.connectConfirmation()
+GET        /redirectingToKeplr                   controllers.HomeController.redirectingToKeplr()
+GET        /connectedSuccessToKeplr              controllers.HomeController.connectedSuccessToKeplr()
+
+# Option 2: Import Wallet
+GET        /importWalletSuccess                  controllers.HomeController.importWalletSuccess()
+
+# Option 3: Create AssetMantle Wallet
+GET        /createwallet                         controllers.HomeController.createWallet()
+GET        /seedPhraseVerification               controllers.HomeController.seedPhraseVerification()
+GET        /assetMantleWalletSuccessfull         controllers.HomeController.assetMantleWalletSuccessfull()
+GET        /signUpMantleplaceCredentials         controllers.HomeController.signUpMantleplaceCredentials()
+
+# Profile
+GET        /profiles            controllers.HomeController.creatorsProfile()
