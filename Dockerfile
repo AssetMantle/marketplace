@@ -42,6 +42,9 @@ LABEL org.opencontainers.image.base.name=openjdk-11-jre-slim
 LABEL org.opencontainers.image.description=mantleplace
 LABEL org.opencontainers.image.source=https://github.com/assetmantle/mantleplace
 LABEL org.opencontainers.image.documentation=https://github.com/assetmantle/mantleplace
+# RUN useradd -rm -d /home/assetmantle -s /bin/bash -g root -G sudo -u 65532 assetmantle
+# USER assetmantle
 WORKDIR /
 COPY --from=extract /app/mantleplace /mantleplace
 ENTRYPOINT [ "/mantleplace/bin/mantleplace" ]
+#  -Dplay.http.secret.key=APPLICATION_SECRET=slw2FnBTONgZq_tOtflOzKoAglFj@AHr=>KTDSQnWNXyZBB>b?les^A:UQIO[9b[
