@@ -3251,3 +3251,10 @@ footer.section{
     left: 0;
     font-size: calc(1rem + 3vw);
 }
+
+.formBody{
+    background-color: var(--dark);
+}
+.inputBox{
+    background-color: #0f6ecd;
+}
