@@ -57,9 +57,76 @@ FOOTER_FAQ_3=Want to know what we’re up to?
 FOOTER_FAQ_LINK_3=Blog
 FOOTER_FAQ_4=Want to know more?
 FOOTER_FAQ_LINK_4=Docs
-FOOTER_FAQ_5=Interested in transaction activities?
+FOOTER_FAQ_5=Want MantleChain inside?
 FOOTER_FAQ_LINK_5=Explorer
 COPYRIGHT=MantlePlace © 2022 - All Rights Reserved
 
 #//Sign Up
-FORM.SIGN_UP.LEGEND = Sign Up
+FORM.SIGN_UP.TITLE = Sign Up
+FORM.SIGN_UP.SUBTITLE = Enter your details to get started.
+FORM.SIGN_UP.SUBMIT = Sign Up
+USERNAME = Username
+PASSWORD = Password
+SIGNUP_PASSWORD = Password
+CONFIRM_PASSWORD = Confirm Password
+USERNAME_NOT_AVAILABLE = Username already exists.
+REPEAT_PASSWORD_MISMATCH = Password mismatched. Please check the password and try again.
+SIGN_UP_TOOLTIP = Username once lost cannot be retrieved. Please store it in a secure place.
+
+
+#//Create Wallet
+CREATE_WALLET_TITLE = Create a Wallet
+CREATE_WALLET_SAFETY_POINTS_TITLE = Points to keep in mind for safety of funds:
+CREATE_WALLET_SAFETY_POINT_1 = Users need to securely store their mnemonic phrase (a.k.a. seed phrase). Losing or exposing the seed phrase can potentially lead to users' funds being stolen.
+CREATE_WALLET_SAFETY_POINT_2 = Users can view and save their mnemonic while creating a wallet.
+CREATE_WALLET_SAFETY_POINT_3 = Do not share seed phrase with anyone.
+COPY_SEED_MESSAGE = Copy seed phrase
+CREATE_WALLET_INFO = This will be used for verification on the next screen.
+FORM.CREATE_WALLET_SEED_PHRASE.TITLE = Create a wallet
+FORM.CREATE_WALLET_SEED_PHRASE.SUBTITLE = Confirm seed phrase.
+FORM.CREATE_WALLET_SEED_PHRASE.SUBMIT = Next
+ENTER_SEED_PHRASE = Enter your Seed Phrase
+SEED_PHRASE_INFO = Do not share seed phrase with anyone.
+CREATE_WALLET_SUCCESS_TITLE = Wallet Created Successfully
+CREATE_WALLET_SUCCESS_SUBTITLE = Congratulations, your wallet has been created successfully.
+CREATE_WALLET_SUCCESS_INFO = Please securely store this to login to your wallet in future.
+SHOW_ADVANCED_PROPERTIES = Show Advanced Properties
+WALLET_PATH = Path:
+WALLET_CHAIN = Chain:
+CREATE_WALLET_ERROR_TITLE = Error in creating Wallet
+CREATE_WALLET_ERROR_MESSAGE_1 = You wallet could not be created. Please try again. You can find guides and resources
+CREATE_WALLET_ERROR_MESSAGE_2 = here
+CREATE_WALLET_ERROR_MESSAGE_3 = to help you create your wallet.
+
+
+#//Sign In
+FORM.SIGN_IN.TITLE = Sign In
+FORM.SIGN_IN.SUBTITLE = Enter your details to get started.
+FORM.SIGN_IN.SUBMIT = Sign In
+INCORRECT_USERNAME = Incorrect Username. Please enter again.
+INCORRECT_PASSWORD = Password incorrect. Please check the password and try again.
+SIGN_IN_FORGOT_PASSWORD = Forgot Password?
+SIGN_IN_SIGN_UP_MESSAGE = Don’t have an account yet?
+SIGN_IN_SIGN_UP = Sign up
+
+
+#//Forgot Password
+FORM.FORGOT_PASSWORD_USERNAME.TITLE = Forgot Password
+FORM.FORGOT_PASSWORD_USERNAME.SUBTITLE = Enter your username to reset password.
+FORM.FORGOT_PASSWORD_USERNAME.SUBMIT = Next
+FORM.FORGOT_PASSWORD_SEED_PHRASE.TITLE = Forgot Password
+FORM.FORGOT_PASSWORD_SEED_PHRASE.SUBTITLE = Confirm your seed phrase to reset your password.
+FORM.FORGOT_PASSWORD_SEED_PHRASE.SUBMIT = Next
+FORM.FORGOT_PASSWORD_NEW_PASSWORD.TITLE = Forgot Password
+FORM.FORGOT_PASSWORD_NEW_PASSWORD.SUBTITLE = Enter a new password.
+FORM.FORGOT_PASSWORD_NEW_PASSWORD.SUBMIT = Next
+FORGOT_PASSWORD = Password
+FORGOT_CONFIRM_PASSWORD = Confirm Password
+SEED_PHRASE_MESSAGE = Enter your Seed Phrase
+SEED_PHRASE_WARNING_MESSAGE = Do not share seed phrase with anyone.
+NEW_PASSWORD_RULE_1 = 8 to 128 characters
+NEW_PASSWORD_RULE_2 = One number
+NEW_PASSWORD_RULE_3 = One Upper case letter
+NEW_PASSWORD_RULE_4 = One special character (!@@#$%^&*./-_)
+FORGOT_PASSWORD_SUCCESS_TITLE = Password Reset successful
+FORGOT_PASSWORD_SUCCESS_SUBTITLE = Your password has been reset successfully. Sign in to continue.

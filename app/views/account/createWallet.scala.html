@@ -1,0 +1,33 @@
+@import views.html.base.forms._
+@import views.html.base.label._
+@import views.html.base.forms.formFooter
+@import views.html.base.forms.commonFieldErrorMessage
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@formHeader(label=Messages(constants.View.CREATE_WALLET_TITLE))
+<div class="form-heading">@Messages(constants.View.CREATE_WALLET_SAFETY_POINTS_TITLE)</div>
+<div class="form-bullet-list">
+    <ul>
+        <li>@Messages(constants.View.CREATE_WALLET_SAFETY_POINT_1)</li>
+        <li>@Messages(constants.View.CREATE_WALLET_SAFETY_POINT_2)</li>
+        <li>@Messages(constants.View.CREATE_WALLET_SAFETY_POINT_3)</li>
+    </ul>
+</div>
+<div class="form-copy-item">
+    <div class="form-copy-text">@Messages(constants.View.COPY_SEED_MESSAGE)</div>
+    <div class="form-copy-icon"><img src="@routes.Assets.versioned("images/copy.png")"/></div>
+</div>
+<div class="form-seed-box-list">
+    @seedInput("1", Symbol("phrase") -> "monkey", Symbol("class") -> "disable")
+    @seedInput("12", Symbol("phrase") -> "honey", Symbol("class") -> "disable")
+    @seedInput("18", Symbol("phrase") -> "food", Symbol("class") -> "disable")
+    @seedInput("24", Symbol("phrase") -> "house", Symbol("class") -> "disable")
+</div>
+<div class="form-information-message">
+    <div class="form-information-icon"><img src="@routes.Assets.versioned("images/info.png")"/></div>
+    <div class="form-information-text">@Messages(constants.View.CREATE_WALLET_INFO)</div>
+</div>
+<div class="form-button">
+    @formSecondaryButton(message = "Cancel")
+    @formPrimaryButton(message = "Next")
+</div>

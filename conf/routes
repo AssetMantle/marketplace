@@ -7,28 +7,64 @@
 # GET        /                                           controllers.HomeController.index()
 
 # Map static resources from the /public folder to the /assets URL path
-GET        /assets/*file        controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                        controllers.Assets.versioned(path="/public", file: Asset)
+GET         /javascriptRoutes                    controllers.JavaScriptRoutesController.javascriptRoutes
 
 # Home
-GET        /                    controllers.HomeController.marketPlaceHome()
+GET         /                                    controllers.HomeController.marketPlaceHome()
 
 # SignIn-SignUp
 
 # Option 1: Connect Wallet
-GET        /test                                 controllers.HomeController.testSignUp()
-GET        /connectWallet                        controllers.HomeController.connectWallet()
-GET        /connectConfirmation                  controllers.HomeController.connectConfirmation()
-GET        /redirectingToKeplr                   controllers.HomeController.redirectingToKeplr()
-GET        /connectedSuccessToKeplr              controllers.HomeController.connectedSuccessToKeplr()
+GET         /connectWallet                       controllers.HomeController.connectWallet()
+GET         /connectConfirmation                 controllers.HomeController.connectConfirmation()
+GET         /redirectingToKeplr                  controllers.HomeController.redirectingToKeplr()
+GET         /connectedSuccessToKeplr             controllers.HomeController.connectedSuccessToKeplr()
 
 # Option 2: Import Wallet
-GET        /importWalletSuccess                  controllers.HomeController.importWalletSuccess()
+GET         /importWalletSuccess                 controllers.HomeController.importWalletSuccess()
 
 # Option 3: Create AssetMantle Wallet
-GET        /createwallet                         controllers.HomeController.createWallet()
-GET        /seedPhraseVerification               controllers.HomeController.seedPhraseVerification()
-GET        /assetMantleWalletSuccessfull         controllers.HomeController.assetMantleWalletSuccessfull()
-GET        /signUpMantleplaceCredentials         controllers.HomeController.signUpMantleplaceCredentials()
+#GET         /createwallet                        controllers.HomeController.createWallet()
+GET         /seedPhraseVerification              controllers.HomeController.seedPhraseVerification()
+GET         /assetMantleWalletSuccessfull        controllers.HomeController.assetMantleWalletSuccessfull()
+GET         /signUpMantleplaceCredentials        controllers.HomeController.signUpMantleplaceCredentials()
+
+GET         /createNewNFT                        controllers.HomeController.createNewNFT()
+GET         /NFTCreatedSuccess                   controllers.HomeController.NFTCreatedSuccess()
+GET         /mintNFT                             controllers.HomeController.mintNFT()
+GET         /mintNFTSuccess                      controllers.HomeController.mintNFTSuccess()
+
+
+
+GET         /signUp                              controllers.AccountController.signUpForm()
+POST        /signUp                              controllers.AccountController.signUp()
+
+GET         /createWallet                        controllers.AccountController.createWalletForm()
+GET         /createWalletSuccess                 controllers.AccountController.createWalletSuccessForm()
+GET         /createWalletError                   controllers.AccountController.createWalletErrorForm()
+
+GET         /createWalletSeedPhrase              controllers.AccountController.createWalletSeedPhraseForm()
+POST        /createWalletSeedPhrase              controllers.AccountController.createWalletSeedPhrase()
+
+GET         /signIn                              controllers.AccountController.signInForm()
+POST        /signIn                              controllers.AccountController.signIn()
+
+GET         /forgotPasswordUsername              controllers.AccountController.forgotPasswordUsernameForm()
+POST        /forgotPasswordUsername              controllers.AccountController.forgotPasswordUsername()
+
+GET         /forgotPasswordSeedPhrase            controllers.AccountController.forgotPasswordSeedPhraseForm()
+POST        /forgotPasswordSeedPhrase            controllers.AccountController.forgotPasswordSeedPhrase()
+
+GET         /forgotPasswordNewPassword           controllers.AccountController.forgotPasswordNewPasswordForm()
+POST        /forgotPasswordNewPassword           controllers.AccountController.forgotPasswordNewPassword()
+
+GET         /forgotPasswordSuccess               controllers.AccountController.forgotPasswordSuccessForm()
+
+# Bootstrap Pages
+GET         /signUpBootstrap                     controllers.AccountController.signUpBootstrapForm()
+POST        /signUpBootstrap                     controllers.AccountController.signUpBootstrap()
 
 # Profile
-GET        /profiles            controllers.HomeController.creatorsProfile()
+GET         /profiles                            controllers.HomeController.creatorsProfile()
+

@@ -1,11 +1,4 @@
 /* Opener */
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;200;300;400;500&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Krona+One&display=swap');
-
 .intro{
     position: fixed;
     /*z-index: 1;*/

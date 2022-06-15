@@ -1,0 +1,13 @@
+@import views.html.base.forms._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@errorModal(heading = Messages(constants.View.CREATE_WALLET_ERROR_TITLE))
+<div class="wallet-error-message">
+    @Messages(constants.View.CREATE_WALLET_ERROR_MESSAGE_1)
+    <a href="#">@Messages(constants.View.CREATE_WALLET_ERROR_MESSAGE_2)</a>
+    @Messages(constants.View.CREATE_WALLET_ERROR_MESSAGE_3)
+
+</div>
+<div class="form-button">
+    @formPrimaryButton(message = "Try again")
+</div>

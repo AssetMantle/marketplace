@@ -279,13 +279,15 @@
     margin-top: 10px;
     color: var(--inactive-gray);
 }
+.modal .footer-message > span{
+    margin-right: 5px;
+}
 .modal .footer-message .link{
     font-style: normal;
     font-weight: 600;
     font-size: 16px;
     color: var(--dark);
     text-transform: capitalize;
-    margin-left: 5px;
     position: relative;
 }
 .modal .msg-3{
@@ -345,6 +347,21 @@
 /* Successful Modal */
 .header-success .form-top{
     display: flex;
+}
+
+/* Error Modal */
+.wallet-error-message{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 120%;
+    text-align: center;
+    color: var(--text-medium);
+    margin-top: 12px;
+}
+.wallet-error-message a{
+    color:var(--dark);
 }
 
 /* Successful Modal Icon */
@@ -857,4 +874,176 @@
     height: 300px;
     object-fit: cover;
     margin: 3px 15px;
+}
+
+/* Form Fields */
+#formBody > div:not(:last-child){
+    margin-bottom: 24px;
+}
+#formBody dl label,
+#formBody .label-container label{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--inactive-gray);
+}
+#formBody dd input[type=text],
+#formBody dd input[type=password]{
+    font-family: var(--font-type-2);
+    height: 36px;
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    border: 1px solid var(--inactive-gray);
+    padding: calc(var(--size-bezel) * 2) 12px;
+    color: var(--mantle-off-white);
+    background: transparent;
+    border-radius: var(--size-radius);
+    font-size: 14px;
+    letter-spacing: 1px;
+    outline: none;
+    font-style: normal;
+    font-weight: 400;
+    margin-top: 8px;
+}
+#formBody dd input[type=text]:focus,
+#formBody dd input[type=password]:focus{
+    border-color: var(--dark);
+}
+#formBody dd input[type=text]:not(:focus),
+#formBody dd input[type=password]:not(:focus){
+    color: var(--inactive-gray);
+}
+#formBody button{
+    padding: 9px 0;
+    width: 220px;
+    font-family: var(--font-type-2);
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    text-transform: capitalize;
+    border: none;
+    outline: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--button-text);
+    background-color: var(--dark);
+    box-shadow: inset -4px -4px 8px rgba(0, 0, 0, 0.2), inset 4px 4px 8px #FFD365;
+    overflow: hidden;
+    position: relative;
+    z-index: 950;
+    transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+}
+#formBody button.disable{
+    border: none !important;
+    box-shadow: none !important;
+    background: var(--disable-yellow) !important;
+    cursor: none;
+    pointer-events: none;
+}
+#formSubmitButton{
+    display: flex;
+    justify-content: end;
+}
+
+/* Field Label */
+#formBody .label-container{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+#formBody .label-container img{
+    width: 16px;
+    height: 16px;
+}
+
+/* Regx msg */
+dl .info {
+    background-color: var(--tooltip-bg);
+    color: var(--gray);
+    text-align: center;
+    border-radius: 6px;
+    position: relative;
+    top: 5px;
+    float: right;
+    font-size: 10px;
+    padding: 5px;
+    display: none;
+}
+dl .info:after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent var(--tooltip-bg) transparent;
+}
+
+/* Input Field Icon */
+.usernameAvailability {
+    position: relative;
+}
+.usernameAvailability .result {
+    position: absolute;
+    top: 0px;
+    right: 0;
+}
+.usernameAvailability .failureIcon,
+.usernameAvailability .checkIcon {
+    display: none;
+    position: absolute;
+    right: 15px;
+    top: 32px;
+    width: 20px;
+    height: 20px;
+}
+.usernameAvailability .fieldIcon + div dl dd input{
+    padding-right: 38px !important;
+}
+.hidden{
+    display: none;
+}
+.showPassword .eyeIcon {
+    position: absolute;
+    right: 15px;
+    top: 32px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+}
+.inputField .errorMessage{
+    display: none;
+}
+.inputField .errorMessage .errorContainer{
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--error);
+    gap: 4px;
+}
+.inputField .errorMessage.show{
+    /*display: block;*/
+}
+.inputField .errorMessage img{
+    width: 16px;
+    height: 16px;
+    margin-top: 3px;
+}
+.forgotPasswordLink{
+    font-family: var(--font-type-1);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    text-transform: capitalize;
+    color: var(--dark);
 }

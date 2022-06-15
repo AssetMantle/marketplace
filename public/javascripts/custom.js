@@ -25,107 +25,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
     });
 });
 
-$(document).ready(function() {
-    if ($('.form-accordion').length) {
-        $('.form-accordion').find('.accordion-toggle').click(function() {
-            if ($(this).hasClass('open')) {
-                $(this).next().slideUp('fast');
-                $(this).removeClass('open');
-            } else {
-                $(this).next().slideDown('fast');
-                $(this).addClass('open');
-                $(".accordion-content").not($(this).next()).slideUp('fast');
-                $(".accordion-toggle").not($(this)).removeClass('open');
-            }
-        });
-    }
-
-    setTimeout(()=>{
-        setTimeout(()=>{
-            $(".form-hidden").addClass('show');
-        },500);
-        $(".form-hidden").slideDown(800);
-    },1000);
-
-});
-
-
-function togglePassword(){
-    const btn = document.querySelector(".btn");
-    var passwordInput = document.querySelectorAll(".password_input");
-
-    passwordInput.forEach((single) => {
-        if(single.type === "password"){
-            single.type = "text";
-            btn.classList.remove("fa-eye-slash");
-            btn.classList.add("fa-eye");
-        }
-        else{
-            single.type = "password";
-            btn.classList.remove("fa-eye");
-            btn.classList.add("fa-eye-slash");
-        }
-    });
-}
-
-function checkUserAvailability(){
-    let validUser = {users:['jaggu','pratik']};
-    var field = document.getElementById("username");
-    if(field.value !== ''){
-        if(validUser.users.includes(field.value)){
-            $("#username ~ i").fadeOut();
-            $(".username_field + .error-message").slideDown();
-            $(".username_field").css("border-color","var(--error)");
-        }
-        else{
-            $("#username ~ i").fadeIn();
-            $(".username_field + .error-message").slideUp();
-            $(".username_field").css("border-color","var(--inactive-gray)");
-        }
-    }
-    else{
-        $("#username ~ i").fadeOut();
-    }
-}
-
-function matchConfirmPassword(){
-    var passwordField = document.getElementById("password");
-    var confirmPasswordField = document.getElementById("confirm_password");
-
-    if(passwordField.value !== confirmPasswordField.value){
-        $(".confirm_password + .error-message").slideDown();
-        $(".confirm_password").css("border-color","var(--error)");
-    }
-    else{
-        $(".confirm_password + .error-message").slideUp();
-        $(".confirm_password").css("border-color","var(--inactive-gray)");
-    }
-}
-
-function checkAccount(){
-    event.preventDefault();
-    var usernameValue = document.getElementById("username").value;
-    var passwordValue = document.getElementById("password").value;
-
-    if(usernameValue !== '' && passwordValue !== ''){
-        if(usernameValue === 'jaggu'){
-            $(".username_field + .error-message").slideUp();
-            $(".username_field").css("border-color","var(--inactive-gray)");
-            if(passwordValue === '123'){
-                $(".password_field + .error-message").slideUp();
-                $(".password_field").css("border-color","var(--inactive-gray)");
-            }
-            else{
-                $(".password_field + .error-message").slideDown();
-                $(".password_field").css("border-color","var(--error)");
-            }
-        }
-        else{
-            $(".username_field + .error-message").slideDown();
-            $(".username_field").css("border-color","var(--error)");
-        }
-    }
-}
 
 function checkUsername(){
     event.preventDefault();
@@ -253,19 +152,19 @@ function removeCollectionTag(e){
     document.getElementsByClassName("collection-form-tag-field")[0].removeChild(element);
 }
 
-$(function() {
-    $('input[name="daterange"]').daterangepicker({
-        opens: 'left'
-    }, function(start, end, label) {
-        console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-    });
-});
-
-// Date Range Picker
-function setDateRange(){
-    document.getElementsByClassName("dateRangeField")[0].setAttribute("name","daterange");
-    console.log(document.getElementsByClassName("dateRangeField")[0].getAttribute('name'));
-}
+// $(function() {
+//     $('input[name="daterange"]').daterangepicker({
+//         opens: 'left'
+//     }, function(start, end, label) {
+//         console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+//     });
+// });
+//
+// // Date Range Picker
+// function setDateRange(){
+//     document.getElementsByClassName("dateRangeField")[0].setAttribute("name","daterange");
+//     console.log(document.getElementsByClassName("dateRangeField")[0].getAttribute('name'));
+// }
 
 // Check Phrase
 function checkPhrase(e){
@@ -628,12 +527,12 @@ const listViewButton = document.querySelector('.list-view-button');
 const gridViewButton = document.querySelector('.grid-view-button');
 const list = document.querySelector('.profile-list ol');
 
-listViewButton.onclick = function () {
-    list.classList.remove('grid-view-filter');
-    list.classList.add('list-view-filter');
-}
-
-gridViewButton.onclick = function () {
-    list.classList.remove('list-view-filter');
-    list.classList.add('grid-view-filter');
-}
+// listViewButton.onclick = function () {
+//     list.classList.remove('grid-view-filter');
+//     list.classList.add('list-view-filter');
+// }
+//
+// gridViewButton.onclick = function () {
+//     list.classList.remove('list-view-filter');
+//     list.classList.add('grid-view-filter');
+// }

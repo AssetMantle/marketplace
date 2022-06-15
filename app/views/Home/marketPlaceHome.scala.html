@@ -6,6 +6,14 @@
     @opener()
     @menu()
 
+    <div class="modal-overlay" id="commonModal">
+        <div class="modal">
+            <div class="modal-content" id="modal-content">
+            </div>
+        </div>
+    </div>
+
+
     <div class="parent">
         <section class="smooth-scroll-section">
             <div class="hero-section section">
@@ -16,6 +24,17 @@
                         <div class="buttons">
                             <button class="button-1"></button>
                             <button class="button-2"></button>
+
+                            <!--<button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_UP.get, ""))">SIGN UP</button>
+                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_WALLET.get, ""))">CREATE WALLET</button>
+                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_WALLET_SEED_PHRASE.get, ""))">CREATE WALLET SEED PHRASE</button>
+                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_WALLET_SUCCESS.get, ""))">CREATE WALLET SUCCESS</button>
+                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_WALLET_ERROR.get, ""))">CREATE WALLET ERROR</button>
+                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN.get, ""))">SIGN IN</button>
+                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.FORGOT_PASSWORD_USERNAME.get, ""))">Forgot Password</button>
+                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.FORGOT_PASSWORD_SEED_PHRASE.get, ""))">Seed Phrase</button>
+                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.FORGOT_PASSWORD_NEW_PASSWORD.get, ""))">New Password</button>
+                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.FORGOT_PASSWORD_SUCCESS.get, ""))">SUCCESS</button> -->
                         </div>
                     </div>
                     <div class="col-2">
@@ -323,7 +342,7 @@
                     <div class="info-steps">
                         <div class="info-step">
                             <div class="info-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Create account.gif")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Create account.gif")" class="create-account-img"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Create account.gif")" data-src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Create account.gif")" class="create-account-img"/>
 
                             </div>
                             <div class="info-label">
@@ -335,7 +354,7 @@
                         </div>
                         <div class="info-step">
                             <div class="info-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Mint NFTs.gif")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Mint NFTs.gif")" class="mint-nfts-img"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Mint NFTs.gif")" data-src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Mint NFTs.gif")" class="mint-nfts-img"/>
 
                             </div>
                             <div class="info-label">
@@ -347,7 +366,7 @@
                         </div>
                         <div class="info-step">
                             <div class="info-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Sell.gif")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Sell.gif")" class="buy-sell-img"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Sell.gif")" data-src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Sell.gif")" class="buy-sell-img"/>
 
                             </div>
                             <div class="info-label">
@@ -359,7 +378,7 @@
                         </div>
                         <div class="info-step">
                             <div class="info-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Engage.gif")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Engage.gif")" class="engage-img"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Engage.gif")" data-src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Engage.gif")" class="engage-img"/>
 
                             </div>
                             <div class="info-label">
@@ -384,7 +403,7 @@
                     <div class="cards">
                         <div class="card c1">
                             <div class="card-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Multi chain access.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multi chain access.gif")"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Multi chain access.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multi chain access.gif")"/>
                             </div>
                             <div class="card-detail">
                                 <h2>@Messages(constants.View.FEATURE_BLOCK_TITLE_1)</h2>
@@ -393,7 +412,7 @@
                         </div>
                         <div class="card c2">
                             <div class="card-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Negligible minting fee final.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Negligible minting fee final.gif")" />
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Negligible minting fee final.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Negligible minting fee final.gif")" />
                             </div>
                             <div class="card-detail">
                                 <h2>@Messages(constants.View.FEATURE_BLOCK_TITLE_2)</h2>
@@ -402,7 +421,7 @@
                         </div>
                         <div class="card c3">
                             <div class="card-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Multiple payments.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multiple payments.gif")"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Multiple payments.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multiple payments.gif")"/>
                             </div>
                             <div class="card-detail">
                                 <h2>@Messages(constants.View.FEATURE_BLOCK_TITLE_3)</h2>
@@ -411,7 +430,7 @@
                         </div>
                         <div class="card c4">
                             <div class="card-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Complete customisation.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Complete customisation.gif")"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Complete customisation.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Complete customisation.gif")"/>
                             </div>
                             <div class="card-detail">
                                 <h2>@Messages(constants.View.FEATURE_BLOCK_TITLE_4)</h2>
@@ -423,7 +442,7 @@
             </div>
         </section>
         <section class="smooth-scroll-section section-footer">
-            @footer()
+        @footer()
         </section>
     </div>
 

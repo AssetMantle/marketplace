@@ -16,12 +16,4 @@ object RegularExpression {
   val SWIFT_CODE: Regex = """^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$""".r
   val SPLIT: Regex = """^[0-9]+(\\.[0-9]+)?$""".r
   val TRANSACTION_HASH: Regex = """[A-F0-9]{64}""".r
-  val ADDRESS_SUFFIX: Regex = """[a-z0-9]{39}""".r
-  val VALIDATOR_HEX_ADDRESS: Regex = """[A-F0-9]{40}""".r
-  val NUMERIC_AND_STRING_SEPARATOR = """(?<=\D)(?=\d)|(?<=\d)(?=\D)"""
-
-  //  val BLOCKCHAIN_ID_SEPARATOR = s"""\\${constants.Blockchain.IDSeparator}"""
-  //  val BLOCKCHAIN_FIRST_ORDER_COMPOSITE_ID_SEPARATOR = s"""\\${constants.Blockchain.FirstOrderCompositeIDSeparator}"""
-  //  val BLOCKCHAIN_SECOND_ORDER_COMPOSITE_ID_SEPARATOR = s"""\\${constants.Blockchain.SecondOrderCompositeIDSeparator}"""
-
 }

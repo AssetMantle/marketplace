@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap');
 @import url('https://use.typekit.net/idg6zrf.css');
 
 :root{
@@ -24,7 +22,7 @@
     --gray: #B0B0B0;
     --card-dark: #030301;
     --font-type-1: paralucent, sans-serif;
-    --font-type-2: 'Lato', sans-serif;
+    --font-type-2: 'Lato';
     --size-bezel: .5rem;
     --size-radius: 8px;
     --field-text: 14px;
@@ -865,7 +863,7 @@ article:first-child{
     cursor: pointer;
 }
 .toolTip {
-    width: 200px;
+    min-width: 190px;
     position: relative;
 }
 .toolTip .toolTipText {
@@ -875,16 +873,16 @@ article:first-child{
     visibility: hidden;
     width:auto;
     background-color: var(--tooltip-bg);
-    padding: 12px 9px;
-    color: var(--text-medium);
-    text-align: center;
-    border-radius: 3px;
+    padding: 12px 8px;
+    color: var(--inactive-gray);
+    /*text-align: center;*/
+    border-radius: 8px;
     position: absolute;
     z-index: 9999;
     /*bottom: 0%;*/
     /*left: -52%;*/
     /*top: -75px;*/
-    bottom: calc(100% + 20px);
+    bottom: calc(100% + 15px);
     left: -80px;
     opacity: 0;
     transition: opacity 0.3s;
@@ -894,7 +892,7 @@ article:first-child{
     position: absolute;
     top: 100%;
     left: 25%;
-    margin-left: -5px;
+    margin-left: -9px;
     border-width: 5px;
     border-style: solid;
     border-color: var(--tooltip-bg) transparent transparent transparent;
@@ -2699,4 +2697,8 @@ footer.section{
     width: 100%;
     left: 0;
     font-size: calc(1rem + 3vw);
+}
+
+.formBody{
+    background-color: var(--dark);
 }

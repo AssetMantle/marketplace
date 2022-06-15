@@ -1,11 +1,9 @@
 @import views.html.Home._
 @import views.html.base._
-
-@import views.companion.SignUp
 @import views.html.base.forms.commonInputText
 
-@(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@index(""){
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@main(""){
     @opener()
     @menu()
 
@@ -21,19 +19,19 @@
 @*                </div>*@
 @*                <div class="rwrap">*@
 @*                    <div class="img1">*@
-@*                        <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/ORBICs_1.jpg")" data-src="@routes.Assets.versioned("images/NFT/orbicsNFT1.jpg")" alt=""/>*@
-@*                        <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/ORBICs_2.jpg")" data-src="@routes.Assets.versioned("images/NFT/orbicsNFT2.jpg")" alt=""/>*@
-@*                        <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/ORBICs_3.jpg")" data-src="@routes.Assets.versioned("images/NFT/orbicsNFT3.jpg")" alt=""/>*@
+@*                        <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/ORBICs_1.jpg")" data-src="@routes.Assets.versioned("images/NFT/orbicsNFT1.jpg")" alt=""/>*@
+@*                        <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/ORBICs_2.jpg")" data-src="@routes.Assets.versioned("images/NFT/orbicsNFT2.jpg")" alt=""/>*@
+@*                        <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/ORBICs_3.jpg")" data-src="@routes.Assets.versioned("images/NFT/orbicsNFT3.jpg")" alt=""/>*@
 @*                    </div>*@
 @*                    <div class="img1">*@
-@*                        <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/IGOR_1.jpg")" data-src="@routes.Assets.versioned("images/NFT/igorNFT1.jpg")" alt=""/>*@
-@*                        <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/IGOR_2.jpg")" data-src="@routes.Assets.versioned("images/NFT/igorNFT2.jpg")" alt=""/>*@
-@*                        <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/IGOR_3.png")" data-src="@routes.Assets.versioned("images/NFT/igorNFT3.jpg")" alt=""/>*@
+@*                        <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/IGOR_1.jpg")" data-src="@routes.Assets.versioned("images/NFT/igorNFT1.jpg")" alt=""/>*@
+@*                        <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/IGOR_2.jpg")" data-src="@routes.Assets.versioned("images/NFT/igorNFT2.jpg")" alt=""/>*@
+@*                        <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/IGOR_3.png")" data-src="@routes.Assets.versioned("images/NFT/igorNFT3.jpg")" alt=""/>*@
 @*                    </div>*@
 @*                    <div class="img1">*@
-@*                        <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/TENDERMIND_1.jpg")" data-src="@routes.Assets.versioned("images/NFT/tendermindNFT1.jpg")" alt=""/>*@
-@*                        <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/TENDERMIND_2.jpg")" data-src="@routes.Assets.versioned("images/NFT/tendermindNFT2.jpg")" alt=""/>*@
-@*                        <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/TENDERMIND_3.jpg")" data-src="@routes.Assets.versioned("images/NFT/tendermindNFT3.jpg")" alt=""/>*@
+@*                        <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/TENDERMIND_1.jpg")" data-src="@routes.Assets.versioned("images/NFT/tendermindNFT1.jpg")" alt=""/>*@
+@*                        <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/TENDERMIND_2.jpg")" data-src="@routes.Assets.versioned("images/NFT/tendermindNFT2.jpg")" alt=""/>*@
+@*                        <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/TENDERMIND_3.jpg")" data-src="@routes.Assets.versioned("images/NFT/tendermindNFT3.jpg")" alt=""/>*@
 @*                    </div>*@
 @*                </div>*@
 @*            </div>*@
@@ -353,7 +351,7 @@
                     <div class="info-steps">
                         <div class="info-step">
                             <div class="info-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Create account.gif")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Create account.gif")" class="create-account-img"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Create account.gif")" data-src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Create account.gif")" class="create-account-img"/>
 
                             </div>
                             <div class="info-label">
@@ -365,7 +363,7 @@
                         </div>
                         <div class="info-step">
                             <div class="info-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Mint NFTs.gif")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Mint NFTs.gif")" class="mint-nfts-img"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Mint NFTs.gif")" data-src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Mint NFTs.gif")" class="mint-nfts-img"/>
 
                             </div>
                             <div class="info-label">
@@ -377,7 +375,7 @@
                         </div>
                         <div class="info-step">
                             <div class="info-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Sell.gif")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Sell.gif")" class="buy-sell-img"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Sell.gif")" data-src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Sell.gif")" class="buy-sell-img"/>
 
                             </div>
                             <div class="info-label">
@@ -389,7 +387,7 @@
                         </div>
                         <div class="info-step">
                             <div class="info-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Engage.gif")" data-src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Engage.gif")" class="engage-img"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Engage.gif")" data-src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=10,f=avif/assets/images/AssetMantle Icon GIFs/Engage.gif")" class="engage-img"/>
 
                             </div>
                             <div class="info-label">
@@ -414,7 +412,7 @@
                     <div class="cards">
                         <div class="card c1">
                             <div class="card-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Multi chain access.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multi chain access.gif")"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Multi chain access.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multi chain access.gif")"/>
                             </div>
                             <div class="card-detail">
                                 <h2>@Messages(constants.View.FEATURE_BLOCK_TITLE_1)</h2>
@@ -423,7 +421,7 @@
                         </div>
                         <div class="card c2">
                             <div class="card-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Negligible minting fee final.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Negligible minting fee final.gif")" />
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Negligible minting fee final.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Negligible minting fee final.gif")" />
                             </div>
                             <div class="card-detail">
                                 <h2>@Messages(constants.View.FEATURE_BLOCK_TITLE_2)</h2>
@@ -432,7 +430,7 @@
                         </div>
                         <div class="card c3">
                             <div class="card-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Multiple payments.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multiple payments.gif")"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Multiple payments.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Multiple payments.gif")"/>
                             </div>
                             <div class="card-detail">
                                 <h2>@Messages(constants.View.FEATURE_BLOCK_TITLE_3)</h2>
@@ -441,7 +439,7 @@
                         </div>
                         <div class="card c4">
                             <div class="card-image">
-                                <img class="lazyload" src="@constants.CommonConfig.baseUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Complete customisation.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Complete customisation.gif")"/>
+                                <img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/anim=false,q=20,f=avif,blur=10/assets/images/AssetMantle Icon GIFs/Complete customisation.gif")" data-src="@routes.Assets.versioned("images/AssetMantle Icon GIFs/Complete customisation.gif")"/>
                             </div>
                             <div class="card-detail">
                                 <h2>@Messages(constants.View.FEATURE_BLOCK_TITLE_4)</h2>
