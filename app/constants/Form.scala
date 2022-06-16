@@ -8,6 +8,7 @@ class Form(name: String, subHeading: String, val get: JavaScriptReverseRoute, va
   val title: String = Seq("FORM", name, "TITLE").mkString(".")
   val subTitle: String = Seq("FORM", subHeading, "SUBTITLE").mkString(".")
   val submit: String = Seq("FORM", name, "SUBMIT").mkString(".")
+  val button: String = Seq("FORM", name, "BUTTON").mkString(".")
 }
 
 object Form {

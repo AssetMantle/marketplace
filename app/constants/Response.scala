@@ -22,6 +22,16 @@ object Response {
 
   val SIGN_UP_SUCCESSFUL = new Success("SIGN_UP_SUCCESSFUL")
 
+  val JSON_PARSE_EXCEPTION = new Failure("JSON_PARSE_EXCEPTION")
+  val JSON_MAPPING_EXCEPTION = new Failure("JSON_MAPPING_EXCEPTION")
+
+  val INVALID_BECH32_ADDRESS = new Failure("INVALID_BECH32_ADDRESS")
+  val KEY_GENERATION_FAILED = new Failure("KEY_GENERATION_FAILED")
+  val INVALID_ACCOUNT_ADDRESS = new Failure("INVALID_ACCOUNT_ADDRESS")
+  val INVALID_OPERATOR_ADDRESS = new Failure("INVALID_OPERATOR_ADDRESS")
+  val INVALID_HRP_OR_BYTES = new Failure("INVALID_HRP_OR_BYTES")
+  val INVALID_MNEMONICS = new Failure("INVALID_MNEMONICS")
+
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
     val action: String = utilities.JsRoutes.getJsRouteString(actionController)

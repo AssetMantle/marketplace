@@ -131,8 +131,8 @@ class HomeController @Inject()(
   }
 
   // Home
-  def marketPlaceHome() = Action { implicit request: Request[AnyContent] => Ok(views.html.Home.marketPlaceHome()) }
-  def home() = Action { implicit request: Request[AnyContent] => Ok(views.html.Home.homeTest()) }
+  def marketPlaceHome() = Action { implicit request: Request[AnyContent] => Ok(views.html.home.marketPlaceHome()) }
+  def home() = Action { implicit request: Request[AnyContent] => Ok(views.html.home.homeTest()) }
 
   // SignIn-SignUp
   // Option 1: Connect Wallet

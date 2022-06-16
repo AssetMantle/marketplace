@@ -21,7 +21,7 @@ object WalletGenerator {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.UTILITIES_KEY_GENERATOR
+  private implicit val module: String = constants.Module.UTILITIES_WALLET
 
   object BouncyHash {
     if (Security.getProvider("BC") == null) {
