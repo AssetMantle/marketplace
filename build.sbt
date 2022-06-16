@@ -32,16 +32,23 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-slick" % "5.0.0",
-  "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0",
-  "org.postgresql" % "postgresql" % "42.3.4"
+  "com.typesafe.play" %% "play-slick" % "5.0.2",
+  "com.typesafe.play" %% "play-slick-evolutions" % "5.0.2",
+  "org.postgresql" % "postgresql" % "42.3.6"
 )
 
 libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.3"
 
 libraryDependencies ++= Seq(
-  "org.scodec" %% "scodec-bits" % "1.1.31",
+  "org.scodec" %% "scodec-bits" % "1.1.34",
   "org.scorexfoundation" %% "scrypto" % "2.2.1",
   "org.bitcoinj" % "bitcoinj-core" % "0.16.1",
   "org.bouncycastle" % "bcpg-jdk15on" % "1.70"
 )
+
+libraryDependencies ++= Seq(
+  "com.amazonaws" % "aws-java-sdk-s3" % "1.12.239",
+  "com.amazonaws" % "aws-java-sdk" % "1.12.239"
+)
+
+libraryDependencies += "org.json" % "json" % "20220320"

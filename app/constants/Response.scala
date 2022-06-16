@@ -32,6 +32,12 @@ object Response {
   val INVALID_HRP_OR_BYTES = new Failure("INVALID_HRP_OR_BYTES")
   val INVALID_MNEMONICS = new Failure("INVALID_MNEMONICS")
 
+  val IPFS_UPLOAD_FAILED = new Failure("IPFS_UPLOAD_FAILED")
+  val AMAZON_S3_UPLOAD_FAILURE = new Failure("AMAZON_S3_UPLOAD_FAILURE")
+  val AMAZON_S3_PROCESS_FAILURE = new Failure("AMAZON_S3_PROCESS_FAILURE")
+  val AMAZON_S3_CLIENT_CONNECTION_FAILURE = new Failure("AMAZON_S3_CLIENT_CONNECTION_FAILURE")
+  val AMAZON_S3_NON_VERSIONED_BUCKET = new Failure("AMAZON_S3_NON_VERSIONED_BUCKET")
+
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
     val action: String = utilities.JsRoutes.getJsRouteString(actionController)
