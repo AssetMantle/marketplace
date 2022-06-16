@@ -1,4 +1,6 @@
 @import views.html.base.commonImage
+@import views.html.base.buttons._
+
 @()(implicit messagesProvider: MessagesProvider)
 @main(""){
     <div class="intro">
@@ -83,6 +85,7 @@
                                         <div class="disable">@Messages(constants.View.COMING_SOON)</div>
                                     </li>
                                 </ul>
+                                @commonFormButton(constants.Form.SIGN_UP)
                                 <!--<ul class="submenu">
                                     <li class="user-profile-data">
                                         <div class="user-profile-image">

@@ -10,7 +10,7 @@ version := "1.0"
 
 lazy val GatlingTest = config("gatling") extend Test
 
-GatlingTest / scalaSource  := baseDirectory.value / "gatling/simulation"
+GatlingTest / scalaSource := baseDirectory.value / "gatling/simulation"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
@@ -26,9 +26,10 @@ resolvers += "Maven Central Server" at "https://repo1.maven.org/maven2"
 
 libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
-libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.7.6" % "test"
-
-libraryDependencies += "io.gatling" % "gatling-test-framework" % "3.7.6" % "test"
+libraryDependencies ++= Seq(
+  "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.7.6" % "test",
+  "io.gatling" % "gatling-test-framework" % "3.7.6" % "test"
+)
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "5.0.0",
@@ -37,3 +38,10 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.3"
+
+libraryDependencies ++= Seq(
+  "org.scodec" %% "scodec-bits" % "1.1.31",
+  "org.scorexfoundation" %% "scrypto" % "2.2.1",
+  "org.bitcoinj" % "bitcoinj-core" % "0.16.1",
+  "org.bouncycastle" % "bcpg-jdk15on" % "1.70"
+)
