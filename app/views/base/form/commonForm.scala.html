@@ -1,14 +1,17 @@
 @import helper._
 @import views.html.base.buttons._
+@import views.html.base.forms._
 
-@(formTemplate: constants.Form, formData: Form[_], customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+@(formTemplate: constants.Form, formData: Form[_], backButton: Int = 0, customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @form(action = formTemplate.post, Symbol("onkeypress") -> "submitFormOnEnter(event,this)") {
-    <fieldset>
-        <legend>
-        @Messages(formTemplate.title)
-        </legend>
-        <hr>
+@*    <fieldset>*@
+    @if(backButton == 0){
+        @formHeader(label=Messages(formTemplate.title),subHeading = Messages(formTemplate.subTitle))
+    } else{
+        @formHeaderWithBackButton(heading=Messages(formTemplate.title),subHeading = Messages(formTemplate.subTitle))
+    }
+
         <div id="formBody">
             @CSRF.formField
             @fieldset
@@ -27,5 +30,5 @@
             }
             </div>
         </div>
-    </fieldset>
+@*    </fieldset>*@
 }

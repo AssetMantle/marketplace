@@ -39,7 +39,7 @@
     };
 
     /**
-    * Merge two or more objects. Returns a new object.
+     * Merge two or more objects. Returns a new object.
     * @private
     * @param {Boolean}  deep     If true, do a deep (or recursive) merge [optional]
     * @param {Object}   objects  The objects to merge together

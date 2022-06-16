@@ -7,11 +7,12 @@ function HideScrollbar() {
 }
 HideScrollbar()
 
-function ShowScrollbar() {
-    var style = document.createElement("style");
-    style.innerHTML = `body::-webkit-scrollbar {display: block;}`;
-    document.head.appendChild(style);
-}
+// function ShowScrollbar() {
+//     var style = document.createElement("style");
+//     style.innerHTML = `body::-webkit-scrollbar {display: block;}`;
+//     document.head.appendChild(style);
+// }
+
 let intro = document.querySelector('.intro');
 
 window.addEventListener('DOMContentLoaded', ()=>{
@@ -19,112 +20,11 @@ window.addEventListener('DOMContentLoaded', ()=>{
         setTimeout(()=>{
             intro.style.top = '-100vh';
             intro.style.visibility = 'hidden';
-            ShowScrollbar();
+            // ShowScrollbar();
         },3500);
     });
 });
 
-$(document).ready(function() {
-    if ($('.form-accordion').length) {
-        $('.form-accordion').find('.accordion-toggle').click(function() {
-            if ($(this).hasClass('open')) {
-                $(this).next().slideUp('fast');
-                $(this).removeClass('open');
-            } else {
-                $(this).next().slideDown('fast');
-                $(this).addClass('open');
-                $(".accordion-content").not($(this).next()).slideUp('fast');
-                $(".accordion-toggle").not($(this)).removeClass('open');
-            }
-        });
-    }
-
-    setTimeout(()=>{
-        setTimeout(()=>{
-            $(".form-hidden").addClass('show');
-        },500);
-        $(".form-hidden").slideDown(800);
-    },1000);
-
-});
-
-
-function togglePassword(){
-    const btn = document.querySelector(".btn");
-    var passwordInput = document.querySelectorAll(".password_input");
-
-    passwordInput.forEach((single) => {
-        if(single.type === "password"){
-            single.type = "text";
-            btn.classList.remove("fa-eye-slash");
-            btn.classList.add("fa-eye");
-        }
-        else{
-            single.type = "password";
-            btn.classList.remove("fa-eye");
-            btn.classList.add("fa-eye-slash");
-        }
-    });
-}
-
-function checkUserAvailability(){
-    let validUser = {users:['jaggu','pratik']};
-    var field = document.getElementById("username");
-    if(field.value !== ''){
-        if(validUser.users.includes(field.value)){
-            $("#username ~ i").fadeOut();
-            $(".username_field + .error-message").slideDown();
-            $(".username_field").css("border-color","var(--error)");
-        }
-        else{
-            $("#username ~ i").fadeIn();
-            $(".username_field + .error-message").slideUp();
-            $(".username_field").css("border-color","var(--inactive-gray)");
-        }
-    }
-    else{
-        $("#username ~ i").fadeOut();
-    }
-}
-
-function matchConfirmPassword(){
-    var passwordField = document.getElementById("password");
-    var confirmPasswordField = document.getElementById("confirm_password");
-
-    if(passwordField.value !== confirmPasswordField.value){
-        $(".confirm_password + .error-message").slideDown();
-        $(".confirm_password").css("border-color","var(--error)");
-    }
-    else{
-        $(".confirm_password + .error-message").slideUp();
-        $(".confirm_password").css("border-color","var(--inactive-gray)");
-    }
-}
-
-function checkAccount(){
-    event.preventDefault();
-    var usernameValue = document.getElementById("username").value;
-    var passwordValue = document.getElementById("password").value;
-
-    if(usernameValue !== '' && passwordValue !== ''){
-        if(usernameValue === 'jaggu'){
-            $(".username_field + .error-message").slideUp();
-            $(".username_field").css("border-color","var(--inactive-gray)");
-            if(passwordValue === '123'){
-                $(".password_field + .error-message").slideUp();
-                $(".password_field").css("border-color","var(--inactive-gray)");
-            }
-            else{
-                $(".password_field + .error-message").slideDown();
-                $(".password_field").css("border-color","var(--error)");
-            }
-        }
-        else{
-            $(".username_field + .error-message").slideDown();
-            $(".username_field").css("border-color","var(--error)");
-        }
-    }
-}
 
 function checkUsername(){
     event.preventDefault();
@@ -252,33 +152,34 @@ function removeCollectionTag(e){
     document.getElementsByClassName("collection-form-tag-field")[0].removeChild(element);
 }
 
-$(function() {
-    $('input[name="daterange"]').daterangepicker({
-        opens: 'left'
-    }, function(start, end, label) {
-        console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-    });
-});
-
-// Date Range Picker
-function setDateRange(){
-    document.getElementsByClassName("dateRangeField")[0].setAttribute("name","daterange");
-    console.log(document.getElementsByClassName("dateRangeField")[0].getAttribute('name'));
-}
+// $(function() {
+//     $('input[name="daterange"]').daterangepicker({
+//         opens: 'left'
+//     }, function(start, end, label) {
+//         console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+//     });
+// });
+//
+// // Date Range Picker
+// function setDateRange(){
+//     document.getElementsByClassName("dateRangeField")[0].setAttribute("name","daterange");
+//     console.log(document.getElementsByClassName("dateRangeField")[0].getAttribute('name'));
+// }
 
 // Check Phrase
 function checkPhrase(e){
-    if(e.className === "input-phrase-1"){
-        if(e.value === "Monkey"){
-            e.parentNode.style.borderColor = "var(--connected)";
+    console.log(e.value);
+    // if(e.className === "input-phrase-1"){
+        if(e.value.toLowerCase() === "monkey"){
+            e.style.borderColor = "var(--connected)";
         }
         else if(e.value.length !== 0){
-            e.parentNode.style.borderColor = "var(--error)";
+            e.style.borderColor = "var(--error)";
         }
         else{
-            e.parentNode.style.borderColor = "var(--dark)";
+            e.style.borderColor = "var(--dark)";
         }
-    }
+    // }
 }
 
 
@@ -319,6 +220,23 @@ var featuredSwiper = new Swiper(".featured-container .swiper-container", {
         nextEl: ".swiper-button-next",
         prevEl: ".swiper-button-prev",
     },
+    breakpoints: {
+        // when window width is >= 499px
+        100: {
+            slidesPerView: 1,
+            // spaceBetweenSlides: 50
+        },
+        // // when window width is >= 499px
+        499: {
+            slidesPerView: 3,
+            // spaceBetweenSlides: 50
+        },
+        // // when window width is >= 999px
+        999: {
+            slidesPerView: 4,
+            // spaceBetweenSlides: 50
+        }
+    }
 });
 
 
@@ -540,3 +458,81 @@ window.onbeforeunload = function () {
     window.scrollTo(0, 0);
 }
 
+// Text Copy to Clipboard
+$(".form-address-box .form-copy-icon").on("click",function (){
+    var element = $(this).next('.form-copy-message');
+    var copyText = $(this).prevAll('.username-data');
+
+    element.addClass("active");
+    element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function() {
+        element.removeClass('active');
+    });
+
+    navigator.clipboard.writeText(copyText.text());
+});
+
+
+// Multi Step
+const dots = document.getElementsByClassName('progress-bar__dot')
+const numberOfSteps = 3
+let currentStep = 1
+
+for(let i = 0 ; i < dots.length ; ++i){
+    dots[i].addEventListener('click', ()=>{
+        goToStep(i+1)
+    })
+}
+
+function goToStep(stepNumber){
+    currentStep = stepNumber
+
+    let indicators = document.getElementsByClassName('progress-bar__dot')
+
+    for(let i = indicators.length-1; i >= currentStep ; --i){
+        indicators[i].classList.remove('full')
+    }
+
+    for(let i = 0; i < currentStep; ++i){
+        indicators[i].classList.add('full')
+    }
+}
+
+// Reveal Navbar on Scroll
+// const body = document.body;
+// let lastScroll = 0;
+//
+// window.addEventListener("scroll", () => {
+//     const currentScroll = window.pageYOffset;
+//     if (currentScroll <= 0) {
+//         body.classList.remove("scroll-up");
+//         return;
+//     }
+//
+//     if (currentScroll > lastScroll && !body.classList.contains("scroll-down")) {
+//         body.classList.remove("scroll-up");
+//         body.classList.add("scroll-down");
+//     } else if (
+//         currentScroll < lastScroll &&
+//         body.classList.contains("scroll-down")
+//     ) {
+//         body.classList.remove("scroll-down");
+//         body.classList.add("scroll-up");
+//     }
+//     lastScroll = currentScroll;
+// });
+
+
+// List - Grid View Transition
+const listViewButton = document.querySelector('.list-view-button');
+const gridViewButton = document.querySelector('.grid-view-button');
+const list = document.querySelector('.profile-list ol');
+
+// listViewButton.onclick = function () {
+//     list.classList.remove('grid-view-filter');
+//     list.classList.add('list-view-filter');
+// }
+//
+// gridViewButton.onclick = function () {
+//     list.classList.remove('list-view-filter');
+//     list.classList.add('grid-view-filter');
+// }

@@ -1,11 +1,15 @@
-function getForm(route) {
+function getForm(route, modal = '#commonModal', modalContent = '#modal-content') {
+    // let modalID = $('#' + modal);
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
         statusCode: {
             200: function (data) {
-
+                // modal.html(data);
+                $(modalContent).html(data);
+                $(modal).addClass('active');
+                $(modal+" .modal").addClass('active');
             },
             500: function (data) {
                 replaceDocument(data);

@@ -1,4 +1,22 @@
-@(id: String = "")
+@* @(id: String = "")*@
 @*<img class="lazyload" src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=20,f=avif,blur=10/assets/images/NFT/@id" data-src="@routes.Assets.versioned("images/NFT/"+id+"")"/>*@
 @*<img src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/@id" data-src="https://staging.marketplace.assetmantle.one/cdn-cgi/image/q=10,f=webp/assets/images/NFT/@id"/>*@
-<img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/${id}")" data-src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/${id}")"/>
+@*<img class="lazyload" src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=5,blur=5,f=webp/assets/images/NFT/${id}")" data-src="@constants.CommonConfig.webAppUrl.concat(s"/cdn-cgi/image/q=10,f=webp/assets/images/NFT/${id}")"/>*@
+
+@(lowQuality: Option[Int] = None, highQuality: Int, blur: Option[Int] = None, fileFormat: String, fileName: String, height: Option[Int] = None, width: Option[Int] = None)
+
+@defining(
+    if(lowQuality.isDefined && blur.isEmpty) {
+        (s"""${constants.CommonConfig.webAppUrl}/cdn-cgi/image/q=${lowQuality.getOrElse(0)},f=${fileFormat}/assets/images/NFT/${fileName}""", s"""${constants.CommonConfig.webAppUrl}/cdn-cgi/image/q=${highQuality},f=${fileFormat}/assets/images/NFT/${fileName}""")
+    } else if(lowQuality.isEmpty && blur.isDefined) {
+        (s"""${constants.CommonConfig.webAppUrl}/cdn-cgi/image/b=${blur.getOrElse(0)},f=${fileFormat}/assets/images/NFT/${fileName}""", s"""${constants.CommonConfig.webAppUrl}/cdn-cgi/image/q=${highQuality},f=${fileFormat}/assets/images/NFT/${fileName}""")
+    } else {
+        (s"""${constants.CommonConfig.webAppUrl}/cdn-cgi/image/q=${lowQuality.getOrElse(0)},b=${blur.getOrElse(0)},f=${fileFormat}/assets/images/NFT/${fileName}""", s"""${constants.CommonConfig.webAppUrl}/cdn-cgi/image/q=${highQuality},f=${fileFormat}/assets/images/NFT/${fileName}""")
+    }
+) { imgSrc =>
+        @if(height.isDefined && width.isDefined){
+            <img class="lazyload" src="@imgSrc._1" data-src="@imgSrc._2" height="@height.concat(s"px")" width="@width.concat(s"px")"/>
+        }else{
+            <img class="lazyload" src="@imgSrc._1" data-src="@imgSrc._2"/>
+        }
+}

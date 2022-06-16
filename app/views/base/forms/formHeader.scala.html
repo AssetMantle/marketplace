@@ -1,0 +1,11 @@
+@(label:String = "",subHeading:String = "")
+
+<div class="header">
+    <div class="form-top">
+        <div class="form-title">@label</div>
+        <a class="form-close-btn close-modal" onclick="closeModal()"></a>
+    </div>
+    @if(subHeading != ""){
+        <div class="form-sub-title">@subHeading</div>
+    }
+</div>

@@ -30,33 +30,33 @@ class HomeController @Inject()(
 
 
 
-  def createWallet() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.createWallet())
-  }
+//  def createWallet() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.createWallet())
+//  }
 
-  def seedPhraseVerification() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.seedPhraseVerification())
-  }
+//  def seedPhraseVerification() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.seedPhraseVerification())
+//  }
 
-  def assetMantleWalletSuccessfull() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.assetMantleWalletSuccessfull())
-  }
+//  def assetMantleWalletSuccessfull() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.assetMantleWalletSuccessfull())
+//  }
 
-  def connectConfirmation() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.connectConfirmation())
-  }
+//  def connectConfirmation() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.connectConfirmation())
+//  }
 
   def connectConfirmationRedirectToKeplrn() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.connectConfirmationRedirectToKeplr())
   }
 
-  def connectedSuccessToKeplr() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.connectedSuccessToKeplr())
-  }
+//  def connectedSuccessToKeplr() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.connectedSuccessToKeplr())
+//  }
 
-  def importWalletSuccess() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.importWalletSuccess())
-  }
+//  def importWalletSuccess() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.importWalletSuccess())
+//  }
 
   def signUpForm() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.signUpForm())
@@ -90,17 +90,17 @@ class HomeController @Inject()(
     Ok(views.html.resetPasswordStep3())
   }
 
-  def profileMyNFTs() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.profile.profileMyNFTs())
-  }
+//  def profileMyNFTs() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.profile.profileMyNFTs())
+//  }
 
   def selectCollection() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.collection.selectCollection())
   }
 
-  def createNewCollection() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.collection.createNewCollection())
-  }
+//  def createNewCollection() = Action { implicit request: Request[AnyContent] =>
+//    Ok(views.html.collection.createNewCollection())
+//  }
 
   def createNewCollectionSuccessful() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.collection.createNewCollectionSuccessful())
@@ -130,8 +130,30 @@ class HomeController @Inject()(
     Ok(views.html.collection.mintNFTSuccess())
   }
 
-  def marketPlaceHome() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.home.marketPlaceHome())
-  }
+  // Home
+  def marketPlaceHome() = Action { implicit request: Request[AnyContent] => Ok(views.html.Home.marketPlaceHome()) }
+  def home() = Action { implicit request: Request[AnyContent] => Ok(views.html.Home.homeTest()) }
 
+  // SignIn-SignUp
+  // Option 1: Connect Wallet
+  def connectWallet() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.connectWallet()) }
+  def connectConfirmation() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.connectConfirmation()) }
+  def redirectingToKeplr() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.redirectingToKeplr()) }
+  def connectedSuccessToKeplr() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.connectedSuccessToKeplr()) }
+
+  // Option 2: Import Wallet
+  def importWalletSuccess() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.importWalletSuccess()) }
+
+  // Option 3: Create AM Wallet
+  def createWallet() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.createWallet()) }
+  def seedPhraseVerification() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.seedPhraseVerification()) }
+  def assetMantleWalletSuccessfull() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.assetMantleWalletSuccessfull()) }
+  def signUpMantleplaceCredentials() = Action { implicit request: Request[AnyContent] => Ok(views.html.signInSignUp.signUpMantleplaceCredentials()) }
+
+  // Create Collection & NFT
+  def createNewCollection() = Action { implicit request: Request[AnyContent] => Ok(views.html.collection.createNewCollection()) }
+
+  // Profile
+  // Visitor's POV
+  def creatorsProfile() = Action { implicit request: Request[AnyContent] => Ok(views.html.userProfile.creatorsProfile()) }
 }

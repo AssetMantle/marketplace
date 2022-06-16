@@ -1,4 +1,4 @@
-@import views.html.base.buttons.commonHtmlButton
+@import views.html.base._
 @main("Create Wallet"){
     <div class="container">
         <div class="form-container">
@@ -46,12 +46,6 @@
                         <div class="form-information-message">
                             <div class="form-information-icon"><img src="@routes.Assets.versioned("images/info.png")"/></div>
                             <div class="form-information-text">This will be used for verification on the next screen.</div>
-                        </div>
-                        <div class="form-button">
-                            @commonHtmlButton(constants.View.Button.CANCEL, Symbol("class") -> "form-cancel-button")
-                            @* <button class="form-cancel-button">Cancel</button> *@
-@*                            <button class="form-next-button">Next</button>*@
-                            @commonHtmlButton(constants.View.Button.NEXT,Symbol("class") -> "form-next-button")
                         </div>
                     </div>
                 </div>

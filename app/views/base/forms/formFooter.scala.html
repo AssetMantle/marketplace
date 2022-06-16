@@ -1,0 +1,11 @@
+@(message:String = "",link:String = "#",linkMessage:String = "")
+<div class="form-footer">
+    <div class="footer-message">
+        @if(message != ""){
+            <span>@message</span>
+        }
+        @if(link != "") {
+            <a class="link" href="@link">@linkMessage</a>
+        }
+    </div>
+</div>
