@@ -37,7 +37,15 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "42.3.6"
 )
 
-libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.3"
+libraryDependencies ++= Seq(
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.3",
+  "org.json" % "json" % "20220320"
+)
+
+libraryDependencies ++= Seq(
+  "com.sksamuel.scrimage" % "scrimage-core" % "4.0.31",
+  "com.sksamuel.scrimage" %% "scrimage-scala" % "4.0.31"
+)
 
 libraryDependencies ++= Seq(
   "org.scodec" %% "scodec-bits" % "1.1.34",
@@ -50,5 +58,3 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk-s3" % "1.12.239",
   "com.amazonaws" % "aws-java-sdk" % "1.12.239"
 )
-
-libraryDependencies += "org.json" % "json" % "20220320"

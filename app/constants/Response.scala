@@ -38,6 +38,19 @@ object Response {
   val AMAZON_S3_CLIENT_CONNECTION_FAILURE = new Failure("AMAZON_S3_CLIENT_CONNECTION_FAILURE")
   val AMAZON_S3_NON_VERSIONED_BUCKET = new Failure("AMAZON_S3_NON_VERSIONED_BUCKET")
 
+  val NO_SUCH_ELEMENT_EXCEPTION = new Failure("NO_SUCH_ELEMENT_EXCEPTION")
+  val NULL_POINTER_EXCEPTION = new Failure("NULL_POINTER_EXCEPTION")
+  val INVALID_FILE_PATH_EXCEPTION = new Failure("INVALID_FILE_PATH_EXCEPTION")
+  val FILE_SECURITY_EXCEPTION = new Failure("FILE_SECURITY_EXCEPTION")
+  val GENERIC_EXCEPTION = new Failure("GENERIC_EXCEPTION")
+  val I_O_EXCEPTION = new Failure("I_O_EXCEPTION")
+  val FILE_NOT_FOUND_EXCEPTION = new Failure("FILE_NOT_FOUND_EXCEPTION")
+  val FILE_ILLEGAL_ARGUMENT_EXCEPTION = new Failure("FILE_ILLEGAL_ARGUMENT_EXCEPTION")
+  val CLASS_CAST_EXCEPTION = new Failure("CLASS_CAST_EXCEPTION")
+  val FILE_UNSUPPORTED_OPERATION_EXCEPTION = new Failure("FILE_UNSUPPORTED_OPERATION_EXCEPTION")
+  val NO_SUCH_FILE_EXCEPTION = new Failure("NO_SUCH_FILE_EXCEPTION")
+  val FILE_UPLOAD_ERROR = new Failure("FILE_UPLOAD_ERROR")
+
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
     val action: String = utilities.JsRoutes.getJsRouteString(actionController)
