@@ -1,0 +1,226 @@
+@import views.html.base.profile._
+@import views.html.home._
+@()(implicit messagesProvider: MessagesProvider)
+@mainBootstrap("") {
+    @menu()
+    <div class="profileContainer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-md-3 col-lg-2">
+                    @userProfileCard()
+                </div>
+                <div class="col-12 col-md-6 col-lg-8">
+                    <div class="item item-center">
+                            <!-- Profiles card -->
+                        <div class="profile-card">
+                            <div class="profiles-container">
+                                <div class="card-header">
+                                    <div class="left-option">
+                                        <ul>
+                                            <li>Created</li>
+                                            <li>Collected</li>
+                                            <li>Favorites</li>
+                                        </ul>
+                                    </div>
+                                    <div class="right-option">
+                                        <div class="right-option-header">
+                                            <div class="option-with-icon">
+                                                <img src="@routes.Assets.versioned("images/icon/sort.png")"/>
+                                                Sort
+                                            </div>
+                                            <div class="option-with-icon">
+                                                <img src="@routes.Assets.versioned("images/icon/filter.png")"/>
+                                                Filter
+                                            </div>
+                                            <div class="option-layout">
+                                                <div class="option grid-view-button">
+                                                    <i class="fa fa-th"></i>
+                                                </div>
+                                                <div class="option list-view-button">
+                                                    <i class="fa-solid fa-bars"></i>
+                                                </div>
+                                                <div class="option">
+                                                    <i class="fa-solid fa-list"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="profile-list">
+                                    <ol class="list grid-view-filter">
+                                        <li>
+                                            <div class="single-profile-card">
+                                                <div class="hero-img">
+                                                    <img src="@routes.Assets.versioned("images/tempBG.png")"/>
+                                                </div>
+                                                <div id="profile-img">
+                                                    <img src="@routes.Assets.versioned("images/TempUserProfile.png")" alt="" />
+                                                </div>
+                                                <div id="content">
+                                                    <h1>Beluga Cat</h1>
+                                                    <p>Consectetur adipiscing amet</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="single-profile-card">
+                                                <div class="hero-img">
+                                                    <img src="@routes.Assets.versioned("images/tempBG.png")"/>
+                                                </div>
+                                                <div id="profile-img">
+                                                    <img src="@routes.Assets.versioned("images/TempUserProfile.png")" alt="" />
+                                                </div>
+                                                <div id="content">
+                                                    <h1>Beluga Cat</h1>
+                                                    <p>Consectetur adipiscing amet</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="single-profile-card">
+                                                <div class="hero-img">
+                                                    <img src="@routes.Assets.versioned("images/tempBG.png")"/>
+                                                </div>
+                                                <div id="profile-img">
+                                                    <img src="@routes.Assets.versioned("images/TempUserProfile.png")" alt="" />
+                                                </div>
+                                                <div id="content">
+                                                    <h1>Beluga Cat</h1>
+                                                    <p>Consectetur adipiscing amet</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="single-profile-card">
+                                                <div class="hero-img">
+                                                    <img src="@routes.Assets.versioned("images/tempBG.png")"/>
+                                                </div>
+                                                <div id="profile-img">
+                                                    <img src="@routes.Assets.versioned("images/TempUserProfile.png")" alt="" />
+                                                </div>
+                                                <div id="content">
+                                                    <h1>Beluga Cat</h1>
+                                                    <p>Consectetur adipiscing amet</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="single-profile-card">
+                                                <div class="hero-img">
+                                                    <img src="@routes.Assets.versioned("images/tempBG.png")"/>
+                                                </div>
+                                                <div id="profile-img">
+                                                    <img src="@routes.Assets.versioned("images/TempUserProfile.png")" alt="" />
+                                                </div>
+                                                <div id="content">
+                                                    <h1>Beluga Cat</h1>
+                                                    <p>Consectetur adipiscing amet</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="single-profile-card">
+                                                <div class="hero-img">
+                                                    <img src="@routes.Assets.versioned("images/tempBG.png")"/>
+                                                </div>
+                                                <div id="profile-img">
+                                                    <img src="@routes.Assets.versioned("images/TempUserProfile.png")" alt="" />
+                                                </div>
+                                                <div id="content">
+                                                    <h1>Beluga Cat</h1>
+                                                    <p>Consectetur adipiscing amet</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-3 col-lg-2">
+                    <div class="item item-sticky">
+
+                            <!-- Creator Activity Card -->
+                        <div class="profile-card">
+                            <div class="activity-top">
+                                <img src="@routes.Assets.versioned("images/icon/recent.png")"/>
+                                <div class="title">User568’s Activity</div>
+                            </div>
+                            <div class="separator"></div>
+                            <div class="activity-card">
+                                <div class="recent-activity-card">
+                                    <img src="@routes.Assets.versioned("images/icon/transfer.png")"/>
+                                    <div class="activity-details">
+                                        <div class="activity-title">
+                                            Transferred
+                                            <div class="activity-thumbnail"></div>
+                                        </div>
+                                        <div class="activity-message">NFT Name lorem ipsum set dorem (1) to Creator’s name.</div>
+                                        <div class="activity-date-time">12/02/2022 12:05:02 </div>
+                                        <div class="activity-transaction-detail">
+                                            <img src="@routes.Assets.versioned("images/icon/external.png")"/>
+                                            Transaction Details
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="activity-card">
+                                <div class="recent-activity-card">
+                                    <img src="@routes.Assets.versioned("images/icon/minted.png")"/>
+                                    <div class="activity-details">
+                                        <div class="activity-title">
+                                            Minted
+                                            <div class="activity-thumbnail"></div>
+                                        </div>
+                                        <div class="activity-message">NFT Name lorem ipsum set dorem (1) to Creator’s name.</div>
+                                        <div class="activity-date-time">12/02/2022 12:05:02 </div>
+                                        <div class="activity-transaction-detail">
+                                            <img src="@routes.Assets.versioned("images/icon/external.png")"/>
+                                            Transaction Details
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="activity-card">
+                                <div class="recent-activity-card">
+                                    <img src="@routes.Assets.versioned("images/icon/transfer.png")"/>
+                                    <div class="activity-details">
+                                        <div class="activity-title">
+                                            Transferred
+                                            <div class="activity-thumbnail"></div>
+                                        </div>
+                                        <div class="activity-message">NFT Name lorem ipsum set dorem (1) to Creator’s name.</div>
+                                        <div class="activity-date-time">12/02/2022 12:05:02 </div>
+                                        <div class="activity-transaction-detail">
+                                            <img src="@routes.Assets.versioned("images/icon/external.png")"/>
+                                            Transaction Details
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="activity-card">
+                                <div class="recent-activity-card">
+                                    <img src="@routes.Assets.versioned("images/icon/minted.png")"/>
+                                    <div class="activity-details">
+                                        <div class="activity-title">
+                                            Minted
+                                            <div class="activity-thumbnail"></div>
+                                        </div>
+                                        <div class="activity-message">NFT Name lorem ipsum set dorem (1) to Creator’s name.</div>
+                                        <div class="activity-date-time">12/02/2022 12:05:02 </div>
+                                        <div class="activity-transaction-detail">
+                                            <img src="@routes.Assets.versioned("images/icon/external.png")"/>
+                                            Transaction Details
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

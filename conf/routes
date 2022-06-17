@@ -67,4 +67,5 @@ POST        /signUpBootstrap                     controllers.AccountController.s
 
 # Profile
 GET         /profiles                            controllers.HomeController.creatorsProfile()
+GET         /profiles2                           controllers.HomeController.creatorsProfile2()
 

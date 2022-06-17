@@ -4,7 +4,8 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @main(""){
     @opener()
-    @menu()
+    @* @menu() *@
+    @menuNoAccount()
 
     <div class="modal-overlay" id="commonModal">
         <div class="modal">
@@ -23,18 +24,7 @@
                         <p>@Messages(constants.View.HERO_SECTION_PARAGRAPH)</p>
                         <div class="buttons">
                             <button class="button-1"></button>
-                            <button class="button-2"></button>
-
-                            <!--<button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_UP.get, ""))">SIGN UP</button>
-                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_WALLET.get, ""))">CREATE WALLET</button>
-                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_WALLET_SEED_PHRASE.get, ""))">CREATE WALLET SEED PHRASE</button>
-                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_WALLET_SUCCESS.get, ""))">CREATE WALLET SUCCESS</button>
-                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_WALLET_ERROR.get, ""))">CREATE WALLET ERROR</button>
-                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN.get, ""))">SIGN IN</button>
-                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.FORGOT_PASSWORD_USERNAME.get, ""))">Forgot Password</button>
-                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.FORGOT_PASSWORD_SEED_PHRASE.get, ""))">Seed Phrase</button>
-                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.FORGOT_PASSWORD_NEW_PASSWORD.get, ""))">New Password</button>
-                            <button onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.FORGOT_PASSWORD_SUCCESS.get, ""))">SUCCESS</button> -->
+                            <button class="button-2" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_UP.get, ""))">@Messages(constants.View.SIGN_UP)</button>
                         </div>
                     </div>
                     <div class="col-2">

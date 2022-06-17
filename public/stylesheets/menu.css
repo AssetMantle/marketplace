@@ -63,6 +63,7 @@ nav .content .links {
     letter-spacing: 2px; /* font-weight: 500; */
     padding: 9px 17px;
     border-radius: 5px;
+    cursor: pointer;
     transition: all 0.3s ease;
 }
 .content .links li .disable{

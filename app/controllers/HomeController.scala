@@ -30,70 +30,6 @@ class HomeController @Inject()(
 
 
 
-//  def createWallet() = Action { implicit request: Request[AnyContent] =>
-//    Ok(views.html.createWallet())
-//  }
-
-//  def seedPhraseVerification() = Action { implicit request: Request[AnyContent] =>
-//    Ok(views.html.seedPhraseVerification())
-//  }
-
-//  def assetMantleWalletSuccessfull() = Action { implicit request: Request[AnyContent] =>
-//    Ok(views.html.assetMantleWalletSuccessfull())
-//  }
-
-//  def connectConfirmation() = Action { implicit request: Request[AnyContent] =>
-//    Ok(views.html.connectConfirmation())
-//  }
-
-  def connectConfirmationRedirectToKeplrn() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.connectConfirmationRedirectToKeplr())
-  }
-
-//  def connectedSuccessToKeplr() = Action { implicit request: Request[AnyContent] =>
-//    Ok(views.html.connectedSuccessToKeplr())
-//  }
-
-//  def importWalletSuccess() = Action { implicit request: Request[AnyContent] =>
-//    Ok(views.html.importWalletSuccess())
-//  }
-
-  def signUpForm() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.signUpForm())
-  }
-
-  def signIn() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.signIn())
-  }
-
-  def signUpCompleteConnectedWallet() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.signUpCompleteConnectedWallet())
-  }
-
-  def forgotPasswordUsername() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.forgotPasswordUsername())
-  }
-
-  def forgotPasswordConfirmPassword() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.forgotPasswordConfirmPassword())
-  }
-
-  def resetPasswordStep1() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.resetPasswordStep1())
-  }
-
-  def resetPasswordStep2() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.resetPasswordStep2())
-  }
-
-  def resetPasswordStep3() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.resetPasswordStep3())
-  }
-
-//  def profileMyNFTs() = Action { implicit request: Request[AnyContent] =>
-//    Ok(views.html.profile.profileMyNFTs())
-//  }
-
   def selectCollection() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.collection.selectCollection())
   }
@@ -155,5 +91,6 @@ class HomeController @Inject()(
 
   // Profile
   // Visitor's POV
-  def creatorsProfile() = Action { implicit request: Request[AnyContent] => Ok(views.html.userProfile.creatorsProfile()) }
+  def creatorsProfile() = Action { implicit request: Request[AnyContent] => Ok(views.html.userProfile.creatorProfileBootstrap()) }
+  def creatorsProfile2() = Action { implicit request: Request[AnyContent] => Ok(views.html.userProfile.creatorsProfile()) }
 }

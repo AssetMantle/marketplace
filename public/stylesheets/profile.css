@@ -26,9 +26,10 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
+    z-index: -1;
 }
 .profileContainer .item-sticky .profile-card{
-    width: 228px;
+    /*width: 228px;*/
     height: fit-content;
     background-color: var(--card-color);
     border-radius: 10px;
@@ -43,6 +44,14 @@
 }
 
 /* Creator Profile Card */
+.profile-card{
+    /*width: 228px !important;*/
+    /*height: fit-content;*/
+    background-color: var(--card-color);
+    /*border-radius: 10px;*/
+    /*padding: 20px !important;*/
+
+}
 .profile-card .user-profile-top{
     display: flex;
     align-items: center;
@@ -56,21 +65,21 @@
     background-color: var(--dark);
     border-radius: 50%;
 }
-.profile-card .user-profile-top .user-profile-name{
+.profile-card .user-profile-name{
     font-family: var(--font-type-2);
     font-style: normal;
     font-weight: 600;
-    font-size: 18px;
+    font-size: 16px;
     color: var(--mantle-off-white);
 }
 .profile-card .user-address-box{
-    display: flex;
     background-color: var(--card-dark);
-    justify-content: space-between;
     margin-top:20px;
-    padding: 8px;
+    padding: 8px !important;
     align-items: center;
     border-radius: 8px;
+    margin-left: 0px !important;
+    margin-right: 0px !important;
 }
 .profile-card .user-address-box .user-address-data{
     font-family: var(--font-type-2);
@@ -81,9 +90,9 @@
 }
 .profile-card .user-address-box .copy-icon{
     padding: 4px 0 0 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
     cursor: pointer;
 }
 .profile-card .user-join-date{
@@ -119,8 +128,13 @@
     list-style: none;
     display: flex;
     gap: 16px;
+    margin: 0px;
 }
-.profile-card img{
+/*.profile-card img{*/
+/*    height: 22px;*/
+/*    width: 22px;*/
+/*}*/
+.profile-card .profile-icon{
     height: 22px;
     width: 22px;
 }
@@ -421,4 +435,10 @@
         flex-direction: column;
         gap: 10px;
     }
+}
+
+/* Bootstrap */
+.profileContainer .row [class^="col-"]{
+    /*border:1px solid red;*/
+    /*padding: .5rem;*/
 }
