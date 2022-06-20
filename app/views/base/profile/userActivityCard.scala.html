@@ -1,0 +1,14 @@
+@import views.html.base.profile.components._
+@()(implicit messagesProvider: MessagesProvider)
+<div class="profile-card">
+    <div class="d-flex flex-row gap-3 gap-md-2 align-items-center activity-top">
+        <img src="@routes.Assets.versioned("images/icon/recent.png")" class="profile-icon"/>
+        <div class="title">User568’s Activity</div>
+    </div>
+    <div class="separator"></div>
+    @singleActivityCard(icon = "transfer.png", title = "Transferred", thumbnail = "", message = "NFT Name lorem ipsum set dorem (1) to Creator’s name.", dateTime = "12/02/2022 12:05:02")
+    @singleActivityCard(icon = "minted.png", title = "Minted", thumbnail = "", message = "NFT Name lorem ipsum set dorem (1) to Creator’s name.", dateTime = "12/02/2022 12:05:02")
+    @singleActivityCard(icon = "transfer.png", title = "Transferred", thumbnail = "", message = "NFT Name lorem ipsum set dorem (1) to Creator’s name.", dateTime = "12/02/2022 12:05:02")
+    @singleActivityCard(icon = "minted.png", title = "Minted", thumbnail = "", message = "NFT Name lorem ipsum set dorem (1) to Creator’s name.", dateTime = "12/02/2022 12:05:02")
+    <div class="mt-5 activity-load-button">@Messages(constants.View.LOAD_OLDER)</div>
+</div>

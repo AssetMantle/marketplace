@@ -26,7 +26,7 @@ class AccountController @Inject()(
   private implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
 
   def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.account.signUp2())
+    Ok(views.html.account.signUp())
   }
 
   def signUp: Action[AnyContent] = withoutLoginActionAsync { implicit request =>

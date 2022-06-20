@@ -1,0 +1,28 @@
+@import views.html.base.profile._
+@import views.html.home._
+@()(implicit messagesProvider: MessagesProvider)
+@mainBootstrap("") {
+    @menu()
+    <div class="profileContainer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-md-3 col-lg-3 col-xl-2">
+                    <div class="sticky-top item-sticky">
+                        @creatorProfileCard()
+                        @creatorStatsCard()
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-6 col-xl-8">
+                    <div class="item item-center">
+                        @creatorCollectionCard()
+                    </div>
+                </div>
+                <div class="col-12 col-md-3 col-lg-3 col-xl-2">
+                    <div class="sticky-top item-sticky">
+                        @userActivityCard()
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

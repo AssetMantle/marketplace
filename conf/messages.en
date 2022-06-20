@@ -6,6 +6,8 @@ CREATE=Create
 SUPPORT=Support
 PROFILE=Profile
 WALLET=Wallet
+SIGN_IN=Sign In
+SIGN_UP=Sign Up
 COMING_SOON=Coming Soon
 HERO_SECTION_TITLE=Welcome To MantlePlace
 HERO_SECTION_PARAGRAPH=Experience the first NFT marketplace with blockchain-based identity.
@@ -130,3 +132,10 @@ NEW_PASSWORD_RULE_3 = One Upper case letter
 NEW_PASSWORD_RULE_4 = One special character (!@@#$%^&*./-_)
 FORGOT_PASSWORD_SUCCESS_TITLE = Password Reset successful
 FORGOT_PASSWORD_SUCCESS_SUBTITLE = Your password has been reset successfully. Sign in to continue.
+
+#//Profile
+TRANSACTION_DETAILS = Transaction Details
+LOAD_OLDER = Load older
+CREATED = Created
+COLLECTED = Collected
+FAVORITES = Favorites
