@@ -1,11 +1,10 @@
 package models.master
 
-import models.Trait.Logged
+import models.Trait.{Entity, GenericDaoImpl, IdentifyableTable, Logged}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import slick.jdbc.H2Profile.api._
-import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
@@ -13,26 +12,19 @@ import scala.concurrent.ExecutionContext
 
 case class Wallet(address: String, mnemonics: Seq[String], accountID: String, provisioned: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
-@Singleton
-class Wallets @Inject()(
-                         protected val databaseConfigProvider: DatabaseConfigProvider
-                       )(implicit executionContext: ExecutionContext) {
+object Wallets {
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
-  private val db = databaseConfigProvider.get[JdbcProfile].db
-
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val walletTable = TableQuery[WalletTable]
-
-  case class WalletSerialized(address: String, mnemonics: String, accountID: String, provisioned: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+  case class WalletSerialized(address: String, mnemonics: String, accountID: String, provisioned: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
     def deserialize: Wallet = Wallet(address = address, mnemonics = utilities.JSON.convertJsonStringToObject[Seq[String]](mnemonics), accountID = accountID, provisioned = provisioned, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+
+    def id: String = address
   }
 
-  def serialize(wallet: Wallet): WalletSerialized = WalletSerialized(address = wallet.address, mnemonics = Json.toJson(wallet.mnemonics).toString(), accountID = wallet.accountID, provisioned = wallet.provisioned, createdBy = wallet.createdBy, createdOn = wallet.createdOn, createdOnTimeZone = wallet.createdOnTimeZone, updatedBy = wallet.updatedBy, updatedOn = wallet.updatedOn, updatedOnTimeZone = wallet.updatedOnTimeZone)
-
-  private class WalletTable(tag: Tag) extends Table[WalletSerialized](tag, "Wallet") {
+  private class WalletTable(tag: Tag) extends Table[WalletSerialized](tag, "Wallet") with IdentifyableTable[String] {
 
     def * = (address, mnemonics, accountID, provisioned.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (WalletSerialized.tupled, WalletSerialized.unapply)
 
@@ -56,7 +48,30 @@ class Wallets @Inject()(
 
     def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
+    override def id = address
   }
+
+  val TableQuery = new TableQuery(tag => new WalletTable(tag))
+}
+
+@Singleton
+class Wallets @Inject()(
+                         protected val databaseConfigProvider: DatabaseConfigProvider
+                       )(implicit executionContext: ExecutionContext)
+  extends GenericDaoImpl[Wallets.WalletTable, Wallets.WalletSerialized, String](databaseConfigProvider, Wallets.TableQuery, executionContext) {
+
+  def serialize(wallet: Wallet): Wallets.WalletSerialized = Wallets.WalletSerialized(
+    address = wallet.address,
+    mnemonics = Json.toJson(wallet.mnemonics).toString(),
+    accountID = wallet.accountID,
+    provisioned = wallet.provisioned,
+    createdBy = wallet.createdBy,
+    createdOn = wallet.createdOn,
+    createdOnTimeZone = wallet.createdOnTimeZone,
+    updatedBy = wallet.updatedBy,
+    updatedOn = wallet.updatedOn,
+    updatedOnTimeZone = wallet.updatedOnTimeZone)
+
 
   object Service {
 
