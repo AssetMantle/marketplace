@@ -1,0 +1,127 @@
+@()(implicit messagesProvider: MessagesProvider)
+<div class="profile-card">
+    <div class="profiles-container">
+        <div class="d-flex flex-xl-row flex-lg-column align-items-center justify-content-between card-header">
+            <div class="left-option">
+                <div class="row">
+                    <div class="col active">@Messages(constants.View.CREATED)</div>
+                    <div class="col">@Messages(constants.View.COLLECTED)</div>
+                    <div class="col">@Messages(constants.View.FAVORITES)</div>
+                    <div class="col">@Messages(constants.View.COLLECTED)</div>
+                    <div class="col">@Messages(constants.View.FAVORITES)</div>
+                </div>
+            </div>
+            <div class="right-option">
+                <div class="right-option-header">
+                    <div class="option-with-icon">
+                        <img src="@routes.Assets.versioned("images/icon/sort.png")" class="profile-icon"/>
+                        Sort
+                    </div>
+                    <div class="option-with-icon">
+                        <img src="@routes.Assets.versioned("images/icon/filter.png")" class="profile-icon"/>
+                        Filter
+                    </div>
+                    <div class="option-layout">
+                        <div class="option grid-view-button active">
+                            <div class="grid-icon profile-icon"></div>
+                        </div>
+                        <div class="option slab-view-button">
+                            <div class="slab-icon profile-icon"></div>
+                        </div>
+                        <div class="option list-view-button">
+                            <div class="list-icon profile-icon"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="profile-list">
+            <ol class="list grid-view-filter">
+                <li>
+                    <div class="single-profile-card">
+                        <div class="hero-img">
+                            <img src="@routes.Assets.versioned("images/tempBG.png")"/>
+                        </div>
+                        <div id="profile-img">
+                            <img src="@routes.Assets.versioned("images/TempUserProfile.png")" alt="" />
+                        </div>
+                        <div id="content">
+                            <h1>Beluga Cat</h1>
+                            <p>Consectetur adipiscing amet</p>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="single-profile-card">
+                        <div class="hero-img">
+                            <img src="@routes.Assets.versioned("images/tempBG.png")"/>
+                        </div>
+                        <div id="profile-img">
+                            <img src="@routes.Assets.versioned("images/TempUserProfile.png")" alt="" />
+                        </div>
+                        <div id="content">
+                            <h1>Beluga Cat</h1>
+                            <p>Consectetur adipiscing amet</p>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="single-profile-card">
+                        <div class="hero-img">
+                            <img src="@routes.Assets.versioned("images/tempBG.png")"/>
+                        </div>
+                        <div id="profile-img">
+                            <img src="@routes.Assets.versioned("images/TempUserProfile.png")" alt="" />
+                        </div>
+                        <div id="content">
+                            <h1>Beluga Cat</h1>
+                            <p>Consectetur adipiscing amet</p>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="single-profile-card">
+                        <div class="hero-img">
+                            <img src="@routes.Assets.versioned("images/tempBG.png")"/>
+                        </div>
+                        <div id="profile-img">
+                            <img src="@routes.Assets.versioned("images/TempUserProfile.png")" alt="" />
+                        </div>
+                        <div id="content">
+                            <h1>Beluga Cat</h1>
+                            <p>Consectetur adipiscing amet</p>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="single-profile-card">
+                        <div class="hero-img">
+                            <img src="@routes.Assets.versioned("images/tempBG.png")"/>
+                        </div>
+                        <div id="profile-img">
+                            <img src="@routes.Assets.versioned("images/TempUserProfile.png")" alt="" />
+                        </div>
+                        <div id="content">
+                            <h1>Beluga Cat</h1>
+                            <p>Consectetur adipiscing amet</p>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="single-profile-card">
+                        <div class="hero-img">
+                            <img src="@routes.Assets.versioned("images/tempBG.png")"/>
+                        </div>
+                        <div id="profile-img">
+                            <img src="@routes.Assets.versioned("images/TempUserProfile.png")" alt="" />
+                        </div>
+                        <div id="content">
+                            <h1>Beluga Cat</h1>
+                            <p>Consectetur adipiscing amet</p>
+                        </div>
+                    </div>
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
