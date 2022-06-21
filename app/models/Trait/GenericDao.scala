@@ -7,7 +7,7 @@ import slick.lifted.CanBeQueryCondition
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] extends HasDatabaseConfigProvider[JdbcProfile] {
+trait GenericDao[T <: Table[E] with ModelTable[PK], E <: Entity[PK], PK] extends HasDatabaseConfigProvider[JdbcProfile] {
 
 //  implicit val executionContext: ExecutionContext
 

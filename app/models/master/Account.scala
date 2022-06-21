@@ -1,6 +1,6 @@
 package models.master
 
-import models.Trait.{Entity, GenericDaoImpl, IdentifyableTable, Logged}
+import models.Trait.{Entity, GenericDaoImpl, ModelTable, Logged}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.i18n.Lang
@@ -22,7 +22,7 @@ object Accounts {
     def deserialize: Account = Account(id = id, passwordHash = passwordHash, salt = salt, iterations = iterations, language = Lang(language), userType = userType, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account") with IdentifyableTable[String] {
+  class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account") with ModelTable[String] {
 
     def * = (id, passwordHash, salt, iterations, accountType, language, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
 

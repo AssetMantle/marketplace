@@ -1,6 +1,6 @@
 package models.Trait
 
-trait IdentifyableTable[PK] {
+trait ModelTable[PK] {
 
   def id : slick.lifted.Rep[PK]
 }

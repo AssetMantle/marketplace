@@ -2,11 +2,12 @@ package models.Trait
 
 import play.api.db.slick._
 import slick.jdbc.H2Profile.api._
+import slick.jdbc.JdbcProfile
 import slick.lifted.CanBeQueryCondition
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK: BaseColumnType](databaseConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T], implicit val executionContext: ExecutionContext) extends GenericDao[T, E, PK] { // extends HasDatabaseConfigProvider[JdbcProfile] { //
+abstract class GenericDaoImpl[T <: Table[E] with ModelTable[PK], E <: Entity[PK], PK: BaseColumnType](databaseConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T], implicit val executionContext: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] { //extends GenericDao[T, E, PK] {
 
   protected val dbConfigProvider: DatabaseConfigProvider = databaseConfigProvider
 

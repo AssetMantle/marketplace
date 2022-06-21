@@ -1,6 +1,6 @@
 package models.master
 
-import models.Trait.{Entity, GenericDaoImpl, IdentifyableTable, Logged}
+import models.Trait.{Entity, GenericDaoImpl, ModelTable, Logged}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -24,7 +24,7 @@ object Wallets {
     def id: String = address
   }
 
-  private class WalletTable(tag: Tag) extends Table[WalletSerialized](tag, "Wallet") with IdentifyableTable[String] {
+  private class WalletTable(tag: Tag) extends Table[WalletSerialized](tag, "Wallet") with ModelTable[String] {
 
     def * = (address, mnemonics, accountID, provisioned.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (WalletSerialized.tupled, WalletSerialized.unapply)
 
