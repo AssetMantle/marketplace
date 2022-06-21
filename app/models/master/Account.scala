@@ -1,6 +1,6 @@
 package models.master
 
-import models.Trait.{Entity, GenericDaoImpl, ModelTable, Logged}
+import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.i18n.Lang
@@ -8,18 +8,18 @@ import slick.jdbc.H2Profile.api._
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-case class Account(id: String, passwordHash: String, salt: Array[Byte], iterations: Int, language: Lang, userType: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Account(id: String, passwordHash: String, salt: Array[Byte], iterations: Int, language: Lang, accountType: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 object Accounts {
 
-  private implicit val module: String = constants.Module.MASTER_ACCOUNT
+  implicit val module: String = constants.Module.MASTER_ACCOUNT
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  case class AccountSerialized(id: String, passwordHash: String, salt: Array[Byte], iterations: Int, language: String, userType: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
-    def deserialize: Account = Account(id = id, passwordHash = passwordHash, salt = salt, iterations = iterations, language = Lang(language), userType = userType, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class AccountSerialized(id: String, passwordHash: String, salt: Array[Byte], iterations: Int, language: String, accountType: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
+    def deserialize: Account = Account(id = id, passwordHash = passwordHash, salt = salt, iterations = iterations, language = Lang(language), accountType = accountType, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account") with ModelTable[String] {
@@ -52,14 +52,20 @@ object Accounts {
 
   }
 
-  val TableQuery = new TableQuery(tag => new AccountTable(tag))
+  lazy val TableQuery = new TableQuery(tag => new AccountTable(tag))
 }
 
 @Singleton
 class Accounts @Inject()(
                           protected val databaseConfigProvider: DatabaseConfigProvider
                         )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Accounts.AccountTable, Accounts.AccountSerialized, String](databaseConfigProvider, Accounts.TableQuery, executionContext) {
+  extends GenericDaoImpl[Accounts.AccountTable, Accounts.AccountSerialized, String](
+    databaseConfigProvider,
+    Accounts.TableQuery,
+    executionContext,
+    Accounts.module,
+    Accounts.logger
+  ) {
 
   def serialize(account: Account): Accounts.AccountSerialized = Accounts.AccountSerialized(
     id = account.id,
@@ -67,7 +73,7 @@ class Accounts @Inject()(
     salt = account.salt,
     iterations = account.iterations,
     language = account.language.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0),
-    userType = account.userType,
+    accountType = account.accountType,
     createdBy = account.createdBy,
     createdOn = account.createdOn,
     createdOnTimeZone = account.createdOnTimeZone,
@@ -78,7 +84,7 @@ class Accounts @Inject()(
 
   object Service {
 
-    def add(username: String, password: String, language: Lang, userType: String) = {
+    def add(username: String, password: String, language: Lang, accountType: String) = {
       val salt = utilities.Secrets.getNewSalt
       val account = Account(
         id = username,
@@ -86,7 +92,7 @@ class Accounts @Inject()(
         salt = salt,
         iterations = constants.Security.DefaultIterations,
         language = language,
-        userType = userType)
+        accountType = accountType)
       (for {
         _ <- create(serialize(account))
       } yield ()
@@ -123,9 +129,9 @@ class Accounts @Inject()(
     //
     //    def tryGetLanguage(id: String): Future[String] = tryGetLanguageById(id)
     //
-    //    def getAccountType(id: String): Future[String] = getAccountTypeById(id)
+    def getAccountType(id: String): Future[String] = tryGetById(id).map(_.accountType)
     //
-    //    def tryVerifyingUserType(id: String, accountType: String): Future[Boolean] = {
+    //    def tryVerifyingaccountType(id: String, accountType: String): Future[Boolean] = {
     //      getAccountType(id).map(accountTypeResult => accountTypeResult == accountType)
     //    }
     //

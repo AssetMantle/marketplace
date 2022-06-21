@@ -17,7 +17,11 @@ trait GenericDao[T <: Table[E] with ModelTable[PK], E <: Entity[PK], PK] extends
 
   def findAll(): Future[Seq[E]]
 
+  def tryGetById(id: PK): Future[E]
+
   def filter[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Seq[E]]
+
+  def filterHead[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[E]
 
   def create(entity: E): Future[Unit]
 

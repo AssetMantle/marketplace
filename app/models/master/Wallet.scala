@@ -1,6 +1,6 @@
 package models.master
 
-import models.Trait.{Entity, GenericDaoImpl, ModelTable, Logged}
+import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -14,9 +14,9 @@ case class Wallet(address: String, mnemonics: Seq[String], accountID: String, pr
 
 object Wallets {
 
-  private implicit val module: String = constants.Module.MASTER_ACCOUNT
+  implicit val module: String = constants.Module.MASTER_WALLET
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   case class WalletSerialized(address: String, mnemonics: String, accountID: String, provisioned: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
     def deserialize: Wallet = Wallet(address = address, mnemonics = utilities.JSON.convertJsonStringToObject[Seq[String]](mnemonics), accountID = accountID, provisioned = provisioned, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -24,7 +24,7 @@ object Wallets {
     def id: String = address
   }
 
-  private class WalletTable(tag: Tag) extends Table[WalletSerialized](tag, "Wallet") with ModelTable[String] {
+  class WalletTable(tag: Tag) extends Table[WalletSerialized](tag, "Wallet") with ModelTable[String] {
 
     def * = (address, mnemonics, accountID, provisioned.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (WalletSerialized.tupled, WalletSerialized.unapply)
 
@@ -51,14 +51,20 @@ object Wallets {
     override def id = address
   }
 
-  val TableQuery = new TableQuery(tag => new WalletTable(tag))
+  lazy val TableQuery = new TableQuery(tag => new WalletTable(tag))
 }
 
 @Singleton
 class Wallets @Inject()(
                          protected val databaseConfigProvider: DatabaseConfigProvider
                        )(implicit executionContext: ExecutionContext)
-  extends GenericDaoImpl[Wallets.WalletTable, Wallets.WalletSerialized, String](databaseConfigProvider, Wallets.TableQuery, executionContext) {
+  extends GenericDaoImpl[Wallets.WalletTable, Wallets.WalletSerialized, String](
+    databaseConfigProvider,
+    Wallets.TableQuery,
+    executionContext,
+    Wallets.module,
+    Wallets.logger
+  ) {
 
   def serialize(wallet: Wallet): Wallets.WalletSerialized = Wallets.WalletSerialized(
     address = wallet.address,
