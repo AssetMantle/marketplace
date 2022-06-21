@@ -94,10 +94,9 @@ class Accounts @Inject()(
         iterations = constants.Security.DefaultIterations,
         language = language,
         accountType = accountType)
-      (for {
+      for {
         _ <- create(account.serialize())
       } yield ()
-        )
     }
 
     def validateUsernamePasswordAndGetAccount(username: String, password: String): Future[(Boolean, Account)] = {

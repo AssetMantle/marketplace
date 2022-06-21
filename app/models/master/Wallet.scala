@@ -8,9 +8,21 @@ import slick.jdbc.H2Profile.api._
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-case class Wallet(address: String, mnemonics: Seq[String], accountID: String, provisioned: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Wallet(address: String, mnemonics: Seq[String], accountID: String, provisioned: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+  def serialize(): Wallets.WalletSerialized = Wallets.WalletSerialized(
+    address = this.address,
+    mnemonics = Json.toJson(this.mnemonics).toString(),
+    accountID = this.accountID,
+    provisioned = this.provisioned,
+    createdBy = this.createdBy,
+    createdOn = this.createdOn,
+    createdOnTimeZone = this.createdOnTimeZone,
+    updatedBy = this.updatedBy,
+    updatedOn = this.updatedOn,
+    updatedOnTimeZone = this.updatedOnTimeZone)
+}
 
 object Wallets {
 
@@ -66,21 +78,16 @@ class Wallets @Inject()(
     Wallets.logger
   ) {
 
-  def serialize(wallet: Wallet): Wallets.WalletSerialized = Wallets.WalletSerialized(
-    address = wallet.address,
-    mnemonics = Json.toJson(wallet.mnemonics).toString(),
-    accountID = wallet.accountID,
-    provisioned = wallet.provisioned,
-    createdBy = wallet.createdBy,
-    createdOn = wallet.createdOn,
-    createdOnTimeZone = wallet.createdOnTimeZone,
-    updatedBy = wallet.updatedBy,
-    updatedOn = wallet.updatedOn,
-    updatedOnTimeZone = wallet.updatedOnTimeZone)
-
 
   object Service {
 
+    def add(address: String, mnemonics: Seq[String], accountID: String, provisioned: Option[Boolean]): Future[Unit] = create(Wallet(address = address, mnemonics = mnemonics, accountID = accountID, provisioned = provisioned).serialize())
+
+    def tryGet(address: String): Future[Wallet] = tryGetById(address).map(_.deserialize)
+
+    def get(address: String): Future[Option[Wallet]] = getById(address).map(_.map(_.deserialize))
+
+    def tryGetByAccountID(accountID: String): Future[Wallet] = filterHead(_.accountID === accountID).map(_.deserialize)
   }
 
 }
