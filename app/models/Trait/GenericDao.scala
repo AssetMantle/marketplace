@@ -13,9 +13,9 @@ trait GenericDao[T <: Table[E] with ModelTable[PK], E <: Entity[PK], PK] extends
 
   def count(): Future[Int]
 
-  def findById(id: PK): Future[Option[E]]
+  def getById(id: PK): Future[Option[E]]
 
-  def findAll(): Future[Seq[E]]
+  def getAll(): Future[Seq[E]]
 
   def tryGetById(id: PK): Future[E]
 
@@ -38,4 +38,6 @@ trait GenericDao[T <: Table[E] with ModelTable[PK], E <: Entity[PK], PK] extends
   def deleteMultiple(ids: Seq[PK]): Future[Unit]
 
   def deleteAll(): Future[Unit]
+
+  def exists(id: PK): Future[Boolean]
 }

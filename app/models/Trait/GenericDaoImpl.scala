@@ -17,7 +17,7 @@ abstract class GenericDaoImpl[T <: Table[E] with ModelTable[PK], E <: Entity[PK]
 
   def count(): Future[Int] = db.run(tableQuery.length.result)
 
-  def findById(id: PK): Future[Option[E]] = db.run(tableQuery.filter(_.id === id).result.headOption)
+  def getById(id: PK): Future[Option[E]] = db.run(tableQuery.filter(_.id === id).result.headOption)
 
   def tryGetById(id: PK): Future[E] = db.run(tableQuery.filter(_.id === id).result.head.asTry).map {
     case Failure(exception) => exception match {
@@ -25,7 +25,7 @@ abstract class GenericDaoImpl[T <: Table[E] with ModelTable[PK], E <: Entity[PK]
     }
   }
 
-  def findAll(): Future[Seq[E]] = db.run(tableQuery.result)
+  def getAll: Future[Seq[E]] = db.run(tableQuery.result)
 
   def filter[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Seq[E]] = db.run(tableQuery.filter(expr).result)
 
@@ -85,4 +85,7 @@ abstract class GenericDaoImpl[T <: Table[E] with ModelTable[PK], E <: Entity[PK]
       case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_DELETE_ALL_FAILED"), psqlException)
     }
   }
+
+  def exists(id: PK): Future[Boolean] = db.run(tableQuery.filter(_.id === id).exists.result)
+
 }

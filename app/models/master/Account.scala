@@ -1,5 +1,6 @@
 package models.master
 
+import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -10,7 +11,21 @@ import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Account(id: String, passwordHash: String, salt: Array[Byte], iterations: Int, language: Lang, accountType: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Account(id: String, passwordHash: String, salt: Array[Byte], iterations: Int, language: Lang, accountType: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+  def serialize(): Accounts.AccountSerialized = Accounts.AccountSerialized(
+    id = this.id,
+    passwordHash = this.passwordHash,
+    salt = this.salt,
+    iterations = this.iterations,
+    language = this.language.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0),
+    accountType = this.accountType,
+    createdBy = this.createdBy,
+    createdOn = this.createdOn,
+    createdOnTimeZone = this.createdOnTimeZone,
+    updatedBy = this.updatedBy,
+    updatedOn = this.updatedOn,
+    updatedOnTimeZone = this.updatedOnTimeZone)
+}
 
 object Accounts {
 
@@ -67,24 +82,10 @@ class Accounts @Inject()(
     Accounts.logger
   ) {
 
-  def serialize(account: Account): Accounts.AccountSerialized = Accounts.AccountSerialized(
-    id = account.id,
-    passwordHash = account.passwordHash,
-    salt = account.salt,
-    iterations = account.iterations,
-    language = account.language.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0),
-    accountType = account.accountType,
-    createdBy = account.createdBy,
-    createdOn = account.createdOn,
-    createdOnTimeZone = account.createdOnTimeZone,
-    updatedBy = account.updatedBy,
-    updatedOn = account.updatedOn,
-    updatedOnTimeZone = account.updatedOnTimeZone)
-
 
   object Service {
 
-    def add(username: String, password: String, language: Lang, accountType: String) = {
+    def add(username: String, password: String, language: Lang, accountType: String): Future[Unit] = {
       val salt = utilities.Secrets.getNewSalt
       val account = Account(
         id = username,
@@ -94,48 +95,46 @@ class Accounts @Inject()(
         language = language,
         accountType = accountType)
       (for {
-        _ <- create(serialize(account))
+        _ <- create(account.serialize())
       } yield ()
         )
     }
-    //
-    //    def validateUsernamePasswordAndGetAccount(username: String, password: String): Future[(Boolean, Account)] = {
-    //      val account = tryGet(username)
-    //      for {
-    //        account <- account
-    //      } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = account.passwordHash, salt = account.salt, iterations = account.iterations), account)
-    //    }
 
-    //    def validateAndUpdatePassword(username: String, oldPassword: String, newPassword: String): Future[Unit] = {
-    //      val account = tryGet(username)
-    //
-    //      def verifyAndUpdate(account: Account) = if (utilities.Secrets.verifyPassword(password = oldPassword, passwordHash = account.passwordHash, salt = account.salt, iterations = account.iterations)) {
-    //        updatePasswordHashByID(id = username, passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = account.salt, iterations = constants.Security.DefaultIterations))
-    //      } else Future(throw new BaseException(constants.Response.INVALID_USERNAME_OR_PASSWORD))
-    //
-    //      for {
-    //        account <- account
-    //        _ <- verifyAndUpdate(account)
-    //      } yield ()
-    //    }
-    //
-    //    def updateOnForgotPassword(account: Account, newPassword: String): Future[Int] = updatePasswordHashByID(id = account.id, passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = account.salt, iterations = constants.Security.DefaultIterations))
-    //
-    //    def checkUsernameAvailable(username: String): Future[Boolean] = checkById(username).map(!_)
-    //
-    //    def tryGet(username: String): Future[Account] = tryGetById(username).map(_.deserialize)
-    //
-    //    def get(username: String): Future[Option[Account]] = getByID(username).map(_.map(_.deserialize))
-    //
-    //    def tryGetLanguage(id: String): Future[String] = tryGetLanguageById(id)
-    //
+    def validateUsernamePasswordAndGetAccount(username: String, password: String): Future[(Boolean, Account)] = {
+      val account = tryGetById(username)
+      for {
+        account <- account
+      } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = account.passwordHash, salt = account.salt, iterations = account.iterations), account.deserialize)
+    }
+
+    def validateAndUpdatePassword(username: String, oldPassword: String, newPassword: String): Future[Unit] = {
+      val account = tryGetById(username).map(_.deserialize)
+
+      def verifyAndUpdate(account: Account) = if (utilities.Secrets.verifyPassword(password = oldPassword, passwordHash = account.passwordHash, salt = account.salt, iterations = account.iterations)) {
+        update(account.copy(passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = account.salt, iterations = constants.Security.DefaultIterations)).serialize())
+      } else Future(throw new BaseException(constants.Response.INVALID_USERNAME_OR_PASSWORD))
+
+      for {
+        account <- account
+        _ <- verifyAndUpdate(account)
+      } yield ()
+    }
+
+    def updateOnForgotPassword(account: Account, newPassword: String): Future[Unit] = update(account.copy(passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = account.salt, iterations = constants.Security.DefaultIterations)).serialize())
+
+    def checkUsernameAvailable(username: String): Future[Boolean] = exists(username).map(!_)
+
+    def tryGet(username: String): Future[Account] = tryGetById(username).map(_.deserialize)
+
+    def get(username: String): Future[Option[Account]] = getById(username).map(_.map(_.deserialize))
+
+    def tryGetLanguage(id: String): Future[Lang] = tryGetById(id).map(_.deserialize.language)
+
     def getAccountType(id: String): Future[String] = tryGetById(id).map(_.accountType)
-    //
-    //    def tryVerifyingaccountType(id: String, accountType: String): Future[Boolean] = {
-    //      getAccountType(id).map(accountTypeResult => accountTypeResult == accountType)
-    //    }
-    //
-    //    def checkAccountExists(username: String): Future[Boolean] = checkById(username)
+
+    def tryVerifyingAccountType(id: String, accountType: String): Future[Boolean] = getAccountType(id).map(_ == accountType)
+
+    def checkAccountExists(username: String): Future[Boolean] = exists(username)
 
   }
 }
