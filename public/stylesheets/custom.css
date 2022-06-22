@@ -49,21 +49,26 @@ body{
     /*background-size: cover;*/
     background-position: center;
 }
+.body-container{
+    max-width: 1440px;
+    width: 100%;
+    margin: auto;
+}
 ::-webkit-scrollbar-track
 {
-    /*border: 5px solid #21211E;*/
-// border color does not support transparent on scrollbar
-// border-color: transparent;
+    border-radius: 5px;
 }
 
 ::-webkit-scrollbar
 {
     width: 5px;
-    background-color: #212121;
+    background-color: var(--line);
+    border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb
 {
+    border-radius: 5px;
     background-color: var(--dark);
     /*border-radius: 10px;*/
 }

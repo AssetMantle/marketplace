@@ -139,3 +139,7 @@ LOAD_OLDER = Load older
 CREATED = Created
 COLLECTED = Collected
 FAVORITES = Favorites
+WISHLIST = Wishlist
+SORT = Sort
+FILTER = Filter
+BUYNOW = Buy Now

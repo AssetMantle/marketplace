@@ -25,15 +25,15 @@
     /*width: 228px;*/
     height: fit-content;
     background-color: var(--card-color);
-    border-radius: 10px;
-    padding: 20px;
+    border-radius: 20px;
+    padding: 16px;
 }
 .profileContainer .item-center .profile-card{
     width: 100%;
     height: fit-content;
     background-color: var(--card-color);
-    border-radius: 10px;
-    padding: 20px;
+    border-radius: 20px;
+    padding: 20px 8px 20px 20px;
 }
 
 /* Creator Profile Card */
@@ -64,6 +64,8 @@
     font-weight: 600;
     font-size: 16px;
     color: var(--mantle-off-white);
+    line-height: 19px;
+    text-transform: capitalize;
 }
 .profile-card .user-address-box{
     background-color: var(--card-dark);
@@ -78,7 +80,7 @@
     font-family: var(--font-type-2);
     font-style: normal;
     font-weight: 400;
-    font-size: 14px;
+    font-size: 12px;
     color: var(--mantle-off-white);
 }
 .profile-card .user-address-box .copy-icon{
@@ -94,7 +96,7 @@
     font-weight: 400;
     font-size: 12px;
     color: var(--disable);
-    margin-top: 8px;
+    margin-top: 16px;
 }
 .profile-card .user-profile-data{
     font-family: var(--font-type-2);
@@ -103,19 +105,15 @@
     font-size: 12px;
     line-height: 14px;
     color: var(--inactive-gray);
-    margin-top: 12px;
+    margin-top: 16px;
 }
 .profile-card .separator{
     height: 2px;
-    width: calc(100% + 40px);
+    width: calc(100% + 32px);
     background-color: #383838;
-    margin-left: -20px;
+    margin-left: -16px;
     margin-top: 16px;
-}
-.profile-card .user-profile-social{
-    display: flex;
-    justify-content: end;
-    margin-top: 16px;
+    margin-bottom: 16px;
 }
 .profile-card .user-profile-social ul{
     list-style: none;
@@ -140,9 +138,9 @@
     gap:16px;
 }
 .profile-card .profile-stats ul li{
-    /*height: 120px;*/
     background-color: var(--card-dark);
-    padding: 20px 25px;
+    padding: 16px;
+    padding-bottom: 26px;
     border-radius: 10px;
 }
 .profile-card .profile-stats .stats-card .stats-title{
@@ -152,12 +150,12 @@
     font-size: 12px;
     line-height: 14px;
     color: var(--gray);
-    margin-top: 8px;
+    /*margin-top: 8px;*/
 }
 .profile-card .profile-stats .stats-card .stats-number{
     font-family: var(--font-type-1);
     font-style: normal;
-    font-weight: 400;
+    font-weight: 500;
     font-size: 28px;
     line-height: 34px;
     letter-spacing: 0.08em;
@@ -167,94 +165,38 @@
 }
 
 /* Profile Activity Card */
-.profile-card .activity-top{
-    display: flex;
-}
 .profile-card .activity-top .title{
     font-family: var(--font-type-2);
     font-style: normal;
     font-weight: 700;
-    font-size: 14px;
-    line-height: 17px;
+    font-size: 12px;
+    line-height: 14px;
     text-transform: capitalize;
     color: var(--mantle-off-white);
 }
-.profile-card .activity-card{
-    /*margin-top: 20px;*/
+.profile-card .activity-thumbnail{
+    height: 28px;
+    width: 28px;
+    border-radius: 8px;
 }
-.profile-card .activity-card .recent-activity-card{
-    display: flex;
-    gap: 8px;
-    /*justify-content: space-between;*/
-    /*align-items: center;*/
-}
-.profile-card .activity-card .recent-activity-card > img{
-    margin-top: 7px;
-}
-.profile-card .activity-card .recent-activity-card .activity-details{
-    width: 100%;
-}
-.profile-card .activity-card .recent-activity-card .activity-details .activity-message{
+.profile-card .notification-message{
     font-family: var(--font-type-2);
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 17px;
-    color: var(--inactive-gray);
-    margin-top: 12px;
-}
-.profile-card .activity-card .recent-activity-card .activity-details .activity-date-time{
-    font-family: var(--font-type-2);
-    font-style: normal;
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 14px;
-    color: var(--disable);
-    margin-top: 8px;
-}
-.profile-card .activity-card .recent-activity-card .activity-details .activity-transaction-detail{
-    display: flex;
-    align-items: center;
-    justify-content: end;
-    gap:6px;
-    font-family: var(--font-type-1);
     font-style: normal;
     font-weight: 400;
     font-size: 12px;
     line-height: 14px;
     color: var(--text-medium);
-    margin-top: 13px;
+    margin-right: 5px;
 }
-.profile-card .activity-card .activity-title{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    /*gap: 8px;*/
-    font-family: var(--font-type-2);
-    font-style: normal;
-    font-weight: 700;
-    font-size: 14px;
-    line-height: 17px;
-    text-transform: capitalize;
-    color: var(--mantle-off-white);
-    margin-top:3px;
+.profile-card .notification-container{
+    max-height: 160px;
+    height: 100%;
+    overflow-y: auto;
+    margin-right: -10px;
+    padding-right: 6px;
 }
-.profile-card .activity-card .activity-thumbnail{
-    height: 28px;
-    width: 28px;
-    background-color: var(--dark);
-    border-radius: 4px;
-}
-.profile-card .activity-load-button{
-    font-family: var(--font-type-1);
-    font-style: normal;
-    font-weight: 700;
-    font-size: 14px;
-    line-height: 120%;
-    text-align: right;
-    text-transform: capitalize;
-    color: var(--dark);
-    cursor: pointer;
+.profile-card .notification-container div:first-child{
+    margin: 0px !important;
 }
 
 /* Profiles Card */
@@ -268,9 +210,15 @@
     text-transform: capitalize;
     color: var(--gray);
 }
+.profile-card .profiles-container .card-header .left-option .row .col{
+    cursor: pointer;
+}
 .profile-card .profiles-container .card-header .left-option .active{
     font-weight: 700;
     color: var(--default);
+}
+.profile-card .profiles-container .card-header .right-option{
+    margin-right: 20px;
 }
 .profile-card .profiles-container .card-header .right-option .right-option-header{
     display: flex;
@@ -319,14 +267,6 @@
 {
     background-image: url("../images/icon/gridViewFill.png");
 }
-.profile-card .profiles-container .card-header .right-option .option-layout .slab-view-button .slab-icon{
-    background-image: url("../images/icon/slabView.png");
-}
-.profile-card .profiles-container .card-header .right-option .option-layout .slab-view-button:hover .slab-icon,
-.profile-card .profiles-container .card-header .right-option .option-layout .slab-view-button.active .slab-icon
-{
-    background-image: url("../images/icon/slabViewFill.png");
-}
 .profile-card .profiles-container .card-header .right-option .option-layout .list-view-button .list-icon{
     background-image: url("../images/icon/listView.png");
 }
@@ -348,8 +288,12 @@
     color: var(--mantle-off-white);
 }
 .profile-card .profiles-container .profile-list{
-    margin-top: 15px;
+    height: 741px;
+    overflow-y: auto;
+    margin-top: 25px;
+    padding-right: 20px;
 }
+
 .profile-card .profiles-container .profile-list .list {
     list-style: none;
     margin: 0;
@@ -359,23 +303,27 @@
 .profile-card .profiles-container .profile-list .list li {
     background-color: var(--card-dark);
     border-radius: 10px;
-    margin-top: 10px;
+    margin-top: 16px;
     transition: 0.3s;
     overflow: hidden;
 }
-.profile-card .profiles-container .profile-list .list.list-view-filter {
-    flex-direction: column;
+.profile-card .profiles-container .profile-list .list.grid-view-filter li:nth-child(-n + 2) {
+    margin-top: 0px;
 }
 .profile-card .profiles-container .profile-list .list.grid-view-filter {
     flex-flow: row wrap;
 }
 .profile-card .profiles-container .profile-list .list.grid-view-filter li {
-    width: calc(calc(100% - 12px) / 2);
+    width: calc(calc(100% - 24px) / 2);
     /*padding: 120px;*/
     text-align: center;
 }
 .profile-card .profiles-container .profile-list .list.grid-view-filter li:nth-child(even){
-    margin-left: 12px;
+    margin-left: 24px;
+}
+.profile-card .profiles-container .profile-list .list-view-filter{
+    display: none;
+    background-color: var(--card-dark);
 }
 
 /* Single Profile Card */
@@ -387,7 +335,13 @@
 }
 .single-profile-card .hero-img img{
     width: 100%;
-    height: 145px;
+    height: 140px;
+}
+.profile-card .profiles-container .profile-list .list.slab-view-filter li .single-profile-card .hero-img{
+    flex-grow: 1;
+}
+.profile-card .profiles-container .profile-list .list.slab-view-filter li .single-profile-card .hero-img img{
+    height: 100% !important;
 }
 .single-profile-card #profile-img {
     width: 50px;
@@ -402,11 +356,11 @@
 }
 .single-profile-card #content {
     text-align: center;
-    width: 320px;
+    /*width: 320px;*/
     margin: 0 auto;
 }
 .single-profile-card #content h1 {
-    margin: 5px 0 0 0;
+    margin: 8px 0 0 0;
     font-family: var(--font-type-2);
     font-style: normal;
     font-weight: 700;
@@ -416,13 +370,14 @@
     color: var(--default);
 }
 .single-profile-card #content p {
-    margin: 6px 0 25px 0;
+    margin: 8px 0 24px 0;
     font-family: var(--font-type-1);
     font-style: normal;
     font-weight: 500;
     font-size: 12px;
     line-height: 14px;
     color: var(--gray);
+    padding: 0px 20px;
 }
 
 
@@ -431,6 +386,21 @@
     .profile-card .profiles-container .card-header{
         flex-direction: column;
         gap: 10px;
+    }
+    .profile-card .profiles-container .card-header .right-option{
+        margin-right: 0px;
+    }
+    .profile-card .profiles-container .profile-list .list.grid-view-filter{
+        flex-direction: column;
+    }
+    .profile-card .profiles-container .profile-list .list.grid-view-filter li{
+        width: 100%;
+    }
+    .profile-card .profiles-container .profile-list .list.grid-view-filter li:nth-child(2){
+        margin-top: 10px;
+    }
+    .profile-card .profiles-container .profile-list .list.grid-view-filter li:nth-child(even){
+        margin-left: 0px;
     }
 }
 @media (max-width: 1250px){
@@ -478,4 +448,73 @@
 .profileContainer .row [class^="col-"]{
     /*border:1px solid red;*/
     /*padding: .5rem;*/
+}
+
+/* NFT Card */
+.nft-list .card{
+    background-color: var(--card-dark);
+    overflow: hidden;
+    border-radius: 10px;
+}
+.nft-list .card .card-img img{
+    height: 245px;
+}
+.nft-list .card .nft-separator{
+    height: 2px;
+    width: calc(100% + 32px);
+    background-color: var(--popup-bg);
+    margin-left: -16px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+.nft-list .card .creator-name{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: capitalize;
+    color: var(--default);
+}
+.nft-list .card .creator-collection-name{
+    font-family: var(--font-type-1);
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--gray);
+}
+.nft-list .card .nft-mantle-price{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--default);
+    margin-left: 4px;
+}
+.nft-list .card .nft-dollar-price{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--disable);
+}
+.nft-list .card .nft-likes{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--gray);
+}
+.nft-list .card .buy-now-btn{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 19px;
+    text-align: right;
+    text-transform: capitalize;
+    background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
 }
