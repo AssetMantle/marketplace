@@ -2,10 +2,14 @@
 @import views.html.base.form._
 @import views.html.base.forms.commonFieldErrorMessage
 @import views.html.base.forms.formFooter
+@import views.html.base.forms.multiStepNavigator
 @import views.html.base.label._
 
 @(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.SIGN_UP, signUpForm) {
+
+    @multiStepNavigator()
+
     <div class="inputField">
         <div class="inputFieldBody">
             <div class="usernameAvailability">
@@ -13,13 +17,13 @@
                 <div id="checkIcon" class="fieldIcon checkIcon">
                     <img src="@routes.Assets.versioned("images/Verified Username.png")"/>
                 </div>
-                @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("class") -> "inputBox", 'id -> "signUpUsername", Symbol("autocomplete") -> "off", 'oninput -> """checkUserAvailability()""")
+                @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("class") -> "inputBox", 'id -> "signUpUsername", Symbol("autocomplete") -> "off", 'oninput -> """checkUsernameAvailable(this,'#USERNAME_AVAILABLE')""")
                 @commonFieldErrorMessage(id = "usernameAvailableError",message = Messages(constants.View.USERNAME_NOT_AVAILABLE))
             </div>
         </div>
     </div>
 
-    @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE, Symbol("containerDivClass") -> "hidden")
+    @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE)
 
     <div class="inputField">
         <div class="inputFieldBody">
@@ -47,6 +51,17 @@
             </div>
         </div>
     </div>
+
+    <div class="terms-condition-container">
+        @commonCheckbox(signUpForm, constants.FormField.SIGNUP_TERMS_CONDITIONS, 'id -> "termsCondition")
+        <span class="terms-condition-message">
+            <label for="termsCondition">
+                @Messages(constants.View.TERMS_CONDITION_MESSAGE)
+                <a class="link" href="#">@Messages(constants.View.TERMS_CONDITION_LABEL)</a>
+            </label>
+        </span>
+    </div>
+
 
     @formFooter("Already have an account?","#","Sign In")
 }

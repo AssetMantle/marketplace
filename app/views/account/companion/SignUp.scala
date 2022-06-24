@@ -11,8 +11,9 @@ object SignUp {
       constants.FormField.USERNAME_AVAILABLE.name -> constants.FormField.USERNAME_AVAILABLE.field,
       constants.FormField.SIGNUP_PASSWORD.name -> constants.FormField.SIGNUP_PASSWORD.field,
       constants.FormField.SIGNUP_CONFIRM_PASSWORD.name -> constants.FormField.SIGNUP_CONFIRM_PASSWORD.field,
+      constants.FormField.SIGNUP_TERMS_CONDITIONS.name -> constants.FormField.SIGNUP_TERMS_CONDITIONS.field
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.signUpConstraint))
 
-  case class Data(username: String, usernameAvailable: Boolean, password: String, confirmPassword: String)
+  case class Data(username: String, usernameAvailable: Boolean, password: String, confirmPassword: String, termsCondition: Boolean)
 
 }

@@ -66,7 +66,7 @@ COPYRIGHT=MantlePlace © 2022 - All Rights Reserved
 #//Sign Up
 FORM.SIGN_UP.TITLE = Sign Up
 FORM.SIGN_UP.SUBTITLE = Enter your details to get started.
-FORM.SIGN_UP.SUBMIT = Sign Up
+FORM.SIGN_UP.SUBMIT = Next
 USERNAME = Username
 PASSWORD = Password
 SIGNUP_PASSWORD = Password
@@ -74,6 +74,8 @@ CONFIRM_PASSWORD = Confirm Password
 USERNAME_NOT_AVAILABLE = Username already exists.
 REPEAT_PASSWORD_MISMATCH = Password mismatched. Please check the password and try again.
 SIGN_UP_TOOLTIP = Username once lost cannot be retrieved. Please store it in a secure place.
+TERMS_CONDITION_MESSAGE = By creating an account, the user agrees to AssetMantle's
+TERMS_CONDITION_LABEL = Terms and conditions
 
 
 #//Create Wallet

@@ -10,6 +10,8 @@ function getForm(route, modal = '#commonModal', modalContent = '#modal-content')
                 $(modalContent).html(data);
                 $(modal).addClass('active');
                 $(modal+" .modal").addClass('active');
+
+                $("body").addClass('modal-active');
             },
             500: function (data) {
                 replaceDocument(data);

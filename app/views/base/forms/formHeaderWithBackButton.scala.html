@@ -1,10 +1,12 @@
-@(heading:String = "", subHeading:String = "")
+@(heading:String = "", subHeading:String = "", closeButton:Boolean = true)
 
 <div class="header-with-icon">
     <div class="form-top">
-        <div class="title-icon back-button-icon"><img src="@routes.Assets.versioned("images/Back Arrow.png")"/></div>
+        <div class="title-icon back-button-icon"><img src="@routes.Assets.versioned("images/backArrow.png")"/></div>
         <div class="title-text">@heading</div>
-        <a class="form-close-btn close-modal" onclick="closeModal()"></a>
+        @if(closeButton){
+            <a class="form-close-btn close-modal" onclick="closeModal()"></a>
+        }
     </div>
     @if(subHeading != ""){
         <div class="form-sub-title">@subHeading</div>
