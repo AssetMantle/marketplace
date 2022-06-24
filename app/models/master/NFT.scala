@@ -98,7 +98,9 @@ class NFTs @Inject()(
 
     def fetchAll(): Future[Seq[NFT]] = getAll.map(_.map(_.deserialize))
 
-    def getAllForCollection(id: String): Future[Seq[NFT]] = filter(_.collectionId === id).map(_.map(_.deserialize))
+    def tryGet(collectionId: String, nftId: String): Future[NFT] = filterHead(x => x.collectionId === collectionId && x.id === nftId).map(_.deserialize)
+
+    def getAllForCollection(collectionId: String): Future[Seq[NFT]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize))
 
   }
 }

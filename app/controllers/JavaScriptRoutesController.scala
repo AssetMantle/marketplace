@@ -21,6 +21,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.walletMnemonicsForm,
         routes.javascript.AccountController.checkUsernameAvailable,
         routes.javascript.AccountController.signInForm,
+
+        routes.javascript.CollectionController.all,
+
+        routes.javascript.NFTController.collectionAllNFT,
+        routes.javascript.NFTController.get,
       )
     ).as("text/javascript")
 
