@@ -1005,7 +1005,7 @@ dl .info:after {
     padding-right: 38px !important;
 }
 .hidden{
-    display: none;
+    display: none !important;
 }
 .showPassword .eyeIcon {
     position: absolute;
