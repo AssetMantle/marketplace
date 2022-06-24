@@ -1,20 +1,44 @@
-function checkUserAvailability(){
-    let validUser = {users:['jaggu','pratik']};
-    var field = document.getElementById("signUpUsername");
-    if(field.value !== ''){
-        if(validUser.users.includes(field.value)){
-            $(".checkIcon").fadeOut();
-            $("#usernameAvailableError").slideDown();
-            $('#signUpUsername').css("border-color","var(--error)");
-        }
-        else{
-            $(".checkIcon").fadeIn();
-            $("#usernameAvailableError").slideUp();
-            $('#signUpUsername').css("border-color","var(--default)");
-        }
-    }
-    else{
-        $(".checkIcon").fadeOut();
+let timer = 0;
+let timeoutFlag = true;
+
+function checkUsernameAvailable(source, usernameAvailableCheckBoxID) {
+    if (timeoutFlag) {
+        timeoutFlag = false;
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            timeoutFlag = true;
+            const username = $(source).val();
+            const usernameAvailableCheckBox = $(usernameAvailableCheckBoxID);
+            const route = jsRoutes.controllers.AccountController.checkUsernameAvailable(username);
+            let loadingSpinner = $('#usernameAvailableLoading');
+            if (username.length > 0) {
+                $.ajax({
+                    url: route.url,
+                    type: route.type,
+                    async: true,
+                    beforeSend: function () {
+                        loadingSpinner.show();
+                    },
+                    complete: function () {
+                        loadingSpinner.hide();
+                    },
+                    statusCode: {
+                        200: function () {
+                            usernameAvailableCheckBox[0].checked = true;
+                            $("#checkUsernameAvailableResult").fadeOut();
+                            $("#checkIcon").fadeIn();
+                        },
+                        204: function () {
+                            usernameAvailableCheckBox[0].checked = false;
+                            $("#checkIcon").fadeOut();
+                            $("#checkUsernameAvailableResult").fadeIn();
+                        },
+                    }
+                });
+            } else {
+                $("#checkUsernameAvailableResult span, #checkIcon").hide();
+            }
+        }, 1500);
     }
 }
 

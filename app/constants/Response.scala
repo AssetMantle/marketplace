@@ -51,6 +51,11 @@ object Response {
   val NO_SUCH_FILE_EXCEPTION = new Failure("NO_SUCH_FILE_EXCEPTION")
   val FILE_UPLOAD_ERROR = new Failure("FILE_UPLOAD_ERROR")
 
+  val USERNAME_NOT_FOUND = new Failure("USERNAME_NOT_FOUND")
+  val ADDRESS_NOT_FOUND = new Failure("ADDRESS_NOT_FOUND")
+  val TOKEN_NOT_FOUND = new Failure("TOKEN_NOT_FOUND")
+  val INVALID_SESSION = new Failure("INVALID_SESSION")
+
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
     val action: String = utilities.JsRoutes.getJsRouteString(actionController)

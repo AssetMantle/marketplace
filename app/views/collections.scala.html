@@ -1,4 +1,4 @@
-@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html = Html(""))(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @views.html.base.common(constants.View.COLLECTION, failures, warnings, successes, infos)(left)(center)(right)
 @left = {
@@ -6,7 +6,10 @@
 }
 
 @center = {
-
+    <div id="centerContent"></div>
+    <script>
+            componentResource('centerContent', jsRoutes.controllers.CollectionController.all())
+    </script>
 }
 
 @right = {
