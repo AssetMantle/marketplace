@@ -115,6 +115,10 @@ object View{
   val CREATED = "CREATED"
   val COLLECTED = "COLLECTED"
   val FAVORITES = "FAVORITES"
+  val SORT = "SORT"
+  val FILTER = "FILTER"
+  val WISHLIST = "WISHLIST"
+  val BUYNOW = "BUYNOW"
 
   val COLLECTION = "COLLECTION"
 

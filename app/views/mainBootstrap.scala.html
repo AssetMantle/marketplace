@@ -50,7 +50,10 @@
         <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" ></script>
     </head>
     <body>
-    @content
+        <div class="body-container">
+            @content
+        </div>
+
     </body>
     <script>
             let lazy = lazyload();
