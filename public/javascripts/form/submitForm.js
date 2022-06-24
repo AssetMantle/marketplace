@@ -1,5 +1,5 @@
 function submitForm(source, targetID) {
-    const target = '#'+targetID;
+    const target = '#' + targetID;
     const form = $(source).closest("form");
     if (validateForm(form)) {
         const result = $(target);
@@ -22,6 +22,9 @@ function submitForm(source, targetID) {
                 },
                 206: function (data) {
                     console.log(data);
+                    $(target).html(data);
+                },
+                404: function (data) {
                     $(target).html(data);
                 }
             }
