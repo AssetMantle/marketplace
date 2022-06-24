@@ -24,4 +24,8 @@ POST        /walletMnemonics               controllers.AccountController.walletM
 GET         /signIn                        controllers.AccountController.signInForm()
 POST        /signIn                        controllers.AccountController.signIn()
 
+GET         /allCollections                controllers.CollectionController.all()
+
+GET         /allCollectionNFTs             controllers.NFTController.collectionAllNFT(collectionId: String)
+
 
