@@ -245,7 +245,7 @@
     color: var(--mantle-off-white);
     margin-top: 15px;
 }
-.modal .footer-terms-condition .link{
+.modal .terms-condition-message .link{
     font-family: var(--font-type-1);
     font-style: normal;
     font-weight: 700;
@@ -1046,4 +1046,60 @@ dl .info:after {
     line-height: 17px;
     text-transform: capitalize;
     color: var(--dark);
+}
+.terms-condition-container{
+    display: flex;
+    align-items: center;
+}
+.terms-condition-message{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--mantle-off-white);
+    margin-left: 6px;
+}
+.cmuk-checkbox{
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: var(--popup-bg);
+    margin: 0;
+    font: inherit;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--default);
+    border-radius: 0.15em;
+    transform: translateY(-0.075em);
+    display: grid;
+    place-content: center;
+    cursor: pointer;
+}
+.cmuk-checkbox::before {
+    content: "";
+    width: 0.60em;
+    height: 0.60em;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em var(--default);
+    transform-origin: bottom left;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+.cmuk-checkbox:checked::before {
+    transform: scale(1);
+}
+.terms-condition-box{
+    width: 100%;
+    height: 450px;
+    background: #030301;
+    border-radius: 10px;
+    overflow-y: auto;
+    margin-top: 12px;
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--mantle-off-white);
+    padding: 24px 16px 24px 24px;
 }

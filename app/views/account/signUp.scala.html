@@ -2,10 +2,14 @@
 @import views.html.base.form._
 @import views.html.base.forms.commonFieldErrorMessage
 @import views.html.base.forms.formFooter
+@import views.html.base.forms.multiStepNavigator
 @import views.html.base.label._
 
 @(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.SIGN_UP, signUpForm) {
+
+    @multiStepNavigator()
+
     <div class="inputField">
         <div class="inputFieldBody">
             <div class="usernameAvailability">
@@ -47,6 +51,17 @@
             </div>
         </div>
     </div>
+
+    <div class="terms-condition-container">
+        @commonCheckbox(signUpForm, constants.FormField.SIGNUP_TERMS_CONDITIONS, 'id -> "termsCondition")
+        <span class="terms-condition-message">
+            <label for="termsCondition">
+                @Messages(constants.View.TERMS_CONDITION_MESSAGE)
+                <a class="link" href="#">@Messages(constants.View.TERMS_CONDITION_LABEL)</a>
+            </label>
+        </span>
+    </div>
+
 
     @formFooter("Already have an account?","#","Sign In")
 }
