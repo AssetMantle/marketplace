@@ -55,6 +55,7 @@ object Response {
   val ADDRESS_NOT_FOUND = new Failure("ADDRESS_NOT_FOUND")
   val TOKEN_NOT_FOUND = new Failure("TOKEN_NOT_FOUND")
   val INVALID_SESSION = new Failure("INVALID_SESSION")
+  val UNAUTHORIZED = new Failure("UNAUTHORIZED")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

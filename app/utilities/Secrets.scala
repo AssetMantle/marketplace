@@ -39,11 +39,11 @@ object Secrets {
     salt
   }
 
-  def hashPassword(password: String, salt: Array[Byte], iterations: Int = constants.Security.DefaultIterations): String = {
-    Base64.getEncoder.encodeToString(pbkdf2(password, salt, iterations))
+  def hashPassword(password: String, salt: Array[Byte], iterations: Int = constants.Security.DefaultIterations): Array[Byte] = {
+    pbkdf2(password, salt, iterations)
   }
 
-  def verifyPassword(password: String, passwordHash: String, salt: Array[Byte], iterations: Int = constants.Security.DefaultIterations): Boolean = {
+  def verifyPassword(password: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int = constants.Security.DefaultIterations): Boolean = {
     pbkdf2(password, salt, iterations).sameElements(passwordHash)
   }
 

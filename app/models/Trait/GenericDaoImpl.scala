@@ -6,7 +6,7 @@ import play.api.Logger
 import play.api.db.slick._
 import slick.jdbc.H2Profile.api._
 import slick.jdbc.JdbcProfile
-import slick.lifted.CanBeQueryCondition
+import slick.lifted.{CanBeQueryCondition, Ordered}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -37,6 +37,13 @@ abstract class GenericDaoImpl[T <: Table[E] with ModelTable[PK], E <: Entity[PK]
     }
   }
 
+  def filterAndSortHead[C1 <: Rep[_], C2 <: Rep[_]](expr: T => C1)(sortExpr: T => C2)(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[E] = db.run(tableQuery.filter(expr).sortBy(sortExpr).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
+    }
+  }
+
   def create(entity: E): Future[Unit] = db.run((tableQuery += entity).asTry).map {
     case Success(result) => ()
     case Failure(exception) => exception match {
@@ -51,19 +58,19 @@ abstract class GenericDaoImpl[T <: Table[E] with ModelTable[PK], E <: Entity[PK]
     }
   }
 
-  def upsert(entity: E): Future[Unit] = db.run(tableQuery.insertOrUpdate(entity).asTry).map {
-    case Success(result) => ()
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPSERT_FAILED"), psqlException)
-    }
-  }
+//  def upsert(entity: E): Future[Unit] = db.run(tableQuery.insertOrUpdate(entity).asTry).map {
+//    case Success(result) => ()
+//    case Failure(exception) => exception match {
+//      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPSERT_FAILED"), psqlException)
+//    }
+//  }
 
-  def upsert(entities: Seq[E]): Future[Unit] = db.run(DBIO.sequence(entities.map(entity => tableQuery.insertOrUpdate(entity))).asTry).map {
-    case Success(result) => ()
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPSERT_FAILED"), psqlException)
-    }
-  }
+//  def upsert(entities: Seq[E]): Future[Unit] = db.run(DBIO.sequence(entities.map(entity => tableQuery.insertOrUpdate(entity))).asTry).map {
+//    case Success(result) => ()
+//    case Failure(exception) => exception match {
+//      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPSERT_FAILED"), psqlException)
+//    }
+//  }
 
   def update(update: E): Future[Unit] = db.run(tableQuery.filter(_.id === update.id).update(update).asTry).map {
     case Success(result) => ()
