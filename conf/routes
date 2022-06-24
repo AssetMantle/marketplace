@@ -16,6 +16,9 @@ GET         /                        controllers.IndexController.index()
 GET         /signUp                  controllers.AccountController.signUpForm()
 POST        /signUp                  controllers.AccountController.signUp()
 
+GET         /walletMnemonics         controllers.AccountController.walletMnemonicsForm()
+POST        /walletMnemonics         controllers.AccountController.walletMnemonics()
+
 GET         /signIn                  controllers.AccountController.signInForm()
 POST        /signIn                  controllers.AccountController.signIn()
 

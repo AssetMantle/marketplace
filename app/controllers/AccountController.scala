@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions.{WithoutLoginAction, WithoutLoginActionAsync}
 import exceptions.BaseException
-import models.{master}
+import models.master
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -44,7 +44,32 @@ class AccountController @Inject()(
         (for {
           _ <- addAccount
           _ <- addWallet()
-        } yield PartialContent(views.html.account.createWalletSuccess(address = wallet.address, partialMnemonics = wallet.mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
+        } yield PartialContent(views.html.account.walletMnemonics(username = signUpData.username, address = wallet.address, partialMnemonics = wallet.mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
+          ).recover {
+          case baseException: BaseException => BadRequest(views.html.account.signUp(SignUp.form.withGlobalError(baseException.failure.message)))
+        }
+      }
+    )
+  }
+
+  def walletMnemonicsForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    BadRequest
+  }
+
+  def walletMnemonics: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+    WalletMnemonics.form.bindFromRequest().fold(
+      formWithErrors => {
+        Future(BadRequest(views.html.account.walletMnemonics(formWithErrors, formWithErrors.get.username, formWithErrors.get.walletAddress, Seq(formWithErrors.get.seed1, formWithErrors.get.seed2, formWithErrors.get.seed3, formWithErrors.get.seed4))))
+      },
+      walletMnemonicsData => {
+        val wallet = masterWallets.Service.tryGet(walletMnemonicsData.walletAddress)
+
+        (for {
+          wallet <- wallet
+        } yield if (wallet.address == walletMnemonicsData.walletAddress && wallet.accountId == walletMnemonicsData.username) {
+          PartialContent(views.html.account.walletSuccess(username = wallet.accountId, address = walletMnemonicsData.walletAddress))
+        } else BadRequest(views.html.account.walletMnemonics(username = walletMnemonicsData.username, address = walletMnemonicsData.walletAddress, partialMnemonics = Seq(walletMnemonicsData.seed1, walletMnemonicsData.seed2, walletMnemonicsData.seed3, walletMnemonicsData.seed4)))
+
           ).recover {
           case baseException: BaseException => BadRequest(views.html.account.signUp(SignUp.form.withGlobalError(baseException.failure.message)))
         }
