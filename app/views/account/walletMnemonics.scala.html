@@ -1,11 +1,28 @@
 @import views.account.companion.WalletMnemonics
+@import views.html.base.form._
 
 @(walletMnemonicsForm: Form[WalletMnemonics.Data] = WalletMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<!-- Wallet Mnemonics -->
 <div class="wallet-mnemonics">
-@*    <div>@username</div>*@
-@*    <div>@address</div>*@
-    @partialMnemonics.zipWithIndex.foreach{ case (word, index) =>
+    <div>@username</div>
+    <div>@address</div>
+    @partialMnemonics.zipWithIndex.map {case(word, index) =>{
         <div>@index</div>
         <div>@word</div>
+    }}
+    <button onclick="showVerificationForm()">Next</button>
+</div>
+
+<!-- Verification Form -->
+<div class="verification-form" style="display: none;">
+    @commonForm(constants.Form.WALLET_MNEMONICS, walletMnemonicsForm) {
+        @commonInputText(walletMnemonicsForm, constants.FormField.USERNAME, Symbol("value") -> username, Symbol("readonly") -> "readonly", Symbol("class") -> "hidden")
+        @commonInputText(walletMnemonicsForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly", Symbol("class") -> "hidden")
+        @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_1)
+        @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_2)
+        @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_3)
+        @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_4)
     }
 </div>
+
+<script src="@routes.Assets.versioned("javascripts/account/walletMnemonics.js")" type="text/javascript"></script>
