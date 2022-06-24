@@ -36,12 +36,11 @@ object Bip39 {
     } mkString wordList.delimiter
   }
 
-  def validate(mnemonic: String, wordList: WordList = constants.Bip39.EnglishWordList): Boolean = {
+  def validate(mnemonics: Seq[String], wordList: WordList = constants.Bip39.EnglishWordList): Boolean = {
     require(wordList.words.size == WordListSize, s"WordList should have $WordListSize words")
-    val words = mnemonic.split(wordList.delimiter)
-    if (words.length % 3 != 0) false
+    if (mnemonics.length % 3 != 0) false
     else {
-      val entWithChecksum = words
+      val entWithChecksum = mnemonics
         .map(normalize(_, NFKD))
         .map(wordList.words.indexOf(_)).foldLeft(BitVector.empty) { (ent: BitVector, wordIndex: Int) =>
         ent ++ BitVector.fromInt(wordIndex, size = BitsGroupSize)
