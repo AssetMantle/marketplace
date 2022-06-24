@@ -18,16 +18,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.Assets.versioned,
 
         routes.javascript.AccountController.signUpForm,
-        routes.javascript.AccountController.createWalletForm,
-        routes.javascript.AccountController.createWalletSeedPhraseForm,
-        routes.javascript.AccountController.createWalletSuccessForm,
-        routes.javascript.AccountController.createWalletErrorForm,
         routes.javascript.AccountController.signInForm,
-        routes.javascript.AccountController.forgotPasswordUsernameForm,
-        routes.javascript.AccountController.forgotPasswordSeedPhraseForm,
-        routes.javascript.AccountController.forgotPasswordNewPasswordForm,
-        routes.javascript.AccountController.forgotPasswordSuccessForm,
-        routes.javascript.AccountController.signUpBootstrapForm,
       )
     ).as("text/javascript")
 

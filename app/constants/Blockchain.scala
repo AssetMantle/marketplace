@@ -9,6 +9,7 @@ object Blockchain {
   val ValidatorPrefix: String = AccountPrefix + "valoper"
   val ValidatorConsensusPublicPrefix: String = AccountPrefix + "valconspub"
   val CoinType = 118
+  val MnemonicShown = 4
   val DefaultHDPath: ImmutableList[ChildNumber] = collect.ImmutableList.of(
     new ChildNumber(44, true),
     new ChildNumber(CoinType, true),

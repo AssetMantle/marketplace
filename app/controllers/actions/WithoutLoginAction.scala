@@ -15,7 +15,7 @@ class WithoutLoginAction @Inject()(messagesControllerComponents: MessagesControl
                                   )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def apply(f: => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
-    withActionLoggingFilter.next { implicit request ⇒
+    withActionLoggingFilter.next { implicit request =>
       try {
         f(request)
       } catch {

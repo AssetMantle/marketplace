@@ -1,6 +1,6 @@
 @import views.html.base.forms._
 
-@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @successModal(heading = Messages(constants.View.CREATE_WALLET_SUCCESS_TITLE), subHeading = Messages(constants.View.CREATE_WALLET_SUCCESS_SUBTITLE))
 @successModalAddressBox(Symbol("address") -> "dwafegrtefdvfhresv -39i539w0rej")
 <div class="form-information-message">
@@ -9,6 +9,9 @@
 </div>
 <div class="form-accordion">
     <div class="accordion-box">
+        @partialMnemonics.zipWithIndex.foreach(word => {
+            <span>@word</span>
+        })
         <div class="accordion-toggle">
             <h4>@Messages(constants.View.SHOW_ADVANCED_PROPERTIES)<span class="icon"></span></h4>
         </div>

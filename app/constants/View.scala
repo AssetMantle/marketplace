@@ -116,6 +116,8 @@ object View{
   val COLLECTED = "COLLECTED"
   val FAVORITES = "FAVORITES"
 
+  val COLLECTION = "COLLECTION"
+
   object Button {
     val NEXT = "NEXT"
     val CANCEL = "CANCEL"

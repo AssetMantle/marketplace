@@ -17,7 +17,7 @@ import scala.util.{Failure, Success}
 
 case class Wallet(address: String, hdPath: String, publicKey: Array[Byte], privateKey: Array[Byte], mnemonics: Seq[String])
 
-object WalletGenerator {
+object Wallet {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -31,6 +31,7 @@ object WalletGenerator {
     def genInstance(algorithm: String): MessageDigest = MessageDigest.getInstance(algorithm, "BC")
 
     val sha256: MessageDigest = genInstance("SHA-256")
+
     val ripemd160: MessageDigest = genInstance("RipeMD160")
 
     def kec256(bytes: ByteVector): Array[Byte] = new Keccak.Digest256().digest(bytes.toArray)

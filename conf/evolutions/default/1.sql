@@ -22,11 +22,59 @@ CREATE TABLE IF NOT EXISTS MASTER."Account"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER."Collection"
+(
+--     "ownerAccountId"    VARCHAR NOT NULL,
+--     "classificationId"  VARCHAR NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "name"              VARCHAR NOT NULL,
+    "description"       VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."CollectionFile"
+(
+    "id"                VARCHAR NOT NULL,
+    "documentType"      VARCHAR NOT NULL,
+    "fileName"          VARCHAR NOT NULL,
+    "file"              BYTEA,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."NFT"
+(
+    "fileHash"          VARCHAR NOT NULL,
+    "collectionId"      VARCHAR NOT NULL,
+    "name"              VARCHAR NOT NULL,
+    "description"       VARCHAR NOT NULL,
+    "properties"        VARCHAR NOT NULL,
+    "edition"           VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("fileHash")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER."Wallet"
 (
     "address"           VARCHAR NOT NULL,
-    "mnemonics"         VARCHAR NOT NULL,
-    "accountID"         VARCHAR NOT NULL,
+    "partialMnemonics"  VARCHAR NOT NULL,
+    "accountId"         VARCHAR NOT NULL,
     "provisioned"       BOOLEAN,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -36,6 +84,10 @@ CREATE TABLE IF NOT EXISTS MASTER."Wallet"
     "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("address")
 );
+
+
+ALTER TABLE MASTER."Wallet"
+    ADD CONSTRAINT Wallet_Account_id FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 
 /*Triggers*/
 
@@ -64,6 +116,21 @@ CREATE TRIGGER ACCOUNT_LOG
     ON MASTER."Account"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER COLLECTION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Collection"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER COLLECTION_FILE_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."CollectionFile"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER NFT_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."NFT"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER WALLET_LOG
     BEFORE INSERT OR UPDATE
     ON MASTER."Wallet"
@@ -74,9 +141,11 @@ EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 # --- !Downs
 
 DROP TRIGGER IF EXISTS ACCOUNT_LOG ON MASTER."Account" CASCADE;
+DROP TRIGGER IF EXISTS COLLECTION_LOG ON MASTER."Collection" CASCADE;
 DROP TRIGGER IF EXISTS WALLET_LOG ON MASTER."Wallet" CASCADE;
 
 DROP TABLE IF EXISTS MASTER."Account" CASCADE;
+DROP TABLE IF EXISTS MASTER."Collection" CASCADE;
 DROP TABLE IF EXISTS MASTER."Wallet" CASCADE;
 
 DROP SCHEMA IF EXISTS MASTER CASCADE;

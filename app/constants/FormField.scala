@@ -12,6 +12,8 @@ object FormField {
   //StringFormField
   val USERNAME = new StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
   val PASSWORD = new StringFormField("PASSWORD", 5, 128)
+  val WALLET_ADDRESS = new StringFormField("WALLET_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
+  val PARTIAL_MNEMONICS = new StringFormField("PARTIAL_MNEMONICS", 3, 128)
   val PUSH_NOTIFICATION_TOKEN = new StringFormField("PUSH_NOTIFICATION_TOKEN", 0, 200)
   val SIGNUP_PASSWORD = new StringFormField("SIGNUP_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SIGNUP_CONFIRM_PASSWORD = new StringFormField("CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
