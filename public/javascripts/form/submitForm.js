@@ -3,6 +3,7 @@ function submitForm(source, targetID) {
     const form = $(source).closest("form");
     if (validateForm(form)) {
         const result = $(target);
+        console.log(form);
         $.ajax({
             type: 'POST',
             contentType: 'application/x-www-form-urlencoded',
@@ -20,6 +21,7 @@ function submitForm(source, targetID) {
                     replaceDocument(data);
                 },
                 206: function (data) {
+                    console.log(data);
                     $(target).html(data);
                 }
             }

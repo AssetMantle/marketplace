@@ -2,7 +2,7 @@
 @import views.html.base.buttons._
 @import views.html.base.forms._
 
-@(formTemplate: constants.Form, formData: Form[_], backButton: Int = 0, customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+@(formTemplate: constants.Form, formData: Form[_], backButton: Int = 0, target:String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @form(action = formTemplate.post, Symbol("onkeypress") -> "submitFormOnEnter(event,this)") {
 @*    <fieldset>*@
@@ -26,7 +26,7 @@
             @if(customSubmit != JavaScript("")) {
                 @commonJavascriptButton(formTemplate.submit, customSubmit)
             } else {
-                @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm(this, 'target')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"))
+                @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm(this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"))
             }
             </div>
         </div>
