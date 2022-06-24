@@ -98,5 +98,7 @@ class NFTs @Inject()(
 
     def fetchAll(): Future[Seq[NFT]] = getAll.map(_.map(_.deserialize))
 
+    def getAllForCollection(id: String): Future[Seq[NFT]] = filter(_.collectionId === id).map(_.map(_.deserialize))
+
   }
 }
