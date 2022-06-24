@@ -17,13 +17,13 @@
                 <div id="checkIcon" class="fieldIcon checkIcon">
                     <img src="@routes.Assets.versioned("images/Verified Username.png")"/>
                 </div>
-                @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("class") -> "inputBox", 'id -> "signUpUsername", Symbol("autocomplete") -> "off", 'oninput -> """checkUserAvailability()""")
+                @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("class") -> "inputBox", 'id -> "signUpUsername", Symbol("autocomplete") -> "off", 'oninput -> """checkUsernameAvailable(this,'#USERNAME_AVAILABLE')""")
                 @commonFieldErrorMessage(id = "usernameAvailableError",message = Messages(constants.View.USERNAME_NOT_AVAILABLE))
             </div>
         </div>
     </div>
 
-    @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE, Symbol("containerDivClass") -> "hidden")
+    @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE)
 
     <div class="inputField">
         <div class="inputFieldBody">
