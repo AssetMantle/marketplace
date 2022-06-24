@@ -23,7 +23,7 @@ function submitForm(source, targetID) {
                     $(target).html(data);
                 },
                 404: function (data) {
-                    $(target).html(data);
+                    $(target).html(data.responseText);
                 }
             }
         }).fail(function (XMLHttpRequest) {

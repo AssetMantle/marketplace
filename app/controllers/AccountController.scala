@@ -44,7 +44,7 @@ class AccountController @Inject()(
         (for {
           _ <- addAccount
           _ <- addWallet()
-        } yield PartialContent(views.html.account.walletMnemonics(username = signUpData.username, address = wallet.address, partialMnemonics = wallet.mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
+        } yield PartialContent(views.html.account.showWalletMnemonics(username = signUpData.username, address = wallet.address, partialMnemonics = wallet.mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
           ).recover {
           case baseException: BaseException => BadRequest(views.html.account.signUp(SignUp.form.withGlobalError(baseException.failure.message)))
         }
@@ -52,14 +52,14 @@ class AccountController @Inject()(
     )
   }
 
-  def walletMnemonicsForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def verifyWalletMnemonicsForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
     BadRequest
   }
 
-  def walletMnemonics: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def verifyWalletMnemonics: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     WalletMnemonics.form.bindFromRequest().fold(
       formWithErrors => {
-        Future(BadRequest(views.html.account.walletMnemonics(formWithErrors, formWithErrors.get.username, formWithErrors.get.walletAddress, Seq(formWithErrors.get.seed1, formWithErrors.get.seed2, formWithErrors.get.seed3, formWithErrors.get.seed4))))
+        Future(BadRequest(views.html.account.verifyWalletMnemonics(formWithErrors, formWithErrors.get.username, formWithErrors.get.walletAddress, Seq(formWithErrors.get.seed1, formWithErrors.get.seed2, formWithErrors.get.seed3, formWithErrors.get.seed4))))
       },
       walletMnemonicsData => {
         val wallet = masterWallets.Service.tryGet(walletMnemonicsData.walletAddress)
@@ -68,15 +68,12 @@ class AccountController @Inject()(
           wallet <- wallet
         } yield {
           val mnemonics = wallet.partialMnemonics ++ Seq(walletMnemonicsData.seed1, walletMnemonicsData.seed2, walletMnemonicsData.seed3, walletMnemonicsData.seed4)
-          val addressVerify = if (utilities.Bip39.validate(mnemonics)) {
-            utilities.Wallet.getWallet(mnemonics).address == walletMnemonicsData.walletAddress
-          } else throw new BaseException(constants.Response.INVALID_MNEMONICS)
-          if (addressVerify && wallet.address == walletMnemonicsData.walletAddress && wallet.accountId == walletMnemonicsData.username) {
+          if (utilities.Wallet.getWallet(mnemonics).address == walletMnemonicsData.walletAddress && wallet.address == walletMnemonicsData.walletAddress && wallet.accountId == walletMnemonicsData.username) {
             PartialContent(views.html.account.walletSuccess(username = wallet.accountId, address = walletMnemonicsData.walletAddress))
           } else throw new BaseException(constants.Response.ACCOUNT_NOT_FOUND)
         }
           ).recover {
-          case baseException: BaseException => NotFound(views.html.account.walletMnemonics(WalletMnemonics.form.withGlobalError(baseException.failure.message), username = walletMnemonicsData.username, address = walletMnemonicsData.walletAddress, partialMnemonics = Seq(walletMnemonicsData.seed1, walletMnemonicsData.seed2, walletMnemonicsData.seed3, walletMnemonicsData.seed4)))
+          case baseException: BaseException => NotFound(views.html.account.verifyWalletMnemonics(walletMnemonicsForm = WalletMnemonics.form.withGlobalError(baseException.failure.message), username = walletMnemonicsData.username, address = walletMnemonicsData.walletAddress, partialMnemonics = Seq(walletMnemonicsData.seed1, walletMnemonicsData.seed2, walletMnemonicsData.seed3, walletMnemonicsData.seed4)))
         }
       }
     )

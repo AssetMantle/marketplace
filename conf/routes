@@ -18,8 +18,8 @@ POST        /signUp                        controllers.AccountController.signUp(
 
 GET         /checkUsernameAvailable        controllers.AccountController.checkUsernameAvailable(username: String)
 
-GET         /walletMnemonics               controllers.AccountController.walletMnemonicsForm()
-POST        /walletMnemonics               controllers.AccountController.walletMnemonics()
+GET         /verifyWalletMnemonicso         controllers.AccountController.verifyWalletMnemonicsForm()
+POST        /verifyWalletMnemonics         controllers.AccountController.verifyWalletMnemonics()
 
 GET         /signIn                        controllers.AccountController.signInForm()
 POST        /signIn                        controllers.AccountController.signIn()

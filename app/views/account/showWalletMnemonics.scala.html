@@ -1,0 +1,20 @@
+@import views.account.companion.WalletMnemonics
+@import views.html.base.form._
+
+@(walletMnemonicsForm: Form[WalletMnemonics.Data] = WalletMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<!-- Wallet Mnemonics -->
+<div class="wallet-mnemonics">
+    <div>@username</div>
+    <div>@address</div>
+    @partialMnemonics.zipWithIndex.map {case(word, index) =>{
+        <div>@index</div>
+        <div>@word</div>
+    }}
+    <button onclick="showVerificationForm()">Next</button>
+</div>
+
+<div id="verificationForm" style="display: none;">
+    @views.html.account.verifyWalletMnemonics(walletMnemonicsForm, username, address, partialMnemonics)
+</div>
+
+<script src="@routes.Assets.versioned("javascripts/account/walletMnemonics.js")" type="text/javascript"></script>

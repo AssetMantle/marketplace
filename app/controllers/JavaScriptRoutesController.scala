@@ -18,7 +18,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.Assets.versioned,
 
         routes.javascript.AccountController.signUpForm,
-        routes.javascript.AccountController.walletMnemonicsForm,
+        routes.javascript.AccountController.verifyWalletMnemonicsForm,
         routes.javascript.AccountController.checkUsernameAvailable,
         routes.javascript.AccountController.signInForm,
 

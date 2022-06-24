@@ -51,7 +51,7 @@ object Wallet {
 
   def getWallet(mnemonics: Seq[String], hdPath: ImmutableList[ChildNumber] = constants.Blockchain.DefaultHDPath, bip39Passphrase: Option[String] = None): Wallet = {
     val words = mnemonics.mkString(" ")
-    if (Bip39.validate(words)) {
+    if (Bip39.validate(mnemonics)) {
       val bitcoinWallet = bitcoinjWallet.fromSeed(
         MainNetParams.get(),
         new DeterministicSeed(words, Bip39.toSeed(words, bip39Passphrase), "", System.currentTimeMillis()),
