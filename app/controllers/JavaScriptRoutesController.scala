@@ -19,6 +19,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.AccountController.signUpForm,
         routes.javascript.AccountController.walletMnemonicsForm,
+        routes.javascript.AccountController.checkUsernameAvailable,
         routes.javascript.AccountController.signInForm,
       )
     ).as("text/javascript")

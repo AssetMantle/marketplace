@@ -12,6 +12,8 @@ object CommonConfig {
   val webAppUrl: String = config.get[String]("webApp.url")
   val webAppCacheDuration: Duration = Duration(config.get[Int]("webApp.cacheDuration"), MILLISECONDS)
 
+  val sessionTokenTimeout: Long = config.get[Long]("play.http.session.token.timeout")
+
   object AmazonS3 {
     val BucketName: String = config.get[String]("amazonS3.bucketName")
     val Region: String = config.get[String]("amazonS3.region")

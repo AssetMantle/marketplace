@@ -1,5 +1,6 @@
 package utilities
 
+import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.security.{MessageDigest, SecureRandom}
 import java.util
@@ -47,5 +48,7 @@ object Secrets {
   }
 
   def sha256Hash(value: String): Array[Byte] = MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8))
+
+  def sha256HashString(value: String) : String = java.lang.String.format("%064x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8))))
 
 }

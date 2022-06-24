@@ -87,9 +87,16 @@ class AccountController @Inject()(
         Future(BadRequest(views.html.account.signIn(formWithErrors)))
       },
       signInData => {
-        Future(Ok(views.html.index()))
+        Future(Ok(views.html.collections()))
       }
     )
+  }
+
+  def checkUsernameAvailable(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+    val checkUsernameAvailable = masterAccounts.Service.checkUsernameAvailable(username)
+    for {
+      checkUsernameAvailable <- checkUsernameAvailable
+    } yield if (checkUsernameAvailable) Ok else NoContent
   }
 
 
