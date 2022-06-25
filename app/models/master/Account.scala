@@ -11,7 +11,7 @@ import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Account(id: String, passwordHash: String, salt: Array[Byte], iterations: Int, language: Lang, accountType: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Account(id: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, language: Lang, accountType: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
   def serialize(): Accounts.AccountSerialized = Accounts.AccountSerialized(
     id = this.id,
     passwordHash = this.passwordHash,
@@ -33,7 +33,7 @@ object Accounts {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class AccountSerialized(id: String, passwordHash: String, salt: Array[Byte], iterations: Int, language: String, accountType: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
+  case class AccountSerialized(id: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, language: String, accountType: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
     def deserialize: Account = Account(id = id, passwordHash = passwordHash, salt = salt, iterations = iterations, language = Lang(language), accountType = accountType, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
@@ -43,7 +43,7 @@ object Accounts {
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def passwordHash = column[String]("passwordHash")
+    def passwordHash = column[Array[Byte]]("passwordHash")
 
     def salt = column[Array[Byte]]("salt")
 
@@ -67,7 +67,7 @@ object Accounts {
 
   }
 
-  lazy val TableQuery = new TableQuery(tag => new AccountTable(tag))
+  val TableQuery = new TableQuery(tag => new AccountTable(tag))
 }
 
 @Singleton
@@ -119,7 +119,16 @@ class Accounts @Inject()(
       } yield ()
     }
 
-    def updateOnForgotPassword(account: Account, newPassword: String): Future[Unit] = update(account.copy(passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = account.salt, iterations = constants.Security.DefaultIterations)).serialize())
+    def updateOnForgotPassword(accountID: String, newPassword: String): Future[Unit] = {
+      val account = tryGetById(accountID).map(_.deserialize)
+
+      def updatePassword(account: Account) = update(account.copy(passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = account.salt, iterations = constants.Security.DefaultIterations)).serialize())
+
+      for {
+        account <- account
+        _ <- updatePassword(account)
+      } yield ()
+    }
 
     def checkUsernameAvailable(username: String): Future[Boolean] = exists(username).map(!_)
 

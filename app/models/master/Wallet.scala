@@ -10,12 +10,13 @@ import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Wallet(address: String, partialMnemonics: Seq[String], accountId: String, provisioned: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Wallet(address: String, partialMnemonics: Seq[String], accountId: String, provisioned: Option[Boolean], preference: Int, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
   def serialize(): Wallets.WalletSerialized = Wallets.WalletSerialized(
     address = this.address,
     partialMnemonics = Json.toJson(this.partialMnemonics).toString(),
     accountId = this.accountId,
     provisioned = this.provisioned,
+    preference = this.preference,
     createdBy = this.createdBy,
     createdOn = this.createdOn,
     createdOnTimeZone = this.createdOnTimeZone,
@@ -30,15 +31,15 @@ object Wallets {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class WalletSerialized(address: String, partialMnemonics: String, accountId: String, provisioned: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
-    def deserialize: Wallet = Wallet(address = address, partialMnemonics = utilities.JSON.convertJsonStringToObject[Seq[String]](partialMnemonics), accountId = accountId, provisioned = provisioned, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class WalletSerialized(address: String, partialMnemonics: String, accountId: String, provisioned: Option[Boolean], preference: Int, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
+    def deserialize: Wallet = Wallet(address = address, partialMnemonics = utilities.JSON.convertJsonStringToObject[Seq[String]](partialMnemonics), accountId = accountId, provisioned = provisioned, preference = preference, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
 
     def id: String = address
   }
 
   class WalletTable(tag: Tag) extends Table[WalletSerialized](tag, "Wallet") with ModelTable[String] {
 
-    def * = (address, partialMnemonics, accountId, provisioned.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (WalletSerialized.tupled, WalletSerialized.unapply)
+    def * = (address, partialMnemonics, accountId, provisioned.?, preference, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (WalletSerialized.tupled, WalletSerialized.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
@@ -47,6 +48,8 @@ object Wallets {
     def accountId = column[String]("accountId")
 
     def provisioned = column[Boolean]("provisioned")
+
+    def preference = column[Int]("preference")
 
     def createdBy = column[String]("createdBy")
 
@@ -81,13 +84,13 @@ class Wallets @Inject()(
 
   object Service {
 
-    def add(address: String, partialMnemonics: Seq[String], accountId: String, provisioned: Option[Boolean]): Future[Unit] = create(Wallet(address = address, partialMnemonics = partialMnemonics, accountId = accountId, provisioned = provisioned).serialize())
+    def add(address: String, partialMnemonics: Seq[String], accountId: String, provisioned: Option[Boolean]): Future[Unit] = create(Wallet(address = address, partialMnemonics = partialMnemonics, accountId = accountId, provisioned = provisioned, preference = 0).serialize())
 
     def tryGet(address: String): Future[Wallet] = tryGetById(address).map(_.deserialize)
 
     def get(address: String): Future[Option[Wallet]] = getById(address).map(_.map(_.deserialize))
 
-    def tryGetByAccountID(accountId: String): Future[Wallet] = filterHead(_.accountId === accountId).map(_.deserialize)
+    def tryGetByAccountID(accountId: String): Future[Wallet] = filterAndSortHead(_.accountId === accountId)(_.preference).map(_.deserialize)
   }
 
 }

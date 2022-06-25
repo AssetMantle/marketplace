@@ -24,7 +24,7 @@ object SessionTokens {
 
   class SessionTokenTable(tag: Tag) extends Table[SessionToken](tag, "SessionToken") with ModelTable[String] {
 
-    def * = (id, sessionTokenHash, sessionTokenTime, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SessionToken.tupled, SessionToken.unapply)
+    def * = (accountId, sessionTokenHash, sessionTokenTime, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SessionToken.tupled, SessionToken.unapply)
 
     def accountId = column[String]("accountId", O.PrimaryKey)
 
@@ -44,10 +44,10 @@ object SessionTokens {
 
     def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
-    def id = accountId
+    override def id = accountId
   }
 
-  lazy val TableQuery = new TableQuery(tag => new SessionTokenTable(tag))
+  val TableQuery = new TableQuery(tag => new SessionTokenTable(tag))
 
 }
 
@@ -70,9 +70,10 @@ class SessionTokens @Inject()(
     def refresh(id: String): Future[String] = {
       val sessionToken: String = utilities.IdGenerator.getRandomHexadecimal
 
-      val upsertToken = upsert(SessionToken(id, utilities.Secrets.sha256HashString(sessionToken), DateTime.now(DateTimeZone.UTC).getMillis))
+//      val upsertToken = upsert(SessionToken(id, utilities.Secrets.sha256HashString(sessionToken), DateTime.now(DateTimeZone.UTC).getMillis))
       for {
-        _ <- upsertToken
+        _ <- delete(id)
+        _ <- create(SessionToken(id, utilities.Secrets.sha256HashString(sessionToken), DateTime.now(DateTimeZone.UTC).getMillis))
       } yield sessionToken
     }
 
