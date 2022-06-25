@@ -1103,3 +1103,14 @@ dl .info:after {
     color: var(--mantle-off-white);
     padding: 24px 16px 24px 24px;
 }
+
+/* Field Level Error */
+dl dd.error{
+    margin-top: 8px;
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--error);
+}

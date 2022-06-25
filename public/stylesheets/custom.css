@@ -50,10 +50,9 @@ body{
     background-position: center;
 }
 body.modal-active{
-    overflow: hidden;
+    /*overflow: hidden;*/
     height: 100vh;
     width: 100vw;
-    /*position: fixed;*/
 }
 .body-container{
     max-width: 1440px;

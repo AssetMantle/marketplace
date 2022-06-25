@@ -6,7 +6,7 @@
 @import views.html.base.label._
 
 @(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@commonForm(constants.Form.SIGN_UP, signUpForm) {
+@commonForm(constants.Form.SIGN_UP, signUpForm, isModal=true) {
 
     @multiStepNavigator()
 

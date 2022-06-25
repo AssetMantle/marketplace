@@ -77,7 +77,6 @@ SIGN_UP_TOOLTIP = Username once lost cannot be retrieved. Please store it in a s
 TERMS_CONDITION_MESSAGE = By creating an account, the user agrees to AssetMantle's
 TERMS_CONDITION_LABEL = Terms and conditions
 
-
 #//Create Wallet
 CREATE_WALLET_TITLE = Create a Wallet
 CREATE_WALLET_SAFETY_POINTS_TITLE = Points to keep in mind for safety of funds:

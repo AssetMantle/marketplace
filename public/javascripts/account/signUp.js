@@ -25,18 +25,18 @@ function checkUsernameAvailable(source, usernameAvailableCheckBoxID) {
                     statusCode: {
                         200: function () {
                             usernameAvailableCheckBox[0].checked = true;
-                            $("#checkUsernameAvailableResult").fadeOut();
                             $("#checkIcon").fadeIn();
+                            $("#usernameAvailableError").fadeOut();
                         },
                         204: function () {
                             usernameAvailableCheckBox[0].checked = false;
                             $("#checkIcon").fadeOut();
-                            $("#checkUsernameAvailableResult").fadeIn();
+                            $("#usernameAvailableError").fadeIn();
                         },
                     }
                 });
             } else {
-                $("#checkUsernameAvailableResult span, #checkIcon").hide();
+                $("#checkIcon").hide();
             }
         }, 1500);
     }

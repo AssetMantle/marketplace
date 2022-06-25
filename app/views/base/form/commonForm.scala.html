@@ -2,7 +2,7 @@
 @import views.html.base.buttons._
 @import views.html.base.forms._
 
-@(formTemplate: constants.Form, formData: Form[_], backButton: Int = 0, target:String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+@(formTemplate: constants.Form, formData: Form[_], backButton: Int = 0, isModal:Boolean = false,target:String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @form(action = formTemplate.post, Symbol("onkeypress") -> "submitFormOnEnter(event,this)") {
 @*    <fieldset>*@
@@ -11,22 +11,23 @@
     } else{
         @formHeaderWithBackButton(heading=Messages(formTemplate.title),subHeading = Messages(formTemplate.subTitle))
     }
+    @if(formData.hasGlobalErrors) {
+        <ul id="formGlobalErrors">
+        @for(error <- formData.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
+    }
 
         <div id="formBody">
             @CSRF.formField
             @fieldset
-            @if(formData.hasGlobalErrors) {
-                <ul id="formGlobalErrors">
-                @for(error <- formData.globalErrors) {
-                    <li>@error.format</li>
-                }
-                </ul>
-            }
+
             <div id="formSubmitButton">
             @if(customSubmit != JavaScript("")) {
                 @commonJavascriptButton(formTemplate.submit, customSubmit)
             } else {
-                @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm(this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"))
+                @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"))
             }
             </div>
         </div>

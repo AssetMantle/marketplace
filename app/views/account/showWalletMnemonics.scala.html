@@ -1,9 +1,11 @@
 @import views.account.companion.WalletMnemonics
-@import views.html.base.form._
+@import views.html.base.forms._
 
 @(walletMnemonicsForm: Form[WalletMnemonics.Data] = WalletMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <!-- Wallet Mnemonics -->
 <div class="wallet-mnemonics">
+    @formHeader(label = "Recovery Phrase", subHeading = " ")
+    @multiStepNavigator()
     <div>@username</div>
     <div>@address</div>
     @partialMnemonics.zipWithIndex.map {case(word, index) =>{
