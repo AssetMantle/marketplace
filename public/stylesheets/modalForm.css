@@ -587,7 +587,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    text-transform: capitalize;
     padding: 9px 0;
     outline:none;
 }

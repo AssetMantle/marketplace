@@ -79,11 +79,12 @@ TERMS_CONDITION_LABEL = Terms and conditions
 
 #//Create Wallet
 CREATE_WALLET_TITLE = Create a Wallet
-CREATE_WALLET_SAFETY_POINTS_TITLE = Points to keep in mind for safety of funds:
-CREATE_WALLET_SAFETY_POINT_1 = Users need to securely store their mnemonic phrase (a.k.a. seed phrase). Losing or exposing the seed phrase can potentially lead to users' funds being stolen.
-CREATE_WALLET_SAFETY_POINT_2 = Users can view and save their mnemonic while creating a wallet.
-CREATE_WALLET_SAFETY_POINT_3 = Do not share seed phrase with anyone.
+CREATE_WALLET_SAFETY_POINTS_TITLE = Important points to consider:
+CREATE_WALLET_SAFETY_POINT_1 = Users need to securely note down their username and recovery phrase using pen and paper. Losing or exposing the recovery phrase can potentially lead to users' funds or assets being stolen.
+CREATE_WALLET_SAFETY_POINT_2 = Users can use recovrey phrase to back up and restore their accounts in case they forget their password.
+CREATE_WALLET_SAFETY_POINT_3 = Do not share your recovery phrase with anyone.
 COPY_SEED_MESSAGE = Copy seed phrase
+RECOVERY_PHRASE = Recovery phrase
 CREATE_WALLET_INFO = This will be used for verification on the next screen.
 FORM.CREATE_WALLET_SEED_PHRASE.TITLE = Create a wallet
 FORM.CREATE_WALLET_SEED_PHRASE.SUBTITLE = Confirm seed phrase.
@@ -100,6 +101,13 @@ CREATE_WALLET_ERROR_TITLE = Error in creating Wallet
 CREATE_WALLET_ERROR_MESSAGE_1 = You wallet could not be created. Please try again. You can find guides and resources
 CREATE_WALLET_ERROR_MESSAGE_2 = here
 CREATE_WALLET_ERROR_MESSAGE_3 = to help you create your wallet.
+NEXT = next
+CANCEL = Cancel
+FORM.VERIFY_WALLET_MNEMONICS.TITLE = Verification
+FORM.VERIFY_WALLET_MNEMONICS.SUBTITLE = Confirm username and recovery phrase.
+FORM.VERIFY_WALLET_MNEMONICS.SUBMIT = Next
+CONFIRM_RECOVERY_PHRASE = Confirm your Recovery Phrase
+PHRASE_VERIFICATION_WARNING = Do not share recovery phrase with anyone.
 
 
 #//Sign In
