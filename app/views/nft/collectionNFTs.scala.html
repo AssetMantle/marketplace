@@ -1,2 +1,4 @@
 @(nfts: Seq[master.NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@nfts.zipWithIndex.map(())
+@nfts.zipWithIndex.map {case(nft, index) =>
+    @nft.fileName
+}
