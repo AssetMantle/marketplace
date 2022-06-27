@@ -32,7 +32,7 @@ class AccountController @Inject()(
   private implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
 
   def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Await.result(uploadCollections.start(), Duration.Inf)
+//    Await.result(uploadCollections.start(), Duration.Inf)
     Ok(views.html.account.signUp())
   }
 
