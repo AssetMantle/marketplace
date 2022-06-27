@@ -28,29 +28,25 @@ class WithLoginActionAsync @Inject()(
       val address = Future(request.session.get(constants.Session.ADDRESS).getOrElse(throw new BaseException(constants.Response.ADDRESS_NOT_FOUND)))
       val token = Future(request.session.get(constants.Session.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
 
-      def verifyAndRefresh(username: String, address: String, sessionToken: String) = {
+      def verify(username: String, address: String, sessionToken: String) = {
         val token = masterTransactionSessionTokens.Service.tryGet(username)
         val wallet = masterWallets.Service.tryGet(address)
-
-        def checkAndRefresh(wallet: master.Wallet, token: masterTransaction.SessionToken) = if (wallet.accountId == username && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.sessionTokenTimeout)) {
-          masterTransactionSessionTokens.Service.refresh(username)
-        } else Future(throw new BaseException(constants.Response.INVALID_SESSION))
 
         for {
           token <- token
           wallet <- wallet
-          _ <- checkAndRefresh(wallet, token)
-        } yield ()
+        } yield (wallet.accountId == username && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.sessionTokenTimeout))
       }
 
-      def getResult(loginState: LoginState): Future[Result] = f(loginState)(request)
+      def getResult(verify: Boolean, loginState: LoginState): Future[Result] = if (verify) f(loginState)(request)
+      else throw new BaseException(constants.Response.INVALID_SESSION)
 
       (for {
         username <- username
         address <- address
         token <- token
-        _ <- verifyAndRefresh(username, address, token)
-        result <- getResult(LoginState(username = username, address = address))
+        verify <- verify(username, address, token)
+        result <- getResult(verify, LoginState(username = username, address = address))
       } yield {
         result
       }).recover {

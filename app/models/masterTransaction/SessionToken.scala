@@ -70,7 +70,7 @@ class SessionTokens @Inject()(
     def refresh(id: String): Future[String] = {
       val sessionToken: String = utilities.IdGenerator.getRandomHexadecimal
 
-//      val upsertToken = upsert(SessionToken(id, utilities.Secrets.sha256HashString(sessionToken), DateTime.now(DateTimeZone.UTC).getMillis))
+      //      val upsertToken = upsert(SessionToken(id, utilities.Secrets.sha256HashString(sessionToken), DateTime.now(DateTimeZone.UTC).getMillis))
       for {
         _ <- delete(id)
         _ <- create(SessionToken(id, utilities.Secrets.sha256HashString(sessionToken), DateTime.now(DateTimeZone.UTC).getMillis))
