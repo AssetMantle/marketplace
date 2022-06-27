@@ -38,5 +38,5 @@ class IndexController @Inject()(
     }
   }
 
-  uploadCollections.start()
+//  uploadCollections.start()
 }

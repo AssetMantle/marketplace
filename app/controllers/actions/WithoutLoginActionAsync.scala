@@ -27,24 +27,29 @@ class WithoutLoginActionAsync @Inject()(
       val sessionToken = request.session.get(constants.Session.TOKEN).getOrElse("")
       val address = request.session.get(constants.Session.ADDRESS).getOrElse("")
 
-      def verifyAndRefresh(username: String, address: String, sessionToken: String) = if (username != "" && address != "" && sessionToken != "") {
-        val token = masterTransactionSessionTokens.Service.tryGet(username)
-        val wallet = masterWallets.Service.tryGet(address)
+      def verifyAndGetResult(username: String, address: String, sessionToken: String) = if (username != "" && address != "" && sessionToken != "") {
+        val verify = {
+          val token = masterTransactionSessionTokens.Service.tryGet(username)
+          val wallet = masterWallets.Service.tryGet(address)
 
-        def checkAndRefresh(wallet: master.Wallet, token: masterTransaction.SessionToken) = if (wallet.accountId == username && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.sessionTokenTimeout)) {
-          masterTransactionSessionTokens.Service.refresh(username)
-        } else Future(throw new BaseException(constants.Response.INVALID_SESSION))
+          for {
+            token <- token
+            wallet <- wallet
+          } yield (wallet.accountId == username && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.sessionTokenTimeout))
+        }
+
+
+        def getResult(verify: Boolean, loginState: LoginState) = if (verify) f(Option(loginState))(request)
+        else Future(throw new BaseException(constants.Response.INVALID_SESSION))
 
         for {
-          token <- token
-          wallet <- wallet
-          _ <- checkAndRefresh(wallet, token)
+          verify <- verify
           result <- f(Option(LoginState(username, address)))(request)
         } yield result
       } else f(None)(request)
 
       (for {
-        result <- verifyAndRefresh(username = username, address = address, sessionToken = sessionToken)
+        result <- verifyAndGetResult(username = username, address = address, sessionToken = sessionToken)
       } yield result).recover {
         case baseException: BaseException => Results.InternalServerError(views.html.index(failures = Seq(baseException.failure))).withNewSession
       }
