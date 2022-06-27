@@ -14,6 +14,11 @@ object CommonConfig {
 
   val sessionTokenTimeout: Long = config.get[Long]("play.http.session.token.timeout")
 
+  object Files {
+    val RootFilePath: String = config.get[String]("upload.rootFilePath")
+    val ColectionPath: String = config.get[String]("upload.collectionPath")
+  }
+
   object AmazonS3 {
     val BucketName: String = config.get[String]("amazonS3.bucketName")
     val Region: String = config.get[String]("amazonS3.region")
@@ -24,6 +29,7 @@ object CommonConfig {
 
   object IPFS {
     val JwtToken: String = config.get[String]("ipfs.jwtToken")
-    val EndPoint: String = config.get[String]("ipfs.endPoint")
+    val UploadEndPoint: String = config.get[String]("ipfs.uploadEndPoint")
+    val DownloadEndPoint: String = config.get[String]("ipfs.downloadEndPoint")
   }
 }

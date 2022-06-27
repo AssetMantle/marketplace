@@ -18,14 +18,16 @@ object Property {
   implicit val propertyReads: Reads[Property] = Json.reads[Property]
 }
 
-case class NFT(fileHash: String, collectionId: String, name: String, description: String, properties: Seq[Property], edition: Option[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class NFT(fileName: String, compressedFile: Array[Byte], collectionId: String, name: String, description: String, properties: Seq[Property], ipfsLink: String, edition: Option[Int], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
 
   def serialize(): NFTs.NFTSerialized = NFTs.NFTSerialized(
-    fileHash = this.fileHash,
+    fileName = this.fileName,
+    compressedFile = this.compressedFile,
     collectionId = collectionId,
     name = this.name,
     description = this.description,
     properties = Json.toJson(this.properties).toString(),
+    ipfsLink = this.ipfsLink,
     edition = this.edition,
     createdBy = this.createdBy,
     createdOn = this.createdOn,
@@ -41,17 +43,19 @@ object NFTs {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class NFTSerialized(fileHash: String, collectionId: String, name: String, description: String, properties: String, edition: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
-    def deserialize: NFT = NFT(fileHash = fileHash, collectionId = collectionId, name = name, description = description, properties = utilities.JSON.convertJsonStringToObject[Seq[Property]](properties), edition = edition, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class NFTSerialized(fileName: String, compressedFile: Array[Byte], collectionId: String, name: String, description: String, properties: String, ipfsLink: String, edition: Option[Int], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
+    def deserialize: NFT = NFT(fileName = fileName, compressedFile = compressedFile, collectionId = collectionId, name = name, description = description, properties = utilities.JSON.convertJsonStringToObject[Seq[Property]](properties), ipfsLink = ipfsLink, edition = edition, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
 
-    def id: String = fileHash
+    def id: String = fileName
   }
 
   class NFTTable(tag: Tag) extends Table[NFTSerialized](tag, "NFT") with ModelTable[String] {
 
-    def * = (id, collectionId, name, description, properties, edition.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (NFTSerialized.tupled, NFTSerialized.unapply)
+    def * = (fileName, compressedFile, collectionId, name, description, properties, ipfsLink, edition.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (NFTSerialized.tupled, NFTSerialized.unapply)
 
-    def fileHash = column[String]("fileHash", O.PrimaryKey)
+    def fileName = column[String]("fileName", O.PrimaryKey)
+
+    def compressedFile = column[Array[Byte]]("compressedFile")
 
     def collectionId = column[String]("collectionId")
 
@@ -59,9 +63,11 @@ object NFTs {
 
     def description = column[String]("description")
 
-    def properties = column[String]("description")
+    def properties = column[String]("properties")
 
-    def edition = column[String]("edition")
+    def ipfsLink = column[String]("ipfsLink")
+
+    def edition = column[Int]("edition")
 
     def createdBy = column[String]("createdBy")
 
@@ -75,7 +81,7 @@ object NFTs {
 
     def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
-    override def id = fileHash
+    override def id = fileName
   }
 
   lazy val TableQuery = new TableQuery(tag => new NFTTable(tag))
@@ -95,6 +101,20 @@ class NFTs @Inject()(
 
 
   object Service {
+
+    def add(fileName: String, compressedFile: Array[Byte], collectionId: String, name: String, description: String, properties: Seq[Property], ipfsLink: String, edition: Option[Int]) = {
+      val nft = NFT(
+        fileName = fileName,
+        compressedFile = compressedFile,
+        collectionId = collectionId,
+        name = name,
+        description = description,
+        properties = properties,
+        ipfsLink = ipfsLink,
+        edition = edition
+      )
+      create(nft.serialize())
+    }
 
     def fetchAll(): Future[Seq[NFT]] = getAll.map(_.map(_.deserialize))
 

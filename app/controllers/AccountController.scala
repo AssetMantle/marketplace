@@ -8,10 +8,12 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import service.UploadCollections
 import views.account.companion._
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class AccountController @Inject()(
@@ -22,6 +24,7 @@ class AccountController @Inject()(
                                    masterAccounts: master.Accounts,
                                    masterWallets: master.Wallets,
                                    withUsernameToken: WithUsernameToken,
+                                   uploadCollections:UploadCollections,
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -29,6 +32,7 @@ class AccountController @Inject()(
   private implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
 
   def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Await.result(uploadCollections.start(), Duration.Inf)
     Ok(views.html.account.signUp())
   }
 

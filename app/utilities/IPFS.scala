@@ -7,7 +7,9 @@ import org.json.JSONObject
 import play.api.Logger
 import play.api.libs.json.{Json, OWrites, Reads}
 
-import java.io.{File, FileInputStream, InputStream}
+import java.io._
+import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 // https://github.com/zinebfadili/pinata-java-sdk/blob/main/src/main/java/pinata/Pinata.java
 object IPFS {
@@ -56,7 +58,7 @@ object IPFS {
 
   private def postOrPutRequest(method: String, requestBody: RequestBody): Success = {
     val client = new OkHttpClient().newBuilder.build
-    val request = new Request.Builder().url(constants.CommonConfig.IPFS.EndPoint).method(method, requestBody)
+    val request = new Request.Builder().url(constants.CommonConfig.IPFS.UploadEndPoint).method(method, requestBody)
       .addHeader("Authorization", jwtToken)
       .addHeader("Content-Type", "application/json").build
     val response = client.newCall(request).execute
@@ -94,5 +96,21 @@ object IPFS {
       content
     }
     postOrPutRequest("POST", RequestBody.create(MediaType.parse("application/json"), bodyContent.toString))
+  }
+
+  def downloadFile(fileUrl: String, downloadPath: String): Boolean = {
+    try {
+      val url = new URL(constants.CommonConfig.IPFS.DownloadEndPoint + "/" + fileUrl)
+      val connection = url.openConnection().asInstanceOf[HttpsURLConnection]
+      connection.setRequestMethod("GET")
+      var in = connection.getInputStream
+      var out = new BufferedOutputStream(new FileOutputStream(downloadPath))
+      val byteArray = LazyList.continually(in.read).takeWhile(_ != -1).map(_.toByte).toArray
+      out.write(byteArray)
+      true
+    } catch {
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        false
+    }
   }
 }

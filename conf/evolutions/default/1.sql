@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Collection"
 --     "ownerAccountId"    VARCHAR NOT NULL,
 --     "classificationId"  VARCHAR NOT NULL,
     "id"                VARCHAR NOT NULL,
-    "name"              VARCHAR NOT NULL,
+    "name"              VARCHAR NOT NULL UNIQUE,
     "description"       VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -55,19 +55,21 @@ CREATE TABLE IF NOT EXISTS MASTER."CollectionFile"
 
 CREATE TABLE IF NOT EXISTS MASTER."NFT"
 (
-    "fileHash"          VARCHAR NOT NULL,
+    "fileName"          VARCHAR NOT NULL,
+    "compressedFile"    BYTEA   NOT NULL,
     "collectionId"      VARCHAR NOT NULL,
     "name"              VARCHAR NOT NULL,
     "description"       VARCHAR NOT NULL,
     "properties"        VARCHAR NOT NULL,
-    "edition"           VARCHAR,
+    "ipfsLink"          VARCHAR NOT NULL,
+    "edition"           INTEGER,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("fileHash")
+    PRIMARY KEY ("fileName")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Wallet"
@@ -102,10 +104,12 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SessionToken"
 );
 
 ALTER TABLE MASTER."Wallet"
-    ADD CONSTRAINT Wallet_Account_id FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
+    ADD CONSTRAINT Wallet_Account_Id FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."NFT"
+    ADD CONSTRAINT NFT_Collection_Id FOREIGN KEY ("collectionId") REFERENCES MASTER."Collection" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."SessionToken"
-    ADD CONSTRAINT Wallet_Account_id FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
+    ADD CONSTRAINT Wallet_Account_Id FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 
 /*Triggers*/
 

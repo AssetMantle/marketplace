@@ -23,7 +23,7 @@ object AmazonS3 {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val clientRegion: Regions = Regions.valueOf(constants.CommonConfig.AmazonS3.Region)
+  private val clientRegion: Regions = Regions.fromName(constants.CommonConfig.AmazonS3.Region)
 
   private val bucketName = constants.CommonConfig.AmazonS3.BucketName
 
