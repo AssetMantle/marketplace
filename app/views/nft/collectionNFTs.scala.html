@@ -1,4 +1,8 @@
-@(nfts: Seq[master.NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@nfts.zipWithIndex.map {case(nft, index) =>
-    @nft.fileName
-}
+@(collection: master.Collection, nfts: Seq[master.NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+    @nfts.map { nft =>
+        <div>
+            @nft.name
+        <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(nft.compressedFile)">
+        </div>
+    }
