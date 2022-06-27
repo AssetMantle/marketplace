@@ -11,4 +11,5 @@ var elements = $('.modal-overlay, .modal');
 
 function closeModal(){
     elements.removeClass('active');
+    $("body").removeClass("modal-active");
 }

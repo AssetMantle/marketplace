@@ -217,6 +217,10 @@
     font-weight: 700;
     color: var(--default);
 }
+.profile-card .profiles-container .card-header .left-option .disable{
+    color: var(--disable);
+    cursor: none !important;
+}
 .profile-card .profiles-container .card-header .right-option{
     margin-right: 20px;
 }
@@ -512,9 +516,10 @@
     line-height: 19px;
     text-align: right;
     text-transform: capitalize;
-    background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
+    /*background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);*/
+    /*-webkit-background-clip: text;*/
+    /*-webkit-text-fill-color: transparent;*/
+    /*background-clip: text;*/
+    /*text-fill-color: transparent;*/
+    color: var(--disable);
 }

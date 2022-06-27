@@ -1,4 +1,4 @@
-function submitForm(source, targetID) {
+function submitForm(isModal,source, targetID) {
     const target = '#' + targetID;
     const form = $(source).closest("form");
     if (validateForm(form)) {
@@ -20,7 +20,16 @@ function submitForm(source, targetID) {
                     replaceDocument(data);
                 },
                 206: function (data) {
-                    $(target).html(data);
+                    if(isModal === "true"){
+                        $(".modal").removeClass('active');
+                        setTimeout(function(){
+                            $(target).html(data);
+                            $(".modal").addClass('active');
+                        },1000);
+                    }
+                    else{
+                        $(target).html(data);
+                    }
                 },
                 404: function (data) {
                     $(target).html(data.responseText);

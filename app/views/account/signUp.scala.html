@@ -1,68 +1,78 @@
 @import views.account.companion.SignUp
 @import views.html.base.form._
 @import views.html.base.forms.commonFieldErrorMessage
-@import views.html.base.forms.formFooter
 @import views.html.base.forms.multiStepNavigator
 @import views.html.base.label._
 
 @(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@commonForm(constants.Form.SIGN_UP, signUpForm) {
+<div id="signUpForm">
+    @commonForm(constants.Form.SIGN_UP, signUpForm, isModal=true, submitDisable=true) {
 
-    @multiStepNavigator()
+        @* @multiStepNavigator() *@
 
-    <div class="inputField">
-        <div class="inputFieldBody">
-            <div class="usernameAvailability">
-                @commonLabelIcon(constants.FormField.USERNAME.name, Messages(constants.View.SIGN_UP_TOOLTIP))
-                <div id="checkIcon" class="fieldIcon checkIcon">
-                    <img src="@routes.Assets.versioned("images/Verified Username.png")"/>
+        <div class="inputField">
+            <div class="inputFieldBody">
+                <div class="usernameAvailability">
+                    @commonLabelIcon(constants.FormField.USERNAME.name, Messages(constants.View.SIGN_UP_TOOLTIP))
+                    <div id="checkIcon" class="fieldIcon checkIcon">
+                        <img src="@routes.Assets.versioned("images/Verified Username.png")"/>
+                    </div>
+                    @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("placeholder") -> "Enter Username", Symbol("class") -> "inputBox", 'id -> "signUpUsername", Symbol("autocomplete") -> "off", 'oninput -> """checkUsernameAvailable(this,'#USERNAME_AVAILABLE')""", Symbol("onblur") -> "changeFieldBorder()", Symbol("onfocus") -> "changeFieldBorder()")
+                    @commonFieldErrorMessage(id = "usernameAvailableError",message = Messages(constants.View.USERNAME_NOT_AVAILABLE))
                 </div>
-                @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("class") -> "inputBox", 'id -> "signUpUsername", Symbol("autocomplete") -> "off", 'oninput -> """checkUsernameAvailable(this,'#USERNAME_AVAILABLE')""")
-                @commonFieldErrorMessage(id = "usernameAvailableError",message = Messages(constants.View.USERNAME_NOT_AVAILABLE))
             </div>
         </div>
-    </div>
 
-    @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE)
+        @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE, Symbol("class") -> "hidden")
 
-    <div class="inputField">
-        <div class="inputFieldBody">
-            <div class="usernameAvailability">
-                @commonLabel(constants.FormField.SIGNUP_PASSWORD.name)
-                @commonInputPassword(signUpForm, constants.FormField.SIGNUP_PASSWORD, 'id -> "signUpPassword")
-            </div>
-        </div>
-    </div>
-
-    <div class="inputField">
-        <div class="inputFieldBody">
-            <div class="usernameAvailability">
-                @commonLabel(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name)
-                <div class="fieldIcon showPassword" id="showPassword" onclick="showPassword()">
-                    <span class="eyeIcon closeEye">
-                        <img src="@routes.Assets.versioned("images/icon/Hide.png")"/>
-                    </span>
-                    <span class="eyeIcon openEye hidden">
-                        <img src="@routes.Assets.versioned("images/icon/Show.png")"/>
-                    </span>
+        <div class="inputField">
+            <div class="inputFieldBody">
+                <div class="usernameAvailability">
+                    @commonLabel(constants.FormField.SIGNUP_PASSWORD.name)
+                    @commonInputPassword(signUpForm, constants.FormField.SIGNUP_PASSWORD, Symbol("placeholder") -> "Enter Password", 'id -> "signUpPassword")
                 </div>
-                @commonInputPassword(signUpForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, 'id -> "signUpConfirmPassword", 'oninput -> """checkPasswords()""")
-                @commonFieldErrorMessage(id = "repeatPasswordError",message = Messages(constants.View.REPEAT_PASSWORD_MISMATCH))
             </div>
         </div>
-    </div>
 
-    <div class="terms-condition-container">
-        @commonCheckbox(signUpForm, constants.FormField.SIGNUP_TERMS_CONDITIONS, 'id -> "termsCondition")
-        <span class="terms-condition-message">
-            <label for="termsCondition">
-                @Messages(constants.View.TERMS_CONDITION_MESSAGE)
-                <a class="link" href="#">@Messages(constants.View.TERMS_CONDITION_LABEL)</a>
-            </label>
-        </span>
-    </div>
+        <div class="inputField">
+            <div class="inputFieldBody">
+                <div class="usernameAvailability">
+                    @commonLabel(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name)
+                    <div class="fieldIcon showPassword" id="showPassword" onclick="showPassword()">
+                        <span class="eyeIcon closeEye">
+                            <img src="@routes.Assets.versioned("images/icon/Hide.png")"/>
+                        </span>
+                        <span class="eyeIcon openEye hidden">
+                            <img src="@routes.Assets.versioned("images/icon/Show.png")"/>
+                        </span>
+                    </div>
+                    @commonInputPassword(signUpForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, Symbol("placeholder") -> "Enter Password", 'id -> "signUpConfirmPassword", 'oninput -> """checkPasswords()""")
+                    @commonFieldErrorMessage(id = "repeatPasswordError",message = Messages(constants.View.REPEAT_PASSWORD_MISMATCH))
+                </div>
+            </div>
+        </div>
 
+        <div class="terms-condition-container">
+            @commonCheckbox(signUpForm, constants.FormField.SIGNUP_TERMS_CONDITIONS, 'id -> "termsCondition", 'oninput -> """activeButton()""")
+            <span class="terms-condition-message">
+                <label for="termsCondition">
+                    @Messages(constants.View.TERMS_CONDITION_MESSAGE)
+                </label>
+                <a class="link" onclick="showHideModalScreen('#termsConditionModal', '#signUpForm')">@Messages(constants.View.TERMS_CONDITION_LABEL)</a>
+            </span>
+        </div>
 
-    @formFooter("Already have an account?","#","Sign In")
-}
+        <div class="form-footer">
+            <div class="footer-message">
+                <span>@Messages(constants.View.SIGN_UP_SIGN_IN_MESSAGE)</span>
+                <a class="link" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN.get, ""))">@Messages(constants.View.SIGN_IN)</a>
+            </div>
+        </div>
+    }
+</div>
+
+<div id="termsConditionModal" style="display: none;">
+    @views.html.account.termsConditions()
+</div>
+
 <script src="@routes.Assets.versioned("javascripts/account/signUp.js")" type="text/javascript"></script>

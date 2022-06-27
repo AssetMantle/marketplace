@@ -34,26 +34,26 @@
     padding: 0;
 }
 a{
-    text-decoration: none;
+    text-decoration: none !important;
+    cursor: pointer;
 }
 ul{
     list-style: none;
     margin: 0px;
-    padding: 0px;
+    padding: 0px !important;
 }
 body{
     /*height: 100vh;*/
-    background-color:#030301;
+    background-color:#030301 !important;
     background-image: url("../images/background.webp");
     /*background-repeat: no-repeat;*/
     /*background-size: cover;*/
     background-position: center;
 }
 body.modal-active{
-    overflow: hidden;
+    /*overflow: hidden;*/
     height: 100vh;
     width: 100vw;
-    /*position: fixed;*/
 }
 .body-container{
     max-width: 1440px;

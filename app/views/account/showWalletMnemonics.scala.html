@@ -1,20 +1,41 @@
 @import views.account.companion.WalletMnemonics
-@import views.html.base.form._
+@import views.html.base.forms._
 
 @(walletMnemonicsForm: Form[WalletMnemonics.Data] = WalletMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <!-- Wallet Mnemonics -->
-<div class="wallet-mnemonics">
-    <div>@username</div>
-    <div>@address</div>
-    @partialMnemonics.zipWithIndex.map {case(word, index) =>{
-        <div>@index</div>
-        <div>@word</div>
-    }}
-    <button onclick="showVerificationForm()">Next</button>
+<div id="wallet-mnemonics">
+    @formHeader(label = "Recovery Phrase", subHeading = " ")
+    @* @multiStepNavigator() *@
+
+    @successModalAddressBox(Symbol("address") -> address)
+
+    <div class="form-copy-item">
+        <div class="form-copy-text">@Messages(constants.View.RECOVERY_PHRASE)</div>
+    </div>
+    <div class="form-seed-box-list">
+        @partialMnemonics.zipWithIndex.map {case(word, index) =>
+            @seedInput(((index.toInt)+1).toString, Symbol("phrase") -> word, Symbol("class") -> "disable")
+        }
+    </div>
+    <div class="form-information-message">
+        <div class="form-information-icon"><img src="@routes.Assets.versioned("images/info.png")"/></div>
+        <div class="form-information-text">@Messages(constants.View.CREATE_WALLET_INFO)</div>
+    </div>
+    <div class="form-heading">@Messages(constants.View.CREATE_WALLET_SAFETY_POINTS_TITLE)</div>
+    <div class="form-bullet-list">
+        <ul>
+            <li>@Messages(constants.View.CREATE_WALLET_SAFETY_POINT_1)</li>
+            <li>@Messages(constants.View.CREATE_WALLET_SAFETY_POINT_2)</li>
+            <li>@Messages(constants.View.CREATE_WALLET_SAFETY_POINT_3)</li>
+        </ul>
+    </div>
+
+    <div class="form-button">
+        <button class="form-secondary-button" onclick="closeModal()">@Messages(constants.View.CANCEL)</button>
+        <button class="form-primary-button" onclick="showHideModalScreen('#verificationForm','#wallet-mnemonics')">@Messages(constants.View.NEXT)</button>
+    </div>
 </div>
 
 <div id="verificationForm" style="display: none;">
     @views.html.account.verifyWalletMnemonics(walletMnemonicsForm, username, address, partialMnemonics)
 </div>
-
-<script src="@routes.Assets.versioned("javascripts/account/walletMnemonics.js")" type="text/javascript"></script>

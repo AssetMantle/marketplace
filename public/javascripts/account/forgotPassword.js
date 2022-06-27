@@ -1,3 +1,6 @@
+// Hide submit button
+$("#formSubmitButton").hide();
+
 function showPassword() {
     let password = $('#forgotNewPassword')[0];
     let matchPassword = $('#forgotNewConfirmPassword')[0];

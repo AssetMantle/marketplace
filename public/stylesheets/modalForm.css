@@ -412,7 +412,7 @@
     padding: 12px 14px;
     margin-top: 30px;
     font-family: var(--font-type-2);
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 400;
     font-style: normal;
 }
@@ -587,7 +587,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    text-transform: capitalize;
     padding: 9px 0;
     outline:none;
 }
@@ -737,7 +736,7 @@
     right:-1px;
     top:6px;
 }
-.progress-bar li.progress-bar__dot {
+.progress-bar li .progress-bar__dot {
     display: block;
     width: 20px;
     border-radius: 10px;
@@ -745,13 +744,13 @@
     aspect-ratio: 1;
     /*border: 2px solid #ff8552;*/
     /*background-color: white;*/
-    cursor: pointer;
+    /*cursor: pointer;*/
     transition: all 0.5s ease;
     background: var(--popup-bg);
     box-shadow: inset 0px 0px 0px 2px var(--popup-bg), 0px 0px 0px 2px var(--mantle-off-white);
     z-index: 99;
 }
-.progress-bar li.progress-bar__dot.full {
+.progress-bar li .progress-bar__dot.full {
     background: var(--radial);
     box-shadow: inset 0px 0px 0px 2px var(--popup-bg), 0px 0px 0px 2px var(--dark);
 }
@@ -942,6 +941,11 @@
     background: var(--disable-yellow) !important;
     cursor: none;
     pointer-events: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 #formSubmitButton{
     display: flex;
@@ -1102,4 +1106,61 @@ dl .info:after {
     line-height: 17px;
     color: var(--mantle-off-white);
     padding: 24px 16px 24px 24px;
+}
+
+/* Field Level Error */
+dl dd.error{
+    margin-top: 8px;
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--gray);
+    position: relative;
+}
+dl dd.error:before{
+    content: '';
+    background-image: url("../images/icon/error.png");
+    position: absolute;
+    left:0px;
+}
+
+/* Global Level Error */
+.toast {
+    margin-bottom: 25px;
+    border-radius: 8px;
+    background: #2c0c0f;
+    padding: 8px 16px 8px 16px;
+    box-shadow: 0 6px 20px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    font-family: var(--font-type-2);
+    border:2px solid var(--error);
+}
+.toast .toast-content {
+    display: flex;
+    align-items: center;
+}
+.toast-content .check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    min-width: 30px;
+    /*background-color: var(--dark);*/
+    border-radius: 50%;
+}
+.toast-content .message {
+    display: flex;
+    flex-direction: column;
+    margin: 0 16px;
+}
+.message .text {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text-medium);
+}
+.message .text.text-1 {
+    font-weight: 600;
+    color: var(--mantle-off-white);
 }

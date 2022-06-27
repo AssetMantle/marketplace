@@ -5,7 +5,7 @@ function componentResource(source, route, loadingSpinnerID = 'commonSpinner', ev
         url: route.url,
         type: route.type,
         async: true,
-        global: showSpinner(event),
+        // global: showSpinner(event),
         beforeSend: function () {
             loadingSpinner.show();
         },

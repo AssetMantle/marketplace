@@ -4,12 +4,34 @@
 @(walletMnemonicsForm: Form[WalletMnemonics.Data] = WalletMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div>
-    @commonForm(constants.Form.VERIFY_WALLET_MNEMONICS, walletMnemonicsForm) {
+    @commonForm(constants.Form.VERIFY_WALLET_MNEMONICS, walletMnemonicsForm, isModal = true, showBackButton = true, showScreen = "#wallet-mnemonics", hideScreen = "#verificationForm") {
+
         @commonInputText(walletMnemonicsForm, constants.FormField.USERNAME, Symbol("value") -> username, Symbol("readonly") -> "readonly", Symbol("class") -> "hidden")
         @commonInputText(walletMnemonicsForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly", Symbol("class") -> "hidden")
-        @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_1)
-        @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_2)
-        @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_3)
-        @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_4)
+        <div class="form-copy-item">
+            <div class="form-copy-text">@Messages(constants.View.CONFIRM_RECOVERY_PHRASE)</div>
+        </div>
+        <div class="form-seed-box-list">
+            <div class="form-seed-box">
+                <div class="form-seed-box-number">1</div>
+                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_1, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
+            </div>
+            <div class="form-seed-box">
+                <div class="form-seed-box-number">2</div>
+                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_2, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
+            </div>
+            <div class="form-seed-box">
+                <div class="form-seed-box-number">3</div>
+                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_3, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
+            </div>
+            <div class="form-seed-box">
+                <div class="form-seed-box-number">4</div>
+                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_4, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
+            </div>
+        </div>
+        <div class="form-information-message">
+            <div class="form-information-icon"><img src="@routes.Assets.versioned("images/info.png")"/></div>
+            <div class="form-information-text">@Messages(constants.View.PHRASE_VERIFICATION_WARNING)</div>
+        </div>
     }
 </div>

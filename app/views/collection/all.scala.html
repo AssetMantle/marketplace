@@ -1,2 +1,76 @@
+@import views.html.base.profile.components._
+
 @(collections: Seq[master.Collection])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="profileContainer">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-md-3 col-lg-3 col-xl-2">
+                @*                        <div class="sticky-top item-sticky">*@
+                @*                            @creatorProfileCard()*@
+                @*                            @creatorStatsCard()*@
+                @*                        </div>*@
+            </div>
+            <div class="col-12 col-md-6 col-lg-6 col-xl-8">
+                <div class="item item-center">
+                    <div class="profile-card">
+                        <div class="profiles-container">
+                            <div class="d-flex flex-xl-row flex-lg-column align-items-center justify-content-between card-header">
+                                <div class="left-option">
+                                    <div class="row">
+                                        <div class="col mx-3 p-0 active">@Messages(constants.View.ART)</div>
+                                        <div class="col mx-3 p-0 disable">@Messages(constants.View.MISC)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                                <!-- NFT List -->
+                            <div class="nft-list me-3">
+                                <div class="collection-link">Collection Name</div>
+                                <div class="nft-list">
+                                    <div class="row">
+                                        <div class="col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-2">
+                                        @singleNFTCard()
+                                        </div>
+                                        <div class="col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-2">
+                                        @singleNFTCard()
+                                        </div>
+                                        <div class="col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-2">
+                                        @singleNFTCard()
+                                        </div>
+                                        <div class="col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-2">
+                                        @singleNFTCard()
+                                        </div>
+                                        <div class="col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-2">
+                                        @singleNFTCard()
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                                <!-- Collection List: Grid View -->
+                            <div class="profile-list">
+                                <ol class="list grid-view-filter">
+                                    @collections.zipWithIndex.map {case(collection, index) =>
+                                        @* @collection.name
+                                        @collection.description *@
+                                        <li>
+                                            @gridViewProfileCard(cover = "tempBG.png", profile = "TempUserProfile.png", creatorName = collection.name, creatorAbout = collection.description)
+                                        </li>
+                                    }
+                                </ol>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-3 col-lg-3 col-xl-2">
+                @*                        <div class="sticky-top item-sticky">*@
+                @*                        @userActivityCard()*@
+                @*                        </div>*@
+            </div>
+        </div>
+    </div>
+</div>
 
