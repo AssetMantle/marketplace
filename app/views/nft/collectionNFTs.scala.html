@@ -6,3 +6,8 @@
         <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(nft.compressedFile)">
         </div>
     }
+@views.html.base.common(constants.View.COLLECTION)
+
+<script>
+        componentResource('centerContent', jsRoutes.controllers.NFTController.collectionAllNFT())
+</script>

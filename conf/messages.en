@@ -84,7 +84,7 @@ SIGN_UP_SIGN_IN_MESSAGE = Already have an account?
 #//Create Wallet
 CREATE_WALLET_TITLE = Create a Wallet
 CREATE_WALLET_SAFETY_POINTS_TITLE = Important points to consider:
-CREATE_WALLET_SAFETY_POINT_1 = Users need to securely note down their username and recovery phrase using pen and paper. Losing or exposing the recovery phrase can potentially lead to users' funds or assets being stolen.
+CREATE_WALLET_SAFETY_POINT_1 = Users need to securely note down their address and recovery phrase using pen and paper. Losing or exposing the recovery phrase can potentially lead to users' funds or assets being stolen.
 CREATE_WALLET_SAFETY_POINT_2 = Users can use recovrey phrase to back up and restore their accounts in case they forget their password.
 CREATE_WALLET_SAFETY_POINT_3 = Do not share your recovery phrase with anyone.
 COPY_SEED_MESSAGE = Copy seed phrase
@@ -124,6 +124,7 @@ SIGN_IN_FORGOT_PASSWORD = Forgot Password?
 SIGN_IN_SIGN_UP_MESSAGE = Don’t have an account yet?
 SIGN_IN_SIGN_UP = Sign up
 RESPONSE.FAILURE.INVALID_USERNAME_OR_PASSWORD = Invalid Username or Password.
+RESPONSE.FAILURE.MASTER_ACCOUNT_NOT_FOUND = Account not found.
 
 #//Forgot Password
 FORGOT_PASSWORD_USERNAME_TITLE = Forgot Password
