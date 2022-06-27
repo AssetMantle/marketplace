@@ -3,7 +3,7 @@
 
 @(walletMnemonicsForm: Form[WalletMnemonics.Data] = WalletMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <!-- Wallet Mnemonics -->
-<div id="wallet-mnemonics">
+<div id="walletMnemonics">
     @formHeader(label = "Recovery Phrase", subHeading = " ")
     @* @multiStepNavigator() *@
 
@@ -32,7 +32,7 @@
 
     <div class="form-button">
         <button class="form-secondary-button" onclick="closeModal()">@Messages(constants.View.CANCEL)</button>
-        <button class="form-primary-button" onclick="showHideModalScreen('#verificationForm','#wallet-mnemonics')">@Messages(constants.View.NEXT)</button>
+        <button class="form-primary-button" onclick="showHideModalScreen('#verificationForm','#walletMnemonics')">@Messages(constants.View.NEXT)</button>
     </div>
 </div>
 
