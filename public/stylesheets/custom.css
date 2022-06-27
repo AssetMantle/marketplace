@@ -34,13 +34,13 @@
     padding: 0;
 }
 a{
-    text-decoration: none;
+    text-decoration: none !important;
     cursor: pointer;
 }
 ul{
     list-style: none;
     margin: 0px;
-    padding: 0px;
+    padding: 0px !important;
 }
 body{
     /*height: 100vh;*/

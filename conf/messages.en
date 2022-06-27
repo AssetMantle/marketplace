@@ -126,6 +126,8 @@ SIGN_IN_SIGN_UP = Sign up
 RESPONSE.FAILURE.INVALID_USERNAME_OR_PASSWORD = Invalid Username or Password.
 
 #//Forgot Password
+FORGOT_PASSWORD_USERNAME_TITLE = Forgot Password
+FORGOT_PASSWORD_USERNAME_SUBTITLE = Enter your username to reset password.
 FORM.FORGOT_PASSWORD_USERNAME.TITLE = Forgot Password
 FORM.FORGOT_PASSWORD_USERNAME.SUBTITLE = Enter your username to reset password.
 FORM.FORGOT_PASSWORD_USERNAME.SUBMIT = Next
@@ -138,13 +140,15 @@ FORM.FORGOT_PASSWORD_NEW_PASSWORD.SUBMIT = Next
 FORGOT_PASSWORD = Password
 FORGOT_CONFIRM_PASSWORD = Confirm Password
 SEED_PHRASE_MESSAGE = Enter your Seed Phrase
-SEED_PHRASE_WARNING_MESSAGE = Do not share seed phrase with anyone.
+SEED_PHRASE_WARNING_MESSAGE = Do not share recovery phrase with anyone.
 NEW_PASSWORD_RULE_1 = 8 to 128 characters
 NEW_PASSWORD_RULE_2 = One number
 NEW_PASSWORD_RULE_3 = One Upper case letter
 NEW_PASSWORD_RULE_4 = One special character (!@@#$%^&*./-_)
 FORGOT_PASSWORD_SUCCESS_TITLE = Password Reset successful
 FORGOT_PASSWORD_SUCCESS_SUBTITLE = Your password has been reset successfully. Sign in to continue.
+FORGOT_PASSWORD_SEED_PHRASE_SUBTITLE = Confirm your recovery phrase to reset your password.
+FORGOT_PASSWORD_NEW_PASSWORD_SUBTITLE = Enter a new password.
 
 #//Profile
 TRANSACTION_DETAILS = Transaction Details

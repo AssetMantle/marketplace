@@ -39,6 +39,7 @@ nav .content {
 }
 
 nav .content .links {
+    margin: 0px;
     margin-left: 80px;
     display: flex;
 }
@@ -139,6 +140,7 @@ nav .content .links {
 .right-menu{
     display: flex;
     align-items: center;
+    color: var(--mantle-off-white);
     /*gap: 10px;*/
 }
 .right-menu .account-menu{

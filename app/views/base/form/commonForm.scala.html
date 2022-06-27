@@ -2,14 +2,37 @@
 @import views.html.base.buttons._
 @import views.html.base.forms._
 
-@(formTemplate: constants.Form, formData: Form[_], backButton: Int = 0, showScreen:String = "", hideScreen:String = "", isModal:Boolean = false, submitDisable:Boolean = false, target:String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+@(formTemplate: constants.Form, formData: Form[_], showBackButton: Boolean = false, closeButton:Boolean = true, showSubtitle: Boolean = true, showScreen:String = "", hideScreen:String = "", isModal:Boolean = false, submitDisable:Boolean = false, target:String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @form(action = formTemplate.post, Symbol("onkeypress") -> "submitFormOnEnter(event,this)") {
 @*    <fieldset>*@
-    @if(backButton == 0){
-        @formHeader(label=Messages(formTemplate.title),subHeading = Messages(formTemplate.subTitle))
-    } else{
-        @formHeaderWithBackButton(heading=Messages(formTemplate.title),subHeading = Messages(formTemplate.subTitle), showScreen = showScreen, hideScreen = hideScreen)
+    @if(showSubtitle) {
+        @if(showBackButton){
+            <div class="header-with-icon">
+                <div class="form-top">
+                    <div class="title-icon back-button-icon" onclick="showHideModalScreen('@showScreen', '@hideScreen')">
+                        <img src="@routes.Assets.versioned("images/backArrow.png")"/>
+                    </div>
+                    <div class="title-text">@Messages(formTemplate.title)</div>
+                    @if(closeButton){
+                        <a class="form-close-btn close-modal" onclick="closeModal()"></a>
+                    }
+                </div>
+                @if(showSubtitle){
+                    <div class="form-sub-title">@Messages(formTemplate.subTitle)</div>
+                }
+            </div>
+        } else{
+            <div class="header">
+                <div class="form-top">
+                    <div class="form-title">@Messages(formTemplate.title)</div>
+                    <a class="form-close-btn close-modal" onclick="closeModal()"></a>
+                </div>
+                @if(showSubtitle){
+                    <div class="form-sub-title">@Messages(formTemplate.subTitle)</div>
+                }
+            </div>
+        }
     }
     @if(formData.hasGlobalErrors) {
         <ul id="formGlobalErrors">
@@ -44,7 +67,7 @@
             @if(customSubmit != JavaScript("")) {
                 @commonJavascriptButton(formTemplate.submit, customSubmit)
             } else {
-                @if(submitDisable == true){
+                @if(submitDisable){
                     @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"), Symbol("class") -> "disable")
                 }else{
                     @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"))
