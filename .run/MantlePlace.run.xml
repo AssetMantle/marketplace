@@ -20,7 +20,6 @@
         <entry key="POSTGRES_USER" value="mantlePlace" />
         <entry key="ROOT_FILE_PATH" value="$USER_HOME$/" />
         <entry key="SITE_URL" value="https://staging.marketplace.assetmantle.one" />
-        <entry key="UPLOAD_COLLECTION_PATH" value="$USER_HOME$/upload.json" />
       </map>
     </option>
     <option name="play2IsNonDefaultInstallDirUsed" value="false" />

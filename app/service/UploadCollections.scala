@@ -2,7 +2,7 @@ package service
 
 import exceptions.BaseException
 import models.master
-import models.master.Property
+import models.master.{Collection, Property}
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import play.api.{Configuration, Logger}
@@ -23,7 +23,7 @@ class UploadCollections @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val uploadCollectionFilePath = configuration.get[String]("upload.uploadCollectionPath")
+  private val uploadCollectionFilePath = constants.CommonConfig.Files.ColectionPath + "/upload.json"
 
   abstract class NftProperty {
     def toStringProperty: StringProperty
@@ -81,15 +81,17 @@ class UploadCollections @Inject()(
     val ipfsHash = ipfsDetails(0)
     val fileName = ipfsDetails(1)
     val oldFilePath = constants.CommonConfig.Files.RootFilePath + uploadCollection.imagePath + "/" + fileName
-    val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
-    val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(fileName)
     val ipfsPath = if (uploadCollection.uploadToIPFS) {
       val file = new File(oldFilePath)
+      val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
+      val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(fileName)
       utilities.IPFS.pinFile(file, newFileName).IpfsHash
-    } else if (uploadCollection.downloadFromIPFS) {
-      utilities.IPFS.downloadFile(ipfsHash + "/" + fileName, oldFilePath)
-      ipfsHash + "/" + fileName
     } else ipfsHash + "/" + fileName
+    if (uploadCollection.downloadFromIPFS) {
+      utilities.IPFS.downloadFile(ipfsHash + "/" + fileName, oldFilePath)
+    }
+    val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
+    val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(fileName)
     println(ipfsPath)
     val awsKey = uploadCollection.name + "/" + newFileName
     val newFilePath = constants.CommonConfig.Files.ColectionPath + "/" + awsKey
@@ -116,24 +118,34 @@ class UploadCollections @Inject()(
     val uploads = readFile[Seq[UploadCollection]](uploadCollectionFilePath)
 
     def processDir(uploadCollections: Seq[UploadCollection]) = utilitiesOperations.traverse(uploadCollections) { uploadCollection =>
-      val collectionID = masterCollections.Service.add(name = uploadCollection.name, description = uploadCollection.description)
-      val collections = getListOfFiles(constants.CommonConfig.Files.RootFilePath + uploadCollection.jsonPath)
-      val collectionProcess = utilitiesOperations.traverse(collections) { filePath =>
-        val nftDetails = readFile[NFT](filePath)
+      val allCollections = masterCollections.Service.fetchAll()
 
-        (for {
-          collectionID <- collectionID
-          nftDetails <- nftDetails
-          _ <- addNfts(collectionID, nftDetails, uploadCollection)
-        } yield ()
-          ).recover {
-          case exception: Exception => logger.error(exception.getLocalizedMessage)
-            throw new BaseException(constants.Response.COLLECTION_UPLOAD_ERROR)
+      def addCollection(allCollections: Seq[Collection]): Future[Unit] = if (!allCollections.map(_.name).contains(uploadCollection.name)) {
+        val collectionID = masterCollections.Service.add(name = uploadCollection.name, description = uploadCollection.description)
+        val collections = getListOfFiles(constants.CommonConfig.Files.RootFilePath + uploadCollection.jsonPath)
+
+        def addCollectionNfts(collectionID: String) = utilitiesOperations.traverse(collections) { filePath =>
+          val nftDetails = readFile[NFT](filePath)
+
+          (for {
+            nftDetails <- nftDetails
+            _ <- addNfts(collectionID, nftDetails, uploadCollection)
+          } yield ()
+            ).recover {
+            case exception: Exception => logger.error(exception.getLocalizedMessage)
+              throw new BaseException(constants.Response.COLLECTION_UPLOAD_ERROR)
+          }
         }
-      }
+
+        for {
+          collectionID <- collectionID
+          _ <- addCollectionNfts(collectionID)
+        } yield ()
+      } else Future()
 
       for {
-        collectionProcess <- collectionProcess
+        allCollections <- allCollections
+        collectionProcess <- addCollection(allCollections)
       } yield collectionProcess
     }
 
