@@ -16,6 +16,7 @@ function componentResource(source, route, loadingSpinnerID = 'commonSpinner', ev
         },
         statusCode: {
             200: function (data) {
+                // console.log(data);
                 div.html(data);
             },
             401: function (data) {

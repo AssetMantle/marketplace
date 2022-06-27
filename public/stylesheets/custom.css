@@ -79,7 +79,10 @@ body.modal-active{
     /*border-radius: 10px;*/
 }
 
-
+.common-container{
+    position: relative;
+    top: 100px;
+}
 
 
 /* Footer */
