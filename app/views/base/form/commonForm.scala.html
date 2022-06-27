@@ -2,20 +2,37 @@
 @import views.html.base.buttons._
 @import views.html.base.forms._
 
-@(formTemplate: constants.Form, formData: Form[_], backButton: Int = 0, isModal:Boolean = false,target:String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+@(formTemplate: constants.Form, formData: Form[_], backButton: Int = 0, showScreen:String = "", hideScreen:String = "", isModal:Boolean = false, submitDisable:Boolean = false, target:String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @form(action = formTemplate.post, Symbol("onkeypress") -> "submitFormOnEnter(event,this)") {
 @*    <fieldset>*@
     @if(backButton == 0){
         @formHeader(label=Messages(formTemplate.title),subHeading = Messages(formTemplate.subTitle))
     } else{
-        @formHeaderWithBackButton(heading=Messages(formTemplate.title),subHeading = Messages(formTemplate.subTitle))
+        @formHeaderWithBackButton(heading=Messages(formTemplate.title),subHeading = Messages(formTemplate.subTitle), showScreen = showScreen, hideScreen = hideScreen)
     }
     @if(formData.hasGlobalErrors) {
         <ul id="formGlobalErrors">
-        @for(error <- formData.globalErrors) {
-            <li>@error.format</li>
-        }
+
+            <div class="toast active">
+
+                <div class="toast-content">
+@*                    <i class="fas fa-solid fa-check check"></i>*@
+                    <img src="@routes.Assets.versioned("images/icon/error.png")" class="check"/>
+
+                    <div class="message">
+                        <span class="text text-1">Error</span>
+                        @for(error <- formData.globalErrors) {
+                            <li>
+                                <span class="text text-2">@error.format</span>
+                            </li>
+                        }
+
+                    </div>
+                </div>
+            </div>
+
+
         </ul>
     }
 
@@ -27,7 +44,12 @@
             @if(customSubmit != JavaScript("")) {
                 @commonJavascriptButton(formTemplate.submit, customSubmit)
             } else {
-                @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"))
+                @if(submitDisable == true){
+                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"), Symbol("class") -> "disable")
+                }else{
+                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"))
+                }
+
             }
             </div>
         </div>

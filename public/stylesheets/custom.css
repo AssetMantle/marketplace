@@ -35,6 +35,7 @@
 }
 a{
     text-decoration: none;
+    cursor: pointer;
 }
 ul{
     list-style: none;
@@ -43,7 +44,7 @@ ul{
 }
 body{
     /*height: 100vh;*/
-    background-color:#030301;
+    background-color:#030301 !important;
     background-image: url("../images/background.webp");
     /*background-repeat: no-repeat;*/
     /*background-size: cover;*/

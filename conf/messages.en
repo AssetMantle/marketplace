@@ -76,6 +76,10 @@ REPEAT_PASSWORD_MISMATCH = Password mismatched. Please check the password and tr
 SIGN_UP_TOOLTIP = Username once lost cannot be retrieved. Please store it in a secure place.
 TERMS_CONDITION_MESSAGE = By creating an account, the user agrees to AssetMantle's
 TERMS_CONDITION_LABEL = Terms and conditions
+RESPONSE.FAILURE.USERNAME_UNAVAILABLE = Username is not available.
+RESPONSE.FAILURE.PASSWORDS_DO_NOT_MATCH = Password do not match.
+RESPONSE.FAILURE.INVALID_MNEMONICS = Invalid mnemonics.
+SIGN_UP_SIGN_IN_MESSAGE = Already have an account?
 
 #//Create Wallet
 CREATE_WALLET_TITLE = Create a Wallet
@@ -119,7 +123,7 @@ INCORRECT_PASSWORD = Password incorrect. Please check the password and try again
 SIGN_IN_FORGOT_PASSWORD = Forgot Password?
 SIGN_IN_SIGN_UP_MESSAGE = Don’t have an account yet?
 SIGN_IN_SIGN_UP = Sign up
-
+RESPONSE.FAILURE.INVALID_USERNAME_OR_PASSWORD = Invalid Username or Password.
 
 #//Forgot Password
 FORM.FORGOT_PASSWORD_USERNAME.TITLE = Forgot Password
@@ -152,3 +156,7 @@ WISHLIST = Wishlist
 SORT = Sort
 FILTER = Filter
 BUYNOW = Buy Now
+
+#//Collection
+ART = Art
+MISC = Misc

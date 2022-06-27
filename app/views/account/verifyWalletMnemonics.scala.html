@@ -1,11 +1,10 @@
 @import views.account.companion.WalletMnemonics
 @import views.html.base.form._
-@import views.html.base.forms.seedInput
 
 @(walletMnemonicsForm: Form[WalletMnemonics.Data] = WalletMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div>
-    @commonForm(constants.Form.VERIFY_WALLET_MNEMONICS, walletMnemonicsForm, isModal = true) {
+    @commonForm(constants.Form.VERIFY_WALLET_MNEMONICS, walletMnemonicsForm, isModal = true, backButton = 1, showScreen = "#wallet-mnemonics", hideScreen = "#verificationForm") {
 
         @commonInputText(walletMnemonicsForm, constants.FormField.USERNAME, Symbol("value") -> username, Symbol("readonly") -> "readonly", Symbol("class") -> "hidden")
         @commonInputText(walletMnemonicsForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly", Symbol("class") -> "hidden")

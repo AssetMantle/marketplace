@@ -26,12 +26,14 @@ function checkUsernameAvailable(source, usernameAvailableCheckBoxID) {
                         200: function () {
                             usernameAvailableCheckBox[0].checked = true;
                             $("#checkIcon").fadeIn();
-                            $("#usernameAvailableError").fadeOut();
+                            $("#usernameAvailableError").hide(300);
+                            $("#signUpUsername").css("border-color","var(--dark)");
                         },
                         204: function () {
                             usernameAvailableCheckBox[0].checked = false;
                             $("#checkIcon").fadeOut();
-                            $("#usernameAvailableError").fadeIn();
+                            $("#usernameAvailableError").show(300);
+                            $("#signUpUsername").css("border-color","var(--error)");
                         },
                     }
                 });
@@ -69,3 +71,22 @@ function checkPasswords() {
         $('#signUpConfirmPassword').css("border-color","var(--default)");
     }
 }
+
+function activeButton(){
+    // let signUpUsername = document.getElementById("signUpUsername");
+    // let signUpPassword = document.getElementById("signUpPassword");
+    // let signUpConfirmPassword = document.getElementById("signUpConfirmPassword");
+    let termsCondition = document.getElementById("termsCondition");
+    // if ($.trim(signUpUsername.value).length && $.trim(signUpPassword.value).length && $.trim(signUpConfirmPassword.value).length && termsCondition.checked === true){
+    if (termsCondition.checked === true){
+        $(".cmuk-button").removeClass("disable");
+    } else {
+        $(".cmuk-button").addClass("disable");
+    }
+}
+
+function changeFieldBorder(){
+    $("#signUpUsername:focus").css("border-color","var(--dark)");
+    $("#signUpUsername:not(:focus)").css("border-color","var(--inactive-gray)");
+}
+

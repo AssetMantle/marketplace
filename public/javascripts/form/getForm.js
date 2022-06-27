@@ -7,11 +7,14 @@ function getForm(route, modal = '#commonModal', modalContent = '#modal-content')
         statusCode: {
             200: function (data) {
                 // modal.html(data);
-                $(modalContent).html(data);
-                $(modal).addClass('active');
-                $(modal+" .modal").addClass('active');
+                $(modal+" .modal").removeClass('active');
+                setTimeout(function(){
+                    $(modalContent).html(data);
+                    $(modal).addClass('active');
+                    $(modal+" .modal").addClass('active');
+                    $("body").addClass('modal-active');
+                },1000);
 
-                $("body").addClass('modal-active');
             },
             500: function (data) {
                 replaceDocument(data);

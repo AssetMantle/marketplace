@@ -3,9 +3,11 @@
 
 @(walletMnemonicsForm: Form[WalletMnemonics.Data] = WalletMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <!-- Wallet Mnemonics -->
-<div class="wallet-mnemonics">
+<div id="wallet-mnemonics">
     @formHeader(label = "Recovery Phrase", subHeading = " ")
-    @multiStepNavigator()
+    @* @multiStepNavigator() *@
+
+    @successModalAddressBox(Symbol("address") -> address)
 
     <div class="form-copy-item">
         <div class="form-copy-text">@Messages(constants.View.RECOVERY_PHRASE)</div>
@@ -30,12 +32,10 @@
 
     <div class="form-button">
         <button class="form-secondary-button" onclick="closeModal()">@Messages(constants.View.CANCEL)</button>
-        <button class="form-primary-button" onclick="showVerificationForm()">@Messages(constants.View.NEXT)</button>
+        <button class="form-primary-button" onclick="showHideModalScreen('#verificationForm','#wallet-mnemonics')">@Messages(constants.View.NEXT)</button>
     </div>
 </div>
 
 <div id="verificationForm" style="display: none;">
     @views.html.account.verifyWalletMnemonics(walletMnemonicsForm, username, address, partialMnemonics)
 </div>
-
-<script src="@routes.Assets.versioned("javascripts/account/walletMnemonics.js")" type="text/javascript"></script>

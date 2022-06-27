@@ -457,6 +457,10 @@ var swiper = new Swiper(".popular-container .swiper-container", {
 window.onbeforeunload = function () {
     window.scrollTo(0, 0);
 }
+document.onload = function (){
+    window.scrollTo(0,0);
+}
+
 
 // Text Copy to Clipboard
 $(".form-address-box .form-copy-icon").on("click",function (){
@@ -521,4 +525,14 @@ function goToStep(stepNumber){
 //     lastScroll = currentScroll;
 // });
 
+
+// Show and hide modal screen
+function showHideModalScreen(showScreen, hideScreen){
+    $(".modal").removeClass('active');
+    setTimeout(function(){
+        $(hideScreen).hide()
+        $(showScreen).show();
+        $(".modal").addClass('active');
+    },1000);
+}
 
