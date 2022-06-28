@@ -125,14 +125,14 @@ class AccountController @Inject()(
     Ok(views.html.account.signOut())
   }
 
-  def signOut: Action[AnyContent] = withLoginActionAsync { loginState =>
+  def signOut: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       SignOut.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.account.signOut(formWithErrors)))
         },
         signOutData => {
-          val pushNotificationTokenDelete = if (!signOutData.receiveNotifications) masterTransactionPushNotificationTokens.Service.deleteByID(loginState.username) else Future(0)
+          val pushNotificationTokenDelete = if (!signOutData.receiveNotifications) masterTransactionPushNotificationTokens.Service.deleteByID(loginState.username) else Future()
           val deleteSessionToken = masterTransactionSessionTokens.Service.deleteById(loginState.username)
 
           (for {
