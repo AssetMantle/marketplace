@@ -2,7 +2,7 @@
 
 <div class="hero-img">
     @coverCollectionFile.fold{
-        <img src="@routes.Assets.versioned("images/defaultCollectionCover")"/>
+        <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
     } { collectionFileData =>
         <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(collectionFileData.file)">
     }

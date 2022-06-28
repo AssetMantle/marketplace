@@ -2,7 +2,7 @@
 
 <div id="profile-img">
     @logoCollectionFile.fold{
-        <img src="@routes.Assets.versioned("images/defaultCollectionProfile")"/>
+        <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
     } { collectionFileData =>
         <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(collectionFileData.file)">
     }
