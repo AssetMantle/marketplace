@@ -1,9 +1,9 @@
 @(logoCollectionFile: Option[master.CollectionFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<div id="profile-img">
-    @logoCollectionFile.fold{
-        <img src="@routes.Assets.versioned("images/defaultCollectionProfile")"/>
-    } { collectionFileData =>
-        <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(collectionFileData.file)">
+<div class="profile-img">
+    @if(logoCollectionFile.isDefined) {
+        <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(logoCollectionFile.get.file)">
+    } else {
+        <img src="@routes.Assets.versioned("images/tempUserProfile.png")"/>
     }
 </div>
