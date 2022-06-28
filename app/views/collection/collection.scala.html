@@ -1,55 +1,17 @@
+@import views.html.base.nft._
+
 @(collection: master.Collection, nfts: Seq[master.NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="profileContainer">
     <div class="item item-center">
         <div class="profile-card">
             <div class="profiles-container">
-
-
                 <div class="nft-list me-3">
                     <div class="collection-link">Collection Name</div>
                     <div class="nft-list">
                         <div class="row">
                             @nfts.map { nft =>
-                                <div class="col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-2">
-                                    <div class="card border-0">
-                                        <div class="card-img">
-                                            <a href="https://ipfs.io/ipfs/@nft.ipfsLink" target="_blank">
-                                                <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(nft.compressedFile)" class="w-100"/>
-                                            </a>
-                                        </div>
-                                        <div class="nft-detail p-3">
-                                            <div class="d-flex flex-row gap-2 nft-creator-detail">
-                                                <div class="creator-profile">
-                                                    <img src="@routes.Assets.versioned("../../../public/images/tempUserProfile.png")" class="rounded-circle" width="34" height="34"/>
-                                                </div>
-                                                <div class="d-flex flex-column">
-                                                    <span class="creator-name">@nft.name</span>
-                                                    <span class="creator-collection-name">@collection.name</span>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex justify-content-between">
-                                                <div class="d-flex flex-row gap-1 align-items-center mt-3">
-                                                    <div class=""><img src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/></div>
-                                                    <div class="nft-mantle-price">--</div>
-                                                    <div class="nft-dollar-price">($--)</div>
-                                                </div>
-                                                <div class="d-flex align-items-center gap-1 mt-3">
-                                                    <div class=""><img src="@routes.Assets.versioned("images/NFTCard/like.png")" width="16" height="16"/></div>
-                                                    <div class="nft-likes">--</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="m-0 nft-separator"></div>
-                                        <div class="d-flex flex-row align-items-center justify-content-between m-3 nft-bottom">
-                                            <div class="setting">
-                                                    <!--<img src="@routes.Assets.versioned("images/NFTCard/meatballMenu.png")"/>-->
-                                            </div>
-                                            <div class="buy-now-btn">@Messages(constants.View.BUYNOW)</div>
-                                        </div>
-                                    </div>
-                                </div>
+                                @commonNFTCard(collection, nft)
                             }
-
                         </div>
                     </div>
                 </div>
@@ -59,5 +21,5 @@
 </div>
 
 <script>
-    checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection().url, '@collection.id', "collection");
+        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection().url, '@collection.id', "collection");
 </script>
