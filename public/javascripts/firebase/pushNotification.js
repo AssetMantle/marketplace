@@ -10,6 +10,7 @@ $(document).ready(function () {
             $('#PUSH_NOTIFICATION_TOKEN').val(token);
         })
         .catch(function (err) {
+            console.log(err)
         });
     //This delivers message in foreground, i.e., when web app is open in browser. https://firebase.google.com/docs/cloud-messaging/js/receive
     messaging.onMessage(function (payload) {

@@ -1,9 +1,9 @@
 package controllers
 
-import controllers.actions.{LoginState, WithoutLoginAction, WithoutLoginActionAsync}
+import controllers.actions._
 import controllers.result.WithUsernameToken
 import exceptions.BaseException
-import models.master
+import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -22,8 +22,11 @@ class AccountController @Inject()(
                                    withoutLoginAction: WithoutLoginAction,
                                    masterAccounts: master.Accounts,
                                    masterWallets: master.Wallets,
+                                   masterTransactionSessionTokens: masterTransaction.SessionTokens,
+                                   masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                                    withUsernameToken: WithUsernameToken,
                                    uploadCollections: UploadCollections,
+                                   withLoginActionAsync: WithLoginActionAsync,
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -112,6 +115,31 @@ class AccountController @Inject()(
           } yield result
             ).recover {
             case baseException: BaseException => NotFound(views.html.account.signIn(SignIn.form.withGlobalError(baseException.failure.message)))
+          }
+        }
+      )
+  }
+
+  def signOutForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.account.signOut())
+  }
+
+  def signOut: Action[AnyContent] = withLoginActionAsync { loginState =>
+    implicit request =>
+      SignOut.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.account.signOut(formWithErrors)))
+        },
+        signOutData => {
+          val pushNotificationTokenDelete = if (!signOutData.receiveNotifications) masterTransactionPushNotificationTokens.Service.deleteByID(loginState.username) else Future(0)
+          val deleteSessionToken = masterTransactionSessionTokens.Service.deleteById(loginState.username)
+
+          (for {
+            _ <- pushNotificationTokenDelete
+            _ <- deleteSessionToken
+          } yield Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

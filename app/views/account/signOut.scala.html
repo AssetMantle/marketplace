@@ -1,0 +1,10 @@
+@import views.html.base.form._
+@import views.account.companion.SignOut
+
+@(signOutForm: Form[SignOut.Data] = SignOut.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="logoutContainer">
+@commonForm(constants.Form.SIGN_OUT, signOutForm) {
+    <p>@Messages(constants.View.SIGN_OUT_CONFIRMATION)</p>
+    @commonCheckbox(signOutForm, constants.FormField.RECEIVE_NOTIFICATIONS)
+}
+</div>

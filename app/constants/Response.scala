@@ -11,6 +11,8 @@ object Response {
   private val INFO_PREFIX = "INFO."
   private val LOG_PREFIX = "LOG."
 
+  val LOGGED_OUT = new Success("LOGGED_OUT")
+
   val ACCOUNT_INSERT_FAILED = new Failure("ACCOUNT_INSERT_FAILED")
   val ACCOUNT_UPSERT_FAILED = new Failure("ACCOUNT_UPSERT_FAILED")
   val ACCOUNT_NOT_FOUND = new Failure("ACCOUNT_NOT_FOUND")
