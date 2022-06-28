@@ -23,7 +23,7 @@
 
 
 .wrapper > nav {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-type-1);
     position: relative;
     display: flex;
     max-width: calc(100% - 200px);
@@ -136,12 +136,22 @@ nav .content .links {
 
 .wrapper .menu-icon {
     display: none;
+    background-image: url("../images/icon/hamburgerMenu.png");
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
 }
 .right-menu{
     display: flex;
     align-items: center;
     color: var(--mantle-off-white);
     /*gap: 10px;*/
+}
+.right-menu .links{
+    display: flex;
+}
+.right-menu .links li a{
+    padding: 9px 17px;
 }
 .right-menu .account-menu{
     height: 70px;
@@ -271,6 +281,9 @@ nav .content .links {
 .content .links ul li:hover ul {
     top: 0;
 }
+.hiddenMenu{
+    display: none;
+}
 
 /* Responsive code start */
 @media screen and (max-width: 1250px) {
@@ -298,13 +311,19 @@ nav .content .links {
 
 @media screen and (max-width: 900px) {
 
-
-    .wrapper .menu-icon {
+    .hiddenMenu{
         display: block;
     }
+    .right-menu ul li{
+        display: none;
+    }
+    .wrapper .menu-icon {
+        display: block;
+        margin-left:10px;
+    }
 
-    .wrapper #show-menu:checked ~ .menu-icon i::before {
-        content: "\e9b8";
+    .wrapper #show-menu:checked ~ .menu-icon{
+        background-image: url("../images/icon/menuClose.png");
     }
 
     nav .content .links {
@@ -360,6 +379,8 @@ nav .content .links {
     }
 
     .content .links #show-features:checked ~ ul,
+    .content .links #show-features2:checked ~ ul,
+    .content .links #show-features3:checked ~ ul,
     .content .links #show-services:checked ~ ul,
     .content .links #show-items:checked ~ ul {
         max-height: 112px;
@@ -376,7 +397,10 @@ nav .content .links {
         pointer-events: none;
         transition: transform .5s ease;
     }
-    .content .links #show-features:checked ~ ul:before{
+    .content .links #show-features:checked ~ ul:before,
+    .content .links #show-features2:checked ~ ul:before,
+    .content .links #show-features3:checked ~ ul:before
+    {
         transform: rotate(0deg);
     }
     .content .links li:hover > ul {
