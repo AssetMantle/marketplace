@@ -1,6 +1,6 @@
 package models.master
 
-import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
+import models.Trait.{Entity2, GenericDaoImpl2, Logged, ModelTable2}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -29,17 +29,21 @@ object CollectionFiles {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class CollectionFileSerialized(id: String, documentType: String, fileName: String, file: Array[Byte], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
+  case class CollectionFileSerialized(id: String, documentType: String, fileName: String, file: Array[Byte], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity2[String, String] {
     def deserialize: CollectionFile = CollectionFile(id = id, documentType = documentType, fileName = fileName, file = file, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+
+    def id1: String = id
+
+    def id2: String = documentType
   }
 
-  class CollectionFileTable(tag: Tag) extends Table[CollectionFileSerialized](tag, "CollectionFile") with ModelTable[String] {
+  class CollectionFileTable(tag: Tag) extends Table[CollectionFileSerialized](tag, "CollectionFile") with ModelTable2[String, String] {
 
     def * = (id, documentType, fileName, file, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (CollectionFileSerialized.tupled, CollectionFileSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def documentType = column[String]("documentType")
+    def documentType = column[String]("documentType", O.PrimaryKey)
 
     def fileName = column[String]("fileName")
 
@@ -57,6 +61,9 @@ object CollectionFiles {
 
     def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
+    def id1 = id
+
+    def id2 = documentType
   }
 
   lazy val TableQuery = new TableQuery(tag => new CollectionFileTable(tag))
@@ -66,7 +73,7 @@ object CollectionFiles {
 class CollectionFiles @Inject()(
                                  protected val databaseConfigProvider: DatabaseConfigProvider
                                )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[CollectionFiles.CollectionFileTable, CollectionFiles.CollectionFileSerialized, String](
+  extends GenericDaoImpl2[CollectionFiles.CollectionFileTable, CollectionFiles.CollectionFileSerialized, String, String](
     databaseConfigProvider,
     CollectionFiles.TableQuery,
     executionContext,
@@ -89,6 +96,8 @@ class CollectionFiles @Inject()(
         _ <- create(collectionFile.serialize())
       } yield id
     }
+
+    def get(id: String, documentType: String): Future[Option[CollectionFile]] = getById(id1 = id, id2 = documentType).map(_.map(_.deserialize))
 
     def fetchAll(): Future[Seq[CollectionFile]] = getAll.map(_.map(_.deserialize))
 

@@ -10,7 +10,7 @@ object CommonConfig {
   private val config: Configuration = Configuration(ConfigFactory.load())
   val logLang: Lang = Lang(config.get[String]("play.log.lang"))
   val webAppUrl: String = config.get[String]("webApp.url")
-  val webAppCacheDuration: Duration = Duration(config.get[Int]("webApp.cacheDuration"), MILLISECONDS)
+  val WebAppCacheDuration: Duration = Duration(config.get[Int]("webApp.cacheDuration"), MILLISECONDS)
 
   val sessionTokenTimeout: Long = config.get[Long]("play.http.session.token.timeout")
 

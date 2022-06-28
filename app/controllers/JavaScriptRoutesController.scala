@@ -1,6 +1,5 @@
 package controllers
 
-import play.api.http.MimeTypes
 import play.api.mvc._
 import play.api.routing._
 import play.api.{Configuration, Logger}
@@ -23,9 +22,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.signInForm,
         routes.javascript.AccountController.forgetPasswordForm,
 
+        routes.javascript.CollectionController.viewCollections,
+        routes.javascript.CollectionController.viewCollection,
         routes.javascript.CollectionController.all,
+        routes.javascript.CollectionController.collection,
+        routes.javascript.CollectionController.collectionFile,
 
-        routes.javascript.NFTController.collectionAllNFT,
         routes.javascript.NFTController.get,
       )
     ).as("text/javascript")

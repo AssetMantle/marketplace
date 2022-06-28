@@ -24,4 +24,9 @@ object File {
     val PROFILE_PICTURE = "PROFILE_PICTURE"
   }
 
+  object Collection {
+    val COVER_IMAGE= "COVER_IMAGE"
+    val PROFILE_IMAGE = "PROFILE_IMAGE"
+  }
+
 }

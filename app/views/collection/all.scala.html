@@ -1,4 +1,4 @@
-@import views.html.base.profile.components._
+@import views.html.base.collection._
 
 @(collections: Seq[master.Collection])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -22,7 +22,7 @@
                             @* @collection.name
                             @collection.description *@
                             <li>
-                                @gridViewProfileCard(cover = "tempBG.png", profile = "TempUserProfile.png", creatorName = collection.name, creatorAbout = collection.description, route = routes.javascript.NFTController.collectionAllNFT, s"'${collection.id}'")
+                                @commonCollectionCard(collection)
                             </li>
                         }
                     </ol>

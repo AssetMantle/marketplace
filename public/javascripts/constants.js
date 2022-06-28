@@ -8,4 +8,4 @@ firebaseConfig = {
     appId: "1:656465615885:web:18bfbb26f03fd043278944",
 };
 
-addState = true
+let addState = true

@@ -12,8 +12,7 @@ import service.UploadCollections
 import views.account.companion._
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AccountController @Inject()(
@@ -24,7 +23,7 @@ class AccountController @Inject()(
                                    masterAccounts: master.Accounts,
                                    masterWallets: master.Wallets,
                                    withUsernameToken: WithUsernameToken,
-                                   uploadCollections:UploadCollections,
+                                   uploadCollections: UploadCollections,
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -101,8 +100,9 @@ class AccountController @Inject()(
           val wallet = masterWallets.Service.tryGetByAccountID(signInData.username)
 
           def getResult(verified: Boolean, wallet: master.Wallet) = if (verified) {
+            implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = signInData.username, address = wallet.address))
             implicit val loginState: LoginState = LoginState(username = signInData.username, address = wallet.address)
-            withUsernameToken.Ok(views.html.collections())
+            withUsernameToken.Ok(views.html.collection.collections(None))
           } else Future(throw new BaseException(constants.Response.INVALID_USERNAME_OR_PASSWORD))
 
           (for {

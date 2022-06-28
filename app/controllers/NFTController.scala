@@ -28,20 +28,6 @@ class NFTController @Inject()(
 
   private implicit val module: String = constants.Module.NFT_CONTROLLER
 
-
-  def collectionAllNFT(collectionId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val collection = masterCollections.Service.tryGet(collectionId)
-      val allNFTs = masterNFTs.Service.getAllForCollection(collectionId)
-      (for {
-        collection <- collection
-        allNFTs <- allNFTs
-      } yield Ok(views.html.nft.collectionNFTs(collection, allNFTs))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
   def get(collectionId: String, nftId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val nft = masterNFTs.Service.tryGet(collectionId, nftId)

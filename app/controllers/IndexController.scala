@@ -25,18 +25,18 @@ class IndexController @Inject()(
 
   private implicit val module: String = constants.Module.HOME_CONTROLLER
 
-  def index: EssentialAction = cached.apply(req => req.path, constants.CommonConfig.webAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
+  def index: EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit optionalLoginState =>
       implicit request =>
-        loginState match {
+        optionalLoginState match {
           case Some(loginState) =>
             implicit val loginStateImplicit: LoginState = loginState
-            withUsernameToken.Ok(views.html.collections())
+            withUsernameToken.Ok(views.html.collection.collections(None))
           case None => Future(Ok(views.html.index()))
         }
 
     }
   }
 
-//  uploadCollections.start()
+  uploadCollections.start()
 }

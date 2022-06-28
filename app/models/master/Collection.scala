@@ -87,6 +87,8 @@ class Collections @Inject()(
 
     def fetchAll(): Future[Seq[Collection]] = getAll.map(_.map(_.deserialize))
 
+    def get(id: String): Future[Option[Collection]] = getById(id).map(_.map(_.deserialize))
+
     def tryGet(id: String): Future[Collection] = tryGetById(id).map(_.deserialize)
 
   }

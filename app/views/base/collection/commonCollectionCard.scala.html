@@ -1,0 +1,21 @@
+@(collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<a onclick="componentResource('centerContent', jsRoutes.controllers.CollectionController.collection('@collection.id'))">
+    <div class="single-profile-card">
+        <div class="profile-section">
+            <div id="collectionCoverImage"></div>
+            <div class="profile-detail">
+                <div id="collectionProfileImage"></div>
+                <div id="content">
+                    <h1>@collection.name</h1>
+                    <p>@collection.description</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</a>
+<script>
+        componentResource('collectionCoverImage', jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.File.Collection.COVER_IMAGE'));
+        componentResource('collectionProfileImage', jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.File.Collection.PROFILE_IMAGE'));
+</script>

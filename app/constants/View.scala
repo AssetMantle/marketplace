@@ -2,7 +2,7 @@ package constants
 
 import scala.language.postfixOps
 
-object View{
+object View {
   val MANTLE_PLACE = "MANTLE_PLACE"
   val NFT_MARKET = "NFT_MARKET"
   val HOME = "HOME"
@@ -124,6 +124,8 @@ object View{
   val TERMS_CONDITION_MESSAGE = "TERMS_CONDITION_MESSAGE"
 
   val COLLECTION = "COLLECTION"
+  val COLLECTIONS = "COLLECTIONS"
+  val COLLECTION_NFTS = "COLLECTION_NFTS"
   val NEXT = "NEXT"
   val CANCEL = "CANCEL"
   val CONFIRM_RECOVERY_PHRASE = "CONFIRM_RECOVERY_PHRASE"

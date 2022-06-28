@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS MASTER."CollectionFile"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("id", "documentType")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."NFT"
