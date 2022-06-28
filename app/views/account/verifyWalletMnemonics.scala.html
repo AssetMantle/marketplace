@@ -4,7 +4,7 @@
 @(walletMnemonicsForm: Form[WalletMnemonics.Data] = WalletMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div>
-    @commonForm(constants.Form.VERIFY_WALLET_MNEMONICS, walletMnemonicsForm, isModal = true, showBackButton = true, showScreen = "#walletMnemonics", hideScreen = "#verificationForm") {
+    @commonForm(constants.Form.VERIFY_WALLET_MNEMONICS, walletMnemonicsForm, isModal = true, showScreen = "#walletMnemonics", hideScreen = "#verificationForm") {
 
         @commonInputText(walletMnemonicsForm, constants.FormField.USERNAME, Symbol("value") -> username, Symbol("readonly") -> "readonly", Symbol("class") -> "hidden")
         @commonInputText(walletMnemonicsForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly", Symbol("class") -> "hidden")

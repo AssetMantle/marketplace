@@ -82,7 +82,7 @@ class AccountController @Inject()(
             } else throw new BaseException(constants.Response.ACCOUNT_NOT_FOUND)
           }
             ).recover {
-            case baseException: BaseException => NotFound(views.html.account.showWalletMnemonics(walletMnemonicsForm = WalletMnemonics.form.withGlobalError(baseException.failure.message), username = walletMnemonicsData.username, address = walletMnemonicsData.walletAddress, partialMnemonics = Seq(walletMnemonicsData.seed1, walletMnemonicsData.seed2, walletMnemonicsData.seed3, walletMnemonicsData.seed4)))
+            case baseException: BaseException => NotFound(views.html.account.verifyWalletMnemonics(walletMnemonicsForm = WalletMnemonics.form.withGlobalError(baseException.failure.message), username = walletMnemonicsData.username, address = walletMnemonicsData.walletAddress, partialMnemonics = Seq(walletMnemonicsData.seed1, walletMnemonicsData.seed2, walletMnemonicsData.seed3, walletMnemonicsData.seed4)))
           }
         }
       )
