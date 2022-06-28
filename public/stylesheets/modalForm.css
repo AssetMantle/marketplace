@@ -12,13 +12,13 @@
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 5;
         background-color: rgba(0, 0, 0, 0.6);
         opacity: 0;
         visibility: hidden;
         -webkit-backface-visibility: hidden;
         backface-visibility: hidden;
         transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
+        z-index: 9999;
     }
     .modal-overlay.active {
         opacity: 1;
@@ -28,7 +28,7 @@
 /**
  * Modal
  */
-.modal {
+.modalContainer {
     background-color: var(--popup-bg);
     border: 2px solid var(--popup-stroke);
     backdrop-filter: blur(20px);
@@ -38,7 +38,7 @@
     /*justify-content: center;*/
     position: relative;
     margin: 0 auto;
-    width: 600px;
+    width: 648px;
     max-width: 75rem;
     min-height: auto;
     padding: 32px;
@@ -50,7 +50,7 @@
     transform: scale(1.2);
     transition: all 0.6s cubic-bezier(0.55, 0, 0.1, 1);
 }
-.modal .modal-content {
+.modalContainer .modal-content {
     width: 100%;
     opacity: 0;
     -webkit-backface-visibility: hidden;
@@ -58,15 +58,15 @@
     transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1);
     transition-delay: 0.3s;
 }
-.modal.active {
+.modalContainer.active {
     visibility: visible;
     opacity: 1;
     transform: scale(1);
 }
-.modal.active .modal-content {
+.modalContainer.active .modal-content {
     opacity: 1;
 }
-.modal.active .close-modal {
+.modalContainer.active .close-modal {
     transform: translateY(0px);
     opacity: 1;
 }
@@ -75,7 +75,7 @@
  * Mobile styling
  */
 @media only screen and (max-width: 39.9375em) {
-    .modal {
+    .modalContainer {
         margin: 0 auto;
         width: 90%;
         -webkit-overflow-scrolling: touch;
@@ -85,12 +85,12 @@
 
 /* Form Header Start*/
 /* Large Header */
-.modal .header .form-top{
+.modalContainer .header .form-top{
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
-.modal .header .form-top .form-title{
+.modalContainer .header .form-top .form-title{
     font-family: var(--font-type-1);
     font-style: normal;
     font-weight: 400;
@@ -99,7 +99,7 @@
     text-transform: capitalize;
     color: var(--dark);
 }
-.modal .header .form-sub-title{
+.modalContainer .header .form-sub-title{
     font-family: var(--font-type-2);
     font-style: normal;
     font-weight: 400;
@@ -108,14 +108,14 @@
     color: var(--inactive-gray);
 }
 /* Header with Icon */
-.modal .header-with-icon .form-top{
+.modalContainer .header-with-icon .form-top{
     display: flex;
     align-items: center;
 }
-.modal .header-with-icon .form-top .title-icon{
+.modalContainer .header-with-icon .form-top .title-icon{
     margin-right: 10px;
 }
-.modal .header-with-icon .form-top .title-text{
+.modalContainer .header-with-icon .form-top .title-text{
     flex-grow: 2;
     font-family: var(--font-type-1);
     font-style: normal;
@@ -125,7 +125,7 @@
     color: var(--dark);
     margin-right: 20px;
 }
-.modal .header-with-icon .form-sub-title{
+.modalContainer .header-with-icon .form-sub-title{
     font-family: var(--font-type-2);
     font-style: normal;
     font-weight: 400;
@@ -133,7 +133,7 @@
     margin:12px 0 0 0;
     color: var(--text-medium);
 }
-.modal .header-with-icon .form-top .back-button-icon{
+.modalContainer .header-with-icon .form-top .back-button-icon{
     height: 40px;
     width: 40px;
     display: flex;
@@ -142,12 +142,12 @@
     border-radius: 20px;
     cursor: pointer;
 }
-.modal .header-with-icon .form-top .back-button-icon:hover{
+.modalContainer .header-with-icon .form-top .back-button-icon:hover{
     background-color: var(--popup-stroke);
 }
 
 /* Close Button */
-.modal .form-close-btn{
+.modalContainer .form-close-btn{
     /*position: absolute;*/
     cursor: pointer;
     /*top: 5px;*/
@@ -161,8 +161,8 @@
     height: 40px;
     border-radius: 50%;
 }
-.modal .form-close-btn:before,
-.modal .form-close-btn:after {
+.modalContainer .form-close-btn:before,
+.modalContainer .form-close-btn:after {
     content: '';
     width: 55%;
     height: 2px;
@@ -181,7 +181,7 @@
     -o-transition: all 0.3s ease-out;
     transition: all 0.3s ease-out;
 }
-.modal .form-close-btn:after {
+.modalContainer .form-close-btn:after {
     -webkit-transform: rotate(-45deg);
     -moz-transform: rotate(-45deg);
     -ms-transform: rotate(-45deg);
@@ -193,23 +193,23 @@
     -o-transition: all 0.3s ease-out;
     transition: all 0.3s ease-out;
 }
-.modal .form-close-btn:hover:before,
-.modal .form-close-btn:hover:after {
+.modalContainer .form-close-btn:hover:before,
+.modalContainer .form-close-btn:hover:after {
     -webkit-transform: rotate(180deg);
     -moz-transform: rotate(180deg);
     -ms-transform: rotate(180deg);
     -o-transform: rotate(180deg);
     transform: rotate(180deg);
 }
-.modal .form-close-btn:hover{
+.modalContainer .form-close-btn:hover{
     background-color: var(--popup-stroke);
 }
 
 /* Wallet List (Sign Up Options) */
-.modal .wallet-list li{
+.modalContainer .wallet-list li{
     border-bottom: 2px solid var(--line);
 }
-.modal .wallet-list .wallet-item{
+.modalContainer .wallet-list .wallet-item{
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -217,10 +217,10 @@
     cursor: pointer;
     transition: background-color 0.5s ease;
 }
-.modal .wallet-list .wallet-item:hover{
+.modalContainer .wallet-list .wallet-item:hover{
     background-color: var(--popup-stroke);
 }
-.modal .wallet-list .wallet-item .wallet-title{
+.modalContainer .wallet-list .wallet-item .wallet-title{
     font-family: var(--font-type-1);
     font-style: normal;
     font-weight: 700;
@@ -233,10 +233,10 @@
 }
 
 /* Footer */
-.modal .form-footer{
+.modalContainer .form-footer{
     margin-top: 25px;
 }
-.modal .footer-terms-condition{
+.modalContainer .footer-terms-condition{
     font-family: var(--font-type-2);
     font-style: normal;
     font-weight: 400;
@@ -245,7 +245,7 @@
     color: var(--mantle-off-white);
     margin-top: 15px;
 }
-.modal .footer-terms-condition .link{
+.modalContainer .terms-condition-message .link{
     font-family: var(--font-type-1);
     font-style: normal;
     font-weight: 700;
@@ -254,7 +254,7 @@
     margin-left: 5px;
     position: relative;
 }
-.modal .link::before {
+.modalContainer .link::before {
     content: '';
     position: absolute;
     width: 100%;
@@ -266,11 +266,11 @@
     transition: clip-path 0.3s, transform 0.3s cubic-bezier(0.2, 1, 0.8, 1);
     clip-path: polygon(0% 0%, 0% 100%, 0 100%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%, 100% 100%, 100% 0%);
 }
-.modal .link:hover::before {
+.modalContainer .link:hover::before {
     transform: translate3d(0, 2px, 0) scale3d(1.0, 2, 1);
     clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 50% 100%, 0 100%, 100% 100%, 100% 0%);
 }
-.modal .footer-message{
+.modalContainer .footer-message{
     font-family: var(--font-type-2);
     font-style: normal;
     font-weight: 400;
@@ -279,23 +279,25 @@
     margin-top: 10px;
     color: var(--inactive-gray);
 }
-.modal .footer-message .link{
+.modalContainer .footer-message > span{
+    margin-right: 5px;
+}
+.modalContainer .footer-message .link{
     font-style: normal;
     font-weight: 600;
     font-size: 16px;
     color: var(--dark);
     text-transform: capitalize;
-    margin-left: 5px;
     position: relative;
 }
-.modal .msg-3{
+.modalContainer .msg-3{
     text-align: left;
     margin-top: 10px;
     font-size: 20px;
     font-weight: 400;
     color: var(--inactive-gray);
 }
-.modal .msg-4{
+.modalContainer .msg-4{
     font-family: var(--font-type-2);
     font-size: 16px;
     color: var(--text-medium);
@@ -347,6 +349,21 @@
     display: flex;
 }
 
+/* Error Modal */
+.wallet-error-message{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 120%;
+    text-align: center;
+    color: var(--text-medium);
+    margin-top: 12px;
+}
+.wallet-error-message a{
+    color:var(--dark);
+}
+
 /* Successful Modal Icon */
 .form-success-icon{
     flex-grow: 2;
@@ -395,7 +412,7 @@
     padding: 12px 14px;
     margin-top: 30px;
     font-family: var(--font-type-2);
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 400;
     font-style: normal;
 }
@@ -570,7 +587,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    text-transform: capitalize;
     padding: 9px 0;
     outline:none;
 }
@@ -638,7 +654,7 @@
 }
 .accordion-toggle .icon:before {
     display: inline-block;
-    content: url('../images/Down-arrow.png');;
+    content: url('../images/icon/downArrow.png');;
     font-size: 25px;
     line-height: 12px;
     -moz-transform:rotate(0deg);
@@ -720,7 +736,7 @@
     right:-1px;
     top:6px;
 }
-.progress-bar li.progress-bar__dot {
+.progress-bar li .progress-bar__dot {
     display: block;
     width: 20px;
     border-radius: 10px;
@@ -728,13 +744,13 @@
     aspect-ratio: 1;
     /*border: 2px solid #ff8552;*/
     /*background-color: white;*/
-    cursor: pointer;
+    /*cursor: pointer;*/
     transition: all 0.5s ease;
     background: var(--popup-bg);
     box-shadow: inset 0px 0px 0px 2px var(--popup-bg), 0px 0px 0px 2px var(--mantle-off-white);
     z-index: 99;
 }
-.progress-bar li.progress-bar__dot.full {
+.progress-bar li .progress-bar__dot.full {
     background: var(--radial);
     box-shadow: inset 0px 0px 0px 2px var(--popup-bg), 0px 0px 0px 2px var(--dark);
 }
@@ -857,4 +873,310 @@
     height: 300px;
     object-fit: cover;
     margin: 3px 15px;
+}
+
+/* Form Fields */
+#formBody > div:not(:last-child){
+    margin-bottom: 24px;
+}
+#formBody dl label,
+#formBody .label-container label{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--inactive-gray);
+}
+#formBody dd input[type=text],
+#formBody dd input[type=password]{
+    font-family: var(--font-type-2);
+    height: 36px;
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    border: 1px solid var(--inactive-gray);
+    padding: calc(var(--size-bezel) * 2) 12px;
+    color: var(--mantle-off-white);
+    background: transparent;
+    border-radius: var(--size-radius);
+    font-size: 14px;
+    letter-spacing: 1px;
+    outline: none;
+    font-style: normal;
+    font-weight: 400;
+    margin-top: 8px;
+}
+#formBody dd input[type=text]:focus,
+#formBody dd input[type=password]:focus{
+    border-color: var(--dark);
+}
+#formBody dd input[type=text]:not(:focus),
+#formBody dd input[type=password]:not(:focus){
+    color: var(--inactive-gray);
+}
+#formBody button{
+    padding: 9px 0;
+    width: 220px;
+    font-family: var(--font-type-2);
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    text-transform: capitalize;
+    border: none;
+    outline: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--button-text);
+    background-color: var(--dark);
+    box-shadow: inset -4px -4px 8px rgba(0, 0, 0, 0.2), inset 4px 4px 8px #FFD365;
+    overflow: hidden;
+    position: relative;
+    z-index: 950;
+    transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+}
+#formBody button.disable{
+    border: none !important;
+    box-shadow: none !important;
+    background: var(--disable-yellow) !important;
+    cursor: none;
+    pointer-events: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+#formSubmitButton{
+    display: flex;
+    justify-content: end;
+}
+
+/* Field Label */
+#formBody .label-container{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+#formBody .label-container img{
+    width: 16px;
+    height: 16px;
+}
+
+/* Regx msg */
+dl .info {
+    background-color: var(--tooltip-bg);
+    color: var(--gray);
+    text-align: center;
+    border-radius: 6px;
+    position: relative;
+    top: 5px;
+    float: right;
+    font-size: 10px;
+    padding: 5px;
+    display: none;
+}
+dl .info:after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent var(--tooltip-bg) transparent;
+}
+
+/* Input Field Icon */
+.usernameAvailability {
+    position: relative;
+}
+.usernameAvailability .result {
+    position: absolute;
+    top: 0px;
+    right: 0;
+}
+.usernameAvailability .failureIcon,
+.usernameAvailability .checkIcon {
+    display: none;
+    position: absolute;
+    right: 15px;
+    top: 32px;
+    width: 20px;
+    height: 20px;
+}
+.usernameAvailability .fieldIcon + div dl dd input{
+    padding-right: 38px !important;
+}
+.hidden{
+    display: none !important;
+}
+.showPassword .eyeIcon {
+    position: absolute;
+    right: 15px;
+    top: 32px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+}
+.inputField .errorMessage{
+    display: none;
+}
+.inputField .errorMessage .errorContainer{
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--error);
+    gap: 4px;
+}
+.inputField .errorMessage.show{
+    /*display: block;*/
+}
+.inputField .errorMessage img{
+    width: 16px;
+    height: 16px;
+    margin-top: 3px;
+}
+.forgotPasswordLink{
+    font-family: var(--font-type-1);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    text-transform: capitalize;
+    color: var(--dark);
+}
+.terms-condition-container{
+    display: flex;
+    align-items: center;
+}
+.terms-condition-message{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--mantle-off-white);
+    margin-left: 6px;
+}
+.cmuk-checkbox{
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: var(--popup-bg);
+    margin: 0;
+    font: inherit;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--default);
+    border-radius: 0.15em;
+    transform: translateY(-0.075em);
+    display: grid;
+    place-content: center;
+    cursor: pointer;
+}
+.cmuk-checkbox::before {
+    content: "";
+    width: 0.60em;
+    height: 0.60em;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em var(--default);
+    transform-origin: bottom left;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+.cmuk-checkbox:checked::before {
+    transform: scale(1);
+}
+.terms-condition-box{
+    width: 100%;
+    height: 450px;
+    background: #030301;
+    border-radius: 10px;
+    overflow-y: auto;
+    margin-top: 12px;
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--mantle-off-white);
+    padding: 24px 16px 24px 24px;
+}
+
+/* Field Level Error */
+dl dd.error{
+    margin-top: 8px;
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--gray);
+    position: relative;
+}
+dl dd.error:before{
+    content: '';
+    background-image: url("../images/icon/error.png");
+    position: absolute;
+    left:0px;
+}
+
+/* Global Level Error */
+.toast {
+    margin-bottom: 25px;
+    border-radius: 8px;
+    background: #2c0c0f;
+    padding: 8px 16px 8px 16px;
+    box-shadow: 0 6px 20px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    font-family: var(--font-type-2);
+    border:2px solid var(--error);
+}
+.toast .toast-content {
+    display: flex;
+    align-items: center;
+}
+.toast-content .check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    min-width: 30px;
+    /*background-color: var(--dark);*/
+    border-radius: 50%;
+}
+.toast-content .message {
+    display: flex;
+    flex-direction: column;
+    margin: 0 16px;
+}
+.message .text {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text-medium);
+}
+.message .text.text-1 {
+    font-weight: 600;
+    color: var(--mantle-off-white);
+}
+.logoutContainer p{
+    font-family: var(--font-type-2);
+    color:var(--mantle-off-white);
+    font-size: 14px;
+}
+#USERNAME_AVAILABLE_field,
+#termsCondition_field dt label{
+    display: none;
+}
+#RECEIVE_NOTIFICATIONS_field{
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: start;
+    align-items: baseline;
+    gap: 10px;
 }

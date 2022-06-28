@@ -1,0 +1,22 @@
+@import play.api.routing.JavaScriptReverseRoute
+@(cover:String = "", profile:String = "", creatorName:String = "", creatorAbout:String = "", route: JavaScriptReverseRoute, arguments: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<a onclick="@utilities.JsRoutes.getJsRouteString(route, arguments)">
+    <div class="single-profile-card">
+        <div class="profile-section">
+            <div class="hero-img">
+                <img src="@routes.Assets.versioned("images/"+cover+"")"/>
+            </div>
+            <div class="profile-detail">
+                <div id="profile-img">
+                    <img src="@routes.Assets.versioned("images/"+profile+"")" alt="" />
+                </div>
+                <div id="content">
+                    <h1>@creatorName</h1>
+                    <p>@creatorAbout</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</a>

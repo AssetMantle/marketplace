@@ -1,0 +1,35 @@
+@import views.html.base.collection._
+
+@(collections: Seq[master.Collection])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="profileContainer">
+    <div class="item item-center">
+        <div class="profile-card">
+            <div class="profiles-container">
+                <div class="d-flex flex-xl-row flex-lg-column align-items-center justify-content-between card-header">
+                    <div class="left-option">
+                        <div class="row">
+                            <div class="col mx-3 p-0 active">@Messages(constants.View.ART)</div>
+                            <div class="col mx-3 p-0 disable">@Messages(constants.View.MISC)</div>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- Collection List: Grid View -->
+                <div class="profile-list">
+                    <ol class="list grid-view-filter">
+                        @collections.zipWithIndex.map {case(collection, index) =>
+                            @* @collection.name
+                            @collection.description *@
+                            <li>
+                                @commonCollectionCard(collection)
+                            </li>
+                        }
+                    </ol>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

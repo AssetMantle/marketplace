@@ -7,7 +7,38 @@
 # GET        /                                           controllers.HomeController.index()
 
 # Map static resources from the /public folder to the /assets URL path
-GET        /assets/*file                         controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                    controllers.Assets.versioned(path="/public", file: Asset)
+GET         /javascriptRoutes                controllers.JavaScriptRoutesController.javascriptRoutes
+GET         /firebase-messaging-sw.js        controllers.Assets.at(path="/public/javascripts/firebase", file="firebase-messaging-sw.js")
 
 # Home
-GET        /                                     controllers.HomeController.marketPlaceHome()
+GET         /                                controllers.IndexController.index()
+
+GET         /signUp                          controllers.AccountController.signUpForm()
+POST        /signUp                          controllers.AccountController.signUp()
+
+GET         /checkUsernameAvailable          controllers.AccountController.checkUsernameAvailable(username: String)
+
+GET         /verifyWalletMnemonicso          controllers.AccountController.verifyWalletMnemonicsForm()
+POST        /verifyWalletMnemonics           controllers.AccountController.verifyWalletMnemonics()
+
+GET         /signIn                          controllers.AccountController.signInForm()
+POST        /signIn                          controllers.AccountController.signIn()
+
+GET         /signOut                         controllers.AccountController.signOutForm()
+POST        /signOut                         controllers.AccountController.signOut()
+
+GET         /forgetPassword                  controllers.AccountController.forgetPasswordForm()
+POST        /forgetPassword                  controllers.AccountController.forgetPassword()
+
+GET         /collections                     controllers.CollectionController.viewCollections()
+GET         /collection/:id                  controllers.CollectionController.viewCollection(id: String)
+GET         /allCollections                  controllers.CollectionController.all()
+GET         /collection                      controllers.CollectionController.collection(id: String)
+GET         /collectionFile                  controllers.CollectionController.collectionFile(id: String, documentType:String)
+GET         /collectionCoverFile             controllers.CollectionController.collectionCoverFile(id: String)
+GET         /collectionProfileFile           controllers.CollectionController.collectionProfileFile(id: String)
+
+GET         /nft/:collectionId/:nftId        controllers.NFTController.get(collectionId: String, nftId: String)
+
+

@@ -1,148 +1,4 @@
-
-// Pre-loader
-function HideScrollbar() {
-    var style = document.createElement("style");
-    style.innerHTML = `body::-webkit-scrollbar {display: none;}`;
-    document.head.appendChild(style);
-}
-HideScrollbar()
-
-// function ShowScrollbar() {
-//     var style = document.createElement("style");
-//     style.innerHTML = `body::-webkit-scrollbar {display: block;}`;
-//     document.head.appendChild(style);
-// }
-
-let intro = document.querySelector('.intro');
-
-window.addEventListener('DOMContentLoaded', ()=>{
-    setTimeout(()=>{
-        setTimeout(()=>{
-            intro.style.top = '-100vh';
-            intro.style.visibility = 'hidden';
-            // ShowScrollbar();
-        },3500);
-    });
-});
-
-$(document).ready(function() {
-    if ($('.form-accordion').length) {
-        $('.form-accordion').find('.accordion-toggle').click(function() {
-            if ($(this).hasClass('open')) {
-                $(this).next().slideUp('fast');
-                $(this).removeClass('open');
-            } else {
-                $(this).next().slideDown('fast');
-                $(this).addClass('open');
-                $(".accordion-content").not($(this).next()).slideUp('fast');
-                $(".accordion-toggle").not($(this)).removeClass('open');
-            }
-        });
-    }
-
-    setTimeout(()=>{
-        setTimeout(()=>{
-            $(".form-hidden").addClass('show');
-        },500);
-        $(".form-hidden").slideDown(800);
-    },1000);
-
-});
-
-
-function togglePassword(){
-    const btn = document.querySelector(".btn");
-    var passwordInput = document.querySelectorAll(".password_input");
-
-    passwordInput.forEach((single) => {
-        if(single.type === "password"){
-            single.type = "text";
-            btn.classList.remove("fa-eye-slash");
-            btn.classList.add("fa-eye");
-        }
-        else{
-            single.type = "password";
-            btn.classList.remove("fa-eye");
-            btn.classList.add("fa-eye-slash");
-        }
-    });
-}
-
-function checkUserAvailability(){
-    let validUser = {users:['jaggu','pratik']};
-    var field = document.getElementById("username");
-    if(field.value !== ''){
-        if(validUser.users.includes(field.value)){
-            $("#username ~ i").fadeOut();
-            $(".username_field + .error-message").slideDown();
-            $(".username_field").css("border-color","var(--error)");
-        }
-        else{
-            $("#username ~ i").fadeIn();
-            $(".username_field + .error-message").slideUp();
-            $(".username_field").css("border-color","var(--inactive-gray)");
-        }
-    }
-    else{
-        $("#username ~ i").fadeOut();
-    }
-}
-
-function matchConfirmPassword(){
-    var passwordField = document.getElementById("password");
-    var confirmPasswordField = document.getElementById("confirm_password");
-
-    if(passwordField.value !== confirmPasswordField.value){
-        $(".confirm_password + .error-message").slideDown();
-        $(".confirm_password").css("border-color","var(--error)");
-    }
-    else{
-        $(".confirm_password + .error-message").slideUp();
-        $(".confirm_password").css("border-color","var(--inactive-gray)");
-    }
-}
-
-function checkAccount(){
-    event.preventDefault();
-    var usernameValue = document.getElementById("username").value;
-    var passwordValue = document.getElementById("password").value;
-
-    if(usernameValue !== '' && passwordValue !== ''){
-        if(usernameValue === 'jaggu'){
-            $(".username_field + .error-message").slideUp();
-            $(".username_field").css("border-color","var(--inactive-gray)");
-            if(passwordValue === '123'){
-                $(".password_field + .error-message").slideUp();
-                $(".password_field").css("border-color","var(--inactive-gray)");
-            }
-            else{
-                $(".password_field + .error-message").slideDown();
-                $(".password_field").css("border-color","var(--error)");
-            }
-        }
-        else{
-            $(".username_field + .error-message").slideDown();
-            $(".username_field").css("border-color","var(--error)");
-        }
-    }
-}
-
-function checkUsername(){
-    event.preventDefault();
-    var usernameValue = document.getElementById("username").value;
-    if(usernameValue !== ''){
-        if(usernameValue === 'jaggu'){
-            $(".username_field + .error-message").slideUp();
-            $(".username_field").css("border-color","var(--inactive-gray)");
-        }
-        else{
-            $(".username_field + .error-message").slideDown();
-            $(".username_field").css("border-color","var(--error)");
-        }
-    }
-}
-
-function checkNewPassword(){
+function checkNewPassword() {
     let passwordValue = document.getElementById('password').value;
     // var completeRegularExpression = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,128}$/;
 
@@ -157,21 +13,20 @@ function checkNewPassword(){
     $(".password_field + .error-message").slideDown();
 }
 
-function collectionCardSelect(card){
+function collectionCardSelect(card) {
     $(".collection_card").removeClass('active');
     $(card).addClass('active');
     $(".form-next-button").removeClass('disable-button');
 }
 
 
-
 // Create Collection : Input type=file
-var inputs = document.querySelectorAll('.file-input')
+inputs = document.querySelectorAll('.file-input')
 for (var i = 0, len = inputs.length; i < len; i++) {
     customInput(inputs[i])
 }
 
-function customInput (el) {
+function customInput(el) {
     const fileInput = el.querySelector('[type="file"]')
     const label = el.querySelector('[data-js-label]')
 
@@ -187,45 +42,23 @@ function customInput (el) {
 }
 
 // Create Collection : Dropdown Menu
-$('.dropdown-el').click(function(e) {
+$('.dropdown-el').click(function (e) {
     e.preventDefault();
     e.stopPropagation();
     $(this).toggleClass('expanded');
-    $('#'+$(e.target).attr('for')).prop('checked',true);
+    $('#' + $(e.target).attr('for')).prop('checked', true);
 });
-$(document).click(function() {
+$(document).click(function () {
     $('.dropdown-el').removeClass('expanded');
 });
 
-
-// check Collection name is exist or not
-function checkCollectionName(){
-    var collectionName = document.getElementById("collectionName");
-
-    if(collectionName.value === "jaggu"){
-        $("#collectionName ~ i").fadeOut();
-        $(".collectionError").slideDown();
-        $("#collectionName").css("border-color","var(--error)");
-    }
-    else{
-        if(collectionName.value.length > 0){
-            $("#collectionName ~ i").fadeIn();
-        }
-        else{
-            $("#collectionName ~ i").fadeOut();
-        }
-        $(".collectionError").slideUp();
-        $("#collectionName").css("border-color","var(--inactive-gray)");
-    }
-}
-
 // Create Collection : Add More Property
-function addCollectionProperty(){
+function addCollectionProperty() {
 
 }
 
 // Create Collection : Add More Tags
-function addCollectionTag(){
+function addCollectionTag() {
 
     let element = document.createElement("div");
     element.innerHTML = `<div class="form-field-2-columns">
@@ -247,41 +80,25 @@ function addCollectionTag(){
 }
 
 // Create Collection : Remove Tags
-function removeCollectionTag(e){
+function removeCollectionTag(e) {
     let element = e.parentNode.parentNode.parentNode.parentNode;
     // console.log(element.);
     document.getElementsByClassName("collection-form-tag-field")[0].removeChild(element);
 }
 
-$(function() {
-    $('input[name="daterange"]').daterangepicker({
-        opens: 'left'
-    }, function(start, end, label) {
-        console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-    });
-});
-
-// Date Range Picker
-function setDateRange(){
-    document.getElementsByClassName("dateRangeField")[0].setAttribute("name","daterange");
-    console.log(document.getElementsByClassName("dateRangeField")[0].getAttribute('name'));
-}
-
-// Check Phrase
-function checkPhrase(e){
-    console.log(e.value);
-    // if(e.className === "input-phrase-1"){
-        if(e.value.toLowerCase() === "monkey"){
-            e.style.borderColor = "var(--connected)";
-        }
-        else if(e.value.length !== 0){
-            e.style.borderColor = "var(--error)";
-        }
-        else{
-            e.style.borderColor = "var(--dark)";
-        }
-    // }
-}
+// $(function() {
+//     $('input[name="daterange"]').daterangepicker({
+//         opens: 'left'
+//     }, function(start, end, label) {
+//         console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+//     });
+// });
+//
+// // Date Range Picker
+// function setDateRange(){
+//     document.getElementsByClassName("dateRangeField")[0].setAttribute("name","daterange");
+//     console.log(document.getElementsByClassName("dateRangeField")[0].getAttribute('name'));
+// }
 
 
 // Hero Section Swiper/Slider 2
@@ -289,8 +106,8 @@ var swiper = new Swiper(".mySwiper2", {
     effect: "coverflow",
     watchSlidesProgress: true,
     slidesPerView: 3,
-    autoplay:true,
-    allowTouchMove:false,
+    autoplay: true,
+    allowTouchMove: false,
     loop: true,
     centeredSlides: true,
 });
@@ -443,9 +260,6 @@ var swiper = new Swiper(".popular-container .swiper-container", {
 // document.addEventListener("mousewheel", this.mousewheel.bind(this), { passive: false });
 
 
-
-
-
 // const scrollElement =
 //     window.document.scrollingElement ||
 //     window.document.body ||
@@ -511,7 +325,6 @@ var swiper = new Swiper(".popular-container .swiper-container", {
 // }, false)
 
 
-
 // Don't use following code
 // var initialY = null
 //
@@ -558,42 +371,44 @@ var swiper = new Swiper(".popular-container .swiper-container", {
 window.onbeforeunload = function () {
     window.scrollTo(0, 0);
 }
+document.onload = function () {
+    window.scrollTo(0, 0);
+}
 
-// Text Copy to Clipboard
-$(".form-address-box .form-copy-icon").on("click",function (){
-    var element = $(this).next('.form-copy-message');
-    var copyText = $(this).prevAll('.username-data');
+// Copy to Clipboard
+function copyToClipboard(e) {
+    var element = $(e).next('.form-copy-message');
+    var copyText = $(e).prevAll('.username-data');
 
     element.addClass("active");
-    element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function() {
+    element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function () {
         element.removeClass('active');
     });
 
     navigator.clipboard.writeText(copyText.text());
-});
-
+}
 
 // Multi Step
-const dots = document.getElementsByClassName('progress-bar__dot')
-const numberOfSteps = 3
-let currentStep = 1
+dots = document.getElementsByClassName('progress-bar__dot')
+numberOfSteps = 3
+currentStep = 1
 
-for(let i = 0 ; i < dots.length ; ++i){
-    dots[i].addEventListener('click', ()=>{
-        goToStep(i+1)
+for (let i = 0; i < dots.length; ++i) {
+    dots[i].addEventListener('click', () => {
+        goToStep(i + 1)
     })
 }
 
-function goToStep(stepNumber){
+function goToStep(stepNumber) {
     currentStep = stepNumber
 
     let indicators = document.getElementsByClassName('progress-bar__dot')
 
-    for(let i = indicators.length-1; i >= currentStep ; --i){
+    for (let i = indicators.length - 1; i >= currentStep; --i) {
         indicators[i].classList.remove('full')
     }
 
-    for(let i = 0; i < currentStep; ++i){
+    for (let i = 0; i < currentStep; ++i) {
         indicators[i].classList.add('full')
     }
 }
@@ -621,3 +436,15 @@ function goToStep(stepNumber){
 //     }
 //     lastScroll = currentScroll;
 // });
+
+
+// Show and hide modal screen
+function showHideModalScreen(showScreen, hideScreen) {
+    $(".modalContainer").removeClass('active');
+    setTimeout(function () {
+        $(hideScreen).hide()
+        $(showScreen).show();
+        $(".modalContainer").addClass('active');
+    }, 1000);
+}
+

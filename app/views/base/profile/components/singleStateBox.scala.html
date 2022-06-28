@@ -1,0 +1,8 @@
+@(icon : String = "", title:String = "", value:Number = 0)
+<div class="stats-card">
+    <div class="d-flex gap-2 align-items-center">
+        <img src="@routes.Assets.versioned("images/icon/" +icon+"")" class="profile-icon"/>
+        <div class="stats-title">@title</div>
+    </div>
+    <div class="stats-number">@value</div>
+</div>

@@ -1,0 +1,25 @@
+@import views.html.base.nft._
+
+@(collection: master.Collection, nfts: Seq[master.NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="profileContainer">
+    <div class="item item-center">
+        <div class="profile-card">
+            <div class="profiles-container">
+                <div class="nft-list me-3">
+                    <div class="collection-link">Collection Name</div>
+                    <div class="nft-list">
+                        <div class="row">
+                            @nfts.map { nft =>
+                                @commonNFTCard(collection, nft)
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection().url, '@collection.id', "collection");
+</script>

@@ -1,0 +1,9 @@
+@(logoCollectionFile: Option[master.CollectionFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="profile-img">
+    @if(logoCollectionFile.isDefined) {
+        <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(logoCollectionFile.get.file)">
+    } else {
+        <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
+    }
+</div>

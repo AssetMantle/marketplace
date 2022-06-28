@@ -4,15 +4,19 @@ import controllers.routes
 import play.api.mvc.Call
 import play.api.routing.JavaScriptReverseRoute
 
-import scala.collection.Seq
-
-class Form(template: String, val route: Call, val get: JavaScriptReverseRoute) {
-  val legend: String = Seq("FORM", template, "LEGEND").mkString(".")
-  val submit: String = Seq("FORM", template, "SUBMIT").mkString(".")
-  val button: String = Seq("FORM", template, "BUTTON").mkString(".")
+class Form(name: String, val get: JavaScriptReverseRoute, val post: Call) {
+  val title: String = Seq("FORM", name, "TITLE").mkString(".")
+  val subTitle: String = Seq("FORM", name, "SUBTITLE").mkString(".")
+  val submit: String = Seq("FORM", name, "SUBMIT").mkString(".")
+  val button: String = Seq("FORM", name, "BUTTON").mkString(".")
 }
 
 object Form {
-//  val SIGN_UP = new Form("SIGN_UP", routes.HomeController.signUpMantleplaceCredentialssignUpMantleplaceCredentials(), routes.javascript.HomeController.signUpMantleplaceCredentials)
-  val SIGN_UP = new Form("SIGN_UP", routes.HomeController.marketPlaceHome(), routes.javascript.HomeController.marketPlaceHome)
+
+  //AccountController
+  val SIGN_UP = new Form("SIGN_UP", routes.javascript.AccountController.signUpForm, routes.AccountController.signUp())
+  val VERIFY_WALLET_MNEMONICS = new Form("VERIFY_WALLET_MNEMONICS", routes.javascript.AccountController.verifyWalletMnemonicsForm, routes.AccountController.verifyWalletMnemonics())
+  val SIGN_IN = new Form("SIGN_IN", routes.javascript.AccountController.signInForm, routes.AccountController.signIn())
+  val FORGET_PASSWORD = new Form("FORGET_PASSWORD", routes.javascript.AccountController.forgetPasswordForm, routes.AccountController.forgetPassword())
+  val SIGN_OUT = new Form("SIGN_OUT", routes.javascript.AccountController.signOutForm, routes.AccountController.signOut())
 }

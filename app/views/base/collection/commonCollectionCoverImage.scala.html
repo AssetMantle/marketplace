@@ -1,0 +1,9 @@
+@(coverCollectionFile: Option[master.CollectionFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="hero-img">
+    @if(coverCollectionFile.isDefined) {
+        <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(coverCollectionFile.get.file)">
+    } else {
+        <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
+    }
+</div>

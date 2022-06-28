@@ -1,0 +1,157 @@
+@()(implicit messagesProvider: MessagesProvider)
+
+<div class="wrapper">
+    <nav>
+        <input type="checkbox" id="show-search"/>
+        <input type="checkbox" id="show-menu"/>
+        <label for="show-menu" class="menu-icon"></label>
+        <div class="content">
+            <div class="logo"><a href="#"><img class="lazyload" src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" data-src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" class="logo"/></a></div>
+            <ul class="links">
+                @* <li class="active"><a href="#">Explore</a></li>*@
+                <li><a href="#">@Messages(constants.View.EXPLORE)</a>
+                    <ul>
+                        <li>
+                            <div class="disable">@Messages(constants.View.COMING_SOON)</div>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="desktop-link">@Messages(constants.View.CREATE)</a>
+                    <input type="checkbox" id="show-features">
+                    <label for="show-features">@Messages(constants.View.CREATE)</label>
+                    <ul>
+                        <li>
+                            <div class="disable">@Messages(constants.View.COMING_SOON)</div>
+                        </li>
+                    </ul>
+                @*  <ul>
+                        <li>
+                            <a href="#">
+                                <img class="lazyload" src="  @routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/createCollection.svg")"/>
+                                Create new collections
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/createNFT.svg")"/>
+                                Create new NFT
+                            </a>
+                        </li>
+                    </ul> *@
+                </li>
+                <li>
+                    <a href="#">@Messages(constants.View.SUPPORT)</a>
+                    <ul>
+                        <li>
+                            <div class="disable">@Messages(constants.View.COMING_SOON)</div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="right-menu">
+@*            <label for="show-search" class="search-icon"><i class="uil uil-search"></i></label>*@
+            <div class="account-menu">
+                <nav id="submenu-main" class="submenu-main">
+                    <ul class="menu">
+                        <li class="user-profile">
+                            <a href="#">
+                                <img class="lazyload" src="@routes.Assets.versioned("images/icon/profile.png")" class="profile"/>
+                            </a>
+                            <ul class="submenu">
+                                <li>
+                                    <div class="disable">@Messages(constants.View.COMING_SOON)</div>
+                                </li>
+                            </ul>
+                        @*  <ul class="submenu">
+                                <li class="user-profile-data">
+                                    <div class="user-profile-image">
+                                        <img class="lazyload" src="  @routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/unsplash_iFgRcqHznqg.png")"/>
+                                    </div>
+                                    <div class="user-profile-information">
+                                        <div class="user-profile-name">User568</div>
+                                        <div class="user-profile-token">0.459930 $MNTL</div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/NFT.svg")"/>
+                                        My NFTs
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/collection.svg")"/>
+                                        My Collections
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/favourites.svg")"/>
+                                        Favourites
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/listing.svg")"/>
+                                        Listings
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/whiteList.svg")"/>
+                                        Whitelist
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/settings.svg")"/>
+                                        Settings
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/logout.svg")"/>
+                                        Sign out
+                                    </a>
+                                </li>
+                            </ul> *@
+                        </li>
+                        <li class="user-wallet">
+                            <a href="https://wallet.assetmantle.one/" target="_blank">
+                                <img class="lazyload" src="@routes.Assets.versioned("images/icon/wallet.png")" class="wallet"/>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+    @* </div>*@
+    @* <input type="checkbox" id="show-profile">*@
+    @* <label for="show-profile">Profile</label>*@
+    @* <div class="popup-menu">*@
+    @* <ul>*@
+    @* <li>*@
+    @* <a href="#">*@
+    @* <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/createCollection.svg")"/>*@
+    @* Create new collections*@
+    @* </a>*@
+    @* </li>*@
+    @* <li>*@
+    @* <a href="#">*@
+    @* <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/createNFT.svg")"/>*@
+    @* Create new NFT*@
+    @* </a>*@
+    @* </li>*@
+    @* </ul>*@
+    @* </div>*@
+    @* <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/wallet.svg")"/>*@
+            </div>
+        </div>
+
+        <form action="#" class="search-box">
+            <input type="text" placeholder="Type Something to Search..." required/>
+            <button type="submit" class="go-icon"></button>
+        </form>
+    </nav>
+</div>
