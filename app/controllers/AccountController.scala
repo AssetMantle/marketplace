@@ -175,7 +175,7 @@ class AccountController @Inject()(
           (for {
             masterWallet <- masterWallet
             _ <- verifyAndUpdate(masterWallet)
-          } yield Ok(views.html.index())
+          } yield PartialContent(views.html.account.successfullPasswordChange())
             ).recover {
             case baseException: BaseException => BadRequest(views.html.account.forgetPassword(ForgotPassword.form.withGlobalError(baseException.failure.message)))
           }
