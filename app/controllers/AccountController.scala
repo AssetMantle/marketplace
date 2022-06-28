@@ -105,6 +105,7 @@ class AccountController @Inject()(
           def getResult(verified: Boolean, wallet: master.Wallet) = if (verified) {
             implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = signInData.username, address = wallet.address))
             implicit val loginState: LoginState = LoginState(username = signInData.username, address = wallet.address)
+            val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.upsert(id = loginState.username, token = signInData.pushNotificationToken)
             withUsernameToken.Ok(views.html.collection.collections(None))
           } else Future(throw new BaseException(constants.Response.INVALID_USERNAME_OR_PASSWORD))
 

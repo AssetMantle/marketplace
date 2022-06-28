@@ -95,4 +95,32 @@ class CollectionController @Inject()(
         }
     }
   }
+
+  def collectionCoverFile(id: String): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collectionFile = masterCollectionFiles.Service.get(id = id, documentType = constants.File.Collection.COVER_IMAGE)
+        (for {
+          collectionFile <- collectionFile
+        } yield {Ok(views.html.base.collection.commonCollectionCoverImage(collectionFile))
+        }
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def collectionProfileFile(id: String): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collectionFile = masterCollectionFiles.Service.get(id = id, documentType = constants.File.Collection.PROFILE_IMAGE)
+        (for {
+          collectionFile <- collectionFile
+        } yield {Ok(views.html.base.collection.commonCollectionProfileImage(collectionFile))
+        }
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
 }

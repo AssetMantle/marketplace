@@ -9,6 +9,7 @@
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                    controllers.Assets.versioned(path="/public", file: Asset)
 GET         /javascriptRoutes                controllers.JavaScriptRoutesController.javascriptRoutes
+GET         /firebase-messaging-sw.js        controllers.Assets.at(path="/public/javascripts/firebase", file="firebase-messaging-sw.js")
 
 # Home
 GET         /                                controllers.IndexController.index()
@@ -35,6 +36,8 @@ GET         /collection/:id                  controllers.CollectionController.vi
 GET         /allCollections                  controllers.CollectionController.all()
 GET         /collection                      controllers.CollectionController.collection(id: String)
 GET         /collectionFile                  controllers.CollectionController.collectionFile(id: String, documentType:String)
+GET         /collectionCoverFile             controllers.CollectionController.collectionCoverFile(id: String)
+GET         /collectionProfileFile           controllers.CollectionController.collectionProfileFile(id: String)
 
 GET         /nft/:collectionId/:nftId        controllers.NFTController.get(collectionId: String, nftId: String)
 

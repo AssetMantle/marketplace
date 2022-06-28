@@ -28,6 +28,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.all,
         routes.javascript.CollectionController.collection,
         routes.javascript.CollectionController.collectionFile,
+        routes.javascript.CollectionController.collectionCoverFile,
+        routes.javascript.CollectionController.collectionProfileFile,
 
         routes.javascript.NFTController.get,
       )
