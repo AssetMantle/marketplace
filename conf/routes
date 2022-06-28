@@ -9,6 +9,7 @@
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                    controllers.Assets.versioned(path="/public", file: Asset)
 GET         /javascriptRoutes                controllers.JavaScriptRoutesController.javascriptRoutes
+GET         /firebase-messaging-sw.js                      controllers.Assets.at(path="/public/javascripts/firebase", file="firebase-messaging-sw.js")
 
 # Home
 GET         /                                controllers.IndexController.index()

@@ -58,7 +58,7 @@ class PushNotificationTokens @Inject()(
 
   object Service {
 
-    def refresh(id: String, token: String): Future[Unit] = {
+    def upsert(id: String, token: String): Future[Unit] = {
       for {
         _ <- delete(id)
         _ <- create(PushNotificationToken(id, token))
