@@ -32,7 +32,7 @@ function submitForm(isModal,source, targetID) {
                     }
                 },
                 404: function (data) {
-                    $(target).html(data.responseText);
+                    result.html(data.responseText);
                 }
             }
         }).fail(function (XMLHttpRequest) {
