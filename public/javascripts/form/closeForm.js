@@ -1,4 +1,4 @@
-let elements = $('.modal-overlay, .modalContainer');
+elements = $('.modal-overlay, .modalContainer');
 
 function closeModal(){
     $(".modal-overlay").removeClass("active");

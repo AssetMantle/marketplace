@@ -1,19 +1,18 @@
-function checkUsername(){
+function checkUsername() {
     event.preventDefault();
     var usernameValue = document.getElementById("username").value;
-    if(usernameValue !== ''){
-        if(usernameValue === 'jaggu'){
+    if (usernameValue !== '') {
+        if (usernameValue === 'jaggu') {
             $(".username_field + .error-message").slideUp();
-            $(".username_field").css("border-color","var(--inactive-gray)");
-        }
-        else{
+            $(".username_field").css("border-color", "var(--inactive-gray)");
+        } else {
             $(".username_field + .error-message").slideDown();
-            $(".username_field").css("border-color","var(--error)");
+            $(".username_field").css("border-color", "var(--error)");
         }
     }
 }
 
-function checkNewPassword(){
+function checkNewPassword() {
     let passwordValue = document.getElementById('password').value;
     // var completeRegularExpression = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,128}$/;
 
@@ -28,21 +27,20 @@ function checkNewPassword(){
     $(".password_field + .error-message").slideDown();
 }
 
-function collectionCardSelect(card){
+function collectionCardSelect(card) {
     $(".collection_card").removeClass('active');
     $(card).addClass('active');
     $(".form-next-button").removeClass('disable-button');
 }
 
 
-
 // Create Collection : Input type=file
-var inputs = document.querySelectorAll('.file-input')
+inputs = document.querySelectorAll('.file-input')
 for (var i = 0, len = inputs.length; i < len; i++) {
     customInput(inputs[i])
 }
 
-function customInput (el) {
+function customInput(el) {
     const fileInput = el.querySelector('[type="file"]')
     const label = el.querySelector('[data-js-label]')
 
@@ -58,45 +56,43 @@ function customInput (el) {
 }
 
 // Create Collection : Dropdown Menu
-$('.dropdown-el').click(function(e) {
+$('.dropdown-el').click(function (e) {
     e.preventDefault();
     e.stopPropagation();
     $(this).toggleClass('expanded');
-    $('#'+$(e.target).attr('for')).prop('checked',true);
+    $('#' + $(e.target).attr('for')).prop('checked', true);
 });
-$(document).click(function() {
+$(document).click(function () {
     $('.dropdown-el').removeClass('expanded');
 });
 
 
 // check Collection name is exist or not
-function checkCollectionName(){
+function checkCollectionName() {
     var collectionName = document.getElementById("collectionName");
 
-    if(collectionName.value === "jaggu"){
+    if (collectionName.value === "jaggu") {
         $("#collectionName ~ i").fadeOut();
         $(".collectionError").slideDown();
-        $("#collectionName").css("border-color","var(--error)");
-    }
-    else{
-        if(collectionName.value.length > 0){
+        $("#collectionName").css("border-color", "var(--error)");
+    } else {
+        if (collectionName.value.length > 0) {
             $("#collectionName ~ i").fadeIn();
-        }
-        else{
+        } else {
             $("#collectionName ~ i").fadeOut();
         }
         $(".collectionError").slideUp();
-        $("#collectionName").css("border-color","var(--inactive-gray)");
+        $("#collectionName").css("border-color", "var(--inactive-gray)");
     }
 }
 
 // Create Collection : Add More Property
-function addCollectionProperty(){
+function addCollectionProperty() {
 
 }
 
 // Create Collection : Add More Tags
-function addCollectionTag(){
+function addCollectionTag() {
 
     let element = document.createElement("div");
     element.innerHTML = `<div class="form-field-2-columns">
@@ -118,7 +114,7 @@ function addCollectionTag(){
 }
 
 // Create Collection : Remove Tags
-function removeCollectionTag(e){
+function removeCollectionTag(e) {
     let element = e.parentNode.parentNode.parentNode.parentNode;
     // console.log(element.);
     document.getElementsByClassName("collection-form-tag-field")[0].removeChild(element);
@@ -139,18 +135,16 @@ function removeCollectionTag(e){
 // }
 
 // Check Phrase
-function checkPhrase(e){
+function checkPhrase(e) {
     console.log(e.value);
     // if(e.className === "input-phrase-1"){
-        if(e.value.toLowerCase() === "monkey"){
-            e.style.borderColor = "var(--connected)";
-        }
-        else if(e.value.length !== 0){
-            e.style.borderColor = "var(--error)";
-        }
-        else{
-            e.style.borderColor = "var(--dark)";
-        }
+    if (e.value.toLowerCase() === "monkey") {
+        e.style.borderColor = "var(--connected)";
+    } else if (e.value.length !== 0) {
+        e.style.borderColor = "var(--error)";
+    } else {
+        e.style.borderColor = "var(--dark)";
+    }
     // }
 }
 
@@ -160,8 +154,8 @@ var swiper = new Swiper(".mySwiper2", {
     effect: "coverflow",
     watchSlidesProgress: true,
     slidesPerView: 3,
-    autoplay:true,
-    allowTouchMove:false,
+    autoplay: true,
+    allowTouchMove: false,
     loop: true,
     centeredSlides: true,
 });
@@ -314,9 +308,6 @@ var swiper = new Swiper(".popular-container .swiper-container", {
 // document.addEventListener("mousewheel", this.mousewheel.bind(this), { passive: false });
 
 
-
-
-
 // const scrollElement =
 //     window.document.scrollingElement ||
 //     window.document.body ||
@@ -382,7 +373,6 @@ var swiper = new Swiper(".popular-container .swiper-container", {
 // }, false)
 
 
-
 // Don't use following code
 // var initialY = null
 //
@@ -429,17 +419,17 @@ var swiper = new Swiper(".popular-container .swiper-container", {
 window.onbeforeunload = function () {
     window.scrollTo(0, 0);
 }
-document.onload = function (){
-    window.scrollTo(0,0);
+document.onload = function () {
+    window.scrollTo(0, 0);
 }
 
 // Copy to Clipboard
-function copyToClipboard(e){
+function copyToClipboard(e) {
     var element = $(e).next('.form-copy-message');
     var copyText = $(e).prevAll('.username-data');
 
     element.addClass("active");
-    element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function() {
+    element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function () {
         element.removeClass('active');
     });
 
@@ -447,26 +437,26 @@ function copyToClipboard(e){
 }
 
 // Multi Step
-const dots = document.getElementsByClassName('progress-bar__dot')
-const numberOfSteps = 3
-let currentStep = 1
+dots = document.getElementsByClassName('progress-bar__dot')
+numberOfSteps = 3
+currentStep = 1
 
-for(let i = 0 ; i < dots.length ; ++i){
-    dots[i].addEventListener('click', ()=>{
-        goToStep(i+1)
+for (let i = 0; i < dots.length; ++i) {
+    dots[i].addEventListener('click', () => {
+        goToStep(i + 1)
     })
 }
 
-function goToStep(stepNumber){
+function goToStep(stepNumber) {
     currentStep = stepNumber
 
     let indicators = document.getElementsByClassName('progress-bar__dot')
 
-    for(let i = indicators.length-1; i >= currentStep ; --i){
+    for (let i = indicators.length - 1; i >= currentStep; --i) {
         indicators[i].classList.remove('full')
     }
 
-    for(let i = 0; i < currentStep; ++i){
+    for (let i = 0; i < currentStep; ++i) {
         indicators[i].classList.add('full')
     }
 }
@@ -497,14 +487,14 @@ function goToStep(stepNumber){
 
 
 // Show and hide modal screen
-function showHideModalScreen(showScreen, hideScreen){
+function showHideModalScreen(showScreen, hideScreen) {
     $(".modalContainer").removeClass('active');
-    console.log("Show="+showScreen);
-    console.log("Hide="+hideScreen);
-    setTimeout(function(){
+    console.log("Show=" + showScreen);
+    console.log("Hide=" + hideScreen);
+    setTimeout(function () {
         $(hideScreen).hide()
         $(showScreen).show();
         $(".modalContainer").addClass('active');
-    },1000);
+    }, 1000);
 }
 

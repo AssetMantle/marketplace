@@ -47,6 +47,7 @@ body{
     /*background-repeat: no-repeat;*/
     /*background-size: cover;*/
     background-position: center;
+    overflow-x: hidden !important;
 }
 body.modal-active{
     /*overflow: hidden;*/

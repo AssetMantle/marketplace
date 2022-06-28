@@ -3,7 +3,7 @@
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
     @main("") {
-        @opener()
+        @* @opener() *@
 
         <div class="wrapper">
             <nav>
@@ -492,6 +492,7 @@
 
     }
     <script>
+            checkAndPushState(jsRoutes.controllers.IndexController.index().url, '', '');
             // Pre-loader
             function HideScrollbar() {
                 var style = document.createElement("style");

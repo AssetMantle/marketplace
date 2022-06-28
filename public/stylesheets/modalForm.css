@@ -1173,3 +1173,10 @@ dl dd.error:before{
 #termsCondition_field dt label{
     display: none;
 }
+#RECEIVE_NOTIFICATIONS_field{
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: start;
+    align-items: baseline;
+    gap: 10px;
+}

@@ -13,6 +13,9 @@ function submitForm(isModal,source, targetID) {
                 400: function (data) {
                     result.html(data.responseText);
                 },
+                401: function (data) {
+                    replaceDocument(data.responseText);
+                },
                 500: function (data) {
                     replaceDocument(data.responseText);
                 },
