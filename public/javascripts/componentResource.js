@@ -1,6 +1,4 @@
 function componentResource(source, route, loadingSpinnerID = 'commonSpinner', event = '') {
-    console.log(source);
-    console.log(route);
     const div = $('#' + source);
     let loadingSpinner = $('#' + loadingSpinnerID);
     $.ajax({
@@ -16,7 +14,6 @@ function componentResource(source, route, loadingSpinnerID = 'commonSpinner', ev
         },
         statusCode: {
             200: function (data) {
-                // console.log(data);
                 div.html(data);
             },
             401: function (data) {

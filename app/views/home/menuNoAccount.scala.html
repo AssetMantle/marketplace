@@ -4,11 +4,13 @@
     <nav>
         <input type="checkbox" id="show-search"/>
         <input type="checkbox" id="show-menu"/>
-        <label for="show-menu" class="menu-icon"><i class="uil uil-bars"></i></label>
+        <label for="show-menu" class="menu-icon"></label>
         <div class="content">
-            <div class="logo"><a href="#"><img class="lazyload" src="@routes.Assets.versioned("images/MantlePlace-Logo.svg")" data-src="@routes.Assets.versioned("images/MantlePlace-Logo.svg")" class="logo"/></a></div>
+            <div class="logo"><a href="#"><img class="lazyload" src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" data-src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" class="logo"/></a></div>
             <ul class="links">
-                <li><a href="#">@Messages(constants.View.EXPLORE)</a>
+                <li><a href="#" class="desktop-link">@Messages(constants.View.EXPLORE)</a>
+                    <input type="checkbox" id="show-features">
+                    <label for="show-features">@Messages(constants.View.EXPLORE)</label>
                     <ul>
                         <li>
                             <div class="disable">@Messages(constants.View.COMING_SOON)</div>
@@ -17,8 +19,8 @@
                 </li>
                 <li>
                     <a href="#" class="desktop-link">@Messages(constants.View.CREATE)</a>
-                    <input type="checkbox" id="show-features">
-                    <label for="show-features">@Messages(constants.View.CREATE)</label>
+                    <input type="checkbox" id="show-features2">
+                    <label for="show-features2">@Messages(constants.View.CREATE)</label>
                     <ul>
                         <li>
                             <div class="disable">@Messages(constants.View.COMING_SOON)</div>
@@ -26,22 +28,36 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="#">@Messages(constants.View.SUPPORT)</a>
+                    <a href="#" class="desktop-link">@Messages(constants.View.SUPPORT)</a>
+                    <input type="checkbox" id="show-features3">
+                    <label for="show-features3">@Messages(constants.View.CREATE)</label>
                     <ul>
                         <li>
                             <div class="disable">@Messages(constants.View.COMING_SOON)</div>
                         </li>
                     </ul>
                 </li>
+                <li class="hiddenMenu"><a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_UP.get, ""))">@Messages(constants.View.SIGN_UP)</a></li>
+                <li class="hiddenMenu"><a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN.get, ""))">@Messages(constants.View.SIGN_IN)</a></li>
             </ul>
         </div>
 
-        <div class="content">
+       <!-- <div class="content">
+            <ul class="links">
+                <li><a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_UP.get, ""))">@Messages(constants.View.SIGN_UP)</a></li>
+                <li><a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN.get, ""))">@Messages(constants.View.SIGN_IN)</a></li>
+            </ul>
+        </div> -->
+
+        <div class="right-menu">
             <ul class="links">
                 <li><a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_UP.get, ""))">@Messages(constants.View.SIGN_UP)</a></li>
                 <li><a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN.get, ""))">@Messages(constants.View.SIGN_IN)</a></li>
             </ul>
         </div>
+
+
+
 
         <form action="#" class="search-box">
             <input type="text" placeholder="Type Something to Search..." required/>

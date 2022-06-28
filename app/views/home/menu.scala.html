@@ -4,9 +4,9 @@
     <nav>
         <input type="checkbox" id="show-search"/>
         <input type="checkbox" id="show-menu"/>
-        <label for="show-menu" class="menu-icon"><i class="uil uil-bars"></i></label>
+        <label for="show-menu" class="menu-icon"></label>
         <div class="content">
-            <div class="logo"><a href="#"><img class="lazyload" src="@routes.Assets.versioned("images/MantlePlace-Logo.svg")" data-src="@routes.Assets.versioned("images/MantlePlace-Logo.svg")" class="logo"/></a></div>
+            <div class="logo"><a href="#"><img class="lazyload" src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" data-src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" class="logo"/></a></div>
             <ul class="links">
                 @* <li class="active"><a href="#">Explore</a></li>*@
                 <li><a href="#">@Messages(constants.View.EXPLORE)</a>
@@ -28,13 +28,13 @@
                 @*  <ul>
                         <li>
                             <a href="#">
-                                <img class="lazyload" src="  @routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Createcollection.svg")"/>
+                                <img class="lazyload" src="  @routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/createCollection.svg")"/>
                                 Create new collections
                             </a>
                         </li>
                         <li>
                             <a href="#">
-                                <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/createNFT.svg")"/>
+                                <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/createNFT.svg")"/>
                                 Create new NFT
                             </a>
                         </li>
@@ -58,7 +58,7 @@
                     <ul class="menu">
                         <li class="user-profile">
                             <a href="#">
-                                <img class="lazyload" src="@routes.Assets.versioned("images/Profile.png")" class="profile"/>
+                                <img class="lazyload" src="@routes.Assets.versioned("images/icon/profile.png")" class="profile"/>
                             </a>
                             <ul class="submenu">
                                 <li>
@@ -77,43 +77,43 @@
                                 </li>
                                 <li>
                                     <a href="#">
-                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/NFT.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/NFT.svg")"/>
                                         My NFTs
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#">
-                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Collection.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/collection.svg")"/>
                                         My Collections
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#">
-                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Favourites.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/favourites.svg")"/>
                                         Favourites
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#">
-                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/listing.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/listing.svg")"/>
                                         Listings
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#">
-                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/whitelist.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/whiteList.svg")"/>
                                         Whitelist
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#">
-                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Settings.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/settings.svg")"/>
                                         Settings
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#">
-                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/logout.svg")"/>
+                                        <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/logout.svg")"/>
                                         Sign out
                                     </a>
                                 </li>
@@ -121,7 +121,7 @@
                         </li>
                         <li class="user-wallet">
                             <a href="https://wallet.assetmantle.one/" target="_blank">
-                                <img class="lazyload" src="@routes.Assets.versioned("images/Wallet.png")" class="wallet"/>
+                                <img class="lazyload" src="@routes.Assets.versioned("images/icon/wallet.png")" class="wallet"/>
                             </a>
                         </li>
                     </ul>
@@ -133,19 +133,19 @@
     @* <ul>*@
     @* <li>*@
     @* <a href="#">*@
-    @* <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Createcollection.svg")"/>*@
+    @* <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/createCollection.svg")"/>*@
     @* Create new collections*@
     @* </a>*@
     @* </li>*@
     @* <li>*@
     @* <a href="#">*@
-    @* <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/createNFT.svg")"/>*@
+    @* <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/createNFT.svg")"/>*@
     @* Create new NFT*@
     @* </a>*@
     @* </li>*@
     @* </ul>*@
     @* </div>*@
-    @* <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/Wallet.svg")"/>*@
+    @* <img class="lazyload" src="@routes.Assets.versioned("images/no-thumbnail-medium.png")" data-src="@routes.Assets.versioned("images/icon/wallet.svg")"/>*@
             </div>
         </div>
 

@@ -1,29 +1,4 @@
 
-// Pre-loader
-function HideScrollbar() {
-    var style = document.createElement("style");
-    style.innerHTML = `body::-webkit-scrollbar {display: none;}`;
-    document.head.appendChild(style);
-}
-HideScrollbar()
-
-// function ShowScrollbar() {
-//     var style = document.createElement("style");
-//     style.innerHTML = `body::-webkit-scrollbar {display: block;}`;
-//     document.head.appendChild(style);
-// }
-
-let intro = document.querySelector('.intro');
-
-window.addEventListener('DOMContentLoaded', ()=>{
-    setTimeout(()=>{
-        setTimeout(()=>{
-            intro.style.top = '-100vh';
-            intro.style.visibility = 'hidden';
-            // ShowScrollbar();
-        },3500);
-    });
-});
 
 
 function checkUsername(){
@@ -461,11 +436,10 @@ document.onload = function (){
     window.scrollTo(0,0);
 }
 
-
-// Text Copy to Clipboard
-$(".form-address-box .form-copy-icon").on("click",function (){
-    var element = $(this).next('.form-copy-message');
-    var copyText = $(this).prevAll('.username-data');
+// Copy to Clipboard
+function copyToClipboard(e){
+    var element = $(e).next('.form-copy-message');
+    var copyText = $(e).prevAll('.username-data');
 
     element.addClass("active");
     element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function() {
@@ -473,8 +447,7 @@ $(".form-address-box .form-copy-icon").on("click",function (){
     });
 
     navigator.clipboard.writeText(copyText.text());
-});
-
+}
 
 // Multi Step
 const dots = document.getElementsByClassName('progress-bar__dot')

@@ -21,3 +21,9 @@
     font-family: 'Josefin Sans';
     src: url('fonts/lato/josefinSans/JosefinSans-Regular.ttf');
 }
+
+/* Paralucent */
+@font-face {
+    font-family: 'Paralucent';
+    src: url('fonts/lato/paralucent/Paralucent Medium.otf');
+}
