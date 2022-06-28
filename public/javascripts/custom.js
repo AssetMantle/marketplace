@@ -1,6 +1,3 @@
-
-
-
 function checkUsername(){
     event.preventDefault();
     var usernameValue = document.getElementById("username").value;
@@ -501,13 +498,13 @@ function goToStep(stepNumber){
 
 // Show and hide modal screen
 function showHideModalScreen(showScreen, hideScreen){
-    $(".modal").removeClass('active');
+    $(".modalContainer").removeClass('active');
     console.log("Show="+showScreen);
     console.log("Hide="+hideScreen);
     setTimeout(function(){
         $(hideScreen).hide()
         $(showScreen).show();
-        $(".modal").addClass('active');
+        $(".modalContainer").addClass('active');
     },1000);
 }
 

@@ -29,6 +29,10 @@
         <script src="@routes.Assets.versioned("javascripts/checkAndPushState.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/backButtonCapture.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/library/bootstrap.bundle.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/form/getForm.js")"></script>
+        <script src="@routes.Assets.versioned("javascripts/form/closeForm.js")"></script>
+        <script src="@routes.Assets.versioned("javascripts/form/submitForm.js")"></script>
+        <script src="@routes.Assets.versioned("javascripts/form/validateForm.js")"></script>
     </head>
     <body>
         <div class="wrapper">
@@ -80,7 +84,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a >
+                                <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))">
                                     <img class="lazyload" src="@routes.Assets.versioned("images/icon/logout.png")" class="logout" width="22" height="22"/>
                                 </a>
                             </li>
@@ -100,6 +104,13 @@
                     <button type="submit" class="go-icon"></button>
                 </form>
             </nav>
+        </div>
+
+        <div class="modal-overlay" id="commonModal">
+            <div class="modalContainer">
+                <div class="modal-content" id="modal-content">
+                </div>
+            </div>
         </div>
 
     <div class="container-fluid common-container">

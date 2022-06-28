@@ -6,12 +6,14 @@ function getForm(route, modal = '#commonModal', modalContent = '#modal-content')
         async: true,
         statusCode: {
             200: function (data) {
-                // modal.html(data);
-                $(modal+" .modal").removeClass('active');
+                var style = document.createElement("style");
+                style.innerHTML = `body::-webkit-scrollbar {display: none;}`;
+                document.head.appendChild(style);
+                $(modal+" .modalContainer").removeClass('active');
                 setTimeout(function(){
                     $(modalContent).html(data);
                     $(modal).addClass('active');
-                    $(modal+" .modal").addClass('active');
+                    $(modal+" .modalContainer").addClass('active');
                     $("body").addClass('modal-active');
                 },1000);
 

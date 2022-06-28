@@ -21,10 +21,10 @@ function submitForm(isModal,source, targetID) {
                 },
                 206: function (data) {
                     if(isModal === "true"){
-                        $(".modal").removeClass('active');
+                        $(".modalContainer").removeClass('active');
                         setTimeout(function(){
                             $(target).html(data);
-                            $(".modal").addClass('active');
+                            $(".modalContainer").addClass('active');
                         },1000);
                     }
                     else{

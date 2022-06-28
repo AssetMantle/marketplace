@@ -1,5 +1,5 @@
 // Sign In / Sign Up Popup Box
-var elements = $('.modal-overlay, .modal');
+var elements = $('.modal-overlay, .modalContainer');
 
 // $('button').click(function(){
 //     elements.addClass('active');

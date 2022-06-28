@@ -33,6 +33,27 @@
                 }
             </div>
         }
+    }else{
+        @if(showBackButton){
+            <div class="header-with-icon">
+                <div class="form-top">
+                    <div class="title-icon back-button-icon" onclick="showHideModalScreen('@showScreen', '@hideScreen')">
+                        <img src="@routes.Assets.versioned("images/icon/backArrow.png")"/>
+                    </div>
+                    <div class="title-text">@Messages(formTemplate.title)</div>
+                    @if(closeButton){
+                        <a class="form-close-btn close-modal" onclick="closeModal()"></a>
+                    }
+                </div>
+            </div>
+        } else{
+            <div class="header">
+                <div class="form-top">
+                    <div class="form-title">@Messages(formTemplate.title)</div>
+                    <a class="form-close-btn close-modal" onclick="closeModal()"></a>
+                </div>
+            </div>
+        }
     }
     @if(formData.hasGlobalErrors) {
         <ul id="formGlobalErrors">
