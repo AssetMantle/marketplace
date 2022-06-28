@@ -21,7 +21,7 @@
                 @commonFieldErrorMessage(id = "incorrectPasswordError", message = Messages(constants.View.INCORRECT_PASSWORD))
             </div>
         </div>
-        @commonInputText(signInForm, constants.FormField.PUSH_NOTIFICATION_TOKEN, Symbol("class") -> "hidden", Symbol("id") -> "signInUsername")
+        @commonInputText(signInForm, constants.FormField.PUSH_NOTIFICATION_TOKEN, Symbol("class") -> "hidden")
         <div class="form-footer">
             <div class="footer-message">
                 <a class="link" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.FORGET_PASSWORD.get, ""))">@Messages(constants.View.SIGN_IN_FORGOT_PASSWORD)</a>
