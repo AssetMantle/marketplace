@@ -149,9 +149,10 @@ nav .content .links {
 }
 .right-menu .links{
     display: flex;
+    margin-bottom: 0px !important;
 }
 .right-menu .links li a{
-    padding: 9px 17px;
+    padding: 9px 10px;
 }
 .right-menu .account-menu{
     height: 70px;

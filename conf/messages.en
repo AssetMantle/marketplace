@@ -157,6 +157,7 @@ FORGOT_PASSWORD_SUCCESS_TITLE=Password Reset successful
 FORGOT_PASSWORD_SUCCESS_SUBTITLE=Your password has been reset successfully. Sign in to continue.
 FORGOT_PASSWORD_SEED_PHRASE_SUBTITLE=Confirm your recovery phrase to reset your password.
 FORGOT_PASSWORD_NEW_PASSWORD_SUBTITLE=Enter a new password.
+FORGOT_PASSWORD_USERNAME=Enter Username
 
 #//Profile
 TRANSACTION_DETAILS=Transaction Details
