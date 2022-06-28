@@ -1,17 +1,3 @@
-function checkUsername() {
-    event.preventDefault();
-    var usernameValue = document.getElementById("username").value;
-    if (usernameValue !== '') {
-        if (usernameValue === 'jaggu') {
-            $(".username_field + .error-message").slideUp();
-            $(".username_field").css("border-color", "var(--inactive-gray)");
-        } else {
-            $(".username_field + .error-message").slideDown();
-            $(".username_field").css("border-color", "var(--error)");
-        }
-    }
-}
-
 function checkNewPassword() {
     let passwordValue = document.getElementById('password').value;
     // var completeRegularExpression = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,128}$/;
@@ -66,26 +52,6 @@ $(document).click(function () {
     $('.dropdown-el').removeClass('expanded');
 });
 
-
-// check Collection name is exist or not
-function checkCollectionName() {
-    var collectionName = document.getElementById("collectionName");
-
-    if (collectionName.value === "jaggu") {
-        $("#collectionName ~ i").fadeOut();
-        $(".collectionError").slideDown();
-        $("#collectionName").css("border-color", "var(--error)");
-    } else {
-        if (collectionName.value.length > 0) {
-            $("#collectionName ~ i").fadeIn();
-        } else {
-            $("#collectionName ~ i").fadeOut();
-        }
-        $(".collectionError").slideUp();
-        $("#collectionName").css("border-color", "var(--inactive-gray)");
-    }
-}
-
 // Create Collection : Add More Property
 function addCollectionProperty() {
 
@@ -133,20 +99,6 @@ function removeCollectionTag(e) {
 //     document.getElementsByClassName("dateRangeField")[0].setAttribute("name","daterange");
 //     console.log(document.getElementsByClassName("dateRangeField")[0].getAttribute('name'));
 // }
-
-// Check Phrase
-function checkPhrase(e) {
-    console.log(e.value);
-    // if(e.className === "input-phrase-1"){
-    if (e.value.toLowerCase() === "monkey") {
-        e.style.borderColor = "var(--connected)";
-    } else if (e.value.length !== 0) {
-        e.style.borderColor = "var(--error)";
-    } else {
-        e.style.borderColor = "var(--dark)";
-    }
-    // }
-}
 
 
 // Hero Section Swiper/Slider 2
