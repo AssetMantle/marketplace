@@ -10,7 +10,7 @@
         @if(showBackButton){
             <div class="header-with-icon">
                 <div class="form-top">
-                    <div class="title-icon back-button-icon" onclick="showHideModalScreen('@showScreen', '@hideScreen')">
+                    <div class="title-icon back-button-icon" id="modalBackButton" onclick="showHideModalScreen('@showScreen', '@hideScreen')">
                         <img src="@routes.Assets.versioned("images/icon/backArrow.png")"/>
                     </div>
                     <div class="title-text">@Messages(formTemplate.title)</div>
@@ -19,7 +19,7 @@
                     }
                 </div>
                 @if(showSubtitle){
-                    <div class="form-sub-title" style="margin-bottom: 24px;">@Messages(formTemplate.subTitle)</div>
+                    <div class="form-sub-title" style="margin-bottom: 24px;" id="modalSubtitle">@Messages(formTemplate.subTitle)</div>
                 }
             </div>
         } else{
@@ -29,7 +29,7 @@
                     <a class="form-close-btn close-modal" onclick="closeModal()"></a>
                 </div>
                 @if(showSubtitle){
-                    <div class="form-sub-title">@Messages(formTemplate.subTitle)</div>
+                    <div class="form-sub-title" id="modalSubtitle">@Messages(formTemplate.subTitle)</div>
                 }
             </div>
         }

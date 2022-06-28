@@ -1,5 +1,6 @@
 // Hide submit button
 $("#formSubmitButton").hide();
+$("#modalBackButton").hide();
 
 function showPassword() {
     let password = $('#forgotNewPassword')[0];
@@ -49,3 +50,26 @@ function checkNewPassword(){
         $(".error-message").slideUp();
     }
 }
+$("#modalBackButton").click(function (){
+    $("#modalBackButton").hide();
+});
+
+function showHideForgotModalScreen(showScreen, hideScreen, pageNumber) {
+    $(".modalContainer").removeClass('active');
+    setTimeout(function () {
+        $(hideScreen).hide()
+        if(pageNumber === 1){
+            $("#modalBackButton").show();
+            $("#modalSubtitle").text("Confirm your recovery phrase to reset your password.");
+        }
+        else if(pageNumber === 2){
+            $("#modalBackButton").hide();
+            $("#modalSubtitle").text("Enter a new password.");
+            $("#formSubmitButton").show();
+        }
+
+        $(showScreen).show();
+        $(".modalContainer").addClass('active');
+    }, 1000);
+}
+
