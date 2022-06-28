@@ -7,6 +7,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: mantleplace
+    environment:
+      - SITE_URL=
     command:
      - '-Dplay.http.secret.key=APPLICATION_SECRET=slw2FnBTONgZq_tOtflOzKoAglFj@AHr=>KTDSQnWNXyZBB>b?les^A:UQIO[9b[ -Xmx2048m -XX:+UseContainerSupport'
     ports:
