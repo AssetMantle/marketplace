@@ -177,10 +177,10 @@ class AccountController @Inject()(
             _ <- verifyAndUpdate(masterWallet)
           } yield Ok(views.html.index())
             ).recover {
-            case baseException: BaseException => NotFound(views.html.account.signIn(SignIn.form.withGlobalError(baseException.failure.message)))
+            case baseException: BaseException => BadRequest(views.html.account.forgetPassword(ForgotPassword.form.withGlobalError(baseException.failure.message)))
           }
-        })
-
+        }
+      )
   }
 
 
