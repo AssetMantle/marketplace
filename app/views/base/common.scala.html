@@ -41,15 +41,9 @@
                 <input type="checkbox" id="show-menu"/>
                 <label for="show-menu" class="menu-icon"></label>
                 <div class="content">
-                    <div class="logo"><a href="#"><img class="lazyload" src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" data-src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" class="logo"/></a></div>
+                    <div class="logo"><a href="@routes.IndexController.index()"><img class="lazyload" src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" data-src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" class="logo"/></a></div>
                     <ul class="links">
-                        <li><a href="#">@Messages(constants.View.EXPLORE)</a>
-                            <ul>
-                                <li>
-                                    <div class="disable">@Messages(constants.View.COMING_SOON)</div>
-                                </li>
-                            </ul>
-                        </li>
+                        <li><a href="@routes.CollectionController.viewCollections()">@Messages(constants.View.EXPLORE)</a></li>
                         <li>
                             <a href="#" class="desktop-link">@Messages(constants.View.CREATE)</a>
                             <input type="checkbox" id="show-features">

@@ -16,6 +16,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
       JavaScriptReverseRouter("jsRoutes")(
         routes.javascript.Assets.versioned,
 
+        routes.javascript.IndexController.index,
+
         routes.javascript.AccountController.signUpForm,
         routes.javascript.AccountController.verifyWalletMnemonicsForm,
         routes.javascript.AccountController.checkUsernameAvailable,
