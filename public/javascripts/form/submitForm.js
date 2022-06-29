@@ -43,5 +43,7 @@ function submitForm(isModal,source, targetID) {
                 $('#connectionError').fadeIn(100);
             }
         });
+    } else {
+        console.log("Form validation failed")
     }
 }

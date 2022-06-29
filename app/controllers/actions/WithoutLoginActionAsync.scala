@@ -44,7 +44,7 @@ class WithoutLoginActionAsync @Inject()(
 
         for {
           verify <- verify
-          result <- f(Option(LoginState(username, address)))(request)
+          result <- getResult(verify, LoginState(username, address))
         } yield result
       } else f(None)(request)
 
