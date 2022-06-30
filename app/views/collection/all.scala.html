@@ -14,17 +14,13 @@
                         </div>
                     </div>
                 </div>
-
-                    <!-- Collection List: Grid View -->
                 <div class="profile-list">
                     <ol class="list grid-view-filter">
-                        @collections.zipWithIndex.map {case(collection, index) =>
-                            @* @collection.name
-                            @collection.description *@
-                            <li>
-                                @commonCollectionCard(collection)
-                            </li>
-                        }
+                    @collections.zipWithIndex.map { case (collection, index) =>
+                    <li>
+                        @commonCollectionCard(collection)
+                    </li>
+                    }
                     </ol>
 
                 </div>
@@ -32,4 +28,7 @@
         </div>
     </div>
 </div>
+<script>
+        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections().url, '', "collections");
+</script>
 
