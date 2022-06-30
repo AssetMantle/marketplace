@@ -69,7 +69,6 @@ jobs:
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          no-cache: ${{ github.ref_type == 'tag' }}
 
       - name: Build staging container image
         uses: docker/build-push-action@v2
