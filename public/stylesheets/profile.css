@@ -33,7 +33,7 @@
     height: fit-content;
     background-color: var(--card-color);
     border-radius: 20px;
-    padding: 20px 8px 20px 20px;
+    padding: 20px 20px 20px 20px;
 }
 
 /* Creator Profile Card */
@@ -288,10 +288,9 @@
     color: var(--mantle-off-white);
 }
 .profile-card .profiles-container .profile-list{
-    height: 741px;
-    overflow-y: auto;
+    /*overflow-y: auto;*/
     margin-top: 25px;
-    padding-right: 20px;
+    /*padding-right: 20px;*/
 }
 
 .profile-card .profiles-container .profile-list .list {
@@ -531,4 +530,9 @@
     line-height: 24px;
     text-transform: capitalize;
     color: var(--gray);
+}
+.nft-list .form-top{
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
 }
