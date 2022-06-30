@@ -47,5 +47,11 @@ LABEL org.opencontainers.image.description=mantleplace
 LABEL org.opencontainers.image.source=https://github.com/assetmantle/mantleplace
 LABEL org.opencontainers.image.documentation=https://github.com/assetmantle/mantleplace
 WORKDIR /
+RUN --mount=type=cache,target=/var/lib/apt/cache \
+  --mount=type=cache,target=/var/lib/apt/lists \
+  --mount=type=cache,target=/var/lib/cache \
+  --mount=type=cache,target=/var/cache/apt/archives \
+  apt update; \
+  apt install -y openssl libexpat1 libsasl2-2 libssl1.1 libsasl2-modules-db
 COPY --from=extract /app/mantleplace /mantleplace
 ENTRYPOINT [ "/mantleplace/bin/mantleplace" ]
