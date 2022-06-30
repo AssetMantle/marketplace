@@ -532,3 +532,8 @@
     text-transform: capitalize;
     color: var(--gray);
 }
+.nft-list .form-top{
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}

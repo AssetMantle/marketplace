@@ -1,3 +1,10 @@
+$(document).click(function (e) {
+    if ($(e.target).is('#commonModal')) {
+        $(".modal-overlay").removeClass("active");
+        $(".modalContainer").removeClass("active");
+        $("body").removeClass("modal-active");
+    }
+});
 function checkNewPassword() {
     let passwordValue = document.getElementById('password').value;
     // var completeRegularExpression = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,128}$/;
