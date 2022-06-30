@@ -26,7 +26,6 @@
         </div>
     </div>
 </div>
-
 <script>
-        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection().url, '@collection.id', "collection");
-</script>
+        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection('@collection.id').url, '@collection.id', "collection");
+    </script>

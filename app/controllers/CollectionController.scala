@@ -70,7 +70,11 @@ class CollectionController @Inject()(
         (for {
           collection <- collection
           allNFTs <- allNFTs
-        } yield Ok(views.html.collection.collection(collection, allNFTs))
+        } yield {
+          println("ALL NFTs:")
+          println(allNFTs.length)
+          Ok(views.html.collection.collection(collection, allNFTs))
+        }
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
