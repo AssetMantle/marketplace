@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Wallet"
     "partialMnemonics"  VARCHAR NOT NULL,
     "accountId"         VARCHAR NOT NULL,
     "provisioned"       BOOLEAN,
+    "verified"          BOOLEAN,
     "preference"        INTEGER NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
