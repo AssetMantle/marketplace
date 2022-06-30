@@ -85,7 +85,7 @@ SIGN_UP_SIGN_IN_MESSAGE=Already have an account?
 CREATE_WALLET_TITLE=Create a Wallet
 CREATE_WALLET_SAFETY_POINTS_TITLE=Important points to consider:
 CREATE_WALLET_SAFETY_POINT_1=Users need to securely note down their address and recovery phrase using pen and paper. Losing or exposing the recovery phrase can potentially lead to users' funds or assets being stolen.
-CREATE_WALLET_SAFETY_POINT_2=Users can use recovrey phrase to back up and restore their accounts in case they forget their password.
+CREATE_WALLET_SAFETY_POINT_2=Users can use recovery phrases to back up and restore their accounts if they forget their passwords.
 CREATE_WALLET_SAFETY_POINT_3=Do not share your recovery phrase with anyone.
 COPY_SEED_MESSAGE=Copy seed phrase
 RECOVERY_PHRASE=Recovery phrase
@@ -123,8 +123,9 @@ INCORRECT_PASSWORD=Password incorrect. Please check the password and try again.
 SIGN_IN_FORGOT_PASSWORD=Forgot Password?
 SIGN_IN_SIGN_UP_MESSAGE=Don’t have an account yet?
 SIGN_IN_SIGN_UP=Sign up
-RESPONSE.FAILURE.INVALID_USERNAME_OR_PASSWORD=Invalid Username or Password.
+RESPONSE.FAILURE.INVALID_USERNAME_OR_PASSWORD=Invalid username or password.
 RESPONSE.FAILURE.MASTER_ACCOUNT_NOT_FOUND=Account not found.
+RESPONSE.FAILURE.INVALID_PASSWORD=Invalid password.
 RESPONSE.FAILURE.PASSWORD_VALIDATION_FAILED=Passowrd does not match minimum criteria. It should contain at least a small letter, a capital letter, a number and a symbol: !@#$%^&*._-.
 
 #//Sign Out
@@ -164,6 +165,9 @@ FORM.FORGET_PASSWORD.SUBTITLE=Enter your username to reset password.
 FORGOT_PASSWORD_ADDRESS=Wallet Address
 WALLET_ADDRESS=Wallet Address
 FORM.FORGET_PASSWORD.SUBMIT=Next
+FORGOT_PASSWORD_WALLET_ADDRESS_ERROR=Invalid wallet address.
+FORGOT_PASSWORD_USERNAME_ERROR=Minimum length 3.
+RESPONSE.FAILURE.MASTER_WALLET_NOT_FOUND=Wallet not found.
 
 
 

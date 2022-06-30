@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel="icon" href="@routes.Assets.versioned("images/Favicon.ico")"/>
+        <link href="@routes.Assets.versioned("images/favicon.ico")" rel="icon"/>
         <metaList charset="utf-8"></metaList>
         <metaList http-equiv="x-ua-compatible" content="ie=edge"></metaList>
         <metaList name="viewport" content="width=device-width, initial-scale=1"></metaList>
@@ -33,6 +33,17 @@
         <script src="@routes.Assets.versioned("javascripts/form/closeForm.js")"></script>
         <script src="@routes.Assets.versioned("javascripts/form/submitForm.js")"></script>
         <script src="@routes.Assets.versioned("javascripts/form/validateForm.js")"></script>
+        <style>
+            img{
+                vertical-align: unset !important;
+            }
+            label{
+                display: unset;
+            }
+            dl,dd{
+                margin: 0;
+            }
+        </style>
     </head>
     <body>
         <div class="wrapper">
