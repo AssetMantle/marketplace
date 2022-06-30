@@ -12,6 +12,7 @@ function submitForm(isModal,source, targetID) {
             statusCode: {
                 400: function (data) {
                     result.html(data.responseText);
+                    $(".error").closest("dd").prev().find('input').css({"border-color":"var(--error)"});
                 },
                 401: function (data) {
                     replaceDocument(data.responseText);

@@ -6,7 +6,14 @@
         <div class="profile-card">
             <div class="profiles-container">
                 <div class="nft-list me-3">
-                    <div class="collection-link">Collection Name</div>
+                    <div class="header-with-icon">
+                        <div class="d-flex flex-row align-items-center gap-2 form-top">
+                            <div class="title-icon back-button-icon">
+                                <img src="@routes.Assets.versioned("images/icon/backArrow.png")"/>
+                            </div>
+                            <div class="collection-link">@collection.name</div>
+                        </div>
+                    </div>
                     <div class="nft-list">
                         <div class="row">
                             @nfts.map { nft =>

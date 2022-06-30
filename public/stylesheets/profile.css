@@ -217,10 +217,6 @@
     font-weight: 700;
     color: var(--default);
 }
-.profile-card .profiles-container .card-header .left-option .disable{
-    color: var(--disable);
-    cursor: none !important;
-}
 .profile-card .profiles-container .card-header .right-option{
     margin-right: 20px;
 }
@@ -522,4 +518,16 @@
     /*background-clip: text;*/
     /*text-fill-color: transparent;*/
     color: var(--disable);
+}
+.nft-list .header-with-icon .back-button-icon img{
+    vertical-align: unset !important;
+}
+.nft-list .header-with-icon .collection-link{
+    font-family: var(--font-type-1);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 24px;
+    text-transform: capitalize;
+    color: var(--gray);
 }

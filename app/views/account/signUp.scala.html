@@ -17,7 +17,7 @@
                     <div id="checkIcon" class="fieldIcon checkIcon">
                         <img src="@routes.Assets.versioned("images/icon/verifiedUsername.png")"/>
                     </div>
-                    @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("placeholder") -> "Enter Username", Symbol("class") -> "inputBox", 'id -> "signUpUsername", Symbol("autocomplete") -> "off", 'oninput -> """checkUsernameAvailable(this,'#USERNAME_AVAILABLE')""", Symbol("onblur") -> "changeFieldBorder()", Symbol("onfocus") -> "changeFieldBorder()")
+                    @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("placeholder") -> "Enter Username", Symbol("class") -> "inputBox", 'id -> "signUpUsername", Symbol("autocomplete") -> "off", 'oninput -> """checkUsernameAvailable(this,'#USERNAME_AVAILABLE'); activeButton();""", Symbol("onblur") -> "changeFieldBorder()", Symbol("onfocus") -> "changeFieldBorder()")
                     @commonFieldErrorMessage(id = "usernameAvailableError",message = Messages(constants.View.USERNAME_NOT_AVAILABLE))
                 </div>
             </div>
@@ -29,7 +29,7 @@
             <div class="inputFieldBody">
                 <div class="usernameAvailability">
                     @commonLabel(constants.FormField.SIGNUP_PASSWORD.name)
-                    @commonInputPassword(signUpForm, constants.FormField.SIGNUP_PASSWORD, Symbol("placeholder") -> "Enter Password", 'id -> "signUpPassword")
+                    @commonInputPassword(signUpForm, constants.FormField.SIGNUP_PASSWORD, Symbol("placeholder") -> "Enter Password", 'id -> "signUpPassword", 'oninput -> """activeButton()""")
                 </div>
             </div>
         </div>
@@ -46,7 +46,7 @@
                             <img src="@routes.Assets.versioned("images/icon/Show.png")"/>
                         </span>
                     </div>
-                    @commonInputPassword(signUpForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, Symbol("placeholder") -> "Enter Password", 'id -> "signUpConfirmPassword", 'oninput -> """checkPasswords()""")
+                    @commonInputPassword(signUpForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, Symbol("placeholder") -> "Enter Password", 'id -> "signUpConfirmPassword", 'oninput -> """checkPasswords(); activeButton();""")
                     @commonFieldErrorMessage(id = "repeatPasswordError",message = Messages(constants.View.REPEAT_PASSWORD_MISMATCH))
                 </div>
             </div>

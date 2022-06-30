@@ -447,4 +447,3 @@ function showHideModalScreen(showScreen, hideScreen) {
         $(".modalContainer").addClass('active');
     }, 1000);
 }
-

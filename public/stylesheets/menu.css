@@ -145,6 +145,9 @@ nav .content .links {
     display: flex;
     align-items: center;
     color: var(--mantle-off-white);
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
     /*gap: 10px;*/
 }
 .right-menu .links{
