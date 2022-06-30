@@ -441,9 +441,9 @@ function goToStep(stepNumber) {
 // Show and hide modal screen
 function showHideModalScreen(showScreen, hideScreen) {
     $(".modalContainer").removeClass('active');
-    setTimeout(function () {
+    // setTimeout(function () {
         $(hideScreen).hide()
         $(showScreen).show();
         $(".modalContainer").addClass('active');
-    }, 1000);
+    // }, 1000);
 }

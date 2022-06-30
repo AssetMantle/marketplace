@@ -12,12 +12,4 @@ $(document).ready(function() {
             }
         });
     }
-
-    setTimeout(()=>{
-        setTimeout(()=>{
-            $(".form-hidden").addClass('show');
-        },500);
-        $(".form-hidden").slideDown(1000);
-    },1000);
-
 });

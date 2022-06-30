@@ -1,5 +1,5 @@
-let timer = 0;
-let timeoutFlag = true;
+timer = 0;
+timeoutFlag = true;
 
 function checkUsernameAvailable(source, usernameAvailableCheckBoxID) {
     if (timeoutFlag) {

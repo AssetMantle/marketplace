@@ -59,7 +59,7 @@ $("#modalBackButton").click(function (){
 
 function showHideForgotModalScreen(showScreen, hideScreen, pageNumber) {
     $(".modalContainer").removeClass('active');
-    setTimeout(function () {
+    // setTimeout(function () {
         $(hideScreen).hide()
         if(pageNumber === 1){
             $("#modalBackButton").show();
@@ -73,7 +73,7 @@ function showHideForgotModalScreen(showScreen, hideScreen, pageNumber) {
 
         $(showScreen).show();
         $(".modalContainer").addClass('active');
-    }, 1000);
+    // }, 1000);
 }
 
 function enableNavigationButton(pageNumber) {
