@@ -520,6 +520,7 @@
     color: var(--disable);
 }
 .nft-list .header-with-icon .back-button-icon img{
+    cursor: pointer;
     vertical-align: unset !important;
 }
 .nft-list .header-with-icon .collection-link{
