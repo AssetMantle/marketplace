@@ -2,7 +2,7 @@
 
 <div>
     @nft.name
-    <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(nft.compressedFile)">
+    <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(nft.file)">
     @defining("https://ipfs.io/ipfs/" + nft.ipfsLink) { ipfsLink =>
         @ipfsLink
     }

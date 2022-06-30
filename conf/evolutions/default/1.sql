@@ -24,11 +24,13 @@ CREATE TABLE IF NOT EXISTS MASTER."Account"
 
 CREATE TABLE IF NOT EXISTS MASTER."Collection"
 (
---     "ownerAccountId"    VARCHAR NOT NULL,
---     "classificationId"  VARCHAR NOT NULL,
+
     "id"                VARCHAR NOT NULL,
+    "classificationId"  VARCHAR,
     "name"              VARCHAR NOT NULL UNIQUE,
     "description"       VARCHAR NOT NULL,
+    "website"           VARCHAR NOT NULL,
+    "socialProfiles"    VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -43,7 +45,7 @@ CREATE TABLE IF NOT EXISTS MASTER."CollectionFile"
     "id"                VARCHAR NOT NULL,
     "documentType"      VARCHAR NOT NULL,
     "fileName"          VARCHAR NOT NULL,
-    "file"              BYTEA,
+    "file"              BYTEA NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -56,8 +58,8 @@ CREATE TABLE IF NOT EXISTS MASTER."CollectionFile"
 CREATE TABLE IF NOT EXISTS MASTER."NFT"
 (
     "fileName"          VARCHAR NOT NULL,
-    "compressedFile"    BYTEA   NOT NULL,
-    "collectionId"      VARCHAR NOT NULL,
+    "file"              BYTEA   NOT NULL,
+    "collectionId" VARCHAR NOT NULL,
     "name"              VARCHAR NOT NULL,
     "description"       VARCHAR NOT NULL,
     "properties"        VARCHAR NOT NULL,
