@@ -124,7 +124,7 @@ class UploadCollections @Inject()(
       utilities.FileOperations.renameFile(oldFilePath, newFilePath)
       masterCollectionFiles.Service.add(
         fileName = newFileName,
-        file = utilities.ImageProcess.convertToThumbnailWithHeight(newFilePath),
+        file = utilities.ImageProcess.convertToThumbnailWithHeight(newFilePath, 200),
         id = collectionID,
         documentType = constants.Collection.File.PROFILE,
       )
