@@ -1,7 +1,13 @@
 @import views.html.base.forms._
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@formHeaderWithBackButton(heading = "Terms and Conditions", subHeading = "Last Updated: May 30, 2022", closeButton = false, showScreen = "#signUpForm", hideScreen = "#termsConditionModal")
+@formHeaderWithBackButton(heading = Messages(constants.View.TERMS_CONDITIONS_TITLE), subHeading = Messages(constants.View.TERMS_CONDITIONS_DATE_MESSAGE)+' '+Messages(constants.View.TERMS_CONDITIONS_DATE), closeButton = false, showScreen = "#signUpForm", hideScreen = "#termsConditionModal")
 <div class="terms-condition-box">
-    @Messages(constants.View.TERMS_CONDITIONS)
+    @Messages(constants.View.TERMS_CONDITIONS_MESSAGE_1, "hello@assetmantle.one")
+    <br>
+    @Messages(constants.View.TERMS_CONDITIONS_MESSAGE_2)
+    <br>
+    @Messages(constants.View.TERMS_CONDITIONS_MESSAGE_3)
+    <br>
+    @Messages(constants.View.TERMS_CONDITIONS_MESSAGE_4)
 </div>
