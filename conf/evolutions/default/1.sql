@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS MASTER."CollectionFile"
     "id"                VARCHAR NOT NULL,
     "documentType"      VARCHAR NOT NULL,
     "fileName"          VARCHAR NOT NULL,
-    "file"              BYTEA NOT NULL,
+    "file"              BYTEA   NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS MASTER."NFT"
 (
     "fileName"          VARCHAR NOT NULL,
     "file"              BYTEA   NOT NULL,
-    "collectionId" VARCHAR NOT NULL,
+    "collectionId"      VARCHAR NOT NULL,
     "name"              VARCHAR NOT NULL,
     "description"       VARCHAR NOT NULL,
     "properties"        VARCHAR NOT NULL,
