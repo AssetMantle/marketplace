@@ -1020,6 +1020,9 @@ dl .info:after {
     width: 20px;
     height: 20px;
 }
+.showPassword .eyeIcon.openEye{
+    top: 34px;
+}
 .inputField .errorMessage,
 .seedPhraseError #phraseError{
     display: none;

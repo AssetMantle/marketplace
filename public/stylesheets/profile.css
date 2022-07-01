@@ -527,12 +527,12 @@
     font-style: normal;
     font-weight: 600;
     font-size: 20px;
-    line-height: 24px;
+    line-height: 0px !important;
     text-transform: capitalize;
     color: var(--gray);
 }
 .nft-list .form-top{
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 8px;
 }
