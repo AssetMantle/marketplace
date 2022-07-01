@@ -10,21 +10,16 @@
                     <div class="left-option">
                         <div class="row">
                             <div class="col mx-3 p-0 active">@Messages(constants.View.ART)</div>
-                            <div class="col mx-3 p-0 disable">@Messages(constants.View.MISC)</div>
                         </div>
                     </div>
                 </div>
-
-                    <!-- Collection List: Grid View -->
                 <div class="profile-list">
                     <ol class="list grid-view-filter">
-                        @collections.zipWithIndex.map {case(collection, index) =>
-                            @* @collection.name
-                            @collection.description *@
-                            <li>
-                                @commonCollectionCard(collection)
-                            </li>
-                        }
+                    @collections.map { collection =>
+                    <li>
+                        @commonCollectionCard(collection)
+                    </li>
+                    }
                     </ol>
 
                 </div>
@@ -32,4 +27,7 @@
         </div>
     </div>
 </div>
+<script>
+        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections().url, '', "collections");
+</script>
 

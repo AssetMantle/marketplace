@@ -47,7 +47,7 @@ class AccountController @Inject()(
           val addAccount = masterAccounts.Service.add(username = signUpData.username, password = signUpData.password, language = request.lang, accountType = constants.User.USER)
           val wallet = utilities.Wallet.getRandomWallet
 
-          def addWallet() = masterWallets.Service.add(address = wallet.address, partialMnemonics = wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown), accountId = signUpData.username, provisioned = None)
+          def addWallet() = masterWallets.Service.add(address = wallet.address, partialMnemonics = wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown), accountId = signUpData.username, provisioned = None, verified = None)
 
           (for {
             _ <- addAccount
@@ -73,14 +73,20 @@ class AccountController @Inject()(
         walletMnemonicsData => {
           val wallet = masterWallets.Service.tryGet(walletMnemonicsData.walletAddress)
 
-          (for {
-            wallet <- wallet
-          } yield {
+          def updateAndGetResult(wallet: master.Wallet) = {
             val mnemonics = wallet.partialMnemonics ++ Seq(walletMnemonicsData.seed1, walletMnemonicsData.seed2, walletMnemonicsData.seed3, walletMnemonicsData.seed4)
             if (utilities.Wallet.getWallet(mnemonics).address == walletMnemonicsData.walletAddress && wallet.address == walletMnemonicsData.walletAddress && wallet.accountId == walletMnemonicsData.username) {
-              PartialContent(views.html.account.walletSuccess(username = wallet.accountId, address = walletMnemonicsData.walletAddress))
+              val updateWallet = masterWallets.Service.updateWallet(wallet.copy(verified = Option(true)))
+              for {
+                _ <- updateWallet
+              } yield PartialContent(views.html.account.walletSuccess(username = wallet.accountId, address = walletMnemonicsData.walletAddress))
             } else throw new BaseException(constants.Response.INVALID_MNEMONICS)
           }
+
+          (for {
+            wallet <- wallet
+            result <- updateAndGetResult(wallet)
+          } yield result
             ).recover {
             case baseException: BaseException => BadRequest(views.html.account.verifyWalletMnemonics(walletMnemonicsForm = WalletMnemonics.form.withGlobalError(baseException.failure.message), username = walletMnemonicsData.username, address = walletMnemonicsData.walletAddress, partialMnemonics = Seq(walletMnemonicsData.seed1, walletMnemonicsData.seed2, walletMnemonicsData.seed3, walletMnemonicsData.seed4)))
           }
@@ -100,19 +106,33 @@ class AccountController @Inject()(
         },
         signInData => {
           val verifyPasswordAndAccount = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = signInData.username, password = signInData.password)
-          val wallet = masterWallets.Service.tryGetByAccountID(signInData.username)
+          val wallets = masterWallets.Service.getAllByAccountId(signInData.username)
 
-          def getResult(verified: Boolean, wallet: master.Wallet) = if (verified) {
-            implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = signInData.username, address = wallet.address))
-            implicit val loginState: LoginState = LoginState(username = signInData.username, address = wallet.address)
-            val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.upsert(id = loginState.username, token = signInData.pushNotificationToken)
-            withUsernameToken.Ok(views.html.collection.collections(None))
+          def getResult(verified: Boolean, wallets: Seq[master.Wallet]) = if (verified) {
+            wallets.find(_.verified.getOrElse(false)).fold {
+              val wallet = utilities.Wallet.getRandomWallet
+              val addWallet = masterWallets.Service.add(address = wallet.address, partialMnemonics = wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown), accountId = signInData.username, provisioned = None, verified = None)
+              val deleteUnverifiedWallets = masterWallets.Service.deleteWallets(wallets.filter(_.verified.isEmpty).map(_.address))
+              for {
+                _ <- addWallet
+                _ <- deleteUnverifiedWallets
+              } yield PartialContent(views.html.account.showWalletMnemonics(username = signInData.username, address = wallet.address, partialMnemonics = wallet.mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
+            } { wallet =>
+              implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = signInData.username, address = wallet.address))
+              implicit val loginState: LoginState = LoginState(username = signInData.username, address = wallet.address)
+              val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.upsert(id = loginState.username, token = signInData.pushNotificationToken)
+
+              for {
+                _ <- pushNotificationTokenUpdate
+                result <- withUsernameToken.Ok(views.html.collection.collections(None))
+              } yield result
+            }
           } else Future(throw new BaseException(constants.Response.INVALID_USERNAME_OR_PASSWORD))
 
           (for {
             (verified, account) <- verifyPasswordAndAccount
-            wallet <- wallet
-            result <- getResult(verified, wallet)
+            wallets <- wallets
+            result <- getResult(verified, wallets)
           } yield result
             ).recover {
             case baseException: BaseException => NotFound(views.html.account.signIn(SignIn.form.withGlobalError(baseException.failure.message)))

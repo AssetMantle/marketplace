@@ -1,18 +1,12 @@
 @import controllers.actions.LoginState
-@import views.html.home._
 
 @(collection: Option[master.Collection], failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 @views.html.base.common(constants.View.COLLECTIONS, failures, warnings, successes, infos)
-@* @if(loginState.isDefined) {
-    @menuWithSignIn(user = loginState.get.username)
-}*@
 <script>
         @if(collection.isEmpty) {
-        componentResource('centerContent', jsRoutes.controllers.CollectionController.all())
-        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections().url, '', "collections");
+                componentResource('centerContent', jsRoutes.controllers.CollectionController.all());
         } else {
-        componentResource('centerContent', jsRoutes.controllers.CollectionController.collection('@collection.get.id'))
-        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection().url, '@collection.get.id', "collection");
+                componentResource('centerContent', jsRoutes.controllers.CollectionController.collection('@collection.get.id'));
         }
 </script>

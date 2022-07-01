@@ -36,8 +36,6 @@ GET         /collection/:id                  controllers.CollectionController.vi
 GET         /allCollections                  controllers.CollectionController.all()
 GET         /collection                      controllers.CollectionController.collection(id: String)
 GET         /collectionFile                  controllers.CollectionController.collectionFile(id: String, documentType:String)
-GET         /collectionCoverFile             controllers.CollectionController.collectionCoverFile(id: String)
-GET         /collectionProfileFile           controllers.CollectionController.collectionProfileFile(id: String)
 
 GET         /nft/:collectionId/:nftId        controllers.NFTController.get(collectionId: String, nftId: String)
 

@@ -51,6 +51,11 @@ nav .content .links {
     color: #fff;
     font-size: 30px; /* font-weight: 600; */
 }
+.content .logo a .appVersion{
+    font-size: 12px;
+    color: var(--gray);
+    align-self: end;
+}
 
 .content .links li {
     list-style: none;
@@ -145,11 +150,17 @@ nav .content .links {
     display: flex;
     align-items: center;
     color: var(--mantle-off-white);
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
     /*gap: 10px;*/
 }
 .right-menu .links{
     display: flex;
     margin-bottom: 0px !important;
+}
+.right-menu .links li img{
+    vertical-align: middle !important;
 }
 .right-menu .links li a{
     padding: 9px 10px;

@@ -11,16 +11,16 @@
                 <input type="checkbox" id="show-menu"/>
                 <label for="show-menu" class="menu-icon"></label>
                 <div class="content">
-                    <div class="logo"><a href="#"><img class="lazyload" src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" data-src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" class="logo"/></a></div>
+                    <div class="logo">
+                        <a href="@routes.IndexController.index()">
+                            <img class="lazyload" src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" data-src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" class="logo"/>
+                            <span class="appVersion">@Messages(constants.View.APP_VERSION)</span>
+                        </a>
+                    </div>
                     <ul class="links">
-                        <li><a href="#" class="desktop-link">@Messages(constants.View.EXPLORE)</a>
+                        <li><a href="@routes.CollectionController.viewCollections()" class="desktop-link">@Messages(constants.View.EXPLORE)</a>
                             <input type="checkbox" id="show-features">
                             <label for="show-features">@Messages(constants.View.EXPLORE)</label>
-                            <ul>
-                                <li>
-                                    <div class="disable">@Messages(constants.View.COMING_SOON)</div>
-                                </li>
-                            </ul>
                         </li>
                         <li>
                             <a href="#" class="desktop-link">@Messages(constants.View.CREATE)</a>
@@ -77,7 +77,7 @@
                             <h2>@Messages(constants.View.HERO_SECTION_TITLE)</h2>
                             <p>@Messages(constants.View.HERO_SECTION_PARAGRAPH)</p>
                             <div class="buttons">
-                                <button class="button-1"></button>
+                                <a href="@routes.CollectionController.viewCollections()"><button>@Messages(constants.View.EXPLORE)</button></a>
                                 <button class="button-2" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_UP.get, ""))">@Messages(constants.View.SIGN_UP)</button>
                             </div>
                         </div>

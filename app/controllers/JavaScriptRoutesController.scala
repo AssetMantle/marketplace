@@ -16,6 +16,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
       JavaScriptReverseRouter("jsRoutes")(
         routes.javascript.Assets.versioned,
 
+        routes.javascript.IndexController.index,
+
         routes.javascript.AccountController.signUpForm,
         routes.javascript.AccountController.verifyWalletMnemonicsForm,
         routes.javascript.AccountController.checkUsernameAvailable,
@@ -28,8 +30,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.all,
         routes.javascript.CollectionController.collection,
         routes.javascript.CollectionController.collectionFile,
-        routes.javascript.CollectionController.collectionCoverFile,
-        routes.javascript.CollectionController.collectionProfileFile,
 
         routes.javascript.NFTController.get,
       )

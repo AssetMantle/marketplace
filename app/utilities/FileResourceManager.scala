@@ -26,7 +26,7 @@ class FileResourceManager @Inject()(messagesApi: MessagesApi)(implicit execution
     logger.info(messagesApi(constants.Log.Info.STORE_FILE_ENTRY, name, document.documentType, path))
     val encodedBase64: Future[Option[Array[Byte]]] = Future {
       utilities.FileOperations.fileExtensionFromName(name) match {
-        case constants.File.JPEG | constants.File.JPG | constants.File.PNG | constants.File.JPEG_LOWER_CASE | constants.File.JPG_LOWER_CASE | constants.File.PNG_LOWER_CASE => Option(utilities.ImageProcess.convertToThumbnail(oldFilePath))
+        case constants.File.JPEG | constants.File.JPG | constants.File.PNG | constants.File.JPEG_LOWER_CASE | constants.File.JPG_LOWER_CASE | constants.File.PNG_LOWER_CASE => Option(utilities.ImageProcess.convertToThumbnailWithHeight(oldFilePath))
         case _ => None
       }
     }
@@ -57,7 +57,7 @@ class FileResourceManager @Inject()(messagesApi: MessagesApi)(implicit execution
     val encodedBase64: Future[Option[Array[Byte]]] = Future {
       utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG | constants.File.JPEG_LOWER_CASE | constants.File.JPG_LOWER_CASE | constants.File.PNG_LOWER_CASE =>
-          Option(utilities.ImageProcess.convertToThumbnail(newUpdateFilePath))
+          Option(utilities.ImageProcess.convertToThumbnailWithHeight(newUpdateFilePath))
         case _ => None
       }
     }

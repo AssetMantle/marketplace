@@ -33,7 +33,7 @@
     height: fit-content;
     background-color: var(--card-color);
     border-radius: 20px;
-    padding: 20px 8px 20px 20px;
+    padding: 20px 20px 20px 20px;
 }
 
 /* Creator Profile Card */
@@ -217,10 +217,6 @@
     font-weight: 700;
     color: var(--default);
 }
-.profile-card .profiles-container .card-header .left-option .disable{
-    color: var(--disable);
-    cursor: none !important;
-}
 .profile-card .profiles-container .card-header .right-option{
     margin-right: 20px;
 }
@@ -292,10 +288,9 @@
     color: var(--mantle-off-white);
 }
 .profile-card .profiles-container .profile-list{
-    height: 741px;
-    overflow-y: auto;
+    /*overflow-y: auto;*/
     margin-top: 25px;
-    padding-right: 20px;
+    /*padding-right: 20px;*/
 }
 
 .profile-card .profiles-container .profile-list .list {
@@ -522,4 +517,22 @@
     /*background-clip: text;*/
     /*text-fill-color: transparent;*/
     color: var(--disable);
+}
+.nft-list .header-with-icon .back-button-icon img{
+    cursor: pointer;
+    vertical-align: unset !important;
+}
+.nft-list .header-with-icon .collection-link{
+    font-family: var(--font-type-1);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 24px;
+    text-transform: capitalize;
+    color: var(--gray);
+}
+.nft-list .form-top{
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
 }

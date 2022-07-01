@@ -12,6 +12,7 @@ function submitForm(isModal,source, targetID) {
             statusCode: {
                 400: function (data) {
                     result.html(data.responseText);
+                    $(".error").closest("dd").prev().find('input').css({"border-color":"var(--error)"});
                 },
                 401: function (data) {
                     replaceDocument(data.responseText);
@@ -25,10 +26,10 @@ function submitForm(isModal,source, targetID) {
                 206: function (data) {
                     if(isModal === "true"){
                         $(".modalContainer").removeClass('active');
-                        setTimeout(function(){
+                        // setTimeout(function(){
                             $(target).html(data);
                             $(".modalContainer").addClass('active');
-                        },1000);
+                        // },1000);
                     }
                     else{
                         $(target).html(data);
@@ -43,5 +44,7 @@ function submitForm(isModal,source, targetID) {
                 $('#connectionError').fadeIn(100);
             }
         });
+    } else {
+        console.log("Form validation failed")
     }
 }

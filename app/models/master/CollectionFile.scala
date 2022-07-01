@@ -84,8 +84,7 @@ class CollectionFiles @Inject()(
 
   object Service {
 
-    def add(documentType: String, fileName: String, file: Array[Byte]): Future[String] = {
-      val id = utilities.IdGenerator.getRandomHexadecimal
+    def add(id: String, documentType: String, fileName: String, file: Array[Byte]): Future[Unit] = {
       val collectionFile = CollectionFile(
         id = id,
         documentType = documentType,
@@ -94,7 +93,7 @@ class CollectionFiles @Inject()(
       )
       for {
         _ <- create(collectionFile.serialize())
-      } yield id
+      } yield ()
     }
 
     def get(id: String, documentType: String): Future[Option[CollectionFile]] = getById(id1 = id, id2 = documentType).map(_.map(_.deserialize))

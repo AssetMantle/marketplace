@@ -1,3 +1,10 @@
+$(document).click(function (e) {
+    if ($(e.target).is('#commonModal')) {
+        $(".modal-overlay").removeClass("active");
+        $(".modalContainer").removeClass("active");
+        $("body").removeClass("modal-active");
+    }
+});
 function checkNewPassword() {
     let passwordValue = document.getElementById('password').value;
     // var completeRegularExpression = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,128}$/;
@@ -441,10 +448,9 @@ function goToStep(stepNumber) {
 // Show and hide modal screen
 function showHideModalScreen(showScreen, hideScreen) {
     $(".modalContainer").removeClass('active');
-    setTimeout(function () {
+    // setTimeout(function () {
         $(hideScreen).hide()
         $(showScreen).show();
         $(".modalContainer").addClass('active');
-    }, 1000);
+    // }, 1000);
 }
-

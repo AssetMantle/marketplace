@@ -77,50 +77,20 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionFile(id: String, documentType: String): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val collectionFile = masterCollectionFiles.Service.get(id = id, documentType = documentType)
-        (for {
-          collectionFile <- collectionFile
-        } yield {
-          documentType match {
-            case constants.File.Collection.COVER_IMAGE => Ok(views.html.base.collection.commonCollectionCoverImage(collectionFile))
-            case constants.File.Collection.PROFILE_IMAGE => Ok(views.html.base.collection.commonCollectionProfileImage(collectionFile))
-            case _ => throw new BaseException(constants.Response.FILE_TYPE_NOT_FOUND)
-          }
+  def collectionFile(id: String, documentType: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val collectionFile = masterCollectionFiles.Service.get(id = id, documentType = documentType)
+      (for {
+        collectionFile <- collectionFile
+      } yield {
+        documentType match {
+          case constants.Collection.File.COVER => Ok(views.html.base.collection.commonCollectionCoverImage(collectionFile))
+          case constants.Collection.File.PROFILE => Ok(views.html.base.collection.commonCollectionProfileImage(collectionFile))
+          case _ => throw new BaseException(constants.Response.FILE_TYPE_NOT_FOUND)
         }
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def collectionCoverFile(id: String): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val collectionFile = masterCollectionFiles.Service.get(id = id, documentType = constants.File.Collection.COVER_IMAGE)
-        (for {
-          collectionFile <- collectionFile
-        } yield {Ok(views.html.base.collection.commonCollectionCoverImage(collectionFile))
-        }
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def collectionProfileFile(id: String): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val collectionFile = masterCollectionFiles.Service.get(id = id, documentType = constants.File.Collection.PROFILE_IMAGE)
-        (for {
-          collectionFile <- collectionFile
-        } yield {Ok(views.html.base.collection.commonCollectionProfileImage(collectionFile))
-        }
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
+      }
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 }
