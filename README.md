@@ -10,7 +10,9 @@
 
   ```shell
   curl -sL get.docker.com | sudo bash
+  docker buildx install
   docker version
+  docker buildx version
   ```
 
 - Install `docker-compose` on your machine

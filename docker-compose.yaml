@@ -7,10 +7,53 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: mantleplace
+    entrypoint: /bin/bash
+    command:
+      - -cx
+      - |
+        apt update
+        apt install -y postgresql-client
+        PGPASSWORD=postgres psql "host=postgres user=postgres" </mantleplace/conf/evolutions/default/0.sql
+        apt remove -y postgresql-client
+        /mantleplace/bin/mantleplace
     environment:
       - SITE_URL=
-    command:
-     - '-Dplay.http.secret.key=APPLICATION_SECRET=slw2FnBTONgZq_tOtflOzKoAglFj@AHr=>KTDSQnWNXyZBB>b?les^A:UQIO[9b[ -Xmx2048m -XX:+UseContainerSupport'
+      - AMAZON_S3_ACCESS_KEY_ID=
+      - AMAZON_S3_BUCKET_NAME=
+      - AMAZON_S3_REGION=
+      - AMAZON_S3_SECRET_KEY=
+      - APPLICATION_SECRET=
+      - COLLECTION_PATH=/collections
+      - IPFS_DOWNLOAD_END_POINT=https://demo-assetmantle.mypinata.cloud/ipfs
+      - IPFS_JWT=
+      - IPFS_UPLOAD_END_POINT=https://api.pinata.cloud/pinning/pinFileToIPFS
+      - POSTGRES_ROOT_USERNAME=postgres
+      - POSTGRES_ROOT_PASSWORD=postgres
+      - POSTGRES_DB=mantlePlace
+      - POSTGRES_PASSWORD=mantlePlace
+      - POSTGRES_URL=postgres:5432
+      - POSTGRES_USER=mantlePlace
+      - ROOT_FILE_PATH=/
+      - JAVA_OPTS=-Xms1000m -XX:MaxRAMPercentage=30.00 -XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport -XX:+ParallelRefProcEnabled -XX:+UseG1GC -XX:+DisableExplicitGC -XX:G1NewSizePercent=50 -XX:+UseStringDeduplication -XX:+ExitOnOutOfMemoryError -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M
     ports:
       - 9000:9000
+    volumes:
+      - ./collections:/collections
     restart: "no"
+
+  postgres:
+    container_name: postgres
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "postgres", "-U", "postgres"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # ports:
+    #   - 5432:5432
