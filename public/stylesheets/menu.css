@@ -72,6 +72,10 @@ nav .content .links {
     cursor: pointer;
     transition: all 0.3s ease;
 }
+.content .links li a:not([href]):not([class]),
+.content .links li a:not([href]):not([class]):hover{
+    color: #fff;
+}
 .content .links li .disable{
     line-height: 30px;
     border-radius: 0px !important;
@@ -137,6 +141,9 @@ nav .content .links {
     width: 50px;
     text-align: center;
     z-index: 9999;
+}
+.wrapper .search-icon img{
+    vertical-align: middle !important;
 }
 
 .wrapper .menu-icon {
@@ -604,4 +611,36 @@ nav .content .links {
     top: 100%;
     opacity: 1;
     visibility: visible;
+}
+
+
+
+/* Bootstrap Menu */
+.navbar {
+    box-shadow: 0 4px 6px 0 rgba(22, 22, 26, 0.18);
+}
+.navbar-nav .nav-link {
+    color: #000000;
+}
+.navbar-nav .nav-link:hover{
+    color: #777777;
+}
+@media screen and (min-width: 769px) {
+    .btn {
+        background-color: #000000;
+        color: #ffffff;
+        border-radius: 0;
+        border-width: 2px;
+    }
+    .btn:hover {
+        background-color: #ffffff;
+        color: #000000;
+        border: 2px solid #000000;
+    }
+}
+@media screen and (max-width: 768px) {
+    .btn {
+        padding: 0;
+        color: #000000;
+    }
 }
