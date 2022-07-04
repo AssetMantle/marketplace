@@ -4,7 +4,6 @@
 @(formTemplate: constants.Form, formData: Form[_], showBackButton: Boolean = false, closeButton:Boolean = true, showSubtitle: Boolean = true, showScreen:String = "", hideScreen:String = "", isModal:Boolean = false, submitDisable:Boolean = false, target:String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @form(action = formTemplate.post, Symbol("onkeypress") -> "submitFormOnEnter(event,this)") {
-    @*    <fieldset>*@
     @if(showSubtitle) {
         @if(showBackButton){
             <div class="header-with-icon">
@@ -60,9 +59,7 @@
             <div class="toastContainer active">
 
                 <div class="toast-content">
-                    @*                    <i class="fas fa-solid fa-check check"></i>*@
                     <img src="@routes.Assets.versioned("images/icon/error.png")" class="check"/>
-
                     <div class="message">
                         <span class="text text-1">Error</span>
                         @for(error <- formData.globalErrors) {
@@ -70,12 +67,9 @@
                                 <span class="text text-2">@error.format</span>
                             </li>
                         }
-
                     </div>
                 </div>
             </div>
-
-
         </ul>
     }
 
@@ -92,9 +86,7 @@
             }else{
                 @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"))
             }
-
         }
         </div>
     </div>
-    @*    </fieldset>*@
 }
