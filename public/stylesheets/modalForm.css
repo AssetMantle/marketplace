@@ -1134,7 +1134,7 @@ dl dd.error:before{
 }
 
 /* Global Level Error */
-.toast {
+.toastContainer {
     margin-bottom: 25px;
     border-radius: 8px;
     background: #2c0c0f;
@@ -1144,7 +1144,7 @@ dl dd.error:before{
     font-family: var(--font-type-2);
     border:2px solid var(--error);
 }
-.toast .toast-content {
+.toastContainer .toast-content {
     display: flex;
     align-items: center;
 }
