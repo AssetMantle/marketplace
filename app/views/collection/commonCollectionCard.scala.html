@@ -14,7 +14,7 @@
         </div>
     </div>
     <script>
-            componentResource('collectionCoverImage_@collection.id', jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.Collection.File.COVER'));
-            componentResource('collectionProfileImage_@collection.id', jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.Collection.File.PROFILE'));
+            componentResource('collectionCoverImage_@collection.id', jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.Collection.File.COVER', true));
+            componentResource('collectionProfileImage_@collection.id', jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.Collection.File.PROFILE', true));
     </script>
 </a>
