@@ -38,5 +38,12 @@ class IndexController @Inject()(
     }
   }
 
+  def home(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.home.home()))
+    }
+  }
+
   uploadCollections.start()
 }
