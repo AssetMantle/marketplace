@@ -1957,7 +1957,7 @@ object Bip39 {
     "vicious",
     "victory",
     "video",
-    "view",
+    "nftDetails",
     "village",
     "vintage",
     "violin",
