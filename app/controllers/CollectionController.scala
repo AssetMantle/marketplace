@@ -1,5 +1,7 @@
 package controllers
 
+import akka.stream.scaladsl.{Source, StreamConverters}
+import akka.util.ByteString
 import controllers.actions.{WithLoginActionAsync, WithoutLoginAction, WithoutLoginActionAsync}
 import exceptions.BaseException
 import models.master
@@ -8,6 +10,7 @@ import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 
+import java.io.{File, FileInputStream}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,7 +39,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def viewCollection(id: String): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollection(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.get(id)
@@ -62,7 +65,20 @@ class CollectionController @Inject()(
     }
   }
 
-  def collection(id: String): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+  def collection(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collection = masterCollections.Service.tryGet(id)
+        (for {
+          collection <- collection
+        } yield Ok(views.html.collection.collection(collection))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def collectionNFTs(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
@@ -70,27 +86,55 @@ class CollectionController @Inject()(
         (for {
           collection <- collection
           allNFTs <- allNFTs
-        } yield Ok(views.html.collection.collection(collection, allNFTs))
+        } yield Ok(views.html.collection.collectionNFTs(collection, allNFTs))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
     }
   }
 
-  def collectionFile(id: String, documentType: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def collectionFile(id: String, documentType: String, compress: Boolean): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val collectionFile = masterCollectionFiles.Service.get(id = id, documentType = documentType)
+      val collection = masterCollections.Service.tryGet(id)
       (for {
         collectionFile <- collectionFile
+        collection <- collection
       } yield {
-        documentType match {
-          case constants.Collection.File.COVER => Ok(views.html.base.collection.commonCollectionCoverImage(collectionFile))
-          case constants.Collection.File.PROFILE => Ok(views.html.base.collection.commonCollectionProfileImage(collectionFile))
-          case _ => throw new BaseException(constants.Response.FILE_TYPE_NOT_FOUND)
+        if (compress) {
+          documentType match {
+            case constants.Collection.File.COVER => Ok(views.html.collection.collectionCardCoverImage(collectionFile))
+            case constants.Collection.File.PROFILE => Ok(views.html.collection.collectionCardProfileImage(collectionFile))
+            case _ => throw new BaseException(constants.Response.FILE_TYPE_NOT_FOUND)
+          }
+        } else {
+          collectionFile.fold {
+            documentType match {
+              case constants.Collection.File.COVER => Ok.chunked(StreamConverters.fromInputStream(() => new FileInputStream(new File("app/assets/defaultImages/defaultCollectionCover.png"))))
+              case constants.Collection.File.PROFILE => Ok.chunked(StreamConverters.fromInputStream(() => new FileInputStream(new File("app/assets/defaultImages/defaultProfileCover.png"))))
+              case _ => throw new BaseException(constants.Response.FILE_TYPE_NOT_FOUND)
+            }
+          }(x => {
+            val source: Source[ByteString, _] = StreamConverters.fromInputStream(() => utilities.AmazonS3.getFullObject(collection.name + "/others/" + x.fileName).getObjectContent.getDelegateStream)
+            Ok.chunked(source, inline = true, Option(x.fileName))
+          })
         }
       }
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
+  }
+
+  def info(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collection = masterCollections.Service.tryGet(id)
+        (for {
+          collection <- collection
+        } yield Ok(views.html.collection.collectionInfo(collection))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
   }
 }
