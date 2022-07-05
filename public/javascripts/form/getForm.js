@@ -11,10 +11,10 @@ function getForm(route, modal = '#commonModal', modalContent = '#modal-content')
                 document.head.appendChild(style);
                 // $(modal+" .modalContainer").removeClass('active');
                 // setTimeout(function(){
-                    $(modalContent).html(data);
-                    $(modal).addClass('active');
-                    $(modal+" .modalContainer").addClass('active');
-                    $("body").addClass('modal-active');
+                $(modalContent).html(data);
+                $(modal).addClass('active');
+                $(modal + " .modalContainer").addClass('active');
+                $("body").addClass('modal-active');
                 // },500);
 
             },

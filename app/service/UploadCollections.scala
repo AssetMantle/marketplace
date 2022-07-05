@@ -96,7 +96,7 @@ class UploadCollections @Inject()(
     val awsKey = uploadCollection.name + "/nfts/" + newFileName
     val newFilePath = constants.CommonConfig.Files.ColectionPath + "/" + awsKey
     println(awsKey)
-    utilities.AmazonS3.uploadFile(awsKey, oldFilePath)
+//    utilities.AmazonS3.uploadFile(awsKey, oldFilePath)
     utilities.FileOperations.renameFile(oldFilePath, newFilePath)
     masterNFTs.Service.add(
       fileName = newFileName,
