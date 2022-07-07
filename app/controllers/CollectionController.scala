@@ -35,58 +35,37 @@ class CollectionController @Inject()(
   def viewCollections(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.collection.collections(None)))
+        Future(Ok(views.html.collection.viewCollections()))
     }
   }
 
   def viewCollection(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val collection = masterCollections.Service.get(id)
-        (for {
-          collection <- collection
-        } yield Ok(views.html.collection.collections(collection))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def all(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val allCollections = masterCollections.Service.fetchAll()
-        (for {
-          allCollections <- allCollections
-        } yield Ok(views.html.collection.all(allCollections))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def collection(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
         val collection = masterCollections.Service.tryGet(id)
         (for {
           collection <- collection
-        } yield Ok(views.html.collection.collection(collection))
+        } yield Ok(views.html.collection.viewCollection(collection))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
     }
   }
 
-  def collectionNFTs(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
+  def collectionsList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginAction { implicit request =>
+      Ok(views.html.collection.explore.collectionsList())
+    }
+  }
+
+  def collectionsPerPage(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "?pageNumber=" + pageNumber, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val collection = masterCollections.Service.tryGet(id)
-        val allNFTs = masterNFTs.Service.getAllForCollection(id)
+        val collections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        else masterCollections.Service.getByPageNumber(pageNumber)
         (for {
-          collection <- collection
-          allNFTs <- allNFTs
-        } yield Ok(views.html.collection.collectionNFTs(collection, allNFTs))
+          collections <- collections
+        } yield Ok(views.html.collection.explore.collectionsPerPage(collections))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -125,13 +104,28 @@ class CollectionController @Inject()(
       }
   }
 
+  def collectionNFTs(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collection = masterCollections.Service.tryGet(id)
+        val allNFTs = masterNFTs.Service.getAllForCollection(id)
+        (for {
+          collection <- collection
+          allNFTs <- allNFTs
+        } yield Ok(views.html.collection.details.collectionNFTs(collection, allNFTs))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
   def info(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
         (for {
           collection <- collection
-        } yield Ok(views.html.collection.collectionInfo(collection))
+        } yield Ok(views.html.collection.details.collectionInfo(collection))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

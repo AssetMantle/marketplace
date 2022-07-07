@@ -10,7 +10,7 @@
                 <div class="nft-list">
                     <div class="header-with-icon">
                         <div class="form-top">
-                            <div onclick="componentResource('centerContent', jsRoutes.controllers.CollectionController.all())" class="d-flex align-items-center title-icon back-button-icon">
+                            <div onclick="componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsList())" class="d-flex align-items-center title-icon back-button-icon">
                                 <img src="@routes.Assets.versioned("images/icon/backArrow.png")"/>
                             </div>
                             <div class="collection-link">@collection.name</div>
@@ -28,6 +28,7 @@
         </div>
     </div>
     <script>
-            getImage(jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.Collection.File.COVER', false), 'collectionUncompressedCoverImage_@collection.id');
+         checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection('@collection.id').url, '@collection.id', "collection");
+         getImage(jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.Collection.File.COVER', false), 'collectionUncompressedCoverImage_@collection.id');
     </script>
 </div>

@@ -1,0 +1,19 @@
+@import views.html.collection._
+
+@(collections: Seq[master.Collection])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+    @if(collections.nonEmpty) {
+        @collections.zipWithIndex.map { case (collection, index) =>
+            @if(index == 0) {
+                <li class="collectionPage">
+                @commonCollectionCard(collection)
+                </li>
+            } else {
+                <li>
+                @commonCollectionCard(collection)
+                </li>
+            }
+        }
+    } else {
+        <li class="noCollection"></li>
+    }

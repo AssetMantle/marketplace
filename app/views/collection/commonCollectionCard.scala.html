@@ -1,6 +1,6 @@
 @(collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<a onclick="componentResource('centerContent', jsRoutes.controllers.CollectionController.collection('@collection.id'))">
+<a onclick="viewCollection('@collection.id')">
     <div class="single-profile-card">
         <div class="profile-section">
             <div id="collectionCoverImage_@collection.id"></div>

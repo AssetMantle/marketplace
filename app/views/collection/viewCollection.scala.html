@@ -1,0 +1,13 @@
+@import controllers.actions.LoginState
+
+@(collection: master.Collection, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+@views.html.base.common(constants.View.COLLECTION, failures, warnings, successes, infos)
+
+<div>
+    <script>
+        componentResource('leftContent', jsRoutes.controllers.CollectionController.info('@collection.id'));
+        componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs('@collection.id'));
+        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection('@collection.id').url, '@collection.id', "viewCollection");
+    </script>
+</div>
