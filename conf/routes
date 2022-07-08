@@ -33,8 +33,8 @@ POST        /forgetPassword                  controllers.AccountController.forge
 
 GET         /collections                     controllers.CollectionController.viewCollections()
 GET         /collection/:id                  controllers.CollectionController.viewCollection(id: String)
-GET         /allCollections                  controllers.CollectionController.all()
-GET         /collection                      controllers.CollectionController.collection(id: String)
+GET         /collectionsList                 controllers.CollectionController.collectionsList()
+GET         /collectionsPerPage              controllers.CollectionController.collectionsPerPage(pageNumber: Int)
 GET         /collectionNFTs                  controllers.CollectionController.collectionNFTs(id: String)
 GET         /collectionFile                  controllers.CollectionController.collectionFile(id: String, documentType:String, compress: Boolean)
 GET         /collectionInfo                  controllers.CollectionController.info(id: String)

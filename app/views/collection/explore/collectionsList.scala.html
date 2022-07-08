@@ -1,7 +1,6 @@
-@import views.html.collection._
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@(collections: Seq[master.Collection])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-
+<script src="@routes.Assets.versioned("javascripts/collections/loadMore.js")" type="text/javascript"></script>
 <div class="profileContainer">
     <div class="item item-center">
         <div class="profile-card">
@@ -14,20 +13,14 @@
                     </div>
                 </div>
                 <div class="profile-list">
-                    <ol class="list grid-view-filter">
-                    @collections.map { collection =>
-                    <li>
-                        @commonCollectionCard(collection)
-                    </li>
-                    }
-                    </ol>
-
+                    <div id="collectionsPerPage" class="w-100 list grid-view-filter collectionsPerPage"></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <script>
+        componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.collectionsPerPage(1));
         checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections().url, '', "collections");
 </script>
 

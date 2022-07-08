@@ -62,6 +62,7 @@ object Response {
   val TOKEN_NOT_FOUND = new Failure("TOKEN_NOT_FOUND")
   val INVALID_SESSION = new Failure("INVALID_SESSION")
   val UNAUTHORIZED = new Failure("UNAUTHORIZED")
+  val INVALID_PAGE_NUMBER = new Failure("INVALID_PAGE_NUMBER")
   val INVALID_SEEDS = new Failure("INVALID_SEEDS")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
