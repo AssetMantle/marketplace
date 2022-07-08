@@ -29,5 +29,12 @@
 </div>
 <script>
         checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections().url, '', "collections");
+
+        $(window).scroll(function() {
+            if($(window).scrollTop() == $(document).height() - $(window).height()) {
+                // ajax call here
+                console.log("Reach Bottom");
+            }
+        });
 </script>
 

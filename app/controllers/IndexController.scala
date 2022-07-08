@@ -34,16 +34,7 @@ class IndexController @Inject()(
             withUsernameToken.Ok(views.html.collection.collections(None))
           case None => Future(Ok(views.html.index()))
         }
-
     }
   }
-
-  def home(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        Future(Ok(views.html.home.home()))
-    }
-  }
-
   uploadCollections.start()
 }

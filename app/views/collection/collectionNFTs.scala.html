@@ -16,8 +16,8 @@
                             <div class="collection-link">@collection.name</div>
                         </div>
                     </div>
-                    <div class="nft-list">
-                        <div class="row">
+                    <div class="nft-list-container">
+                        <div class="row m-0">
                         @nfts.map { nft =>
                             @commonNFTCard(collection, nft)
                         }

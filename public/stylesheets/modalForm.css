@@ -84,68 +84,6 @@
 }
 
 /* Form Header Start*/
-/* Large Header */
-.modalContainer .header .form-top{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.modalContainer .header .form-top .form-title{
-    font-family: var(--font-type-1);
-    font-style: normal;
-    font-weight: 400;
-    font-size: 28px;
-    letter-spacing: 0.08em;
-    text-transform: capitalize;
-    color: var(--dark);
-}
-.modalContainer .header .form-sub-title{
-    font-family: var(--font-type-2);
-    font-style: normal;
-    font-weight: 400;
-    font-size: 18px;
-    margin:10px 0 25px 0;
-    color: var(--inactive-gray);
-}
-/* Header with Icon */
-.modalContainer .header-with-icon .form-top{
-    display: flex;
-    align-items: center;
-}
-.modalContainer .header-with-icon .form-top .title-icon{
-    margin-right: 10px;
-}
-.modalContainer .header-with-icon .form-top .title-text{
-    flex-grow: 2;
-    font-family: var(--font-type-1);
-    font-style: normal;
-    font-weight: 600;
-    font-size: 20px;
-    text-transform: capitalize;
-    color: var(--dark);
-    margin-right: 20px;
-}
-.modalContainer .header-with-icon .form-sub-title{
-    font-family: var(--font-type-2);
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    margin:12px 0 0 0;
-    color: var(--text-medium);
-}
-.modalContainer .header-with-icon .form-top .back-button-icon{
-    height: 40px;
-    width: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 20px;
-    cursor: pointer;
-}
-.modalContainer .header-with-icon .form-top .back-button-icon:hover{
-    background-color: var(--popup-stroke);
-}
-
 /* Close Button */
 .modalContainer .form-close-btn{
     /*position: absolute;*/
@@ -233,63 +171,6 @@
 }
 
 /* Footer */
-.modalContainer .form-footer{
-    margin-top: 25px;
-}
-.modalContainer .footer-terms-condition{
-    font-family: var(--font-type-2);
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    text-align: left;
-    color: var(--mantle-off-white);
-    margin-top: 15px;
-}
-.modalContainer .terms-condition-message .link{
-    font-family: var(--font-type-1);
-    font-style: normal;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--dark);
-    margin-left: 5px;
-    position: relative;
-}
-.modalContainer .link::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 1px;
-    background: currentColor;
-    top: 100%;
-    left: 0;
-    transform-origin: 50% 100%;
-    transition: clip-path 0.3s, transform 0.3s cubic-bezier(0.2, 1, 0.8, 1);
-    clip-path: polygon(0% 0%, 0% 100%, 0 100%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%, 100% 100%, 100% 0%);
-}
-.modalContainer .link:hover::before {
-    transform: translate3d(0, 2px, 0) scale3d(1.0, 2, 1);
-    clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 50% 100%, 0 100%, 100% 100%, 100% 0%);
-}
-.modalContainer .footer-message{
-    font-family: var(--font-type-2);
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    text-align: left;
-    margin-top: 10px;
-    color: var(--inactive-gray);
-}
-.modalContainer .footer-message > span{
-    margin-right: 5px;
-}
-.modalContainer .footer-message .link{
-    font-style: normal;
-    font-weight: 600;
-    font-size: 16px;
-    color: var(--dark);
-    text-transform: capitalize;
-    position: relative;
-}
 .modalContainer .msg-3{
     text-align: left;
     margin-top: 10px;
@@ -344,11 +225,6 @@
     transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
 }
 
-/* Successful Modal */
-.header-success .form-top{
-    display: flex;
-}
-
 /* Error Modal */
 .wallet-error-message{
     font-family: var(--font-type-2);
@@ -364,46 +240,7 @@
     color:var(--dark);
 }
 
-/* Successful Modal Icon */
-.form-success-icon{
-    flex-grow: 2;
-    padding-left: 40px;
-}
-.header-success .form-success-icon{
-    text-align: center;
-}
 
-/* Successful Modal Message */
-.header-success .form-success-message{
-    margin:10px 0 0 0;
-    text-align: center;
-}
-.header-success .form-success-message .form-success-message-heading{
-    font-family: var(--font-type-1);
-    font-style: normal;
-    font-weight: 600;
-    font-size: 20px;
-    text-transform: capitalize;
-    color: var(--dark);
-    margin-top: 10px;
-}
-.header-success .form-success-message-sub-heading{
-    font-family: var(--font-type-2);
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    color: var(--text-medium);
-    margin-top: 10px;
-    text-align: center;
-}
-.header-success .form-success-message .form-success-message-sub-text{
-    font-family: var(--font-type-2);
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    color: var(--text-medium);
-    margin: 10px 0px;
-}
 
 /* Form Address Box */
 .form-address-box{
@@ -495,34 +332,9 @@
     position: relative;
 }
 
-/* Form Heading */
-.form-heading{
-    font-family: var(--font-type-2);
-    font-style: normal;
-    font-weight: 600;
-    font-size: 18px;
-    color: var(--inactive-gray);
-    margin-top: 25px;
-}
 
-/* Form Bullet List*/
-.form-bullet-list{
-    margin: 15px 25px;
-}
-.form-bullet-list ul{
-    font-family: var(--font-type-2);
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    list-style: disc;
-    color: var(--inactive-gray);
-}
-.form-bullet-list ul li{
-    margin: 15px 0;
-}
 
 /* Form Copy Item */
-.form-copy-item,
 .form-input-text{
     font-family: var(--font-type-2);
     font-style: normal;
@@ -553,87 +365,10 @@
     background-color: var(--popup-stroke);
 }
 
-/* Form Seed Box */
-.form-seed-box-list{
-    display: flex;
-    justify-content:space-between;
-    align-items: center;
-    margin-top: 10px;
-    font-family: var(--font-type-2);
-    color: var(--mantle-off-white);
-    gap: 10px;
-}
-.form-seed-box-list .form-seed-box{
-    flex: 1 1 0;
-}
-.form-seed-box-list .form-seed-box .form-seed-box-number{
-    font-style: normal;
-    font-weight: 500;
-    font-size: 12px;
-    margin-left: 5px;
-}
-.form-seed-box-list .form-seed-box .form-seed-box-phrase{
-    text-align: center;
-    color: var(--mantle-off-white);
-    background: transparent;
-    width: 100%;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    border: 1px solid var(--inactive-gray);
-    box-sizing: border-box;
-    border-radius: 8px;
-    margin-top:5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 9px 0;
-    outline:none;
-}
-.form-seed-box-list .form-seed-box .form-seed-box-phrase.disable{
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Old versions of Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none;
-    pointer-events: none;
-}
-.form-seed-box-list .form-seed-box .form-seed-box-phrase:focus-within{
-    border-color: var(--dark);
-}
-.form-seed-box-list .form-seed-box .form-seed-box-phrase input{
-    height: 100%;
-    width: 100%;
-    border-radius: 8px;
-    border:none;
-    outline: none;
-    background-color: transparent;
-    text-align: center;
-    font-family: var(--font-type-2);
-    color: var(--mantle-off-white);
-    font-size: 16px;
-}
-.form-seed-box-list .form-seed-box .form-seed-box-phrase input:focus{
-    color: var(--dark);
-}
+
 
 /* Form Information Message */
-.form-information-message{
-    display: flex;
-    margin-top: 15px;
-    gap: 5px;
-}
-.form-information-message .form-information-icon img{
-    width: 18px;
-}
-.form-information-message .form-information-text{
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    font-family: var(--font-type-2);
-    color: var(--mantle-off-white);
-}
+
 
 /* Form Accordion */
 .accordion-toggle {
@@ -801,78 +536,6 @@
 }
 .commonField input:not(:focus){
     color: var(--inactive-gray);
-}
-
-.hero-wrapper{
-    width: 100%;
-    height: 100vh;
-    display: grid;
-    grid-template-columns: 60% auto;
-    position: relative;
-    overflow: hidden;
-}
-.hero-wrapper .lwrap{
-    width: 90%;
-    margin-top: 100px;
-    padding: 50px 30px;
-}
-.hero-wrapper .lwrap h1{
-    font-size: 50px;
-    font-weight: 300;
-    text-transform: capitalize;
-    line-height: 110%;
-    font-family: var(--font-type-1);
-    color: var(--dark);
-    margin-top: 40px;
-}
-.hero-wrapper .lwrap h1 span{
-    font-weight: bold;
-}
-.hero-wrapper .lwrap p{
-    font-family: var(--font-type-2);
-    color: var(--mantle-off-white);
-    padding: 20px 80px 30px 0px;
-}
-.hero-wrapper .lwrap .button{
-    display: grid;
-    grid-template-columns: 30% auto;
-    grid-gap: 20px;
-    margin-top: 30px;
-}
-.hero-wrapper .lwrap .button a{
-    display: grid;
-    place-items: center;
-    background: #000;
-    color: #fff;
-    width: 100%;
-    height: 50px;
-    font-size: 18px;
-    position: relative;
-    font-weight: 500;
-    border-radius: 20px;
-}
-.hero-wrapper .lwrap .button .vdbtn{
-    display: flex;
-    place-items: center;
-    cursor: pointer;
-}
-.hero-wrapper .lwrap .button .vdbtn p{
-    font-size: 20px;
-    padding: 0px 10px;
-}
-.hero-wrapper .rwrap{
-    margin-top:50px;
-    display: flex;
-}
-.hero-wrapper .rwrap .img1{
-    transform: rotate(20deg) translate(-200px, -65px);
-    transform-origin: center center;
-}
-.hero-wrapper .rwrap .img1 img{
-    width: 235px;
-    height: 300px;
-    object-fit: cover;
-    margin: 3px 15px;
 }
 
 /* Form Fields */
@@ -1057,19 +720,6 @@ dl .info:after {
     line-height: 17px;
     text-transform: capitalize;
     color: var(--dark);
-}
-.terms-condition-container{
-    display: flex;
-    align-items: center;
-}
-.terms-condition-message{
-    font-family: var(--font-type-2);
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 14px;
-    color: var(--mantle-off-white);
-    margin-left: 6px;
 }
 .cmuk-checkbox{
     -webkit-appearance: none;

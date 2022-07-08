@@ -13,7 +13,6 @@ GET         /firebase-messaging-sw.js        controllers.Assets.at(path="/public
 
 # Home
 GET         /                                controllers.IndexController.index()
-GET         /home                            controllers.IndexController.home()
 
 GET         /signUp                          controllers.AccountController.signUpForm()
 POST        /signUp                          controllers.AccountController.signUp()

@@ -4,20 +4,20 @@
 @(walletMnemonicsForm: Form[WalletMnemonics.Data] = WalletMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <!-- Wallet Mnemonics -->
 <div id="walletMnemonics">
-    @formHeader(label = "Recovery Phrase", subHeading = " ")
+    @formHeader(label = "Recovery Phrase")
     @* @multiStepNavigator() *@
 
     @successModalAddressBox(Symbol("address") -> address)
 
-    <div class="form-copy-item">
-        <div class="form-copy-text">@Messages(constants.View.RECOVERY_PHRASE)</div>
+    <div class="mt-4 form-copy-item">
+        <div>@Messages(constants.View.RECOVERY_PHRASE)</div>
     </div>
-    <div class="form-seed-box-list">
+    <div class="d-flex align-items-center justify-content-between mt-3 form-seed-box-list">
         @partialMnemonics.zipWithIndex.map {case(word, index) =>
             @seedInput(((index.toInt)+1).toString, Symbol("phrase") -> word, Symbol("class") -> "disable")
         }
     </div>
-    <div class="form-information-message">
+    <div class="d-flex mt-3 form-information-message">
         <div class="form-information-icon"><img src="@routes.Assets.versioned("images/icon/info.png")"/></div>
         <div class="form-information-text">@Messages(constants.View.CREATE_WALLET_INFO)</div>
     </div>
@@ -31,7 +31,7 @@
     </div>
 
     <div class="form-button">
-        <button class="form-secondary-button" onclick="closeModal()">@Messages(constants.View.CANCEL)</button>
+        <button class="form-secondary-button" onclick="closeModal()" data-bs-dismiss="modal" aria-label="Close">@Messages(constants.View.CANCEL)</button>
         <button class="form-primary-button" onclick="showHideModalScreen('#verificationForm','#walletMnemonics')">@Messages(constants.View.NEXT)</button>
     </div>
 </div>

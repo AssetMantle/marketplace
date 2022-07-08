@@ -1,7 +1,15 @@
 @import views.html.base.forms._
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@formHeaderWithBackButton(heading = Messages(constants.View.TERMS_CONDITIONS_TITLE), subHeading = Messages(constants.View.TERMS_CONDITIONS_DATE_MESSAGE)+' '+Messages(constants.View.TERMS_CONDITIONS_DATE), closeButton = false, showScreen = "#signUpForm", hideScreen = "#termsConditionModal")
+<div class="header-with-icon">
+    <div class="d-flex align-items-center form-top">
+        <div class="title-icon back-button-icon" onclick="showHideModalScreen('#signUpForm', '#termsConditionModal')">
+            <img src="@routes.Assets.versioned("images/icon/backArrow.png")"/>
+        </div>
+        <div class="title-text">@Messages(constants.View.TERMS_CONDITIONS_TITLE)</div>
+    </div>
+    <div class="mt-3 termsConditionSubTitle">@Messages(constants.View.TERMS_CONDITIONS_DATE_MESSAGE) @Messages(constants.View.TERMS_CONDITIONS_DATE)</div>
+</div>
 <div class="terms-condition-box">
     @Messages(constants.View.TERMS_CONDITIONS_MESSAGE_1, "hello@assetmantle.one")
     <br>
