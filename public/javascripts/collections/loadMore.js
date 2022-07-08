@@ -27,7 +27,7 @@ function loadMoreCollections() {
 }
 
 function getDocHeight() {
-    var D = document;
+    let D = document;
     return Math.max(
         D.body.scrollHeight, D.documentElement.scrollHeight,
         D.body.offsetHeight, D.documentElement.offsetHeight,
@@ -35,10 +35,10 @@ function getDocHeight() {
     );
 }
 
-var timeout;
+let collectionPageTimeout;
 window.addEventListener('scroll', () => {
-    clearTimeout(timeout);
-    timeout = setTimeout(function() {
+    clearTimeout(collectionPageTimeout);
+    collectionPageTimeout = setTimeout(function() {
         if($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10)) {
             loadMoreCollections();
         }
