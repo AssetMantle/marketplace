@@ -58,18 +58,16 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionsPerPage(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "?pageNumber=" + pageNumber, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val collections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
-        else masterCollections.Service.getByPageNumber(pageNumber)
-        (for {
-          collections <- collections
-        } yield Ok(views.html.collection.explore.collectionsPerPage(collections))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
+  def collectionsPerPage(pageNumber: Int) = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val collections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+      else masterCollections.Service.getByPageNumber(pageNumber)
+      (for {
+        collections <- collections
+      } yield Ok(views.html.collection.explore.collectionsPerPage(collections))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def collectionFile(id: String, documentType: String, compress: Boolean): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>

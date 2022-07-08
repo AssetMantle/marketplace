@@ -14,18 +14,38 @@ function loadMoreCollections() {
             // },
             statusCode: {
                 200: function (data) {
-                    const loadMore = $(".collectionsPerPage:last");
+                    console.log(data);
+                    const loadMore = $(".collectionsPerPage");
                     loadMore.append(data);
                 }
             }
         });
+    } else {
+        console.log("NO COLLECTION LEFT")
+        $(".collectionPage:last").css("margin-top","0px");
     }
 }
 
+function getDocHeight() {
+    var D = document;
+    return Math.max(
+        D.body.scrollHeight, D.documentElement.scrollHeight,
+        D.body.offsetHeight, D.documentElement.offsetHeight,
+        D.body.clientHeight, D.documentElement.clientHeight
+    );
+}
+
+var timeout;
 window.addEventListener('scroll', () => {
-    if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight) {
-        loadMoreCollections();
-    }
+    clearTimeout(timeout);
+    timeout = setTimeout(function() {
+        if($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10)) {
+            loadMoreCollections();
+        }
+    }, 50);
 }, {
     passive: true
 });
+
+
+
