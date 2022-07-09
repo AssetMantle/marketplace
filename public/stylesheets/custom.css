@@ -76,6 +76,9 @@ body{
 .common-container{
     position: relative;
     top: 100px;
+    /*max-width: 1440px;*/
+    /*width: 100%;*/
+    /*margin: auto;*/
 }
 
 
