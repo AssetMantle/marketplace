@@ -1,7 +1,7 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <script src="@routes.Assets.versioned("javascripts/collections/loadMore.js")" type="text/javascript"></script>
-<div class="profileContainer">
+@*<div class="profileContainer">*@
     <div class="item item-center">
         <div class="profile-card">
             <div class="profiles-container">
@@ -18,7 +18,7 @@
             </div>
         </div>
     </div>
-</div>
+@*</div>*@
 <script>
         componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.collectionsPerPage(1));
         checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections().url, '', "collections");

@@ -1,6 +1,7 @@
 @(collection: master.Collection, nft: master.NFT)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<div class="col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-2">
+
+<div class="col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3">
     <div class="card border-0">
         <div class="card-img">
             <a href="https://ipfs.io/ipfs/@nft.ipfsLink" target="_blank">
@@ -19,22 +20,24 @@
             </div>
             <div class="d-flex justify-content-between">
                 <div class="d-flex flex-row gap-1 align-items-center mt-3">
-                    <div class=""><img src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/></div>
+                    <div class=""><img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/></div>
                     <div class="nft-mantle-price">--</div>
                     <div class="nft-dollar-price">($--)</div>
                 </div>
                 <div class="d-flex align-items-center gap-1 mt-3">
-                    <div class=""><img src="@routes.Assets.versioned("images/NFTCard/like.png")" width="16" height="16"/></div>
+                    <div class=""><img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/like.png")" width="16" height="16"/></div>
                     <div class="nft-likes">--</div>
                 </div>
             </div>
         </div>
         <div class="m-0 nft-separator"></div>
-        <div class="d-flex flex-row align-items-center justify-content-between m-3 nft-bottom">
+        <div class="d-flex flex-row align-items-center justify-content-between nft-bottom">
             <div class="setting">
-                    <!--<img src="@routes.Assets.versioned("images/NFTCard/meatballMenu.png")"/>-->
+                <div class="dots">
+                    <div class="dot"></div>
+                </div>
             </div>
-            <div class="buy-now-btn">@Messages(constants.View.BUYNOW)</div>
+            @* <div class="buy-now-btn">@Messages(constants.View.BUYNOW)</div> *@
         </div>
     </div>
 </div>
