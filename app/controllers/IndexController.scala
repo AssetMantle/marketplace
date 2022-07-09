@@ -34,9 +34,7 @@ class IndexController @Inject()(
             withUsernameToken.Ok(views.html.collection.viewCollections())
           case None => Future(Ok(views.html.index()))
         }
-
     }
   }
-
   uploadCollections.start()
 }

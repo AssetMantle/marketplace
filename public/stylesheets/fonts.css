@@ -27,3 +27,9 @@
     font-family: 'Paralucent';
     src: url('fonts/lato/paralucent/Paralucent Medium.otf');
 }
+
+/* Work Sans */
+@font-face {
+    font-family: 'Work Sans';
+    src: url('fonts/lato/workSans/WorkSans.ttf');
+}

@@ -1,7 +1,17 @@
 @(collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<div>
-    @collection.name
-    @collection.description
-    @collection.website
+<div class="sticky-top item-sticky">
+    <div class="card collection-card">
+        <div class="collectionName">@collection.name</div>
+        <div class="collectionDescription">
+            @collection.description
+        </div>
+        <div class="separator"></div>
+        <div class="d-flex gap-3 gap-sm-4 gap-md-2 gap-lg-2 align-items-center w-100">
+            <a href="@collection.website" target="_blank"><img src="@routes.Assets.versioned("images/icon/website.png")" class="icon"/></a>
+            @if(collection.getTwitter.isDefined) {
+                <a href="@collection.getTwitter.getOrElse("#")" target="_blank"><img src="@routes.Assets.versioned("images/icon/twitter.png")" class="icon"/></a>
+            }
+        </div>
+    </div>
 </div>

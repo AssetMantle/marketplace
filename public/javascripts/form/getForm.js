@@ -1,22 +1,18 @@
 function getForm(route, modal = '#commonModal', modalContent = '#modal-content') {
     // let modalID = $('#' + modal);
+    let myModal = new bootstrap.Modal($(modal), {});
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
         statusCode: {
             200: function (data) {
-                var style = document.createElement("style");
-                style.innerHTML = `body::-webkit-scrollbar {display: none;}`;
-                document.head.appendChild(style);
-                // $(modal+" .modalContainer").removeClass('active');
-                // setTimeout(function(){
-                $(modalContent).html(data);
+                // $(modalContent).html(data);
                 $(modal).addClass('active');
-                $(modal + " .modalContainer").addClass('active');
-                $("body").addClass('modal-active');
-                // },500);
-
+                // $(modal + " .modalContainer").addClass('active');
+                $(modalContent).html(data);
+                myModal.show();
+                // $("body").addClass('modal-active');
             },
             500: function (data) {
                 replaceDocument(data);

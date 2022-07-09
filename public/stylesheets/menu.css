@@ -301,7 +301,7 @@ nav .content .links {
     top: 0;
 }
 .hiddenMenu{
-    display: none;
+    display: none !important;
 }
 
 /* Responsive code start */
@@ -331,7 +331,7 @@ nav .content .links {
 @media screen and (max-width: 900px) {
 
     .hiddenMenu{
-        display: block;
+        display: flex !important;
     }
     .right-menu ul li{
         display: none;
