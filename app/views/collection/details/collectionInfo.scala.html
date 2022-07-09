@@ -9,7 +9,9 @@
         <div class="separator"></div>
         <div class="d-flex gap-3 gap-sm-4 gap-md-2 gap-lg-2 align-items-center w-100">
             <a href="@collection.website"><img src="@routes.Assets.versioned("images/icon/website.png")" class="icon"/></a>
-            <a href="#"><img src="@routes.Assets.versioned("images/icon/twitter.png")" class="icon"/></a>
+            @if(collection.getTwitter.isDefined) {
+                <a href="@collection.getTwitter.getOrElse("#")"><img src="@routes.Assets.versioned("images/icon/twitter.png")" class="icon"/></a>
+            }
 @*            <a href="#"><img src="@routes.Assets.versioned("images/icon/instagram.png")" class="icon"/></a>*@
 @*            <a href="#"><img src="@routes.Assets.versioned("images/icon/share.png")" class="icon"/></a>*@
         </div>
