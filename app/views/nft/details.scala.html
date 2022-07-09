@@ -1,0 +1,24 @@
+@(nft: master.NFT)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div>
+    @nft.name
+    @nft.description
+<div id="nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)"></div>
+    @defining("https://ipfs.io/ipfs/" + nft.ipfsLink) { ipfsLink =>
+        @ipfsLink
+    }
+<div>
+@nft.properties.map { property =>
+    <br>
+    @property.name
+    <br>
+    @defining(property.`type`) { propertyValue =>
+        @propertyValue
+    }
+}
+</div>
+<script>
+        getImage(jsRoutes.controllers.NFTController.file('@nft.collectionId', '@nft.fileName'), 'nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)');
+        checkAndPushState(jsRoutes.controllers.NFTController.viewNFT('@nft.collectionId', '@nft.fileName').url, '@nft.collectionId' + '/' + '@nft.fileName', "nft");
+</script>
+</div>

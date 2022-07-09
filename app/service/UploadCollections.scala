@@ -86,7 +86,8 @@ class UploadCollections @Inject()(
       val file = new File(oldFilePath)
       val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
       val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(fileName)
-      utilities.IPFS.pinFile(file, newFileName).IpfsHash
+//      utilities.IPFS.pinFile(file, newFileName).IpfsHash
+      "NA"
     } else ipfsHash + "/" + fileName
     if (uploadCollection.downloadFromIPFS) {
       utilities.IPFS.downloadFile(ipfsHash + "/" + fileName, oldFilePath)

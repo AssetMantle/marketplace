@@ -7,6 +7,7 @@
                 <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(nft.file)" class="w-100"/>
             </a>
         </div>
+        <button onclick="viewNFT('@collection.id', '@nft.fileName')">@Messages(constants.View.NFT_DETAILS)</button>
         <div class="nft-detail p-3">
             <div class="d-flex flex-row gap-2 nft-creator-detail">
                 <div class="creator-profile">

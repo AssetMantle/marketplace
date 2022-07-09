@@ -1,0 +1,12 @@
+@(nft: master.NFT)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div>
+    @nft.name
+    @nft.description
+        <div id="nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)"></div>
+        <div>
+        @defining("https://ipfs.io/ipfs/" + nft.ipfsLink) { ipfsLink =>
+            @ipfsLink
+        }
+    </div>
+</div>

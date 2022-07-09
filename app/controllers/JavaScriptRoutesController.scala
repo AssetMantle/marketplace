@@ -33,7 +33,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.collectionNFTs,
         routes.javascript.CollectionController.info,
 
-        routes.javascript.NFTController.get,
+        routes.javascript.NFTController.viewNFT,
+        routes.javascript.NFTController.info,
+        routes.javascript.NFTController.details,
+        routes.javascript.NFTController.file,
       )
     ).as("text/javascript")
 
