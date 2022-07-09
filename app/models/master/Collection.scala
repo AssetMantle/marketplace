@@ -32,6 +32,8 @@ case class Collection(id: String, classificationId: Option[String], name: String
     updatedBy = this.updatedBy,
     updatedOn = this.updatedOn,
     updatedOnTimeZone = this.updatedOnTimeZone)
+
+  def getTwitter: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.TWITTER).map(_.url)
 }
 
 object Collections {
