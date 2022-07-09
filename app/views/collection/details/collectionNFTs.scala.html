@@ -8,7 +8,6 @@
             <div class="profileCoverContainer" id="collectionUncompressedCoverImage_@collection.id"></div>
         </div>
         <div class="profile-card">
-
             <div class="profiles-container">
                 <div class="nft-list">
 @*                    <div class="header-with-icon">*@
@@ -280,6 +279,7 @@
         </div>
     </div>
     <script>
-            getImage(jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.Collection.File.COVER', false), 'collectionUncompressedCoverImage_@collection.id');
+         checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection('@collection.id').url, '@collection.id', "collection");
+         getImage(jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.Collection.File.COVER', false), 'collectionUncompressedCoverImage_@collection.id');
     </script>
 @*</div>*@

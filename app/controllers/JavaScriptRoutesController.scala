@@ -27,11 +27,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.CollectionController.viewCollections,
         routes.javascript.CollectionController.viewCollection,
-        routes.javascript.CollectionController.all,
-        routes.javascript.CollectionController.collection,
+        routes.javascript.CollectionController.collectionsList,
+        routes.javascript.CollectionController.collectionsPerPage,
+        routes.javascript.CollectionController.collectionFile,
         routes.javascript.CollectionController.collectionNFTs,
         routes.javascript.CollectionController.info,
-        routes.javascript.CollectionController.collectionFile,
 
         routes.javascript.NFTController.get,
       )

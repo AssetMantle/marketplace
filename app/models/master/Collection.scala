@@ -112,5 +112,7 @@ class Collections @Inject()(
 
     def tryGet(id: String): Future[Collection] = tryGetById(id).map(_.deserialize)
 
+    def getByPageNumber(pageNumber: Int): Future[Seq[Collection]] = getAll.map(_.sortBy(_.createdOn).slice((pageNumber - 1) * constants.CommonConfig.Collections.CollectionsPerPage, pageNumber * constants.CommonConfig.Collections.CollectionsPerPage).map(_.deserialize))
+
   }
 }
