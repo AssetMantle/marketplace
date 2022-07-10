@@ -1,5 +1,6 @@
 @(nft: master.NFT)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
+@*
 <div>
     @nft.name
     @nft.description
@@ -8,5 +9,22 @@
         @defining("https://ipfs.io/ipfs/" + nft.ipfsLink) { ipfsLink =>
             @ipfsLink
         }
+    </div>
+</div>
+*@
+
+<div class="sticky-top item-sticky">
+    <div class="card leftInfoCard">
+        <div class="title">@nft.name</div>
+        <div class="description">
+            @nft.description
+        </div>
+        <div class="separator"></div>
+        <div class="categorySection">
+            <div class="title">@Messages(constants.View.NFT_CATEGORY_TITLE)</div>
+            <div class="d-flex flex-row flex-wrap justify-content-between categoryList">
+                <div class="mt-2 categoryBadge">@Messages(constants.View.ART)</div>
+            </div>
+        </div>
     </div>
 </div>
