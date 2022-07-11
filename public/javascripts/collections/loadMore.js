@@ -21,7 +21,7 @@ function loadMoreCollections() {
         });
     } else {
         console.log("NO COLLECTION LEFT")
-        $(".collectionPage:last").css("margin-top","0px");
+        $(".collectionPage:last").css("margin-top", "0px");
     }
 }
 
@@ -34,11 +34,11 @@ function getDocHeight() {
     );
 }
 
-let collectionPageTimeout;
+collectionPageTimeout = 0;
 window.addEventListener('scroll', () => {
     clearTimeout(collectionPageTimeout);
-    collectionPageTimeout = setTimeout(function() {
-        if($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10)) {
+    collectionPageTimeout = setTimeout(function () {
+        if ($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10)) {
             loadMoreCollections();
         }
     }, 50);
