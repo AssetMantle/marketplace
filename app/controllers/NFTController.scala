@@ -30,10 +30,10 @@ class NFTController @Inject()(
 
   private implicit val module: String = constants.Module.NFT_CONTROLLER
 
-  def viewNFT(collectionId: String, nftId: String): EssentialAction = cached.apply(req => req.path + "/" + collectionId + "/" + nftId, constants.CommonConfig.WebAppCacheDuration) {
+  def viewNFT(nftId: String): EssentialAction = cached.apply(req => req.path + "/" + nftId, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val nft = masterNFTs.Service.tryGet(collectionId, nftId)
+        val nft = masterNFTs.Service.tryGet(nftId)
         (for {
           nft <- nft
         } yield Ok(views.html.nft.viewNft(nft))
@@ -43,14 +43,16 @@ class NFTController @Inject()(
     }
   }
 
-  def details(collectionId: String, nftId: String): EssentialAction = cached.apply(req => req.path + "/" + collectionId + "/" + nftId, constants.CommonConfig.WebAppCacheDuration) {
+  def details(nftId: String): EssentialAction = cached.apply(req => req.path + "/" + nftId, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val nft = masterNFTs.Service.tryGet(collectionId, nftId)
-        val collection = masterCollections.Service.tryGet(collectionId)
+        val nft = masterNFTs.Service.tryGet(nftId)
+
+        def getCollection(collectionID: String) = masterCollections.Service.tryGet(collectionID)
+
         (for {
           nft <- nft
-          collection <- collection
+          collection <- getCollection(nft.collectionId)
         } yield Ok(views.html.nft.details(collection, nft))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
@@ -58,10 +60,10 @@ class NFTController @Inject()(
     }
   }
 
-  def info(collectionId: String, nftId: String): EssentialAction = cached.apply(req => req.path + "/" + collectionId + "/" + nftId, constants.CommonConfig.WebAppCacheDuration) {
+  def info(nftId: String): EssentialAction = cached.apply(req => req.path + "/" + nftId, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val nft = masterNFTs.Service.tryGet(collectionId, nftId)
+        val nft = masterNFTs.Service.tryGet(nftId)
         (for {
           nft <- nft
         } yield Ok(views.html.nft.info(nft))
@@ -71,13 +73,15 @@ class NFTController @Inject()(
     }
   }
 
-  def file(collectionId: String, nftId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def file(nftId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      val nft = masterNFTs.Service.tryGet(collectionId, nftId)
-      val collection = masterCollections.Service.tryGet(collectionId)
+      val nft = masterNFTs.Service.tryGet(nftId)
+
+      def getCollection(collectionID: String) = masterCollections.Service.tryGet(collectionID)
+
       (for {
-        collection <- collection
         nft <- nft
+        collection <- getCollection(nft.collectionId)
       } yield {
         val source: Source[ByteString, _] = StreamConverters.fromInputStream(() => utilities.AmazonS3.getFullObject(collection.name + "/nfts/" + nft.fileName).getObjectContent.getDelegateStream)
         Ok.chunked(source, inline = true, Option(nft.fileName))

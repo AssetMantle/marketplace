@@ -10,6 +10,9 @@ window.addEventListener('popstate', e => {
         case "collection":
             viewCollection(lastPart);
             break;
+        case "nft":
+            viewNFT(lastPart);
+            break;
         default:
             componentResource('centerContent', jsRoutes.controllers.CollectionController.viewCollections());
             break;
