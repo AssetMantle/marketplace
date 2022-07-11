@@ -8,7 +8,7 @@ function viewCollection(collectionId) {
     componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs(collectionId));
 }
 
-function viewNFT(collectionId, nftId) {
-    componentResource('leftContent', jsRoutes.controllers.NFTController.info(collectionId, nftId));
-    componentResource('centerContent', jsRoutes.controllers.NFTController.details(collectionId, nftId));
+function viewNFT(nftId) {
+    componentResource('leftContent', jsRoutes.controllers.NFTController.info(nftId));
+    componentResource('centerContent', jsRoutes.controllers.NFTController.details(nftId));
 }

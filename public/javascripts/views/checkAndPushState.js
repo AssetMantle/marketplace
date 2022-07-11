@@ -5,7 +5,10 @@ function checkAndPushState(route, parameter, functionName) {
         } else {
             let address = "";
             if (parameter !== "") {
+                console.log(route)
+                console.log(route.split('/'))
                 address = "/" + route.split('/')[1] + "/" + parameter.toString();
+                console.log(address)
             } else {
                 address = "/" + route.split('/')[1];
             }

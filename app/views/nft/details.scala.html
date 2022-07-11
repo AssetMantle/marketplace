@@ -66,6 +66,6 @@
 @*</div>*@
 @*</div>*@
 <script>
-        getImage(jsRoutes.controllers.NFTController.file('@nft.collectionId', '@nft.fileName'), 'nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)');
-        checkAndPushState(jsRoutes.controllers.NFTController.viewNFT('@nft.collectionId', '@nft.fileName').url, '@nft.collectionId' + '/' + '@nft.fileName', "nft");
+        getImage(jsRoutes.controllers.NFTController.file('@nft.fileName'), 'nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)');
+        checkAndPushState(jsRoutes.controllers.NFTController.viewNFT('@nft.fileName').url, '@nft.fileName', "nft");
 </script>
