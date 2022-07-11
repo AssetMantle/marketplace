@@ -11,6 +11,7 @@ object CommonConfig {
   val logLang: Lang = Lang(config.get[String]("play.log.lang"))
   val webAppUrl: String = config.get[String]("webApp.url")
   val WebAppCacheDuration: Duration = Duration(config.get[Int]("webApp.cacheDuration"), MILLISECONDS)
+  val DefaultPublicFolder: String= config.get[String]("webApp.defaultPublicFolder")
 
   val sessionTokenTimeout: Long = config.get[Long]("play.http.session.token.timeout")
 
