@@ -14,7 +14,6 @@ function loadMoreCollections() {
             // },
             statusCode: {
                 200: function (data) {
-                    console.log(data);
                     const loadMore = $(".collectionsPerPage");
                     loadMore.append(data);
                 }
