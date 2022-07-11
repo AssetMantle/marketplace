@@ -47,9 +47,11 @@ class NFTController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val nft = masterNFTs.Service.tryGet(collectionId, nftId)
+        val collection = masterCollections.Service.tryGet(collectionId)
         (for {
           nft <- nft
-        } yield Ok(views.html.nft.details(nft))
+          collection <- collection
+        } yield Ok(views.html.nft.details(collection, nft))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
