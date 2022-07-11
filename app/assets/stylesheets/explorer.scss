@@ -1,0 +1,136 @@
+@mixin setFont($type, $style, $weight, $size, $lineHeight, $color){
+  font-family: $type;
+  font-style: $style;
+  font-weight: $weight;
+  font-size: $size;
+  line-height: $lineHeight;
+  color: $color;
+}
+/* Left Info Card  */
+.leftInfoCard{
+  height: fit-content;
+  background-color: var(--card-color);
+  border-radius: 20px;
+  padding: 20px;
+  .title{
+    @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+    text-transform: capitalize;
+  }
+  .description{
+    @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+    margin-top: 20px;
+  }
+  .separator{
+    height: 2px;
+    width: calc(100% + 40px);
+    background-color: #383838;
+    margin: 20px -20px 20px;
+    //margin-left: -20px;
+    //margin-top: 20px;
+    //margin-bottom: 20px;
+  }
+  a, .icon{
+    height: 22px;
+    width: 22px;
+  }
+  .categorySection{
+    .categoryList{
+      margin-top: 10px;
+      .categoryBadge{
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--dark));
+        padding: 6px 20px;
+        background: rgba(242, 175, 19, 0.1);
+        border: 1px solid var(--dark);
+        border-radius: 24px;
+      }
+    }
+  }
+}
+.collectionContainer{
+  width: 100%;
+  height: fit-content;
+  background-color: var(--card-color);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 100px;
+}
+/* NFT Preview Center Card */
+.nftPreviewContainer{
+  width: 100%;
+  height: fit-content;
+  background-color: var(--card-color);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 100px;
+  padding: 20px;
+  .leftOptions{
+    li{
+      @include setFont(var(--font-type-1), normal, 500, 14px, 17px, var(--gray));
+      text-transform: capitalize;
+      &.active{
+        @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--default));
+      }
+    }
+  }
+  .rightOptions{
+    li{
+      .icon{
+        height: 22px;
+        width: 22px;
+      }
+    }
+  }
+  .nftImagePreview{
+    background: var(--card-dark);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    div{
+      overflow: hidden;
+      img{
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        margin: auto;
+        border-radius: 10px;
+        //object-fit: cover;
+        //width: 100%;
+        //height: 250px;
+      }
+    }
+  }
+  .nftPropertyContainer{
+    background: var(--card-dark);
+    border-radius: 10px;
+    margin-top: 20px;
+    padding: 20px;
+    .title{
+      @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+      text-transform: capitalize;
+    }
+    .propertyList{
+      max-height: 310px;
+      overflow-y: auto;
+      padding-right: 20px;
+      margin-top: 20px;
+      .singleProperty{
+        background: var(--popup-bg);
+        border: 1px solid var(--dark);
+        border-radius: 12px;
+        padding: 12px 24px;
+        .propertyName{
+          @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--dark));
+          text-transform: uppercase;
+        }
+        .propertyValue{
+          @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+        }
+        .propertyRarity{
+          @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+        }
+      }
+    }
+  }
+}
