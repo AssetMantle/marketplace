@@ -1,18 +1,18 @@
 # syntax=docker/dockerfile:latest
 ARG BUILD_IMAGE=adoptopenjdk:11-jdk-hotspot
 ARG JRE_IMAGE=adoptopenjdk:11-jre-hotspot
+
 FROM $BUILD_IMAGE as build
+ENV SBT_VERSION=1.7.0
 SHELL [ "/bin/bash", "-cx" ]
-RUN --mount=type=cache,target=/var/lib/cache/ \
-  --mount=type=cache,target=/var/lib/apt/cache \
-  apt-get update; \
-  apt-get install -y gnupg; \
-  echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/apt/sources.list.d/sbt.list; \
-  echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | tee /etc/apt/sources.list.d/sbt_old.list; \
-  curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | apt-key add; \
-  apt-get update; \
-  apt-get install -y sbt unzip
+WORKDIR /tmp
+RUN curl -sLo - https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz | tar -xvzf -; \
+  mv sbt/bin/* /usr/local/bin/; \
+  rm -rf /tmp/*
 WORKDIR /app
+ENV JAVA_OPTS="-Xms4G -Xmx8G -Xss6M -XX:ReservedCodeCacheSize=256M -XX:+CMSClassUnloadingEnabled -XX:+UseG1GC"
+ENV JVM_OPTS="-Xms4G -Xmx8G -Xss6M -XX:ReservedCodeCacheSize=256M -XX:+CMSClassUnloadingEnabled -XX:+UseG1GC"
+ENV SBT_OPTS="-Xms4G -Xmx8G -Xss6M -XX:ReservedCodeCacheSize=256M -XX:+CMSClassUnloadingEnabled -XX:+UseG1GC"
 COPY . .
 RUN --mount=type=cache,target=/root/.sbt \
   --mount=type=cache,target=/root/.cache \
