@@ -87,8 +87,8 @@ class CollectionController @Inject()(
         } else {
           collectionFile.fold {
             documentType match {
-              case constants.Collection.File.COVER => Ok.chunked(StreamConverters.fromInputStream(() => new FileInputStream(new File("app/assets/defaultImages/defaultCollectionCover.png"))))
-              case constants.Collection.File.PROFILE => Ok.chunked(StreamConverters.fromInputStream(() => new FileInputStream(new File("app/assets/defaultImages/defaultProfileCover.png"))))
+              case constants.Collection.File.COVER => Ok.chunked(StreamConverters.fromInputStream(() => new FileInputStream(new File("public/images/defaultCollectionCover.png"))))
+              case constants.Collection.File.PROFILE => Ok.chunked(StreamConverters.fromInputStream(() => new FileInputStream(new File("public/images/defaultProfileCover.png"))))
               case _ => throw new BaseException(constants.Response.FILE_TYPE_NOT_FOUND)
             }
           }(x => {
