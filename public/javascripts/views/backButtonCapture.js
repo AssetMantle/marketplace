@@ -14,7 +14,7 @@ window.addEventListener('popstate', e => {
             viewNFT(lastPart);
             break;
         default:
-            componentResource('centerContent', jsRoutes.controllers.CollectionController.viewCollections());
+            window.location = "/";
             break;
     }
     let elems = document.querySelectorAll(".active");
