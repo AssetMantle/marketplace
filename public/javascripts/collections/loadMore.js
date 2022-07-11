@@ -1,3 +1,10 @@
+// Goto top when refresh the page
+window.onbeforeunload = function () {
+    window.scrollTo(0, 0);
+}
+document.onload = function () {
+    window.scrollTo(0, 0);
+}
 function loadMoreCollections() {
     if ($(".noCollection").length === 0) {
         let route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
