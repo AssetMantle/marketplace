@@ -1,7 +1,7 @@
 @(heading:String = "", subHeading:String = "", closeButton:Boolean = true, showScreen:String = "", hideScreen:String = "")
 
 <div class="header-with-icon">
-    <div class="form-top">
+    <div class="d-flex align-items-center form-top">
         <div class="title-icon back-button-icon" onclick="showHideModalScreen('@showScreen', '@hideScreen')">
             <img src="@routes.Assets.versioned("images/icon/backArrow.png")"/>
         </div>
@@ -11,6 +11,6 @@
         }
     </div>
     @if(subHeading != ""){
-        <div class="form-sub-title">@subHeading</div>
+        <div class="mt-3 form-sub-title">@subHeading</div>
     }
 </div>

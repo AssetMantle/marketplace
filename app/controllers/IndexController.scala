@@ -31,19 +31,10 @@ class IndexController @Inject()(
         optionalLoginState match {
           case Some(loginState) =>
             implicit val loginStateImplicit: LoginState = loginState
-            withUsernameToken.Ok(views.html.collection.collections(None))
+            withUsernameToken.Ok(views.html.collection.viewCollections())
           case None => Future(Ok(views.html.index()))
         }
-
     }
   }
-
-  def home(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        Future(Ok(views.html.home.home()))
-    }
-  }
-
   uploadCollections.start()
 }

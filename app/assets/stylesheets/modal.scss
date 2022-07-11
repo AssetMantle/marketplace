@@ -1,0 +1,258 @@
+@media (min-width: 500px) {
+  .modal-dialog{
+    max-width: 650px;
+  }
+}
+@mixin setFont($type, $style, $weight, $size, $lineHeight, $color){
+  font-family: $type;
+  font-style: $style;
+  font-weight: $weight;
+  font-size: $size;
+  line-height: $lineHeight;
+  color: $color;
+}
+// Common
+body.modal-open::-webkit-scrollbar{
+  display: none;
+}
+.modal-backdrop.fade.show{
+  opacity: 0;
+}
+@media only screen and (min-width: 10em) {
+  .modal-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
+    z-index: 9999;
+  }
+  .modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+#modal-content{
+  padding: 32px;
+  background-color: #21211E;
+  border-radius: 10px;
+  border: 2px solid #282826;
+}
+.btn-close{
+  background: none;
+  color: #ffc033 !important;
+  font-size: 45px;
+  line-height: 0px;
+  box-shadow: none !important;
+}
+.modal-header{
+  border-bottom: none;
+  padding: 0px;
+}
+.modal-body{
+  padding: 0px;
+}
+.modal-title{
+  @include setFont(var(--font-type-1), normal, 500, 28px, 34px, var(--dark));
+}
+.sub-heading{
+  @include setFont(var(--font-type-2), normal, 400, 18px, 22px, var(--inactive-gray));
+  margin-bottom: 32px;
+}
+.modal-footer{
+  padding: 0px;
+  border-top: none;
+}
+.link{
+  @include setFont(var(--font-type-1), normal, 500, 14px, 17px, var(--dark));
+  position: relative;
+  text-transform: capitalize;
+
+  &:hover{
+    color: var(--dark);
+  }
+
+  &:before{
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    top: 100%;
+    left: 0;
+    transform-origin: 50% 100%;
+    transition: clip-path 0.3s, transform 0.3s cubic-bezier(0.2, 1, 0.8, 1);
+    clip-path: polygon(0% 0%, 0% 100%, 0 100%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%, 100% 100%, 100% 0%);
+  }
+
+  &:hover:before {
+    color: var(--dark);
+    transform: translate3d(0, 2px, 0) scale3d(1.0, 2, 1);
+    clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 50% 100%, 0 100%, 100% 100%, 100% 0%);
+  }
+}
+/* Header with Icon */
+.header-with-icon .form-top .title-icon{
+  margin-right: 5px;
+}
+.header-with-icon .form-top .title-text{
+  @include setFont(var(--font-type-1), normal, 500, 28px, 34px, var(--dark));
+  text-transform: capitalize;
+  flex-grow: 2;
+  margin-right: 20px;
+}
+.header-with-icon .form-sub-title{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 22px, var(--text-medium));
+}
+.header-with-icon .form-top .back-button-icon{
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  cursor: pointer;
+}
+.header-with-icon .form-top .back-button-icon:hover{
+  background-color: var(--popup-stroke);
+}
+
+// Sign Up
+.termsConditionMessage{
+  @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--mantle-off-white));
+  margin-left: 6px;
+
+  label{
+    margin-right: 5px;
+  }
+}
+.footerMessage{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
+  text-align: left;
+
+  span{
+    margin-right: 5px;
+  }
+
+  .link{
+    @include setFont(var(--font-type-2), normal, 500, 16px, 19px, var(--dark));
+  }
+}
+
+// Terms & Conditions
+.termsConditionSubTitle{
+  @include setFont(var(--font-type-2), normal, 400, 18px, 22px, var(--inactive-gray));
+}
+
+// Recovery Phrase
+.form-copy-item{
+  @include setFont(var(--font-type-2), normal, 700, 14px, 22px, var(--text-medium));
+  text-transform: capitalize;
+}
+
+// Form Seed Box
+.form-seed-box-list{
+  gap: 8px;
+}
+.form-seed-box-list .form-seed-box{
+  flex: 1 1 0;
+}
+.form-seed-box-list .form-seed-box .form-seed-box-number{
+  @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--mantle-off-white));
+  margin-left: 5px;
+}
+.form-seed-box-list .form-seed-box .form-seed-box-phrase{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 14px, var(--mantle-off-white));
+  text-align: center;
+  background: transparent;
+  width: 100%;
+  border: 1px solid var(--inactive-gray);
+  box-sizing: border-box;
+  border-radius: 8px;
+  padding: 9px 0;
+  outline:none;
+}
+.form-seed-box-list .form-seed-box .form-seed-box-phrase.disable{
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
+  pointer-events: none;
+}
+.form-seed-box-list .form-seed-box .form-seed-box-phrase:focus-within{
+  border-color: var(--dark);
+}
+.form-seed-box-list .form-seed-box .form-seed-box-phrase input{
+  @include setFont(var(--font-type-2), normal, 400, 16px, 14px, var(--mantle-off-white));
+  height: 100%;
+  width: 100%;
+  border-radius: 8px;
+  border:none;
+  outline: none;
+  background-color: transparent;
+  text-align: center;
+}
+.form-seed-box-list .form-seed-box .form-seed-box-phrase input:focus{
+  color: var(--dark);
+}
+.form-information-message{
+  gap: 5px;
+}
+.form-information-message .form-information-icon img{
+  width: 18px;
+}
+.form-information-message .form-information-text{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+}
+
+/* Form Heading */
+.form-heading{
+  @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--inactive-gray));
+  margin-top: 32px;
+}
+
+/* Form Bullet List*/
+.form-bullet-list{
+  margin: 16px 25px;
+}
+.form-bullet-list ul{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
+  list-style: disc;
+}
+.form-bullet-list ul li{
+  margin: 16px 0;
+}
+
+// Successful Modal
+.form-success-icon{
+  flex-grow: 2;
+  padding-left: 40px;
+}
+.header-success .form-success-message-heading{
+  @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--dark));
+  text-transform: capitalize;
+}
+.header-success .form-success-message-sub-text{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 24px, var(--text-medium));
+}
+
+// Forgot Password
+.forgotPasswordUsername{
+  margin-bottom: 0px;
+}
+.errorMessage .errorContainer{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--error));
+  gap: 4px;
+}

@@ -1,0 +1,14 @@
+@import views.html.collection._
+
+@(collections: Seq[master.Collection])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="collectionPage">
+    @if(collections.nonEmpty) {
+        @collections.map { collection =>
+        <div class="singleCollection">
+            @commonCollectionCard(collection)
+        </div>
+        }
+    } else {
+        <div class="noCollection"></div>
+    }
+</div>

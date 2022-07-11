@@ -17,12 +17,12 @@ object FormField {
   val PUSH_NOTIFICATION_TOKEN = new StringFormField("PUSH_NOTIFICATION_TOKEN", 0, 200)
   val SIGNUP_PASSWORD = new StringFormField("SIGNUP_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SIGNUP_CONFIRM_PASSWORD = new StringFormField("CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val SEED_PHRASE_1 = new StringFormField("SEED_PHRASE_1", 3, 20)
-  val SEED_PHRASE_2 = new StringFormField("SEED_PHRASE_2", 3, 20)
-  val SEED_PHRASE_3 = new StringFormField("SEED_PHRASE_3", 3, 20)
-  val SEED_PHRASE_4 = new StringFormField("SEED_PHRASE_4", 3, 20)
-  val FORGOT_PASSWORD = new StringFormField("FORGOT_PASSWORD", 5, 128)
-  val FORGOT_CONFIRM_PASSWORD = new StringFormField("FORGOT_CONFIRM_PASSWORD", 5, 128)
+  val SEED_PHRASE_1 = new StringFormField("SEED_PHRASE_1", 3, 20, RegularExpression.ALL_SMALL_LETTERS, Response.INVALID_SEEDS.message)
+  val SEED_PHRASE_2 = new StringFormField("SEED_PHRASE_2", 3, 20, RegularExpression.ALL_SMALL_LETTERS, Response.INVALID_SEEDS.message)
+  val SEED_PHRASE_3 = new StringFormField("SEED_PHRASE_3", 3, 20, RegularExpression.ALL_SMALL_LETTERS, Response.INVALID_SEEDS.message)
+  val SEED_PHRASE_4 = new StringFormField("SEED_PHRASE_4", 3, 20, RegularExpression.ALL_SMALL_LETTERS, Response.INVALID_SEEDS.message)
+  val FORGOT_PASSWORD = new StringFormField("FORGOT_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val FORGOT_CONFIRM_PASSWORD = new StringFormField("FORGOT_CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
 
 
   //BooleanFormField

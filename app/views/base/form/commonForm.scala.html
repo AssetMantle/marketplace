@@ -6,50 +6,51 @@
 @form(action = formTemplate.post, Symbol("onkeypress") -> "submitFormOnEnter(event,this)") {
     @if(showSubtitle) {
         @if(showBackButton){
-            <div class="header-with-icon">
-                <div class="form-top">
-                    <div class="title-icon back-button-icon" id="modalBackButton" onclick="showHideModalScreen('@showScreen', '@hideScreen')">
-                        <img src="@routes.Assets.versioned("images/icon/backArrow.png")"/>
-                    </div>
-                    <div class="title-text">@Messages(formTemplate.title)</div>
-                    @if(closeButton){
-                        <a class="form-close-btn close-modal" onclick="closeModal()"></a>
-                    }
+            <div class="modal-header mb-3">
+                <div class="title-icon back-button-icon" id="modalBackButton" onclick="showHideModalScreen('@showScreen', '@hideScreen')">
+                    <img src="@routes.Assets.versioned("images/icon/backArrow.png")"/>
                 </div>
-                @if(showSubtitle){
-                    <div class="form-sub-title" style="margin-bottom: 24px;" id="modalSubtitle">@Messages(formTemplate.subTitle)</div>
+                <h5 class="modal-title" id="staticBackdropLabel">@Messages(formTemplate.title)</h5>
+                @if(closeButton) {
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                                &times;
+                    </button>
                 }
             </div>
+            @if(showSubtitle){
+                <p class="sub-heading" id="modalSubtitle">@Messages(formTemplate.subTitle)</p>
+            }
+
         } else{
-            <div class="header">
-                <div class="form-top">
-                    <div class="form-title">@Messages(formTemplate.title)</div>
-                    <a class="form-close-btn close-modal" onclick="closeModal()"></a>
-                </div>
-                @if(showSubtitle){
-                    <div class="form-sub-title" id="modalSubtitle">@Messages(formTemplate.subTitle)</div>
-                }
+            <div class="modal-header mb-3">
+                <h5 class="modal-title" id="staticBackdropLabel">@Messages(formTemplate.title)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                            &times;
+                </button>
             </div>
+            @if(showSubtitle){
+                <p class="sub-heading" id="modalSubtitle">@Messages(formTemplate.subTitle)</p>
+            }
         }
     }else{
         @if(showBackButton){
-            <div class="header-with-icon">
-                <div class="form-top">
-                    <div class="title-icon back-button-icon" onclick="showHideModalScreen('@showScreen', '@hideScreen')">
-                        <img src="@routes.Assets.versioned("images/icon/backArrow.png")"/>
-                    </div>
-                    <div class="title-text">@Messages(formTemplate.title)</div>
-                    @if(closeButton){
-                        <a class="form-close-btn close-modal" onclick="closeModal()"></a>
-                    }
+            <div class="modal-header mb-3">
+                <div class="title-icon back-button-icon" onclick="showHideModalScreen('@showScreen', '@hideScreen')">
+                    <img src="@routes.Assets.versioned("images/icon/backArrow.png")"/>
                 </div>
+                <h5 class="modal-title" id="staticBackdropLabel">@Messages(formTemplate.title)</h5>
+                @if(closeButton) {
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                                &times;
+                    </button>
+                }
             </div>
         } else{
-            <div class="header">
-                <div class="form-top">
-                    <div class="form-title">@Messages(formTemplate.title)</div>
-                    <a class="form-close-btn close-modal" onclick="closeModal()"></a>
-                </div>
+            <div class="modal-header mb-3">
+                <h5 class="modal-title" id="staticBackdropLabel">@Messages(formTemplate.title)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                            &times;
+                </button>
             </div>
         }
     }
@@ -77,16 +78,18 @@
         @CSRF.formField
         @fieldset
 
-        <div id="formSubmitButton">
-        @if(customSubmit != JavaScript("")) {
-            @commonJavascriptButton(formTemplate.submit, customSubmit)
-        } else {
-            @if(submitDisable){
-                @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"), Symbol("class") -> "disable")
-            }else{
-                @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"))
+        <div class="modal-footer">
+            <div id="formSubmitButton">
+            @if(customSubmit != JavaScript("")) {
+                @commonJavascriptButton(formTemplate.submit, customSubmit)
+            } else {
+                @if(submitDisable){
+                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"), Symbol("class") -> "disable")
+                }else{
+                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"))
+                }
             }
-        }
+            </div>
         </div>
     </div>
 }

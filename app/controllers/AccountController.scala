@@ -124,7 +124,7 @@ class AccountController @Inject()(
 
               for {
                 _ <- pushNotificationTokenUpdate
-                result <- withUsernameToken.Ok(views.html.collection.collections(None))
+                result <- withUsernameToken.Ok(views.html.collection.viewCollections())
               } yield result
             }
           } else Future(throw new BaseException(constants.Response.INVALID_USERNAME_OR_PASSWORD))

@@ -121,10 +121,6 @@
 }
 
 /* Footer */
-.form .form-footer{
-    font-family: var(--font-type-2);
-    margin-top: 30px;
-}
 .form .msg-1{
     text-align: left;
     font-size: 14px;
@@ -390,10 +386,6 @@
 
 
 /* AssetMantle Wallet Connected Successful Animation */
-.form-success-icon{
-    flex-grow: 2;
-    padding-left: 40px;
-}
 .form-success-animation .checkmark {
     width: 100px;
     height: 100px;

@@ -14,6 +14,10 @@ object CommonConfig {
 
   val sessionTokenTimeout: Long = config.get[Long]("play.http.session.token.timeout")
 
+  object Collections {
+    val CollectionsPerPage: Int = config.get[Int]("webApp.collectionsPerPage")
+  }
+
   object Files {
     val RootFilePath: String = config.get[String]("upload.rootFilePath")
     val ColectionPath: String = config.get[String]("upload.collectionPath")

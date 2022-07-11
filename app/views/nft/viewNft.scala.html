@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+
+@(nft: master.NFT, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+@views.html.base.common(constants.View.NFT, failures, warnings, successes, infos)
+
+<div>
+    <script>
+            viewNFT('@nft.collectionId', '@nft.fileName');
+    </script>
+</div>

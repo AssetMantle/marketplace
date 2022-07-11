@@ -4,11 +4,11 @@ window.addEventListener('popstate', e => {
     let lastPart = window.location.href.substr(window.location.href.lastIndexOf('/') + 1);
 
     switch (this.history.state) {
-        case "collection":
-            componentResource('centerContent', jsRoutes.controllers.CollectionController.collection(lastPart))
-            break;
         case "collections":
-            componentResource('centerContent', jsRoutes.controllers.CollectionController.all());
+            viewCollections();
+            break;
+        case "collection":
+            viewCollection(lastPart);
             break;
         default:
             componentResource('centerContent', jsRoutes.controllers.CollectionController.viewCollections());

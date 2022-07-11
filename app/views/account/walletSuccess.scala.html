@@ -3,7 +3,7 @@
 @(username: String, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @successModal(heading = Messages(constants.View.CREATE_WALLET_SUCCESS_TITLE), subHeading = Messages(constants.View.CREATE_WALLET_SUCCESS_SUBTITLE))
 @successModalAddressBox(Symbol("userName") -> username, Symbol("address") -> address)
-<div class="form-information-message">
+<div class="d-flex mt-3 form-information-message">
     <div class="form-information-icon"><img src="@routes.Assets.versioned("images/icon/info.png")"/></div>
     <div class="form-information-text">@Messages(constants.View.CREATE_WALLET_SUCCESS_INFO)</div>
 </div>

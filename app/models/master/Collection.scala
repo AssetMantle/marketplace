@@ -32,6 +32,8 @@ case class Collection(id: String, classificationId: Option[String], name: String
     updatedBy = this.updatedBy,
     updatedOn = this.updatedOn,
     updatedOnTimeZone = this.updatedOnTimeZone)
+
+  def getTwitter: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.TWITTER).map(_.url)
 }
 
 object Collections {
@@ -111,6 +113,8 @@ class Collections @Inject()(
     def get(id: String): Future[Option[Collection]] = getById(id).map(_.map(_.deserialize))
 
     def tryGet(id: String): Future[Collection] = tryGetById(id).map(_.deserialize)
+
+    def getByPageNumber(pageNumber: Int): Future[Seq[Collection]] = getAll.map(_.sortBy(_.createdOn).slice((pageNumber - 1) * constants.CommonConfig.Collections.CollectionsPerPage, pageNumber * constants.CommonConfig.Collections.CollectionsPerPage).map(_.deserialize))
 
   }
 }

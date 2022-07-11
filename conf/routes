@@ -13,7 +13,6 @@ GET         /firebase-messaging-sw.js        controllers.Assets.at(path="/public
 
 # Home
 GET         /                                controllers.IndexController.index()
-GET         /home                            controllers.IndexController.home()
 
 GET         /signUp                          controllers.AccountController.signUpForm()
 POST        /signUp                          controllers.AccountController.signUp()
@@ -34,10 +33,15 @@ POST        /forgetPassword                  controllers.AccountController.forge
 
 GET         /collections                     controllers.CollectionController.viewCollections()
 GET         /collection/:id                  controllers.CollectionController.viewCollection(id: String)
-GET         /allCollections                  controllers.CollectionController.all()
-GET         /collection                      controllers.CollectionController.collection(id: String)
-GET         /collectionFile                  controllers.CollectionController.collectionFile(id: String, documentType:String)
+GET         /collectionsList                 controllers.CollectionController.collectionsList()
+GET         /collectionsPerPage              controllers.CollectionController.collectionsPerPage(pageNumber: Int)
+GET         /collectionNFTs                  controllers.CollectionController.collectionNFTs(id: String)
+GET         /collectionFile                  controllers.CollectionController.collectionFile(id: String, documentType:String, compress: Boolean)
+GET         /collectionInfo                  controllers.CollectionController.info(id: String)
 
-GET         /nft/:collectionId/:nftId        controllers.NFTController.get(collectionId: String, nftId: String)
+GET         /nft/:collectionId/:nftId        controllers.NFTController.viewNFT(collectionId: String, nftId: String)
+GET         /nftDetails                      controllers.NFTController.details(collectionId: String, nftId: String)
+GET         /nftInfo                         controllers.NFTController.info(collectionId: String, nftId: String)
+GET         /nftFile                         controllers.NFTController.file(collectionId: String, nftId: String)
 
 

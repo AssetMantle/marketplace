@@ -27,11 +27,16 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.CollectionController.viewCollections,
         routes.javascript.CollectionController.viewCollection,
-        routes.javascript.CollectionController.all,
-        routes.javascript.CollectionController.collection,
+        routes.javascript.CollectionController.collectionsList,
+        routes.javascript.CollectionController.collectionsPerPage,
         routes.javascript.CollectionController.collectionFile,
+        routes.javascript.CollectionController.collectionNFTs,
+        routes.javascript.CollectionController.info,
 
-        routes.javascript.NFTController.get,
+        routes.javascript.NFTController.viewNFT,
+        routes.javascript.NFTController.info,
+        routes.javascript.NFTController.details,
+        routes.javascript.NFTController.file,
       )
     ).as("text/javascript")
 
