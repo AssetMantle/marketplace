@@ -1,4 +1,4 @@
-@(nft: master.NFT)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(collection: master.Collection, nft: master.NFT)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="item item-center nftPreviewContainer">
     <div class="d-flex justify-content-between">
@@ -7,10 +7,12 @@
 @*            <li>@Messages(constants.View.ACTIVITY)</li>*@
 @*            <li>@Messages(constants.View.MORE)</li>*@
         </ul>
-        <ul class="d-flex gap-3 rightOptions">
-            <li><img src="@routes.Assets.versioned("images/icon/website.png")" class="icon"/></li>
-@*            <li><img src="@routes.Assets.versioned("images/icon/twitter.png")" class="icon"/></li>*@
-        </ul>
+        @if(collection.website != "") {
+            <ul class="d-flex gap-3 rightOptions">
+                <li><a href="@collection.website" target="_blank"><img src="@routes.Assets.versioned("images/icon/website.png")" class="icon"/></a></li>
+                @*            <li><img src="@routes.Assets.versioned("images/icon/twitter.png")" class="icon"/></li>*@
+            </ul>
+        }
     </div>
     <div class="nftImagePreview">
         <a href="https://ipfs.io/ipfs/@nft.ipfsLink" target="_blank">
