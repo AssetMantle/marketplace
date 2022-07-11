@@ -1,4 +1,4 @@
-let heroSwiper = new Swiper(".mySwiper2", {
+heroSwiper = new Swiper(".mySwiper2", {
     effect: "coverflow",
     watchSlidesProgress: true,
     slidesPerView: 3,
@@ -8,7 +8,7 @@ let heroSwiper = new Swiper(".mySwiper2", {
     centeredSlides: true,
 });
 
-let featuredSwiper = new Swiper(".featured-container .swiper-container", {
+featuredSwiper = new Swiper(".featured-container .swiper-container", {
     autoplay: true,
     // speed:1000,
     effect: "coverflow",
@@ -54,7 +54,7 @@ let featuredSwiper = new Swiper(".featured-container .swiper-container", {
 
 
 // Popular Swiper/Slider
-let swiperPopular = new Swiper(".popular-container .swiper-container", {
+swiperPopular = new Swiper(".popular-container .swiper-container", {
     slidesPerView: "auto",
     spaceBetween: 5,
     loop: true,
@@ -94,6 +94,7 @@ function HideScrollbar() {
     style.innerHTML = `body::-webkit-scrollbar {display: none;}`;
     document.head.appendChild(style);
 }
+
 HideScrollbar()
 
 // function ShowScrollbar() {
@@ -104,12 +105,12 @@ HideScrollbar()
 
 intro = document.querySelector('.intro');
 
-window.addEventListener('DOMContentLoaded', ()=>{
-    setTimeout(()=>{
-        setTimeout(()=>{
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        setTimeout(() => {
             intro.style.top = '-100vh';
             intro.style.visibility = 'hidden';
             // ShowScrollbar();
-        },3500);
+        }, 3500);
     });
 });
