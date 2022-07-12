@@ -19,7 +19,7 @@
     --default: #FFC640;
     --gray: #B0B0B0;
     --card-dark: #030301;
-    --font-type-1: 'Paralucent';
+    --font-type-1: 'Work Sans';
     --font-type-2: 'Lato';
     --size-bezel: .5rem;
     --size-radius: 8px;
@@ -49,11 +49,6 @@ body{
     background-position: center;
     /*overflow-x: hidden !important;*/
 }
-body.modal-active{
-    /*overflow: hidden;*/
-    height: 100vh;
-    width: 100vw;
-}
 .body-container{
     max-width: 1440px;
     width: 100%;
@@ -81,14 +76,13 @@ body.modal-active{
 .common-container{
     position: relative;
     top: 100px;
+    /*max-width: 1440px;*/
+    /*width: 100%;*/
+    /*margin: auto;*/
 }
 
 
 /* Footer */
-.form .form-footer{
-    font-family: var(--font-type-2);
-    margin-top: 30px;
-}
 .form .msg-1{
     text-align: left;
     font-size: 14px;
@@ -1083,32 +1077,33 @@ article:first-child{
     display: flex;
     align-items: center;
 }
-.hero-section .row{
+.hero-section .heroSectionRow{
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin: 100px 0;
 }
-.hero-section .row .col-1{
+.hero-section .heroSectionRow .heroSectionCol1{
     flex-basis: 45%;
     position: relative;
     margin-left: 100px;
 }
-.hero-section .row .col-1 h2{
+.hero-section .heroSectionRow .heroSectionCol1 h2{
+    font-style: normal;
+    font-weight: 500;
+    font-size: 40px;
+    line-height: 48px;
     font-family: var(--font-type-1);
-    font-size: 36px;
     color: var(--dark);
-    font-weight: 400;
-    letter-spacing: 0.08em;
 }
-.hero-section .row .col-1 h3{
+.hero-section .heroSectionRow .heroSectionCol1 h3{
     font-family: var(--font-type-1);
     font-size: 32px;
     color: var(--text-medium);
     font-weight: 400;
     margin: 20px 0 10px;
 }
-.hero-section .row .col-1 p{
+.hero-section .heroSectionRow .heroSectionCol1 p{
     font-family: var(--font-type-2);
     font-size: 22px;
     color: #9D9D9D;
@@ -1116,12 +1111,12 @@ article:first-child{
     margin-top: 40px;
     padding: 0 150px 0 0;
 }
-.hero-section .row .col-1 .buttons{
+.hero-section .heroSectionRow .heroSectionCol1 .buttons{
     display: flex;
     gap: 30px;
     margin-top: 100px;
 }
-.hero-section .row .col-1 button{
+.hero-section .heroSectionRow .heroSectionCol1 button{
     font-family: var(--font-type-2);
     font-size: 20px;
     font-weight: 600;
@@ -1137,8 +1132,9 @@ article:first-child{
     position: relative;
     overflow: hidden;
     height: 50px;
+    line-height: 10px;
 }
-.hero-section .row .col-1 .button-1::before {
+.hero-section .heroSectionRow .heroSectionCol1 .button-1::before {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1150,7 +1146,7 @@ article:first-child{
     content: 'Explore';
     transition: all .3s;
 }
-.hero-section .row .col-1 .button-1::after {
+.hero-section .heroSectionRow .heroSectionCol1 .button-1::after {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1162,14 +1158,14 @@ article:first-child{
     content: 'Coming Soon!';
     transition: all .3s;
 }
-.hero-section .row .col-1 .button-1:hover::before {
+.hero-section .heroSectionRow .heroSectionCol1 .button-1:hover::before {
     top: -60px;
 }
-.hero-section .row .col-1 .button-1:hover::after {
+.hero-section .heroSectionRow .heroSectionCol1 .button-1:hover::after {
     top: 0;
 }
 
-.hero-section .row .col-1 .buttons .button-2{
+.hero-section .heroSectionRow .heroSectionCol1 .buttons .button-2{
     background:transparent;
     border: 2px solid var(--dark);
     color: var(--dark);
@@ -1177,22 +1173,23 @@ article:first-child{
     position: relative;
     overflow: hidden;
 }
-.hero-section .row .col-2{
+.hero-section .heroSectionRow .heroSectionCol2{
     position: relative;
     flex-basis: 55%;
     display: flex;
     align-items: center;
 }
-.hero-section .row .col-2 .hero-img{
+.hero-section .heroSectionRow .heroSectionCol2 .hero-img{
     width: 100%;
 }
 
 .landing-page-heading{
-    font-family: var(--font-type-1);
+    font-style: normal;
+    font-weight: 500;
     font-size: 36px;
-    font-weight: 400;
+    line-height: 43px;
     text-align: center;
-    letter-spacing: 0.08em;
+    font-family: var(--font-type-1);
     color:var(--default);
     padding-top: 20px;
 }
@@ -1233,31 +1230,31 @@ article:first-child{
 
 
 @media screen and (max-width:700px) {
-    .hero-section .row{
+    .hero-section .heroSectionRow{
         flex-direction: column-reverse;
         margin: 50px 0px;
     }
-    .hero-section .row .col-1 .buttons{
+    .hero-section .heroSectionRow .heroSectionCol1 .buttons{
         /*flex-direction: column;*/
         margin-top: 45px;
     }
-    .hero-section .row .col-2{
+    .hero-section .heroSectionRow .heroSectionCol2{
         flex-basis: 100%;
         margin-bottom: 50px;
     }
-    .hero-section .row .col-2 .hero-img{
+    .hero-section .heroSectionRow .heroSectionCol2 .hero-img{
         width: 100%;
     }
-    .hero-section .row .col-1{
+    .hero-section .heroSectionRow .heroSectionCol1{
         flex-basis: 100%;
     }
-    .hero-section .row .col-1 h2{
+    .hero-section .heroSectionRow .heroSectionCol1 h2{
         font-size: 35px;
     }
-    .hero-section .row .col-1 h3{
+    .hero-section .heroSectionRow .heroSectionCol1 h3{
         font-size: 20px;
     }
-    .hero-section .row .col-1 p{
+    .hero-section .heroSectionRow .heroSectionCol1 p{
         font-size: 15px;
     }
 }
@@ -1348,6 +1345,10 @@ article:first-child{
 .featured-container .swiper-3d .swiper-slide-shadow-right
 {
     background-image: none !important;
+}
+.featured-container .swiper-button-next img,
+.featured-container .swiper-button-prev img{
+    width: 20px;
 }
 .featured-container .swiper-button-next,
 .featured-container .swiper-button-prev{
@@ -1637,10 +1638,11 @@ article:first-child{
     padding: 140px 0px;
 }
 .landing-page-info-section .info-title h2{
+    font-style: normal;
+    line-height: 43px;
     font-family: var(--font-type-1);
     font-size: 36px;
-    font-weight: 400;
-    letter-spacing: 0.08em;
+    font-weight: 500;
     color: var(--default);
 }
 .landing-page-info-section .info-title p{
@@ -1773,10 +1775,11 @@ article:first-child{
     align-items: center;
 }
 .landing-page-info-section-2 .info-title h2{
-    font-family: var(--font-type-1);
+    font-style: normal;
+    font-weight: 500;
     font-size: 36px;
-    font-weight: 400;
-    letter-spacing: 0.08em;
+    line-height: 43px;
+    font-family: var(--font-type-1);
     color: var(--default);
 }
 .landing-page-info-section-2 .info-title p{
@@ -1786,14 +1789,14 @@ article:first-child{
     color: var(--gray);
     margin-top:15px;
 }
-.landing-page-info-section-2 .info-card-container .card{
+.landing-page-info-section-2 .info-card-container .infoCard{
     padding: 1rem;
     height: 9rem;
     display: flex;
     align-items: center;
     gap: 10px;
 }
-.landing-page-info-section-2 .info-card-container .card .card-image img{
+.landing-page-info-section-2 .info-card-container .infoCard .card-image img{
     height: 100px;
     width: 100px;
 }
@@ -1831,7 +1834,7 @@ article:first-child{
     .landing-page-info-section .info-steps .info-step{
         /*width: 100px;*/
     }
-    .landing-page-info-section-2 .info-card-container .card{
+    .landing-page-info-section-2 .info-card-container .infoCard{
         margin-top: 10px !important;
     }
 }
@@ -1986,7 +1989,7 @@ footer.section{
     overflow: hidden;
     padding: 20px 0px;
 }
-footer .row{
+footer .footerRow{
     width: 85%;
     margin: auto;
     display: flex;
@@ -1994,26 +1997,26 @@ footer .row{
     /*align-items: flex-start;*/
     justify-content: space-between;
 }
-footer .row.row-1{
+footer .footerRow.row-1{
     flex-basis: 100%;
     display: flex;
     justify-content: center;
     margin-top: 10px;
     /*margin-bottom: 30px;*/
 }
-footer .col{
+footer .footerCol{
     /*flex-basis: 25%;*/
     padding: 10px;
     width: calc(100% / 3);
 }
-footer .col:nth-child(1){
+footer .footerCol:nth-child(1){
     /*flex-basis: 0;*/
     /*margin-left: 15px;*/
 }
-footer .col:nth-child(2){
+footer .footerCol:nth-child(2){
     /*flex-basis: 0;*/
 }
-footer .col:nth-child(3){
+footer .footerCol:nth-child(3){
     padding-left: 190px;
     /*flex-basis: 0;*/
 }
@@ -2036,22 +2039,21 @@ footer .social-icons{
     display: flex;
     flex-direction: column;
 }
-footer .col h3{
+footer .footerCol h3{
     /*width: fit-content;*/
     margin-bottom: 15px;
     position: relative;
     font-family: var(--font-type-1);
     font-weight: 400;
     font-size: 20px;
-    letter-spacing: 0.08em;
     text-transform: capitalize;
     color: var(--mantle-off-white);
 }
-footer .col ul li{
+footer .footerCol ul li{
     list-style: none;
     margin-bottom: 8px;
 }
-footer .col ul li a{
+footer .footerCol ul li a{
     font-family: var(--font-type-2);
     /*font-weight: 600;*/
     font-size: 12px;
@@ -2059,14 +2061,14 @@ footer .col ul li a{
     text-decoration: none;
     color: var(--text-medium);
 }
-footer .col > p{
+footer .footerCol > p{
     font-family: var(--font-type-2);
     font-size: 12px;
     font-weight: 400;
     color: var(--gray);
     margin-bottom: 10px;
 }
-footer .col > p > a{
+footer .footerCol > p > a{
     font-family: var(--font-type-1);
     font-size: 12px;
     font-weight: 700;
@@ -2087,14 +2089,14 @@ footer .newsLetterContainer lable{
     color: var(--inactive-gray);
     margin-bottom: 5px;
 }
-footer .col form{
+footer .footerCol form{
     padding-bottom: 15px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 10px;
 }
-footer .col form input{
+footer .footerCol form input{
     width: 100%;
     background: transparent;
     color: var(--mantle-off-white);
@@ -2127,7 +2129,7 @@ footer .newsLetterContainer button{
 }
 
 
-footer .col .social-icons a{
+footer .footerCol .social-icons a{
     width: 40px;
     height: 40px;
     aspect-ratio: 1;
@@ -2144,8 +2146,8 @@ footer .col .social-icons a{
     margin: 5px 5px;
     transition: all 200ms ease;
 }
-footer .col .social-icons a:hover,
-footer .col .social-icons a:active {
+footer .footerCol .social-icons a:hover,
+footer .footerCol .social-icons a:active {
     background: none;
     cursor: pointer !important;
     transform: scale(1.2);
@@ -2153,7 +2155,7 @@ footer .col .social-icons a:active {
     border: 2px solid #fff;
     text-decoration: none;
 }
-footer .col .social-icons img{
+footer .footerCol .social-icons img{
     width: 20px;
     height: 20px;
 }
@@ -2222,13 +2224,13 @@ footer.section{
         bottom: unset;
 
     }
-    footer .col:nth-child(1){
+    footer .footerCol:nth-child(1){
         flex-basis: 20%;
     }
-    footer .col:nth-child(2){
+    footer .footerCol:nth-child(2){
         flex-basis: 40%;
     }
-    footer .col:nth-child(3){
+    footer .footerCol:nth-child(3){
         flex-basis: 30%;
     }
     footer.section{
@@ -2239,19 +2241,19 @@ footer.section{
     footer{
         bottom: unset;
     }
-    footer .col{
+    footer .footerCol{
         flex-basis: 100%;
     }
-    footer .col:nth-child(1){
+    footer .footerCol:nth-child(1){
         text-align: center;
     }
-    footer .col:nth-child(2),
-    footer .col:nth-child(3){
+    footer .footerCol:nth-child(2),
+    footer .footerCol:nth-child(3){
         flex-basis: 100%;
     }
-    footer .col:nth-child(1),
-    footer .col:nth-child(2),
-    footer .col:nth-child(3)
+    footer .footerCol:nth-child(1),
+    footer .footerCol:nth-child(2),
+    footer .footerCol:nth-child(3)
     {
         margin-left:0px;
     }
@@ -2259,23 +2261,23 @@ footer.section{
 
 @media screen and (max-width:1024px) {
 
-    .hero-section .row .col-1{
+    .hero-section .heroSectionRow .heroSectionCol1{
         flex-basis: 30%;
         margin-left: 20px;
     }
-    .hero-section .row .col-1 h3{
+    .hero-section .heroSectionRow .heroSectionCol1 h3{
         font-size: 26px;
     }
-    .hero-section .row .col-1 p{
+    .hero-section .heroSectionRow .heroSectionCol1 p{
         font-size: 16px;
     }
-    .hero-section .row .col-2{
+    .hero-section .heroSectionRow .heroSectionCol2{
         flex-basis: 70%;
     }
-    .hero-section .row .col-1 .buttons{
+    .hero-section .heroSectionRow .heroSectionCol1 .buttons{
         margin-top: 50px;
     }
-    .hero-section .row .col-1 button{
+    .hero-section .heroSectionRow .heroSectionCol1 button{
         width: 150px;
     }
     .mySwiper2{
@@ -2299,7 +2301,7 @@ footer.section{
     .landing-page-info-section .info-steps{
         gap: 15px;
     }
-    .landing-page-info-section-2 .info-card-container .card {
+    .landing-page-info-section-2 .info-card-container .infoCard {
         padding: 80px 10px;
 
     }
@@ -2334,11 +2336,11 @@ footer.section{
     .landing-page-info-section-3 .form-field-bottom{
         flex-direction: column;
     }
-    footer .col:nth-child(1),
-    footer .col:nth-child(2){
+    footer .footerCol:nth-child(1),
+    footer .footerCol:nth-child(2){
         flex-basis: 50%;
     }
-    footer .col:nth-child(3){
+    footer .footerCol:nth-child(3){
         flex-basis: 100%;
     }
 }
@@ -2358,10 +2360,10 @@ footer.section{
         /*padding: 120px 0;*/
         padding: 50px 0px !important;
     }
-    .hero-section .row .col-1{
+    .hero-section .heroSectionRow .heroSectionCol1{
         margin-top: 50px;
     }
-    .hero-section .row{
+    .hero-section .heroSectionRow{
         flex-direction: column-reverse;
     }
     .landing-page-info-section-2.section{
@@ -2435,17 +2437,17 @@ footer.section{
     .featured-section{
         padding: 0px !important;
     }
-    .hero-section .row .col-1{
+    .hero-section .heroSectionRow .heroSectionCol1{
         margin-top: 0px;
         margin-left: 0px;
         text-align: center;
     }
-    .hero-section .row .col-1 h2{
+    .hero-section .heroSectionRow .heroSectionCol1 h2{
         font-size: 24px;
         padding: 0 20px;
         /*margin-left: 20px;*/
     }
-    .hero-section .row .col-1 p{
+    .hero-section .heroSectionRow .heroSectionCol1 p{
         font-size: 15px;
         margin:20px 10px;
         padding: 0 20px;
@@ -2454,7 +2456,7 @@ footer.section{
     .hero-section{
         padding-left: 0px;
     }
-    .hero-section .row .col-2{
+    .hero-section .heroSectionRow .heroSectionCol2{
         width: 100vw;
     }
     .landing-page-info-section{
@@ -2486,11 +2488,11 @@ footer.section{
         width: 50px;
         height: 50px;
     }
-    .hero-section .row .col-1 .buttons{
+    .hero-section .heroSectionRow .heroSectionCol1 .buttons{
         gap: 20px;
         justify-content: center;
     }
-    .hero-section .row .col-1 button{
+    .hero-section .heroSectionRow .heroSectionCol1 button{
         width: 130px !important;
         font-size: 18px;
     }
@@ -2535,12 +2537,12 @@ footer.section{
     .landing-page-info-section-3 .row .column-1{
         margin-right: 0px;
     }
-    footer .col:nth-child(1),
-    footer .col:nth-child(2),
-    footer .col:nth-child(3){
+    footer .footerCol:nth-child(1),
+    footer .footerCol:nth-child(2),
+    footer .footerCol:nth-child(3){
         flex-basis: 100%;
     }
-    footer .col:nth-child(3){
+    footer .footerCol:nth-child(3){
         padding-left: 0px;
     }
     .landing-page-info-section-2.section{
@@ -2551,13 +2553,13 @@ footer.section{
     .landing-page-info-section-3 .row .info-box h3{
         font-size: 18px;
     }
-    .landing-page-info-section-2 .info-card-container .card{
+    .landing-page-info-section-2 .info-card-container .infoCard{
         height: 0rem;
         padding: 60px 10px;
         gap:10px;
         margin-top: 0px !important;
     }
-    .landing-page-info-section-2 .info-card-container .card .card-image img{
+    .landing-page-info-section-2 .info-card-container .infoCard .card-image img{
         width: 70px;
         height: 70px;
     }

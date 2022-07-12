@@ -64,9 +64,13 @@ nav .content .links {
 }
 
 .content .links li a, .content .links li label {
-    color: #fff;
-    font-size: 16px;
-    letter-spacing: 2px; /* font-weight: 500; */
+    font-family: var(--font-type-1);
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 120%;
+    text-transform: capitalize;
+    color: var(--mantle-off-white);
     padding: 9px 17px;
     border-radius: 5px;
     cursor: pointer;
@@ -154,11 +158,16 @@ nav .content .links {
     background-repeat: no-repeat;
 }
 .right-menu{
+    font-family: var(--font-type-1);
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    text-transform: capitalize;
+    color: var(--mantle-off-white);
+
     display: flex;
     align-items: center;
-    color: var(--mantle-off-white);
-    font-size: 16px;
-    letter-spacing: 2px;
     cursor: pointer;
     /*gap: 10px;*/
 }
@@ -257,7 +266,7 @@ nav .content .links {
     border-bottom: 9px solid var(--popup-bg);
     position: absolute;
     top: -11px;
-    right: 40px;
+    right: 30px;
 }
 .content .links li:hover > ul {
     top: 70px;
@@ -301,7 +310,7 @@ nav .content .links {
     top: 0;
 }
 .hiddenMenu{
-    display: none;
+    display: none !important;
 }
 
 /* Responsive code start */
@@ -331,7 +340,7 @@ nav .content .links {
 @media screen and (max-width: 900px) {
 
     .hiddenMenu{
-        display: block;
+        display: flex !important;
     }
     .right-menu ul li{
         display: none;

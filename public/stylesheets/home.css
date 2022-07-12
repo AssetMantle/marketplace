@@ -1,7 +1,6 @@
 /* Opener */
 .intro{
     position: fixed;
-    /*z-index: 1;*/
     left: 0;
     top: 0;
     width: 100%;
@@ -9,15 +8,15 @@
     transition: 1s cubic-bezier(0.74, 0.06, 0.4, 0.92);
     z-index: 9999;
 }
-.intro .container {
+.intro .introContainer {
     width: 100%;
     height: 100vh;
-    background: #030303;
+    background: var(--card-dark);
     display: flex;
     justify-content: center;
     align-items: center;
 }
-.intro .container .box {
+.intro .introContainer .box {
     width: 200px;
     height: 250px;
     position: relative;
@@ -25,15 +24,14 @@
     justify-content: center;
     flex-direction: column;
 }
-.intro .container .box .title {
+.intro .introContainer .box .title {
     width: 100%;
     position: relative;
     display: flex;
     align-items: center;
     height: 50px;
-
 }
-.intro .container .box .title .block {
+.intro .introContainer .box .title .block {
     width: 0%;
     height: inherit;
     background: #FFC640;
@@ -41,7 +39,7 @@
     animation: mainBlock 2s cubic-bezier(0.74, 0.06, 0.4, 0.92) forwards;
     display: flex;
 }
-.intro .container .box .title h1 {
+.intro .introContainer .box .title h1 {
     font-family: 'Josefin Sans', sans-serif;
     color: #fff;
     font-size: 32px;
@@ -54,7 +52,7 @@
     align-items: baseline;
     position: relative;
 }
-.intro .container .box .title h1 span {
+.intro .introContainer .box .title h1 span {
     width: 0px;
     height: 0px;
     -webkit-border-radius: 50%;
@@ -66,10 +64,10 @@
     margin-left: 5px;
     margin-top: -10px;
     position: absolute;
-    bottom: 13px;
+    bottom: 10px;
     right: -8px;
 }
-.intro .container .box .role {
+.intro .introContainer .box .role {
     width: 100%;
     position: relative;
     display: flex;
@@ -78,7 +76,7 @@
     margin-top: -15px;
     overflow: hidden;
 }
-.intro .container .box .role p {
+.intro .introContainer .box .role p {
     animation: secFadeIn 0.9s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
     animation-delay: 2.5s;
     font-weight: 400;
@@ -89,7 +87,7 @@
     letter-spacing: 5px;
     position: absolute;
     top: -25px;
-    right: 5px;
+    right: 10px;
 }
 @keyframes mainBlock {
     0% {
@@ -158,7 +156,7 @@
         height: 7px;
         background: #FFC640;
         border: 0px solid #222;
-        bottom: 5px;
+        bottom: 10px;
     }
 }
 @keyframes secFadeIn {
@@ -173,46 +171,13 @@
         top: 5px;
     }
 }
-
-/* Smooth Scroll */
-/*.parent {*/
-/*    overflow: scroll;*/
-/*    height: 100vh;*/
-/*    scroll-snap-points-y: repeat(100vh);*/
-/*    scroll-snap-type: y mandatory;*/
-/*}*/
-
-/*section {*/
-/*    height: 100vh;*/
-/*    scroll-snap-align: start;*/
-/*    position: relative;*/
-/*}*/
-
-/*.one {*/
-/*    background-color: red;*/
-/*}*/
-
-/*.two {*/
-/*    background-color: blue;*/
-/*}*/
-
-/*.three {*/
-/*    background-color: grey;*/
-/*}*/
-
-/*.four {*/
-/*    background-color: green;*/
-/*}*/
-
 html {
     height: 100vh;
     overflow-y: scroll;
     font-family: sans-serif;
     scroll-snap-points-y: repeat(100vh);
     scroll-snap-type: y mandatory;
-    /*cursor: none;*/
 }
-
 /* Smooth Scroll */
 .smooth-scroll-section {
     height: 100vh;
