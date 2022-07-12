@@ -16,7 +16,7 @@ class WithoutLoginActionAsync @Inject()(
                                          messagesControllerComponents: MessagesControllerComponents,
                                          withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter,
                                          masterTransactionSessionTokens: masterTransaction.SessionTokens,
-                                         masterWallets: master.Wallets,
+                                         masterKeys: master.Keys,
                                        )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITHOUT_LOGIN_ACTION_ASYNC
@@ -30,12 +30,12 @@ class WithoutLoginActionAsync @Inject()(
       def verifyAndGetResult(username: String, address: String, sessionToken: String) = if (username != "" && address != "" && sessionToken != "") {
         val verify = {
           val token = masterTransactionSessionTokens.Service.tryGet(username)
-          val wallet = masterWallets.Service.tryGet(address)
+          val key = masterKeys.Service.tryGetActive(username)
 
           for {
             token <- token
-            wallet <- wallet
-          } yield (wallet.accountId == username && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.sessionTokenTimeout))
+            key <- key
+          } yield (key.accountId == username && key.address == address && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.sessionTokenTimeout))
         }
 
 

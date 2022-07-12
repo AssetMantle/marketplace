@@ -45,7 +45,7 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.account.signUp(formWithErrors)))
         },
         signUpData => {
-          val addAccount = masterAccounts.Service.add(username = signUpData.username, password = signUpData.password, language = request.lang, accountType = constants.User.USER)
+          val addAccount = masterAccounts.Service.add(username = signUpData.username, password = "", language = request.lang, accountType = constants.User.USER)
           val wallet = utilities.Wallet.getRandomWallet
 
           def addKey() = masterKeys.Service.add(

@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class WithLoginActionAsync @Inject()(
                                       messagesControllerComponents: MessagesControllerComponents,
                                       withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter,
-                                      masterWallets: master.Wallets,
+                                      masterKeys: master.Keys,
                                       masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                     )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -30,12 +30,12 @@ class WithLoginActionAsync @Inject()(
 
       def verify(username: String, address: String, sessionToken: String) = {
         val token = masterTransactionSessionTokens.Service.tryGet(username)
-        val wallet = masterWallets.Service.tryGet(address)
+        val key = masterKeys.Service.tryGetActive(username)
 
         for {
           token <- token
-          wallet <- wallet
-        } yield (wallet.accountId == username && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.sessionTokenTimeout))
+          key <- key
+        } yield (key.accountId == username && key.address == address && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.sessionTokenTimeout))
       }
 
       def getResult(verify: Boolean, loginState: LoginState): Future[Result] = if (verify) f(loginState)(request)
