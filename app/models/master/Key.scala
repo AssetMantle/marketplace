@@ -68,6 +68,8 @@ object Keys {
 
     def backupUsed = column[Boolean]("backupUsed")
 
+    def verified = column[Boolean]("verified")
+
     def createdBy = column[String]("createdBy")
 
     def createdOn = column[Timestamp]("createdOn")

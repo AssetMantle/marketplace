@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Key"
     "retryCounter"        INTEGER NOT NULL,
     "active"              BOOLEAN NOT NULL,
     "backupUsed"          BOOLEAN NOT NULL,
+    "verified"            BOOLEAN NOT NULL,
     "createdBy"           VARCHAR,
     "createdOn"           TIMESTAMP,
     "createdOnTimeZone"   VARCHAR,
