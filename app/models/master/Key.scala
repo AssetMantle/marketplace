@@ -1,6 +1,7 @@
 package models.master
 
 import models.Trait._
+import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -29,6 +30,8 @@ case class Key(accountId: String, address: String, passwordHash: Array[Byte], sa
     updatedBy = this.updatedBy,
     updatedOn = this.updatedOn,
     updatedOnTimeZone = this.updatedOnTimeZone)
+
+  def getECKey(password: String): Option[ECKey] = this.encryptedPrivateKey.fold[Option[ECKey]](None)(x => Option(ECKey.fromPrivate(utilities.Secrets.decryptData(x, password))))
 }
 
 object Keys {
