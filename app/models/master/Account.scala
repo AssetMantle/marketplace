@@ -99,13 +99,6 @@ class Accounts @Inject()(
       } yield ()
     }
 
-    def validateUsernamePasswordAndGetAccount(username: String, password: String): Future[(Boolean, Account)] = {
-      val account = tryGetById(username)
-      for {
-        account <- account
-      } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = account.passwordHash, salt = account.salt, iterations = account.iterations), account.deserialize)
-    }
-
     def validateAndUpdatePassword(username: String, oldPassword: String, newPassword: String): Future[Unit] = {
       val account = tryGetById(username).map(_.deserialize)
 

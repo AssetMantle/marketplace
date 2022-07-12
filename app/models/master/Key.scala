@@ -10,7 +10,7 @@ import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Key(accountId: String, address: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Option[Array[Byte]], partialMnemonics: Option[Seq[String]], retryCounter: Int, active: Boolean, backupUsed: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Key(accountId: String, address: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Option[Array[Byte]], partialMnemonics: Option[Seq[String]], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
   def serialize(): Keys.KeySerialized = Keys.KeySerialized(
     accountId = this.accountId,
     address = this.address,
@@ -22,6 +22,7 @@ case class Key(accountId: String, address: String, passwordHash: Array[Byte], sa
     retryCounter = this.retryCounter,
     active = this.active,
     backupUsed = this.backupUsed,
+    verified = this.verified,
     createdBy = this.createdBy,
     createdOn = this.createdOn,
     createdOnTimeZone = this.createdOnTimeZone,
@@ -36,8 +37,8 @@ object Keys {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class KeySerialized(accountId: String, address: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Option[Array[Byte]], partialMnemonics: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity2[String, String] {
-    def deserialize: Key = Key(accountId = accountId, address = address, passwordHash = passwordHash, salt = salt, iterations = iterations, encryptedPrivateKey = encryptedPrivateKey, partialMnemonics = partialMnemonics.fold[Option[Seq[String]]](None)(x => Option(utilities.JSON.convertJsonStringToObject[Seq[String]](x))), retryCounter = retryCounter, active = active, backupUsed = backupUsed, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class KeySerialized(accountId: String, address: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Option[Array[Byte]], partialMnemonics: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity2[String, String] {
+    def deserialize: Key = Key(accountId = accountId, address = address, passwordHash = passwordHash, salt = salt, iterations = iterations, encryptedPrivateKey = encryptedPrivateKey, partialMnemonics = partialMnemonics.fold[Option[Seq[String]]](None)(x => Option(utilities.JSON.convertJsonStringToObject[Seq[String]](x))), retryCounter = retryCounter, active = active, backupUsed = backupUsed, verified = verified, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
 
     def id1: String = accountId
 
@@ -46,7 +47,7 @@ object Keys {
 
   class KeyTable(tag: Tag) extends Table[KeySerialized](tag, "Key") with ModelTable2[String, String] {
 
-    def * = (accountId, address, passwordHash, salt, iterations, encryptedPrivateKey.?, partialMnemonics.?, retryCounter, active, backupUsed, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (KeySerialized.tupled, KeySerialized.unapply)
+    def * = (accountId, address, passwordHash, salt, iterations, encryptedPrivateKey.?, partialMnemonics.?, retryCounter, active, backupUsed, verified.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (KeySerialized.tupled, KeySerialized.unapply)
 
     def accountId = column[String]("accountId", O.PrimaryKey)
 
@@ -105,7 +106,7 @@ class Keys @Inject()(
 
   object Service {
 
-    def add(accountId: String, address: String, password: String, privateKey: Option[Array[Byte]], partialMnemonics: Option[Seq[String]], retryCounter: Int, active: Boolean, backupUsed: Boolean): Future[Unit] = {
+    def add(accountId: String, address: String, password: String, privateKey: Option[Array[Byte]], partialMnemonics: Option[Seq[String]], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
       val salt = utilities.Secrets.getNewSalt
       create(Key(
         accountId = accountId,
@@ -117,10 +118,30 @@ class Keys @Inject()(
         encryptedPrivateKey = privateKey.fold[Option[Array[Byte]]](None)(x => Option(utilities.Secrets.encryptData(x, password))),
         retryCounter = retryCounter,
         active = active,
-        backupUsed = backupUsed).serialize())
+        backupUsed = backupUsed,
+        verified = verified
+      ).serialize())
+    }
+
+    def validateUsernamePasswordAndGetKey(username: String, address: String, password: String): Future[(Boolean, Key)] = {
+      val key = tryGetById(username, address)
+      for {
+        key <- key
+      } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = key.passwordHash, salt = key.salt, iterations = key.iterations), key.deserialize)
+    }
+
+    def validateActiveKeyUsernamePasswordAndGet(username: String, password: String): Future[(Boolean, Key)] = {
+      val key = tryGetActive(username)
+      for {
+        key <- key
+      } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = key.passwordHash, salt = key.salt, iterations = key.iterations), key)
     }
 
     def tryGetActive(accountId: String): Future[Key] = filterHead(x => x.id1 === accountId && x.active).map(_.deserialize)
+
+    def updateKey(key: Key): Future[Unit] = update(key.serialize())
+
+    def deleteKey(accountId: String, address: String): Future[Unit] = delete(accountId, address)
   }
 
 }
