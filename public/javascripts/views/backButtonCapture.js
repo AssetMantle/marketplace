@@ -10,8 +10,14 @@ window.addEventListener('popstate', e => {
         case "collection":
             viewCollection(lastPart);
             break;
+        case "nft":
+            viewNFT(lastPart);
+            break;
+        case "index":
+            window.location = "/";
+            break;
         default:
-            componentResource('centerContent', jsRoutes.controllers.CollectionController.viewCollections());
+            window.location = "/";
             break;
     }
     let elems = document.querySelectorAll(".active");

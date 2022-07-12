@@ -1,3 +1,10 @@
+window.onbeforeunload = function () {
+    window.scrollTo(0, 0);
+}
+document.onload = function () {
+    window.scrollTo(0, 0);
+}
+
 function loadMoreCollections() {
     if ($(".noCollection").length === 0) {
         let route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
@@ -21,7 +28,7 @@ function loadMoreCollections() {
         });
     } else {
         console.log("NO COLLECTION LEFT")
-        $(".collectionPage:last").css("margin-top","0px");
+        $(".collectionPage:last").css("margin-top", "0px");
     }
 }
 
@@ -34,14 +41,16 @@ function getDocHeight() {
     );
 }
 
-let collectionPageTimeout;
+collectionPageTimeout = 0;
 window.addEventListener('scroll', () => {
     clearTimeout(collectionPageTimeout);
-    collectionPageTimeout = setTimeout(function() {
-        if($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10)) {
+    collectionPageTimeout = setTimeout(function () {
+        console.log("SCROLL 1")
+        if ($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10) && $(".collectionsPerPage").length() !== 0) {
+            console.log("SCROLL 2")
             loadMoreCollections();
         }
-    }, 50);
+    }, 100);
 }, {
     passive: true
 });

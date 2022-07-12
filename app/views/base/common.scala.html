@@ -94,7 +94,7 @@
                         @optionalLoginState match {
                             case Some(loginState) => {
                                 <li class="d-flex hiddenMenu">
-                                    <a href="https://wallet.assetmantle.one/" target="_blank">
+                                    <a href="https://wallet.assetmantle.one/dashboard/@loginState.address" target="_blank">
                                         <img class="lazyload" src="@routes.Assets.versioned("images/icon/wallet.png")" class="wallet"/>
                                     </a>
                                     <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))">
@@ -119,7 +119,7 @@
                                 <a>@loginState.username</a>
                             </li>
                             <li class="user-wallet">
-                                <a href="https://wallet.assetmantle.one/" target="_blank">
+                                <a href="https://wallet.assetmantle.one/dashboard/@loginState.address" target="_blank">
                                     <img class="lazyload" src="@routes.Assets.versioned("images/icon/wallet.png")" class="wallet"/>
                                 </a>
                             </li>
