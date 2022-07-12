@@ -85,7 +85,7 @@ object Keys {
     override def id2 = address
   }
 
-  lazy val TableQuery = new TableQuery(tag => new KeyTable(tag))
+  val TableQuery = new TableQuery(tag => new KeyTable(tag))
 }
 
 @Singleton

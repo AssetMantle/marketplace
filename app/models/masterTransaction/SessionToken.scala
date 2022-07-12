@@ -69,11 +69,9 @@ class SessionTokens @Inject()(
 
     def refresh(id: String): Future[String] = {
       val sessionToken: String = utilities.IdGenerator.getRandomHexadecimal
-
-      //      val upsertToken = upsert(SessionToken(id, utilities.Secrets.sha256HashString(sessionToken), DateTime.now(DateTimeZone.UTC).getMillis))
+      val upsertToken = upsert(SessionToken(id, utilities.Secrets.sha256HashString(sessionToken), DateTime.now(DateTimeZone.UTC).getMillis))
       for {
-        _ <- delete(id)
-        _ <- create(SessionToken(id, utilities.Secrets.sha256HashString(sessionToken), DateTime.now(DateTimeZone.UTC).getMillis))
+        _ <- upsertToken
       } yield sessionToken
     }
 
@@ -115,5 +113,5 @@ class SessionTokens @Inject()(
     }
   }
 
-  actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 300.second, delay = 300.second)(runnable)(schedulerExecutionContext)
+  actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.CommonConfig.sessionTokenTimeout.milliseconds, delay = constants.CommonConfig.sessionTokenTimeout.milliseconds)(runnable)(schedulerExecutionContext)
 }
