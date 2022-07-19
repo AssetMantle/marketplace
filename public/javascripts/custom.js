@@ -360,7 +360,7 @@ function goToStep(stepNumber) {
 
 
 // Show and hide modal screen
-function showHideModalScreen(showScreen, hideScreen) {
+function showHideModalScreen(showScreen="", hideScreen="") {
     $(".modalContainer").removeClass('active');
     // setTimeout(function () {
         $(hideScreen).hide()

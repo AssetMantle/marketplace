@@ -24,7 +24,7 @@ services:
       - AMAZON_S3_SECRET_KEY=
       - APPLICATION_SECRET=
       - COLLECTION_PATH=/collections
-      - IPFS_DOWNLOAD_END_POINT=https://demo-assetmantle.mypinata.cloud/ipfs
+      - IPFS_DOWNLOAD_END_POINT=https://settingsPage-assetmantle.mypinata.cloud/ipfs
       - IPFS_JWT=
       - IPFS_UPLOAD_END_POINT=https://api.pinata.cloud/pinning/pinFileToIPFS
       - POSTGRES_ROOT_USERNAME=postgres

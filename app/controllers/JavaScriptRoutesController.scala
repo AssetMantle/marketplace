@@ -37,6 +37,15 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.info,
         routes.javascript.NFTController.details,
         routes.javascript.NFTController.file,
+
+        routes.javascript.ProfileController.viewSettings,
+        routes.javascript.ProfileController.settingsPage,
+        routes.javascript.ProfileController.verifyWalletMnemonicsForm,
+        routes.javascript.ProfileController.verifyWalletMnemonics,
+        routes.javascript.ProfileController.addNewWallet,
+        routes.javascript.ProfileController.unmanagedAddressForm,
+        routes.javascript.ProfileController.unmanagedAddress,
+
       )
     ).as("text/javascript")
 

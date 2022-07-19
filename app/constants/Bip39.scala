@@ -1794,7 +1794,7 @@ object Bip39 {
     "tennis",
     "tent",
     "term",
-    "test",
+    "viewSettings",
     "text",
     "thank",
     "that",
