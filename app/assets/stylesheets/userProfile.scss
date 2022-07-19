@@ -1,0 +1,285 @@
+@mixin setFont($type, $style, $weight, $size, $lineHeight, $color){
+  font-family: $type;
+  font-style: $style;
+  font-weight: $weight;
+  font-size: $size;
+  line-height: $lineHeight;
+  color: $color;
+}
+.icon{
+  height: 20px;
+  width: 20px;
+}
+.copyIcon{
+  height: 24px;
+  width: 21px;
+}
+.iconContainer{
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
+}
+.profileSettingsContainer{
+  width: 100%;
+  height: fit-content;
+  background-color: var(--card-color);
+  border-radius: 20px;
+  //overflow: hidden;
+  margin-bottom: 100px;
+  padding: 20px;
+  .title{
+    @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--mantle-off-white));
+    text-transform: capitalize;
+  }
+  .subTitle{
+    @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
+    margin-top: 12px;
+  }
+  .basicInformation,
+  .walletInformation{
+    background: var(--card-dark);
+    border-radius: 10px;
+    margin-top: 20px;
+    padding: 20px;
+    .containerTitle{
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+    }
+    .infoField{
+      padding: 20px 0px;
+      border-bottom: 1px solid var(--line-2);
+      .fieldLabel{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+        text-transform: capitalize;
+      }
+      .fieldValue{
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+      }
+
+    }
+    .walletInfoField{
+      padding: 20px 0px 0px;
+      display: block;
+      .fieldLabel{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+        text-transform: capitalize;
+        cursor: pointer;
+      }
+      .fieldValue{
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+      }
+      .iconContainer{
+        height: 24px;
+        width: 21px;
+        cursor: pointer;
+      }
+
+    }
+  }
+  .walletInformation{
+    .walletInfoField{
+      padding: 20px 0px;
+      border-bottom: 1px solid var(--line-2);
+      .fieldLabel{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+        text-transform: capitalize;
+        transition: all 0.5s ease;
+        cursor: auto;
+        label{
+          cursor: pointer !important;
+        }
+      }
+      .fieldValue{
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
+        transition: all 0.5s ease;
+        label{
+          cursor: pointer !important;
+        }
+      }
+      .walletAddressItem{
+        input[type="radio"]{
+          cursor: pointer;
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          box-shadow: 0.984848px 0.984848px 1.9697px rgba(0, 0, 0, 0.2), inset -0.984848px -0.984848px 1.9697px rgba(255, 255, 255, 0.2), inset 0.984848px 0.984848px 1.38889px rgba(168, 168, 168, 0.7);
+          border: 2px solid var(--icon-white);
+          border-radius: 50%;
+          transform: translateY(-0.075em);
+          display: grid;
+          place-content: center;
+          &::before{
+            content: "";
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em var(--default);
+          }
+          &:checked{
+            border-color: var(--default);
+          }
+          &:checked::before{
+            transform: scale(1);
+          }
+          &:focus{
+            outline: none;
+          }
+        }
+      }
+      &.active{
+        .fieldLabel{
+          @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--default));
+        }
+        .fieldValue{
+          @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+        }
+      }
+    }
+    .addNewWalletBtn{
+      display: inline-flex !important;
+      cursor: pointer;
+      margin-top: 20px;
+      .btnMessage{
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, #848484);
+      }
+    }
+  }
+}
+.toggleBtn{
+  position: relative;
+  right: 0;
+  button{
+    box-shadow: none !important;
+    border: 2px solid var(--line);
+    background: var(--popup-bg);
+    @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--text-medium));
+    &:first-child{
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+    &:last-child{
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+    &:hover{
+      background: var(--dark);
+      border: 2px solid var(--line);
+    }
+    &.active{
+      background: var(--dark);
+      border: 2px solid var(--line);
+      @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--card-color));
+    }
+  }
+}
+.showHideSeeds{
+  span{
+    @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--text-medium));
+
+  }
+}
+.seedsSection1{
+  margin-bottom: 0px !important;
+  &.active{
+    margin-bottom: 32px !important;
+  }
+}
+.seedsSection2{
+  display: none;
+  margin-bottom: 32px !important;
+  &.active{
+    display: block;
+  }
+}
+
+.menuToolTip {
+  position: relative;
+  //position: absolute;
+  display: inline-block;
+}
+.menuToolTip .tooltiptext {
+  display: none;
+  visibility: hidden;
+  width: 312px;
+  background: var(--card-dark);
+  color: #fff;
+  border-radius: 10px;
+  border: 2px solid #383838;
+  padding: 24px;
+  position: absolute;
+  z-index: 1;
+  top: 125%;
+  right: -20px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.menuToolTip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  right: 12px;
+  margin-left: -5px;
+  border-width: 9px;
+  border-style: solid;
+  border-color: transparent transparent #222 transparent;
+}
+@media (max-width: 1200px) {
+  .menuToolTip .tooltiptext {
+    right: -190px;
+  }
+  .menuToolTip .tooltiptext::after {
+    right: 182px;
+  }
+}
+@media (max-width: 576px){
+  .menuToolTip .tooltiptext{
+    width: 250px;
+    right: -36px;
+  }
+  .menuToolTip .tooltiptext::after {
+    right: 28px;
+  }
+}
+@media (max-width: 435px){
+  .menuToolTip .tooltiptext{
+    width: 250px;
+    right: -182px;
+  }
+  .menuToolTip .tooltiptext::after {
+    right: 173px;
+  }
+}
+@media (max-width: 400px){
+  .menuToolTip .tooltiptext{
+    right: -162px;
+    width: 225px;
+  }
+  .menuToolTip .tooltiptext::after {
+    right: 153px;
+  }
+}
+.menuToolTip.active .tooltiptext{
+  display: inline-block;
+  visibility: visible;
+  opacity: 1;
+}
+.menuToolTip
+{
+  .tooltiptext{
+    .menuOption{
+      .option{
+        padding: 12px 0px 12px 8px;
+        border-bottom: 2px solid #383838;
+        text-transform: capitalize;
+        &:first-child{
+          padding: 0px 0px 12px 8px;
+        }
+        &:last-child{
+          padding: 12px 0px 0px 8px;
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}
