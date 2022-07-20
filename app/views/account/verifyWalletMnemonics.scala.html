@@ -1,7 +1,9 @@
-@import views.account.companion.WalletMnemonics
+@import views.account.companion.VerifyMnemonics
 @import views.html.base.form._
+@import views.html.base.forms.commonFieldErrorMessage
+@import views.html.base.label._
 
-@(walletMnemonicsForm: Form[WalletMnemonics.Data] = WalletMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(walletMnemonicsForm: Form[VerifyMnemonics.Data] = VerifyMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div>
     @commonForm(constants.Form.VERIFY_WALLET_MNEMONICS, walletMnemonicsForm, isModal = true, showScreen = "#walletMnemonics", hideScreen = "#verificationForm") {
@@ -57,6 +59,37 @@
             <div class="form-seed-box">
                 <div class="form-seed-box-number">4</div>
                 @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_4, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="inputField">
+                <div class="inputFieldBody">
+                    <div class="usernameAvailability">
+                        @commonLabel(constants.FormField.SIGNUP_PASSWORD.name)
+                        @commonInputPassword(walletMnemonicsForm, constants.FormField.SIGNUP_PASSWORD, Symbol("placeholder") -> "Enter Password", 'id -> "signUpPassword", 'oninput -> """activeButton()""")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="inputField">
+                <div class="inputFieldBody">
+                    <div class="usernameAvailability">
+                        @commonLabel(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name)
+                        <div class="fieldIcon showPassword" id="showPassword" onclick="showPassword()">
+                            <span class="eyeIcon closeEye">
+                                <img src="@routes.Assets.versioned("images/icon/hidePassword.png")" width="24px" height="22px"/>
+                            </span>
+                            <span class="eyeIcon openEye hidden">
+                                <img src="@routes.Assets.versioned("images/icon/showPassword.png")" width="24px" height="18px"/>
+                            </span>
+                        </div>
+                        @commonInputPassword(walletMnemonicsForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, Symbol("placeholder") -> "Enter Password", 'id -> "signUpConfirmPassword", 'oninput -> """checkPasswords(); activeButton();""")
+                        @commonFieldErrorMessage(id = "repeatPasswordError",message = Messages(constants.View.REPEAT_PASSWORD_MISMATCH))
+                    </div>
+                </div>
             </div>
         </div>
         <div class="d-flex form-information-message">

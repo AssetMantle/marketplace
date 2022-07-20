@@ -3,7 +3,7 @@ package views.account.companion
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
-object ForgotPassword {
+object VerifyMnemonics {
 
   val form: Form[Data] = Form(
     mapping(
@@ -13,10 +13,10 @@ object ForgotPassword {
       constants.FormField.SEED_PHRASE_2.mapping,
       constants.FormField.SEED_PHRASE_3.mapping,
       constants.FormField.SEED_PHRASE_4.mapping,
-      constants.FormField.FORGOT_PASSWORD.mapping,
-      constants.FormField.FORGOT_CONFIRM_PASSWORD.mapping,
-    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.forgotPasswordConstraint))
+      constants.FormField.SIGNUP_PASSWORD.mapping,
+      constants.FormField.SIGNUP_CONFIRM_PASSWORD.mapping,
+    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.verifyMnemonicsConstraint))
 
-  case class Data(username: String, address: String, phrase1: String, phrase2: String, phrase3: String, phrase4: String, newPassword: String, confirmNewPassword: String)
+  case class Data(username: String, walletAddress: String, seed1: String, seed2: String, seed3: String, seed4: String, password: String, confirmPassword: String)
 
 }

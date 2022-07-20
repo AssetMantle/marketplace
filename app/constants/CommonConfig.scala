@@ -13,7 +13,7 @@ object CommonConfig {
   val WebAppCacheDuration: Duration = Duration(config.get[Int]("webApp.cacheDuration"), MILLISECONDS)
   val DefaultPublicFolder: String= config.get[String]("webApp.defaultPublicFolder")
 
-  val sessionTokenTimeout: Long = config.get[Long]("play.http.session.token.timeout")
+  val sessionTokenTimeout: Int = config.get[Int]("play.http.session.token.timeout")
 
   object Collections {
     val CollectionsPerPage: Int = config.get[Int]("webApp.collectionsPerPage")

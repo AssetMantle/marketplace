@@ -1,7 +1,7 @@
-@import views.account.companion.WalletMnemonics
+@import views.account.companion.VerifyMnemonics
 @import views.html.base.forms._
 
-@(walletMnemonicsForm: Form[WalletMnemonics.Data] = WalletMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(walletMnemonicsForm: Form[VerifyMnemonics.Data] = VerifyMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <!-- Wallet Mnemonics -->
 <div id="walletMnemonics">
     @formHeader(label = "Recovery Phrase")

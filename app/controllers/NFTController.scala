@@ -21,7 +21,6 @@ class NFTController @Inject()(
                                withLoginActionAsync: WithLoginActionAsync,
                                withoutLoginAction: WithoutLoginAction,
                                masterAccounts: master.Accounts,
-                               masterWallets: master.Wallets,
                                masterCollections: master.Collections,
                                masterNFTs: master.NFTs,
                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {

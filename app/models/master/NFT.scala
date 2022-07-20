@@ -84,7 +84,7 @@ object NFTs {
     override def id = fileName
   }
 
-  lazy val TableQuery = new TableQuery(tag => new NFTTable(tag))
+  val TableQuery = new TableQuery(tag => new NFTTable(tag))
 }
 
 @Singleton
