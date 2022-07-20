@@ -44,4 +44,16 @@ GET         /nftDetails                      controllers.NFTController.details( 
 GET         /nftInfo                         controllers.NFTController.info( nftId: String)
 GET         /nftFile                         controllers.NFTController.file( nftId: String)
 
+GET         /settings                        controllers.ProfileController.viewSettings()
+GET         /settingsPage                    controllers.ProfileController.settingsPage()
 
+GET         /addNewWallet                    controllers.ProfileController.addNewWallet()
+
+GET         /profileManagedAddress           controllers.ProfileController.managedAddressForm()
+POST        /profileManagedAddress           controllers.ProfileController.managedAddress()
+
+GET         /profileUnmanagedAddress         controllers.ProfileController.unmanagedAddressForm()
+POST        /profileUnmanagedAddress         controllers.ProfileController.unmanagedAddress()
+
+GET         /changeWalletName                controllers.ProfileController.changeWalletNameForm()
+POST        /changeWalletName                controllers.ProfileController.changeWalletName()

@@ -6,7 +6,7 @@
 
 @(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div id="signUpForm">
-    @commonForm(constants.Form.SIGN_UP, signUpForm, isModal=true, submitDisable=true) {
+    @commonForm(constants.Form.SIGN_UP, signUpForm, isModal=true, submitDisable=true){
         <div class="modal-body">
             <div class="mb-3">
                 <div class="inputField">
@@ -25,7 +25,7 @@
 
             @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE, Symbol("class") -> "hidden")
 
-            <div class="mb-3">
+            @* <div class="mb-3">
                 <div class="inputField">
                     <div class="inputFieldBody">
                         <div class="usernameAvailability">
@@ -54,7 +54,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> *@
 
             <div class="d-flex align-items-center">
                 @commonCheckbox(signUpForm, constants.FormField.SIGNUP_TERMS_CONDITIONS, 'id -> "termsCondition", 'oninput -> """activeButton()""")

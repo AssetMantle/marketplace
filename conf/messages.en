@@ -202,3 +202,74 @@ OVERVIEW=Overview
 ACTIVITY=Activity
 MORE=More
 PROPERTIES=Properties
+
+#//Profile
+PROFILE_VERIFY_WALLET_MNEMONICS_SHOW_HIDE_MESSAGE=Click to show or hide seed phrase
+PROFILE_VERIFY_WALLET_MNEMONICS_FOOTER_MESSAGE=Do you want this wallet to be managed by AssetMantle?
+ADD_WALLET_ADDRESS_SUCCESS_TITLE=Wallet Address added successfully
+ADD_WALLET_ADDRESS_SUCCESS_SUBTITLE=Your wallet address has been been added successfully. You can view this in you wallet or profile settings.
+PROFILE_SETTINGS_TITLE=Profile Settings
+PROFILE_SETTINGS_SUBTITLE=Set your preferences, view and manage personal information.
+PROFILE_BASIC_INFO_TITLE=Basic Information
+PROFILE_USERNAME=Username:
+PROFILE_PASSWORD=Password:
+PROFILE_IDENTITY_ADDRESS=Identity address:
+PROFILE_WALLET_DETAIL_TITLE=Wallet Details
+PROFILE_ADD_NEW_ADDRESS=Add New Address
+ADD_NEW_WALLET_OPTION_TITLE=Add New Address
+ADD_NEW_WALLET_OPTION_SUBTITLE=Select the type of address you want to add
+ADD_NEW_WALLET_OPTION_SELECT_ITEM=Select Item
+ADD_NEW_WALLET_OPTION_MANAGED=Managed
+ADD_NEW_WALLET_OPTION_UNMANAGED=Unmanaged
+WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS=View mnemonic seed phrase
+WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME=Change Name
+WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT=Delete account
+
+#//Wallet
+POPUP_WALLET_BODY_MESSAGE=You will be redirected to another page on clicking buy more. Some other details user needs to know.
+BUY_MORE=Buy more
+SEND=Send
+POPUP_WALLET_FOOTER_MESSAGE=Lorem ipusm set dorem amit etc
+MY_NFTS_LINK=My NFTs
+ADDRESS_BOOK=Address Book
+SIGN_OUT=Sign Out
+ADDRESS_BOOK_TITLE=Manage Address Book
+ADD_NEW_ADDRESS_LABEL=Add new
+ADD_NEW_ADDRESS_TITLE=Add New Address
+LABEL_NAME=Name
+FIELD_PLACEHOLDER_NAME=Type name here
+LABEL_ADDRESS=Address
+FIELD_PLACEHOLDER_ADDRESS=Type address here
+LABEL_DEFAULT_MEMO=Default memo (Optional)
+FIELD_PLACEHOLDER_DEFAULT_MEMO=Type address here
+ADD_NEW_ADDRESS_FOOTER_MESSAGE=Want this address to be managed?
+ADD_NEW_ADDRESS_FOOTER_LINK=Profile Settings
+MENU_CREATED=Created
+MENU_SETTINGS=Settings
+MENU_SIGN_OUT=Sign out
+LABEL_TYPE_OF_WALLET=Type of wallet
+TOOLTIP_COPIED=Copied
+TOOLTIP_USERNAME=Username:
+TOOLTIP_PASSWORD=Address:
+
+#//Managed Address
+FORM.MANAGED_ADDRESS.TITLE=Add New Address
+FORM.MANAGED_ADDRESS.SUBTITLE=Enter details to add an address
+FORM.MANAGED_ADDRESS.SUBMIT=Confirm
+MANAGED_ADDRESS_WALLET_NAME=Wallet Name
+MANAGED_ADDRESS_NEW_ADDRESS=Address
+MANAGED_ADDRESS_PASSWORD=Password
+WALLET_NAME_PLACEHOLDER=Type wallet name here
+ADDRESS_PLACEHOLDER=Type address here
+WALLET_PASSWORD_PLACEHOLDER=Password
+DISCLAIMER_MESSAGE=AssetMantle wallet provides an option to store separate wallet addresses for custody and transaction management for blockchain-based digital wallets. This allows the user to operate multiple addresses and restore their MantlePlace account via any of these addresses using the custody solution managed by AssetMantle.
+DISCLAIMER_POLICY_MESSAGE=I agree to AssetMantle managing my wallet address through the custody solution
+
+#//Unmanaged Address
+FORM.UNMANAGED_ADDRESS.TITLE=Add New Address
+FORM.UNMANAGED_ADDRESS.SUBTITLE=Enter details to add an address
+FORM.UNMANAGED_ADDRESS.SUBMIT=Confirm
+UNMANAGED_ADDRESS_WALLET_NAME=Wallet Name
+UNMANAGED_ADDRESS_NEW_ADDRESS=Address
+UNMANAGED_ADDRESS_DEFAULT_MEMO=Default memo (Optional)
+CONFIRM_BUTTON=Confirm

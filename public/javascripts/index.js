@@ -94,7 +94,6 @@ function HideScrollbar() {
     style.innerHTML = `body::-webkit-scrollbar {display: none;}`;
     document.head.appendChild(style);
 }
-
 HideScrollbar()
 
 // function ShowScrollbar() {
@@ -105,12 +104,12 @@ HideScrollbar()
 
 intro = document.querySelector('.intro');
 
-window.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        setTimeout(() => {
+window.addEventListener('DOMContentLoaded', ()=>{
+    setTimeout(()=>{
+        setTimeout(()=>{
             intro.style.top = '-100vh';
             intro.style.visibility = 'hidden';
             // ShowScrollbar();
-        }, 3500);
+        },3500);
     });
 });
