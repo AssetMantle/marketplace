@@ -21,14 +21,6 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-3">
-                <div class="inputField">
-                    <div class="inputFieldBody">
-                        @views.html.base.label.commonLabel(constants.FormField.UNMANAGED_ADDRESS_DEFAULT_MEMO.name)
-                        @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_ADDRESS_DEFAULT_MEMO, Symbol("placeholder") -> Messages(constants.View.DEFAULT_MEMO_PLACEHOLDER), Symbol("autocomplete") -> "off")
-                    </div>
-                </div>
-            </div>
         </div>
         <div class="form-button">
             <button type="button" class="form-primary-button" onclick="showHideUnmanagedAddressModalScreen('#newUnmanagedAddressPasswordScreen','#newUnmanagedAddressScreen')">@Messages(constants.View.NEXT)</button>
@@ -38,7 +30,7 @@
     <div id="newUnmanagedAddressPasswordScreen" style="display: none;">
         <div class="mb-3 inputField">
             <div class="inputFieldBody">
-                @commonInputPassword(unmanagedAddressForm, constants.FormField.UNMANAGED_ADDRESS_PASSWORD)
+                @commonInputPassword(unmanagedAddressForm, constants.FormField.UNMANAGED_ADDRESS_PASSWORD,  Symbol("placeholder") -> Messages(constants.View.WALLET_PASSWORD_PLACEHOLDER), Symbol("autocomplete") -> "off")
             </div>
         </div>
     </div>

@@ -204,9 +204,6 @@ MORE=More
 PROPERTIES=Properties
 
 #//Profile
-FORM.PROFILE_VERIFY_WALLET_MNEMONICS.TITLE=Seed Phrase
-FORM.PROFILE_VERIFY_WALLET_MNEMONICS.SUBTITLE=Enter your seed phrase to add a wallet
-FORM.PROFILE_VERIFY_WALLET_MNEMONICS.SUBMIT=Confirm
 PROFILE_VERIFY_WALLET_MNEMONICS_SHOW_HIDE_MESSAGE=Click to show or hide seed phrase
 PROFILE_VERIFY_WALLET_MNEMONICS_FOOTER_MESSAGE=Do you want this wallet to be managed by AssetMantle?
 ADD_WALLET_ADDRESS_SUCCESS_TITLE=Wallet Address added successfully
@@ -255,13 +252,24 @@ TOOLTIP_COPIED=Copied
 TOOLTIP_USERNAME=Username:
 TOOLTIP_PASSWORD=Address:
 
+#//Managed Address
+FORM.MANAGED_ADDRESS.TITLE=Add New Address
+FORM.MANAGED_ADDRESS.SUBTITLE=Enter details to add an address
+FORM.MANAGED_ADDRESS.SUBMIT=Confirm
+MANAGED_ADDRESS_WALLET_NAME=Wallet Name
+MANAGED_ADDRESS_NEW_ADDRESS=Address
+MANAGED_ADDRESS_PASSWORD=Password
+WALLET_NAME_PLACEHOLDER=Type wallet name here
+ADDRESS_PLACEHOLDER=Type address here
+WALLET_PASSWORD_PLACEHOLDER=Password
+DISCLAIMER_MESSAGE=AssetMantle wallet provides an option to store separate wallet addresses for custody and transaction management for blockchain-based digital wallets. This allows the user to operate multiple addresses and restore their MantlePlace account via any of these addresses using the custody solution managed by AssetMantle.
+DISCLAIMER_POLICY_MESSAGE=I agree to AssetMantle managing my wallet address through the custody solution
+
 #//Unmanaged Address
 FORM.UNMANAGED_ADDRESS.TITLE=Add New Address
 FORM.UNMANAGED_ADDRESS.SUBTITLE=Enter details to add an address
 FORM.UNMANAGED_ADDRESS.SUBMIT=Confirm
-WALLET_NAME_PLACEHOLDER=Type wallet name here
-ADDRESS_PLACEHOLDER=Type address here
-DEFAULT_MEMO_PLACEHOLDER=Type address here
 UNMANAGED_ADDRESS_WALLET_NAME=Wallet Name
 UNMANAGED_ADDRESS_NEW_ADDRESS=Address
 UNMANAGED_ADDRESS_DEFAULT_MEMO=Default memo (Optional)
+CONFIRM_BUTTON=Confirm

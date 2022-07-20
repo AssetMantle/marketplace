@@ -215,6 +215,18 @@
     transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
     border: 1px solid var(--dark);
 }
+.form-button .form-primary-button.disable{
+    border: none !important;
+    box-shadow: none !important;
+    background: var(--disable-yellow) !important;
+    cursor: none;
+    pointer-events: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 .form-button .form-secondary-button{
     color: var(--dark);
     background-color: transparent;

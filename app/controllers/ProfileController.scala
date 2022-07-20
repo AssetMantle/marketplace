@@ -45,27 +45,27 @@ class ProfileController @Inject()(
     }
   }
 
+  def addNewWallet(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.addNewWallet())
+  }
+
   // GET Request
-  def verifyWalletMnemonicsForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.profile.verifyWalletMnemonics())
+  def managedAddressForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.managedAddress())
 //    Ok(views.html.profile.walletAddSuccess())
   }
 
   // POST Request
-  def verifyWalletMnemonics: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def managedAddress: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      WalletMnemonics.form.bindFromRequest().fold(
+      ManagedAddress.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.verifyWalletMnemonics(formWithErrors)))
+          Future(BadRequest(views.html.profile.managedAddress(formWithErrors)))
         },
-        walletMnemonicsData => {
+        managedAddressData => {
           Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
         }
       )
-  }
-
-  def addNewWallet(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.profile.addNewWallet())
   }
 
   // GET Request
@@ -80,6 +80,24 @@ class ProfileController @Inject()(
           Future(BadRequest(views.html.profile.unmanagedAddress(formWithErrors)))
         },
         unmanagedAddressData => {
+          Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
+        }
+      )
+  }
+
+  // GET Request
+  def changeWalletNameForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.changeWalletName())
+  }
+
+  // POST Request
+  def changeWalletName: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      ChangeWalletName.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.profile.changeWalletName(formWithErrors)))
+        },
+        changeWalletNameData => {
           Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
         }
       )

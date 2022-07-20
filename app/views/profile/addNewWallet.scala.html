@@ -8,18 +8,40 @@
     </button>
 </div>
 <p class="sub-heading" id="modalSubtitle">@Messages(constants.View.ADD_NEW_WALLET_OPTION_SUBTITLE)</p>
-<div class="dropdown">
-    <input type="hidden" class="dp-input" value=""/>
-    <div class="dropdownHead" onclick="showOptions(this)">
-        <div class="currentSelected">@Messages(constants.View.ADD_NEW_WALLET_OPTION_SELECT_ITEM)</div>
-    </div>
-    <div class="dropdownBody">
-        <div class="dropdownBodyInner">
-            <div class="dropdownItem" value="Managed" onclick="setOption(this)">@Messages(constants.View.ADD_NEW_WALLET_OPTION_MANAGED)</div>
-            <div class="dropdownItem" value="Unmanaged" onclick="setOption(this)">@Messages(constants.View.ADD_NEW_WALLET_OPTION_UNMANAGED)</div>
-        </div>
+<div class="optionBoxContainer">
+    <div class="options">
+        <label class="option" for="managedAddress" onclick="setNextButton('managed')">
+            <input type="radio" name="addressType" id="managedAddress" value="managed"/>
+            <div class="optionContent">
+                <div class="optionDetails">
+                    <span>Managed address</span>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam hendrerit nisi sed sollicitudin pellentesque.</p>
+                </div>
+            </div>
+        </label>
+
+        <label class="option" for="unmanagedAddress" onclick="setNextButton('unmanaged')">
+            <input type="radio" id="unmanagedAddress" name="addressType" value="unmanaged"/>
+            <div class="optionContent">
+                <div class="optionDetails">
+                    <span>Unmanaged address</span>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam hendrerit nisi sed sollicitudin pellentesque.</p>
+                </div>
+            </div>
+        </label>
     </div>
 </div>
 <div class="mt-3 form-button">
-    <button class="form-primary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN.get, ""))">@Messages(constants.View.NEXT)</button>
+    <button id="nextBtn" class="form-primary-button disable">@Messages(constants.View.NEXT)</button>
 </div>
+
+<script>
+    function setNextButton(addressType){
+        $("#nextBtn").removeClass("disable");
+        if(addressType === "managed"){
+            $("#nextBtn").attr("onclick","getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.MANAGED_ADDRESS.get, ""))")
+        }else{
+            $("#nextBtn").attr("onclick","getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.UNMANAGED_ADDRESS.get, ""))")
+        }
+    }
+</script>

@@ -283,3 +283,116 @@
     }
   }
 }
+
+// Custom Radio Button
+.options {
+  padding: 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+.options .option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.options .option {
+  cursor: pointer;
+  width: 48.5%;
+}
+
+.options .option .optionContent{
+  background: var(--button-text);
+  display: flex;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.options .option .optionDetails span {
+  @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--inactive-gray));
+  text-transform: capitalize;
+}
+
+.options .option .optionDetails p {
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
+  margin-top: 32px;
+  margin-bottom: 12px;
+}
+
+.options .option input[type="radio"]:checked + .optionContent{
+  border: 1px solid var(--dark);
+  -webkit-transition: ease-in 0.3s;
+  -o-transition: ease-in 0.3s;
+  transition: ease-in 0.3s;
+}
+
+.options .option input[type="radio"]:checked + .optionContent .optionDetails span{
+  @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--dark));
+}
+
+@media screen and (max-width: 991px) {
+  .options {
+    //margin: 0 20px;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    //padding: 40px;
+  }
+
+  .options .option {
+    width: 100%;
+  }
+
+  .option:last-child {
+    margin-top: 20px;
+  }
+
+  .options .option .optionContent .optionDetails {
+    width: 70%;
+    display: inline-block;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .options .option .optionContent .optionDetails {
+    width: 60%;
+    display: inline-block;
+  }
+}
+
+@media screen and (max-width: 540px) {
+  .options .option .optionContent .optionDetails {
+    width: 100%;
+  }
+
+  .options .option .optionContent {
+    padding: 20px;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: baseline;
+    -ms-flex-align: baseline;
+    align-items: baseline;
+  }
+}
+
+// Disclaimer
+#disclaimerScreen{
+  .disclaimerMessage{
+    @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
+    margin-top: 16px;
+  }
+}

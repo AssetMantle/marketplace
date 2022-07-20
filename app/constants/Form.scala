@@ -20,6 +20,7 @@ object Form {
   val FORGET_PASSWORD = new Form("FORGET_PASSWORD", routes.javascript.AccountController.forgetPasswordForm, routes.AccountController.forgetPassword())
   val SIGN_OUT = new Form("SIGN_OUT", routes.javascript.AccountController.signOutForm, routes.AccountController.signOut())
 
-  val PROFILE_VERIFY_WALLET_MNEMONICS = new Form("PROFILE_VERIFY_WALLET_MNEMONICS", routes.javascript.ProfileController.verifyWalletMnemonicsForm, routes.ProfileController.verifyWalletMnemonics())
+  val MANAGED_ADDRESS = new Form("MANAGED_ADDRESS", routes.javascript.ProfileController.managedAddressForm, routes.ProfileController.managedAddress())
   val UNMANAGED_ADDRESS = new Form("UNMANAGED_ADDRESS", routes.javascript.ProfileController.unmanagedAddressForm, routes.ProfileController.unmanagedAddress())
+  val CHANGE_WALLET_NAME = new Form("CHANGE_WALLET_NAME", routes.javascript.ProfileController.changeWalletNameForm, routes.ProfileController.changeWalletName())
 }
