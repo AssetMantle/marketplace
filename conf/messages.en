@@ -80,6 +80,8 @@ TERMS_CONDITION_LABEL=Terms and conditions
 RESPONSE.FAILURE.USERNAME_UNAVAILABLE=Username is not available.
 RESPONSE.FAILURE.PASSWORDS_DO_NOT_MATCH=Password do not match.
 RESPONSE.FAILURE.INVALID_MNEMONICS=Invalid mnemonics.
+RESPONSE.FAILURE.INVALID_MNEMONICS_OR_USERNAME=Invalid mnemonics or username.
+RESPONSE.FAILURE.INVALID_SEEDS_OR_ADDRESS=Invalid Seeds or Address
 SIGN_UP_SIGN_IN_MESSAGE=Already have an account?
 
 #//Create Wallet

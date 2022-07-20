@@ -45,15 +45,15 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.account.signUp(formWithErrors)))
         },
         signUpData => {
-          val addAccount = masterAccounts.Service.add(username = signUpData.username, password = "", language = request.lang, accountType = constants.User.USER)
+          val addAccount = masterAccounts.Service.add(username = signUpData.username, language = request.lang, accountType = constants.User.USER)
           val wallet = utilities.Wallet.getRandomWallet
 
           def addKey() = masterKeys.Service.add(
             accountId = signUpData.username,
             address = wallet.address,
-            password = signUpData.password,
-            privateKey = Option(wallet.privateKey),
-            partialMnemonics = Option(wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown)),
+            hdPath = wallet.hdPath,
+            partialMnemonics = wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown),
+            name = constants.Key.DEFAULT_NAME,
             retryCounter = 0,
             active = true,
             backupUsed = false,
@@ -76,7 +76,7 @@ class AccountController @Inject()(
 
   def verifyWalletMnemonics: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      WalletMnemonics.form.bindFromRequest().fold(
+      VerifyMnemonics.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.account.verifyWalletMnemonics(formWithErrors, formWithErrors.get.username, formWithErrors.get.walletAddress, Seq(formWithErrors.get.seed1, formWithErrors.get.seed2, formWithErrors.get.seed3, formWithErrors.get.seed4))))
         },
@@ -85,20 +85,21 @@ class AccountController @Inject()(
 
           def updateAndGetResult(key: master.Key) = if (key.partialMnemonics.isDefined) {
             val mnemonics = key.partialMnemonics.get ++ Seq(walletMnemonicsData.seed1, walletMnemonicsData.seed2, walletMnemonicsData.seed3, walletMnemonicsData.seed4)
-            if (utilities.Wallet.getWallet(mnemonics).address == walletMnemonicsData.walletAddress && key.address == walletMnemonicsData.walletAddress && key.accountId == walletMnemonicsData.username) {
-              val updateWallet = masterKeys.Service.updateKey(key.copy(verified = Option(true)))
+            val wallet = utilities.Wallet.getWallet(mnemonics)
+            if (wallet.address == walletMnemonicsData.walletAddress && key.address == walletMnemonicsData.walletAddress && key.accountId == walletMnemonicsData.username) {
+              val updateWallet = masterKeys.Service.updateOnVerifyMnemonics(key, password = walletMnemonicsData.password, privateKey = wallet.privateKey)
               for {
                 _ <- updateWallet
               } yield PartialContent(views.html.account.walletSuccess(username = key.accountId, address = walletMnemonicsData.walletAddress))
-            } else Future(throw new BaseException(constants.Response.INVALID_MNEMONICS))
-          } else Future(throw new BaseException(constants.Response.INVALID_ACTIVE_WALLET))
+            } else constants.Response.INVALID_MNEMONICS_OR_USERNAME.throwFutureBaseException()
+          } else constants.Response.INVALID_ACTIVE_WALLET.throwFutureBaseException()
 
           (for {
             key <- key
             result <- updateAndGetResult(key)
           } yield result
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.account.verifyWalletMnemonics(walletMnemonicsForm = WalletMnemonics.form.withGlobalError(baseException.failure.message), username = walletMnemonicsData.username, address = walletMnemonicsData.walletAddress, partialMnemonics = Seq(walletMnemonicsData.seed1, walletMnemonicsData.seed2, walletMnemonicsData.seed3, walletMnemonicsData.seed4)))
+            case baseException: BaseException => BadRequest(views.html.account.verifyWalletMnemonics(walletMnemonicsForm = VerifyMnemonics.form.withGlobalError(baseException.failure.message), username = walletMnemonicsData.username, address = walletMnemonicsData.walletAddress, partialMnemonics = Seq(walletMnemonicsData.seed1, walletMnemonicsData.seed2, walletMnemonicsData.seed3, walletMnemonicsData.seed4)))
           }
         }
       )
@@ -123,9 +124,9 @@ class AccountController @Inject()(
               val addKey = masterKeys.Service.add(
                 accountId = signInData.username,
                 address = wallet.address,
-                password = signInData.password,
-                privateKey = Option(wallet.privateKey),
-                partialMnemonics = Option(wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown)),
+                hdPath = wallet.hdPath,
+                partialMnemonics = wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown),
+                name = constants.Key.DEFAULT_NAME,
                 retryCounter = 0,
                 active = true,
                 backupUsed = false,
@@ -145,7 +146,7 @@ class AccountController @Inject()(
                 result <- withUsernameToken.Ok(views.html.collection.viewCollections())
               } yield result
             }
-          } else Future(throw new BaseException(constants.Response.INVALID_USERNAME_OR_PASSWORD))
+          } else constants.Response.INVALID_USERNAME_OR_PASSWORD.throwFutureBaseException()
 
           (for {
             (passwordVerified, key) <- verifyPasswordAndKey
@@ -208,8 +209,8 @@ class AccountController @Inject()(
           def verifyAndUpdate(key: master.Key) = if (key.partialMnemonics.isDefined) {
             if (utilities.Wallet.getWallet(key.partialMnemonics.get ++ lastWords).address == key.address && key.accountId == forgetPasswordData.username) {
               masterAccounts.Service.updateOnForgotPassword(accountID = forgetPasswordData.username, newPassword = forgetPasswordData.newPassword)
-            } else Future(throw new BaseException(constants.Response.UNAUTHORIZED))
-          } else Future(throw new BaseException(constants.Response.INVALID_ACTIVE_WALLET))
+            } else constants.Response.UNAUTHORIZED.throwFutureBaseException()
+          } else constants.Response.INVALID_ACTIVE_WALLET.throwFutureBaseException()
 
           (for {
             masterKey <- masterKey
@@ -222,5 +223,79 @@ class AccountController @Inject()(
       )
   }
 
+  def addCustodialKeyForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.account.addCustodialKey())
+  }
+
+  def addCustodialKey(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      AddCustodialKey.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.account.addCustodialKey(formWithErrors)))
+        },
+        addCustodialKeyData => {
+          val wallet = utilities.Wallet.getWallet(addCustodialKeyData.seeds.split(" "))
+          val validatePassword = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = addCustodialKeyData.password)
+
+          def validateAndAdd(validatePassword: Boolean) = if (validatePassword && wallet.address == addCustodialKeyData.address) {
+            masterKeys.Service.add(
+              accountId = loginState.username,
+              address = wallet.address,
+              hdPath = wallet.hdPath,
+              password = addCustodialKeyData.password,
+              privateKey = wallet.privateKey,
+              partialMnemonics = wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown),
+              name = addCustodialKeyData.keyName,
+              retryCounter = 0,
+              backupUsed = true,
+              active = false,
+              verified = Option(true)
+            )
+          } else constants.Response.INVALID_SEEDS_OR_ADDRESS.throwFutureBaseException()
+
+          def getResult = {
+            implicit val optionalLoginState: Option[LoginState] = Option(loginState)
+            withUsernameToken.Ok(views.html.collection.viewCollections())
+          }
+
+          (for {
+            (validatePassword, _) <- validatePassword
+            _ <- validateAndAdd(validatePassword)
+            result <- getResult
+          } yield result
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.account.addCustodialKey(AddCustodialKey.form.withGlobalError(baseException.failure.message)))
+          }
+        }
+      )
+  }
+
+  def removeCustodialKeyForm(address: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.account.removeCustodialKey(address = address))
+  }
+
+  def removeCustodialKey(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      RemoveCustodialKey.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.account.removeCustodialKey(formWithErrors, formWithErrors.get.address)))
+        },
+        removeCustodialKeyData => {
+          val validatePassword = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = removeCustodialKeyData.address, password = removeCustodialKeyData.password)
+
+          def update(validated: Boolean, key: master.Key) = if (validated) {
+            masterKeys.Service.updateKey(key.copy(encryptedPrivateKey = None, partialMnemonics = None))
+          } else constants.Response.INCORRECT_KEY_PASSWORD.throwFutureBaseException()
+
+          (for {
+            (validated, key) <- validatePassword
+            _ <- update(validated, key)
+          } yield Ok
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.account.removeCustodialKey(RemoveCustodialKey.form.withGlobalError(baseException.failure.message), removeCustodialKeyData.address))
+          }
+        }
+      )
+  }
 
 }

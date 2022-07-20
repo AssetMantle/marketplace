@@ -1,6 +1,10 @@
 package constants
 
+import exceptions.BaseException
+import play.api.Logger
 import play.api.routing.JavaScriptReverseRoute
+
+import scala.concurrent.{ExecutionContext, Future}
 
 object Response {
 
@@ -19,9 +23,14 @@ object Response {
 
   val INVALID_USERNAME_OR_PASSWORD = new Failure("INVALID_USERNAME_OR_PASSWORD")
   val INVALID_PASSWORD = new Failure("INVALID_PASSWORD")
+  val INCORRECT_KEY_PASSWORD = new Failure("INCORRECT_KEY_PASSWORD")
+  val INVALID_CURRENT_PASSWORD = new Failure("INVALID_CURRENT_PASSWORD")
   val PASSWORDS_DO_NOT_MATCH = new Failure("PASSWORDS_DO_NOT_MATCH")
+  val TERMS_AND_CONDITION_NOT_ACCEPTED = new Failure("TERMS_AND_CONDITION_NOT_ACCEPTED")
   val USERNAME_UNAVAILABLE = new Failure("USERNAME_UNAVAILABLE")
   val PASSWORD_VALIDATION_FAILED = new Failure("PASSWORD_VALIDATION_FAILED")
+  val INVALID_SEEDS_OR_ADDRESS = new Failure("INVALID_SEEDS_OR_ADDRESS")
+  val MNEMONICS_LENGTH_NOT_12_OR_24 = new Failure("MNEMONICS_LENGTH_NOT_12_OR_24")
 
   val SIGN_UP_SUCCESSFUL = new Success("SIGN_UP_SUCCESSFUL")
 
@@ -34,6 +43,7 @@ object Response {
   val INVALID_OPERATOR_ADDRESS = new Failure("INVALID_OPERATOR_ADDRESS")
   val INVALID_HRP_OR_BYTES = new Failure("INVALID_HRP_OR_BYTES")
   val INVALID_MNEMONICS = new Failure("INVALID_MNEMONICS")
+  val INVALID_MNEMONICS_OR_USERNAME = new Failure("INVALID_MNEMONICS_OR_USERNAME")
   val INVALID_ACTIVE_WALLET = new Failure("INVALID_ACTIVE_WALLET")
 
   val IPFS_UPLOAD_FAILED = new Failure("IPFS_UPLOAD_FAILED")
@@ -65,11 +75,17 @@ object Response {
   val UNAUTHORIZED = new Failure("UNAUTHORIZED")
   val INVALID_PAGE_NUMBER = new Failure("INVALID_PAGE_NUMBER")
   val INVALID_SEEDS = new Failure("INVALID_SEEDS")
+  val INVALID_KEY_NAME = new Failure("INVALID_KEY_NAME")
+  val INVALID_PASSWORD_OR_SEEDS = new Failure("INVALID_PASSWORD_OR_SEEDS")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
     val action: String = utilities.JsRoutes.getJsRouteString(actionController)
     val logMessage: String = LOG_PREFIX + response
+
+    def throwBaseException(exception: Exception = null)(implicit module: String, logger: Logger) = throw new BaseException(this, exception)
+
+    def throwFutureBaseException(exception: Exception = null)(implicit module: String, logger: Logger, executionContext: ExecutionContext) = Future(throw new BaseException(this, exception))
   }
 
   class Warning(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

@@ -85,13 +85,12 @@ class Accounts @Inject()(
 
   object Service {
 
-    def add(username: String, password: String, language: Lang, accountType: String): Future[Unit] = {
-      val salt = utilities.Secrets.getNewSalt
+    def add(username: String, language: Lang, accountType: String): Future[Unit] = {
       val account = Account(
         id = username,
-        passwordHash = utilities.Secrets.hashPassword(password = password, salt = salt, iterations = constants.Security.DefaultIterations),
-        salt = salt,
-        iterations = constants.Security.DefaultIterations,
+        passwordHash = Array[Byte](),
+        salt = Array[Byte](),
+        iterations = 0,
         language = language,
         accountType = accountType)
       for {

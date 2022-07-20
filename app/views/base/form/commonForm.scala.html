@@ -84,9 +84,9 @@
                 @commonJavascriptButton(formTemplate.submit, customSubmit)
             } else {
                 @if(submitDisable){
-                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"), Symbol("class") -> "disable")
+                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace(".", "_"), Symbol("class") -> "disable")
                 }else{
-                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace("../../../../public", "_"))
+                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace(".", "_"))
                 }
             }
             </div>

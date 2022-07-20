@@ -1,0 +1,9 @@
+@import views.html.base.form._
+@import helper._
+@import views.account.companion.RemoveCustodialKey
+
+@(removeCustodialKeyForm: Form[RemoveCustodialKey.Data] = RemoveCustodialKey.form, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.REMOVE_CUSTODIAL_KEY, removeCustodialKeyForm) {
+    @commonInputText(removeCustodialKeyForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address)
+    @commonInputText(removeCustodialKeyForm, constants.FormField.PASSWORD)
+}
