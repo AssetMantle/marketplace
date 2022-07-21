@@ -1,4 +1,6 @@
-@(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import controllers.actions.LoginState
+
+@(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="profileSettingsContainer">
     <div class="title">@Messages(constants.View.PROFILE_SETTINGS_TITLE)</div>
     <div class="subTitle">@Messages(constants.View.PROFILE_SETTINGS_SUBTITLE)</div>
@@ -6,12 +8,12 @@
         <div class="containerTitle">@Messages(constants.View.PROFILE_BASIC_INFO_TITLE)</div>
         <div class="d-flex flex-row align-items-center flex-wrap infoField">
             <div class="ps-0 ps-xl-5 pe-2 fieldLabel">@Messages(constants.View.PROFILE_USERNAME)</div>
-            <div class="flex-grow-1 fieldValue">xyz123</div>
+            <div class="flex-grow-1 fieldValue">@loginState.username</div>
             <div class="me-2"><img src="@routes.Assets.versioned("images/icon/verifiedGreen.png")" class="icon"/></div>
         </div>
         <div class="d-flex flex-row align-items-center flex-wrap infoField">
             <div class="ps-0 ps-xl-5 pe-2 fieldLabel">@Messages(constants.View.PROFILE_PASSWORD)</div>
-            <div id="userPassword" class="flex-grow-1 fieldValue">xyz123</div>
+            <div id="userPassword" class="flex-grow-1 fieldValue">@constants.View.PROFILE_PASSWORD</div>
             <div class="me-2 m-0 iconContainer"><img src="@routes.Assets.versioned("images/icon/edit.png")" class="icon"/></div>
         </div>
         <div class="d-flex flex-row align-items-center flex-wrap walletInfoField">

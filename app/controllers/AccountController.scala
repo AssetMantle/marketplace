@@ -92,7 +92,7 @@ class AccountController @Inject()(
                 _ <- updateWallet
               } yield PartialContent(views.html.account.walletSuccess(username = key.accountId, address = walletMnemonicsData.walletAddress))
             } else constants.Response.INVALID_MNEMONICS_OR_USERNAME.throwFutureBaseException()
-          } else constants.Response.INVALID_ACTIVE_WALLET.throwFutureBaseException()
+          } else constants.Response.INVALID_ACTIVE_KEY.throwFutureBaseException()
 
           (for {
             key <- key
@@ -204,17 +204,32 @@ class AccountController @Inject()(
         },
         forgetPasswordData => {
           val lastWords = Seq(forgetPasswordData.phrase1, forgetPasswordData.phrase2, forgetPasswordData.phrase3, forgetPasswordData.phrase4)
-          val masterKey = masterKeys.Service.tryGetActive(forgetPasswordData.address)
-
-          def verifyAndUpdate(key: master.Key) = if (key.partialMnemonics.isDefined) {
-            if (utilities.Wallet.getWallet(key.partialMnemonics.get ++ lastWords).address == key.address && key.accountId == forgetPasswordData.username) {
-              masterAccounts.Service.updateOnForgotPassword(accountID = forgetPasswordData.username, newPassword = forgetPasswordData.newPassword)
-            } else constants.Response.UNAUTHORIZED.throwFutureBaseException()
-          } else constants.Response.INVALID_ACTIVE_WALLET.throwFutureBaseException()
+          val update = masterKeys.Service.updateOnForgotPassword(accountId = forgetPasswordData.username, address = forgetPasswordData.address, lastWords = lastWords, newPassword = forgetPasswordData.newPassword)
 
           (for {
-            masterKey <- masterKey
-            _ <- verifyAndUpdate(masterKey)
+            _ <- update
+          } yield PartialContent(views.html.account.successfullPasswordChange())
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.account.forgetPassword(ForgotPassword.form.withGlobalError(baseException.failure.message)))
+          }
+        }
+      )
+  }
+
+  def changePasswordForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.account.forgetPassword())
+  }
+
+  def changePassword: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      ChangePassword.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.account.changePassword(formWithErrors)))
+        },
+        changePasswordData => {
+          val changePassword = masterKeys.Service.changePassword(accountId = loginState.username, address = loginState.address, oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword)
+          (for {
+            _ <- changePassword
           } yield PartialContent(views.html.account.successfullPasswordChange())
             ).recover {
             case baseException: BaseException => BadRequest(views.html.account.forgetPassword(ForgotPassword.form.withGlobalError(baseException.failure.message)))

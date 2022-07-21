@@ -26,6 +26,9 @@ object FormField {
   val SEED_PHRASE_4 = new StringFormField("SEED_PHRASE_4", 3, 20, RegularExpression.ALL_SMALL_LETTERS, Response.INVALID_SEEDS.message)
   val FORGOT_PASSWORD = new StringFormField("FORGOT_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val FORGOT_CONFIRM_PASSWORD = new StringFormField("FORGOT_CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val OLD_PASSWORD = new StringFormField("OLD_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val CHANGE_PASSWORD = new StringFormField("CHANGE_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val CHANGE_CONFIRM_PASSWORD = new StringFormField("CHANGE_CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SEEDS = new StringFormField("SEEDS", 3, 500, RegularExpression.ALL_SMALL_LETTERS_WITH_SPACE, Response.INVALID_SEEDS.message)
   val KEY_NAME = new StringFormField("KEY_NAME", 3, 128, RegularExpression.ALL_NUMBERS_ALL_LETTERS, Response.INVALID_KEY_NAME.message)
 

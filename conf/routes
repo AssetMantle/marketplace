@@ -31,6 +31,9 @@ POST        /signOut                         controllers.AccountController.signO
 GET         /forgetPassword                  controllers.AccountController.forgetPasswordForm()
 POST        /forgetPassword                  controllers.AccountController.forgetPassword()
 
+GET         /changePassword                  controllers.AccountController.changePasswordForm()
+POST        /changePassword                  controllers.AccountController.changePassword()
+
 GET         /collections                     controllers.CollectionController.viewCollections()
 GET         /collection/:id                  controllers.CollectionController.viewCollection(id: String)
 GET         /collectionsList                 controllers.CollectionController.collectionsList()

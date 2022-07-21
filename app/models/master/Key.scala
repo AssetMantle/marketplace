@@ -209,6 +209,46 @@ class Keys @Inject()(
 
     def getAll(accountId: String): Future[Seq[Key]] = filter(_.id1 === accountId).map(_.map(_.deserialize))
 
+    def updateOnForgotPassword(accountId: String, address: String, lastWords: Seq[String], newPassword: String): Future[Unit] = {
+      val key = tryGet(accountId = accountId, address = address)
+
+      def getWallet(key: Key) = if (key.hdPath.isDefined && key.partialMnemonics.isDefined) {
+        Future(utilities.Wallet.getWallet(mnemonics = key.partialMnemonics.get ++ lastWords, hdPath = key.hdPath.get))
+      } else constants.Response.INVALID_ACTIVE_KEY.throwFutureBaseException()
+
+      def updatePassword(key: Key, wallet: utilities.Wallet) = if (key.address == wallet.address) {
+        update(key.copy(
+          passwordHash = Option(utilities.Secrets.hashPassword(password = newPassword, salt = key.salt, iterations = constants.Security.DefaultIterations)),
+          encryptedPrivateKey = Option(utilities.Secrets.encryptData(data = wallet.privateKey, secret = newPassword))
+        ).serialize())
+      } else constants.Response.INVALID_ACTIVE_KEY.throwFutureBaseException()
+
+      for {
+        key <- key
+        wallet <- getWallet(key)
+        _ <- updatePassword(key, wallet)
+      } yield ()
+    }
+
+    def changePassword(accountId: String, address: String, oldPassword: String, newPassword: String): Future[Unit] = {
+      val validateAndOldKey = validateActiveKeyUsernamePasswordAndGet(username = accountId, password = oldPassword)
+
+      def updatePassword(passwordValidated: Boolean, oldKey: Key) = if (passwordValidated) {
+        if (oldKey.encryptedPrivateKey.isDefined && oldKey.partialMnemonics.isDefined) {
+          val decryptedPrivateKey = utilities.Secrets.decryptData(encryptedData = oldKey.encryptedPrivateKey.get, secret = oldPassword)
+          update(oldKey.copy(
+            passwordHash = Option(utilities.Secrets.hashPassword(password = newPassword, salt = oldKey.salt, iterations = constants.Security.DefaultIterations)),
+            encryptedPrivateKey = Option(utilities.Secrets.encryptData(data = decryptedPrivateKey, secret = newPassword)),
+          ).serialize())
+        } else constants.Response.INVALID_ACTIVE_KEY.throwFutureBaseException()
+      } else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+
+      for {
+        (passwordValidated, oldKey) <- validateAndOldKey
+        _ <- updatePassword(passwordValidated, oldKey)
+      } yield ()
+    }
+
   }
 
 }

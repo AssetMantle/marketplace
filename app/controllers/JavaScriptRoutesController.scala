@@ -24,6 +24,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.signInForm,
         routes.javascript.AccountController.signOutForm,
         routes.javascript.AccountController.forgetPasswordForm,
+        routes.javascript.AccountController.changePasswordForm,
 
         routes.javascript.CollectionController.viewCollections,
         routes.javascript.CollectionController.viewCollection,
