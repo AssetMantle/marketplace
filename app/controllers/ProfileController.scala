@@ -134,21 +134,21 @@ class ProfileController @Inject()(
             _ <- validateAndAdd(validatePassword)
           } yield PartialContent(views.html.profile.keyAddedOrUpdatedSuccessfully(address = addUnmanagedKeyData.address, name = addUnmanagedKeyData.keyName))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.profile.addManagedKey(AddManagedKey.form.withGlobalError(baseException.failure.message)))
+            case baseException: BaseException => BadRequest(views.html.profile.addUnmanagedKey(AddUnmanagedKey.form.withGlobalError(baseException.failure.message)))
           }
         }
       )
   }
 
-  def changeKeyNameForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.profile.changeKeyName())
+  def changeKeyNameForm(address: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.changeKeyName(address = address))
   }
 
   def changeKeyName: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       ChangeKeyName.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.changeKeyName(formWithErrors)))
+          Future(BadRequest(views.html.profile.changeKeyName(formWithErrors, formWithErrors.get.address)))
         },
         changeKeyNameData => {
           val update = masterKeys.Service.updateKeyName(accountId = loginState.username, address = changeKeyNameData.address, keyName = changeKeyNameData.keyName)
@@ -157,7 +157,7 @@ class ProfileController @Inject()(
             _ <- update
           } yield PartialContent(views.html.profile.keyAddedOrUpdatedSuccessfully(address = changeKeyNameData.address, name = changeKeyNameData.keyName))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.profile.addManagedKey(AddManagedKey.form.withGlobalError(baseException.failure.message)))
+            case baseException: BaseException => BadRequest(views.html.profile.changeKeyName(ChangeKeyName.form.withGlobalError(baseException.failure.message), changeKeyNameData.address))
           }
 
         }

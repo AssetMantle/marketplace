@@ -34,6 +34,8 @@ POST        /forgetPassword                  controllers.AccountController.forge
 GET         /changePassword                  controllers.AccountController.changePasswordForm()
 POST        /changePassword                  controllers.AccountController.changePassword()
 
+GET         /changeActiveKey                 controllers.AccountController.changeActiveKey(address: String)
+
 GET         /collections                     controllers.CollectionController.viewCollections()
 GET         /collection/:id                  controllers.CollectionController.viewCollection(id: String)
 GET         /collectionsList                 controllers.CollectionController.collectionsList()
@@ -58,5 +60,5 @@ POST        /addManagedKey                   controllers.ProfileController.addMa
 GET         /addUnmanagedKey                 controllers.ProfileController.addUnmanagedKeyForm()
 POST        /addUnmanagedKey                 controllers.ProfileController.addUnmanagedKey()
 
-GET         /changeKeyName                   controllers.ProfileController.changeKeyNameForm()
+GET         /changeKeyName                   controllers.ProfileController.changeKeyNameForm(address: String)
 POST        /changeKeyName                   controllers.ProfileController.changeKeyName()

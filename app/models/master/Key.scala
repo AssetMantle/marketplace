@@ -249,6 +249,18 @@ class Keys @Inject()(
       } yield ()
     }
 
+    def changeActive(accountId: String, oldAddress: String, newAddress: String): Future[Unit] = {
+      val oldKey = tryGet(accountId = accountId, address = oldAddress)
+      val key = tryGet(accountId = accountId, address = newAddress)
+
+      for {
+        oldKey <- oldKey
+        key <- key
+        _ <- update(key.copy(active = true).serialize())
+        _ <- update(oldKey.copy(active = false).serialize())
+      } yield ()
+    }
+
   }
 
 }
