@@ -47,6 +47,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.unmanagedAddress,
         routes.javascript.ProfileController.changeWalletNameForm,
         routes.javascript.ProfileController.changeWalletName,
+        routes.javascript.ProfileController.viewMnemonicsPasswordInputForm,
+        routes.javascript.ProfileController.viewMnemonicsPasswordInput,
 
       )
     ).as("text/javascript")

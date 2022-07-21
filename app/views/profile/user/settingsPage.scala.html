@@ -35,8 +35,8 @@
                             <img src="@routes.Assets.versioned("images/icon/kebabMenuYellow.png")" class="ms-3" width="6px" height="20px"/>
                             <span class="tooltiptext">
                                 <div class="menuOption">
-                                    <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
-                                    <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
+                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.viewMnemonicsPasswordInputForm())">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
+                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.changeWalletNameForm())">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
                                     <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
                                 </div>
                             </span>

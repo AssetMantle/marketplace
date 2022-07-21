@@ -53,6 +53,7 @@ class ProfileController @Inject()(
   def managedAddressForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.profile.managedAddress())
 //    Ok(views.html.profile.walletAddSuccess())
+//    Ok(views.html.profile.viewMnemonicsSeedPhrase())
   }
 
   // POST Request
@@ -98,6 +99,24 @@ class ProfileController @Inject()(
           Future(BadRequest(views.html.profile.changeWalletName(formWithErrors)))
         },
         changeWalletNameData => {
+          Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
+        }
+      )
+  }
+
+  // GET Request
+  def viewMnemonicsPasswordInputForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.viewMnemonicsPasswordInput())
+  }
+
+  // POST Request
+  def viewMnemonicsPasswordInput: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      ViewMnemonicsPasswordInput.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.profile.viewMnemonicsPasswordInput(formWithErrors)))
+        },
+        viewMnemonicsSeedPhraseData => {
           Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
         }
       )

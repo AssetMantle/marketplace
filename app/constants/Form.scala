@@ -23,4 +23,5 @@ object Form {
   val MANAGED_ADDRESS = new Form("MANAGED_ADDRESS", routes.javascript.ProfileController.managedAddressForm, routes.ProfileController.managedAddress())
   val UNMANAGED_ADDRESS = new Form("UNMANAGED_ADDRESS", routes.javascript.ProfileController.unmanagedAddressForm, routes.ProfileController.unmanagedAddress())
   val CHANGE_WALLET_NAME = new Form("CHANGE_WALLET_NAME", routes.javascript.ProfileController.changeWalletNameForm, routes.ProfileController.changeWalletName())
+  val VIEW_MNEMONICS_PASSWORD_INPUT = new Form("VIEW_MNEMONICS_PASSWORD_INPUT", routes.javascript.ProfileController.viewMnemonicsPasswordInputForm, routes.ProfileController.viewMnemonicsPasswordInput())
 }
