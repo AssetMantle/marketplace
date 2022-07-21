@@ -20,9 +20,7 @@ object Form {
   val FORGET_PASSWORD = new Form("FORGET_PASSWORD", routes.javascript.AccountController.forgetPasswordForm, routes.AccountController.forgetPassword())
   val SIGN_OUT = new Form("SIGN_OUT", routes.javascript.AccountController.signOutForm, routes.AccountController.signOut())
 
-  val MANAGED_ADDRESS = new Form("MANAGED_ADDRESS", routes.javascript.ProfileController.managedAddressForm, routes.ProfileController.managedAddress())
-  val UNMANAGED_ADDRESS = new Form("UNMANAGED_ADDRESS", routes.javascript.ProfileController.unmanagedAddressForm, routes.ProfileController.unmanagedAddress())
-  val CHANGE_WALLET_NAME = new Form("CHANGE_WALLET_NAME", routes.javascript.ProfileController.changeWalletNameForm, routes.ProfileController.changeWalletName())
-  val ADD_CUSTODIAL_KEY = new Form("ADD_CUSTODIAL_KEY", routes.javascript.AccountController.addCustodialKeyForm, routes.AccountController.addCustodialKey())
-  val REMOVE_CUSTODIAL_KEY = new Form("REMOVE_CUSTODIAL_KEY", routes.javascript.AccountController.removeCustodialKeyForm, routes.AccountController.removeCustodialKey())
+  val ADD_MANAGED_KEY = new Form("ADD_MANAGED_KEY", routes.javascript.ProfileController.addManagedKeyForm, routes.ProfileController.addManagedKey())
+  val ADD_UNMANAGED_KEY = new Form("ADD_UNMANAGED_KEY", routes.javascript.ProfileController.addUnmanagedKeyForm, routes.ProfileController.addUnmanagedKey())
+  val CHANGE_KEY_NAME = new Form("CHANGE_KEY_NAME", routes.javascript.ProfileController.changeKeyNameForm, routes.ProfileController.changeKeyName())
 }

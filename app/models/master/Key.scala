@@ -13,11 +13,11 @@ import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Key(accountId: String, address: String, hdPath: Seq[ChildNumber], passwordHash: Option[Array[Byte]], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Option[Array[Byte]], partialMnemonics: Option[Seq[String]], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Key(accountId: String, address: String, hdPath: Option[Seq[ChildNumber]], passwordHash: Option[Array[Byte]], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Option[Array[Byte]], partialMnemonics: Option[Seq[String]], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
   def serialize(): Keys.KeySerialized = Keys.KeySerialized(
     accountId = this.accountId,
     address = this.address,
-    hdPath = Json.toJson(this.hdPath.map(_.toString)).toString(),
+    hdPath = this.hdPath.fold[Option[String]](None)(x => Option(Json.toJson(x.map(_.toString)).toString())),
     passwordHash = this.passwordHash,
     salt = this.salt,
     iterations = this.iterations,
@@ -44,11 +44,11 @@ object Keys {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class KeySerialized(accountId: String, address: String, hdPath: String, passwordHash: Option[Array[Byte]], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Option[Array[Byte]], partialMnemonics: Option[String], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity2[String, String] {
+  case class KeySerialized(accountId: String, address: String, hdPath: Option[String], passwordHash: Option[Array[Byte]], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Option[Array[Byte]], partialMnemonics: Option[String], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity2[String, String] {
     def deserialize: Key = Key(
       accountId = accountId,
       address = address,
-      hdPath = utilities.JSON.convertJsonStringToObject[Seq[String]](this.hdPath).map(x => if (x.contains("H")) new ChildNumber(x.split("H")(0).toInt, true) else new ChildNumber(x.toInt)),
+      hdPath = this.hdPath.fold[Option[Seq[ChildNumber]]](None)(x => Option(utilities.JSON.convertJsonStringToObject[Seq[String]](x).map(x => if (x.contains("H")) new ChildNumber(x.split("H")(0).toInt, true) else new ChildNumber(x.toInt)))),
       passwordHash = passwordHash,
       salt = salt,
       iterations = iterations,
@@ -67,7 +67,7 @@ object Keys {
 
   class KeyTable(tag: Tag) extends Table[KeySerialized](tag, "Key") with ModelTable2[String, String] {
 
-    def * = (accountId, address, hdPath, passwordHash.?, salt, iterations, encryptedPrivateKey.?, partialMnemonics.?, name.?, retryCounter, active, backupUsed, verified.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (KeySerialized.tupled, KeySerialized.unapply)
+    def * = (accountId, address, hdPath.?, passwordHash.?, salt, iterations, encryptedPrivateKey.?, partialMnemonics.?, name.?, retryCounter, active, backupUsed, verified.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (KeySerialized.tupled, KeySerialized.unapply)
 
     def accountId = column[String]("accountId", O.PrimaryKey)
 
@@ -132,10 +132,10 @@ class Keys @Inject()(
 
     def add(accountId: String, address: String, hdPath: Seq[ChildNumber], partialMnemonics: Seq[String], name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
       val salt = utilities.Secrets.getNewSalt
-      create(Key(
+      val key = Key(
         accountId = accountId,
         address = address,
-        hdPath = hdPath,
+        hdPath = Option(hdPath),
         passwordHash = None,
         salt = salt,
         iterations = constants.Security.DefaultIterations,
@@ -146,10 +146,11 @@ class Keys @Inject()(
         active = active,
         backupUsed = backupUsed,
         verified = verified
-      ).serialize())
+      )
+      create(key.serialize())
     }
 
-    def add(accountId: String, address: String, hdPath: Seq[ChildNumber], password: String, privateKey: Array[Byte], partialMnemonics: Seq[String], name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
+    def add(accountId: String, address: String, hdPath: Option[Seq[ChildNumber]], password: String, privateKey: Option[Array[Byte]], partialMnemonics: Option[Seq[String]], name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
       val salt = utilities.Secrets.getNewSalt
       create(Key(
         accountId = accountId,
@@ -158,9 +159,9 @@ class Keys @Inject()(
         passwordHash = Option(utilities.Secrets.hashPassword(password = password, salt = salt, iterations = constants.Security.DefaultIterations)),
         salt = salt,
         iterations = constants.Security.DefaultIterations,
-        partialMnemonics = Option(partialMnemonics),
+        partialMnemonics = partialMnemonics,
         name = Option(name),
-        encryptedPrivateKey = Option(utilities.Secrets.encryptData(privateKey, password)),
+        encryptedPrivateKey = privateKey.fold[Option[Array[Byte]]](None)(x => Option(utilities.Secrets.encryptData(x, password))),
         retryCounter = retryCounter,
         active = active,
         backupUsed = backupUsed,
@@ -197,6 +198,16 @@ class Keys @Inject()(
     def deleteKey(accountId: String, address: String): Future[Unit] = delete(accountId, address)
 
     def tryGet(accountId: String, address: String): Future[Key] = tryGetById(id1 = accountId, id2 = address).map(_.deserialize)
+
+    def updateKeyName(accountId: String, address: String, keyName: String): Future[Unit] = {
+      val key = tryGet(accountId = accountId, address = address)
+      for {
+        key <- key
+        _ <- updateKey(key.copy(name = Option(keyName)))
+      } yield ()
+    }
+
+    def getAll(accountId: String): Future[Seq[Key]] = filter(_.id1 === accountId).map(_.map(_.deserialize))
 
   }
 

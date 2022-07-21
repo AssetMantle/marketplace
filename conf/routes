@@ -31,12 +31,6 @@ POST        /signOut                         controllers.AccountController.signO
 GET         /forgetPassword                  controllers.AccountController.forgetPasswordForm()
 POST        /forgetPassword                  controllers.AccountController.forgetPassword()
 
-GET         /addCustodialKey                 controllers.AccountController.addCustodialKeyForm()
-POST        /addCustodialKey                 controllers.AccountController.addCustodialKey()
-
-GET         /removeCustodialKey              controllers.AccountController.removeCustodialKeyForm(address: String)
-POST        /removeCustodialKey              controllers.AccountController.removeCustodialKey()
-
 GET         /collections                     controllers.CollectionController.viewCollections()
 GET         /collection/:id                  controllers.CollectionController.viewCollection(id: String)
 GET         /collectionsList                 controllers.CollectionController.collectionsList()
@@ -50,16 +44,16 @@ GET         /nftDetails                      controllers.NFTController.details( 
 GET         /nftInfo                         controllers.NFTController.info( nftId: String)
 GET         /nftFile                         controllers.NFTController.file( nftId: String)
 
-GET         /settings                        controllers.ProfileController.viewSettings()
-GET         /settingsPage                    controllers.ProfileController.settingsPage()
+GET         /profile                         controllers.ProfileController.viewProfile()
+GET         /settings                        controllers.ProfileController.settings()
 
-GET         /addNewWallet                    controllers.ProfileController.addNewWallet()
+GET         /addNewKey                       controllers.ProfileController.addNewKey()
 
-GET         /profileManagedAddress           controllers.ProfileController.managedAddressForm()
-POST        /profileManagedAddress           controllers.ProfileController.managedAddress()
+GET         /addManagedKey                   controllers.ProfileController.addManagedKeyForm()
+POST        /addManagedKey                   controllers.ProfileController.addManagedKey()
 
-GET         /profileUnmanagedAddress         controllers.ProfileController.unmanagedAddressForm()
-POST        /profileUnmanagedAddress         controllers.ProfileController.unmanagedAddress()
+GET         /addUnmanagedKey                 controllers.ProfileController.addUnmanagedKeyForm()
+POST        /addUnmanagedKey                 controllers.ProfileController.addUnmanagedKey()
 
-GET         /changeWalletName                controllers.ProfileController.changeWalletNameForm()
-POST        /changeWalletName                controllers.ProfileController.changeWalletName()
+GET         /changeKeyName                   controllers.ProfileController.changeKeyNameForm()
+POST        /changeKeyName                   controllers.ProfileController.changeKeyName()

@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Key"
 (
     "accountId"           VARCHAR NOT NULL,
     "address"             VARCHAR NOT NULL,
-    "hdPath"              VARCHAR NOT NULL,
+    "hdPath"              VARCHAR,
     "passwordHash"        BYTEA,
     "salt"                BYTEA   NOT NULL,
     "iterations"          INTEGER NOT NULL,

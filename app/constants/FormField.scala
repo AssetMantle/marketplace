@@ -29,14 +29,12 @@ object FormField {
   val SEEDS = new StringFormField("SEEDS", 3, 500, RegularExpression.ALL_SMALL_LETTERS_WITH_SPACE, Response.INVALID_SEEDS.message)
   val KEY_NAME = new StringFormField("KEY_NAME", 3, 128, RegularExpression.ALL_NUMBERS_ALL_LETTERS, Response.INVALID_KEY_NAME.message)
 
-  val MANAGED_ADDRESS_WALLET_NAME = new StringFormField("MANAGED_ADDRESS_WALLET_NAME", 3, 50)
-  val MANAGED_ADDRESS_NEW_ADDRESS = new StringFormField("MANAGED_ADDRESS_NEW_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
-  val MANAGED_ADDRESS_PASSWORD = new StringFormField("MANAGED_ADDRESS_PASSWORD", 5, 128)
-  val UNMANAGED_ADDRESS_WALLET_NAME = new StringFormField("UNMANAGED_ADDRESS_WALLET_NAME", 3, 50)
-  val UNMANAGED_ADDRESS_NEW_ADDRESS = new StringFormField("UNMANAGED_ADDRESS_NEW_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
-  val UNMANAGED_ADDRESS_PASSWORD = new StringFormField("UNMANAGED_ADDRESS_PASSWORD", 5, 128)
-  val WALLET_NAME_PREVIOUS = new StringFormField("WALLET_NAME_PREVIOUS", 3, 50)
-  val WALLET_NAME_NEW = new StringFormField("WALLET_NAME_NEW", 3, 50)
+  val MANAGED_KEY_NAME = new StringFormField("MANAGED_KEY_NAME", 3, 50)
+  val MANAGED_KEY_ADDRESS = new StringFormField("MANAGED_KEY_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
+  val UNMANAGED_KEY_NAME = new StringFormField("UNMANAGED_KEY_NAME", 3, 50)
+  val UNMANAGED_KEY_ADDRESS = new StringFormField("UNMANAGED_KEY_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
+  val CHANGE_KEY_NAME = new StringFormField("CHANGE_KEY_NAME", 3, 50)
+  val CHANGE_KEY_ADDRESS = new StringFormField("CHANGE_KEY_ADDRESS", 3, 50)
 
   //BooleanFormField
   val RECEIVE_NOTIFICATIONS = new BooleanFormField("RECEIVE_NOTIFICATIONS")
@@ -55,51 +53,53 @@ object FormField {
   class SelectFormField(fieldName: String, val options: Seq[String], errorMessage: String = "Error Response") {
     val name: String = fieldName
     val field: Mapping[String] = text.verifying(constraint = field => options contains field, error = errorMessage)
-
+    val placeHolder: String = "PLACEHOLDER." + name
     def mapping: (String, Mapping[String]) = name -> field
   }
 
   class CustomSelectFormField(fieldName: String) {
     val name: String = fieldName
     val field: Mapping[String] = text
+    val placeHolder: String = "PLACEHOLDER." + name
   }
 
   class IntFormField(fieldName: String, val minimumValue: Int, val maximumValue: Int) {
     val name: String = fieldName
     val field: Mapping[Int] = number(min = minimumValue, max = maximumValue)
-
+    val placeHolder: String = "PLACEHOLDER." + name
     def mapping: (String, Mapping[Int]) = name -> field
   }
 
   class DateFormField(fieldName: String) {
     val name: String = fieldName
     val field: Mapping[Date] = date
-
+    val placeHolder: String = "PLACEHOLDER." + name
     def mapping: (String, Mapping[Date]) = name -> field
   }
 
   class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
     val name: String = fieldName
     val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
-
+    val placeHolder: String = "PLACEHOLDER." + name
     def mapping: (String, Mapping[Double]) = name -> field
   }
 
   class BigDecimalFormField(fieldName: String, val minimumValue: BigDecimal, val maximumValue: BigDecimal) {
     val name: String = fieldName
     val field: Mapping[BigDecimal] = of(bigDecimalFormat).verifying(Constraints.max[BigDecimal](maximumValue), Constraints.min[BigDecimal](minimumValue))
-
+    val placeHolder: String = "PLACEHOLDER." + name
     def mapping: (String, Mapping[BigDecimal]) = name -> field
   }
 
   class BooleanFormField(fieldName: String) {
     val name: String = fieldName
     val field: Mapping[Boolean] = boolean
-
+    val placeHolder: String = "PLACEHOLDER." + name
     def mapping: (String, Mapping[Boolean]) = name -> field
   }
 
   class NestedFormField(fieldName: String) {
     val name: String = fieldName
+    val placeHolder: String = "PLACEHOLDER." + name
   }
 }

@@ -10,8 +10,8 @@
 <p class="sub-heading" id="modalSubtitle">@Messages(constants.View.ADD_NEW_WALLET_OPTION_SUBTITLE)</p>
 <div class="optionBoxContainer">
     <div class="options">
-        <label class="option" for="managedAddress" onclick="setNextButton('managed')">
-            <input type="radio" name="addressType" id="managedAddress" value="managed"/>
+        <label class="option" for="addManagedKey" onclick="setNextButton('managed')">
+            <input type="radio" name="addressType" id="addManagedKey" value="managed"/>
             <div class="optionContent">
                 <div class="optionDetails">
                     <span>Managed address</span>
@@ -20,8 +20,8 @@
             </div>
         </label>
 
-        <label class="option" for="unmanagedAddress" onclick="setNextButton('unmanaged')">
-            <input type="radio" id="unmanagedAddress" name="addressType" value="unmanaged"/>
+        <label class="option" for="addUnmanagedKey" onclick="setNextButton('unmanaged')">
+            <input type="radio" id="addUnmanagedKey" name="addressType" value="unmanaged"/>
             <div class="optionContent">
                 <div class="optionDetails">
                     <span>Unmanaged address</span>
@@ -39,9 +39,9 @@
     function setNextButton(addressType){
         $("#nextBtn").removeClass("disable");
         if(addressType === "managed"){
-            $("#nextBtn").attr("onclick","getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.MANAGED_ADDRESS.get, ""))")
+            $("#nextBtn").attr("onclick","getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.ADD_MANAGED_KEY.get, ""))")
         }else{
-            $("#nextBtn").attr("onclick","getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.UNMANAGED_ADDRESS.get, ""))")
+            $("#nextBtn").attr("onclick","getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.ADD_UNMANAGED_KEY.get, ""))")
         }
     }
 </script>

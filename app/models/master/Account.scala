@@ -33,8 +33,8 @@ object Accounts {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class AccountSerialized(id: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, language: String, accountType: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
-    def deserialize: Account = Account(id = id, passwordHash = passwordHash, salt = salt, iterations = iterations, language = Lang(language), accountType = accountType, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class AccountSerialized(id: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, accountType: String, language: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
+    def deserialize: Account = Account(id = id, passwordHash = passwordHash, salt = salt, iterations = iterations, accountType = accountType, language = Lang(language), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account") with ModelTable[String] {

@@ -1,25 +1,24 @@
-@import views.profile.companion.ManagedAddress
+@import views.profile.companion.AddManagedKey
 @import views.html.base.form._
 
-@(managedAddressForm: Form[ManagedAddress.Data] = ManagedAddress.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(managedAddressForm: Form[AddManagedKey.Data] = AddManagedKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonForm(constants.Form.MANAGED_ADDRESS, managedAddressForm) {
-    <!-- Address Form -->
+@commonForm(constants.Form.ADD_MANAGED_KEY, managedAddressForm) {
     <div id="newManagedAddressScreen">
         <div class="modal-body">
             <div class="mb-3">
                 <div class="inputField">
                     <div class="inputFieldBody">
-                        @views.html.base.label.commonLabel(constants.FormField.MANAGED_ADDRESS_WALLET_NAME.name)
-                        @commonInputText(managedAddressForm, constants.FormField.MANAGED_ADDRESS_WALLET_NAME, Symbol("placeholder") -> Messages(constants.View.WALLET_NAME_PLACEHOLDER), Symbol("autocomplete") -> "off")
+                        @views.html.base.label.commonLabel(constants.FormField.MANAGED_KEY_NAME.name)
+                        @commonInputText(managedAddressForm, constants.FormField.MANAGED_KEY_NAME, Symbol("autocomplete") -> "off")
                     </div>
                 </div>
             </div>
             <div class="mb-3">
                 <div class="inputField">
                     <div class="inputFieldBody">
-                        @views.html.base.label.commonLabel(constants.FormField.MANAGED_ADDRESS_NEW_ADDRESS.name)
-                        @commonInputText(managedAddressForm, constants.FormField.MANAGED_ADDRESS_NEW_ADDRESS, Symbol("placeholder") -> Messages(constants.View.ADDRESS_PLACEHOLDER), Symbol("autocomplete") -> "off")
+                        @views.html.base.label.commonLabel(constants.FormField.MANAGED_KEY_ADDRESS.name)
+                        @commonInputText(managedAddressForm, constants.FormField.MANAGED_KEY_ADDRESS, Symbol("autocomplete") -> "off")
                     </div>
                 </div>
             </div>
@@ -170,11 +169,10 @@
         </div>
     </div>
 
-    <!-- Confirm Password -->
     <div id="newWalletPasswordScreen" style="display: none;">
         <div class="mb-3 inputField">
             <div class="inputFieldBody">
-                @commonInputPassword(managedAddressForm, constants.FormField.MANAGED_ADDRESS_PASSWORD, 'id -> "mnemonicPassword")
+                @commonInputPassword(managedAddressForm, constants.FormField.PASSWORD, Symbol("id") -> "mnemonicPassword")
             </div>
         </div>
     </div>

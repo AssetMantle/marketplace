@@ -2,6 +2,7 @@ package constants
 
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import views.account.companion._
+import views.profile.companion._
 
 object FormConstraint {
   val passwordSymbols = "!@#$%^&*._-"
@@ -32,11 +33,11 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val addCustodialKeyConstraint: Constraint[AddCustodialKey.Data] = Constraint("constraints.AddCustodialKey")({ addCustodialKeyData: AddCustodialKey.Data =>
-    val seeds =  addCustodialKeyData.seeds.split(" ")
+  val addManagedKeyConstraint: Constraint[AddManagedKey.Data] = Constraint("constraints.AddManagedKey")({ addManagedKeyData: AddManagedKey.Data =>
+    val seeds =  addManagedKeyData.seeds.split(" ")
     val walletError = try {
       val wallet = utilities.Wallet.getWallet(seeds)
-      if (wallet.address != addCustodialKeyData.address) true else false
+      if (wallet.address != addManagedKeyData.address) true else false
     } catch {
       case _: Exception => true
     }

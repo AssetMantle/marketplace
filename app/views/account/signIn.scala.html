@@ -12,7 +12,7 @@
                 <div class="inputField">
                     <div class="inputFieldBody">
                         @commonLabel(constants.FormField.USERNAME.name)
-                        @commonInputText(signInForm, constants.FormField.USERNAME, Symbol("placeholder") -> "Enter Username", Symbol("autocomplete") -> "off", Symbol("id") -> "signInUsername")
+                        @commonInputText(signInForm, constants.FormField.USERNAME, Symbol("autocomplete") -> "off", Symbol("id") -> "signInUsername")
                         @commonFieldErrorMessage(id = "incorrectUsernameError", message = Messages(constants.View.INCORRECT_USERNAME))
                     </div>
                 </div>
