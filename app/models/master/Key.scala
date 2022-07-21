@@ -67,7 +67,7 @@ object Keys {
 
   class KeyTable(tag: Tag) extends Table[KeySerialized](tag, "Key") with ModelTable2[String, String] {
 
-    def * = (accountId, address, hdPath.?, passwordHash.?, salt, iterations, encryptedPrivateKey.?, partialMnemonics.?, name.?, retryCounter, active, backupUsed, verified.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (KeySerialized.tupled, KeySerialized.unapply)
+    def * = (accountId, address, hdPath.?, passwordHash, salt, iterations, encryptedPrivateKey.?, partialMnemonics.?, name.?, retryCounter, active, backupUsed, verified.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (KeySerialized.tupled, KeySerialized.unapply)
 
     def accountId = column[String]("accountId", O.PrimaryKey)
 
@@ -75,7 +75,7 @@ object Keys {
 
     def hdPath = column[String]("hdPath")
 
-    def passwordHash = column[Array[Byte]]("passwordHash")
+    def passwordHash = column[Option[Array[Byte]]]("passwordHash")
 
     def salt = column[Array[Byte]]("salt")
 
@@ -136,12 +136,12 @@ class Keys @Inject()(
         accountId = accountId,
         address = address,
         hdPath = Option(hdPath),
-        passwordHash = None,
+        passwordHash = Option(Array[Byte]()),
         salt = salt,
         iterations = constants.Security.DefaultIterations,
         partialMnemonics = Option(partialMnemonics),
         name = Option(name),
-        encryptedPrivateKey = None,
+        encryptedPrivateKey = Option(Array[Byte]()),
         retryCounter = retryCounter,
         active = active,
         backupUsed = backupUsed,
