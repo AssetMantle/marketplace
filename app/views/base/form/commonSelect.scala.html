@@ -4,8 +4,8 @@
 
 @(formData: Form[_], formField: SelectFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialFormField: Option[Field] = None)
 
-<div id='@arguments.toMap.get('containerDivID).map(_.toString).getOrElse("")' class='@arguments.toMap.get('containerDivClass).map(_.toString).getOrElse("commonSelect")'>
-@defining(Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input", '_default -> Messages(formField.name))) { defaultArguments =>
+<div id='@arguments.toMap.get(Symbol("containerDivID")).map(_.toString).getOrElse("")' class='@arguments.toMap.get(Symbol("containerDivClass")).map(_.toString).getOrElse("commonSelect")'>
+@defining(Seq(Symbol("_label") -> Messages(formField.name), Symbol("placeholder") -> Messages(formField.placeHolder), Symbol("class") -> "cmuk-input", Symbol("_default") -> Messages(formField.name))) { defaultArguments =>
     @defining(
         sequentialFormField match {
             case Some(sequentialField: Field) => {
@@ -24,7 +24,7 @@
                 nestedFormField match {
                     case Some(field: NestedFormField) => {
                         //This case handles nested fields. See AddOrganization for example.
-                        formData(Seq(field.name, formField.name).mkString("../../../../public"))
+                        formData(Seq(field.name, formField.name).mkString("."))
                     }
                     case None => {
                         //This case handles generic fields.
@@ -34,7 +34,7 @@
             }
         }
     ) { field =>
-        @select(if(arguments.toMap.get('value).map(_.toString).isDefined) field.copy(value = arguments.toMap.get('value).map(_.toString)) else field, for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
+        @select(if(arguments.toMap.get(Symbol("value")).map(_.toString).isDefined) field.copy(value = arguments.toMap.get(Symbol("value")).map(_.toString)) else field, for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
     }
 }
 </div>

@@ -6,7 +6,7 @@ import play.api.data.Forms.mapping
 object SignOut {
   val form: Form[Data] = Form(
     mapping(
-      constants.FormField.RECEIVE_NOTIFICATIONS.name -> constants.FormField.RECEIVE_NOTIFICATIONS.field,
+      constants.FormField.RECEIVE_NOTIFICATIONS.mapping,
     )(Data.apply)(Data.unapply)
   )
 

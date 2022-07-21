@@ -33,8 +33,8 @@ object Accounts {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class AccountSerialized(id: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, language: String, accountType: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
-    def deserialize: Account = Account(id = id, passwordHash = passwordHash, salt = salt, iterations = iterations, language = Lang(language), accountType = accountType, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class AccountSerialized(id: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, accountType: String, language: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
+    def deserialize: Account = Account(id = id, passwordHash = passwordHash, salt = salt, iterations = iterations, accountType = accountType, language = Lang(language), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account") with ModelTable[String] {
@@ -85,25 +85,17 @@ class Accounts @Inject()(
 
   object Service {
 
-    def add(username: String, password: String, language: Lang, accountType: String): Future[Unit] = {
-      val salt = utilities.Secrets.getNewSalt
+    def add(username: String, language: Lang, accountType: String): Future[Unit] = {
       val account = Account(
         id = username,
-        passwordHash = utilities.Secrets.hashPassword(password = password, salt = salt, iterations = constants.Security.DefaultIterations),
-        salt = salt,
-        iterations = constants.Security.DefaultIterations,
+        passwordHash = Array[Byte](),
+        salt = Array[Byte](),
+        iterations = 0,
         language = language,
         accountType = accountType)
       for {
         _ <- create(account.serialize())
       } yield ()
-    }
-
-    def validateUsernamePasswordAndGetAccount(username: String, password: String): Future[(Boolean, Account)] = {
-      val account = tryGetById(username)
-      for {
-        account <- account
-      } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = account.passwordHash, salt = account.salt, iterations = account.iterations), account.deserialize)
     }
 
     def validateAndUpdatePassword(username: String, oldPassword: String, newPassword: String): Future[Unit] = {

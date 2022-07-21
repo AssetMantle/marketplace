@@ -20,8 +20,8 @@ object Form {
   val FORGET_PASSWORD = new Form("FORGET_PASSWORD", routes.javascript.AccountController.forgetPasswordForm, routes.AccountController.forgetPassword())
   val SIGN_OUT = new Form("SIGN_OUT", routes.javascript.AccountController.signOutForm, routes.AccountController.signOut())
 
-  val MANAGED_ADDRESS = new Form("MANAGED_ADDRESS", routes.javascript.ProfileController.managedAddressForm, routes.ProfileController.managedAddress())
-  val UNMANAGED_ADDRESS = new Form("UNMANAGED_ADDRESS", routes.javascript.ProfileController.unmanagedAddressForm, routes.ProfileController.unmanagedAddress())
-  val CHANGE_WALLET_NAME = new Form("CHANGE_WALLET_NAME", routes.javascript.ProfileController.changeWalletNameForm, routes.ProfileController.changeWalletName())
+  val ADD_MANAGED_KEY = new Form("ADD_MANAGED_KEY", routes.javascript.ProfileController.addManagedKeyForm, routes.ProfileController.addManagedKey())
+  val ADD_UNMANAGED_KEY = new Form("ADD_UNMANAGED_KEY", routes.javascript.ProfileController.addUnmanagedKeyForm, routes.ProfileController.addUnmanagedKey())
+  val CHANGE_KEY_NAME = new Form("CHANGE_KEY_NAME", routes.javascript.ProfileController.changeKeyNameForm, routes.ProfileController.changeKeyName())
   val VIEW_MNEMONICS_PASSWORD_INPUT = new Form("VIEW_MNEMONICS_PASSWORD_INPUT", routes.javascript.ProfileController.viewMnemonicsPasswordInputForm, routes.ProfileController.viewMnemonicsPasswordInput())
 }

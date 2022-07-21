@@ -2,6 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.result.WithUsernameToken
+import exceptions.BaseException
 import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
@@ -21,7 +22,7 @@ class ProfileController @Inject()(
                                    withoutLoginActionAsync: WithoutLoginActionAsync,
                                    withoutLoginAction: WithoutLoginAction,
                                    masterAccounts: master.Accounts,
-                                   masterWallets: master.Wallets,
+                                   masterKeys: master.Keys,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                    masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                                    withUsernameToken: WithUsernameToken,
@@ -33,76 +34,131 @@ class ProfileController @Inject()(
 
   private implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
 
-  def viewSettings(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
+  def viewProfile(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.profile.viewSettings()))
-    }
-  }
-  def settingsPage(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginAction { implicit request =>
-      Ok(views.html.profile.user.settingsPage())
+        implicit val optionalLoginState: Option[LoginState] = Option(loginState)
+        Future(Ok(views.html.profile.viewProfile()))
     }
   }
 
-  def addNewWallet(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.profile.addNewWallet())
+  def settings(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val keys = masterKeys.Service.getAll(loginState.username)
+        (for {
+          keys <- keys
+        } yield Ok(views.html.profile.settings(keys))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
   }
 
-  // GET Request
-  def managedAddressForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.profile.managedAddress())
-//    Ok(views.html.profile.walletAddSuccess())
-//    Ok(views.html.profile.viewMnemonicsSeedPhrase())
+  def addNewKey(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.addNewKey())
   }
 
-  // POST Request
-  def managedAddress: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def addManagedKeyForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.addManagedKey())
+  }
+
+  def addManagedKey(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      ManagedAddress.form.bindFromRequest().fold(
+      AddManagedKey.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.managedAddress(formWithErrors)))
+          Future(BadRequest(views.html.profile.addManagedKey(formWithErrors)))
         },
-        managedAddressData => {
-          Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
+        addManagedKeyData => {
+          val wallet = utilities.Wallet.getWallet(addManagedKeyData.seeds.split(" "))
+          val validatePassword = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = addManagedKeyData.password)
+
+          def validateAndAdd(validatePassword: Boolean) = if (validatePassword && wallet.address == addManagedKeyData.address) {
+            masterKeys.Service.add(
+              accountId = loginState.username,
+              address = wallet.address,
+              hdPath = Option(wallet.hdPath),
+              password = addManagedKeyData.password,
+              privateKey = Option(wallet.privateKey),
+              partialMnemonics = Option(wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown)),
+              name = addManagedKeyData.keyName,
+              retryCounter = 0,
+              backupUsed = true,
+              active = false,
+              verified = Option(true)
+            )
+          } else constants.Response.INVALID_SEEDS_OR_ADDRESS.throwFutureBaseException()
+
+          (for {
+            (validatePassword, _) <- validatePassword
+            _ <- validateAndAdd(validatePassword)
+          } yield PartialContent(views.html.profile.keyAddedOrUpdatedSuccessfully(address = wallet.address, name = addManagedKeyData.keyName))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.profile.addManagedKey(AddManagedKey.form.withGlobalError(baseException.failure.message)))
+          }
         }
       )
   }
 
-  // GET Request
-  def unmanagedAddressForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.profile.unmanagedAddress())
+  def addUnmanagedKeyForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.addUnmanagedKey())
   }
-  // POST Request
-  def unmanagedAddress: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+
+  def addUnmanagedKey(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      UnmanagedAddress.form.bindFromRequest().fold(
+      AddUnmanagedKey.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.unmanagedAddress(formWithErrors)))
+          Future(BadRequest(views.html.profile.addUnmanagedKey(formWithErrors)))
         },
-        unmanagedAddressData => {
-          Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
+        addUnmanagedKeyData => {
+          val validatePassword = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = addUnmanagedKeyData.password)
+
+          def validateAndAdd(validatePassword: Boolean) = if (validatePassword) {
+            masterKeys.Service.add(
+              accountId = loginState.username,
+              address = addUnmanagedKeyData.address,
+              hdPath = None,
+              password = addUnmanagedKeyData.password,
+              privateKey = None,
+              partialMnemonics = None,
+              name = addUnmanagedKeyData.keyName,
+              retryCounter = 0,
+              backupUsed = true,
+              active = false,
+              verified = Option(true)
+            )
+          } else constants.Response.INVALID_SEEDS_OR_ADDRESS.throwFutureBaseException()
+
+          (for {
+            (validatePassword, _) <- validatePassword
+            _ <- validateAndAdd(validatePassword)
+          } yield PartialContent(views.html.profile.keyAddedOrUpdatedSuccessfully(address = addUnmanagedKeyData.address, name = addUnmanagedKeyData.keyName))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.profile.addManagedKey(AddManagedKey.form.withGlobalError(baseException.failure.message)))
+          }
         }
       )
   }
 
-  // GET Request
-  def changeWalletNameForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.profile.changeWalletName())
+  def changeKeyNameForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.changeKeyName())
   }
 
-  // POST Request
-  def changeWalletName: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def changeKeyName: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      ChangeWalletName.form.bindFromRequest().fold(
+      ChangeKeyName.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.changeWalletName(formWithErrors)))
+          Future(BadRequest(views.html.profile.changeKeyName(formWithErrors)))
         },
-        changeWalletNameData => {
-          Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
-        }
-      )
-  }
+        changeKeyNameData => {
+          val update = masterKeys.Service.updateKeyName(accountId = loginState.username, address = changeKeyNameData.address, keyName = changeKeyNameData.keyName)
+
+          (for {
+            _ <- update
+          } yield PartialContent(views.html.profile.keyAddedOrUpdatedSuccessfully(address = changeKeyNameData.address, name = changeKeyNameData.keyName))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.profile.addManagedKey(AddManagedKey.form.withGlobalError(baseException.failure.message)))
+          }
 
   // GET Request
   def viewMnemonicsPasswordInputForm(): Action[AnyContent] = withoutLoginAction { implicit request =>

@@ -1,0 +1,8 @@
+@import views.profile.companion.ChangeKeyName
+@import views.html.base.form._
+
+@(changeWalletNameForm: Form[ChangeKeyName.Data] = ChangeKeyName.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.CHANGE_KEY_NAME, changeWalletNameForm) {
+    <div>Test</div>
+}

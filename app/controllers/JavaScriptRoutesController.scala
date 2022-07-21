@@ -38,15 +38,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.details,
         routes.javascript.NFTController.file,
 
-        routes.javascript.ProfileController.viewSettings,
-        routes.javascript.ProfileController.settingsPage,
-        routes.javascript.ProfileController.addNewWallet,
-        routes.javascript.ProfileController.managedAddressForm,
-        routes.javascript.ProfileController.managedAddress,
-        routes.javascript.ProfileController.unmanagedAddressForm,
-        routes.javascript.ProfileController.unmanagedAddress,
-        routes.javascript.ProfileController.changeWalletNameForm,
-        routes.javascript.ProfileController.changeWalletName,
+        routes.javascript.ProfileController.viewProfile,
+        routes.javascript.ProfileController.settings,
+        routes.javascript.ProfileController.addNewKey,
+        routes.javascript.ProfileController.addManagedKeyForm,
+        routes.javascript.ProfileController.addUnmanagedKeyForm,
+        routes.javascript.ProfileController.changeKeyNameForm,
+
         routes.javascript.ProfileController.viewMnemonicsPasswordInputForm,
         routes.javascript.ProfileController.viewMnemonicsPasswordInput,
 

@@ -22,7 +22,6 @@ class CollectionController @Inject()(
                                       withoutLoginActionAsync: WithoutLoginActionAsync,
                                       withLoginActionAsync: WithLoginActionAsync,
                                       masterAccounts: master.Accounts,
-                                      masterWallets: master.Wallets,
                                       masterCollections: master.Collections,
                                       masterNFTs: master.NFTs,
                                       masterCollectionFiles: master.CollectionFiles,

@@ -7,56 +7,56 @@
 # GET        /                                           controllers.HomeController.index()
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)
-GET         /javascriptRoutes                  controllers.JavaScriptRoutesController.javascriptRoutes
-GET         /firebase-messaging-sw.js          controllers.Assets.at(path="/public/javascripts/firebase", file="firebase-messaging-sw.js")
+GET         /assets/*file                    controllers.Assets.versioned(path="/public", file: Asset)
+GET         /javascriptRoutes                controllers.JavaScriptRoutesController.javascriptRoutes
+GET         /firebase-messaging-sw.js        controllers.Assets.at(path="/public/javascripts/firebase", file="firebase-messaging-sw.js")
 
 # Home
-GET         /                                  controllers.IndexController.index()
+GET         /                                controllers.IndexController.index()
 
-GET         /signUp                            controllers.AccountController.signUpForm()
-POST        /signUp                            controllers.AccountController.signUp()
+GET         /signUp                          controllers.AccountController.signUpForm()
+POST        /signUp                          controllers.AccountController.signUp()
 
-GET         /checkUsernameAvailable            controllers.AccountController.checkUsernameAvailable(username: String)
+GET         /checkUsernameAvailable          controllers.AccountController.checkUsernameAvailable(username: String)
 
-GET         /verifyWalletMnemonicso            controllers.AccountController.verifyWalletMnemonicsForm()
-POST        /verifyWalletMnemonics             controllers.AccountController.verifyWalletMnemonics()
+GET         /verifyWalletMnemonicso          controllers.AccountController.verifyWalletMnemonicsForm()
+POST        /verifyWalletMnemonics           controllers.AccountController.verifyWalletMnemonics()
 
-GET         /signIn                            controllers.AccountController.signInForm()
-POST        /signIn                            controllers.AccountController.signIn()
+GET         /signIn                          controllers.AccountController.signInForm()
+POST        /signIn                          controllers.AccountController.signIn()
 
-GET         /signOut                           controllers.AccountController.signOutForm()
-POST        /signOut                           controllers.AccountController.signOut()
+GET         /signOut                         controllers.AccountController.signOutForm()
+POST        /signOut                         controllers.AccountController.signOut()
 
-GET         /forgetPassword                    controllers.AccountController.forgetPasswordForm()
-POST        /forgetPassword                    controllers.AccountController.forgetPassword()
+GET         /forgetPassword                  controllers.AccountController.forgetPasswordForm()
+POST        /forgetPassword                  controllers.AccountController.forgetPassword()
 
-GET         /collections                       controllers.CollectionController.viewCollections()
-GET         /collection/:id                    controllers.CollectionController.viewCollection(id: String)
-GET         /collectionsList                   controllers.CollectionController.collectionsList()
-GET         /collectionsPerPage                controllers.CollectionController.collectionsPerPage(pageNumber: Int)
-GET         /collectionNFTs                    controllers.CollectionController.collectionNFTs(id: String)
-GET         /collectionFile                    controllers.CollectionController.collectionFile(id: String, documentType:String, compress: Boolean)
-GET         /collectionInfo                    controllers.CollectionController.info(id: String)
+GET         /collections                     controllers.CollectionController.viewCollections()
+GET         /collection/:id                  controllers.CollectionController.viewCollection(id: String)
+GET         /collectionsList                 controllers.CollectionController.collectionsList()
+GET         /collectionsPerPage              controllers.CollectionController.collectionsPerPage(pageNumber: Int)
+GET         /collectionNFTs                  controllers.CollectionController.collectionNFTs(id: String)
+GET         /collectionFile                  controllers.CollectionController.collectionFile(id: String, documentType:String, compress: Boolean)
+GET         /collectionInfo                  controllers.CollectionController.info(id: String)
 
-GET         /nft/:nftId                        controllers.NFTController.viewNFT( nftId: String)
-GET         /nftDetails                        controllers.NFTController.details( nftId: String)
-GET         /nftInfo                           controllers.NFTController.info( nftId: String)
-GET         /nftFile                           controllers.NFTController.file( nftId: String)
+GET         /nft/:nftId                      controllers.NFTController.viewNFT( nftId: String)
+GET         /nftDetails                      controllers.NFTController.details( nftId: String)
+GET         /nftInfo                         controllers.NFTController.info( nftId: String)
+GET         /nftFile                         controllers.NFTController.file( nftId: String)
 
-GET         /settings                          controllers.ProfileController.viewSettings()
-GET         /settingsPage                      controllers.ProfileController.settingsPage()
+GET         /profile                         controllers.ProfileController.viewProfile()
+GET         /settings                        controllers.ProfileController.settings()
 
-GET         /addNewWallet                      controllers.ProfileController.addNewWallet()
+GET         /addNewKey                       controllers.ProfileController.addNewKey()
 
-GET         /profileManagedAddress             controllers.ProfileController.managedAddressForm()
-POST        /profileManagedAddress             controllers.ProfileController.managedAddress()
+GET         /addManagedKey                   controllers.ProfileController.addManagedKeyForm()
+POST        /addManagedKey                   controllers.ProfileController.addManagedKey()
 
-GET         /profileUnmanagedAddress           controllers.ProfileController.unmanagedAddressForm()
-POST        /profileUnmanagedAddress           controllers.ProfileController.unmanagedAddress()
+GET         /addUnmanagedKey                 controllers.ProfileController.addUnmanagedKeyForm()
+POST        /addUnmanagedKey                 controllers.ProfileController.addUnmanagedKey()
 
-GET         /changeWalletName                  controllers.ProfileController.changeWalletNameForm()
-POST        /changeWalletName                  controllers.ProfileController.changeWalletName()
+GET         /changeKeyName                   controllers.ProfileController.changeKeyNameForm()
+POST        /changeKeyName                   controllers.ProfileController.changeKeyName()
 
 GET         /viewMnemonicsPasswordInput        controllers.ProfileController.viewMnemonicsPasswordInputForm()
 POST        /viewMnemonicsPasswordInput        controllers.ProfileController.viewMnemonicsPasswordInput()
