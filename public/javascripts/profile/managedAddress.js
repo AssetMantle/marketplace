@@ -116,3 +116,8 @@ function showHideSeed(){
         $(".openEye").addClass("hidden");
     }
 }
+
+// Enable Disclaimer Button
+$("#acceptPolicy").click(function (){
+   $("#disclaimerButton").toggleClass("disable");
+});

@@ -2,8 +2,9 @@
 @import views.html.base.form._
 
 @(unmanagedAddressForm: Form[AddUnmanagedKey.Data] = AddUnmanagedKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
 @commonForm(constants.Form.ADD_UNMANAGED_KEY, unmanagedAddressForm) {
-    <div id="newUnmanagedAddressScreen">
+    <div id="newUnmanagedAddressScreen" class="mb-0">
         <div class="modal-body">
             <div class="mb-3">
                 <div class="inputField">

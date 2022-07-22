@@ -44,10 +44,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.addManagedKeyForm,
         routes.javascript.ProfileController.addUnmanagedKeyForm,
         routes.javascript.ProfileController.changeKeyNameForm,
-
-        routes.javascript.ProfileController.viewMnemonicsPasswordInputForm,
-        routes.javascript.ProfileController.viewMnemonicsPasswordInput,
-
+        routes.javascript.ProfileController.viewMnemonicsForm,
+        routes.javascript.ProfileController.deleteAccountForm,
       )
     ).as("text/javascript")
 

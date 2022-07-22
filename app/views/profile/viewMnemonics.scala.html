@@ -1,0 +1,16 @@
+@import views.profile.companion.ViewMnemonics
+@import views.html.base.form._
+
+@(viewMnemonicsForm: Form[ViewMnemonics.Data] = ViewMnemonics.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
+@commonForm(constants.Form.VIEW_MNEMONICS, viewMnemonicsForm) {
+    <div class="modal-body">
+        <div class="mb-3">
+            <div class="inputField">
+                <div class="inputFieldBody">
+                    @commonInputText(viewMnemonicsForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off")
+                </div>
+            </div>
+        </div>
+    </div>
+}

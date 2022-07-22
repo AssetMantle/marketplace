@@ -24,3 +24,16 @@ $('.walletInformation input').on('change', function() {
     $(".walletInfoField").removeClass("active");
     let parent = $(this).parents('.walletInfoField').last().addClass("active");
 });
+
+// Copy to Clipboard
+function copyToClipboard(e) {
+    var element = $(e).next('.form-copy-message');
+    var copyText = $(e).prevAll('.username-data');
+
+    element.addClass("active");
+    element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function () {
+        element.removeClass('active');
+    });
+
+    navigator.clipboard.writeText(copyText.text());
+}

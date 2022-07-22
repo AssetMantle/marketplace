@@ -1,4 +1,5 @@
 @(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
 <div class="profileSettingsContainer">
     <div class="title">@Messages(constants.View.PROFILE_SETTINGS_TITLE)</div>
     <div class="subTitle">@Messages(constants.View.PROFILE_SETTINGS_SUBTITLE)</div>
@@ -16,8 +17,9 @@
         </div>
         <div class="d-flex flex-row align-items-center flex-wrap walletInfoField">
             <div class=" pe-2 fieldLabel">@Messages(constants.View.PROFILE_IDENTITY_ADDRESS)</div>
-            <div class=" fieldValue">mantle10...x0k7tfhd4hm4hg</div>
-            <div class="m-0 ms-2 mt-2 mt-xl-0 mt-md-2 iconContainer"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
+            <div class=" fieldValue username-data">mantle10...x0k7tfhd4hm4hg</div>
+            <div class="m-0 ms-2 mt-2 mt-xl-0 mt-md-2 iconContainer" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
+            <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
         </div>
     </div>
     <div class="walletInformation">
@@ -26,8 +28,9 @@
         <div class="walletInfoField active">
             <div class="pe-2 mb-2 fieldLabel"><label for="walletAddress1">Lorem Ipsum 1</label></div>
             <div class="d-flex flex-row align-items-center flex-wrap">
-                <div class="fieldValue"><label for="walletAddress1">mantle10...x0k7tfhd4hm4hg</label></div>
-                <div class="pe-2 m-0 ms-2 iconContainer"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
+                <div class="fieldValue username-data"><label for="walletAddress1">mantle10...x0k7tfhd4hm4hg</label></div>
+                <div class="pe-2 m-0 ms-2 iconContainer" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
+                <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
                 <div class="ms-xl-auto ms-lg-3 ms-3 mt-2 mt-xl-0 mt-lg-2">
                     <div class="d-flex flex-row justify-content-between align-items-center walletAddressItem">
                         <input type="radio" name="walletAddress" id="walletAddress1" checked/>
@@ -35,9 +38,9 @@
                             <img src="@routes.Assets.versioned("images/icon/kebabMenuYellow.png")" class="ms-3" width="6px" height="20px"/>
                             <span class="tooltiptext">
                                 <div class="menuOption">
-                                    <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
-                                    <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
-                                    <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
+                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.viewMnemonicsForm())">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
+                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.changeKeyNameForm())">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
+                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.deleteAccountForm())">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
                                 </div>
                             </span>
                         </div>
@@ -49,8 +52,9 @@
         <div class="walletInfoField">
             <div class="pe-2 mb-2 fieldLabel"><label for="walletAddress2">Lorem Ipsum 2</label></div>
             <div class="d-flex flex-row align-items-center flex-wrap">
-                <div class="fieldValue"><label for="walletAddress2">mantle10...x0k7tfhd4hm4hg</label></div>
-                <div class="pe-2 m-0 ms-2 iconContainer"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
+                <div class="fieldValue username-data"><label for="walletAddress2">mantle10...x0k7tfhd4hm4hg</label></div>
+                <div class="pe-2 m-0 ms-2 iconContainer" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
+                <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
                 <div class="ms-xl-auto ms-lg-3 ms-3 mt-2 mt-xl-0 mt-lg-2">
                     <div class="d-flex flex-row walletAddressItem">
                         <input type="radio" name="walletAddress" id="walletAddress2"/>
@@ -71,8 +75,9 @@
         <div class="walletInfoField">
             <div class="pe-2 mb-2 fieldLabel">Lorem Ipsum 3</div>
             <div class="d-flex flex-row align-items-center flex-wrap">
-                <div class="fieldValue"><label>mantle10...x0k7tfhd4hm4hg</label></div>
-                <div class="pe-2 m-0 ms-2 iconContainer"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
+                <div class="fieldValue username-data"><label>mantle10...x0k7tfhd4hm4hg</label></div>
+                <div class="pe-2 m-0 ms-2 iconContainer" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
+                <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
                 <div class="ms-xl-auto ms-lg-3 ms-3 mt-2 mt-xl-0 mt-lg-2">
                     <div class="d-flex flex-row walletAddressItem">
                         <div class="me-3 iconContainer menuToolTip">

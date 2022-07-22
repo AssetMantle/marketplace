@@ -58,5 +58,8 @@ POST        /addUnmanagedKey                 controllers.ProfileController.addUn
 GET         /changeKeyName                   controllers.ProfileController.changeKeyNameForm()
 POST        /changeKeyName                   controllers.ProfileController.changeKeyName()
 
-GET         /viewMnemonicsPasswordInput        controllers.ProfileController.viewMnemonicsPasswordInputForm()
-POST        /viewMnemonicsPasswordInput        controllers.ProfileController.viewMnemonicsPasswordInput()
+GET         /viewMnemonics                   controllers.ProfileController.viewMnemonicsForm()
+POST        /viewMnemonics                   controllers.ProfileController.viewMnemonics()
+
+GET         /deleteAccount                   controllers.ProfileController.deleteAccountForm()
+POST        /deleteAccount                   controllers.ProfileController.deleteAccount()

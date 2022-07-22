@@ -1,6 +1,7 @@
 @import views.html.base.forms._
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
 <div class="modal-header">
     <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.VIEW_MNEMONICS_SEED_PHRASE_TITLE)</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
@@ -57,6 +58,11 @@
         mnemonicsLayout += `</div>`;
         $(".seedsSection").append(mnemonicsLayout);
         mnemonicsLayout = "";
+    }
+
+    allSeeds = $('.mnemonicValue');
+    for(i=1; i<=4; i++){
+        $(allSeeds[allSeeds.length-i]).attr("value","*****");
     }
 
     function showHideSeed(){

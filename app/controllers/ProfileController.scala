@@ -159,22 +159,40 @@ class ProfileController @Inject()(
             ).recover {
             case baseException: BaseException => BadRequest(views.html.profile.addManagedKey(AddManagedKey.form.withGlobalError(baseException.failure.message)))
           }
-
-  // GET Request
-  def viewMnemonicsPasswordInputForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.profile.viewMnemonicsPasswordInput())
+        }
+      )
   }
 
-  // POST Request
-  def viewMnemonicsPasswordInput: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def viewMnemonicsForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.viewMnemonics())
+  }
+
+  def viewMnemonics: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      ViewMnemonicsPasswordInput.form.bindFromRequest().fold(
+      ViewMnemonics.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.viewMnemonicsPasswordInput(formWithErrors)))
+          Future(BadRequest(views.html.profile.viewMnemonics(formWithErrors)))
         },
-        viewMnemonicsSeedPhraseData => {
+        viewMnemonicsData => {
           Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
         }
       )
   }
+
+  def deleteAccountForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.deleteAccount())
+  }
+
+  def deleteAccount: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      DeleteAccount.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.profile.deleteAccount(formWithErrors)))
+        },
+        deleteAccountData => {
+          Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
+        }
+      )
+  }
+
 }

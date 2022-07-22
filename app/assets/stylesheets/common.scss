@@ -82,3 +82,37 @@
     }
   }
 }
+
+// Tooltip
+.form-copy-message.active{
+  animation: msg-copied 2s ease-in-out forwards;
+}
+.form-copy-message{
+  margin-left:5px;
+  font-size: 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: var(--popup-bg);
+  color: var(--inactive-gray);
+  position: relative;
+  top: 10px;
+  opacity: 0;
+}
+@keyframes msg-copied {
+  0%{
+    top:10px;
+    opacity: 0;
+  }
+  20%{
+    top:0px;
+    opacity: 1;
+  }
+  80%{
+    top:0px;
+    opacity: 1;
+  }
+  100%{
+    top:-10px;
+    opacity: 0;
+  }
+}

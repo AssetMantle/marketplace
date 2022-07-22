@@ -24,6 +24,10 @@ $("#walletBackDrop").click(function (){
     $("#walletPopup").removeClass("active");
     $("#walletBackDrop").removeClass("active");
     $("body").removeClass("modal-open");
+    setTimeout(()=>{
+        $("#walletMenu").removeClass("open");
+        $("#addressBook").removeClass("open");
+    },200);
 });
 
 // Open wallet menu
@@ -44,26 +48,6 @@ $("#addressBookOpenBtn").click(function(){
 // Close Address Book
 $("#addressBookCloseBtn").click(function(){
     $("#addressBook").removeClass("open");
-});
-
-// Open New Address Option
-$("#newAddressOptionOpenBtn").click(function(){
-    $("#newAddressOption").addClass("open");
-});
-
-// Close New Address Option
-$("#newAddressOptionCloseBtn").click(function(){
-    $("#newAddressOption").removeClass("open");
-});
-
-// Open New Address Form
-$("#newAddressFormOpenBtn").click(function(){
-    $("#newAddressForm").addClass("open");
-});
-
-// Close New Address Form
-$("#newAddressFormCloseBtn").click(function(){
-    $("#newAddressForm").removeClass("open");
 });
 
 function showOptions(current)

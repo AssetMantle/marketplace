@@ -156,7 +156,7 @@ body.modal-open::-webkit-scrollbar{
 
 // Recovery Phrase
 .form-copy-item{
-  @include setFont(var(--font-type-2), normal, 700, 14px, 22px, var(--text-medium));
+  @include setFont(var(--font-type-2), normal, 700, 14px, 22px, var(--inactive-gray));
   text-transform: capitalize;
 }
 
