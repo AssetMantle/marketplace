@@ -46,6 +46,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.addManagedKeyForm,
         routes.javascript.ProfileController.addUnmanagedKeyForm,
         routes.javascript.ProfileController.changeKeyNameForm,
+        routes.javascript.ProfileController.changeManagedToUnmanagedForm,
 
       )
     ).as("text/javascript")

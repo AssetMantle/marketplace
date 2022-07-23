@@ -62,3 +62,6 @@ POST        /addUnmanagedKey                 controllers.ProfileController.addUn
 
 GET         /changeKeyName                   controllers.ProfileController.changeKeyNameForm(address: String)
 POST        /changeKeyName                   controllers.ProfileController.changeKeyName()
+
+GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
+POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()
