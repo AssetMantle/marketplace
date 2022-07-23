@@ -291,10 +291,10 @@ PLACEHOLDER.UNMANAGED_KEY_ADDRESS=Type address here
 FORM.CHANGE_KEY_NAME.TITLE=Change Wallet Name
 FORM.CHANGE_KEY_NAME.SUBTITLE=Enter a new name for the wallet
 FORM.CHANGE_KEY_NAME.SUBMIT=Save
-CHANGE_KEY_ADDRESS=Previous Name
-CHANGE_KEY_ADDRESS=New Name
-PLACEHOLDER.CHANGE_KEY_ADDRESS=Type previous wallet name here
-PLACEHOLDER.CHANGE_KEY_ADDRESS=Type next wallet name here
+CHANGE_KEY_ADDRESS=Address
+CHANGE_KEY_NAME=New Name
+PLACEHOLDER.CHANGE_KEY_ADDRESS=Type wallet address here
+PLACEHOLDER.CHANGE_KEY_NAME=Type new wallet name here
 
 #//View Mnemonics Seed Phrase
 FORM.VIEW_MNEMONICS.TITLE=Confirm Password

@@ -88,9 +88,9 @@ function showHideManagedModalScreen(showScreen, hideScreen, screenNo) {
                  mnemonicsList += $(this).val() + " ";
             }
         });
-        $("#mnemonicsList").val(mnemonicsList);
+        $("#mnemonicsList").attr("value", mnemonicsList);
 
-        $("#mnemonicsList").val();
+        // $("#mnemonicsList").val();
         $("#staticBackdropLabel").text("Confirm Password");
         $(".subHeading").text("Enter your password to confirm action");
         $(".toggleBtn").hide();
@@ -117,7 +117,28 @@ function showHideSeed(){
     }
 }
 
-// Enable Disclaimer Button
-$("#acceptPolicy").click(function (){
-   $("#disclaimerButton").toggleClass("disable");
+
+
+// Enable button on fill
+$(function () {
+    $('#newManagedAddressScreen').keyup(function () {
+        if ($.trim(managedKeyName.value).length && $.trim(managedKeyAddress.value).length) {
+            $("#newManagedAddressScreenBtn").removeClass("disable");
+        } else {
+            $("#newManagedAddressScreenBtn").addClass("disable");
+        }
+    });
+
+    $("#acceptPolicy").click(function (){
+        $("#disclaimerButton").toggleClass("disable");
+    });
+
+    $("#formSubmitButton .buttonPrimary").addClass("disable");
+    $("#newWalletPasswordScreen").keyup(function (){
+        if ($.trim(managedMnemonicPassword.value).length) {
+            $("#formSubmitButton .buttonPrimary").removeClass("disable");
+        } else {
+            $("#formSubmitButton .buttonPrimary").addClass("disable");
+        }
+    });
 });

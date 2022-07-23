@@ -29,6 +29,7 @@ object Response {
   val TERMS_AND_CONDITION_NOT_ACCEPTED = new Failure("TERMS_AND_CONDITION_NOT_ACCEPTED")
   val USERNAME_UNAVAILABLE = new Failure("USERNAME_UNAVAILABLE")
   val PASSWORD_VALIDATION_FAILED = new Failure("PASSWORD_VALIDATION_FAILED")
+  val OLD_AND_NEW_SAME_PASSWORD = new Failure("OLD_AND_NEW_SAME_PASSWORD")
   val INVALID_SEEDS_OR_ADDRESS = new Failure("INVALID_SEEDS_OR_ADDRESS")
   val MNEMONICS_LENGTH_NOT_12_OR_24 = new Failure("MNEMONICS_LENGTH_NOT_12_OR_24")
 
@@ -44,7 +45,7 @@ object Response {
   val INVALID_HRP_OR_BYTES = new Failure("INVALID_HRP_OR_BYTES")
   val INVALID_MNEMONICS = new Failure("INVALID_MNEMONICS")
   val INVALID_MNEMONICS_OR_USERNAME = new Failure("INVALID_MNEMONICS_OR_USERNAME")
-  val INVALID_ACTIVE_WALLET = new Failure("INVALID_ACTIVE_WALLET")
+  val INVALID_ACTIVE_KEY = new Failure("INVALID_ACTIVE_KEY")
 
   val IPFS_UPLOAD_FAILED = new Failure("IPFS_UPLOAD_FAILED")
   val ERROR_DOWNLOADING_IPFS_FILE = new Failure("ERROR_DOWNLOADING_IPFS_FILE")
@@ -77,6 +78,7 @@ object Response {
   val INVALID_SEEDS = new Failure("INVALID_SEEDS")
   val INVALID_KEY_NAME = new Failure("INVALID_KEY_NAME")
   val INVALID_PASSWORD_OR_SEEDS = new Failure("INVALID_PASSWORD_OR_SEEDS")
+  val HD_PATH_NOT_FOUND = new Failure("HD_PATH_NOT_FOUND")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

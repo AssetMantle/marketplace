@@ -8,9 +8,19 @@
         <div class="mb-3">
             <div class="inputField">
                 <div class="inputFieldBody">
-                @commonInputText(deleteAccountForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off")
+                @commonInputPassword(deleteAccountForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off", Symbol("id") -> "deleteAccountPassword")
                 </div>
             </div>
         </div>
     </div>
 }
+<script>
+        $("#formSubmitButton .buttonPrimary").addClass("disable");
+        $("#deleteAccountPassword").keyup(function (){
+            if ($.trim(deleteAccountPassword.value).length) {
+                $("#formSubmitButton .buttonPrimary").removeClass("disable");
+            } else {
+                $("#formSubmitButton .buttonPrimary").addClass("disable");
+            }
+        });
+</script>

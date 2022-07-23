@@ -8,9 +8,19 @@
         <div class="mb-3">
             <div class="inputField">
                 <div class="inputFieldBody">
-                    @commonInputText(viewMnemonicsForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off")
+                    @commonInputPassword(viewMnemonicsForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off", Symbol("id") -> "viewMnemonicsPassword")
                 </div>
             </div>
         </div>
     </div>
 }
+<script>
+        $("#formSubmitButton .buttonPrimary").addClass("disable");
+        $("#viewMnemonicsPassword").keyup(function (){
+            if ($.trim(viewMnemonicsPassword.value).length) {
+                $("#formSubmitButton .buttonPrimary").removeClass("disable");
+            } else {
+                $("#formSubmitButton .buttonPrimary").addClass("disable");
+            }
+        });
+</script>

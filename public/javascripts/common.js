@@ -134,3 +134,32 @@ function changeSelected(parent, selectedItem){
 //         $(parent).find("input.dp-input").val($(selectedItem).attr("value"));
 //     }
 // });
+
+// Address Shorter
+var addresses = document.querySelectorAll('.username-data');
+addresses.forEach(address => {
+    $(address).text($(address).text().substr(0,8) + "..." + $(address).text().substr($(address).length - 8));
+});
+
+// Copy to Clipboard
+function copyToClipboard(e) {
+    var element = $(e).next('.form-copy-message');
+    // var copyText = $(e).prevAll('.username-data');
+    var copyText = $(e).prevAll('.username-data').attr("data-value");
+
+    element.addClass("active");
+    element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function () {
+        element.removeClass('active');
+    });
+
+    // navigator.clipboard.writeText(copyText.text());
+    navigator.clipboard.writeText(copyText);
+}
+
+$(document).click(function (e) {
+    if ($(e.target).is('#commonModal')) {
+        $(".modal-overlay").removeClass("active");
+        $(".modalContainer").removeClass("active");
+        $("body").removeClass("modal-active");
+    }
+});

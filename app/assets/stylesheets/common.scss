@@ -98,6 +98,14 @@
   top: 10px;
   opacity: 0;
 }
+@media (max-width: 1200px) {
+  .form-copy-message{
+    display: none;
+  }
+  .form-copy-message.active{
+    animation: msg-copied 2s ease-in-out forwards;
+  }
+}
 @keyframes msg-copied {
   0%{
     top:10px;

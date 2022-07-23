@@ -111,17 +111,6 @@ class Accounts @Inject()(
       } yield ()
     }
 
-    def updateOnForgotPassword(accountID: String, newPassword: String): Future[Unit] = {
-      val account = tryGetById(accountID).map(_.deserialize)
-
-      def updatePassword(account: Account) = update(account.copy(passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = account.salt, iterations = constants.Security.DefaultIterations)).serialize())
-
-      for {
-        account <- account
-        _ <- updatePassword(account)
-      } yield ()
-    }
-
     def checkUsernameAvailable(username: String): Future[Boolean] = exists(username).map(!_)
 
     def tryGet(username: String): Future[Account] = tryGetById(username).map(_.deserialize)

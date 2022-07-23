@@ -10,7 +10,7 @@
                 <div class="inputField">
                     <div class="inputFieldBody">
                         @views.html.base.label.commonLabel(constants.FormField.MANAGED_KEY_NAME.name)
-                        @commonInputText(managedAddressForm, constants.FormField.MANAGED_KEY_NAME, Symbol("autocomplete") -> "off")
+                        @commonInputText(managedAddressForm, constants.FormField.MANAGED_KEY_NAME, Symbol("autocomplete") -> "off", Symbol("id") -> "managedKeyName")
                     </div>
                 </div>
             </div>
@@ -18,13 +18,13 @@
                 <div class="inputField">
                     <div class="inputFieldBody">
                         @views.html.base.label.commonLabel(constants.FormField.MANAGED_KEY_ADDRESS.name)
-                        @commonInputText(managedAddressForm, constants.FormField.MANAGED_KEY_ADDRESS, Symbol("autocomplete") -> "off")
+                        @commonInputText(managedAddressForm, constants.FormField.MANAGED_KEY_ADDRESS, Symbol("autocomplete") -> "off", Symbol("id") -> "managedKeyAddress")
                     </div>
                 </div>
             </div>
         </div>
         <div class="form-button">
-            <button type="button" class="form-primary-button" onclick="showHideManagedModalScreen('#disclaimerScreen', '#newManagedAddressScreen', 1)">@Messages(constants.View.NEXT)</button>
+            <button type="button" id="newManagedAddressScreenBtn" class="form-primary-button disable" onclick="showHideManagedModalScreen('#disclaimerScreen', '#newManagedAddressScreen', 1)">@Messages(constants.View.NEXT)</button>
         </div>
     </div>
 
@@ -69,8 +69,8 @@
     <div id="newWalletPasswordScreen" style="display: none;">
         <div class="mb-3 inputField">
             <div class="inputFieldBody">
-                <input type="hidden" id="mnemonicsList"/>
-                @commonInputPassword(managedAddressForm, constants.FormField.PASSWORD, Symbol("id") -> "mnemonicPassword")
+                @commonInputText(managedAddressForm, constants.FormField.SEEDS, Symbol("class") -> "hidden", Symbol("id") -> "mnemonicsList")
+                @commonInputPassword(managedAddressForm, constants.FormField.PASSWORD, Symbol("id") -> "managedMnemonicPassword")
             </div>
         </div>
     </div>

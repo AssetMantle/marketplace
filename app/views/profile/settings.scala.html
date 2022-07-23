@@ -1,4 +1,6 @@
-@(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import controllers.actions.LoginState
+
+@(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
 <div class="profileSettingsContainer">
     <div class="title">@Messages(constants.View.PROFILE_SETTINGS_TITLE)</div>
@@ -7,17 +9,17 @@
         <div class="containerTitle">@Messages(constants.View.PROFILE_BASIC_INFO_TITLE)</div>
         <div class="d-flex flex-row align-items-center flex-wrap infoField">
             <div class="ps-0 ps-xl-5 pe-2 fieldLabel">@Messages(constants.View.PROFILE_USERNAME)</div>
-            <div class="flex-grow-1 fieldValue">xyz123</div>
-            <div class="me-2"><img src="@routes.Assets.versioned("images/icon/verifiedGreen.png")" class="icon"/></div>
+            <div class="flex-grow-1 fieldValue">@loginState.username</div>
+            <div class="m-0 me-2 mt-2 mt-xl-0 mt-md-2"><img src="@routes.Assets.versioned("images/icon/verifiedGreen.png")" class="icon"/></div>
         </div>
         <div class="d-flex flex-row align-items-center flex-wrap infoField">
             <div class="ps-0 ps-xl-5 pe-2 fieldLabel">@Messages(constants.View.PROFILE_PASSWORD)</div>
-            <div id="userPassword" class="flex-grow-1 fieldValue">xyz123</div>
-            <div class="me-2 m-0 iconContainer"><img src="@routes.Assets.versioned("images/icon/edit.png")" class="icon"/></div>
+            <div id="userPassword" class="flex-grow-1 fieldValue">@constants.View.PROFILE_PASSWORD</div>
+            <div class="m-0 me-2 mt-2 mt-xl-0 mt-md-2 iconContainer" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CHANGE_PASSWORD.get, ""))"><img src="@routes.Assets.versioned("images/icon/edit.png")" class="icon"/></div>
         </div>
         <div class="d-flex flex-row align-items-center flex-wrap walletInfoField">
             <div class=" pe-2 fieldLabel">@Messages(constants.View.PROFILE_IDENTITY_ADDRESS)</div>
-            <div class=" fieldValue username-data">mantle10...x0k7tfhd4hm4hg</div>
+            <div class=" fieldValue username-data" data-value="@keys.find(_.active).fold(Messages(constants.View.ACTIVE_ADDRESS_NOT_FOUND))(_.address)">@keys.find(_.active).fold(Messages(constants.View.ACTIVE_ADDRESS_NOT_FOUND))(_.address)</div>
             <div class="m-0 ms-2 mt-2 mt-xl-0 mt-md-2 iconContainer" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
             <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
         </div>
@@ -25,15 +27,21 @@
     <div class="walletInformation">
         <div class="containerTitle">@Messages(constants.View.PROFILE_WALLET_DETAIL_TITLE)</div>
             <!-- Single Address Start -->
+
+        @keys.zipWithIndex.map { case (key, index) =>
         <div class="walletInfoField active">
-            <div class="pe-2 mb-2 fieldLabel"><label for="walletAddress1">Lorem Ipsum 1</label></div>
+            <div class="pe-2 mb-2 fieldLabel"><label for="walletAddress1">@key.name.getOrElse("")</label></div>
             <div class="d-flex flex-row align-items-center flex-wrap">
-                <div class="fieldValue username-data"><label for="walletAddress1">mantle10...x0k7tfhd4hm4hg</label></div>
+                <div class="fieldValue username-data" data-value="@key.address"><label for="walletAddress1">@key.address</label></div>
                 <div class="pe-2 m-0 ms-2 iconContainer" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
                 <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
                 <div class="ms-xl-auto ms-lg-3 ms-3 mt-2 mt-xl-0 mt-lg-2">
                     <div class="d-flex flex-row justify-content-between align-items-center walletAddressItem">
-                        <input type="radio" name="walletAddress" id="walletAddress1" checked/>
+                        @if(key.active) {
+                            <input type="radio" name="walletAddress" id="walletAddress1" checked/>
+                        } else {
+                            <input type="radio" name="walletAddress" id="walletAddress2"/>
+                        }
                         <div class="me-3 iconContainer menuToolTip">
                             <img src="@routes.Assets.versioned("images/icon/kebabMenuYellow.png")" class="ms-3" width="6px" height="20px"/>
                             <span class="tooltiptext">
@@ -48,52 +56,7 @@
                 </div>
             </div>
         </div>
-            <!-- Single Address End -->
-        <div class="walletInfoField">
-            <div class="pe-2 mb-2 fieldLabel"><label for="walletAddress2">Lorem Ipsum 2</label></div>
-            <div class="d-flex flex-row align-items-center flex-wrap">
-                <div class="fieldValue username-data"><label for="walletAddress2">mantle10...x0k7tfhd4hm4hg</label></div>
-                <div class="pe-2 m-0 ms-2 iconContainer" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
-                <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
-                <div class="ms-xl-auto ms-lg-3 ms-3 mt-2 mt-xl-0 mt-lg-2">
-                    <div class="d-flex flex-row walletAddressItem">
-                        <input type="radio" name="walletAddress" id="walletAddress2"/>
-                        <div class="me-3 iconContainer menuToolTip">
-                            <img src="@routes.Assets.versioned("images/icon/kebabMenuYellow.png")" class="ms-3" width="6px" height="20px"/>
-                            <span class="tooltiptext">
-                                <div class="menuOption">
-                                    <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
-                                    <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
-                                    <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
-                                </div>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="walletInfoField">
-            <div class="pe-2 mb-2 fieldLabel">Lorem Ipsum 3</div>
-            <div class="d-flex flex-row align-items-center flex-wrap">
-                <div class="fieldValue username-data"><label>mantle10...x0k7tfhd4hm4hg</label></div>
-                <div class="pe-2 m-0 ms-2 iconContainer" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
-                <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
-                <div class="ms-xl-auto ms-lg-3 ms-3 mt-2 mt-xl-0 mt-lg-2">
-                    <div class="d-flex flex-row walletAddressItem">
-                        <div class="me-3 iconContainer menuToolTip">
-                            <img src="@routes.Assets.versioned("images/icon/kebabMenuYellow.png")" class="ms-3" width="6px" height="20px"/>
-                            <span class="tooltiptext">
-                                <div class="menuOption">
-                                    <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
-                                    <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
-                                    <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
-                                </div>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        }
         <div class="d-flex flex-row gap-2 align-items-center addNewWalletBtn" onclick="getForm(jsRoutes.controllers.ProfileController.addNewKey())">
             <div class="iconContainer"><img src="@routes.Assets.versioned("images/icon/addYellow.png")" class="icon"/></div>
             <div class="btnMessage">@Messages(constants.View.PROFILE_ADD_NEW_ADDRESS)</div>

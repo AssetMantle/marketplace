@@ -35,11 +35,18 @@ body.modal-open::-webkit-scrollbar{
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
+    //transition: opacity 0.6s ease, visibility 0.6s ease;
+    //transition: all 0.6s;
+    //transform: translate(0, -50px);
     z-index: 9999;
   }
   .modal-overlay.active {
     opacity: 1;
     visibility: visible;
+    //transform: translate(0, 0);
+  }
+  .modal.fade .modal-dialog{
+    transition: transform 0.6s ease;
   }
 }
 #modal-content{
