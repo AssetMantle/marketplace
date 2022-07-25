@@ -135,6 +135,7 @@ SIGN_IN_SIGN_UP_MESSAGE=Don’t have an account yet?
 SIGN_IN_SIGN_UP=Sign up
 RESPONSE.FAILURE.INVALID_USERNAME_OR_PASSWORD=Invalid username or password.
 RESPONSE.FAILURE.MASTER_ACCOUNT_NOT_FOUND=Account not found.
+RESPONSE.FAILURE.MASTER_KEY_NOT_FOUND=Invalid username or address.
 RESPONSE.FAILURE.INVALID_PASSWORD=Invalid password.
 RESPONSE.FAILURE.PASSWORD_VALIDATION_FAILED=Password does not match minimum criteria. It should contain at least a small letter, a capital letter, a number and a symbol: !@#$%^&*._-.
 PLACEHOLDER.PASSWORD=Enter Password

@@ -5,7 +5,17 @@
 
 <div>
     @commonForm(constants.Form.VERIFY_WALLET_MNEMONICS, walletMnemonicsForm, isModal = true, showScreen = "#walletMnemonics", hideScreen = "#verificationForm") {
-        @commonInputText(walletMnemonicsForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly", Symbol("class") -> "hidden")
+
+        <div class="mb-3">
+            <div class="inputField">
+                <div class="inputFieldBody">
+                    <div class="usernameAvailability">
+                        @views.html.base.label.commonLabel(constants.FormField.WALLET_ADDRESS.name)
+                        @commonInputText(walletMnemonicsForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly")
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="mb-3">
             <div class="inputField">

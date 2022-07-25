@@ -78,7 +78,7 @@ class AccountController @Inject()(
     implicit request =>
       VerifyMnemonics.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.account.verifyWalletMnemonics(formWithErrors, formWithErrors.get.username, formWithErrors.get.walletAddress)))
+          Future(BadRequest(views.html.account.verifyWalletMnemonics(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CONFIRM_USERNAME.name, ""), formWithErrors.data.getOrElse(constants.FormField.WALLET_ADDRESS.name, ""))))
         },
         walletMnemonicsData => {
           val key = masterKeys.Service.tryGetActive(walletMnemonicsData.username)
