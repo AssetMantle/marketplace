@@ -1,5 +1,6 @@
 @import views.account.companion.MigrateWalletToKey
 @import views.html.base.form._
+@import views.html.base.label._
 @import views.html.base.forms.commonFieldErrorMessage
 @import views.html.base.label._
 
@@ -8,16 +9,15 @@
 <div>
     @commonForm(constants.Form.MIGRATE_WALLET_TO_KEY, migrateWalletToKeyForm) {
 
-        @commonInputText(migrateWalletToKeyForm, constants.FormField.USERNAME, Symbol("value") -> username, Symbol("readonly") -> "readonly", Symbol("class") -> "hidden")
-        @commonInputText(migrateWalletToKeyForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly", Symbol("class") -> "hidden")
-        <div class="form-copy-item">
-            <div class="form-copy-text">@Messages(constants.View.CONFIRM_RECOVERY_PHRASE)</div>
-        </div>
+        @commonLabel(constants.FormField.USERNAME.name)
+        @commonInputText(migrateWalletToKeyForm, constants.FormField.USERNAME, Symbol("value") -> username, Symbol("readonly") -> "readonly")
+        @commonLabel(constants.FormField.WALLET_ADDRESS.name)
+        @commonInputText(migrateWalletToKeyForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly")
         <div class="mb-3">
             <div class="inputField">
                 <div class="inputFieldBody">
                     <div class="usernameAvailability">
-                        @views.html.base.label.commonLabel(constants.FormField.SIGNUP_PASSWORD.name)
+                        @commonLabel(constants.FormField.SIGNUP_PASSWORD.name)
                         @commonInputPassword(migrateWalletToKeyForm, constants.FormField.SIGNUP_PASSWORD, Symbol("id") -> "signUpPassword", Symbol("oninput") -> """activeButton()""")
                     </div>
                 </div>
