@@ -7,7 +7,7 @@ object VerifyMnemonics {
 
   val form: Form[Data] = Form(
     mapping(
-      constants.FormField.USERNAME.mapping,
+      constants.FormField.CONFIRM_USERNAME.mapping,
       constants.FormField.WALLET_ADDRESS.mapping,
       constants.FormField.SEED_PHRASE_1.mapping,
       constants.FormField.SEED_PHRASE_2.mapping,
