@@ -76,6 +76,7 @@ object Response {
   val UNAUTHORIZED = new Failure("UNAUTHORIZED")
   val INVALID_PAGE_NUMBER = new Failure("INVALID_PAGE_NUMBER")
   val INVALID_SEEDS = new Failure("INVALID_SEEDS")
+  val SEEDS_NOT_FOUND = new Failure("SEEDS_NOT_FOUND")
   val INVALID_KEY_NAME = new Failure("INVALID_KEY_NAME")
   val INVALID_PASSWORD_OR_SEEDS = new Failure("INVALID_PASSWORD_OR_SEEDS")
   val HD_PATH_NOT_FOUND = new Failure("HD_PATH_NOT_FOUND")

@@ -7,9 +7,10 @@ object ViewMnemonics {
 
   val form: Form[Data] = Form(
     mapping(
-      constants.FormField.PASSWORD.name-> constants.FormField.PASSWORD.field,
+      constants.FormField.WALLET_ADDRESS.mapping,
+      constants.FormField.PASSWORD.mapping,
     )(Data.apply)(Data.unapply))
 
-  case class Data(password: String)
+  case class Data(address: String, password: String)
 
 }
