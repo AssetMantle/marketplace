@@ -74,7 +74,7 @@ class ProfileController @Inject()(
           val validatePassword = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = addManagedKeyData.password)
 
           def validateAndAdd(validatePassword: Boolean) = if (validatePassword && wallet.address == addManagedKeyData.address) {
-            masterKeys.Service.add(
+            masterKeys.Service.addManagedKey(
               accountId = loginState.username,
               address = wallet.address,
               hdPath = wallet.hdPath,
@@ -114,7 +114,7 @@ class ProfileController @Inject()(
           val validatePassword = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = addUnmanagedKeyData.password)
 
           def validateAndAdd(validatePassword: Boolean) = if (validatePassword) {
-            masterKeys.Service.add(
+            masterKeys.Service.addUnmanagedKey(
               accountId = loginState.username,
               address = addUnmanagedKeyData.address,
               password = addUnmanagedKeyData.password,

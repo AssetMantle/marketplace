@@ -13,7 +13,7 @@ class WithActionLoggingFilter @Inject()(messagesControllerComponents: MessagesCo
 
   private implicit val lang: Lang = constants.CommonConfig.logLang
 
-  def next(f: => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = Action { implicit request ⇒
+  def next(f: => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = Action { implicit request =>
     val startTime = System.currentTimeMillis()
     try {
       logger.info(messagesApi(constants.Log.Info.CONTROLLERS_REQUEST, request.method, request.path, request.remoteAddress, request.session.get(constants.Session.USERNAME).getOrElse(constants.View.UNKNOWN)))
