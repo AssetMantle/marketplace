@@ -2,11 +2,8 @@
 @import views.html.base.forms._
 
 @(walletMnemonicsForm: Form[VerifyMnemonics.Data] = VerifyMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<!-- Wallet Mnemonics -->
 <div id="walletMnemonics">
     @formHeader(label = "Recovery Phrase")
-    @* @multiStepNavigator() *@
-
     @successModalAddressBox(Symbol("address") -> address)
 
 <div class="mt-4 form-copy-item">

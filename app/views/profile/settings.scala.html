@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
 
 @(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
 <div class="profileSettingsContainer">
     <div class="title">@Messages(constants.View.PROFILE_SETTINGS_TITLE)</div>
     <div class="subTitle">@Messages(constants.View.PROFILE_SETTINGS_SUBTITLE)</div>
@@ -9,20 +10,20 @@
         <div class="d-flex flex-row align-items-center flex-wrap infoField">
             <div class="ps-0 ps-xl-5 pe-2 fieldLabel">@Messages(constants.View.PROFILE_USERNAME)</div>
             <div class="flex-grow-1 fieldValue">@loginState.username</div>
-            <div class="me-2"><img src="@routes.Assets.versioned("images/icon/verifiedGreen.png")" class="icon"/></div>
+            <div class="m-0 me-2 mt-2 mt-xl-0 mt-md-2"><img src="@routes.Assets.versioned("images/icon/verifiedGreen.png")" class="icon"/></div>
         </div>
         <div class="d-flex flex-row align-items-center flex-wrap infoField">
             <div class="ps-0 ps-xl-5 pe-2 fieldLabel">@Messages(constants.View.PROFILE_PASSWORD)</div>
             <div id="userPassword" class="flex-grow-1 fieldValue">@constants.View.PROFILE_PASSWORD</div>
-            <div class="me-2 m-0 iconContainer" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CHANGE_PASSWORD.get, ""))"><img src="@routes.Assets.versioned("images/icon/edit.png")" class="icon"/></div>
+            <div class="m-0 me-2 mt-2 mt-xl-0 mt-md-2 iconContainer" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CHANGE_PASSWORD.get, ""))"><img src="@routes.Assets.versioned("images/icon/edit.png")" class="icon"/></div>
         </div>
         <div class="d-flex flex-row align-items-center flex-wrap walletInfoField">
             <div class=" pe-2 fieldLabel">@Messages(constants.View.PROFILE_IDENTITY_ADDRESS)</div>
-            <div class=" fieldValue">@keys.find(_.active).fold(Messages(constants.View.ACTIVE_ADDRESS_NOT_FOUND))(_.address)</div>
-            <div class="m-0 ms-2 mt-2 mt-xl-0 mt-md-2 iconContainer"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
+            <div class=" fieldValue username-data" data-value="@keys.find(_.active).fold(Messages(constants.View.ACTIVE_ADDRESS_NOT_FOUND))(_.address)">@keys.find(_.active).fold(Messages(constants.View.ACTIVE_ADDRESS_NOT_FOUND))(_.address)</div>
+            <div class="m-0 ms-2 mt-2 mt-xl-0 mt-md-2 iconContainer" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
+            <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
         </div>
     </div>
-
     <div class="walletInformation">
         <div class="containerTitle">@Messages(constants.View.PROFILE_WALLET_DETAIL_TITLE)</div>
             <!-- Single Address Start -->
@@ -31,8 +32,9 @@
         <div class="walletInfoField active">
             <div class="pe-2 mb-2 fieldLabel"><label for="walletAddress1">@key.name.getOrElse("")</label></div>
             <div class="d-flex flex-row align-items-center flex-wrap">
-                <div class="fieldValue"><label for="walletAddress1">@key.address</label></div>
-                <div class="pe-2 m-0 ms-2 iconContainer"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
+                <div class="fieldValue username-data" data-value="@key.address"><label for="walletAddress1">@key.address</label></div>
+                <div class="pe-2 m-0 ms-2 iconContainer" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copyYellow.png")" class="copyIcon"/></div>
+                <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
                 <div class="ms-xl-auto ms-lg-3 ms-3 mt-2 mt-xl-0 mt-lg-2">
                     <div class="d-flex flex-row justify-content-between align-items-center walletAddressItem">
                         @if(key.active) {
@@ -40,19 +42,19 @@
                         } else {
                             <input type="radio" name="walletAddress" id="walletAddress2"/>
                         }
-                    <div class="me-3 iconContainer menuToolTip">
-                        <img src="@routes.Assets.versioned("images/icon/kebabMenuYellow.png")" class="ms-3" width="6px" height="20px"/>
-                        <span class="tooltiptext">
-                            <div class="menuOption">
-                                <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
-                                <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
-                                <div class="option">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
-        </div>
-        </span>
-        </div>
-        </div>
-        </div>
-        </div>
+                        <div class="me-3 iconContainer menuToolTip">
+                            <img src="@routes.Assets.versioned("images/icon/kebabMenuYellow.png")" class="ms-3" width="6px" height="20px"/>
+                            <span class="tooltiptext">
+                                <div class="menuOption">
+                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.viewMnemonicsForm())">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
+                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.changeKeyNameForm())">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
+                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.deleteAccountForm())">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         }
         <div class="d-flex flex-row gap-2 align-items-center addNewWalletBtn" onclick="getForm(jsRoutes.controllers.ProfileController.addNewKey())">

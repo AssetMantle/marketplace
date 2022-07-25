@@ -1,0 +1,26 @@
+@import views.profile.companion.ViewMnemonics
+@import views.html.base.form._
+
+@(viewMnemonicsForm: Form[ViewMnemonics.Data] = ViewMnemonics.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
+@commonForm(constants.Form.VIEW_MNEMONICS, viewMnemonicsForm) {
+    <div class="modal-body">
+        <div class="mb-3">
+            <div class="inputField">
+                <div class="inputFieldBody">
+                    @commonInputPassword(viewMnemonicsForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off", Symbol("id") -> "viewMnemonicsPassword")
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script>
+        $("#formSubmitButton .buttonPrimary").addClass("disable");
+        $("#viewMnemonicsPassword").keyup(function (){
+            if ($.trim(viewMnemonicsPassword.value).length) {
+                $("#formSubmitButton .buttonPrimary").removeClass("disable");
+            } else {
+                $("#formSubmitButton .buttonPrimary").addClass("disable");
+            }
+        });
+</script>

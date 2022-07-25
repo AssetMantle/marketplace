@@ -2,14 +2,15 @@
 @import views.html.base.form._
 
 @(unmanagedAddressForm: Form[AddUnmanagedKey.Data] = AddUnmanagedKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
 @commonForm(constants.Form.ADD_UNMANAGED_KEY, unmanagedAddressForm) {
-    <div id="newUnmanagedAddressScreen">
+    <div id="newUnmanagedAddressScreen" class="mb-0">
         <div class="modal-body">
             <div class="mb-3">
                 <div class="inputField">
                     <div class="inputFieldBody">
                         @views.html.base.label.commonLabel(constants.FormField.UNMANAGED_KEY_NAME.name)
-                        @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_KEY_NAME, Symbol("autocomplete") -> "off")
+                        @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_KEY_NAME, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedKeyName")
                     </div>
                 </div>
             </div>
@@ -17,20 +18,20 @@
                 <div class="inputField">
                     <div class="inputFieldBody">
                         @views.html.base.label.commonLabel(constants.FormField.UNMANAGED_KEY_ADDRESS.name)
-                        @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_KEY_ADDRESS, Symbol("autocomplete") -> "off")
+                        @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_KEY_ADDRESS, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedKeyAddress")
                     </div>
                 </div>
             </div>
         </div>
         <div class="form-button">
-            <button type="button" class="form-primary-button" onclick="showHideUnmanagedAddressModalScreen('#newUnmanagedAddressPasswordScreen', '#newUnmanagedAddressScreen')">@Messages(constants.View.NEXT)</button>
+            <button type="button" id="newUnmanagedAddressScreenBtn" class="form-primary-button disable" onclick="showHideUnmanagedAddressModalScreen('#newUnmanagedAddressPasswordScreen', '#newUnmanagedAddressScreen')">@Messages(constants.View.NEXT)</button>
         </div>
     </div>
 
     <div id="newUnmanagedAddressPasswordScreen" style="display: none;">
         <div class="mb-3 inputField">
             <div class="inputFieldBody">
-            @commonInputPassword(unmanagedAddressForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off")
+            @commonInputPassword(unmanagedAddressForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedMnemonicPassword")
             </div>
         </div>
     </div>
