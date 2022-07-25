@@ -268,6 +268,8 @@ LABEL_TYPE_OF_WALLET=Type of wallet
 TOOLTIP_COPIED=Copied
 TOOLTIP_USERNAME=Username:
 TOOLTIP_PASSWORD=Address:
+KEY_DELETED_SUCCESSFULLY_TITLE=Key Deleted Successfully
+KEY_DELETED_SUCCESSFULLY_SUBTITLE=
 
 #//Managed Address
 FORM.ADD_MANAGED_KEY.TITLE=Add New Address
@@ -308,9 +310,9 @@ VIEW_MNEMONICS_SEED_PHRASE_TITLE=Seed Phrase
 VIEW_MNEMONICS_SEED_PHRASE_SUBTITLE=Click to show or hide seed phrase
 
 #//Delete Account
-FORM.REMOVE_ACCOUNT.TITLE=Confirm Password
-FORM.REMOVE_ACCOUNT.SUBTITLE=Enter your password to confirm action
-FORM.REMOVE_ACCOUNT.SUBMIT=Confirm
+FORM.DELETE_KEY.TITLE=Delete Key
+FORM.DELETE_KEY.SUBTITLE=Enter your password to confirm action
+FORM.DELETE_KEY.SUBMIT=Confirm
 
 #//Change Password
 FORM.CHANGE_PASSWORD.TITLE=Change Password

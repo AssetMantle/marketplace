@@ -27,7 +27,7 @@ object Form {
   val CHANGE_KEY_NAME = new Form("CHANGE_KEY_NAME", routes.javascript.ProfileController.changeKeyNameForm, routes.ProfileController.changeKeyName())
 
   val VIEW_MNEMONICS = new Form("VIEW_MNEMONICS", routes.javascript.ProfileController.viewMnemonicsForm, routes.ProfileController.viewMnemonics())
-  val REMOVE_ACCOUNT = new Form("REMOVE_ACCOUNT", routes.javascript.ProfileController.deleteAccountForm, routes.ProfileController.deleteAccount())
+  val DELETE_KEY = new Form("DELETE_KEY", routes.javascript.ProfileController.deleteKeyForm, routes.ProfileController.deleteKey())
 
   val CHANGE_MANAGED_TO_UNMANAGED = new Form("CHANGE_MANAGED_TO_UNMANAGED", routes.javascript.ProfileController.changeManagedToUnmanagedForm, routes.ProfileController.changeManagedToUnmanaged())
 

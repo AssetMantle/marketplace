@@ -180,18 +180,28 @@ class ProfileController @Inject()(
       )
   }
 
-  def deleteAccountForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.profile.deleteAccount())
+  def deleteKeyForm(address: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.deleteKey(address = address))
   }
 
-  def deleteAccount(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def deleteKey(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      DeleteAccount.form.bindFromRequest().fold(
+      DeleteKey.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.deleteAccount(formWithErrors)))
+          Future(BadRequest(views.html.profile.deleteKey(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.WALLET_ADDRESS.name, ""))))
         },
-        deleteAccountData => {
-          Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
+        deleteKeyData => {
+          val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = deleteKeyData.address, password = deleteKeyData.password)
+
+          def delete(validated: Boolean, key: master.Key) = if (validated) masterKeys.Service.deleteKey(accountId = key.accountId, address = key.address) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+
+          (for {
+            (validated, key) <- validateAndGetKey
+            _ <- delete(validated, key)
+          } yield PartialContent(views.html.profile.keyDeletedSuccessfully())
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.profile.deleteKey(DeleteKey.form.withGlobalError(baseException.failure.message), deleteKeyData.address))
+          }
         }
       )
   }

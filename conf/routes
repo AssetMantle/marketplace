@@ -70,8 +70,8 @@ POST        /changeKeyName                   controllers.ProfileController.chang
 GET         /viewMnemonics                   controllers.ProfileController.viewMnemonicsForm(address: String)
 POST        /viewMnemonics                   controllers.ProfileController.viewMnemonics()
 
-GET         /deleteAccount                   controllers.ProfileController.deleteAccountForm()
-POST        /deleteAccount                   controllers.ProfileController.deleteAccount()
+GET         /deleteKey                       controllers.ProfileController.deleteKeyForm(address: String)
+POST        /deleteKey                       controllers.ProfileController.deleteKey()
 
 GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()
