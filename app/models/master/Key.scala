@@ -131,7 +131,7 @@ class Keys @Inject()(
 
   object Service {
 
-    def add(accountId: String, address: String, hdPath: Seq[ChildNumber], partialMnemonics: Seq[String], name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
+    def addOnSignUp(accountId: String, address: String, hdPath: Seq[ChildNumber], partialMnemonics: Seq[String], name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
       val salt = utilities.Secrets.getNewSalt
       val key = Key(
         accountId = accountId,
@@ -151,7 +151,7 @@ class Keys @Inject()(
       create(key.serialize())
     }
 
-    def add(accountId: String, address: String, hdPath: Seq[ChildNumber], password: String, privateKey: Array[Byte], partialMnemonics: Option[Seq[String]], name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
+    def addManagedKey(accountId: String, address: String, hdPath: Seq[ChildNumber], password: String, privateKey: Array[Byte], partialMnemonics: Option[Seq[String]], name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
       val salt = utilities.Secrets.getNewSalt
       create(Key(
         accountId = accountId,
@@ -170,13 +170,13 @@ class Keys @Inject()(
       ).serialize())
     }
 
-    def add(accountId: String, address: String, password: String, name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
+    def addUnmanagedKey(accountId: String, address: String, password: String, name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
       val salt = utilities.Secrets.getNewSalt
       create(Key(
         accountId = accountId,
         address = address,
         hdPath = None,
-        passwordHash = Array[Byte](),
+        passwordHash = if (password != "") utilities.Secrets.hashPassword(password = password, salt = salt, iterations = constants.Security.DefaultIterations) else Array[Byte](),
         salt = salt,
         iterations = constants.Security.DefaultIterations,
         partialMnemonics = None,
@@ -189,8 +189,31 @@ class Keys @Inject()(
       ).serialize())
     }
 
+    def addOnMigration(accountId: String, address: String, hdPath: Seq[ChildNumber], partialMnemonics: Seq[String], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
+      create(Key(
+        accountId = accountId,
+        address = address,
+        hdPath = Option(hdPath),
+        passwordHash = passwordHash,
+        salt = salt,
+        iterations = iterations,
+        partialMnemonics = Option(partialMnemonics),
+        name = Option(name),
+        encryptedPrivateKey = Array[Byte](),
+        retryCounter = retryCounter,
+        active = active,
+        backupUsed = backupUsed,
+        verified = verified
+      ).serialize())
+    }
+
     def updateOnVerifyMnemonics(key: Key, password: String, privateKey: Array[Byte]): Future[Unit] = updateKey(key.copy(
       passwordHash = utilities.Secrets.hashPassword(password = password, salt = key.salt, iterations = key.iterations),
+      encryptedPrivateKey = utilities.Secrets.encryptData(privateKey, password),
+      verified = Option(true)
+    ))
+
+    def updateOnMigration(key: Key, password: String, privateKey: Array[Byte]): Future[Unit] = updateKey(key.copy(
       encryptedPrivateKey = utilities.Secrets.encryptData(privateKey, password),
       verified = Option(true)
     ))
@@ -214,6 +237,8 @@ class Keys @Inject()(
     def getActive(accountId: String): Future[Option[Key]] = filter(x => x.id1 === accountId && x.active).map(_.headOption.map(_.deserialize))
 
     def updateKey(key: Key): Future[Unit] = update(key.serialize())
+
+    def getActiveByAccountId(accountId: String): Future[Option[Key]] = filter(x => x.id1 === accountId && x.active).map(_.map(_.deserialize).headOption)
 
     def deleteKey(accountId: String, address: String): Future[Unit] = delete(accountId, address)
 

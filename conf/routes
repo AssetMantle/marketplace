@@ -66,10 +66,11 @@ POST        /addUnmanagedKey                 controllers.ProfileController.addUn
 GET         /changeKeyName                   controllers.ProfileController.changeKeyNameForm(address: String)
 POST        /changeKeyName                   controllers.ProfileController.changeKeyName()
 
-GET         /viewMnemonics                   controllers.ProfileController.viewMnemonicsForm()
+GET         /viewMnemonics                   controllers.ProfileController.viewMnemonicsForm(address: String)
 POST        /viewMnemonics                   controllers.ProfileController.viewMnemonics()
 
 GET         /deleteAccount                   controllers.ProfileController.deleteAccountForm()
 POST        /deleteAccount                   controllers.ProfileController.deleteAccount()
+
 GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()

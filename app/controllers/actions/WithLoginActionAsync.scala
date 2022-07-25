@@ -22,7 +22,7 @@ class WithLoginActionAsync @Inject()(
   private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN_ACTION
 
   def apply(f: => LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
-    withActionAsyncLoggingFilter.next { implicit request ⇒
+    withActionAsyncLoggingFilter.next { implicit request =>
 
       val username = Future(request.session.get(constants.Session.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
       val address = Future(request.session.get(constants.Session.ADDRESS).getOrElse(throw new BaseException(constants.Response.ADDRESS_NOT_FOUND)))

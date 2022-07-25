@@ -74,7 +74,7 @@ class ProfileController @Inject()(
           val validatePassword = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = addManagedKeyData.password)
 
           def validateAndAdd(validatePassword: Boolean) = if (validatePassword && wallet.address == addManagedKeyData.address) {
-            masterKeys.Service.add(
+            masterKeys.Service.addManagedKey(
               accountId = loginState.username,
               address = wallet.address,
               hdPath = wallet.hdPath,
@@ -114,7 +114,7 @@ class ProfileController @Inject()(
           val validatePassword = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = addUnmanagedKeyData.password)
 
           def validateAndAdd(validatePassword: Boolean) = if (validatePassword) {
-            masterKeys.Service.add(
+            masterKeys.Service.addUnmanagedKey(
               accountId = loginState.username,
               address = addUnmanagedKeyData.address,
               password = addUnmanagedKeyData.password,
@@ -160,18 +160,24 @@ class ProfileController @Inject()(
       )
   }
 
-  def viewMnemonicsForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.profile.viewMnemonics())
+  def viewMnemonicsForm(address: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.viewMnemonics(address = address))
   }
 
-  def viewMnemonics: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def viewMnemonics(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       ViewMnemonics.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.viewMnemonics(formWithErrors)))
+          Future(BadRequest(views.html.profile.viewMnemonics(formWithErrors, formWithErrors.get.address)))
         },
         viewMnemonicsData => {
-          Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
+          val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = viewMnemonicsData.address, password = viewMnemonicsData.password)
+          (for {
+            (validated, key) <- validateAndGetKey
+          } yield if (validated) PartialContent(views.html.profile.seedPhrase(key.partialMnemonics.getOrElse(constants.Response.SEEDS_NOT_FOUND.throwBaseException()))) else constants.Response.INVALID_PASSWORD.throwBaseException()
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.profile.viewMnemonics(ViewMnemonics.form.withGlobalError(baseException.failure.message), viewMnemonicsData.address))
+          }
         }
       )
   }
@@ -180,7 +186,7 @@ class ProfileController @Inject()(
     Ok(views.html.profile.deleteAccount())
   }
 
-  def deleteAccount: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def deleteAccount(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       DeleteAccount.form.bindFromRequest().fold(
         formWithErrors => {
