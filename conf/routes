@@ -34,6 +34,9 @@ POST        /forgetPassword                  controllers.AccountController.forge
 GET         /changePassword                  controllers.AccountController.changePasswordForm()
 POST        /changePassword                  controllers.AccountController.changePassword()
 
+GET         /migrateWalletToKey              controllers.AccountController.migrateWalletToKeyForm()
+POST        /migrateWalletToKey              controllers.AccountController.migrateWalletToKey()
+
 GET         /changeActiveKey                 controllers.AccountController.changeActiveKey(address: String)
 
 GET         /collections                     controllers.CollectionController.viewCollections()

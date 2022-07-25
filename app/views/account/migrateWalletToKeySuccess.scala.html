@@ -1,0 +1,12 @@
+@import views.html.base.forms._
+
+@(username: String, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@successModal(heading = Messages(constants.View.UPDATE_WALLET_SUCCESS_TITLE), subHeading = Messages(constants.View.UPDATE_WALLET_SUCCESS_SUBTITLE))
+@successModalAddressBox(Symbol("userName") -> username, Symbol("address") -> address)
+<div class="d-flex mt-3 form-information-message">
+    <div class="form-information-icon"><img src="@routes.Assets.versioned("images/icon/info.png")"/></div>
+    <div class="form-information-text">@Messages(constants.View.UPDATE_WALLET_SUCCESS_INFO)</div>
+</div>
+<div class="form-button">
+    <button class="form-primary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN.get, ""))">@Messages(constants.View.SIGN_IN)</button>
+</div>

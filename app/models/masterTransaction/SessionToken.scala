@@ -91,7 +91,7 @@ class SessionTokens @Inject()(
 
     def getTimedOutIDs: Future[Seq[String]] = filter(_.sessionTokenTime < DateTime.now(DateTimeZone.UTC).getMillis - constants.CommonConfig.sessionTokenTimeout).map(_.map(_.accountId))
 
-    def deleteById(id: String): Future[Unit] = delete(id)
+    def deleteById(id: String): Future[Int] = delete(id)
 
     def deleteSessionTokens(ids: Seq[String]): Future[Unit] = deleteMultiple(ids)
 

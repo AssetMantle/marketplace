@@ -20,6 +20,7 @@ object Form {
   val FORGET_PASSWORD = new Form("FORGET_PASSWORD", routes.javascript.AccountController.forgetPasswordForm, routes.AccountController.forgetPassword())
   val CHANGE_PASSWORD = new Form("CHANGE_PASSWORD", routes.javascript.AccountController.changePasswordForm, routes.AccountController.changePassword())
   val SIGN_OUT = new Form("SIGN_OUT", routes.javascript.AccountController.signOutForm, routes.AccountController.signOut())
+  val MIGRATE_WALLET_TO_KEY = new Form("MIGRATE_WALLET_TO_KEY", routes.javascript.AccountController.migrateWalletToKeyForm, routes.AccountController.migrateWalletToKey())
 
   val ADD_MANAGED_KEY = new Form("ADD_MANAGED_KEY", routes.javascript.ProfileController.addManagedKeyForm, routes.ProfileController.addManagedKey())
   val ADD_UNMANAGED_KEY = new Form("ADD_UNMANAGED_KEY", routes.javascript.ProfileController.addUnmanagedKeyForm, routes.ProfileController.addUnmanagedKey())
