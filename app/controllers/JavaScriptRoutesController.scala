@@ -52,8 +52,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ProfileController.changeManagedToUnmanagedForm,
 
-        routes.javascript.ProfileController.viewMnemonicsForm,
-        routes.javascript.ProfileController.deleteAccountForm,
       )
     ).as("text/javascript")
 
