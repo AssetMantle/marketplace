@@ -156,7 +156,38 @@ class ProfileController @Inject()(
             ).recover {
             case baseException: BaseException => BadRequest(views.html.profile.changeKeyName(ChangeKeyName.form.withGlobalError(baseException.failure.message), changeKeyNameData.address))
           }
+        }
+      )
+  }
 
+  def viewMnemonicsForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.viewMnemonics())
+  }
+
+  def viewMnemonics: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      ViewMnemonics.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.profile.viewMnemonics(formWithErrors)))
+        },
+        viewMnemonicsData => {
+          Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
+        }
+      )
+  }
+
+  def deleteAccountForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.deleteAccount())
+  }
+
+  def deleteAccount: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      DeleteAccount.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.profile.deleteAccount(formWithErrors)))
+        },
+        deleteAccountData => {
+          Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
         }
       )
   }

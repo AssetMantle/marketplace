@@ -1,6 +1,7 @@
 @import views.html.base.form._
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
 <div class="modal-header mb-3">
     <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.ADD_NEW_WALLET_OPTION_TITLE)</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">

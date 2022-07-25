@@ -31,7 +31,7 @@
                                 <img src="@routes.Assets.versioned("images/icon/showPassword.png")" width="24px" height="18px"/>
                             </span>
                         </div>
-                        @commonInputPassword(signInForm, constants.FormField.PASSWORD, Symbol("placeholder") -> "Enter Password", 'id -> "signInPassword")
+                        @commonInputPassword(signInForm, constants.FormField.PASSWORD, 'id -> "signInPassword")
                         @commonFieldErrorMessage(id = "incorrectPasswordError", message = Messages(constants.View.INCORRECT_PASSWORD))
                         </div>
                     </div>
