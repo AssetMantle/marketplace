@@ -309,4 +309,15 @@ FORM.REMOVE_ACCOUNT.TITLE=Confirm Password
 FORM.REMOVE_ACCOUNT.SUBTITLE=Enter your password to confirm action
 FORM.REMOVE_ACCOUNT.SUBMIT=Confirm
 
+#//Change Password
+FORM.CHANGE_PASSWORD.TITLE=Change Password
+FORM.CHANGE_PASSWORD.SUBTITLE=Enter your password to confirm action
+FORM.CHANGE_PASSWORD.SUBMIT=Confirm
+OLD_PASSWORD=Old Password
+CHANGE_PASSWORD=New Password
+CHANGE_CONFIRM_PASSWORD=Confirm Password
+PLACEHOLDER.OLD_PASSWORD=Type old password here
+PLACEHOLDER.CHANGE_PASSWORD=Type new password here
+PLACEHOLDER.CHANGE_CONFIRM_PASSWORD=Type confirm password here
+
 
