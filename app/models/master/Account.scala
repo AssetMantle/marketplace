@@ -121,5 +121,7 @@ class Accounts @Inject()(
 
     def checkAccountExists(username: String): Future[Boolean] = exists(username)
 
+    def getAllIncorrectLang(): Future[Seq[Account]] = filter(_.accountType === "en").map(_.map(_.deserialize))
+
   }
 }

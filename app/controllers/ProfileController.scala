@@ -8,7 +8,6 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import service.UploadCollections
 import views.profile.companion._
 import play.api.mvc._
 
@@ -26,7 +25,6 @@ class ProfileController @Inject()(
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                    masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                                    withUsernameToken: WithUsernameToken,
-                                   uploadCollections: UploadCollections,
                                    withLoginActionAsync: WithLoginActionAsync,
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 

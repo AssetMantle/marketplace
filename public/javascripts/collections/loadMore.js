@@ -46,7 +46,7 @@ window.addEventListener('scroll', () => {
     clearTimeout(collectionPageTimeout);
     collectionPageTimeout = setTimeout(function () {
         console.log("SCROLL 1")
-        if ($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10) && $(".collectionsPerPage").length() !== 0) {
+        if ($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10) && $(".collectionsPerPage").length !== 0) {
             console.log("SCROLL 2")
             loadMoreCollections();
         }

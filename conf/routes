@@ -44,6 +44,7 @@ GET         /collection/:id                  controllers.CollectionController.vi
 GET         /collectionsList                 controllers.CollectionController.collectionsList()
 GET         /collectionsPerPage              controllers.CollectionController.collectionsPerPage(pageNumber: Int)
 GET         /collectionNFTs                  controllers.CollectionController.collectionNFTs(id: String)
+GET         /collectionNFTsPerPage           controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionFile                  controllers.CollectionController.collectionFile(id: String, documentType:String, compress: Boolean)
 GET         /collectionInfo                  controllers.CollectionController.info(id: String)
 

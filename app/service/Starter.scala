@@ -3,24 +3,27 @@ package service
 import exceptions.BaseException
 import models.master
 import models.master.{Collection, Property, SocialProfile}
+import play.api.i18n.Lang
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import play.api.{Configuration, Logger}
 
 import java.io.File
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.{Source => ScalaSource}
 
 @Singleton
-class UploadCollections @Inject()(
-                                   masterCollections: master.Collections,
-                                   masterCollectionFiles: master.CollectionFiles,
-                                   masterNFTs: master.NFTs,
-                                   utilitiesOperations: utilities.Operations,
-                                 )(implicit exec: ExecutionContext, configuration: Configuration) {
+class Starter @Inject()(
+                         masterAccounts: master.Accounts,
+                         masterCollections: master.Collections,
+                         masterCollectionFiles: master.CollectionFiles,
+                         masterNFTs: master.NFTs,
+                         utilitiesOperations: utilities.Operations,
+                       )(implicit exec: ExecutionContext, configuration: Configuration) {
 
-  private implicit val module: String = constants.Module.UPLOAD_COLLECTION_SERVICE
+  private implicit val module: String = constants.Module.STARTER_SERVICE
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -71,50 +74,55 @@ class UploadCollections @Inject()(
   }
 
   def readFile[T](path: String)(implicit reads: Reads[T]): Future[T] = Future {
+    println(path)
     val source = ScalaSource.fromFile(path)
     val obj = utilities.JSON.convertJsonStringToObject[T](source.mkString)
     source.close()
     obj
   }
 
-  def addNfts(collectionID: String, nftDetails: NFT, uploadCollection: UploadCollection): Future[Unit] = try {
-    val ipfsDetails = nftDetails.image.split("/").takeRight(2)
-    val ipfsHash = ipfsDetails(0)
-    val fileName = ipfsDetails(1)
-    val oldFilePath = constants.CommonConfig.Files.RootFilePath + uploadCollection.imagePath + "/" + fileName
-    val ipfsPath = if (uploadCollection.uploadToIPFS) {
-      val file = new File(oldFilePath)
-      val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
-      val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(fileName)
-//      utilities.IPFS.pinFile(file, newFileName).IpfsHash
-      "NA"
-    } else ipfsHash + "/" + fileName
-    if (uploadCollection.downloadFromIPFS) {
-      utilities.IPFS.downloadFile(ipfsHash + "/" + fileName, oldFilePath)
-    }
-    val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
-    val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(fileName)
-    val awsKey = uploadCollection.name + "/nfts/" + newFileName
-    val newFilePath = constants.CommonConfig.Files.ColectionPath + "/" + awsKey
-    println(awsKey)
-    utilities.AmazonS3.uploadFile(awsKey, oldFilePath)
-    utilities.FileOperations.renameFile(oldFilePath, newFilePath)
-    masterNFTs.Service.add(
-      fileName = newFileName,
-      file = utilities.ImageProcess.convertToThumbnailWithHeight(newFilePath, 400),
-      collectionId = collectionID,
-      name = nftDetails.name,
-      description = nftDetails.description,
-      properties = nftDetails.properties.map(_.toStringProperty.toProperty),
-      ipfsLink = ipfsPath,
-      edition = nftDetails.edition
-    )
-  } catch {
-    case exception: Exception => logger.error(exception.getLocalizedMessage)
-      throw new BaseException(constants.Response.FILE_UPLOAD_ERROR)
+  def addNfts(collectionID: String, nftDetails: NFT, uploadCollection: UploadCollection, allNfts: Seq[master.NFT]): Future[Unit] = {
+    println(nftDetails.name)
+    if (!allNfts.exists(_.name == nftDetails.name)) {
+      try {
+        val ipfsDetails = nftDetails.image.split("/").takeRight(2)
+        val ipfsHash = ipfsDetails(0)
+        val fileName = ipfsDetails(1)
+        val oldFilePath = constants.CommonConfig.Files.RootFilePath + uploadCollection.imagePath + "/" + fileName
+        val ipfsPath = if (uploadCollection.uploadToIPFS) {
+          val file = new File(oldFilePath)
+          val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
+          val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(fileName)
+          utilities.IPFS.pinFile(file, newFileName).IpfsHash
+        } else ipfsHash + "/" + fileName
+        if (uploadCollection.downloadFromIPFS) {
+          utilities.IPFS.downloadFile(ipfsHash + "/" + fileName, oldFilePath)
+        }
+        val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
+        val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(fileName)
+        val awsKey = uploadCollection.name + "/nfts/" + newFileName
+        val newFilePath = constants.CommonConfig.Files.ColectionPath + "/" + awsKey
+        println(awsKey)
+        utilities.AmazonS3.uploadFile(awsKey, oldFilePath)
+        utilities.FileOperations.renameFile(oldFilePath, newFilePath)
+        masterNFTs.Service.add(
+          fileName = newFileName,
+          file = utilities.ImageProcess.convertToThumbnailWithHeight(newFilePath, 400),
+          collectionId = collectionID,
+          name = nftDetails.name,
+          description = nftDetails.description,
+          properties = nftDetails.properties.map(_.toStringProperty.toProperty),
+          ipfsLink = ipfsPath,
+          edition = nftDetails.edition
+        )
+      } catch {
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
+          throw new BaseException(constants.Response.FILE_UPLOAD_ERROR)
+      }
+    } else Future()
   }
 
-  def addCollectionFiles(collectionID: String, uploadCollection: UploadCollection) = {
+  def addCollectionFiles(collectionID: String, uploadCollection: UploadCollection): Future[Unit] = {
     val uploadProfile = if (uploadCollection.profile != "") {
       val oldFilePath = constants.CommonConfig.Files.ColectionPath + "/" + uploadCollection.profile
       val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
@@ -152,22 +160,41 @@ class UploadCollections @Inject()(
     } yield ()
   }
 
+  def correctMasterAccount(): Future[Unit] = {
+    val accounts = masterAccounts.Service.getAllIncorrectLang()
+
+    def update(accounts: Seq[master.Account]) = if (accounts.nonEmpty) {
+      utilitiesOperations.traverse(accounts) { account =>
+        val update = masterAccounts.Service.updateAccount(account.copy(language = Lang("en"), accountType = constants.User.USER))
+        for {
+          _ <- update
+        } yield ()
+      }
+    } else Future(Seq())
+
+    for {
+      accounts <- accounts
+      _ <- update(accounts)
+    } yield ()
+  }
+
   def start(): Future[Unit] = {
+    val allNfts = masterNFTs.Service.fetchAll()
     val uploads = readFile[Seq[UploadCollection]](uploadCollectionFilePath)
 
-    def processDir(uploadCollections: Seq[UploadCollection]) = utilitiesOperations.traverse(uploadCollections) { uploadCollection =>
+    def processDir(uploadCollections: Seq[UploadCollection], allNfts: Seq[master.NFT]) = utilitiesOperations.traverse(uploadCollections) { uploadCollection =>
       val allCollections = masterCollections.Service.fetchAll()
 
-      def addCollection(allCollections: Seq[Collection]): Future[Unit] = if (!allCollections.map(_.name).contains(uploadCollection.name)) {
-        val collectionID = masterCollections.Service.add(name = uploadCollection.name, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = if (uploadCollection.twitter != "") Seq(SocialProfile(name = constants.Collection.SocialProfile.TWITTER, url = uploadCollection.twitter)) else Seq())
+      def addCollection(allCollections: Seq[Collection]): Future[Unit] = {
+        val collection = masterCollections.Service.tryGetByName(name = uploadCollection.name)
         val collections = getListOfFiles(constants.CommonConfig.Files.RootFilePath + uploadCollection.jsonPath)
 
-        def addCollectionNfts(collectionID: String) = utilitiesOperations.traverse(collections.take(6)) { filePath =>
+        def addCollectionNfts(collection: master.Collection) = utilitiesOperations.traverse(collections) { filePath =>
           val nftDetails = readFile[NFT](filePath)
 
           (for {
             nftDetails <- nftDetails
-            _ <- addNfts(collectionID, nftDetails, uploadCollection)
+            _ <- addNfts(collection.id, nftDetails, uploadCollection, allNfts)
           } yield ()
             ).recover {
             case exception: Exception => logger.error(exception.getLocalizedMessage)
@@ -176,11 +203,11 @@ class UploadCollections @Inject()(
         }
 
         for {
-          collectionID <- collectionID
-          _ <- addCollectionFiles(collectionID, uploadCollection)
-          _ <- addCollectionNfts(collectionID)
+          collection <- collection
+          //          _ <- addCollectionFiles(collection, uploadCollection)
+          _ <- addCollectionNfts(collection)
         } yield ()
-      } else Future()
+      }
 
       for {
         allCollections <- allCollections
@@ -189,8 +216,10 @@ class UploadCollections @Inject()(
     }
 
     (for {
+      _ <- correctMasterAccount()
       uploads <- uploads
-      _ <- processDir(uploads)
+      allNfts <- allNfts
+      _ <- processDir(uploads, allNfts)
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
