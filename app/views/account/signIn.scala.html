@@ -12,7 +12,7 @@
                 <div class="inputField">
                     <div class="inputFieldBody">
                         @commonLabel(constants.FormField.USERNAME.name)
-                        @commonInputText(signInForm, constants.FormField.USERNAME, Symbol("placeholder") -> "Enter Username", Symbol("autocomplete") -> "off", Symbol("id") -> "signInUsername")
+                        @commonInputText(signInForm, constants.FormField.USERNAME, Symbol("autocomplete") -> "off", Symbol("id") -> "signInUsername")
                         @commonFieldErrorMessage(id = "incorrectUsernameError", message = Messages(constants.View.INCORRECT_USERNAME))
                     </div>
                 </div>
@@ -31,7 +31,7 @@
                                 <img src="@routes.Assets.versioned("images/icon/showPassword.png")" width="24px" height="18px"/>
                             </span>
                         </div>
-                        @commonInputPassword(signInForm, constants.FormField.PASSWORD, Symbol("placeholder") -> "Enter Password", 'id -> "signInPassword")
+                        @commonInputPassword(signInForm, constants.FormField.PASSWORD, 'id -> "signInPassword")
                         @commonFieldErrorMessage(id = "incorrectPasswordError", message = Messages(constants.View.INCORRECT_PASSWORD))
                         </div>
                     </div>

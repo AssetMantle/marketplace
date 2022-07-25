@@ -206,9 +206,9 @@
 .form-copy-item{
     font-family: var(--font-type-2);
     font-weight: 700;
-    font-size: 16px;
+    font-size: 14px;
     text-transform: capitalize;
-    color: var(--text-medium);
+    color: var(--inactive-gray);
     display: flex;
     align-items: center;
     margin-top: 40px;

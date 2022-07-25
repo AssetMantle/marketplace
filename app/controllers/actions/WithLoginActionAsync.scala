@@ -15,14 +15,14 @@ import scala.concurrent.{ExecutionContext, Future}
 class WithLoginActionAsync @Inject()(
                                       messagesControllerComponents: MessagesControllerComponents,
                                       withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter,
-                                      masterWallets: master.Wallets,
+                                      masterKeys: master.Keys,
                                       masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                     )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN_ACTION
 
   def apply(f: => LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
-    withActionAsyncLoggingFilter.next { implicit request ⇒
+    withActionAsyncLoggingFilter.next { implicit request =>
 
       val username = Future(request.session.get(constants.Session.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
       val address = Future(request.session.get(constants.Session.ADDRESS).getOrElse(throw new BaseException(constants.Response.ADDRESS_NOT_FOUND)))
@@ -30,12 +30,12 @@ class WithLoginActionAsync @Inject()(
 
       def verify(username: String, address: String, sessionToken: String) = {
         val token = masterTransactionSessionTokens.Service.tryGet(username)
-        val wallet = masterWallets.Service.tryGet(address)
+        val key = masterKeys.Service.tryGetActive(username)
 
         for {
           token <- token
-          wallet <- wallet
-        } yield (wallet.accountId == username && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.sessionTokenTimeout))
+          key <- key
+        } yield (key.accountId == username && key.address == address && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.sessionTokenTimeout))
       }
 
       def getResult(verify: Boolean, loginState: LoginState): Future[Result] = if (verify) f(loginState)(request)

@@ -296,19 +296,6 @@ document.onload = function () {
     window.scrollTo(0, 0);
 }
 
-// Copy to Clipboard
-function copyToClipboard(e) {
-    var element = $(e).next('.form-copy-message');
-    var copyText = $(e).prevAll('.username-data');
-
-    element.addClass("active");
-    element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function () {
-        element.removeClass('active');
-    });
-
-    navigator.clipboard.writeText(copyText.text());
-}
-
 // Multi Step
 dots = document.getElementsByClassName('progress-bar__dot')
 numberOfSteps = 3
@@ -360,7 +347,7 @@ function goToStep(stepNumber) {
 
 
 // Show and hide modal screen
-function showHideModalScreen(showScreen, hideScreen) {
+function showHideModalScreen(showScreen="", hideScreen="") {
     $(".modalContainer").removeClass('active');
     // setTimeout(function () {
         $(hideScreen).hide()

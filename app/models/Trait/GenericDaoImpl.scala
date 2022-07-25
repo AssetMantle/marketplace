@@ -11,9 +11,21 @@ import slick.lifted.{CanBeQueryCondition, Ordered}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-abstract class GenericDaoImpl[T <: Table[E] with ModelTable[PK], E <: Entity[PK], PK: BaseColumnType](databaseConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T], implicit val executionContext: ExecutionContext, implicit val module: String, implicit val logger: Logger) extends HasDatabaseConfigProvider[JdbcProfile] { //extends GenericDao[T, E, PK] {
+abstract class GenericDaoImpl[
+  T <: Table[E] with ModelTable[PK],
+  E <: Entity[PK],
+  PK: BaseColumnType](
+                       databaseConfigProvider: DatabaseConfigProvider,
+                       tableQuery: TableQuery[T],
+                       implicit val executionContext: ExecutionContext,
+                       implicit val module: String,
+                       implicit val logger: Logger) { //extends GenericDao[T, E, PK] {
 
-  protected val dbConfigProvider: DatabaseConfigProvider = databaseConfigProvider
+  private val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
+  private val db = databaseConfig.db
+
+  import databaseConfig.profile.api._
 
   def count(): Future[Int] = db.run(tableQuery.length.result)
 
@@ -58,19 +70,19 @@ abstract class GenericDaoImpl[T <: Table[E] with ModelTable[PK], E <: Entity[PK]
     }
   }
 
-//  def upsert(entity: E): Future[Unit] = db.run(tableQuery.insertOrUpdate(entity).asTry).map {
-//    case Success(result) => ()
-//    case Failure(exception) => exception match {
-//      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPSERT_FAILED"), psqlException)
-//    }
-//  }
+  def upsert(entity: E): Future[Unit] = db.run(tableQuery.insertOrUpdate(entity).asTry).map {
+    case Success(result) => ()
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPSERT_FAILED"), psqlException)
+    }
+  }
 
-//  def upsert(entities: Seq[E]): Future[Unit] = db.run(DBIO.sequence(entities.map(entity => tableQuery.insertOrUpdate(entity))).asTry).map {
-//    case Success(result) => ()
-//    case Failure(exception) => exception match {
-//      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPSERT_FAILED"), psqlException)
-//    }
-//  }
+  def upsertMultiple(entities: Seq[E]): Future[Unit] = db.run(DBIO.sequence(entities.map(entity => tableQuery.insertOrUpdate(entity))).asTry).map {
+    case Success(result) => ()
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPSERT_FAILED"), psqlException)
+    }
+  }
 
   def update(update: E): Future[Unit] = db.run(tableQuery.filter(_.id === update.id).update(update).asTry).map {
     case Success(result) => ()
@@ -80,8 +92,8 @@ abstract class GenericDaoImpl[T <: Table[E] with ModelTable[PK], E <: Entity[PK]
     }
   }
 
-  def delete(id: PK): Future[Unit] = db.run(tableQuery.filter(_.id === id).delete.asTry).map {
-    case Success(result) => ()
+  def delete(id: PK): Future[Int] = db.run(tableQuery.filter(_.id === id).delete.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_DELETE_FAILED"), psqlException)
       case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_DELETE_FAILED"), noSuchElementException)

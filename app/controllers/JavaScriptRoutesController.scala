@@ -24,6 +24,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.signInForm,
         routes.javascript.AccountController.signOutForm,
         routes.javascript.AccountController.forgetPasswordForm,
+        routes.javascript.AccountController.changePasswordForm,
+        routes.javascript.AccountController.changeActiveKey,
 
         routes.javascript.CollectionController.viewCollections,
         routes.javascript.CollectionController.viewCollection,
@@ -31,12 +33,24 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.collectionsPerPage,
         routes.javascript.CollectionController.collectionFile,
         routes.javascript.CollectionController.collectionNFTs,
+        routes.javascript.CollectionController.collectionNFTsPerPage,
         routes.javascript.CollectionController.info,
 
         routes.javascript.NFTController.viewNFT,
         routes.javascript.NFTController.info,
         routes.javascript.NFTController.details,
         routes.javascript.NFTController.file,
+
+        routes.javascript.ProfileController.viewProfile,
+        routes.javascript.ProfileController.settings,
+        routes.javascript.ProfileController.addNewKey,
+        routes.javascript.ProfileController.addManagedKeyForm,
+        routes.javascript.ProfileController.addUnmanagedKeyForm,
+        routes.javascript.ProfileController.changeKeyNameForm,
+        routes.javascript.ProfileController.viewMnemonicsForm,
+        routes.javascript.ProfileController.deleteKeyForm,
+        routes.javascript.ProfileController.changeManagedToUnmanagedForm,
+
       )
     ).as("text/javascript")
 

@@ -1,0 +1,16 @@
+@(defaultOption:String, availableOptions: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="dropdown">
+    <input type="hidden" class="dp-input" value=""/>
+    <div class="dropdownHead" onclick="showOptions(this)">
+        <div class="currentSelected">@defaultOption</div>
+    </div>
+    <div class="dropdownBody">
+        <div class="dropdownBodyInner">
+            @availableOptions.zipWithIndex.map {case(option, index) =>
+                <div class="dropdownItem" value="@option" onclick="setOption(this)">@option</div>
+            }
+        </div>
+    </div>
+</div>
+
+@* Example Usage: @views.html.base.form.commonDropDown("Default Option", Seq("Option 1", "Option 2")) *@

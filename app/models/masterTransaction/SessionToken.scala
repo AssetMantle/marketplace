@@ -69,11 +69,9 @@ class SessionTokens @Inject()(
 
     def refresh(id: String): Future[String] = {
       val sessionToken: String = utilities.IdGenerator.getRandomHexadecimal
-
-      //      val upsertToken = upsert(SessionToken(id, utilities.Secrets.sha256HashString(sessionToken), DateTime.now(DateTimeZone.UTC).getMillis))
+      val upsertToken = upsert(SessionToken(id, utilities.Secrets.sha256HashString(sessionToken), DateTime.now(DateTimeZone.UTC).getMillis))
       for {
-        _ <- delete(id)
-        _ <- create(SessionToken(id, utilities.Secrets.sha256HashString(sessionToken), DateTime.now(DateTimeZone.UTC).getMillis))
+        _ <- upsertToken
       } yield sessionToken
     }
 
@@ -93,7 +91,7 @@ class SessionTokens @Inject()(
 
     def getTimedOutIDs: Future[Seq[String]] = filter(_.sessionTokenTime < DateTime.now(DateTimeZone.UTC).getMillis - constants.CommonConfig.sessionTokenTimeout).map(_.map(_.accountId))
 
-    def deleteById(id: String): Future[Unit] = delete(id)
+    def deleteById(id: String): Future[Int] = delete(id)
 
     def deleteSessionTokens(ids: Seq[String]): Future[Unit] = deleteMultiple(ids)
 
@@ -115,5 +113,5 @@ class SessionTokens @Inject()(
     }
   }
 
-  actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 300.second, delay = 300.second)(runnable)(schedulerExecutionContext)
+  actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.CommonConfig.sessionTokenTimeout.milliseconds, delay = constants.CommonConfig.sessionTokenTimeout.milliseconds)(runnable)(schedulerExecutionContext)
 }

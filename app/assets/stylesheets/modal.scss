@@ -35,11 +35,18 @@ body.modal-open::-webkit-scrollbar{
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
+    //transition: opacity 0.6s ease, visibility 0.6s ease;
+    //transition: all 0.6s;
+    //transform: translate(0, -50px);
     z-index: 9999;
   }
   .modal-overlay.active {
     opacity: 1;
     visibility: visible;
+    //transform: translate(0, 0);
+  }
+  .modal.fade .modal-dialog{
+    transition: transform 0.6s ease;
   }
 }
 #modal-content{
@@ -156,7 +163,7 @@ body.modal-open::-webkit-scrollbar{
 
 // Recovery Phrase
 .form-copy-item{
-  @include setFont(var(--font-type-2), normal, 700, 14px, 22px, var(--text-medium));
+  @include setFont(var(--font-type-2), normal, 700, 14px, 22px, var(--inactive-gray));
   text-transform: capitalize;
 }
 
@@ -255,4 +262,45 @@ body.modal-open::-webkit-scrollbar{
 .errorMessage .errorContainer{
   @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--error));
   gap: 4px;
+}
+
+
+// View Seed Phrase
+.formSeedBoxList{
+ .formSeedBox{
+   .form-seed-box-number{
+     @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--mantle-off-white));
+     margin-left: 5px;
+   }
+   .form-seed-box-phrase{
+     @include setFont(var(--font-type-2), normal, 400, 14px, 14px, var(--mantle-off-white));
+     text-align: center;
+     background: transparent;
+     width: 100%;
+     border: 1px solid var(--inactive-gray);
+     box-sizing: border-box;
+     border-radius: 8px;
+     padding: 9px 0;
+     outline:none;
+     &.disable{
+       -webkit-touch-callout: none; /* iOS Safari */
+       -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+       -ms-user-select: none; /* Internet Explorer/Edge */
+       user-select: none;
+       pointer-events: none;
+     }
+     input{
+       @include setFont(var(--font-type-2), normal, 400, 16px, 14px, var(--mantle-off-white));
+       height: 100%;
+       width: 100%;
+       border-radius: 8px;
+       border:none;
+       outline: none;
+       background-color: transparent;
+       text-align: center;
+     }
+   }
+ }
 }

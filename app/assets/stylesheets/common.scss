@@ -1,0 +1,164 @@
+@mixin setFont($type, $style, $weight, $size, $lineHeight, $color){
+  font-family: $type;
+  font-style: $style;
+  font-weight: $weight;
+  font-size: $size;
+  line-height: $lineHeight;
+  color: $color;
+}
+
+// Dropdown Menu
+.dropdown {
+  display: inline-block;
+  width: 100%;
+  z-index: 999;
+  .dropdownHead{
+    @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
+    padding: 10px 12px;
+    border: 1px solid var(--inactive-gray);
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    transition: all .5s;
+    &.active{
+      @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-color: var(--dark);
+      background: var(--card-color);
+    }
+    &::after{
+      content: "";
+      height: 20px;
+      width: 20px;
+      background-image: url("../images/icon/downArrowWhite.png");
+      background-size: 18px;
+      background-repeat: no-repeat;
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      transform-origin: center center;
+      transition: all .5s;
+    }
+    &.active::after{
+      top:10px;
+      transform: rotate(180deg);
+    }
+    .currentSelected{
+      line-height: 20px;
+    }
+    &.active + .dropdownBody{
+      @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+    }
+  }
+  .dropdownBody{
+    @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
+    padding: 10px 12px;
+    position: relative;
+    .dropdownBodyInner{
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      background: var(--card-color);
+      display: none;
+      border: 1px solid var(--dark);
+      border-top: none;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      overflow: hidden;
+      .dropdownItem{
+        padding: 10px 12px;
+        cursor: pointer;
+        transition: all .5s;
+        background: var(--card-color);
+        line-height: 20px;
+        position: relative;
+        z-index: 89;
+        &:nth-last-child(1) {
+          padding-bottom: 10px;
+        }
+      }
+    }
+  }
+}
+
+// Tooltip
+.form-copy-message.active{
+  animation: msg-copied 2s ease-in-out forwards;
+}
+.form-copy-message{
+  margin-left:5px;
+  font-size: 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: var(--popup-bg);
+  color: var(--inactive-gray);
+  position: relative;
+  top: 10px;
+  opacity: 0;
+}
+@media (max-width: 1200px) {
+  .form-copy-message{
+    display: none;
+  }
+  .form-copy-message.active{
+    animation: msg-copied 2s ease-in-out forwards;
+  }
+}
+@keyframes msg-copied {
+  0%{
+    top:10px;
+    opacity: 0;
+  }
+  20%{
+    top:0px;
+    opacity: 1;
+  }
+  80%{
+    top:0px;
+    opacity: 1;
+  }
+  100%{
+    top:-10px;
+    opacity: 0;
+  }
+}
+
+// Coming Soon Btn
+#comingSoonBtn{
+  position: relative;
+  overflow: hidden;
+  outline: none;
+  cursor: pointer;
+}
+#comingSoonBtn::before {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  content: 'Send';
+  transition: all .3s;
+}
+#comingSoonBtn::after {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  content: 'Coming Soon';
+  transition: all .3s;
+}
+#comingSoonBtn:hover::before {
+  top: -60px;
+}
+#comingSoonBtn:hover::after {
+  top: 0;
+}

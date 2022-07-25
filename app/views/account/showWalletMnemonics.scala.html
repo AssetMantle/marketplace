@@ -1,41 +1,38 @@
-@import views.account.companion.WalletMnemonics
+@import views.account.companion.VerifyMnemonics
 @import views.html.base.forms._
 
-@(walletMnemonicsForm: Form[WalletMnemonics.Data] = WalletMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<!-- Wallet Mnemonics -->
+@(walletMnemonicsForm: Form[VerifyMnemonics.Data] = VerifyMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div id="walletMnemonics">
     @formHeader(label = "Recovery Phrase")
-    @* @multiStepNavigator() *@
-
     @successModalAddressBox(Symbol("address") -> address)
 
-    <div class="mt-4 form-copy-item">
-        <div>@Messages(constants.View.RECOVERY_PHRASE)</div>
-    </div>
-    <div class="d-flex align-items-center justify-content-between mt-3 form-seed-box-list">
-        @partialMnemonics.zipWithIndex.map {case(word, index) =>
-            @seedInput(((index.toInt)+1).toString, Symbol("phrase") -> word, Symbol("class") -> "disable")
-        }
-    </div>
-    <div class="d-flex mt-3 form-information-message">
-        <div class="form-information-icon"><img src="@routes.Assets.versioned("images/icon/info.png")"/></div>
-        <div class="form-information-text">@Messages(constants.View.CREATE_WALLET_INFO)</div>
-    </div>
-    <div class="form-heading">@Messages(constants.View.CREATE_WALLET_SAFETY_POINTS_TITLE)</div>
-    <div class="form-bullet-list">
-        <ul>
-            <li>@Messages(constants.View.CREATE_WALLET_SAFETY_POINT_1)</li>
-            <li>@Messages(constants.View.CREATE_WALLET_SAFETY_POINT_2)</li>
-            <li>@Messages(constants.View.CREATE_WALLET_SAFETY_POINT_3)</li>
-        </ul>
-    </div>
+<div class="mt-4 form-copy-item">
+    <div>@Messages(constants.View.RECOVERY_PHRASE)</div>
+</div>
+<div class="d-flex align-items-center justify-content-between mt-3 form-seed-box-list">
+@partialMnemonics.zipWithIndex.map { case (word, index) =>
+    @seedInput(((index.toInt) + 1).toString, Symbol("phrase") -> word, Symbol("class") -> "disable")
+}
+</div>
+<div class="d-flex mt-3 form-information-message">
+    <div class="form-information-icon"><img src="@routes.Assets.versioned("images/icon/info.png")"/></div>
+    <div class="form-information-text">@Messages(constants.View.CREATE_WALLET_INFO)</div>
+</div>
+<div class="form-heading">@Messages(constants.View.CREATE_WALLET_SAFETY_POINTS_TITLE)</div>
+<div class="form-bullet-list">
+    <ul>
+        <li>@Messages(constants.View.CREATE_WALLET_SAFETY_POINT_1)</li>
+        <li>@Messages(constants.View.CREATE_WALLET_SAFETY_POINT_2)</li>
+        <li>@Messages(constants.View.CREATE_WALLET_SAFETY_POINT_3)</li>
+    </ul>
+</div>
 
-    <div class="form-button">
-        <button class="form-secondary-button" onclick="closeModal()" data-bs-dismiss="modal" aria-label="Close">@Messages(constants.View.CANCEL)</button>
-        <button class="form-primary-button" onclick="showHideModalScreen('#verificationForm','#walletMnemonics')">@Messages(constants.View.NEXT)</button>
-    </div>
+<div class="form-button">
+    <button class="form-secondary-button" onclick="closeModal()" data-bs-dismiss="modal" aria-label="Close">@Messages(constants.View.CANCEL)</button>
+    <button class="form-primary-button" onclick="showHideModalScreen('#verificationForm', '#walletMnemonics')">@Messages(constants.View.NEXT)</button>
+</div>
 </div>
 
 <div id="verificationForm" style="display: none;">
-    @views.html.account.verifyWalletMnemonics(walletMnemonicsForm, username, address, partialMnemonics)
+@views.html.account.verifyWalletMnemonics(walletMnemonicsForm, username, address)
 </div>

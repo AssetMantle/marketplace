@@ -1,0 +1,76 @@
+@import views.html.base.forms._
+
+@(seeds: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
+<div class="modal-header">
+    <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.VIEW_MNEMONICS_SEED_PHRASE_TITLE)</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                &times;
+    </button>
+</div>
+
+<div class="mb-0" id="viewMnemonicsSeedPhraseScreen" style="margin-top: 32px;">
+    <div class="d-flex flex-row mb-3 showHideSeeds">
+        <span class="me-2">@Messages(constants.View.PROFILE_VERIFY_WALLET_MNEMONICS_SHOW_HIDE_MESSAGE)</span>
+        <div class="iconContainer" onclick="showHideSeed()">
+            <span class="eyeIcon closeEye">
+                <img src="@routes.Assets.versioned("images/icon/hidePassword.png")" width="22px" height="20px"/>
+            </span>
+            <span class="eyeIcon openEye hidden">
+                <img src="@routes.Assets.versioned("images/icon/showPassword.png")" width="22px" height="17px"/>
+            </span>
+        </div>
+    </div>
+    <div class="seedsSection"></div>
+</div>
+
+<script>
+        mnemonicsLayout = "";
+        mnemonicsNumber = 1;
+
+        // Show seeds
+        @if(seeds.nonEmpty) {
+        mnemonicsLayout += `<div class="row formSeedBoxList">`;
+            @seeds.map { seed =>
+                        mnemonicsLayout += `
+                <div class="col-3 mb-3 formSeedBox">
+                    <div class="form-seed-box-number">${('0' + mnemonicsNumber).slice(-2)}</div>
+                    <input type="password" value="@seed" class="mt-2 form-seed-box-phrase mnemonicValue active disable" id="mnemonic${mnemonicsNumber}"/>
+                </div>`;
+                        mnemonicsNumber += 1;
+            }
+        mnemonicsLayout += `</div>`;
+        $(".seedsSection").append(mnemonicsLayout);
+        }
+
+        // Add last 4 seeds
+        lastSeeds = "";
+        for(j=1; j<=4; j++){
+            lastSeeds += `
+                 <div class="col-3 mb-3 formSeedBox">
+                    <div class="form-seed-box-number">${('0' + mnemonicsNumber).slice(-2)}</div>
+                    <input type="password" value="*****" class="mt-2 form-seed-box-phrase mnemonicValue active disable" id="mnemonic${mnemonicsNumber}"/>
+                </div>`;
+            mnemonicsNumber+=1;
+        }
+        $(".formSeedBoxList").append(lastSeeds);
+
+        function showHideSeed() {
+            allSeeds = $('.mnemonicValue');
+            if (allSeeds[0].type === "password") {
+                allSeeds.each(function () {
+                    $(this).attr("type", "text");
+                });
+                $(".closeEye").addClass("hidden");
+                $(".openEye").removeClass("hidden");
+            } else {
+                allSeeds.each(function () {
+                    $(this).attr("type", "password");
+                });
+                $(".closeEye").removeClass("hidden");
+                $(".openEye").addClass("hidden");
+            }
+        }
+</script>
+
+

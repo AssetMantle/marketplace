@@ -1,4 +1,4 @@
-@(heading:String = "", subHeading:String = "")
+@(heading: String = "", subHeading: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="header-success">
     <div class="d-flex">
@@ -11,8 +11,8 @@
     </div>
     <div class="form-body">
         <div class="mt-4 text-center">
-            <div class="form-success-message-heading">@heading</div>
-            <div class="mt-2 form-success-message-sub-text">@subHeading</div>
+            <div class="form-success-message-heading">@Messages(heading)</div>
+            <div class="mt-2 form-success-message-sub-text">@Messages(subHeading)</div>
         </div>
     </div>
 </div>

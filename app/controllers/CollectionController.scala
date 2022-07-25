@@ -22,7 +22,6 @@ class CollectionController @Inject()(
                                       withoutLoginActionAsync: WithoutLoginActionAsync,
                                       withLoginActionAsync: WithLoginActionAsync,
                                       masterAccounts: master.Accounts,
-                                      masterWallets: master.Wallets,
                                       masterCollections: master.Collections,
                                       masterNFTs: master.NFTs,
                                       masterCollectionFiles: master.CollectionFiles,
@@ -58,7 +57,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionsPerPage(pageNumber: Int) = withoutLoginActionAsync { implicit loginState =>
+  def collectionsPerPage(pageNumber: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val collections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
       else masterCollections.Service.getByPageNumber(pageNumber)
@@ -106,11 +105,25 @@ class CollectionController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
-        val allNFTs = masterNFTs.Service.getAllForCollection(id)
         (for {
           collection <- collection
-          allNFTs <- allNFTs
-        } yield Ok(views.html.collection.details.collectionNFTs(collection, allNFTs))
+        } yield Ok(views.html.collection.details.collectionNFTs(collection))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def collectionNFTsPerPage(id: String, pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + id + "/" + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        else masterCollections.Service.tryGet(id)
+        val nfts = masterNFTs.Service.getByPageNumber(id, pageNumber)
+        (for {
+          collection <- collection
+          nfts <- nfts
+        } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

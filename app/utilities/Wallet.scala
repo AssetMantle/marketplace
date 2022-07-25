@@ -15,7 +15,7 @@ import scodec.bits.ByteVector
 import java.security.{MessageDigest, Security}
 import scala.util.{Failure, Success}
 
-case class Wallet(address: String, hdPath: String, publicKey: Array[Byte], privateKey: Array[Byte], mnemonics: Seq[String])
+case class Wallet(address: String, hdPath: Seq[ChildNumber], publicKey: Array[Byte], privateKey: Array[Byte], mnemonics: Seq[String])
 
 object Wallet {
 
@@ -49,18 +49,24 @@ object Wallet {
     )
   }
 
-  def getWallet(mnemonics: Seq[String], hdPath: ImmutableList[ChildNumber] = constants.Blockchain.DefaultHDPath, bip39Passphrase: Option[String] = None): Wallet = {
+  def getWallet(mnemonics: Seq[String], hdPath: Seq[ChildNumber] = constants.Blockchain.DefaultHDPath, bip39Passphrase: Option[String] = None): Wallet = {
     val words = mnemonics.mkString(" ")
+    val hdPathAsList = collect.ImmutableList.copyOf(scala.jdk.CollectionConverters.SeqHasAsJava(hdPath).asJava)
     if (Bip39.validate(mnemonics)) {
       val bitcoinWallet = bitcoinjWallet.fromSeed(
         MainNetParams.get(),
         new DeterministicSeed(words, Bip39.toSeed(words, bip39Passphrase), "", System.currentTimeMillis()),
         Script.ScriptType.P2PKH,
-        hdPath
+        hdPathAsList
       )
 
-      utilities.Bech32.encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(bitcoinWallet.getKeyByPath(hdPath).getPubKey)))) match {
-        case Success(address) => Wallet(address = address, hdPath = hdPath.toString, publicKey = bitcoinWallet.getKeyByPath(hdPath).getPubKey, privateKey = bitcoinWallet.getKeyByPath(hdPath).getPrivKeyBytes, mnemonics = mnemonics)
+      utilities.Bech32.encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(bitcoinWallet.getKeyByPath(hdPathAsList).getPubKey)))) match {
+        case Success(address) => Wallet(
+          address = address,
+          hdPath = hdPath,
+          publicKey = bitcoinWallet.getKeyByPath(hdPathAsList).getPubKey,
+          privateKey = bitcoinWallet.getKeyByPath(hdPathAsList).getPrivKeyBytes,
+          mnemonics = mnemonics)
         case Failure(exception) => logger.error(exception.getLocalizedMessage)
           throw new BaseException(constants.Response.KEY_GENERATION_FAILED)
       }

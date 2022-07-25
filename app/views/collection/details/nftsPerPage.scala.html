@@ -1,0 +1,12 @@
+@import views.html.nft._
+
+@(collection: master.Collection, nfts: Seq[master.NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="row m-0 nftPage">
+    @if(nfts.nonEmpty) {
+        @nfts.map { nft =>
+            @commonNFTCard(collection, nft)
+        }
+    } else {
+        <div class="noNFT"></div>
+    }
+</div>

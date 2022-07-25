@@ -80,7 +80,19 @@ TERMS_CONDITION_LABEL=Terms and conditions
 RESPONSE.FAILURE.USERNAME_UNAVAILABLE=Username is not available.
 RESPONSE.FAILURE.PASSWORDS_DO_NOT_MATCH=Password do not match.
 RESPONSE.FAILURE.INVALID_MNEMONICS=Invalid mnemonics.
+RESPONSE.FAILURE.INVALID_MNEMONICS_OR_USERNAME=Invalid mnemonics or username.
+RESPONSE.FAILURE.INVALID_SEEDS_OR_ADDRESS=Invalid Seeds or Address
+RESPONSE.FAILURE.INVALID_WALLET_ADDRESS=Invalid wallet address
+RESPONSE.FAILURE.MASTER_KEY_INSERT_FAILED=Key already exists or account doesn't exist
 SIGN_UP_SIGN_IN_MESSAGE=Already have an account?
+PLACEHOLDER.SIGNUP_PASSWORD=Enter Password
+PLACEHOLDER.CONFIRM_PASSWORD=Enter Password
+PLACEHOLDER.SEED_PHRASE_1=
+PLACEHOLDER.SEED_PHRASE_2=
+PLACEHOLDER.SEED_PHRASE_3=
+PLACEHOLDER.SEED_PHRASE_4=
+CONFIRM_USERNAME=Confirm Username
+PLACEHOLDER.CONFIRM_USERNAME=Enter Username
 
 #//Create Wallet
 CREATE_WALLET_TITLE=Create a Wallet
@@ -108,12 +120,11 @@ CREATE_WALLET_ERROR_MESSAGE_2=here
 CREATE_WALLET_ERROR_MESSAGE_3=to help you create your wallet.
 NEXT=next
 CANCEL=Cancel
-FORM.VERIFY_WALLET_MNEMONICS.TITLE=Verification
+FORM.VERIFY_WALLET_MNEMONICS.TITLE=Set Password And Verify
 FORM.VERIFY_WALLET_MNEMONICS.SUBTITLE=Confirm username and recovery phrase.
 FORM.VERIFY_WALLET_MNEMONICS.SUBMIT=Next
 CONFIRM_RECOVERY_PHRASE=Confirm your Recovery Phrase
 PHRASE_VERIFICATION_WARNING=Do not share recovery phrase with anyone.
-
 
 #//Sign In
 FORM.SIGN_IN.TITLE=Sign In
@@ -126,8 +137,12 @@ SIGN_IN_SIGN_UP_MESSAGE=Don’t have an account yet?
 SIGN_IN_SIGN_UP=Sign up
 RESPONSE.FAILURE.INVALID_USERNAME_OR_PASSWORD=Invalid username or password.
 RESPONSE.FAILURE.MASTER_ACCOUNT_NOT_FOUND=Account not found.
+RESPONSE.FAILURE.MASTER_KEY_NOT_FOUND=Invalid username or address.
 RESPONSE.FAILURE.INVALID_PASSWORD=Invalid password.
+RESPONSE.FAILURE.OLD_AND_NEW_SAME_PASSWORD=Old & new password cannot be same.
 RESPONSE.FAILURE.PASSWORD_VALIDATION_FAILED=Password does not match minimum criteria. It should contain at least a small letter, a capital letter, a number and a symbol: !@#$%^&*._-.
+PLACEHOLDER.PASSWORD=Enter Password
+PLACEHOLDER.WALLET_ADDRESS=Wallet Address
 
 #//Sign Out
 SIGN_OUT_CONFIRMATION=Are you sure you want to sign out?
@@ -169,6 +184,8 @@ FORM.FORGET_PASSWORD.SUBMIT=Next
 FORGOT_PASSWORD_WALLET_ADDRESS_ERROR=Invalid wallet address.
 FORGOT_PASSWORD_USERNAME_ERROR=Minimum length 3.
 RESPONSE.FAILURE.MASTER_WALLET_NOT_FOUND=Wallet not found.
+PLACEHOLDER.FORGOT_PASSWORD=Password
+PLACEHOLDER.FORGOT_CONFIRM_PASSWORD=Confirm Password
 
 #//Profile
 TRANSACTION_DETAILS=Transaction Details
@@ -202,3 +219,110 @@ OVERVIEW=Overview
 ACTIVITY=Activity
 MORE=More
 PROPERTIES=Properties
+
+#//Profile
+PROFILE_VERIFY_WALLET_MNEMONICS_SHOW_HIDE_MESSAGE=Click to show or hide seed phrase
+PROFILE_VERIFY_WALLET_MNEMONICS_FOOTER_MESSAGE=Do you want this wallet to be managed by AssetMantle?
+ADD_WALLET_ADDRESS_SUCCESS_TITLE=Wallet Address added successfully
+ADD_WALLET_ADDRESS_SUCCESS_SUBTITLE=Your wallet address has been been added successfully. You can view this in you wallet or profile settings.
+PROFILE_SETTINGS_TITLE=Profile Settings
+PROFILE_SETTINGS_SUBTITLE=Set your preferences, view and manage personal information.
+PROFILE_BASIC_INFO_TITLE=Basic Information
+PROFILE_USERNAME=Username:
+PROFILE_PASSWORD=Password:
+PROFILE_IDENTITY_ADDRESS=Identity address:
+PROFILE_WALLET_DETAIL_TITLE=Wallet Details
+PROFILE_ADD_NEW_ADDRESS=Add New Address
+ADD_NEW_WALLET_OPTION_TITLE=Add New Address
+ADD_NEW_WALLET_OPTION_SUBTITLE=Select the type of address you want to add
+ADD_NEW_WALLET_OPTION_SELECT_ITEM=Select Item
+ADD_NEW_WALLET_OPTION_MANAGED=Managed
+ADD_NEW_WALLET_OPTION_UNMANAGED=Unmanaged
+WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS=View mnemonic seed phrase
+WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME=Change Name
+WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT=Delete account
+
+#//Wallet
+POPUP_WALLET_BODY_MESSAGE=You will be redirected to another page on clicking buy more. Some other details user needs to know.
+BUY_MORE=Buy more
+SEND=Send
+POPUP_WALLET_FOOTER_MESSAGE=Lorem ipusm set dorem amit etc
+MY_NFTS_LINK=My NFTs
+ADDRESS_BOOK=Address Book
+SIGN_OUT=Sign Out
+ADDRESS_BOOK_TITLE=Manage Address Book
+ADD_NEW_ADDRESS_LABEL=Add new
+ADD_NEW_ADDRESS_TITLE=Add New Address
+LABEL_NAME=Name
+FIELD_PLACEHOLDER_NAME=Type name here
+LABEL_ADDRESS=Address
+FIELD_PLACEHOLDER_ADDRESS=Type address here
+LABEL_DEFAULT_MEMO=Default memo (Optional)
+FIELD_PLACEHOLDER_DEFAULT_MEMO=Type address here
+ADD_NEW_ADDRESS_FOOTER_MESSAGE=Want this address to be managed?
+ADD_NEW_ADDRESS_FOOTER_LINK=Profile Settings
+MENU_CREATED=Created
+MENU_SETTINGS=Settings
+MENU_SIGN_OUT=Sign out
+LABEL_TYPE_OF_WALLET=Type of wallet
+TOOLTIP_COPIED=Copied
+TOOLTIP_USERNAME=Username:
+TOOLTIP_PASSWORD=Address:
+KEY_DELETED_SUCCESSFULLY_TITLE=Key Deleted Successfully
+KEY_DELETED_SUCCESSFULLY_SUBTITLE=
+
+#//Managed Address
+FORM.ADD_MANAGED_KEY.TITLE=Add New Address
+FORM.ADD_MANAGED_KEY.SUBTITLE=Enter details to add an address
+FORM.ADD_MANAGED_KEY.SUBMIT=Confirm
+DISCLAIMER_MESSAGE=AssetMantle wallet provides an option to store separate wallet addresses for custody and transaction management for blockchain-based digital wallets. This allows the user to operate multiple addresses and restore their MantlePlace account via any of these addresses using the custody solution managed by AssetMantle.
+DISCLAIMER_POLICY_MESSAGE=I agree to AssetMantle managing my wallet address through the custody solution
+MANAGED_KEY_NAME=Wallet Name
+MANAGED_KEY_ADDRESS=Address
+PLACEHOLDER.MANAGED_KEY_NAME=Type wallet name here
+PLACEHOLDER.MANAGED_KEY_ADDRESS=Type address here
+
+#//Unmanaged Address
+FORM.ADD_UNMANAGED_KEY.TITLE=Add New Address
+FORM.ADD_UNMANAGED_KEY.SUBTITLE=Enter details to add an address
+FORM.ADD_UNMANAGED_KEY.SUBMIT=Confirm
+CONFIRM_BUTTON=Confirm
+PLACEHOLDER.USERNAME=Enter Username
+UNMANAGED_KEY_NAME=Wallet Name
+UNMANAGED_KEY_ADDRESS=Address
+PLACEHOLDER.UNMANAGED_KEY_NAME=Type wallet name here
+PLACEHOLDER.UNMANAGED_KEY_ADDRESS=Type address here
+
+#//Change Wallet Name
+FORM.CHANGE_KEY_NAME.TITLE=Change Wallet Name
+FORM.CHANGE_KEY_NAME.SUBTITLE=Enter a new name for the wallet
+FORM.CHANGE_KEY_NAME.SUBMIT=Save
+CHANGE_KEY_ADDRESS=Address
+CHANGE_KEY_NAME=New Name
+PLACEHOLDER.CHANGE_KEY_ADDRESS=Type wallet address here
+PLACEHOLDER.CHANGE_KEY_NAME=Type new wallet name here
+
+#//View Mnemonics Seed Phrase
+FORM.VIEW_MNEMONICS.TITLE=Confirm Password
+FORM.VIEW_MNEMONICS.SUBTITLE=Enter your password to confirm action
+FORM.VIEW_MNEMONICS.SUBMIT=Confirm
+VIEW_MNEMONICS_SEED_PHRASE_TITLE=Seed Phrase
+VIEW_MNEMONICS_SEED_PHRASE_SUBTITLE=Click to show or hide seed phrase
+
+#//Delete Account
+FORM.DELETE_KEY.TITLE=Delete Key
+FORM.DELETE_KEY.SUBTITLE=Enter your password to confirm action
+FORM.DELETE_KEY.SUBMIT=Confirm
+
+#//Change Password
+FORM.CHANGE_PASSWORD.TITLE=Change Password
+FORM.CHANGE_PASSWORD.SUBTITLE=Enter your password to confirm action
+FORM.CHANGE_PASSWORD.SUBMIT=Confirm
+OLD_PASSWORD=Old Password
+CHANGE_PASSWORD=New Password
+CHANGE_CONFIRM_PASSWORD=Confirm Password
+PLACEHOLDER.OLD_PASSWORD=Type old password here
+PLACEHOLDER.CHANGE_PASSWORD=Type new password here
+PLACEHOLDER.CHANGE_CONFIRM_PASSWORD=Type confirm password here
+
+

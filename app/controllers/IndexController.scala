@@ -6,7 +6,7 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import service.UploadCollections
+import service.Starter
 
 import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,7 +18,7 @@ class IndexController @Inject()(
                                  withoutLoginActionAsync: WithoutLoginActionAsync,
                                  withoutLoginAction: WithoutLoginAction,
                                  withUsernameToken: WithUsernameToken,
-                                 uploadCollections: UploadCollections
+                                 starter: Starter
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -36,5 +36,5 @@ class IndexController @Inject()(
         }
     }
   }
-  uploadCollections.start()
+  starter.start()
 }
