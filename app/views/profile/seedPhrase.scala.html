@@ -28,42 +28,32 @@
         mnemonicsLayout = "";
         mnemonicsNumber = 1;
 
-        // 12 Seed Phrase
-        for (i = 1; i <= 3; i++) {
-            mnemonicsLayout += `<div class="d-flex mb-3 form-seed-box-list">`;
-            for (j = 1; j <= 4; j++) {
-                mnemonicsLayout += `
-                <div class="form-seed-box">
+        // Show seeds
+        @if(seeds.nonEmpty) {
+        mnemonicsLayout += `<div class="row formSeedBoxList">`;
+            @seeds.map { seed =>
+                        mnemonicsLayout += `
+                <div class="col-3 mb-3 formSeedBox">
                     <div class="form-seed-box-number">${('0' + mnemonicsNumber).slice(-2)}</div>
-                    <input type="password" class="mt-2 form-seed-box-phrase mnemonicValue active disable" id="mnemonic${mnemonicsNumber}"/>
+                    <input type="password" value="@seed" class="mt-2 form-seed-box-phrase mnemonicValue active disable" id="mnemonic${mnemonicsNumber}"/>
                 </div>`;
-                mnemonicsNumber += 1;
+                        mnemonicsNumber += 1;
             }
-            mnemonicsLayout += `</div>`;
-            $(".seedsSection").append(mnemonicsLayout);
-            mnemonicsLayout = "";
+        mnemonicsLayout += `</div>`;
+        $(".seedsSection").append(mnemonicsLayout);
         }
 
-        // 24 Sedd Phrase
-        for (i = 1; i <= 3; i++) {
-            mnemonicsLayout += `<div class="d-flex mb-3 form-seed-box-list">`;
-            for (j = 1; j <= 4; j++) {
-                mnemonicsLayout += `
-                <div class="form-seed-box">
+        // Add last 4 seeds
+        lastSeeds = "";
+        for(j=1; j<=4; j++){
+            lastSeeds += `
+                 <div class="col-3 mb-3 formSeedBox">
                     <div class="form-seed-box-number">${('0' + mnemonicsNumber).slice(-2)}</div>
-                    <input type="password" class="mt-2 form-seed-box-phrase mnemonicValue disable" id="mnemonic${mnemonicsNumber}"/>
+                    <input type="password" value="*****" class="mt-2 form-seed-box-phrase mnemonicValue active disable" id="mnemonic${mnemonicsNumber}"/>
                 </div>`;
-                mnemonicsNumber += 1;
-            }
-            mnemonicsLayout += `</div>`;
-            $(".seedsSection").append(mnemonicsLayout);
-            mnemonicsLayout = "";
+            mnemonicsNumber+=1;
         }
-
-        allSeeds = $('.mnemonicValue');
-        for (i = 1; i <= 4; i++) {
-            $(allSeeds[allSeeds.length - i]).attr("value", "*****");
-        }
+        $(".formSeedBoxList").append(lastSeeds);
 
         function showHideSeed() {
             allSeeds = $('.mnemonicValue');
