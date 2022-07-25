@@ -27,8 +27,8 @@ resolvers += "Maven Central Server" at "https://repo1.maven.org/maven2"
 libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
 libraryDependencies ++= Seq(
-  "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.7.6" % "viewSettings",
-  "io.gatling" % "gatling-viewSettings-framework" % "3.7.6" % "viewSettings"
+  "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.7.6" % "test",
+  "io.gatling" % "gatling-test-framework" % "3.7.6" % "test"
 )
 
 libraryDependencies ++= Seq(
