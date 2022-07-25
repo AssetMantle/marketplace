@@ -147,7 +147,8 @@
     cursor: pointer;
   }
   .walletMenu{
-    height: 512px;
+    //height: 512px;
+    height: 460px;
     width: 254px;
     position: absolute;
     right: -255px;
@@ -177,7 +178,8 @@
     }
   }
   .addressBook{
-    height: 512px;
+    //height: 512px;
+    height: 450px;
     width: 254px;
     position: absolute;
     right: -255px;
@@ -193,8 +195,11 @@
     }
 
     .walletAddressList{
-      height: 330px;
+      //height: 330px;
+      height: 200px;
       overflow-y: auto;
+      padding-right: 12px;
+      margin-bottom: 24px;
       .walletAddressItem{
         padding: 12px 0px;
         border-bottom: 2px solid var(--line);
@@ -238,6 +243,9 @@
           }
         }
       }
+    }
+    .bottomMenu{
+      margin-top: 37px;
     }
   }
 }

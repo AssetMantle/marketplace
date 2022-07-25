@@ -124,3 +124,41 @@
     opacity: 0;
   }
 }
+
+// Coming Soon Btn
+#comingSoonBtn{
+  position: relative;
+  overflow: hidden;
+  outline: none;
+  cursor: pointer;
+}
+#comingSoonBtn::before {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  content: 'Send';
+  transition: all .3s;
+}
+#comingSoonBtn::after {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  content: 'Coming Soon';
+  transition: all .3s;
+}
+#comingSoonBtn:hover::before {
+  top: -60px;
+}
+#comingSoonBtn:hover::after {
+  top: 0;
+}

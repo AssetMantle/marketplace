@@ -52,8 +52,8 @@
                                 <img src="@routes.Assets.versioned("images/icon/showPassword.png")" width="24px" height="18px"/>
                             </span>
                         </div>
-                        @commonInputPassword(walletMnemonicsForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, Symbol("id") -> "signUpConfirmPassword", Symbol("oninput") -> """checkPasswords(); activeButton();""")
-                        @views.html.base.forms.commonFieldErrorMessage(id = "repeatPasswordError", message = Messages(constants.View.REPEAT_PASSWORD_MISMATCH))
+                        @commonInputPassword(walletMnemonicsForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, Symbol("id") -> "signUpConfirmPassword", Symbol("oninput") -> """checkPasswords();""")
+                        @views.html.base.forms.commonFieldErrorMessage(id = "repeatPasswordError",message = Messages(constants.View.REPEAT_PASSWORD_MISMATCH))
                     </div>
                 </div>
             </div>
