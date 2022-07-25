@@ -1,15 +1,15 @@
 @import views.profile.companion.ChangeKeyName
 @import views.html.base.form._
 
-@(changeWalletNameForm: Form[ChangeKeyName.Data] = ChangeKeyName.form, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(changeKeyNameForm: Form[ChangeKeyName.Data] = ChangeKeyName.form, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
-@commonForm(constants.Form.CHANGE_KEY_NAME, changeWalletNameForm) {
+@commonForm(constants.Form.CHANGE_KEY_NAME, changeKeyNameForm) {
     <div class="modal-body">
         <div class="mb-3">
             <div class="inputField">
                 <div class="inputFieldBody">
                     @views.html.base.label.commonLabel(constants.FormField.CHANGE_KEY_ADDRESS.name)
-                    @commonInputText(changeWalletNameForm, constants.FormField.CHANGE_KEY_ADDRESS, Symbol("autocomplete") -> "off", Symbol("id") -> "changeKeyAddress")
+                    @commonInputText(changeKeyNameForm, constants.FormField.CHANGE_KEY_ADDRESS, Symbol("autocomplete") -> "off", Symbol("id") -> "changeKeyAddress", Symbol("value") -> address, Symbol("readonly") -> "readonly")
                 </div>
             </div>
         </div>
@@ -17,7 +17,7 @@
             <div class="inputField">
                 <div class="inputFieldBody">
                     @views.html.base.label.commonLabel(constants.FormField.CHANGE_KEY_NAME.name)
-                    @commonInputText(changeWalletNameForm, constants.FormField.CHANGE_KEY_NAME, Symbol("autocomplete") -> "off", Symbol("id") -> "changeKeyName")
+                    @commonInputText(changeKeyNameForm, constants.FormField.CHANGE_KEY_NAME, Symbol("autocomplete") -> "off", Symbol("id") -> "changeKeyName")
                 </div>
             </div>
         </div>

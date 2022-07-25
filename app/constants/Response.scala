@@ -46,6 +46,7 @@ object Response {
   val INVALID_MNEMONICS = new Failure("INVALID_MNEMONICS")
   val INVALID_MNEMONICS_OR_USERNAME = new Failure("INVALID_MNEMONICS_OR_USERNAME")
   val INVALID_ACTIVE_KEY = new Failure("INVALID_ACTIVE_KEY")
+  val ACTIVATING_UNMANAGED_KEY = new Failure("ACTIVATING_UNMANAGED_KEY")
 
   val IPFS_UPLOAD_FAILED = new Failure("IPFS_UPLOAD_FAILED")
   val ERROR_DOWNLOADING_IPFS_FILE = new Failure("ERROR_DOWNLOADING_IPFS_FILE")
@@ -80,6 +81,7 @@ object Response {
   val INVALID_KEY_NAME = new Failure("INVALID_KEY_NAME")
   val INVALID_PASSWORD_OR_SEEDS = new Failure("INVALID_PASSWORD_OR_SEEDS")
   val HD_PATH_NOT_FOUND = new Failure("HD_PATH_NOT_FOUND")
+  val INVALID_WALLET_ADDRESS = new Failure("INVALID_WALLET_ADDRESS")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

@@ -310,7 +310,7 @@ class AccountController @Inject()(
             _ <- changePassword
           } yield PartialContent(views.html.account.successfullPasswordChange())
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.account.forgetPassword(ForgotPassword.form.withGlobalError(baseException.failure.message)))
+            case baseException: BaseException => BadRequest(views.html.account.changePassword(ChangePassword.form.withGlobalError(baseException.failure.message)))
           }
         }
       )

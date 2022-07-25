@@ -7,7 +7,6 @@ document.onload = function () {
 
 function loadMoreNFTs(collectionId) {
     if ($(".noNFT").length === 0) {
-        console.log($(".nftPage").length);
         let route = jsRoutes.controllers.CollectionController.collectionNFTsPerPage(collectionId, $(".nftPage").length + 1);
         $.ajax({
             url: route.url,

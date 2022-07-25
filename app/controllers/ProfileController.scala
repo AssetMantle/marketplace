@@ -122,7 +122,7 @@ class ProfileController @Inject()(
               active = false,
               verified = Option(true)
             )
-          } else constants.Response.INVALID_SEEDS_OR_ADDRESS.throwFutureBaseException()
+          } else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
 
           (for {
             (validatePassword, _) <- validatePassword

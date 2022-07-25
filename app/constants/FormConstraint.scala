@@ -51,8 +51,15 @@ object FormConstraint {
       case _: Exception => true
     }
     val errors = Seq(
-      if (seeds.length != 24 || seeds.length != 12) Option(ValidationError(constants.Response.MNEMONICS_LENGTH_NOT_12_OR_24.message)) else None,
+      if (!(seeds.length == 24 || seeds.length == 12)) Option(ValidationError(constants.Response.MNEMONICS_LENGTH_NOT_12_OR_24.message)) else None,
       if (walletError) Option(ValidationError(constants.Response.INVALID_SEEDS_OR_ADDRESS.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val addUnmanagedKeyConstraint: Constraint[AddUnmanagedKey.Data] = Constraint("constraints.AddUnmanagedKey")({ addUnmanagedKeyData: AddUnmanagedKey.Data =>
+    val errors = Seq(
+      if (!addUnmanagedKeyData.address.startsWith("mantle") || addUnmanagedKeyData.address.length != 45) Option(ValidationError(constants.Response.INVALID_WALLET_ADDRESS.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })

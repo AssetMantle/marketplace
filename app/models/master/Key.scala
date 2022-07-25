@@ -298,11 +298,17 @@ class Keys @Inject()(
       val oldKey = tryGet(accountId = accountId, address = oldAddress)
       val key = tryGet(accountId = accountId, address = newAddress)
 
+      def updateKeys(oldKey: Key, newKey: Key) =  if (newKey.encryptedPrivateKey.nonEmpty) {
+        for {
+          _ <- update(newKey.copy(active = true).serialize())
+          _ <- update(oldKey.copy(active = false).serialize())
+        } yield ()
+      } else constants.Response.ACTIVATING_UNMANAGED_KEY.throwBaseException()
+
       for {
         oldKey <- oldKey
         key <- key
-        _ <- update(key.copy(active = true).serialize())
-        _ <- update(oldKey.copy(active = false).serialize())
+        _ <- updateKeys(oldKey = oldKey, newKey = key)
       } yield ()
     }
 

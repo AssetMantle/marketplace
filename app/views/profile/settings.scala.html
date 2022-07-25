@@ -37,26 +37,28 @@
                 <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
                 <div class="ms-xl-auto ms-lg-3 ms-3 mt-2 mt-xl-0 mt-lg-2">
                     <div class="d-flex flex-row justify-content-between align-items-center walletAddressItem">
-                        @if(key.active) {
-                            <input type="radio" name="walletAddress" id="walletAddress1" checked/>
-                        } else {
-                            <input type="radio" name="walletAddress" id="walletAddress2"/>
+                        @if(key.encryptedPrivateKey.nonEmpty) {
+                            @if(key.active) {
+                                <input type="radio" name="walletAddress" id="walletAddress1" checked/>
+                            } else {
+                                <input type="radio" name="walletAddress" id="walletAddress2" onclick="changeActive('@key.address')"/>
+                            }
                         }
-                        <div class="me-3 iconContainer menuToolTip">
-                            <img src="@routes.Assets.versioned("images/icon/kebabMenuYellow.png")" class="ms-3" width="6px" height="20px"/>
-                            <span class="tooltiptext">
-                                <div class="menuOption">
-                                    @if(key.partialMnemonics.isDefined) {
-                                        <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.viewMnemonicsForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
-                                    }
-                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.changeKeyNameForm())">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
-                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.deleteAccountForm())">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
-                                </div>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    <div class="me-3 iconContainer menuToolTip">
+                        <img src="@routes.Assets.versioned("images/icon/kebabMenuYellow.png")" class="ms-3" width="6px" height="20px"/>
+                        <span class="tooltiptext">
+                            <div class="menuOption">
+                                @if(key.partialMnemonics.isDefined) {
+                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.viewMnemonicsForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
+                                }
+                            <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.changeKeyNameForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
+                            <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.deleteAccountForm())">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
+        </div>
+        </span>
+        </div>
+        </div>
+        </div>
+        </div>
         </div>
         }
         <div class="d-flex flex-row gap-2 align-items-center addNewWalletBtn" onclick="getForm(jsRoutes.controllers.ProfileController.addNewKey())">

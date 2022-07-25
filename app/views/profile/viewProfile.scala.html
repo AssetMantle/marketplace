@@ -2,7 +2,7 @@
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
-@views.html.base.common(constants.View.COLLECTIONS, failures, warnings, successes, infos)
+@views.html.base.common(constants.View.PROFILE, failures, warnings, successes, infos)
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
 <script>
         componentResource('centerContent', jsRoutes.controllers.ProfileController.settings());
