@@ -297,7 +297,7 @@ class AccountController @Inject()(
   }
 
   def changePasswordForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.account.forgetPassword())
+    Ok(views.html.account.changePassword())
   }
 
   def changePassword: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
