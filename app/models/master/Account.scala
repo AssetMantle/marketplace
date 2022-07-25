@@ -98,18 +98,14 @@ class Accounts @Inject()(
       } yield ()
     }
 
-    def validateAndUpdatePassword(username: String, oldPassword: String, newPassword: String): Future[Unit] = {
-      val account = tryGetById(username).map(_.deserialize)
+    def updateAccount(account: Account): Future[Unit] = update(account.serialize())
 
-      def verifyAndUpdate(account: Account) = if (utilities.Secrets.verifyPassword(password = oldPassword, passwordHash = account.passwordHash, salt = account.salt, iterations = account.iterations)) {
-        update(account.copy(passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = account.salt, iterations = constants.Security.DefaultIterations)).serialize())
-      } else Future(throw new BaseException(constants.Response.INVALID_USERNAME_OR_PASSWORD))
-
-      for {
-        account <- account
-        _ <- verifyAndUpdate(account)
-      } yield ()
-    }
+    //    def validateUsernamePasswordAndGetAccount(username: String, password: String): Future[(Boolean, Account)] = {
+    //      val account = tryGetById(username)
+    //      for {
+    //        account <- account
+    //      } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = account.passwordHash, salt = account.salt, iterations = account.iterations), account.deserialize)
+    //    }
 
     def checkUsernameAvailable(username: String): Future[Boolean] = exists(username).map(!_)
 

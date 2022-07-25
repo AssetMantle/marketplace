@@ -92,8 +92,8 @@ abstract class GenericDaoImpl[
     }
   }
 
-  def delete(id: PK): Future[Unit] = db.run(tableQuery.filter(_.id === id).delete.asTry).map {
-    case Success(result) => ()
+  def delete(id: PK): Future[Int] = db.run(tableQuery.filter(_.id === id).delete.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_DELETE_FAILED"), psqlException)
       case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_DELETE_FAILED"), noSuchElementException)

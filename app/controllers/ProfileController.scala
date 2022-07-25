@@ -77,9 +77,9 @@ class ProfileController @Inject()(
             masterKeys.Service.add(
               accountId = loginState.username,
               address = wallet.address,
-              hdPath = Option(wallet.hdPath),
+              hdPath = wallet.hdPath,
               password = addManagedKeyData.password,
-              privateKey = Option(wallet.privateKey),
+              privateKey = wallet.privateKey,
               partialMnemonics = Option(wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown)),
               name = addManagedKeyData.keyName,
               retryCounter = 0,
@@ -117,10 +117,7 @@ class ProfileController @Inject()(
             masterKeys.Service.add(
               accountId = loginState.username,
               address = addUnmanagedKeyData.address,
-              hdPath = None,
               password = addUnmanagedKeyData.password,
-              privateKey = None,
-              partialMnemonics = None,
               name = addUnmanagedKeyData.keyName,
               retryCounter = 0,
               backupUsed = true,
@@ -191,6 +188,30 @@ class ProfileController @Inject()(
         },
         deleteAccountData => {
           Future(Ok(views.html.index(successes = Seq(constants.Response.SIGN_UP_SUCCESSFUL))))
+        }
+      )
+  }
+
+  def changeManagedToUnmanagedForm(address: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.changeManagedToUnmanaged(address = address))
+  }
+
+  def changeManagedToUnmanaged: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      ChangeManagedToUnmanaged.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.profile.changeManagedToUnmanaged(formWithErrors, formWithErrors.get.address)))
+        },
+        changeManagedToUnmanagedData => {
+          val validate = masterKeys.Service.changeManagedToUnmanaged(accountId = loginState.username, address = changeManagedToUnmanagedData.address, password = changeManagedToUnmanagedData.password)
+
+          (for {
+            _ <- validate
+          } yield PartialContent(views.html.profile.changeManagedToUnmanaged(address = changeManagedToUnmanagedData.address))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.profile.changeManagedToUnmanaged(ChangeManagedToUnmanaged.form.withGlobalError(baseException.failure.message), changeManagedToUnmanagedData.address))
+          }
+
         }
       )
   }

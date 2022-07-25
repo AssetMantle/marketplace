@@ -13,7 +13,7 @@ import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Key(accountId: String, address: String, hdPath: Option[Seq[ChildNumber]], passwordHash: Option[Array[Byte]], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Option[Array[Byte]], partialMnemonics: Option[Seq[String]], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Key(accountId: String, address: String, hdPath: Option[Seq[ChildNumber]], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Array[Byte], partialMnemonics: Option[Seq[String]], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
   def serialize(): Keys.KeySerialized = Keys.KeySerialized(
     accountId = this.accountId,
     address = this.address,
@@ -35,7 +35,8 @@ case class Key(accountId: String, address: String, hdPath: Option[Seq[ChildNumbe
     updatedOn = this.updatedOn,
     updatedOnTimeZone = this.updatedOnTimeZone)
 
-  def getECKey(password: String): Option[ECKey] = this.encryptedPrivateKey.fold[Option[ECKey]](None)(x => Option(ECKey.fromPrivate(utilities.Secrets.decryptData(x, password))))
+  def getECKey(password: String): Option[ECKey] = if (this.encryptedPrivateKey.nonEmpty) Option(ECKey.fromPrivate(utilities.Secrets.decryptData(this.encryptedPrivateKey, password)))
+  else None
 }
 
 object Keys {
@@ -44,7 +45,7 @@ object Keys {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class KeySerialized(accountId: String, address: String, hdPath: Option[String], passwordHash: Option[Array[Byte]], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Option[Array[Byte]], partialMnemonics: Option[String], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity2[String, String] {
+  case class KeySerialized(accountId: String, address: String, hdPath: Option[String], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Array[Byte], partialMnemonics: Option[String], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity2[String, String] {
     def deserialize: Key = Key(
       accountId = accountId,
       address = address,
@@ -67,7 +68,7 @@ object Keys {
 
   class KeyTable(tag: Tag) extends Table[KeySerialized](tag, "Key") with ModelTable2[String, String] {
 
-    def * = (accountId, address, hdPath.?, passwordHash, salt, iterations, encryptedPrivateKey.?, partialMnemonics.?, name.?, retryCounter, active, backupUsed, verified.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (KeySerialized.tupled, KeySerialized.unapply)
+    def * = (accountId, address, hdPath.?, passwordHash, salt, iterations, encryptedPrivateKey, partialMnemonics.?, name.?, retryCounter, active, backupUsed, verified.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (KeySerialized.tupled, KeySerialized.unapply)
 
     def accountId = column[String]("accountId", O.PrimaryKey)
 
@@ -75,7 +76,7 @@ object Keys {
 
     def hdPath = column[String]("hdPath")
 
-    def passwordHash = column[Option[Array[Byte]]]("passwordHash")
+    def passwordHash = column[Array[Byte]]("passwordHash")
 
     def salt = column[Array[Byte]]("salt")
 
@@ -136,12 +137,12 @@ class Keys @Inject()(
         accountId = accountId,
         address = address,
         hdPath = Option(hdPath),
-        passwordHash = Option(Array[Byte]()),
+        passwordHash = Array[Byte](),
         salt = salt,
         iterations = constants.Security.DefaultIterations,
         partialMnemonics = Option(partialMnemonics),
         name = Option(name),
-        encryptedPrivateKey = Option(Array[Byte]()),
+        encryptedPrivateKey = Array[Byte](),
         retryCounter = retryCounter,
         active = active,
         backupUsed = backupUsed,
@@ -150,18 +151,37 @@ class Keys @Inject()(
       create(key.serialize())
     }
 
-    def add(accountId: String, address: String, hdPath: Option[Seq[ChildNumber]], password: String, privateKey: Option[Array[Byte]], partialMnemonics: Option[Seq[String]], name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
+    def add(accountId: String, address: String, hdPath: Seq[ChildNumber], password: String, privateKey: Array[Byte], partialMnemonics: Option[Seq[String]], name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
       val salt = utilities.Secrets.getNewSalt
       create(Key(
         accountId = accountId,
         address = address,
-        hdPath = hdPath,
-        passwordHash = Option(utilities.Secrets.hashPassword(password = password, salt = salt, iterations = constants.Security.DefaultIterations)),
+        hdPath = Option(hdPath),
+        passwordHash = if (password != "") utilities.Secrets.hashPassword(password = password, salt = salt, iterations = constants.Security.DefaultIterations) else Array[Byte](),
         salt = salt,
         iterations = constants.Security.DefaultIterations,
         partialMnemonics = partialMnemonics,
         name = Option(name),
-        encryptedPrivateKey = privateKey.fold[Option[Array[Byte]]](None)(x => Option(utilities.Secrets.encryptData(x, password))),
+        encryptedPrivateKey = if (privateKey.nonEmpty) utilities.Secrets.encryptData(privateKey, password) else Array[Byte](),
+        retryCounter = retryCounter,
+        active = active,
+        backupUsed = backupUsed,
+        verified = verified
+      ).serialize())
+    }
+
+    def add(accountId: String, address: String, password: String, name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
+      val salt = utilities.Secrets.getNewSalt
+      create(Key(
+        accountId = accountId,
+        address = address,
+        hdPath = None,
+        passwordHash = Array[Byte](),
+        salt = salt,
+        iterations = constants.Security.DefaultIterations,
+        partialMnemonics = None,
+        name = Option(name),
+        encryptedPrivateKey = Array[Byte](),
         retryCounter = retryCounter,
         active = active,
         backupUsed = backupUsed,
@@ -170,8 +190,8 @@ class Keys @Inject()(
     }
 
     def updateOnVerifyMnemonics(key: Key, password: String, privateKey: Array[Byte]): Future[Unit] = updateKey(key.copy(
-      passwordHash = Option(utilities.Secrets.hashPassword(password = password, salt = key.salt, iterations = key.iterations)),
-      encryptedPrivateKey = Option(utilities.Secrets.encryptData(privateKey, password)),
+      passwordHash = utilities.Secrets.hashPassword(password = password, salt = key.salt, iterations = key.iterations),
+      encryptedPrivateKey = utilities.Secrets.encryptData(privateKey, password),
       verified = Option(true)
     ))
 
@@ -179,14 +199,14 @@ class Keys @Inject()(
       val key = tryGetById(username, address)
       for {
         key <- key
-      } yield key.passwordHash.fold((false, key.deserialize))(passwordHash => (utilities.Secrets.verifyPassword(password = password, passwordHash = passwordHash, salt = key.salt, iterations = key.iterations), key.deserialize))
+      } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = key.passwordHash, salt = key.salt, iterations = key.iterations), key.deserialize)
     }
 
     def validateActiveKeyUsernamePasswordAndGet(username: String, password: String): Future[(Boolean, Key)] = {
       val key = tryGetActive(username)
       for {
         key <- key
-      } yield key.passwordHash.fold((false, key))(passwordHash => (utilities.Secrets.verifyPassword(password = password, passwordHash = passwordHash, salt = key.salt, iterations = key.iterations), key))
+      } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = key.passwordHash, salt = key.salt, iterations = key.iterations), key)
     }
 
     def tryGetActive(accountId: String): Future[Key] = filterHead(x => x.id1 === accountId && x.active).map(_.deserialize)
@@ -218,8 +238,8 @@ class Keys @Inject()(
 
       def updatePassword(key: Key, wallet: utilities.Wallet) = if (key.address == wallet.address) {
         update(key.copy(
-          passwordHash = Option(utilities.Secrets.hashPassword(password = newPassword, salt = key.salt, iterations = constants.Security.DefaultIterations)),
-          encryptedPrivateKey = Option(utilities.Secrets.encryptData(data = wallet.privateKey, secret = newPassword))
+          passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = key.salt, iterations = constants.Security.DefaultIterations),
+          encryptedPrivateKey = utilities.Secrets.encryptData(data = wallet.privateKey, secret = newPassword)
         ).serialize())
       } else constants.Response.INVALID_ACTIVE_KEY.throwFutureBaseException()
 
@@ -234,11 +254,11 @@ class Keys @Inject()(
       val validateAndOldKey = validateActiveKeyUsernamePasswordAndGet(username = accountId, password = oldPassword)
 
       def updatePassword(passwordValidated: Boolean, oldKey: Key) = if (passwordValidated) {
-        if (oldKey.encryptedPrivateKey.isDefined && oldKey.partialMnemonics.isDefined) {
-          val decryptedPrivateKey = utilities.Secrets.decryptData(encryptedData = oldKey.encryptedPrivateKey.get, secret = oldPassword)
+        if (oldKey.encryptedPrivateKey.nonEmpty && oldKey.partialMnemonics.isDefined) {
+          val decryptedPrivateKey = utilities.Secrets.decryptData(encryptedData = oldKey.encryptedPrivateKey, secret = oldPassword)
           update(oldKey.copy(
-            passwordHash = Option(utilities.Secrets.hashPassword(password = newPassword, salt = oldKey.salt, iterations = constants.Security.DefaultIterations)),
-            encryptedPrivateKey = Option(utilities.Secrets.encryptData(data = decryptedPrivateKey, secret = newPassword)),
+            passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = oldKey.salt, iterations = constants.Security.DefaultIterations),
+            encryptedPrivateKey = utilities.Secrets.encryptData(data = decryptedPrivateKey, secret = newPassword),
           ).serialize())
         } else constants.Response.INVALID_ACTIVE_KEY.throwFutureBaseException()
       } else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
@@ -258,6 +278,18 @@ class Keys @Inject()(
         key <- key
         _ <- update(key.copy(active = true).serialize())
         _ <- update(oldKey.copy(active = false).serialize())
+      } yield ()
+    }
+
+    def changeManagedToUnmanaged(accountId: String, address: String, password: String): Future[Unit] = {
+      val validate = validateUsernamePasswordAndGetKey(username = accountId, address = address, password = password)
+
+      def validateAndUpdate(validated: Boolean, key: Key) = if (validated) update(key.copy(encryptedPrivateKey = Array[Byte](), partialMnemonics = None).serialize())
+      else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+
+      for {
+        (validated, key) <- validate
+        _ <- validateAndUpdate(validated, key)
       } yield ()
     }
 

@@ -67,7 +67,7 @@ class PushNotificationTokens @Inject()(
 
     def getPushNotificationToken(id: String): Future[Option[String]] = getById(id).map(_.map(_.token))
 
-    def deleteByID(id: String): Future[Unit] = delete(id)
+    def deleteByID(id: String): Future[Int] = delete(id)
 
   }
 
