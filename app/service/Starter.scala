@@ -11,6 +11,7 @@ import play.api.{Configuration, Logger}
 import java.io.File
 import javax.inject.{Inject, Singleton}
 import scala.concurrent
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.{Source => ScalaSource}
 
@@ -81,9 +82,9 @@ class Starter @Inject()(
     obj
   }
 
-  def addNfts(collectionID: String, nftDetails: NFT, uploadCollection: UploadCollection, allNfts: Seq[master.NFT]): Future[Unit] = {
+  def addNfts(collectionID: String, nftDetails: NFT, uploadCollection: UploadCollection): Future[Unit] = {
     println(nftDetails.name)
-    if (!allNfts.exists(_.name == nftDetails.name)) {
+    if (Await.result(masterNFTs.Service.checkExistsByName(nftDetails.name), Duration.Inf)) {
       try {
         val ipfsDetails = nftDetails.image.split("/").takeRight(2)
         val ipfsHash = ipfsDetails(0)
@@ -180,10 +181,9 @@ class Starter @Inject()(
   }
 
   def start(): Future[Unit] = {
-    val allNfts = masterNFTs.Service.fetchAll()
     val uploads = readFile[Seq[UploadCollection]](uploadCollectionFilePath)
 
-    def processDir(uploadCollections: Seq[UploadCollection], allNfts: Seq[master.NFT]) = utilitiesOperations.traverse(uploadCollections) { uploadCollection =>
+    def processDir(uploadCollections: Seq[UploadCollection]) = utilitiesOperations.traverse(uploadCollections) { uploadCollection =>
       val allCollections = masterCollections.Service.fetchAll()
 
       def addCollection(allCollections: Seq[Collection]): Future[Unit] = {
@@ -195,7 +195,7 @@ class Starter @Inject()(
 
           (for {
             nftDetails <- nftDetails
-            _ <- addNfts(collection.id, nftDetails, uploadCollection, allNfts)
+            _ <- addNfts(collection.id, nftDetails, uploadCollection)
           } yield ()
             ).recover {
             case exception: Exception => logger.error(exception.getLocalizedMessage)
@@ -219,8 +219,7 @@ class Starter @Inject()(
     (for {
       _ <- correctMasterAccount()
       uploads <- uploads
-      allNfts <- allNfts
-      _ <- processDir(uploads, allNfts)
+      _ <- processDir(uploads)
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
