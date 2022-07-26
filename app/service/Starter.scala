@@ -117,7 +117,8 @@ class Starter @Inject()(
         )
       } catch {
         case exception: Exception => logger.error(exception.getLocalizedMessage)
-          throw new BaseException(constants.Response.FILE_UPLOAD_ERROR)
+          //          throw new BaseException(constants.Response.FILE_UPLOAD_ERROR)
+          Future()
       }
     } else Future()
   }
