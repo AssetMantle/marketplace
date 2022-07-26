@@ -39,10 +39,10 @@ collectionId = '';
 window.addEventListener('scroll', () => {
     clearTimeout(nftPageTimeout);
     nftPageTimeout = setTimeout(function () {
-        if ($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10) && $(".nftsPerPage").length !== 0) {
+        if (($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10)) && $(".nftsPerPage").length !== 0) {
             loadMoreNFTs(collectionId);
         }
-    }, 100);
+    }, 200);
 }, {
     passive: true
 });
