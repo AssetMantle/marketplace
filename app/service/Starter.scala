@@ -117,7 +117,8 @@ class Starter @Inject()(
         )
       } catch {
         case exception: Exception => logger.error(exception.getLocalizedMessage)
-          throw new BaseException(constants.Response.FILE_UPLOAD_ERROR)
+          Future()
+        //          throw new BaseException(constants.Response.FILE_UPLOAD_ERROR)
       }
     } else Future()
   }
@@ -183,9 +184,8 @@ class Starter @Inject()(
     val uploads = readFile[Seq[UploadCollection]](uploadCollectionFilePath)
 
     def processDir(uploadCollections: Seq[UploadCollection], allNfts: Seq[master.NFT]) = utilitiesOperations.traverse(uploadCollections) { uploadCollection =>
-      val allCollections = masterCollections.Service.fetchAll()
 
-      def addCollection(allCollections: Seq[Collection]): Future[Unit] = {
+      def addCollection(): Future[Unit] = {
         val collection = masterCollections.Service.tryGetByName(name = uploadCollection.name)
         val collections = getListOfFiles(constants.CommonConfig.Files.RootFilePath + uploadCollection.jsonPath)
 
@@ -210,8 +210,7 @@ class Starter @Inject()(
       }
 
       for {
-        allCollections <- allCollections
-        collectionProcess <- addCollection(allCollections)
+        collectionProcess <- addCollection()
       } yield collectionProcess
     }
 
