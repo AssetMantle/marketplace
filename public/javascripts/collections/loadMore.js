@@ -11,7 +11,8 @@ document.onload = function () {
 
 function loadMoreCollections() {
     const loading = document.querySelector('.loading');
-    if ($(".noCollection").length === 0 && $(".collectionPage").length !== 0) {
+    // if ($(".noCollection").length === 0 && $(".collectionPage").length !== 0) {
+    if ($(".noCollection").length === 0) {
         let route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
         $.ajax({
             url: route.url,
