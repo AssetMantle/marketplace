@@ -11,7 +11,7 @@ document.onload = function () {
 
 function loadMoreNFTs(collectionId) {
     const loading = document.querySelector('.loading');
-    if ($(".noNFT").length === 0) {
+    if ($(".noNFT").length === 0 && $(".nftPage").length !== 0) {
         let route = jsRoutes.controllers.CollectionController.collectionNFTsPerPage(collectionId, $(".nftPage").length + 1);
         $.ajax({
             url: route.url,
