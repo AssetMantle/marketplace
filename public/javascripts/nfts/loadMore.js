@@ -1,17 +1,28 @@
 window.onbeforeunload = function () {
-    window.scrollTo(0, 0);
+    if($(".nftContainer").length !== 0) {
+        window.scrollTo(0, 0);
+    }
 }
 document.onload = function () {
-    window.scrollTo(0, 0);
+    if($(".nftContainer").length !== 0) {
+        window.scrollTo(0, 0);
+    }
 }
 
 function loadMoreNFTs(collectionId) {
+    const loading = document.querySelector('.loading');
     if ($(".noNFT").length === 0) {
         let route = jsRoutes.controllers.CollectionController.collectionNFTsPerPage(collectionId, $(".nftPage").length + 1);
         $.ajax({
             url: route.url,
             type: route.type,
             async: true,
+            beforeSend: function () {
+                loading.classList.add('show');
+            },
+            complete: function () {
+                loading.classList.remove('show');
+            },
             statusCode: {
                 200: function (data) {
                     const loadMore = $(".nftsPerPage");
@@ -36,13 +47,26 @@ function getDocHeight() {
 
 nftPageTimeout = 0;
 collectionId = '';
+// window.addEventListener('scroll', () => {
+//     clearTimeout(nftPageTimeout);
+//     nftPageTimeout = setTimeout(function () {
+//         if ($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10) && $(".nftsPerPage").length !== 0) {
+//             loadMoreNFTs(collectionId);
+//         }
+//     }, 100);
+// }, {
+//     passive: true
+// });
+
 window.addEventListener('scroll', () => {
-    clearTimeout(nftPageTimeout);
-    nftPageTimeout = setTimeout(function () {
-        if ($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10) && $(".nftsPerPage").length !== 0) {
-            loadMoreNFTs(collectionId);
-        }
-    }, 100);
+    if($(".nftsPerPage").length !== 0){
+        clearTimeout(nftPageTimeout);
+        nftPageTimeout = setTimeout(function () {
+            if ($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10)) {
+                loadMoreNFTs(collectionId);
+            }
+        }, 100);
+    }
 }, {
     passive: true
 });

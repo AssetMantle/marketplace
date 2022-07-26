@@ -1,11 +1,16 @@
 window.onbeforeunload = function () {
-    window.scrollTo(0, 0);
+    if($(".collectionsPerPage").length !== 0) {
+        window.scrollTo(0, 0);
+    }
 }
 document.onload = function () {
-    window.scrollTo(0, 0);
+    if($(".collectionsPerPage").length !== 0) {
+        window.scrollTo(0, 0);
+    }
 }
 
 function loadMoreCollections() {
+    const loading = document.querySelector('.loading');
     if ($(".noCollection").length === 0) {
         let route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
         $.ajax({
@@ -13,12 +18,12 @@ function loadMoreCollections() {
             type: route.type,
             async: true,
             // global: showSpinner('recentActivity'),
-            // beforeSend: function () {
-            //     loadingSpinner.show();
-            // },
-            // complete: function () {
-            //     loadingSpinner.hide();
-            // },
+            beforeSend: function () {
+                loading.classList.add('show');
+            },
+            complete: function () {
+                loading.classList.remove('show');
+            },
             statusCode: {
                 200: function (data) {
                     const loadMore = $(".collectionsPerPage");
@@ -42,18 +47,31 @@ function getDocHeight() {
 }
 
 collectionPageTimeout = 0;
+// window.addEventListener('scroll', () => {
+//     clearTimeout(collectionPageTimeout);
+//     collectionPageTimeout = setTimeout(function () {
+//         console.log("SCROLL 1")
+//         if ($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10) && $(".collectionsPerPage").length !== 0) {
+//             console.log("SCROLL 2")
+//             loadMoreCollections();
+//         }
+//     }, 100);
+// }, {
+//     passive: true
+// });
+
+
 window.addEventListener('scroll', () => {
-    clearTimeout(collectionPageTimeout);
-    collectionPageTimeout = setTimeout(function () {
-        console.log("SCROLL 1")
-        if ($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10) && $(".collectionsPerPage").length !== 0) {
-            console.log("SCROLL 2")
-            loadMoreCollections();
-        }
-    }, 100);
+    if($(".collectionsPerPage").length !== 0) {
+        clearTimeout(collectionPageTimeout);
+        collectionPageTimeout = setTimeout(function () {
+            console.log("SCROLL 1")
+            if ($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10)) {
+                console.log("SCROLL 2")
+                loadMoreCollections();
+            }
+        }, 100);
+    }
 }, {
     passive: true
 });
-
-
-
