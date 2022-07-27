@@ -45,6 +45,7 @@ class AccountController @Inject()(
         signUpData => {
           val addAccount = masterAccounts.Service.upsertOnSignUp(username = signUpData.username, language = request.lang, accountType = constants.User.USER)
           val wallet = utilities.Wallet.getRandomWallet
+          val deleteUnverifiedKeys = masterKeys.Service.deleteUnverifiedKeys(signUpData.username)
 
           def addKey() = masterKeys.Service.addOnSignUp(
             accountId = signUpData.username,
@@ -59,6 +60,7 @@ class AccountController @Inject()(
 
           (for {
             _ <- addAccount
+            _ <- deleteUnverifiedKeys
             _ <- addKey()
           } yield PartialContent(views.html.account.showWalletMnemonics(username = signUpData.username, address = wallet.address, partialMnemonics = wallet.mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
             ).recover {

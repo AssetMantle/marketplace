@@ -325,7 +325,7 @@ class Keys @Inject()(
     }
     def checkVerifiedKeyExists(accountId: String): Future[Boolean] = filter(x => x.accountId === accountId && x.verified).map(_.nonEmpty)
 
-    def deleteUnverifiedWallet(accountId: String): Future[Int] = {
+    def deleteUnverifiedKeys(accountId: String): Future[Int] = {
       val verified: Option[Boolean] = null
       filterAndDelete(x => x.accountId === accountId && x.verified.? === verified)
     }
