@@ -12,7 +12,8 @@
     --error: #E44651;
     --connected: #148919;
     --tooltip-bg: #424242;
-    --header-bg: rgba(4, 4, 4, 0.8);
+    /*--header-bg: rgba(4, 4, 4, 0.8);*/
+    --header-bg: rgba(4, 4, 4);
     --popup-bg: #21211E;
     --popup-stroke: #282826;
     --radial: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
@@ -49,6 +50,9 @@ body{
     /*background-size: cover;*/
     background-position: center;
     /*overflow-x: hidden !important;*/
+    background-attachment: fixed;
+    background-position: center center;
+    background-size: cover;
 }
 .body-container{
     max-width: 1440px;

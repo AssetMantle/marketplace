@@ -301,6 +301,8 @@ CHANGE_KEY_ADDRESS=Address
 CHANGE_KEY_NAME=New Name
 PLACEHOLDER.CHANGE_KEY_ADDRESS=Type wallet address here
 PLACEHOLDER.CHANGE_KEY_NAME=Type new wallet name here
+CHANGE_KEY_NAME_TITLE=Wallet Address updated successfully
+CHANGE_KEY_NAME_SUBTITLE=Your wallet address has been been updated successfully. You can view this in you wallet or profile settings.
 
 #//View Mnemonics Seed Phrase
 FORM.VIEW_MNEMONICS.TITLE=Confirm Password

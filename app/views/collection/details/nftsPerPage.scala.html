@@ -10,3 +10,13 @@
         <div class="noNFT"></div>
     }
 </div>
+
+<script>
+    // Hide Load More button if NFTs are <= 5
+    $(document).ready(function() {
+        console.log($(".singleNFTCard").length);
+        if($(".nftPage .singleNFTCard").length <= 5){
+            $("#loadMoreBtnContainer").addClass("hide");
+        }
+    });
+</script>
