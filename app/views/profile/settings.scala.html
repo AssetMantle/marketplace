@@ -39,9 +39,9 @@
                     <div class="d-flex flex-row justify-content-between align-items-center walletAddressItem">
                         @if(key.encryptedPrivateKey.nonEmpty) {
                             @if(key.active) {
-                                <input type="radio" name="walletAddress" id="walletAddress1" checked/>
+                                <input type="radio" name="walletAddress" id='@key.address' checked/>
                             } else {
-                                <input type="radio" name="walletAddress" id="walletAddress2" onclick="changeActive('@key.address')"/>
+                                <input type="radio" name="walletAddress" id='@key.address' onclick="changeActive('@key.address', '@keys.find(_.active).getOrElse("")')"/>
                             }
                         }
                     <div class="me-3 iconContainer menuToolTip">

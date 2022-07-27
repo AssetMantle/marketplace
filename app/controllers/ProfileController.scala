@@ -53,6 +53,19 @@ class ProfileController @Inject()(
     }
   }
 
+  def walletPopup(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val keys = masterKeys.Service.getAll(loginState.username)
+        (for {
+          keys <- keys
+        } yield Ok(views.html.base.commonWalletPopup(keys))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
   def addNewKey(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.profile.addNewKey())
   }

@@ -30,26 +30,6 @@ $("#walletBackDrop").click(function (){
     },200);
 });
 
-// Open wallet menu
-$("#openWalletMenu").click(function(){
-   $("#walletMenu").addClass("open");
-});
-
-// Close wallet menu
-$("#closeWalletMenu").click(function(){
-    $("#walletMenu").removeClass("open");
-});
-
-// Open Address Book
-$("#addressBookOpenBtn").click(function(){
-    $("#addressBook").addClass("open");
-});
-
-// Close Address Book
-$("#addressBookCloseBtn").click(function(){
-    $("#addressBook").removeClass("open");
-});
-
 function showOptions(current)
 {
     console.log($(current));
