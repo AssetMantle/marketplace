@@ -1,6 +1,6 @@
 @(collection: master.Collection, nft: master.NFT)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<div class="col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3" onclick="viewNFT('@nft.fileName')">
+<div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3" onclick="viewNFT('@nft.fileName')">
     <div class="card border-0" style="cursor: pointer;">
         <div class="card-img rounded-0">
 @*            <a href="https://ipfs.io/ipfs/@nft.ipfsLink" target="_blank">*@

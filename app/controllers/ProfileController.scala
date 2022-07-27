@@ -146,7 +146,7 @@ class ProfileController @Inject()(
 
           (for {
             _ <- update
-          } yield PartialContent(views.html.profile.keyAddedOrUpdatedSuccessfully(address = changeKeyNameData.address, name = changeKeyNameData.keyName))
+          } yield PartialContent(views.html.profile.changeKeyNameSuccessfully(address = changeKeyNameData.address, name = changeKeyNameData.keyName))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.profile.changeKeyName(ChangeKeyName.form.withGlobalError(baseException.failure.message), changeKeyNameData.address))
           }

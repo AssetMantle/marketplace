@@ -1,7 +1,7 @@
 @import views.html.collection._
 
 @(collections: Seq[master.Collection])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<div class="collectionPage">
+<div class="m-0 p-0 collectionPage">
     @if(collections.nonEmpty) {
         @collections.map { collection =>
         <div class="singleCollection">
