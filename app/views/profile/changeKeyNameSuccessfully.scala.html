@@ -1,0 +1,14 @@
+@import views.html.base.forms._
+
+@(address: String, name: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@successModal(heading = constants.View.CHANGE_KEY_NAME_TITLE)
+<div class="header-success">
+    <div class="form-body">
+        <div class="text-center">
+            <div class="mt-2 mx-5 form-success-message-sub-text">@Messages(constants.View.CHANGE_KEY_NAME_SUBTITLE)</div>
+        </div>
+    </div>
+</div>
+<script>
+    $('.walletInfoField').load(document.URL);
+</script>
