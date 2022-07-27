@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
-@(loginState: LoginState)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+
+@(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="walletPopupContainer">
     <div class="d-flex flex-row justify-content-end">
         <img id="openWalletMenu" src="@routes.Assets.versioned("images/icon/hamburgerMenuYellow.png")" width="22px" height="14px"/>
@@ -13,10 +14,6 @@
             <div class="ml-3 d-flex align-items-center">
                 <div class="userName">@loginState.username</div>
             </div>
-            @*    <div class="ml-3 d-flex flex-column align-content-between">
-            <div class="userName">@loginState.username</div>
-            <div class="userBalance">0.459930 $MNTL</div>
-            </div> *@
         </div>
         <div class="row p-2 mx-0 mt-4 align-items-center userAddressBox">
             <div class="col-10 p-0 userAddressData username-data" data-value="@loginState.address">@loginState.address</div>
@@ -31,15 +28,8 @@
             <button class="secondaryButton" id="comingSoonBtn"></button>
         </div>
         <div class="innerSeparator"></div>
-        @* <div class="walletMessage">
-        @Messages(constants.View.POPUP_WALLET_FOOTER_MESSAGE)
-        </div> *@
     </div>
 
-    @* <div class="d-flex flex-row align-items-center justify-content-end gap-2 nftLink">
-    <img src="@routes.Assets.versioned("images/icon/link.png")" class="icon"/>
-    <div>@Messages(constants.View.MY_NFTS_LINK)</div>
-    </div> *@
 
         <!-- Wallet Menu -->
     <div id="walletMenu" class="walletMenu">
@@ -72,20 +62,18 @@
         </div>
         <div class="d-flex flex-column justify-content-between">
             <div class="mt-2 walletAddressList">
+            @keys.map { key =>
                 <div class="d-flex flex-row-reverse justify-content-between walletAddressItem">
-                    <input type="radio" name="address" id="radio1" checked/>
-                    <label for="radio1" class="walletAddressLabel">mantle10...x4hg4</label>
+                    @if(key.encryptedPrivateKey.nonEmpty) {
+                        @if(key.active) {
+                            <input type="radio" name="address" id='@key.address' checked/>
+                        } else {
+                            <input type="radio" name="address" id='@key.address' onclick="changeActive('@key.address', '@keys.find(_.active).getOrElse("")')"/>
+                        }
+                    }
+                <label for="radio1" class="walletAddressLabel username-data">@key.address</label>
                 </div>
-                <div class="d-flex flex-row-reverse justify-content-between walletAddressItem">
-                    <input type="radio" name="address" id="radio2"/>
-                    <label for="radio2" class="walletAddressLabel">mantle10...x4hg4</label>
-                </div>
-                <div class="d-flex justify-content-between walletAddressItem">
-                    <label class="walletAddressLabel">mantle10...x4hg4</label>
-                </div>
-                <div class="d-flex justify-content-between walletAddressItem">
-                    <label class="walletAddressLabel">mantle10...x4hg4</label>
-                </div>
+            }
             </div>
 
             <div class="text-center d-flex flex-column align-items-end bottomMenu buttons">
@@ -98,3 +86,4 @@
         </div>
     </div>
 </div>
+<script src="@routes.Assets.versioned("javascripts/profile/settings.js")" type="text/javascript"></script>

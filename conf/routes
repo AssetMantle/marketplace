@@ -55,6 +55,7 @@ GET         /nftFile                         controllers.NFTController.file( nft
 
 GET         /profile                         controllers.ProfileController.viewProfile()
 GET         /settings                        controllers.ProfileController.settings()
+GET         /walletPopup                     controllers.ProfileController.walletPopup()
 
 GET         /addNewKey                       controllers.ProfileController.addNewKey()
 

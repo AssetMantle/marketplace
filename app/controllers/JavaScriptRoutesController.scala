@@ -43,6 +43,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ProfileController.viewProfile,
         routes.javascript.ProfileController.settings,
+        routes.javascript.ProfileController.walletPopup,
         routes.javascript.ProfileController.addNewKey,
         routes.javascript.ProfileController.addManagedKeyForm,
         routes.javascript.ProfileController.addUnmanagedKeyForm,

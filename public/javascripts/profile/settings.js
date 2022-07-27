@@ -46,18 +46,37 @@ function copyToClipboard(e) {
     navigator.clipboard.writeText(copyText);
 }
 
-function changeActive(address) {
-    let route = jsRoutes.controllers.AccountController.changeActiveKey(address);
+$("#openWalletMenu").click(function(){
+    $("#walletMenu").addClass("open");
+});
+
+// Close wallet menu
+$("#closeWalletMenu").click(function(){
+    $("#walletMenu").removeClass("open");
+});
+
+// Open Address Book
+$("#addressBookOpenBtn").click(function(){
+    $("#addressBook").addClass("open");
+});
+
+// Close Address Book
+$("#addressBookCloseBtn").click(function(){
+    $("#addressBook").removeClass("open");
+});
+
+function changeActive(setAddress, oldAddress) {
+    let route = jsRoutes.controllers.AccountController.changeActiveKey(setAddress);
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
         statusCode: {
             200: function (data) {
-
+                $(setAddress).prop("checked", true);
+                $(oldAddress).prop("checked", false);
             },
             400: function (data) {
-                console.log("invalid");
             },
             204: function (data) {
 
