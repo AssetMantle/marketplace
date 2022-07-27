@@ -325,4 +325,6 @@ PLACEHOLDER.OLD_PASSWORD=Type old password here
 PLACEHOLDER.CHANGE_PASSWORD=Type new password here
 PLACEHOLDER.CHANGE_CONFIRM_PASSWORD=Type confirm password here
 
+LOAD_MORE_BUTTON=Load More
+
 
