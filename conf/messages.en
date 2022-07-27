@@ -326,5 +326,11 @@ PLACEHOLDER.CHANGE_PASSWORD=Type new password here
 PLACEHOLDER.CHANGE_CONFIRM_PASSWORD=Type confirm password here
 
 LOAD_MORE_BUTTON=Load More
+UNMANAGED_KEY=Unmanaged Key
+MANAGED_KEY=Managed Key
+MANAGED_KEY_DESCRIPTION=Private key is encrypted and stored. Can be used to do tx.
+UNMANAGED_KEY_DESCRIPTION=Only address is stored. Cannot be used to do tx.
+FORM.MIGRATE_WALLET_TO_KEY.TITLE=Security Update
+FORM.MIGRATE_WALLET_TO_KEY.SUBTITLE=Enter your password and 4 seeds
 
 
