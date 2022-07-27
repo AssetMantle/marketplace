@@ -240,7 +240,7 @@ class Keys @Inject()(
 
     def getActiveByAccountId(accountId: String): Future[Option[Key]] = filter(x => x.id1 === accountId && x.active).map(_.map(_.deserialize).headOption)
 
-    def deleteKey(accountId: String, address: String): Future[Unit] = delete(accountId, address)
+    def deleteKey(accountId: String, address: String): Future[Int] = delete(accountId, address)
 
     def tryGet(accountId: String, address: String): Future[Key] = tryGetById(id1 = accountId, id2 = address).map(_.deserialize)
 
@@ -298,7 +298,7 @@ class Keys @Inject()(
       val oldKey = tryGet(accountId = accountId, address = oldAddress)
       val key = tryGet(accountId = accountId, address = newAddress)
 
-      def updateKeys(oldKey: Key, newKey: Key) =  if (newKey.encryptedPrivateKey.nonEmpty) {
+      def updateKeys(oldKey: Key, newKey: Key) = if (newKey.encryptedPrivateKey.nonEmpty) {
         for {
           _ <- update(newKey.copy(active = true).serialize())
           _ <- update(oldKey.copy(active = false).serialize())
@@ -322,6 +322,11 @@ class Keys @Inject()(
         (validated, key) <- validate
         _ <- validateAndUpdate(validated, key)
       } yield ()
+    }
+
+    def deleteUnverifiedWallet(accountId: String): Future[Int] = {
+      val verified: Option[Boolean] = null
+      filterAndDelete(x => x.accountId === accountId && x.verified.? === verified)
     }
 
   }
