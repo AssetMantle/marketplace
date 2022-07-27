@@ -265,9 +265,11 @@ class AccountController @Inject()(
   def checkUsernameAvailable(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val checkUsernameAvailable = masterAccounts.Service.checkUsernameAvailable(username)
+      val verifiedMnemonic = masterKeys.Service.checkVerifiedKeyExists(username)
       for {
         checkUsernameAvailable <- checkUsernameAvailable
-      } yield if (checkUsernameAvailable) Ok else NoContent
+        verifiedMnemonic <- verifiedMnemonic
+      } yield if (checkUsernameAvailable && verifiedMnemonic) Ok else NoContent
   }
 
   def forgetPasswordForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
@@ -323,7 +325,7 @@ class AccountController @Inject()(
         _ <- changeActive
       } yield Ok
         ).recover {
-        case _: BaseException => BadRequest
+        case _: BaseException => NoContent
       }
   }
 

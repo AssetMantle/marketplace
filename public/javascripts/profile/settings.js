@@ -58,7 +58,10 @@ function changeActive(address) {
             },
             400: function (data) {
                 console.log("invalid");
-            }
+            },
+            204: function (data) {
+
+            },
         }
     });
 }
