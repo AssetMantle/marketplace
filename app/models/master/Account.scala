@@ -98,6 +98,19 @@ class Accounts @Inject()(
       } yield ()
     }
 
+    def upsertOnSignUp(username: String, language: Lang, accountType: String): Future[Unit] = {
+      val account = Account(
+        id = username,
+        passwordHash = Array[Byte](),
+        salt = Array[Byte](),
+        iterations = 0,
+        language = language,
+        accountType = accountType)
+      for {
+        _ <- upsert(account.serialize())
+      } yield ()
+    }
+
     def updateAccount(account: Account): Future[Unit] = update(account.serialize())
 
     //    def validateUsernamePasswordAndGetAccount(username: String, password: String): Future[(Boolean, Account)] = {

@@ -32,25 +32,21 @@ class ProfileController @Inject()(
 
   private implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
 
-  def viewProfile(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withLoginActionAsync { implicit loginState =>
-      implicit request =>
-        implicit val optionalLoginState: Option[LoginState] = Option(loginState)
-        Future(Ok(views.html.profile.viewProfile()))
-    }
+  def viewProfile(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      implicit val optionalLoginState: Option[LoginState] = Option(loginState)
+      Future(Ok(views.html.profile.viewProfile()))
   }
 
-  def settings(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val keys = masterKeys.Service.getAll(loginState.username)
-        (for {
-          keys <- keys
-        } yield Ok(views.html.profile.settings(keys))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
+  def settings(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val keys = masterKeys.Service.getAll(loginState.username)
+      (for {
+        keys <- keys
+      } yield Ok(views.html.profile.settings(keys))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def addNewKey(): Action[AnyContent] = withoutLoginAction { implicit request =>

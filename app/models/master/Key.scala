@@ -323,6 +323,7 @@ class Keys @Inject()(
         _ <- validateAndUpdate(validated, key)
       } yield ()
     }
+    def checkVerifiedKeyExists(accountId: String): Future[Boolean] = filter(x => x.accountId === accountId && x.verified).map(_.nonEmpty)
 
     def deleteUnverifiedWallet(accountId: String): Future[Int] = {
       val verified: Option[Boolean] = null

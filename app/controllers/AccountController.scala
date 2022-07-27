@@ -43,7 +43,7 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.account.signUp(formWithErrors)))
         },
         signUpData => {
-          val addAccount = masterAccounts.Service.add(username = signUpData.username, language = request.lang, accountType = constants.User.USER)
+          val addAccount = masterAccounts.Service.upsertOnSignUp(username = signUpData.username, language = request.lang, accountType = constants.User.USER)
           val wallet = utilities.Wallet.getRandomWallet
 
           def addKey() = masterKeys.Service.addOnSignUp(
@@ -264,10 +264,10 @@ class AccountController @Inject()(
 
   def checkUsernameAvailable(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      val checkUsernameAvailable = masterAccounts.Service.checkUsernameAvailable(username)
+      val verifiedMnemonicExists = masterKeys.Service.checkVerifiedKeyExists(username)
       for {
-        checkUsernameAvailable <- checkUsernameAvailable
-      } yield if (checkUsernameAvailable) Ok else NoContent
+        verifiedMnemonicExists <- verifiedMnemonicExists
+      } yield if (!verifiedMnemonicExists) Ok else NoContent
   }
 
   def forgetPasswordForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
@@ -323,7 +323,7 @@ class AccountController @Inject()(
         _ <- changeActive
       } yield Ok
         ).recover {
-        case _: BaseException => BadRequest
+        case _: BaseException => NoContent
       }
   }
 
