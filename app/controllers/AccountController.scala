@@ -264,12 +264,10 @@ class AccountController @Inject()(
 
   def checkUsernameAvailable(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      val checkUsernameAvailable = masterAccounts.Service.checkUsernameAvailable(username)
-      val verifiedMnemonic = masterKeys.Service.checkVerifiedKeyExists(username)
+      val verifiedMnemonicExists = masterKeys.Service.checkVerifiedKeyExists(username)
       for {
-        checkUsernameAvailable <- checkUsernameAvailable
-        verifiedMnemonic <- verifiedMnemonic
-      } yield if (checkUsernameAvailable && verifiedMnemonic) Ok else NoContent
+        verifiedMnemonicExists <- verifiedMnemonicExists
+      } yield if (!verifiedMnemonicExists) Ok else NoContent
   }
 
   def forgetPasswordForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
