@@ -21,6 +21,16 @@ class WithUsernameToken @Inject()(masterTransactionSessionTokens: masterTransact
       - Session.ADDRESS + (Session.ADDRESS -> loginState.address))
   }
 
+  def Ok()(implicit request: RequestHeader, loginState: LoginState): Future[Result] = {
+    val newToken = masterTransactionSessionTokens.Service.refresh(loginState.username)
+    for {
+      newToken <- newToken
+    } yield Results.Ok.withSession(request.session
+      - Session.TOKEN + (Session.TOKEN -> newToken)
+      - Session.USERNAME + (Session.USERNAME -> loginState.username)
+      - Session.ADDRESS + (Session.ADDRESS -> loginState.address))
+  }
+
   def PartialContent[C](content: C)(implicit request: RequestHeader, writeable: Writeable[C], loginState: LoginState): Future[Result] = {
     val newToken = masterTransactionSessionTokens.Service.refresh(loginState.username)
     for {

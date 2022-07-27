@@ -318,12 +318,17 @@ class AccountController @Inject()(
       )
   }
 
-  def changeActiveKey(address: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def changeActiveKey(address: String): Action[AnyContent] = withLoginActionAsync { oldLoginState =>
     implicit request =>
-      val changeActive = masterKeys.Service.changeActive(accountId = loginState.username, oldAddress = loginState.address, newAddress = address)
+      val changeActive = masterKeys.Service.changeActive(accountId = oldLoginState.username, oldAddress = oldLoginState.address, newAddress = address)
+      def getResult = {
+        implicit val loginState: LoginState = LoginState(username = oldLoginState.username, address = address)
+        withUsernameToken.Ok()
+      }
       (for {
         _ <- changeActive
-      } yield Ok
+        result <- getResult
+      } yield result
         ).recover {
         case _: BaseException => NoContent
       }
