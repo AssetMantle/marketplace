@@ -282,6 +282,10 @@ MANAGED_KEY_NAME=Wallet Name
 MANAGED_KEY_ADDRESS=Address
 PLACEHOLDER.MANAGED_KEY_NAME=Type wallet name here
 PLACEHOLDER.MANAGED_KEY_ADDRESS=Type address here
+KEY_NAME_ERROR=Minimum length 3
+WALLET_ADDRESS_ERROR=Invalid wallet address
+PASSWORD_ERROR=Minimum length 5
+PASTE_MNEMONICS_MESSAGE=Paste all Mnemonics
 
 #//Unmanaged Address
 FORM.ADD_UNMANAGED_KEY.TITLE=Add New Address
@@ -335,5 +339,4 @@ MANAGED_KEY_DESCRIPTION=Private key is encrypted and stored. Can be used to do t
 UNMANAGED_KEY_DESCRIPTION=Only address is stored. Cannot be used to do tx.
 FORM.MIGRATE_WALLET_TO_KEY.TITLE=Security Update
 FORM.MIGRATE_WALLET_TO_KEY.SUBTITLE=Enter your password and 4 seeds
-
-
+RESPONSE.FAILURE.MNEMONICS_LENGTH_NOT_12_OR_24=Mnemonics length must be 12 or 24

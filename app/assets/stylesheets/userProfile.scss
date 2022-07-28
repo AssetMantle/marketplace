@@ -175,10 +175,13 @@
     }
   }
 }
-.showHideSeeds{
+.showHideSeeds,
+#pasteSeeds{
   span{
     @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--text-medium));
-
+  }
+  img{
+    cursor: pointer;
   }
 }
 .seedsSection1{
@@ -350,6 +353,7 @@
     -webkit-box-align: start;
     -ms-flex-align: start;
     align-items: flex-start;
+    gap: 12px;
     //padding: 40px;
   }
 
