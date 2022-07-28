@@ -1,5 +1,6 @@
 @import views.profile.companion.AddUnmanagedKey
 @import views.html.base.form._
+@import views.html.base.forms.{commonFieldErrorMessage}
 
 @(unmanagedAddressForm: Form[AddUnmanagedKey.Data] = AddUnmanagedKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
@@ -10,7 +11,8 @@
                 <div class="inputField">
                     <div class="inputFieldBody">
                         @views.html.base.label.commonLabel(constants.FormField.UNMANAGED_KEY_NAME.name)
-                        @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_KEY_NAME, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedKeyName")
+                        @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_KEY_NAME, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedKeyName", Symbol("oninput") -> "enableNavigationButton(0)")
+                        @commonFieldErrorMessage(id = "keyNameError", message = Messages(constants.View.KEY_NAME_ERROR))
                     </div>
                 </div>
             </div>
@@ -18,7 +20,8 @@
                 <div class="inputField">
                     <div class="inputFieldBody">
                         @views.html.base.label.commonLabel(constants.FormField.UNMANAGED_KEY_ADDRESS.name)
-                        @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_KEY_ADDRESS, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedKeyAddress")
+                        @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_KEY_ADDRESS, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedKeyAddress", Symbol("oninput") -> "enableNavigationButton(0)")
+                        @commonFieldErrorMessage(id = "walletAddressError", message = Messages(constants.View.WALLET_ADDRESS_ERROR))
                     </div>
                 </div>
             </div>
@@ -31,7 +34,8 @@
     <div id="newUnmanagedAddressPasswordScreen" style="display: none;">
         <div class="mb-3 inputField">
             <div class="inputFieldBody">
-            @commonInputPassword(unmanagedAddressForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedMnemonicPassword")
+                @commonInputPassword(unmanagedAddressForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedMnemonicPassword", Symbol("oninput") -> "enableNavigationButton(1)")
+                @commonFieldErrorMessage(id = "passwordError", message = Messages(constants.View.PASSWORD_ERROR))
             </div>
         </div>
     </div>

@@ -1,5 +1,6 @@
 @import views.profile.companion.AddManagedKey
 @import views.html.base.form._
+@import views.html.base.forms.{commonFieldErrorMessage}
 
 @(managedAddressForm: Form[AddManagedKey.Data] = AddManagedKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
@@ -10,7 +11,8 @@
                 <div class="inputField">
                     <div class="inputFieldBody">
                         @views.html.base.label.commonLabel(constants.FormField.MANAGED_KEY_NAME.name)
-                        @commonInputText(managedAddressForm, constants.FormField.MANAGED_KEY_NAME, Symbol("autocomplete") -> "off", Symbol("id") -> "managedKeyName")
+                        @commonInputText(managedAddressForm, constants.FormField.MANAGED_KEY_NAME, Symbol("autocomplete") -> "off", Symbol("id") -> "managedKeyName", Symbol("oninput") -> "enableNavigationButton(0)")
+                        @commonFieldErrorMessage(id = "keyNameError", message = Messages(constants.View.KEY_NAME_ERROR))
                     </div>
                 </div>
             </div>
@@ -18,7 +20,8 @@
                 <div class="inputField">
                     <div class="inputFieldBody">
                         @views.html.base.label.commonLabel(constants.FormField.MANAGED_KEY_ADDRESS.name)
-                        @commonInputText(managedAddressForm, constants.FormField.MANAGED_KEY_ADDRESS, Symbol("autocomplete") -> "off", Symbol("id") -> "managedKeyAddress")
+                        @commonInputText(managedAddressForm, constants.FormField.MANAGED_KEY_ADDRESS, Symbol("autocomplete") -> "off", Symbol("id") -> "managedKeyAddress", Symbol("oninput") -> "enableNavigationButton(0)")
+                        @commonFieldErrorMessage(id = "walletAddressError", message = Messages(constants.View.WALLET_ADDRESS_ERROR))
                     </div>
                 </div>
             </div>
@@ -34,7 +37,7 @@
             @Messages(constants.View.DISCLAIMER_MESSAGE)
         </div>
         <div class="d-flex align-items-center mt-4">
-            <input type="checkbox" id="acceptPolicy" class="cmuk-checkbox"/>
+            @commonCheckbox(managedAddressForm, constants.FormField.MANAGED_KEY_DISCLAIMER, Symbol("id") -> "acceptPolicy", Symbol("onclick") -> "enableNavigationButton(1);")
             <span class="termsConditionMessage">
                 <label for="acceptPolicy">
                     @Messages(constants.View.DISCLAIMER_POLICY_MESSAGE)
@@ -48,21 +51,29 @@
 
     <!-- Mnemonics Input -->
     <div id="newWalletMnemonicsScreen" class="mb-0" style="display: none;">
-        <div class="d-flex flex-row mb-3 showHideSeeds">
-            <span class="me-2">@Messages(constants.View.PROFILE_VERIFY_WALLET_MNEMONICS_SHOW_HIDE_MESSAGE)</span>
-            <div class="iconContainer" onclick="showHideSeed()">
-                <span class="eyeIcon closeEye">
-                    <img src="@routes.Assets.versioned("images/icon/hidePassword.png")" width="22px" height="20px"/>
-                </span>
-                <span class="eyeIcon openEye hidden">
-                    <img src="@routes.Assets.versioned("images/icon/showPassword.png")" width="22px" height="17px"/>
+        <div class="d-flex justify-content-between flex-column flex-lg-row">
+            <div class="d-flex flex-row mb-3 showHideSeeds">
+                <span class="me-2">@Messages(constants.View.PROFILE_VERIFY_WALLET_MNEMONICS_SHOW_HIDE_MESSAGE)</span>
+                <div class="iconContainer" onclick="showHideSeed()">
+                    <span class="eyeIcon closeEye">
+                        <img src="@routes.Assets.versioned("images/icon/hidePassword.png")" width="22px" height="20px"/>
+                    </span>
+                    <span class="eyeIcon openEye hidden">
+                        <img src="@routes.Assets.versioned("images/icon/showPassword.png")" width="22px" height="17px"/>
+                    </span>
+                </div>
+            </div>
+            <div class="d-flex flex-row mb-3" id="pasteSeeds" onclick="pasteSeeds()">
+                <span class="me-2">@Messages(constants.View.PASTE_MNEMONICS_MESSAGE)</span>
+                <span>
+                    <img src="@routes.Assets.versioned("images/icon/editYellow.png")" width="20px" height="20px"/>
                 </span>
             </div>
         </div>
         <div class="seedsSection1 active"></div>
         <div class="seedsSection2"></div>
         <div class="form-button">
-            <button type="button" class="form-primary-button" onclick="showHideManagedModalScreen('#newWalletPasswordScreen','#newWalletMnemonicsScreen',3)">@Messages(constants.View.NEXT)</button>
+            <button type="button" id="newManagedAddressMnemonicsBtn" class="form-primary-button disable" onclick="showHideManagedModalScreen('#newWalletPasswordScreen','#newWalletMnemonicsScreen',3)">@Messages(constants.View.NEXT)</button>
         </div>
     </div>
 
@@ -70,7 +81,8 @@
         <div class="mb-3 inputField">
             <div class="inputFieldBody">
                 @commonInputText(managedAddressForm, constants.FormField.SEEDS, Symbol("class") -> "hidden", Symbol("id") -> "mnemonicsList")
-                @commonInputPassword(managedAddressForm, constants.FormField.PASSWORD, Symbol("id") -> "managedMnemonicPassword")
+                @commonInputPassword(managedAddressForm, constants.FormField.PASSWORD, Symbol("id") -> "managedMnemonicPassword", Symbol("oninput") -> "enableNavigationButton(3)")
+                @commonFieldErrorMessage(id = "passwordError", message = Messages(constants.View.PASSWORD_ERROR))
             </div>
         </div>
     </div>
