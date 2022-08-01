@@ -77,7 +77,7 @@
                     <ul class="links">
                         <li><a href="@routes.CollectionController.viewCollections()">@Messages(constants.View.EXPLORE)</a></li>
                         <li>
-                            <a href="@routes.ProfileController.viewWishList()" class="desktop-link">@Messages(constants.View.CREATE)</a>
+                            <a class="desktop-link">@Messages(constants.View.CREATE)</a>
                             <input type="checkbox" id="show-features2">
                             <label for="show-features2">@Messages(constants.View.CREATE)</label>
                             <ul>
@@ -98,15 +98,17 @@
                         </li>
                         @optionalLoginState match {
                             case Some(loginState) => {
-                                <div class="d-flex hiddenMenu">
+                                <div class="hiddenMenu">
                                     <li id="userWalletMobile" class="user-wallet">
-                                        <a onclick="getForm(jsRoutes.controllers.ProfileController.walletPopup())">
+                                        <a onclick="getForm(jsRoutes.controllers.ProfileController.walletPopup())" class="d-flex align-items-center gap-3">
                                             <img class="lazyload wallet icon" src="@routes.Assets.versioned("images/icon/wallet.png")"/>
+                                            <span>@Messages(constants.View.WALLET)</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))">
+                                        <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))" class="d-flex align-items-center gap-3">
                                             <img class="lazyload" src="@routes.Assets.versioned("images/icon/logout.png")" class="logout" width="22" height="22"/>
+                                            <span>@Messages(constants.View.SIGN_OUT)</span>
                                         </a>
                                     </li>
                                 </div>
