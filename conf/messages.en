@@ -336,4 +336,7 @@ UNMANAGED_KEY_DESCRIPTION=Only address is stored. Cannot be used to do tx.
 FORM.MIGRATE_WALLET_TO_KEY.TITLE=Security Update
 FORM.MIGRATE_WALLET_TO_KEY.SUBTITLE=Enter your password and 4 seeds
 
+#//Wish List
+WISHLIST_MENU=Wishlist
+
 

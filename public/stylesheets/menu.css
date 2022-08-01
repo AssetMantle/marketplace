@@ -441,7 +441,9 @@ nav .content .links
     .content .links #show-features3:checked ~ ul,
     .content .links #show-services:checked ~ ul,
     .content .links #show-items:checked ~ ul {
-        max-height: 112px;
+        /*max-height: 112px;*/
+        max-height: 500px;
+        height: fit-content;
         border-color: var(--popup-stroke);
     }
 

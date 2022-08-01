@@ -76,3 +76,7 @@ POST        /deleteKey                       controllers.ProfileController.delet
 
 GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()
+
+GET         /viewWishList                    controllers.ProfileController.viewWishList()
+GET         /wishList                        controllers.ProfileController.wishList()
+GET         /wishListNFTs                    controllers.ProfileController.wishListNFTs()

@@ -350,6 +350,7 @@
     -webkit-box-align: start;
     -ms-flex-align: start;
     align-items: flex-start;
+    gap: 12px;
     //padding: 40px;
   }
 
@@ -398,3 +399,46 @@
     margin-top: 16px;
   }
 }
+
+// Add To Favorites Button
+.addToFavoritesButton{
+  .label {
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    .heart {
+      display: grid;
+      place-items: center;
+      position: relative;
+      svg {
+        height: 14px;
+        fill: rgb(255,255,255);
+        transition: all 500ms ease-in-out;
+        &:nth-child(2) {
+          height: 12px;
+          fill: var(--card-dark);
+          position: absolute;
+          z-index: 2;
+        }
+      }
+    }
+    input {
+      display: none;
+      &:checked + .heart svg {
+        fill: var(--dark);
+      }
+      &:checked + .heart svg:nth-child(2) {
+        filter: opacity(1);
+        animation: heart 0.3s linear forwards;
+      }
+      @keyframes heart {
+        to {
+          transform: scale(2.5);
+          filter: opacity(0);
+          fill: var(--dark);
+        }
+      }
+    }
+  }
+}
+
