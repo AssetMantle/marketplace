@@ -46,6 +46,7 @@ object FormField {
   val SIGNUP_TERMS_CONDITIONS = new BooleanFormField("SIGNUP_TERMS_CONDITIONS")
   val STATUS = new BooleanFormField("STATUS")
   val ACTIVE = new BooleanFormField("ACTIVE")
+  val MANAGED_KEY_DISCLAIMER = new BooleanFormField("MANAGED_KEY_DISCLAIMER")
 
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName

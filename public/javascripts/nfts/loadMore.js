@@ -60,3 +60,38 @@ function loadCollections(){
 function setCollectionId(id) {
     collectionId = id;
 }
+
+function loadFirstNFTBulk(source, route, loadingSpinnerID = 'commonSpinner', event = '') {
+    const loading = document.querySelector('.loading');
+    const div = $('#' + source);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        beforeSend: function () {
+            loading.classList.add('show');
+            $("#loadMoreBtnContainer").addClass("hide");
+        },
+        complete: function () {
+            loading.classList.remove('show');
+            $("#loadMoreBtnContainer").removeClass("hide");
+        },
+        statusCode: {
+            200: function (data) {
+                div.html(data);
+            },
+            401: function (data) {
+                replaceDocument(data.responseText);
+            },
+            500: function (data) {
+                let imageElement = document.createElement('img');
+                const imageRoute = jsRoutes.controllers.Assets.versioned("images/exclamation.png");
+                imageElement.src = imageRoute.url;
+                div.addClass("centerText componentError cmuk-card cmuk-card-default commonCard cmuk-animation-fade cmuk-card-body cmuk-height-medium cmuk-overflow-auto");
+                div.html(imageElement);
+                div.append("<p>" + data.responseText + "</p>")
+
+            }
+        }
+    });
+}
