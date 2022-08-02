@@ -98,7 +98,24 @@
                         </li>
                         @optionalLoginState match {
                             case Some(loginState) => {
+
                                 <div class="hiddenMenu">
+                                    <li>
+                                        <a class="desktop-link">@Messages(constants.View.PROFILE)</a>
+                                        <input type="checkbox" id="profileMenu">
+                                        <label for="profileMenu" class="d-flex align-items-center gap-3">
+                                            <img class="lazyload wallet icon" src="@routes.Assets.versioned("images/icon/profileWhite.png")"/>
+                                            <span>@Messages(constants.View.PROFILE)</span>
+                                        </label>
+                                        <ul>
+                                            <li>
+                                                <a href="@routes.ProfileController.viewProfile()" class="d-flex flex-row align-items-center">
+                                                    <img class="icon" src="@routes.Assets.versioned("images/icon/settings.png")"/>
+                                                    <div class="profileMenuLabel">@Messages(constants.View.MENU_SETTINGS)</div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
                                     <li id="userWalletMobile" class="user-wallet">
                                         <a onclick="getForm(jsRoutes.controllers.ProfileController.walletPopup())" class="d-flex align-items-center gap-3">
                                             <img class="lazyload wallet icon" src="@routes.Assets.versioned("images/icon/wallet.png")"/>
