@@ -445,3 +445,39 @@
   }
 }
 
+// Center Container
+.centerContainer{
+  width: 100%;
+  height: fit-content;
+  background-color: var(--card-color);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 100px;
+  .centerCard{
+    background-color: var(--card-color);
+    padding: 20px 20px 40px 20px;
+    .contentContainer{
+      .contentHeader{
+        .leftOptions {
+          list-style: none;
+          font-family: var(--font-type-1);
+          font-style: normal;
+          font-weight: 400;
+          font-size: 14px;
+          line-height: 17px;
+          text-transform: capitalize;
+          color: var(--gray);
+          .row{
+            .col{
+              cursor: pointer;
+            }
+            .col.active{
+              font-weight: 700;
+              color: var(--default);
+            }
+          }
+        }
+      }
+    }
+  }
+}

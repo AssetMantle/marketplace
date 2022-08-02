@@ -261,4 +261,17 @@ class ProfileController @Inject()(
       Ok(views.html.profile.wishList.wishListNFTs())
     }
   }
+
+  def viewWhiteList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.whiteList.viewWhiteList()))
+    }
+  }
+
+  def whiteList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginAction { implicit request =>
+      Ok(views.html.profile.whiteList.whiteList())
+    }
+  }
 }

@@ -80,3 +80,6 @@ POST        /changeManagedToUnmanaged        controllers.ProfileController.chang
 GET         /viewWishList                    controllers.ProfileController.viewWishList()
 GET         /wishList                        controllers.ProfileController.wishList()
 GET         /wishListNFTs                    controllers.ProfileController.wishListNFTs()
+
+GET         /viewWhiteList                    controllers.ProfileController.viewWhiteList()
+GET         /whiteList                        controllers.ProfileController.whiteList()
