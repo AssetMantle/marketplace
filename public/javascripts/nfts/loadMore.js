@@ -19,16 +19,18 @@ function loadMoreNFTs(collectionId) {
             type: route.type,
             async: true,
             beforeSend: function () {
-                loading.classList.add('show');
+                // loading.classList.add('show');
                 if($(".noNFT").length === 0) {
                     $("#loadMoreBtnContainer").addClass("hide");
                 }
+                $(".skeletonLoading").addClass("show");
             },
-            complete: function () {
-                loading.classList.remove('show');
+            complete: function (data) {
+                // loading.classList.remove('show');
                 if($(".noNFT").length === 0) {
                     $("#loadMoreBtnContainer").removeClass("hide");
                 }
+                $(".skeletonLoading").removeClass("show");
             },
             statusCode: {
                 200: function (data) {
@@ -69,12 +71,14 @@ function loadFirstNFTBulk(source, route, loadingSpinnerID = 'commonSpinner', eve
         type: route.type,
         async: true,
         beforeSend: function () {
-            loading.classList.add('show');
+            // loading.classList.add('show');
             $("#loadMoreBtnContainer").addClass("hide");
+            $(".skeletonLoading").addClass("show");
         },
         complete: function () {
-            loading.classList.remove('show');
+            // loading.classList.remove('show');
             $("#loadMoreBtnContainer").removeClass("hide");
+            $(".skeletonLoading").removeClass("show");
         },
         statusCode: {
             200: function (data) {

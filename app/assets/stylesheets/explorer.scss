@@ -181,3 +181,60 @@
 #loadMoreBtnContainer.hide{
   display: none !important;
 }
+
+// Skeleton Loading
+.skeletonLoading{
+  opacity: 0;
+  visibility: hidden;
+  display: none;
+  &.show{
+    opacity: 1;
+    visibility: visible;
+    display: block;
+  }
+}
+
+.shimmerBG {
+  animation-duration: 2.2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-name: shimmer;
+  animation-timing-function: linear;
+  background: #50535a;
+  background-image: linear-gradient(to right, #50535a 0%, #656871 20%, #50535a 40%, #50535a 100%);
+  background-size: 1200px 100%;
+  @-webkit-keyframes shimmer {
+    0% {
+      background-position: -100% 0;
+    }
+    100% {
+      background-position: 100% 0;
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -1200px 0;
+    }
+    100% {
+      background-position: 1200px 0;
+    }
+  }
+  &.media {
+    height: 200px;
+  }
+  &.contentLine {
+    height: 8px;
+    width: 100%;
+    margin-bottom: 16px;
+    border-radius: 8px;
+
+  }
+  &.end {
+    width: 60px;
+  }
+}
+
+
+
+
