@@ -112,5 +112,7 @@ class CollectionFiles @Inject()(
 
     def fetchAll(): Future[Seq[CollectionFile]] = getAll.map(_.map(_.deserialize))
 
+    def deleteByCollectionId(id: String): Future[Int] = deleteMultipleById1(id)
+
   }
 }

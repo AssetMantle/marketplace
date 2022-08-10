@@ -117,4 +117,6 @@ abstract class GenericDaoImpl[
 
   def exists(id: PK): Future[Boolean] = db.run(tableQuery.filter(_.id === id).exists.result)
 
+  def filterAndDelete[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Int] = db.run(tableQuery.filter(expr).delete)
+
 }
