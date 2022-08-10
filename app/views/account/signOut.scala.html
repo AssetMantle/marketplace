@@ -3,8 +3,8 @@
 
 @(signOutForm: Form[SignOut.Data] = SignOut.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="logoutContainer">
-@commonForm(constants.Form.SIGN_OUT, signOutForm, showSubtitle = false) {
-    <p>@Messages(constants.View.SIGN_OUT_CONFIRMATION)</p>
-    @commonCheckbox(signOutForm, constants.FormField.RECEIVE_NOTIFICATIONS, Symbol("class") -> "mt-4 cmuk-checkbox")
-}
+    @commonForm(constants.Form.SIGN_OUT, signOutForm, showSubtitle = false) {
+        <p>@Messages(constants.View.SIGN_OUT_CONFIRMATION)</p>
+        @commonCheckbox(signOutForm, constants.FormField.RECEIVE_NOTIFICATIONS, Symbol("containerDivClass") -> "hidden", Symbol("class") -> "mt-4 cmuk-checkbox")
+    }
 </div>
