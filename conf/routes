@@ -65,9 +65,6 @@ POST        /addManagedKey                   controllers.ProfileController.addMa
 GET         /addUnmanagedKey                 controllers.ProfileController.addUnmanagedKeyForm()
 POST        /addUnmanagedKey                 controllers.ProfileController.addUnmanagedKey()
 
-GET         /changeKeyName                   controllers.ProfileController.changeKeyNameForm(address: String)
-POST        /changeKeyName                   controllers.ProfileController.changeKeyName()
-
 GET         /viewMnemonics                   controllers.ProfileController.viewMnemonicsForm(address: String)
 POST        /viewMnemonics                   controllers.ProfileController.viewMnemonics()
 

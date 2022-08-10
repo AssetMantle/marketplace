@@ -24,7 +24,7 @@ object Form {
 
   val ADD_MANAGED_KEY = new Form("ADD_MANAGED_KEY", routes.javascript.ProfileController.addManagedKeyForm, routes.ProfileController.addManagedKey())
   val ADD_UNMANAGED_KEY = new Form("ADD_UNMANAGED_KEY", routes.javascript.ProfileController.addUnmanagedKeyForm, routes.ProfileController.addUnmanagedKey())
-  val CHANGE_KEY_NAME = new Form("CHANGE_KEY_NAME", routes.javascript.ProfileController.changeKeyNameForm, routes.ProfileController.changeKeyName())
+  val CHANGE_KEY_NAME = new Form("CHANGE_KEY_NAME", routes.javascript.ProfileController.addManagedKeyForm, routes.ProfileController.addManagedKey())
 
   val VIEW_MNEMONICS = new Form("VIEW_MNEMONICS", routes.javascript.ProfileController.viewMnemonicsForm, routes.ProfileController.viewMnemonics())
   val DELETE_KEY = new Form("DELETE_KEY", routes.javascript.ProfileController.deleteKeyForm, routes.ProfileController.deleteKey())

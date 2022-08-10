@@ -47,7 +47,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.addNewKey,
         routes.javascript.ProfileController.addManagedKeyForm,
         routes.javascript.ProfileController.addUnmanagedKeyForm,
-        routes.javascript.ProfileController.changeKeyNameForm,
+//        routes.javascript.ProfileController.changeKeyNameForm,
         routes.javascript.ProfileController.viewMnemonicsForm,
         routes.javascript.ProfileController.deleteKeyForm,
         routes.javascript.ProfileController.changeManagedToUnmanagedForm,
