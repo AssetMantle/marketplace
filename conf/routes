@@ -74,5 +74,5 @@ POST        /viewMnemonics                   controllers.ProfileController.viewM
 GET         /deleteKey                       controllers.ProfileController.deleteKeyForm(address: String)
 POST        /deleteKey                       controllers.ProfileController.deleteKey()
 
-GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
-POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()
+#GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
+#POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()

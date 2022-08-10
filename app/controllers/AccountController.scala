@@ -205,7 +205,7 @@ class AccountController @Inject()(
     implicit request =>
       MigrateWalletToKey.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.account.migrateWalletToKey(formWithErrors, formWithErrors.get.username, formWithErrors.get.walletAddress)))
+          Future(BadRequest(views.html.account.migrateWalletToKey(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.USERNAME.name, ""), formWithErrors.data.getOrElse(constants.FormField.WALLET_ADDRESS.name, ""))))
         },
         migrateWalletToKeyData => {
           val validateAndKey = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(migrateWalletToKeyData.username, password = migrateWalletToKeyData.password)
@@ -321,10 +321,12 @@ class AccountController @Inject()(
   def changeActiveKey(address: String): Action[AnyContent] = withLoginActionAsync { oldLoginState =>
     implicit request =>
       val changeActive = masterKeys.Service.changeActive(accountId = oldLoginState.username, oldAddress = oldLoginState.address, newAddress = address)
+
       def getResult = {
         implicit val loginState: LoginState = LoginState(username = oldLoginState.username, address = address)
         withUsernameToken.Ok()
       }
+
       (for {
         _ <- changeActive
         result <- getResult
