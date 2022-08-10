@@ -12,6 +12,9 @@
             @if(collection.getTwitter.isDefined) {
                 <a href="@collection.getTwitter.getOrElse("#")" target="_blank"><img src="@routes.Assets.versioned("images/icon/twitter.png")" class="icon"/></a>
             }
+            @if(collection.getInstagram.isDefined) {
+                <a href="@collection.getInstagram.getOrElse("#")" target="_blank"><img src="@routes.Assets.versioned("images/icon/instagram.png")" class="icon"/></a>
+            }
         </div>
     </div>
 </div>

@@ -17,11 +17,12 @@ object CommonConfig {
 
   object Collections {
     val CollectionsPerPage: Int = config.get[Int]("webApp.collectionsPerPage")
+    val NFTsPerPage: Int = config.get[Int]("webApp.nftsPerPage")
   }
 
   object Files {
     val RootFilePath: String = config.get[String]("upload.rootFilePath")
-    val ColectionPath: String = config.get[String]("upload.collectionPath")
+    val CollectionPath: String = config.get[String]("upload.collectionPath")
   }
 
   object AmazonS3 {
