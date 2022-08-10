@@ -81,6 +81,23 @@ class Starter @Inject()(
     obj
   }
 
+  def deleteOsmoNOTs(): Future[Unit] = {
+    val collection = Await.result(masterCollections.Service.getByName(name = "OsmoNOTs"), Duration.Inf)
+
+    if (collection.nonEmpty) {
+      val deleteNFTs = masterNFTs.Service.deleteByCollectionId(collection.get.id)
+      val deleteCollectionFiles = masterCollectionFiles.Service.deleteByCollectionId(collection.get.id)
+      val deleteCollection = masterCollections.Service.deleteById(collection.get.id)
+
+      for {
+        _ <- deleteNFTs
+        _ <- deleteCollectionFiles
+        _ <- deleteCollection
+      } yield ()
+    } else Future()
+
+  }
+
   def addNfts(collectionID: String, nftDetails: NFT, uploadCollection: UploadCollection): Future[Unit] = {
     println(nftDetails.name)
     println(uploadCollection.name)
@@ -89,7 +106,7 @@ class Starter @Inject()(
         val ipfsDetails = nftDetails.image.split("/").takeRight(2)
         val ipfsHash = ipfsDetails(0)
         val fileName = ipfsDetails(1)
-        val oldFilePath = constants.CommonConfig.Files.CollectionPath + uploadCollection.imagePath + "/" + fileName
+        val oldFilePath = constants.CommonConfig.Files.CollectionPath + "/" + uploadCollection.imagePath + "/" + fileName
         val ipfsPath = if (uploadCollection.uploadToIPFS) {
           val file = new File(oldFilePath)
           val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
@@ -223,6 +240,7 @@ class Starter @Inject()(
 
     (for {
       _ <- correctMasterAccount()
+      _ <- deleteOsmoNOTs()
       uploads <- uploads
       _ <- processDir(uploads)
     } yield ()

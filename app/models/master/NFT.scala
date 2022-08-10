@@ -126,5 +126,7 @@ class NFTs @Inject()(
 
     def checkExistsByName(name: String): Future[Boolean] = filter(_.name === name).map(_.nonEmpty)
 
+    def deleteByCollectionId(id: String): Future[Int] = filterAndDelete(_.collectionId === id)
+
   }
 }
