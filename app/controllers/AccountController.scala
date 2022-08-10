@@ -308,9 +308,13 @@ class AccountController @Inject()(
         },
         changePasswordData => {
           val changePassword = masterKeys.Service.changePassword(accountId = loginState.username, address = loginState.address, oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword)
+
+          def signOut = masterTransactionSessionTokens.Service.deleteById(loginState.username)
+
           (for {
             _ <- changePassword
-          } yield PartialContent(views.html.account.successfullPasswordChange())
+            _ <- signOut
+          } yield PartialContent(views.html.account.successfullPasswordChange()).withNewSession
             ).recover {
             case baseException: BaseException => BadRequest(views.html.account.changePassword(ChangePassword.form.withGlobalError(baseException.failure.message)))
           }
