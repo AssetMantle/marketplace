@@ -156,7 +156,7 @@ class ProfileController @Inject()(
     implicit request =>
       ChangeKeyName.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.changeKeyName(formWithErrors, formWithErrors.get.address)))
+          Future(BadRequest(views.html.profile.changeKeyName(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CHANGE_KEY_ADDRESS.name, ""))))
         },
         changeKeyNameData => {
           val update = masterKeys.Service.updateKeyName(accountId = loginState.username, address = changeKeyNameData.address, keyName = changeKeyNameData.keyName)
@@ -179,7 +179,7 @@ class ProfileController @Inject()(
     implicit request =>
       ViewMnemonics.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.viewMnemonics(formWithErrors, formWithErrors.get.address)))
+          Future(BadRequest(views.html.profile.viewMnemonics(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.WALLET_ADDRESS.name, ""))))
         },
         viewMnemonicsData => {
           val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = viewMnemonicsData.address, password = viewMnemonicsData.password)
@@ -227,7 +227,7 @@ class ProfileController @Inject()(
     implicit request =>
       ChangeManagedToUnmanaged.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.changeManagedToUnmanaged(formWithErrors, formWithErrors.get.address)))
+          Future(BadRequest(views.html.profile.changeManagedToUnmanaged(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.MANAGED_KEY_ADDRESS.name, ""))))
         },
         changeManagedToUnmanagedData => {
           val validate = masterKeys.Service.changeManagedToUnmanaged(accountId = loginState.username, address = changeManagedToUnmanagedData.address, password = changeManagedToUnmanagedData.password)
