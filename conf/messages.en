@@ -277,7 +277,6 @@ FORM.ADD_MANAGED_KEY.TITLE=Add New Address
 FORM.ADD_MANAGED_KEY.SUBTITLE=Enter details to add an address
 FORM.ADD_MANAGED_KEY.SUBMIT=Confirm
 DISCLAIMER_MESSAGE=AssetMantle wallet provides an option to store separate wallet addresses for custody and transaction management for blockchain-based digital wallets. This allows the user to operate multiple addresses and restore their MantlePlace account via any of these addresses using the custody solution managed by AssetMantle.
-DISCLAIMER_POLICY_MESSAGE=I agree to AssetMantle managing my wallet address through the custody solution
 MANAGED_KEY_NAME=Wallet Name
 MANAGED_KEY_ADDRESS=Address
 PLACEHOLDER.MANAGED_KEY_NAME=Type wallet name here
@@ -286,6 +285,7 @@ KEY_NAME_ERROR=Minimum length 3
 WALLET_ADDRESS_ERROR=Invalid wallet address
 PASSWORD_ERROR=Minimum length 5
 PASTE_MNEMONICS_MESSAGE=Paste all Mnemonics
+MANAGED_KEY_DISCLAIMER=I agree to AssetMantle managing my wallet address through the custody solution
 
 #//Unmanaged Address
 FORM.ADD_UNMANAGED_KEY.TITLE=Add New Address
