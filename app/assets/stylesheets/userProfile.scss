@@ -455,18 +455,13 @@
   margin-bottom: 100px;
   .centerCard{
     background-color: var(--card-color);
-    padding: 20px 20px 40px 20px;
+    padding: 20px 20px 20px 20px;
     .contentContainer{
       .contentHeader{
         .leftOptions {
+          @include setFont(var(--font-type-1), normal, 400, 14px, 17px, var(--gray));
           list-style: none;
-          font-family: var(--font-type-1);
-          font-style: normal;
-          font-weight: 400;
-          font-size: 14px;
-          line-height: 17px;
           text-transform: capitalize;
-          color: var(--gray);
           .row{
             .col{
               cursor: pointer;
@@ -478,6 +473,301 @@
           }
         }
       }
+      .contentTitle{
+        text-transform: capitalize;
+        margin-top: 20px;
+        .title{
+          @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--mantle-off-white));
+        }
+        .titleMenu{
+          a{
+            @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--mantle-off-white));
+            background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+          }
+          .toggleBtn{
+            button{
+              width: 70px;
+            }
+          }
+        }
+      }
+      .contentBody{
+        background-color: var(--card-dark);
+        width: 100%;
+        height: 664px;
+        border-radius: 10px;
+        margin-top: 20px;
+        .emptyWhitelist{
+          .message{
+            @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+          }
+        }
+        .contentTableContainer{
+          padding: 20px 32px 20px 32px;
+          .contentTable{
+            border-collapse: collapse;
+            width: 100%;
+            overflow-x: auto;
+            display: block;
+            thead{
+              display: block;
+              tr{
+                border-color: var(--line-2);
+                th{
+                  @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+                  text-transform: capitalize;
+                  min-width: 140px;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  max-width: 140px;
+                  display: table-cell;
+                  vertical-align: middle;
+                  padding: 20px 20px 20px 0px !important;
+                }
+
+              }
+            }
+            tbody{
+              display: block;
+              overflow-y: auto;
+              overflow-x: hidden;
+              height: fit-content;
+              max-height: 550px;
+              tr{
+                border-color: var(--line-2);
+                td{
+                  @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+                  min-width: 140px;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  max-width: 140px;
+                  display: table-cell;
+                  vertical-align: middle;
+                  padding: 20px 20px 20px 0px !important;
+                  .statusCircle{
+                    display: inline-block;
+                    width: 12px;
+                    height: 12px;
+                    aspect-ratio: 1;
+                    border-radius: 50%;
+                    &:first-child{
+                      margin-right: 4px;
+                    }
+                    &.onGoing{
+                      background: var(--connected);
+                      box-shadow: 1.41818px 1.41818px 2.83636px rgba(0, 0, 0, 0.2), inset -1.41818px -1.41818px 2.83636px rgba(0, 0, 0, 0.2), inset 1.41818px 1.41818px 2.83636px #61A956;
+                    }
+                    &.ended{
+                      background: var(--error);
+                      box-shadow: 0.531818px 0.531818px 1.06364px rgba(0, 0, 0, 0.2), inset -0.531818px -0.531818px 1.06364px rgba(0, 0, 0, 0.2), inset 0.531818px 0.531818px 1.06364px #EC6969;
+                    }
+                  }
+                  &.whitelistActionButton{
+                    img{
+                      margin-left: 20px;
+                      cursor: pointer;
+                    }
+                  }
+                  &.tableFieldName{
+                    color: var(--dark);
+                  }
+                }
+              }
+            }
+          }
+          #whitelistRequestsSent{
+            display: none;
+            &.show{
+              display: block;
+            }
+          }
+          #whitelistRequestsReceived{
+            display: none;
+            &.show{
+              display: block;
+            }
+          }
+        }
+        #createdWhitelist{
+          .tableFieldNo{min-width: 50px;}
+          .tableFieldName{min-width: 100px;max-width: 100px;}
+          .tableFieldStatus{min-width: 90px;}
+          .tableFieldTotalMembers{min-width: 120px;}
+          .tableFieldMaxMembers{min-width: 110px;}
+          .tableFieldSale{min-width: 130px;}
+          .tableFieldAction{min-width: 100px;width: 116px;}
+        }
+        #joinedWhitelist{
+          .tableFieldNo{min-width: 50px;}
+          .tableFieldName{min-width: 160px;max-width: 160px;}
+          .tableFieldStatus{min-width: 110px;}
+          .tableFieldTotalMembers{min-width: 130px;}
+          .tableFieldMaxMembers{min-width: 120px;}
+          .tableFieldSale{min-width: 140px;}
+        }
+        #whitelistRequests{
+          .tableFieldNo{min-width: 50px;}
+          .tableFieldName{min-width: 130px;max-width: 130px;}
+          .tableFieldStatus{min-width: 90px;}
+          .tableFieldTotalMembers{min-width: 120px;}
+          .tableFieldMaxMembers{min-width: 110px;}
+          .tableFieldSale{min-width: 140px;}
+          .tableFieldRequestStatus{min-width: 120px;
+            &.statusPending{color: var(--disable);}
+            &.statusAccepted{color: var(--connected);}
+            &.statusDeclined{color: var(--error);}
+          }
+        }
+      }
     }
+  }
+}
+
+
+// Dropdown Menu
+.dropdownContainer {
+  position: relative;
+  max-width: 100%;
+  text-align: center;
+  z-index: 200;
+  [type="checkbox"]:checked,
+  [type="checkbox"]:not(:checked){
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .dropdown:checked + label:before,
+  .dropdown:not(:checked) + label:before{
+    position: fixed;
+    top: 0;
+    left: 0;
+    content: '';
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    cursor: auto;
+    pointer-events: none;
+  }
+  .dropdown:checked + label:before{
+    pointer-events: auto;
+  }
+  .dropdown:not(:checked) + label.forDropdown{
+    cursor: pointer;
+  }
+  .dropdown:not(:checked) + label.forDropdown img{
+    margin-left: 4px;
+    transition: transform 0.3s ease;
+  }
+  .dropdown:checked + label.forDropdown img{
+    transform: rotate(180deg);
+    margin-left: 4px;
+    transition: transform 0.3s ease;
+  }
+  .sectionDropdown {
+    position: absolute;
+    padding: 24px;
+    background-color: var(--card-dark);
+    border: 2px solid var(--line-2);
+    border-radius: 20px;
+    top: 35px;
+    left: calc(100% - 50px);
+    min-width: 314px;
+    width: 100%;
+    display: block;
+    z-index: 2;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    &:before {
+      position: absolute;
+      top: -20px;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      content: '';
+      display: block;
+      z-index: 1;
+    }
+    &:after {
+      position: absolute;
+      top: -8px;
+      left: 30px;
+      width: 0;
+      height: 0;
+      border-left: 9px solid transparent;
+      border-right: 9px solid transparent;
+      border-bottom: 9px solid var(--card-dark);
+      content: '';
+      display: block;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+    a{
+      @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--icon-white));
+      padding-left: 8px;
+      transition: all 0.3s ease;
+      display: flex;
+      -webkit-align-items: center;
+      -moz-align-items: center;
+      -ms-align-items: center;
+      align-items: center;
+      justify-content: space-between;
+      -ms-flex-pack: distribute;
+      cursor: pointer;
+    }
+    .dropdownSub:checked + label,
+    .dropdownSub:not(:checked) + label{
+      @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--icon-white));
+      transition: all 0.3s ease;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-align-items: center;
+      -moz-align-items: center;
+      -ms-align-items: center;
+      align-items: center;
+      justify-content: space-between;
+      -ms-flex-pack: distribute;
+      cursor: pointer;
+    }
+    .sectionDropdownSub{
+      position: relative;
+      display: block;
+      width: 100%;
+      pointer-events: none;
+      opacity: 0;
+      max-height: 0;
+      padding-left: 10px;
+      padding-right: 3px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .dropdownSub:checked ~ .sectionDropdownSub{
+      pointer-events: auto;
+      opacity: 1;
+      max-height: 999px;
+    }
+  }
+  .dropdown:checked ~ .sectionDropdown{
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .separator{
+    height: 2px;
+    width: calc(100% + 41px);
+    background-color: var(--line-2);
+    margin: 20px -20px 20px;
+  }
+  .innerSeparator{
+    height: 2px;
+    width: 100%;
+    background-color: var(--line-2);
+    margin: 12px 0px;
   }
 }

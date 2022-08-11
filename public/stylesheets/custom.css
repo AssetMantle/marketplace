@@ -5,7 +5,7 @@
     --mantle-off-white: #FFFDFA;
     --button-text: #2C2C2C;
     --disable-yellow: #624D19;
-    --card-color: #242420;
+    --card-color: #252525;
     --line: #2E2E2E;
     --line-2: #383838;
     --icon-white: #E6E6E6;
@@ -66,6 +66,7 @@ body{
 
 ::-webkit-scrollbar
 {
+    height: 5px;
     width: 5px;
     background-color: var(--line);
     border-radius: 5px;
