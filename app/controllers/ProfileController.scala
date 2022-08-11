@@ -210,7 +210,9 @@ class ProfileController @Inject()(
         deleteKeyData => {
           val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = deleteKeyData.address, password = deleteKeyData.password)
 
-          def delete(validated: Boolean, key: master.Key) = if (validated) masterKeys.Service.deleteKey(accountId = key.accountId, address = key.address) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+          def delete(validated: Boolean, key: master.Key) = if (!key.active) {
+            if (validated) masterKeys.Service.deleteKey(accountId = key.accountId, address = key.address) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+          } else constants.Response.CANNOT_DELETE_ACTIVE_KEY.throwFutureBaseException()
 
           (for {
             (validated, key) <- validateAndGetKey
