@@ -144,6 +144,7 @@ RESPONSE.FAILURE.OLD_AND_NEW_SAME_PASSWORD=Old & new password cannot be same.
 RESPONSE.FAILURE.PASSWORD_VALIDATION_FAILED=Password does not match minimum criteria. It should contain at least a small letter, a capital letter, a number and a symbol: !@#$%^&*._-.
 PLACEHOLDER.PASSWORD=Enter Password
 PLACEHOLDER.WALLET_ADDRESS=Wallet Address
+SHARE_USERNAME_TWEET=Share on Twitter
 
 #//Sign Out
 SIGN_OUT_CONFIRMATION=Are you sure you want to sign out?
