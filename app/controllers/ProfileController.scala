@@ -183,8 +183,12 @@ class ProfileController @Inject()(
         },
         viewMnemonicsData => {
           val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = viewMnemonicsData.address, password = viewMnemonicsData.password)
+
+          def update(validated: Boolean, key: master.Key) = if (validated) masterKeys.Service.updateKey(key.copy(backupUsed = true)) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+
           (for {
             (validated, key) <- validateAndGetKey
+            _ <- update(validated, key)
           } yield if (validated) PartialContent(views.html.profile.seedPhrase(key.partialMnemonics.getOrElse(constants.Response.SEEDS_NOT_FOUND.throwBaseException()))) else constants.Response.INVALID_PASSWORD.throwBaseException()
             ).recover {
             case baseException: BaseException => BadRequest(views.html.profile.viewMnemonics(ViewMnemonics.form.withGlobalError(baseException.failure.message), viewMnemonicsData.address))
