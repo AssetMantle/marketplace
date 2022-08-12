@@ -225,7 +225,7 @@ class Starter @Inject()(
         } yield ()
           ).recover {
           case exception: Exception => logger.error(exception.getLocalizedMessage)
-            throw new BaseException(constants.Response.COLLECTION_UPLOAD_ERROR)
+            Future()
         }
       }
 
