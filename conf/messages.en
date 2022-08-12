@@ -341,4 +341,6 @@ MANAGED_KEY_DESCRIPTION=Private key is encrypted and stored. Can be used to do t
 UNMANAGED_KEY_DESCRIPTION=Only address is stored. Cannot be used to do tx.
 FORM.MIGRATE_WALLET_TO_KEY.TITLE=Security Update
 FORM.MIGRATE_WALLET_TO_KEY.SUBTITLE=Enter your password and 4 seeds
+FORM.MIGRATE_WALLET_TO_KEY.SUBMIT=Submit
+FORM.MIGRATE_WALLET_TO_KEY.BUTTON=Submit
 RESPONSE.FAILURE.MNEMONICS_LENGTH_NOT_12_OR_24=Mnemonics length must be 12 or 24
