@@ -6,7 +6,7 @@
   <appender name="APPLICATION_FILE" class="ch.qos.logback.core.FileAppender">
     <file>${application.home:-.}/logs/application.log</file>
     <encoder>
-      <pattern>%date [%level] from %logger in %thread  - %message%n%xException</pattern>
+      <pattern>%date [%level] from %logger in %thread - %message%n%xException</pattern>
     </encoder>
   </appender>
 
@@ -16,7 +16,7 @@
     </filter>
     <file>${application.home:-.}/logs/error.log</file>
     <encoder>
-      <pattern>%date [%level] from %logger in %thread  - %message%n%xException</pattern>
+      <pattern>%date [%level] from %logger in %thread - %message%n%xException</pattern>
     </encoder>
   </appender>
 
@@ -25,7 +25,7 @@
 <!--      <level>WARN</level>-->
 <!--    </filter>-->
     <encoder>
-      <pattern>%date [%level] from %logger in %thread  - %message%n%xException</pattern>
+      <pattern>%date [%level] from %logger in %thread - %message%n%xException</pattern>
     </encoder>
   </appender>
 
