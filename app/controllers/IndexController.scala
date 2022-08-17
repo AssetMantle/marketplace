@@ -28,7 +28,6 @@ class IndexController @Inject()(
   def index: EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit optionalLoginState =>
       implicit request =>
-        logger.info(request.path)
         optionalLoginState match {
           case Some(loginState) =>
             implicit val loginStateImplicit: LoginState = loginState
