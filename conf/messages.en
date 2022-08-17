@@ -344,3 +344,7 @@ FORM.MIGRATE_WALLET_TO_KEY.SUBTITLE=Enter your password and 4 seeds
 FORM.MIGRATE_WALLET_TO_KEY.SUBMIT=Submit
 FORM.MIGRATE_WALLET_TO_KEY.BUTTON=Submit
 RESPONSE.FAILURE.MNEMONICS_LENGTH_NOT_12_OR_24=Mnemonics length must be 12 or 24
+
+#Logs
+CONTROLLERS_REQUEST=REQUEST  path-{0} {1}  by address-{2} username-{3}
+CONTROLLERS_RESPONSE=RESPONSE for-{0} {1}  by address-{2} username-{3}  returnedWithStatus-{4} in {5}ms
