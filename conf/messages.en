@@ -346,5 +346,5 @@ FORM.MIGRATE_WALLET_TO_KEY.BUTTON=Submit
 RESPONSE.FAILURE.MNEMONICS_LENGTH_NOT_12_OR_24=Mnemonics length must be 12 or 24
 
 #Logs
-CONTROLLERS_REQUEST=REQUEST  path-{0} {1}  by address-{2} username-{3}
-CONTROLLERS_RESPONSE=RESPONSE for-{0} {1}  by address-{2} username-{3}  returnedWithStatus-{4} in {5}ms
+CONTROLLERS_REQUEST=REQUEST "{0} {1}" from {2} by username: {3}
+CONTROLLERS_RESPONSE=RESPONSE "{0} {1}" {4} from {2} by username: {3} in {5}ms
