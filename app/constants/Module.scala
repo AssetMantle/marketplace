@@ -44,4 +44,6 @@ object Module {
   val PROPOSAL_CONTENT = "PROPOSAL_CONTENT"
   val COIN = "COIN"
   val FEE_GRANT = "FEE_GRANT"
+
+  val BROADCAST_TX_SYNC = "BROADCAST_TX_SYNC"
 }

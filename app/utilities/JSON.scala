@@ -45,4 +45,26 @@ object JSON {
     }
   }
 
+  def getResponseFromJson[T1, T2](wsResponse: Future[WSResponse])(implicit exec: ExecutionContext, logger: Logger, module: String, reads1: Reads[T1], reads2: Reads[T2]): Future[(Option[T1], Option[T2])] = {
+    wsResponse.map { response =>
+      Json.fromJson[T1](response.json) match {
+        case JsSuccess(value: T1, _: JsPath) => (Option(value), None)
+        case mainError: JsError => logger.debug(response.json.toString())
+          logger.error(mainError.toString)
+          val errorResponse = Json.fromJson[T2](response.json) match {
+            case JsSuccess(value: T2, _: JsPath) => (None, Option(value))
+            case error: JsError => logger.debug(response.json.toString())
+              logger.error(error.toString)
+              constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
+          }
+          constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
+      }
+    }
+  }.recover {
+    case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
+      constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
+    case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
+      constants.Response.JSON_MAPPING_EXCEPTION.throwBaseException(jsonMappingException)
+  }
+
 }

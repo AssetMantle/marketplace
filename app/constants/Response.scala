@@ -99,7 +99,7 @@ object Response {
   val UNKNOWN_GRANT_AUTHORIZATION_RESPONSE_STRUCTURE = new Failure("UNKNOWN_GRANT_AUTHORIZATION_RESPONSE_STRUCTURE")
   val TRANSACTION_PROCESSING_FAILED = new Failure("TRANSACTION_PROCESSING_FAILED")
 
-  class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
+  class Failure(response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
     val action: String = utilities.JsRoutes.getJsRouteString(actionController)
     val logMessage: String = LOG_PREFIX + response

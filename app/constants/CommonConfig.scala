@@ -18,6 +18,7 @@ object CommonConfig {
   object Blockchain {
     case class IBCDenom(hash: String, name: String)
 
+    val ChainId: String = config.get[String]("blockchain.chainId")
     val RPCEndPoint: String = config.get[String]("blockchain.rpcURL")
     val RestEndPoint: String = config.get[String]("blockchain.restURL")
     val TransactionMode: String = config.get[String]("blockchain.transactionMode")

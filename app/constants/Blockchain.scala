@@ -10,6 +10,7 @@ object Blockchain {
   val ValidatorConsensusPublicPrefix: String = AccountPrefix + "valconspub"
   val CoinType = 118
   val MnemonicShown = 4
+  val ChainId: String = CommonConfig.Blockchain.ChainId
   val DefaultHDPath: Seq[ChildNumber] = Seq(
     new ChildNumber(44, true),
     new ChildNumber(CoinType, true),
