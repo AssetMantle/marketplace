@@ -95,7 +95,7 @@ PLACEHOLDER.SEED_PHRASE_3=
 PLACEHOLDER.SEED_PHRASE_4=
 CONFIRM_USERNAME=Confirm Username
 PLACEHOLDER.CONFIRM_USERNAME=Enter Username
-ERROR_INVALID_USERNAME=Invalid Username
+ERROR_INVALID_INPUT=Invalid Input
 
 #//Create Wallet
 CREATE_WALLET_TITLE=Create a Wallet
@@ -174,7 +174,7 @@ SEED_PHRASE_WARNING_MESSAGE=Do not share recovery phrase with anyone.
 NEW_PASSWORD_RULE_1=8 to 128 characters
 NEW_PASSWORD_RULE_2=One number
 NEW_PASSWORD_RULE_3=One Upper case letter
-NEW_PASSWORD_RULE_4=One special character (!@@#$%^&*./-_)
+NEW_PASSWORD_RULE_4=One special character (!@#$%^&*./-_)
 FORGOT_PASSWORD_SUCCESS_TITLE=Password Reset successful
 FORGOT_PASSWORD_SUCCESS_SUBTITLE=Your password has been reset successfully. Sign in to continue.
 FORGOT_PASSWORD_SEED_PHRASE_SUBTITLE=Confirm your recovery phrase to reset your password.
@@ -280,7 +280,6 @@ FORM.ADD_MANAGED_KEY.TITLE=Add New Address
 FORM.ADD_MANAGED_KEY.SUBTITLE=Enter details to add an address
 FORM.ADD_MANAGED_KEY.SUBMIT=Confirm
 DISCLAIMER_MESSAGE=AssetMantle wallet provides an option to store separate wallet addresses for custody and transaction management for blockchain-based digital wallets. This allows the user to operate multiple addresses and restore their MantlePlace account via any of these addresses using the custody solution managed by AssetMantle.
-DISCLAIMER_POLICY_MESSAGE=I agree to AssetMantle managing my wallet address through the custody solution
 MANAGED_KEY_NAME=Wallet Name
 MANAGED_KEY_ADDRESS=Address
 PLACEHOLDER.MANAGED_KEY_NAME=Type wallet name here
@@ -289,6 +288,7 @@ KEY_NAME_ERROR=Minimum length 3
 WALLET_ADDRESS_ERROR=Invalid wallet address
 PASSWORD_ERROR=Minimum length 5
 PASTE_MNEMONICS_MESSAGE=Paste all Mnemonics
+MANAGED_KEY_DISCLAIMER=I agree to AssetMantle managing my wallet address through the custody solution
 
 #//Unmanaged Address
 FORM.ADD_UNMANAGED_KEY.TITLE=Add New Address

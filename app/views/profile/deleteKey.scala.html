@@ -1,6 +1,7 @@
 @import views.profile.companion.DeleteKey
 @import views.html.base.form._
 @import views.html.base.label._
+@import views.html.base.forms.{commonFieldErrorMessage}
 
 @(deleteKeyForm: Form[DeleteKey.Data] = DeleteKey.form, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
@@ -13,23 +14,35 @@
                         @commonInputText(deleteKeyForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly")
                     </div>
                 </div>
+            </div>
 
-                <div class="mt-3 inputField">
+            <div class="mb-3">
+                <div class="inputField">
                     <div class="inputFieldBody">
                         @commonLabel(constants.FormField.PASSWORD.name)
-                        @commonInputPassword(deleteKeyForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off", Symbol("id") -> "deleteAccountPassword")
+                        @commonInputPassword(deleteKeyForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off", Symbol("id") -> "deleteAccountPassword", Symbol("oninput") -> "enableNavigationButton()")
+                        @commonFieldErrorMessage(id = "errorMessagePassword", message = Messages(constants.View.ERROR_INVALID_INPUT))
                     </div>
                 </div>
             </div>
         </div>
     }
 <script>
-        $("#formSubmitButton .buttonPrimary").addClass("disable");
-        $("#deleteAccountPassword").keyup(function () {
-            if ($.trim(deleteAccountPassword.value).length) {
+        function enableNavigationButton(){
+            let flag = 0;
+            let password = document.getElementById("deleteAccountPassword");
+            let regexPassword = new RegExp("^[A-Za-z0-9!@@#$%^&*._-]*$");
+            if(regexPassword.test(password.value)){
+                $("#errorMessagePassword").slideUp();
+            }else{
+                $("#errorMessagePassword").slideDown();
+                flag = 1;
+            }
+
+            if ($.trim(password.value).length && flag === 0) {
                 $("#formSubmitButton .buttonPrimary").removeClass("disable");
             } else {
                 $("#formSubmitButton .buttonPrimary").addClass("disable");
             }
-        });
+        }
 </script>

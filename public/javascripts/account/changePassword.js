@@ -1,11 +1,4 @@
 $("#formSubmitButton .buttonPrimary").addClass("disable");
-$("#oldPassword, #changePassword, #changeConfirmPassword").keyup(function (){
-    if ($.trim(oldPassword.value).length && $.trim(changePassword.value).length && $.trim(changeConfirmPassword.value).length) {
-        $("#formSubmitButton .buttonPrimary").removeClass("disable");
-    } else {
-        $("#formSubmitButton .buttonPrimary").addClass("disable");
-    }
-});
 
 function showPassword() {
     let password = $('#changePassword')[0];
@@ -42,7 +35,7 @@ function checkNewPassword(){
 
         let numberMatchPattern = passwordValue.match(/\d+/g);
         const isUpperCase = (x) => /[A-Z]/.test(x);
-        let isSpecialCharacter = (x) => /[ `!@@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(x);
+        let isSpecialCharacter = (x) => /[ `!@@#$%^&*_.\-\/]/.test(x);
 
         if (passwordValue.length > 7 && passwordValue.length < 129) {
             $(".error-info-1 .error-icon").addClass('active');
@@ -77,5 +70,46 @@ function checkNewPassword(){
         } else {
             $(".error-message").slideUp();
         }
+    }
+}
+
+function activeButton() {
+    let oldPassword = document.getElementById("oldPassword");
+    let newPassword = document.getElementById("changePassword");
+    let confirmPassword = document.getElementById("changeConfirmPassword");
+
+    let inputOldPassword = $("#oldPassword").val();
+    let inputNewPassword = $("#changePassword").val();
+    let inputConfirmPassword = $("#changeConfirmPassword").val();
+
+    let regexPassword = new RegExp("^[A-Za-z0-9!@#$%^&*._-]*$");
+
+    if(regexPassword.test(inputOldPassword)){
+        $("#errorMessageOldPassword").slideUp();
+    }else{
+        $("#errorMessageOldPassword").slideDown();
+    }
+
+    if(regexPassword.test(inputNewPassword)){
+        $("#errorMessageNewPassword").slideUp();
+    }else{
+        $("#errorMessageNewPassword").slideDown();
+    }
+
+    if(regexPassword.test(inputConfirmPassword)){
+        $("#errorMessageConfirmPassword").slideUp();
+    }else{
+        $("#errorMessageConfirmPassword").slideDown();
+    }
+
+    if ($.trim(oldPassword.value).length &&
+        $.trim(newPassword.value).length &&
+        $.trim(confirmPassword.value).length &&
+        regexPassword.test(inputOldPassword) &&
+        regexPassword.test(inputNewPassword) &&
+        regexPassword.test(inputConfirmPassword)){
+        $(".cmuk-button").removeClass("disable");
+    } else {
+        $(".cmuk-button").addClass("disable");
     }
 }

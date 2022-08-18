@@ -12,8 +12,9 @@
                 <div class="inputField">
                     <div class="inputFieldBody">
                         @commonLabel(constants.FormField.USERNAME.name)
-                        @commonInputText(signInForm, constants.FormField.USERNAME, Symbol("autocomplete") -> "off", Symbol("id") -> "signInUsername")
+                        @commonInputText(signInForm, constants.FormField.USERNAME, Symbol("autocomplete") -> "off", Symbol("id") -> "signInUsername", Symbol("oninput") -> """activeButton()""")
                         @commonFieldErrorMessage(id = "incorrectUsernameError", message = Messages(constants.View.INCORRECT_USERNAME))
+                        @commonFieldErrorMessage(id = "errorMessageUsername", message = Messages(constants.View.ERROR_INVALID_INPUT))
                     </div>
                 </div>
             </div>
@@ -31,8 +32,9 @@
                                 <img src="@routes.Assets.versioned("images/icon/showPassword.png")" width="24px" height="18px"/>
                             </span>
                         </div>
-                        @commonInputPassword(signInForm, constants.FormField.PASSWORD, 'id -> "signInPassword")
+                        @commonInputPassword(signInForm, constants.FormField.PASSWORD, 'id -> "signInPassword", Symbol("oninput") -> """activeButton()""")
                         @commonFieldErrorMessage(id = "incorrectPasswordError", message = Messages(constants.View.INCORRECT_PASSWORD))
+                        @commonFieldErrorMessage(id = "errorMessagePassword", message = Messages(constants.View.ERROR_INVALID_INPUT))
                         </div>
                     </div>
                 </div>

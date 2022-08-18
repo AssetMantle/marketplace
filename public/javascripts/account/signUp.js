@@ -75,22 +75,19 @@ function checkPasswords() {
 
 function activeButton() {
     let signUpUsername = document.getElementById("signUpUsername");
-    // let signUpPassword = document.getElementById("signUpPassword");
-    // let signUpConfirmPassword = document.getElementById("signUpConfirmPassword");
     let termsCondition = document.getElementById("termsCondition");
-    // if ($.trim(signUpUsername.value).length && $.trim(signUpPassword.value).length && $.trim(signUpConfirmPassword.value).length && termsCondition.checked === true){
+    let input = $("#signUpUsername").val();
+    let regex = new RegExp("^[a-zA-Z0-9!@#$._-]*$");
+    if(regex.test(input)){
+        $("#errorMessageUsername").slideUp();
+    }else{
+        $("#errorMessageUsername").slideDown();
+    }
+
     if ($.trim(signUpUsername.value).length && termsCondition.checked === true && regex.test(input)){
         $(".cmuk-button").removeClass("disable");
     } else {
         $(".cmuk-button").addClass("disable");
-    }
-
-    let input = $("#signUpUsername").val();
-    let regex = new RegExp(signUpUsername.getAttribute("data-pattern"));
-    if(regex.test(input)){
-        $(".error-message").slideUp();
-    }else{
-        $(".error-message").slideDown();
     }
 }
 

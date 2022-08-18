@@ -107,6 +107,22 @@ function enableNavigationButton(pageNumber) {
         let flag = 0;
         let username = document.getElementById("username");
         let walletAddress = document.getElementById("walletAddress");
+        let regexUsername = new RegExp("^[a-zA-Z0-9!@#$._-]*$");
+        let regexWalletAddress = new RegExp("^[a-z0-9]*$");
+
+        if(regexUsername.test(username.value)){
+            $("#errorMessageUsername").slideUp();
+        }else{
+            $("#errorMessageUsername").slideDown();
+            flag = 1;
+        }
+        if(regexWalletAddress.test(walletAddress.value)){
+            $("#errorMessageWalletAddress").slideUp();
+        }else{
+            $("#errorMessageWalletAddress").slideDown();
+            flag = 1;
+        }
+
         if($.trim(username.value).length && ($.trim(username.value).length < 3 || $.trim(username.value).length > 50)){
             $("#username").css("border-color", "var(--error)");
             $("#usernameError").show(300);
@@ -137,6 +153,15 @@ function enableNavigationButton(pageNumber) {
         let phrase2 = document.getElementById("phrase2");
         let phrase3 = document.getElementById("phrase3");
         let phrase4 = document.getElementById("phrase4");
+        let regexSeed = new RegExp("^[a-z]*$");
+
+        if(regexSeed.test(phrase1.value) && regexSeed.test(phrase2.value) && regexSeed.test(phrase3.value) && regexSeed.test(phrase4.value)){
+            $("#errorMessageSeeds").slideUp();
+        }else{
+            $("#errorMessageSeeds").slideDown();
+            flag = 1;
+        }
+
         if(($.trim(phrase1.value).length && ($.trim(phrase1.value).length < 3 || $.trim(phrase1.value).length > 20)) ||
             ($.trim(phrase2.value).length && ($.trim(phrase2.value).length < 3 || $.trim(phrase2.value).length > 20)) ||
             ($.trim(phrase3.value).length && ($.trim(phrase3.value).length < 3 || $.trim(phrase3.value).length > 20)) ||
@@ -153,10 +178,70 @@ function enableNavigationButton(pageNumber) {
         }
     }
     else if(pageNumber === 2){
+        var flag1,flag2,flag3,flag4 = 0;
+        let passwordValue = document.getElementById('forgotNewPassword').value;
+        if($.trim(passwordValue).length) {
+            // var completeRegularExpression = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,128}$/;
 
+            let numberMatchPattern = passwordValue.match(/\d+/g);
+            const isUpperCase = (x) => /[A-Z]/.test(x);
+            let isSpecialCharacter = (x) => /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(x);
+
+            if (passwordValue.length > 7 && passwordValue.length < 129) {
+                $(".error-info-1 .error-icon").addClass('active');
+                flag1 = 0;
+            } else {
+                $(".error-info-1 .error-icon").removeClass('active');
+                flag1 = 1;
+            }
+            if (numberMatchPattern != null) {
+                $(".error-info-2 .error-icon").addClass('active');
+                flag2 = 0;
+            } else {
+                $(".error-info-2 .error-icon").removeClass('active');
+                flag2 = 1;
+            }
+            if (isUpperCase(passwordValue)) {
+                $(".error-info-3 .error-icon").addClass('active');
+                flag3 = 0;
+            } else {
+                $(".error-info-3 .error-icon").removeClass('active');
+                flag3 = 1;
+            }
+            if (isSpecialCharacter(passwordValue)) {
+                $(".error-info-4 .error-icon").addClass('active');
+                flag4 = 0;
+            } else {
+                $(".error-info-4 .error-icon").removeClass('active');
+                flag4 = 1;
+            }
+            if (flag1 == 1 || flag2 == 1 || flag3 == 1 || flag4 == 1) {
+                $(".error-message").slideDown();
+            } else {
+                $(".error-message").slideUp();
+            }
+        }
+
+
+        let flag = 0;
         let forgotNewPassword = document.getElementById("forgotNewPassword");
         let forgotNewConfirmPassword = document.getElementById("forgotNewConfirmPassword");
-        if ($.trim(forgotNewPassword.value).length && $.trim(forgotNewConfirmPassword.value).length) {
+        let regexPassword = new RegExp("^[A-Za-z0-9!@#$%^&*._-]*$");
+
+        if(regexPassword.test(forgotNewPassword.value)){
+            $("#errorMessagePassword").slideUp();
+        }else{
+            $("#errorMessagePassword").slideDown();
+            flag = 1;
+        }
+        if(regexPassword.test(forgotNewConfirmPassword.value)){
+            $("#errorMessageConfirmPassword").slideUp();
+        }else{
+            $("#errorMessageConfirmPassword").slideDown();
+            flag = 1;
+        }
+
+        if ($.trim(forgotNewPassword.value).length && $.trim(forgotNewConfirmPassword.value).length && flag === 0 && flag1 === 0 && flag2 === 0 && flag3 === 0 && flag4 === 0) {
             $("#formSubmitButton button").removeClass("disable");
         } else {
             $("#formSubmitButton button").addClass("disable");

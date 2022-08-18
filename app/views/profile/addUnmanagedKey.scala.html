@@ -22,6 +22,7 @@
                         @views.html.base.label.commonLabel(constants.FormField.UNMANAGED_KEY_ADDRESS.name)
                         @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_KEY_ADDRESS, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedKeyAddress", Symbol("oninput") -> "enableNavigationButton(0)")
                         @commonFieldErrorMessage(id = "walletAddressError", message = Messages(constants.View.WALLET_ADDRESS_ERROR))
+                        @commonFieldErrorMessage(id = "errorMessageWalletAddress", message = Messages(constants.View.ERROR_INVALID_INPUT))
                     </div>
                 </div>
             </div>
@@ -36,6 +37,7 @@
             <div class="inputFieldBody">
                 @commonInputPassword(unmanagedAddressForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedMnemonicPassword", Symbol("oninput") -> "enableNavigationButton(1)")
                 @commonFieldErrorMessage(id = "passwordError", message = Messages(constants.View.PASSWORD_ERROR))
+                @commonFieldErrorMessage(id = "errorMessagePassword", message = Messages(constants.View.ERROR_INVALID_INPUT))
             </div>
         </div>
     </div>

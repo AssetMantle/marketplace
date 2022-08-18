@@ -1,8 +1,46 @@
 @import views.profile.companion.ChangeManagedToUnmanaged
 @import views.html.base.form._
+@import views.html.base.forms.{commonFieldErrorMessage}
 
 @(changeManagedToUnmanagedForm: Form[ChangeManagedToUnmanaged.Data] = ChangeManagedToUnmanaged.form, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.CHANGE_MANAGED_TO_UNMANAGED, changeManagedToUnmanagedForm) {
-
+    <div class="modal-body">
+        <div class="mb-3">
+            <div class="inputField">
+                <div class="inputFieldBody">
+                    @views.html.base.label.commonLabel(constants.FormField.MANAGED_KEY_ADDRESS.name)
+                    @commonInputText(changeManagedToUnmanagedForm, constants.FormField.MANAGED_KEY_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly")
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="inputField">
+                <div class="inputFieldBody">
+                    @views.html.base.label.commonLabel(constants.FormField.PASSWORD.name)
+                    @commonInputText(changeManagedToUnmanagedForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off", Symbol("id") -> "managedKeyPassword", Symbol("oninput") -> "enableNavigationButton()")
+                    @commonFieldErrorMessage(id = "errorMessagePassword", message = Messages(constants.View.ERROR_INVALID_INPUT))
+                </div>
+            </div>
+        </div>
+    </div>
 }
+<script>
+    function enableNavigationButton(){
+        let flag = 0;
+        let password = document.getElementById("managedKeyPassword");
+        let regexPassword = new RegExp("^[A-Za-z0-9!@@#$%^&*._-]*$");
+        if(regexPassword.test(password.value)){
+            $("#errorMessagePassword").slideUp();
+        }else{
+            $("#errorMessagePassword").slideDown();
+            flag = 1;
+        }
+
+        if ($.trim(password.value).length && flag === 0) {
+            $("#formSubmitButton .buttonPrimary").removeClass("disable");
+        } else {
+            $("#formSubmitButton .buttonPrimary").addClass("disable");
+        }
+    }
+</script>

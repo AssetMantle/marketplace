@@ -128,6 +128,8 @@ function enableNavigationButton(pageNumber) {
         let flag = 0;
         let managedKeyName = document.getElementById("managedKeyName");
         let walletAddress = document.getElementById("managedKeyAddress");
+        let regexWalletAddress = new RegExp("^[a-z0-9]*$");
+
         if ($.trim(managedKeyName.value).length && ($.trim(managedKeyName.value).length < 3 || $.trim(managedKeyName.value).length > 50)) {
             $("#managedKeyName").css("border-color", "var(--error)");
             $("#keyNameError").show(300);
@@ -136,6 +138,14 @@ function enableNavigationButton(pageNumber) {
             $("#managedKeyName").css("border-color", "var(--default)");
             $("#keyNameError").hide(300);
         }
+
+        if(regexWalletAddress.test(walletAddress.value)){
+            $("#errorMessageWalletAddress").slideUp();
+        }else{
+            $("#errorMessageWalletAddress").slideDown();
+            flag = 1;
+        }
+
         if ($.trim(walletAddress.value).length && $.trim(walletAddress.value).length !== 45) {
             $("#managedKeyAddress").css("border-color", "var(--error)");
             $("#walletAddressError").show(300);
@@ -154,30 +164,57 @@ function enableNavigationButton(pageNumber) {
     } else if (pageNumber === 2) {
         checkSeedInput();
     } else if (pageNumber === 3) {
+        let flag1 = 0;
+        let flag2 = 0;
         let managedMnemonicPassword = document.getElementById("managedMnemonicPassword");
+        let regexPassword = new RegExp("^[A-Za-z0-9!@#$%^&*._-]*$");
+
+        if(regexPassword.test(managedMnemonicPassword.value)){
+            $("#errorMessagePassword").slideUp();
+        }else{
+            $("#errorMessagePassword").slideDown();
+            flag1 = 1;
+        }
 
         if ($.trim(managedMnemonicPassword.value).length < 5 || $.trim(managedMnemonicPassword.value).length > 128) {
             $("#managedMnemonicPassword").css("border-color", "var(--error)");
             $("#passwordError").show(300);
+            flag2 = 1;
         } else {
             $("#managedMnemonicPassword").css("border-color", "var(--default)");
             $("#passwordError").hide(300);
+        }
+
+        if(flag1 === 0 && flag2 === 0){
+            $("#formSubmitButton .buttonPrimary").removeClass("disable");
+        }else{
+            $("#formSubmitButton .buttonPrimary").addClass("disable");
         }
     }
 }
 
 function checkSeedInput() {
     let flag = 0;
+    let flag2 = 0;
+    let regexSeed = new RegExp("^[a-z]*$");
     allSeeds = $('.mnemonicValue.active');
     allSeeds.each(function () {
         if ($.trim($(this).val()).length === 0) {
             flag = 1;
         }
+        if($.trim($(this).val()).length && !(regexSeed.test($(this).val()))){
+            flag2 = 1;
+        }
     });
-    if (flag === 0) {
+    if (flag === 0 && flag2 === 0) {
         $("#newManagedAddressMnemonicsBtn").removeClass("disable");
     } else {
         $("#newManagedAddressMnemonicsBtn").addClass("disable");
+    }
+    if(flag2 === 0){
+        $("#errorMessageSeeds").slideUp();
+    }else{
+        $("#errorMessageSeeds").slideDown();
     }
 }
 

@@ -1,5 +1,6 @@
 @import views.account.companion.VerifyMnemonics
 @import views.html.base.form._
+@import views.html.base.forms.{commonFieldErrorMessage}
 
 @(walletMnemonicsForm: Form[VerifyMnemonics.Data] = VerifyMnemonics.form, username: String, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -22,7 +23,8 @@
                 <div class="inputFieldBody">
                     <div class="usernameAvailability">
                         @views.html.base.label.commonLabel(constants.FormField.CONFIRM_USERNAME.name)
-                        @commonInputText(walletMnemonicsForm, constants.FormField.CONFIRM_USERNAME)
+                        @commonInputText(walletMnemonicsForm, constants.FormField.CONFIRM_USERNAME, Symbol("autocomplete") -> "off", Symbol("id") -> "signUpUsername", Symbol("oninput") -> """activeButton()""")
+                        @commonFieldErrorMessage(id = "errorMessageUsername", message = Messages(constants.View.ERROR_INVALID_INPUT))
                     </div>
                 </div>
             </div>
@@ -33,7 +35,8 @@
                 <div class="inputFieldBody">
                     <div class="usernameAvailability">
                         @views.html.base.label.commonLabel(constants.FormField.SIGNUP_PASSWORD.name)
-                        @commonInputPassword(walletMnemonicsForm, constants.FormField.SIGNUP_PASSWORD, Symbol("id") -> "signUpPassword")
+                        @commonInputPassword(walletMnemonicsForm, constants.FormField.SIGNUP_PASSWORD, Symbol("autocomplete") -> "off", Symbol("id") -> "signUpPassword", Symbol("oninput") -> """activeButton()""")
+                        @commonFieldErrorMessage(id = "errorMessagePassword", message = Messages(constants.View.ERROR_INVALID_INPUT))
                     </div>
                 </div>
             </div>
@@ -52,8 +55,9 @@
                                 <img src="@routes.Assets.versioned("images/icon/showPassword.png")" width="24px" height="18px"/>
                             </span>
                         </div>
-                        @commonInputPassword(walletMnemonicsForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, Symbol("id") -> "signUpConfirmPassword", Symbol("oninput") -> """checkPasswords();""")
+                        @commonInputPassword(walletMnemonicsForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, Symbol("id") -> "signUpConfirmPassword", Symbol("oninput") -> """activeButton(); checkPasswords();""")
                         @views.html.base.forms.commonFieldErrorMessage(id = "repeatPasswordError",message = Messages(constants.View.REPEAT_PASSWORD_MISMATCH))
+                        @commonFieldErrorMessage(id = "errorMessageConfirmPassword", message = Messages(constants.View.ERROR_INVALID_INPUT))
                     </div>
                 </div>
             </div>
@@ -64,19 +68,26 @@
         <div class="d-flex mb-3 form-seed-box-list">
             <div class="form-seed-box">
                 <div class="form-seed-box-number">1</div>
-                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_1, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
+                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_1, Symbol("class") -> "form-seed-box-phrase", Symbol("id") -> "signUpSeed1", Symbol("autocomplete") -> "off", Symbol("oninput") -> """activeButton()""")
             </div>
             <div class="form-seed-box">
                 <div class="form-seed-box-number">2</div>
-                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_2, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
+                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_2, Symbol("class") -> "form-seed-box-phrase", Symbol("id") -> "signUpSeed2", Symbol("autocomplete") -> "off", Symbol("oninput") -> """activeButton()""")
             </div>
             <div class="form-seed-box">
                 <div class="form-seed-box-number">3</div>
-                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_3, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
+                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_3, Symbol("class") -> "form-seed-box-phrase", Symbol("id") -> "signUpSeed3", Symbol("autocomplete") -> "off", Symbol("oninput") -> """activeButton()""")
             </div>
             <div class="form-seed-box">
                 <div class="form-seed-box-number">4</div>
-                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_4, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
+                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_4, Symbol("class") -> "form-seed-box-phrase", Symbol("id") -> "signUpSeed4", Symbol("autocomplete") -> "off", Symbol("oninput") -> """activeButton()""")
+            </div>
+        </div>
+        <div class="inputField">
+            <div class="inputFieldBody">
+                <div class="usernameAvailability">
+                @commonFieldErrorMessage(id = "errorMessageSeeds", message = Messages(constants.View.ERROR_INVALID_INPUT))
+                </div>
             </div>
         </div>
         <div class="d-flex form-information-message">
@@ -85,3 +96,71 @@
         </div>
     }
 </div>
+
+<script>
+    function activeButton() {
+        let signUpUsername = document.getElementById("signUpUsername");
+        let signUpPassword = document.getElementById("signUpPassword");
+        let signUpConfirmPassword = document.getElementById("signUpConfirmPassword");
+        let signUpSeed1 = document.getElementById("signUpSeed1");
+        let signUpSeed2 = document.getElementById("signUpSeed2");
+        let signUpSeed3 = document.getElementById("signUpSeed3");
+        let signUpSeed4 = document.getElementById("signUpSeed4");
+
+        let inputUsername = $("#signUpUsername").val();
+        let inputPassword = $("#signUpPassword").val();
+        let inputConfirmPassword = $("#signUpConfirmPassword").val();
+        let inputSeed1 = $("#signUpSeed1").val();
+        let inputSeed2 = $("#signUpSeed2").val();
+        let inputSeed3 = $("#signUpSeed3").val();
+        let inputSeed4 = $("#signUpSeed4").val();
+
+        let regexUsername = new RegExp("^[a-zA-Z0-9!@@#$._-]*$");
+        let regexPassword = new RegExp("^[A-Za-z0-9!@@#$%^&*._-]*$");
+        let regexConfirmPassword = new RegExp("^[A-Za-z0-9!@@#$%^&*._-]*$");
+        let regexSeed = new RegExp("^[a-z]*$");
+
+        if(regexUsername.test(inputUsername)){
+            $("#errorMessageUsername").slideUp();
+        }else{
+            $("#errorMessageUsername").slideDown();
+        }
+
+        if(regexPassword.test(inputPassword)){
+            $("#errorMessagePassword").slideUp();
+        }else{
+            $("#errorMessagePassword").slideDown();
+        }
+
+        if(regexConfirmPassword.test(inputConfirmPassword)){
+            $("#errorMessageConfirmPassword").slideUp();
+        }else{
+            $("#errorMessageConfirmPassword").slideDown();
+        }
+
+        if(regexSeed.test(inputSeed1) && regexSeed.test(inputSeed2) && regexSeed.test(inputSeed3) && regexSeed.test(inputSeed4)){
+            $("#errorMessageSeeds").slideUp();
+        }else{
+            $("#errorMessageSeeds").slideDown();
+        }
+
+        if ($.trim(signUpUsername.value).length &&
+                $.trim(signUpPassword.value).length &&
+                $.trim(signUpConfirmPassword.value).length &&
+                $.trim(signUpSeed1.value).length &&
+                $.trim(signUpSeed2.value).length &&
+                $.trim(signUpSeed3.value).length &&
+                $.trim(signUpSeed4.value).length &&
+                regexUsername.test(inputUsername) &&
+                regexPassword.test(inputPassword) &&
+                regexConfirmPassword.test(inputConfirmPassword) &&
+                regexSeed.test(inputSeed1) &&
+                regexSeed.test(inputSeed2) &&
+                regexSeed.test(inputSeed3) &&
+                regexSeed.test(inputSeed4)){
+            $(".cmuk-button").removeClass("disable");
+        } else {
+            $(".cmuk-button").addClass("disable");
+        }
+    }
+</script>
