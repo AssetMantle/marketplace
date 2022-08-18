@@ -1,0 +1,32 @@
+@import views.html.base.forms._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
+@successModal(heading = constants.View.CREATE_WHITELIST_SUCCESS_TITLE, subHeading = constants.View.CREATE_WHITELIST_SUCCESS_SUBTITLE)
+
+<div class="whitelistInfo form-address-box">
+    <div class="form-address-box-item">
+        <span class="address-box-label">@Messages(constants.View.WHITELIST_NAME)</span>
+        <span class="address-box-text">
+            <span class="username-data">@Messages(constants.View.WHITELIST_VALUE)</span>
+        </span>
+        <span class="address-box-label">@Messages(constants.View.WHITELIST_MAX_MEMBERS)</span>
+        <span class="address-box-text">
+            <span class="username-data">@Messages(constants.View.WHITELIST_VALUE)</span>
+        </span>
+        <span class="address-box-label">@Messages(constants.View.WHITELIST_DURATION)</span>
+        <span class="address-box-text">
+            <span class="username-data">@Messages(constants.View.WHITELIST_VALUE)</span>
+        </span>
+        <span class="address-box-label">@Messages(constants.View.WHITELIST_UNIQUE_URL)</span>
+        <span class="address-box-text">
+            <span class="username-data" data-value="@Messages(constants.View.WHITELIST_VALUE)">@Messages(constants.View.WHITELIST_VALUE)</span>
+            <span class="form-copy-icon" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copy.png")"/></span>
+            <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
+        </span>
+    </div>
+</div>
+
+<div class="d-flex mt-4 justify-content-end whitelistInfoFooter">
+    <a href="">@Messages(constants.View.WHITELIST_VIEW_DETAILS)</a>
+</div>

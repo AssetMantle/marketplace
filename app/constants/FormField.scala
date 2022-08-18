@@ -40,6 +40,11 @@ object FormField {
   val CHANGE_KEY_NAME = new StringFormField("CHANGE_KEY_NAME", 3, 50)
   val CHANGE_KEY_ADDRESS = new StringFormField("CHANGE_KEY_ADDRESS", 3, 50)
 
+  val WHITELIST_NAME = new StringFormField("WHITELIST_NAME", 3, 50)
+  val WHITELIST_MAX_MEMBERS = new IntFormField("WHITELIST_MAX_MEMBERS", 1, 10)
+  val WHITELIST_DURATION = new StringFormField("WHITELIST_DURATION", 3, 50)
+  val WHITELIST_MEMBER_NAME = new StringFormField("WHITELIST_MEMBER_NAME", 3, 50)
+
   //BooleanFormField
   val RECEIVE_NOTIFICATIONS = new BooleanFormField("RECEIVE_NOTIFICATIONS")
   val USERNAME_AVAILABLE = new BooleanFormField("USERNAME_AVAILABLE")

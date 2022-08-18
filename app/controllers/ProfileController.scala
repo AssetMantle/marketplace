@@ -262,16 +262,43 @@ class ProfileController @Inject()(
     }
   }
 
-  def viewWhiteList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+  def viewWhitelist(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.profile.whiteList.viewWhiteList()))
+        Future(Ok(views.html.profile.whitelist.viewWhitelist()))
     }
   }
 
-  def whiteList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+  def whitelist(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginAction { implicit request =>
-      Ok(views.html.profile.whiteList.whiteList())
+      Ok(views.html.profile.whitelist.whitelist())
     }
+  }
+
+  def createWhitelistForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.whitelist.createWhitelist())
+//    Ok(views.html.profile.whitelist.createWhitelistSuccessfully())
+  }
+
+  def editWhitelistForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.whitelist.editWhitelist())
+  }
+
+  def viewWhitelistMembers(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.whitelist.viewWhitelistMembers()))
+    }
+  }
+
+  def whitelistMembers(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginAction { implicit request =>
+      Ok(views.html.profile.whitelist.whitelistMembers())
+    }
+  }
+
+  def addWhitelistMemberForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.whitelist.addWhitelistMember())
+    //    Ok(views.html.profile.whitelist.createWhitelistSuccessfully())
   }
 }

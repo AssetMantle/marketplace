@@ -54,8 +54,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.viewWishList,
         routes.javascript.ProfileController.wishList,
         routes.javascript.ProfileController.wishListNFTs,
-        routes.javascript.ProfileController.viewWhiteList,
-        routes.javascript.ProfileController.whiteList,
+        routes.javascript.ProfileController.viewWhitelist,
+        routes.javascript.ProfileController.whitelist,
+        routes.javascript.ProfileController.createWhitelistForm,
+        routes.javascript.ProfileController.editWhitelistForm,
+        routes.javascript.ProfileController.viewWhitelistMembers,
+        routes.javascript.ProfileController.whitelistMembers,
+        routes.javascript.ProfileController.addWhitelistMemberForm,
 
       )
     ).as("text/javascript")

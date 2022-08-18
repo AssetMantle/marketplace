@@ -26,6 +26,7 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/explorer.css")"/>
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/walletPopUp.css")"/>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/library/daterangepicker.min.css")"/>
             <!-- JS -->
         <script src="@routes.Assets.versioned("javascripts/constants.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/firebase/firebase.js")" type="text/javascript"></script>
@@ -44,6 +45,11 @@
             <!-- JSRoute -->
         <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" ></script>
         <script src="@routes.Assets.versioned("javascripts/file/images.js")"></script>
+            <!-- Date Range Picker -->
+        <script src="@routes.Assets.versioned("javascripts/library/moment.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/library/dateRangePicker.min.js")" type="text/javascript"></script>
+            <!-- Search Bar Autocomplete-->
+        <script src="@routes.Assets.versioned("javascripts/library/bootstrap3-typeahead.min.js")" type="text/javascript"></script>
 
         <script src="@routes.Assets.versioned("javascripts/custom.js")" type="text/javascript"></script>
 
@@ -77,7 +83,7 @@
                     <ul class="links">
                         <li><a href="@routes.CollectionController.viewCollections()">@Messages(constants.View.EXPLORE)</a></li>
                         <li>
-                            <a href="@routes.ProfileController.viewWhiteList()" class="desktop-link">@Messages(constants.View.CREATE)</a>
+                            <a href="@routes.ProfileController.viewWhitelist()" class="desktop-link">@Messages(constants.View.CREATE)</a>
                             <input type="checkbox" id="show-features2">
                             <label for="show-features2">@Messages(constants.View.CREATE)</label>
                             <ul>
@@ -87,7 +93,7 @@
                             </ul>
                         </li>
                         <li>
-                            <a class="desktop-link">@Messages(constants.View.SUPPORT)</a>
+                            <a href="@routes.ProfileController.viewWhitelistMembers()" class="desktop-link">@Messages(constants.View.SUPPORT)</a>
                             <input type="checkbox" id="show-features3">
                             <label for="show-features3">@Messages(constants.View.SUPPORT)</label>
                             <ul>

@@ -81,5 +81,13 @@ GET         /viewWishList                    controllers.ProfileController.viewW
 GET         /wishList                        controllers.ProfileController.wishList()
 GET         /wishListNFTs                    controllers.ProfileController.wishListNFTs()
 
-GET         /viewWhiteList                    controllers.ProfileController.viewWhiteList()
-GET         /whiteList                        controllers.ProfileController.whiteList()
+GET         /viewWhitelist                   controllers.ProfileController.viewWhitelist()
+GET         /whitelist                       controllers.ProfileController.whitelist()
+
+GET         /createWhitelist                 controllers.ProfileController.createWhitelistForm()
+GET         /editWhitelist                   controllers.ProfileController.editWhitelistForm()
+
+GET         /viewWhitelistMembers            controllers.ProfileController.viewWhitelistMembers()
+GET         /whitelistMembers                controllers.ProfileController.whitelistMembers()
+
+GET         /addWhitelistMember              controllers.ProfileController.addWhitelistMemberForm()

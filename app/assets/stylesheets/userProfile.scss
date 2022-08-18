@@ -19,6 +19,12 @@
   width: 20px;
   cursor: pointer;
 }
+.whitelistSeparator{
+  height: 2px;
+  width: calc(100% + 18px);
+  background-color: #383838;
+  margin: 24px -9px 24px;
+}
 .profileSettingsContainer{
   width: 100%;
   height: fit-content;
@@ -457,6 +463,25 @@
     background-color: var(--card-color);
     padding: 20px 20px 20px 20px;
     .contentContainer{
+      .header-with-icon{
+        .form-top{
+          .title-text{
+            @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--default));
+            text-transform: capitalize;
+          }
+        }
+      }
+      .contentSubHeader{
+        .subHeader{
+          @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+        }
+        .filterOption{
+          .filterTitle{
+            @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+            text-transform: capitalize;
+          }
+        }
+      }
       .contentHeader{
         .leftOptions {
           @include setFont(var(--font-type-1), normal, 400, 14px, 17px, var(--gray));
@@ -514,7 +539,7 @@
             overflow-x: auto;
             display: block;
             thead{
-              display: block;
+              //display: block;
               tr{
                 border-color: var(--line-2);
                 th{
@@ -532,7 +557,7 @@
               }
             }
             tbody{
-              display: block;
+              //display: block;
               overflow-y: auto;
               overflow-x: hidden;
               height: fit-content;
@@ -573,7 +598,10 @@
                     }
                   }
                   &.tableFieldName{
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                     color: var(--dark);
+                    white-space: nowrap;
                   }
                 }
               }
@@ -589,6 +617,72 @@
             display: none;
             &.show{
               display: block;
+            }
+          }
+
+          .searchBox{
+            position: relative;
+            width: 100%;
+            input{
+              @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+              box-sizing: border-box;
+              padding: 10px 12px;
+              margin-top: 8px;
+              letter-spacing: 1px;
+              width: 100%;
+              height: 36px;
+              border: 1px solid var(--inactive-gray);
+              border-radius: 8px;
+              background-color: transparent;
+              outline: none;
+              display: block;
+              &::placeholder{
+                color: var(--inactive-gray);
+                text-transform: capitalize;
+              }
+              &:focus{
+                border-color: var(--dark);
+              }
+              &:not(:focus){
+                color: var(--inactive-gray);
+                border-color: var(--gray);
+              }
+            }
+            .autocomplete-items{
+              position: absolute;
+              width: 100%;
+              height: fit-content;
+              max-height: 500px;
+              overflow-y: auto;
+              background-color: var(--card-color);
+              border:1px solid var(--dark);
+              padding: 6px 0px 6px 0px;
+              border-radius: 0px 0px 8px 8px;
+              &>div{
+                @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--gray));
+                padding: 6px 12px 6px 10px;
+                strong{
+                  color: var(--mantle-off-white);
+                }
+              }
+              &::-webkit-scrollbar{
+                margin-right: 10px;
+              }
+            }
+          }
+          .whitelistMembers{
+            overflow-y: auto;
+            height: fit-content;
+            max-height: 530px;
+            .singleMemberName{
+              @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--dark));
+              text-align: center;
+              display: inline-block;
+              background: rgba(242, 175, 19, 0.1);
+              border: 1px solid var(--dark);
+              border-radius: 24px;
+              margin-right: 12px;
+              margin-bottom: 16px;
             }
           }
         }
@@ -770,4 +864,56 @@
     background-color: var(--line-2);
     margin: 12px 0px;
   }
+}
+
+// Whitelist Success Modal
+.whitelistInfo{
+  &.form-address-box{
+    font-size: 14px;
+    .form-address-box-item{
+      .address-box-label{
+        white-space: nowrap;
+      }
+      .address-box-text{
+        height: 30px;
+        .username-data{
+          @media (max-width: 600px) {
+            width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+      }
+    }
+  }
+}
+.whitelistInfoFooter{
+  a{
+    color: var(--dark);
+  }
+}
+.whitelistMemberList{
+  color:var(--dark);
+  @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--icon-white));
+  text-transform: capitalize;
+  background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+.whitelistFormInfo{
+  .whitelistName{
+    @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--dark));
+    text-transform: capitalize;
+  }
+  .copyInfo{
+    span{
+      @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
+    }
+  }
+}
+.whitelistFieldMessage{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
 }

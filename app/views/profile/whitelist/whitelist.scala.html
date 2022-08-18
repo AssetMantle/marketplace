@@ -29,7 +29,7 @@
                 <!-- Created Whitelist Start -->
                     <div class="title">@Messages(constants.View.CREATED_WHITELISTS)</div>
                     <div class="titleMenu">
-                        <a href="">@Messages(constants.View.CREATE_NEW_WHITELIST)</a>
+                        <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_WHITELIST.get, ""))">@Messages(constants.View.CREATE_NEW_WHITELIST)</a>
                     </div>
                 <!-- Created Whitelist End -->
 
@@ -92,7 +92,7 @@
                                             <td class="text-end tableFieldSale">1</td>
                                             <td class="d-flex text-end tableFieldAction whitelistActionButton">
                                                 <img src="@routes.Assets.versioned("images/icon/profileYellow.png")" width="18px" height="22px"/>
-                                                <img src="@routes.Assets.versioned("images/icon/editYellow.png")" width="22px" height="22px"/>
+                                                <img onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.EDIT_WHITELIST.get, ""))" src="@routes.Assets.versioned("images/icon/editYellow.png")" width="22px" height="22px"/>
                                             </td>
                                         </tr>
                                         <tr>

@@ -931,28 +931,40 @@ article:first-child{
 }
 
 /* Date Range Picker */
+
 .daterangepicker{
     border: none !important;
     font-family: var(--font-type-2) !important;
     font-size: 16px !important;
-    border-radius: 10px !important;
-    top: 1755px !important;
-    right: 144px !important;
+    border-radius: 0px 0px 8px 8px !important;
+    left: auto !important;
+    right: 310px !important;
+    margin-top: 0px !important;
+    background-color: var(--popup-bg) !important;
+    color: var(--dark) !important;
 }
-.daterangepicker .drp-calendar.left,
-.daterangepicker .drp-calendar.right
+.daterangepicker:before,
+.daterangepicker:after
 {
-    background-color: var(--tooltip-bg) !important;
+    display: none !important;
+}
+.daterangepicker .calendar-table{
+    background-color: var(--popup-bg) !important;
+}
+.daterangepicker .drp-calendar.left{
+    /*background-color: var(--tooltip-bg) !important;*/
     color: var(--mantle-off-white) !important;
     border: none !important;
     outline: none !important;
-    border: 2px solid var(--dark) !important;
+    border-left: 1px solid var(--dark) !important;
 }
-.drp-calendar.left{
-    border-radius: 10px 0px 0 0px !important;
-}
-.drp-calendar.right{
-    border-radius: 0px 10px 0 0 !important;
+.daterangepicker .drp-calendar.right
+{
+    /*background-color: var(--tooltip-bg) !important;*/
+    color: var(--mantle-off-white) !important;
+    border: none !important;
+    outline: none !important;
+    border-right: 1px solid var(--dark) !important;
 }
 .calendar-table{
     background-color: var(--tooltip-bg) !important;
@@ -971,16 +983,25 @@ article:first-child{
 {
     font-size: 14px !important;
 }
-.table-condensed thead:first-child .month{
+.table-condensed thead:first-child tr th.month{
+    font-family: var(--font-type-2) !important;
     color: var(--dark) !important;
+    text-transform: capitalize !important;
 }
-.table-condensed thead:nth-child(1) tr{
+.table-condensed thead:nth-child(1) tr th{
+    font-family: var(--font-type-1) !important;
     color: var(--inactive-gray) !important;
+    text-transform: uppercase !important;
+    font-weight: 500 !important;
+    font-size: 12px !important;
 }
 .table-condensed .off.ends.available{
-    background-color: var(--tooltip-bg) !important;
+    background-color: var(--popup-bg) !important;
     color: var(--inactive-gray) !important;
     margin: 2px !important;
+}
+.table-condensed .available{
+    color: var(--mantle-off-white) !important;
 }
 .table-condensed td.available:hover{
     background-color: var(--dark) !important;
@@ -998,30 +1019,35 @@ article:first-child{
     background-color: rgba(242, 175, 19, 0.1) !important;
 }
 .drp-buttons{
-    background-color: var(--tooltip-bg);
+    background-color: var(--popup-bg);
 }
 .drp-buttons .drp-selected{
     color: var(--mantle-off-white) !important;
 }
-.drp-buttons button{
-    color: var(--mantle-off-white) !important;
-    background-color: var(--tooltip-bg);
+.daterangepicker .drp-buttons{
+    border-radius: 0 0 8px 8px;
     border: none !important;
-    border: 1px solid var(--mantle-off-white) !important;
-    border-radius: 3px !important;
+    border: 1px solid var(--dark) !important;
+}
+.drp-buttons button{
+    border-radius: 4px !important;
+    color: var(--button-text) !important;
+    background-color: var(--dark) !important;
+    box-shadow: inset -4px -4px 8px rgba(0, 0, 0, 0.2), inset 4px 4px 8px #FFD365 !important;
+    overflow: hidden !important;
+    position: relative !important;
+    z-index: 950 !important;
+    border: 1px solid var(--dark) !important;
+}
+.drp-buttons button:hover{
+    background-color: var(--dark);
 }
 .daterangepicker .drp-calendar.right .calendar-table{
     border: none;
 }
 .daterangepicker.opensleft:before{
-    /*right: px !important;*/
-    /*border-bottom: var(--tooltip-bg) !important;*/
     z-index: 9999;
 }
-.daterangepicker:before{
-    border-bottom-color: var(--tooltip-bg) !important;
-}
-
 
 /* Create NFT : Toggle Button (bottom) */
 .form-bottom-switch{
