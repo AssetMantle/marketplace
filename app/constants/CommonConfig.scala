@@ -11,9 +11,18 @@ object CommonConfig {
   val logLang: Lang = Lang(config.get[String]("play.log.lang"))
   val webAppUrl: String = config.get[String]("webApp.url")
   val WebAppCacheDuration: Duration = Duration(config.get[Int]("webApp.cacheDuration"), MILLISECONDS)
-  val DefaultPublicFolder: String= config.get[String]("webApp.defaultPublicFolder")
+  val DefaultPublicFolder: String = config.get[String]("webApp.defaultPublicFolder")
 
   val sessionTokenTimeout: Int = config.get[Int]("play.http.session.token.timeout")
+
+  object Blockchain {
+    case class IBCDenom(hash: String, name: String)
+
+    val RPCEndPoint: String = config.get[String]("blockchain.rpcURL")
+    val RestEndPoint: String = config.get[String]("blockchain.restURL")
+    val TransactionMode: String = config.get[String]("blockchain.transactionMode")
+    val IBCDenoms: Seq[IBCDenom] = config.get[Seq[Configuration]]("blockchain.ibcDenomList").map { ibcDenoms => IBCDenom(hash = ibcDenoms.get[String]("hash"), name = ibcDenoms.get[String]("name")) }
+  }
 
   object Collections {
     val CollectionsPerPage: Int = config.get[Int]("webApp.collectionsPerPage")
