@@ -4,7 +4,7 @@ import com.typesafe.config.ConfigFactory
 import play.api.Configuration
 import play.api.i18n.Lang
 
-import scala.concurrent.duration.{Duration, MILLISECONDS}
+import scala.concurrent.duration.{Duration, DurationInt, FiniteDuration, MILLISECONDS}
 
 object CommonConfig {
   private val config: Configuration = Configuration(ConfigFactory.load())
@@ -14,6 +14,11 @@ object CommonConfig {
   val DefaultPublicFolder: String = config.get[String]("webApp.defaultPublicFolder")
 
   val sessionTokenTimeout: Int = config.get[Int]("play.http.session.token.timeout")
+
+  object Scheduler {
+    val InitialDelay: FiniteDuration = config.get[Int]("scheduler.initialDelay").millis
+    val FixedDelay: FiniteDuration = config.get[Int]("scheduler.fixedDelay").millis
+  }
 
   object Blockchain {
     case class IBCDenom(hash: String, name: String)

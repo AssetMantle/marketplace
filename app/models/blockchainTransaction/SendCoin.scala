@@ -1,6 +1,8 @@
 package models.blockchainTransaction
 
+import akka.actor.Cancellable
 import cosmos.bank.v1beta1.Tx
+import exceptions.BaseException
 import models.Trait.Logged
 import models.Trait.{Entity2, GenericDaoImpl2, ModelTable2}
 import models.common.Coin
@@ -11,11 +13,12 @@ import slick.jdbc.H2Profile.api._
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import play.api.libs.json.Json
 import transactions.blockchain.BroadcastTxSync
 import transactions.responses.blockchain.BroadcastTxSyncResponse
 
+import scala.concurrent.duration.Duration
 import scala.jdk.CollectionConverters.IterableHasAsJava
 
 case class SendCoin(accountId: String, txHash: String, txRawHex: String, fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], log: Option[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
@@ -85,7 +88,9 @@ object SendCoins {
 class SendCoins @Inject()(
                            protected val databaseConfigProvider: DatabaseConfigProvider,
                            blockchainAccounts: models.blockchain.Accounts,
+                           blockchainTransactions: models.blockchain.Transactions,
                            broadcastTxSync: transactions.blockchain.BroadcastTxSync,
+                           utilitiesOperations: utilities.Operations,
                          )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl2[SendCoins.SendCoinTable, SendCoins.SendCoinSerialized, String, String](
     databaseConfigProvider,
@@ -94,6 +99,8 @@ class SendCoins @Inject()(
     SendCoins.module,
     SendCoins.logger
   ) {
+
+  private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   object Service {
 
@@ -108,6 +115,7 @@ class SendCoins @Inject()(
 
     def updateSendCoin(sendCoin: SendCoin): Future[Unit] = update(sendCoin.serialize())
 
+    def getAllPendingStatus: Future[Seq[SendCoin]] = filter(_.status.?.isEmpty).map(_.map(_.deserialize))
   }
 
   object Utility {
@@ -146,6 +154,35 @@ class SendCoins @Inject()(
         _ <- broadcastTxAndUpdate(sendCoin)
       } yield sendCoin.txHash
     }
+
+    private val txSchedulerRunnable = new Runnable {
+      def run(): Unit = {
+        val sendCoins = Service.getAllPendingStatus
+
+        def checkAndUpdate(sendCoins: Seq[SendCoin]) = utilitiesOperations.traverse(sendCoins) { sendCoin =>
+          val transaction = blockchainTransactions.Service.get(sendCoin.txHash)
+
+          def update(transaction: Option[models.blockchain.Transaction]) = transaction.fold[Future[Unit]](Future())(tx => Service.updateSendCoin(sendCoin.copy(status = Option(tx.status), log = if (tx.rawLog != "") Option(tx.rawLog) else None)))
+
+          for {
+            transaction <- transaction
+            _ <- update(transaction)
+          } yield ()
+
+        }
+
+        val forComplete = (for {
+          sendCoins <- sendCoins
+          _ <- checkAndUpdate(sendCoins)
+        } yield ()).recover{
+          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+        }
+
+        Await.result(forComplete, Duration.Inf)
+      }
+    }
+
+    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.CommonConfig.Scheduler.InitialDelay, delay = constants.CommonConfig.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
 
   }
 
