@@ -205,7 +205,7 @@ class AccountController @Inject()(
     implicit request =>
       MigrateWalletToKey.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.account.migrateWalletToKey(formWithErrors, formWithErrors.get.username, formWithErrors.get.walletAddress)))
+          Future(BadRequest(views.html.account.migrateWalletToKey(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.USERNAME.name, ""), formWithErrors.data.getOrElse(constants.FormField.WALLET_ADDRESS.name, ""))))
         },
         migrateWalletToKeyData => {
           val validateAndKey = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(migrateWalletToKeyData.username, password = migrateWalletToKeyData.password)
@@ -308,9 +308,13 @@ class AccountController @Inject()(
         },
         changePasswordData => {
           val changePassword = masterKeys.Service.changePassword(accountId = loginState.username, address = loginState.address, oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword)
+
+          def signOut = masterTransactionSessionTokens.Service.deleteById(loginState.username)
+
           (for {
             _ <- changePassword
-          } yield PartialContent(views.html.account.successfullPasswordChange())
+            _ <- signOut
+          } yield PartialContent(views.html.account.successfullPasswordChange()).withNewSession
             ).recover {
             case baseException: BaseException => BadRequest(views.html.account.changePassword(ChangePassword.form.withGlobalError(baseException.failure.message)))
           }
@@ -321,10 +325,12 @@ class AccountController @Inject()(
   def changeActiveKey(address: String): Action[AnyContent] = withLoginActionAsync { oldLoginState =>
     implicit request =>
       val changeActive = masterKeys.Service.changeActive(accountId = oldLoginState.username, oldAddress = oldLoginState.address, newAddress = address)
+
       def getResult = {
         implicit val loginState: LoginState = LoginState(username = oldLoginState.username, address = address)
         withUsernameToken.Ok()
       }
+
       (for {
         _ <- changeActive
         result <- getResult

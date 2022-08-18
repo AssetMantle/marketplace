@@ -1,9 +1,9 @@
 // Hide submit button
 $("#formSubmitButton").hide();
-$("#mnemonicsList").attr("type","hidden");
+$("#mnemonicsList").attr("type", "hidden");
 
 // 12 Button event
-function setOption1(){
+function setOption1() {
     $("#option1").addClass("active");
     $("#option2").removeClass("active");
     $(".seedsSection1").addClass("active");
@@ -11,8 +11,9 @@ function setOption1(){
     $(".seedsSection2 .mnemonicValue").removeClass("active");
     checkSeedInput();
 }
+
 // 24 Button event
-function setOption2(){
+function setOption2() {
     $("#option2").addClass("active");
     $("#option1").removeClass("active");
     $(".seedsSection1").removeClass("active");
@@ -20,6 +21,7 @@ function setOption2(){
     $(".seedsSection2 .mnemonicValue").addClass("active");
     checkSeedInput();
 }
+
 // 12/24 Button
 function addSeedOptionButton() {
     subHeading = $("#modalSubtitle").text();
@@ -38,10 +40,10 @@ function addSeedOptionButton() {
 // Show/Hide Mnemonics & Password Screen
 function showHideManagedModalScreen(showScreen, hideScreen, screenNo) {
     $(hideScreen).hide();
-    if(screenNo === 1){
+    if (screenNo === 1) {
         $("#staticBackdropLabel").text("Disclaimer");
         $("#modalSubtitle").hide();
-    } else if(screenNo === 2){
+    } else if (screenNo === 2) {
         $("#staticBackdropLabel").text("Seed Pharse");
         $("#modalSubtitle").text("Enter your seed phrase to add a managed wallet");
 
@@ -53,30 +55,30 @@ function showHideManagedModalScreen(showScreen, hideScreen, screenNo) {
         let mnemonicsLayout = "";
         let mnemonicsNumber = 1;
 
-        for(i=1; i<=3; i++){
+        for (let i = 1; i <= 3; i++) {
             mnemonicsLayout += `<div class="d-flex mb-3 form-seed-box-list">`;
-            for(j=1; j<=4; j++){
+            for (let j = 1; j <= 4; j++) {
                 mnemonicsLayout += `
                 <div class="form-seed-box">
                     <div class="form-seed-box-number">${('0' + mnemonicsNumber).slice(-2)}</div>
                     <input type="password" class="mt-2 form-seed-box-phrase mnemonicValue active" id="mnemonic${mnemonicsNumber}" oninput="enableNavigationButton(2)"/>
                 </div>`;
-                mnemonicsNumber+=1;
+                mnemonicsNumber += 1;
             }
             mnemonicsLayout += `</div>`;
             $(".seedsSection1").append(mnemonicsLayout);
             mnemonicsLayout = "";
         }
 
-        for(i=1; i<=3; i++){
+        for (let i = 1; i <= 3; i++) {
             mnemonicsLayout += `<div class="d-flex mb-3 form-seed-box-list">`;
-            for(j=1; j<=4; j++){
+            for (let j = 1; j <= 4; j++) {
                 mnemonicsLayout += `
                 <div class="form-seed-box">
                     <div class="form-seed-box-number">${('0' + mnemonicsNumber).slice(-2)}</div>
                     <input type="password" class="mt-2 form-seed-box-phrase mnemonicValue active" id="mnemonic${mnemonicsNumber}" oninput="enableNavigationButton(2)"/>
                 </div>`;
-                mnemonicsNumber+=1;
+                mnemonicsNumber += 1;
             }
             mnemonicsLayout += `</div>`;
             $(".seedsSection2").append(mnemonicsLayout);
@@ -84,10 +86,10 @@ function showHideManagedModalScreen(showScreen, hideScreen, screenNo) {
         }
         $("#modalSubtitle").show();
         addSeedOptionButton();
-    } else if(screenNo === 3){
+    } else if (screenNo === 3) {
         let mnemonicsList = '';
-        $('.mnemonicValue.active').each(function(){
-            if($(this).val()) {
+        $('.mnemonicValue.active').each(function () {
+            if ($(this).val()) {
                 mnemonicsList += $(this).val() + " ";
             }
         });
@@ -103,17 +105,17 @@ function showHideManagedModalScreen(showScreen, hideScreen, screenNo) {
 }
 
 // Show/Hide Seed Phrase
-function showHideSeed(){
+function showHideSeed() {
     allSeeds = $('.mnemonicValue');
-    if (allSeeds[0].type === "password"){
-        allSeeds.each(function(){
-            $(this).attr("type","text");
+    if (allSeeds[0].type === "password") {
+        allSeeds.each(function () {
+            $(this).attr("type", "text");
         });
         $(".closeEye").addClass("hidden");
         $(".openEye").removeClass("hidden");
     } else {
-        allSeeds.each(function(){
-            $(this).attr("type","password");
+        allSeeds.each(function () {
+            $(this).attr("type", "password");
         });
         $(".closeEye").removeClass("hidden");
         $(".openEye").addClass("hidden");
@@ -121,7 +123,7 @@ function showHideSeed(){
 }
 
 // Enable button on fill
-function enableNavigationButton(pageNumber){
+function enableNavigationButton(pageNumber) {
     if (pageNumber === 0) {
         let flag = 0;
         let managedKeyName = document.getElementById("managedKeyName");
@@ -147,49 +149,44 @@ function enableNavigationButton(pageNumber){
         } else {
             $("#newManagedAddressScreenBtn").addClass("disable");
         }
-    }
-    else if(pageNumber === 1){
+    } else if (pageNumber === 1) {
         $("#disclaimerButton").toggleClass("disable");
-    }
-    else if(pageNumber === 2){
+    } else if (pageNumber === 2) {
         checkSeedInput();
-    }
-    else if(pageNumber === 3){
+    } else if (pageNumber === 3) {
         let managedMnemonicPassword = document.getElementById("managedMnemonicPassword");
 
         if ($.trim(managedMnemonicPassword.value).length < 5 || $.trim(managedMnemonicPassword.value).length > 128) {
             $("#managedMnemonicPassword").css("border-color", "var(--error)");
             $("#passwordError").show(300);
-        }else {
+        } else {
             $("#managedMnemonicPassword").css("border-color", "var(--default)");
             $("#passwordError").hide(300);
         }
     }
 }
 
-function checkSeedInput(){
+function checkSeedInput() {
     let flag = 0;
     allSeeds = $('.mnemonicValue.active');
     allSeeds.each(function () {
-        if($.trim($(this).val()).length === 0){
+        if ($.trim($(this).val()).length === 0) {
             flag = 1;
         }
     });
-    if(flag === 0){
+    if (flag === 0) {
         $("#newManagedAddressMnemonicsBtn").removeClass("disable");
-    }
-    else{
+    } else {
         $("#newManagedAddressMnemonicsBtn").addClass("disable");
     }
 }
 
 // Paste Seeds Phrase
-function pasteSeeds(){
+function pasteSeeds() {
     navigator.clipboard
         .readText()
         .then(
-            cliptext =>
-            {
+            cliptext => {
                 var seedsList = cliptext.split(" ");
                 var index = 0;
                 allSeeds = $('.mnemonicValue.active');

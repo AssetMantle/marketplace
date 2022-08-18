@@ -3,6 +3,7 @@ package utilities
 import akka.stream.scaladsl.{FileIO, Source}
 import akka.util.ByteString
 import exceptions.BaseException
+import org.apache.commons.io.FileUtils
 import play.api.Logger
 import views.file.UploadInfo.UploadInfo
 
@@ -72,6 +73,21 @@ object FileOperations {
   def renameFile(oldFilePath: String, newFilePath: String)(implicit executionContext: ExecutionContext): Boolean =
     try {
       new File(oldFilePath).renameTo(new File(newFilePath))
+    } catch {
+      case baseException: BaseException => throw baseException
+      case securityException: SecurityException => logger.error(securityException.getMessage)
+        throw new BaseException(constants.Response.FILE_SECURITY_EXCEPTION)
+      case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage)
+        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
+      case ioException: IOException => logger.error(ioException.getMessage)
+        throw new BaseException(constants.Response.I_O_EXCEPTION)
+      case e: Exception => logger.error(e.getMessage)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+    }
+
+  def copyFile(oldFilePath: String, newFilePath: String)(implicit executionContext: ExecutionContext): Unit =
+    try {
+      FileUtils.copyFile(new File(oldFilePath), new File(newFilePath))
     } catch {
       case baseException: BaseException => throw baseException
       case securityException: SecurityException => logger.error(securityException.getMessage)

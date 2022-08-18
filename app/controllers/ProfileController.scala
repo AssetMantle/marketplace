@@ -156,7 +156,7 @@ class ProfileController @Inject()(
     implicit request =>
       ChangeKeyName.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.changeKeyName(formWithErrors, formWithErrors.get.address)))
+          Future(BadRequest(views.html.profile.changeKeyName(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CHANGE_KEY_ADDRESS.name, ""))))
         },
         changeKeyNameData => {
           val update = masterKeys.Service.updateKeyName(accountId = loginState.username, address = changeKeyNameData.address, keyName = changeKeyNameData.keyName)
@@ -179,12 +179,16 @@ class ProfileController @Inject()(
     implicit request =>
       ViewMnemonics.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.viewMnemonics(formWithErrors, formWithErrors.get.address)))
+          Future(BadRequest(views.html.profile.viewMnemonics(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.WALLET_ADDRESS.name, ""))))
         },
         viewMnemonicsData => {
           val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = viewMnemonicsData.address, password = viewMnemonicsData.password)
+
+          def update(validated: Boolean, key: master.Key) = if (validated) masterKeys.Service.updateKey(key.copy(backupUsed = true)) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+
           (for {
             (validated, key) <- validateAndGetKey
+            _ <- update(validated, key)
           } yield if (validated) PartialContent(views.html.profile.seedPhrase(key.partialMnemonics.getOrElse(constants.Response.SEEDS_NOT_FOUND.throwBaseException()))) else constants.Response.INVALID_PASSWORD.throwBaseException()
             ).recover {
             case baseException: BaseException => BadRequest(views.html.profile.viewMnemonics(ViewMnemonics.form.withGlobalError(baseException.failure.message), viewMnemonicsData.address))
@@ -206,7 +210,9 @@ class ProfileController @Inject()(
         deleteKeyData => {
           val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = deleteKeyData.address, password = deleteKeyData.password)
 
-          def delete(validated: Boolean, key: master.Key) = if (validated) masterKeys.Service.deleteKey(accountId = key.accountId, address = key.address) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+          def delete(validated: Boolean, key: master.Key) = if (!key.active) {
+            if (validated) masterKeys.Service.deleteKey(accountId = key.accountId, address = key.address) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+          } else constants.Response.CANNOT_DELETE_ACTIVE_KEY.throwFutureBaseException()
 
           (for {
             (validated, key) <- validateAndGetKey
@@ -227,7 +233,7 @@ class ProfileController @Inject()(
     implicit request =>
       ChangeManagedToUnmanaged.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.changeManagedToUnmanaged(formWithErrors, formWithErrors.get.address)))
+          Future(BadRequest(views.html.profile.changeManagedToUnmanaged(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.MANAGED_KEY_ADDRESS.name, ""))))
         },
         changeManagedToUnmanagedData => {
           val validate = masterKeys.Service.changeManagedToUnmanaged(accountId = loginState.username, address = changeManagedToUnmanagedData.address, password = changeManagedToUnmanagedData.password)

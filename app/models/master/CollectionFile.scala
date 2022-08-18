@@ -96,9 +96,23 @@ class CollectionFiles @Inject()(
       } yield ()
     }
 
+    def insertOrUpdate(id: String, documentType: String, fileName: String, file: Array[Byte]): Future[Unit] = {
+      val collectionFile = CollectionFile(
+        id = id,
+        documentType = documentType,
+        fileName = fileName,
+        file = file
+      )
+      for {
+        _ <- upsert(collectionFile.serialize())
+      } yield ()
+    }
+
     def get(id: String, documentType: String): Future[Option[CollectionFile]] = getById(id1 = id, id2 = documentType).map(_.map(_.deserialize))
 
     def fetchAll(): Future[Seq[CollectionFile]] = getAll.map(_.map(_.deserialize))
+
+    def deleteByCollectionId(id: String): Future[Int] = deleteMultipleById1(id)
 
   }
 }
