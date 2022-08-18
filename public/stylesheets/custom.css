@@ -260,10 +260,13 @@ body{
 }
 .error-message{
     font-family: var(--font-type-2);
-    font-size: 16px;
+    font-size: 14px;
     color: var(--error);
-    margin-top: 10px;
     display: none;
+    margin-top: 8px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 17px;
 }
 .error-info
 {

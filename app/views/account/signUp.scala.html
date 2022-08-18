@@ -15,8 +15,13 @@
                             <div id="checkIcon" class="fieldIcon checkIcon">
                                 <img src="@routes.Assets.versioned("images/icon/verifiedUsername.png")" width="24px" height="22px"/>
                             </div>
-                            @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("class") -> "inputBox", Symbol("id") -> "signUpUsername", Symbol("autocomplete") -> "off", 'oninput -> """checkUsernameAvailable(this,'#USERNAME_AVAILABLE'); activeButton();""", Symbol("onblur") -> "changeFieldBorder()", Symbol("onfocus") -> "changeFieldBorder()")
+                            @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("class") -> "inputBox", Symbol("data-pattern") -> "^[a-zA-Z0-9!@@#$._-]*$", Symbol("id") -> "signUpUsername", Symbol("autocomplete") -> "off", 'oninput -> """checkUsernameAvailable(this,'#USERNAME_AVAILABLE'); activeButton(); validateField(this)""", Symbol("onblur") -> "changeFieldBorder()", Symbol("onfocus") -> "changeFieldBorder()")
                             @commonFieldErrorMessage(id = "usernameAvailableError",message = Messages(constants.View.USERNAME_NOT_AVAILABLE))
+                            <div class="error-message">
+                                <div class="error-info error-info-1">
+                                    <span class="error-text">@Messages(constants.View.ERROR_INVALID_USERNAME)</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

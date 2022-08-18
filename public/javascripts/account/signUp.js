@@ -79,10 +79,18 @@ function activeButton() {
     // let signUpConfirmPassword = document.getElementById("signUpConfirmPassword");
     let termsCondition = document.getElementById("termsCondition");
     // if ($.trim(signUpUsername.value).length && $.trim(signUpPassword.value).length && $.trim(signUpConfirmPassword.value).length && termsCondition.checked === true){
-    if ($.trim(signUpUsername.value).length && termsCondition.checked === true){
+    if ($.trim(signUpUsername.value).length && termsCondition.checked === true && regex.test(input)){
         $(".cmuk-button").removeClass("disable");
     } else {
         $(".cmuk-button").addClass("disable");
+    }
+
+    let input = $("#signUpUsername").val();
+    let regex = new RegExp(signUpUsername.getAttribute("data-pattern"));
+    if(regex.test(input)){
+        $(".error-message").slideUp();
+    }else{
+        $(".error-message").slideDown();
     }
 }
 
