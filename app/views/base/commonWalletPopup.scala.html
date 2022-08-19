@@ -1,4 +1,5 @@
 @import controllers.actions.LoginState
+@import views.html.base.buttons._
 
 @(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="walletPopupContainer">
@@ -25,7 +26,7 @@
         </div>
         <div class="text-center buttons">
             <a href="https://app.osmosis.zone/?from=USDC&to=MNTL" target="_blank"><button class="primaryButton">@Messages(constants.View.BUY_MORE)</button></a>
-            <button class="secondaryButton" id="comingSoonBtn"></button>
+            @commonSecondaryFormButton(constants.Form.SEND_COIN, Symbol("parameters") -> s"'${loginState.address}'")
         </div>
         <div class="innerSeparator"></div>
     </div>
