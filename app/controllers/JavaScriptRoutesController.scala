@@ -52,6 +52,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.deleteKeyForm,
 //        routes.javascript.ProfileController.changeManagedToUnmanagedForm,
 
+        routes.javascript.BlockchainTransactionController.sendCoinForm,
+
       )
     ).as("text/javascript")
 

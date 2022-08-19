@@ -3,6 +3,7 @@ package constants
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import views.account.companion._
 import views.profile.companion._
+import views.blockchainTransaction.companion._
 
 object FormConstraint {
   val passwordSymbols = "!@#$%^&*._-"
@@ -43,7 +44,7 @@ object FormConstraint {
   })
 
   val addManagedKeyConstraint: Constraint[AddManagedKey.Data] = Constraint("constraints.AddManagedKey")({ addManagedKeyData: AddManagedKey.Data =>
-    val seeds =  addManagedKeyData.seeds.split(" ")
+    val seeds = addManagedKeyData.seeds.split(" ")
     val walletError = try {
       val wallet = utilities.Wallet.getWallet(seeds)
       if (wallet.address != addManagedKeyData.address) true else false
@@ -60,6 +61,15 @@ object FormConstraint {
   val addUnmanagedKeyConstraint: Constraint[AddUnmanagedKey.Data] = Constraint("constraints.AddUnmanagedKey")({ addUnmanagedKeyData: AddUnmanagedKey.Data =>
     val errors = Seq(
       if (!addUnmanagedKeyData.address.startsWith("mantle") || addUnmanagedKeyData.address.length != 45) Option(ValidationError(constants.Response.INVALID_WALLET_ADDRESS.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val sendCoinConstraint: Constraint[SendCoin.Data] = Constraint("constraints.SendCoin")({ sendCoin: SendCoin.Data =>
+    val errors = Seq(
+      if (!sendCoin.fromAddress.startsWith("mantle") || sendCoin.fromAddress.length != 45) Option(ValidationError(constants.Response.INVALID_FROM_ADDRESS.message)) else None,
+      if (!sendCoin.toAddress.startsWith("mantle") || sendCoin.toAddress.length != 45) Option(ValidationError(constants.Response.INVALID_TO_ADDRESS.message)) else None,
+      if (sendCoin.fromAddress == sendCoin.toAddress) Option(ValidationError(constants.Response.FROM_AND_TO_ADDRESS_SAME.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })

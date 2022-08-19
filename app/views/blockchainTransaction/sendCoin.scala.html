@@ -1,0 +1,14 @@
+@import views.blockchainTransaction.companion.SendCoin
+@import views.html.base.form._
+@import views.html.base.forms.commonFieldErrorMessage
+
+@(sendCoin: Form[SendCoin.Data] = SendCoin.form, fromAddress: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.SEND_COIN, sendCoin) {
+    @commonInputText(sendCoin, constants.FormField.FROM_ADDRESS, Symbol("value") -> fromAddress, Symbol("readonly") -> "readonly")
+    @commonInputText(sendCoin, constants.FormField.TO_ADDRESS)
+    @commonInputMicornumber(sendCoin, constants.FormField.SEND_COIN_AMOUNT)
+    @commonInputMicornumber(sendCoin, constants.FormField.FEE_AMOUNT)
+    @commonInputInt(sendCoin, constants.FormField.GAS_AMOUNT,  Symbol("value") -> constants.Blockchain.DefaultSendCoinGasAmount)
+    @commonInputPassword(sendCoin, constants.FormField.PASSWORD)
+}

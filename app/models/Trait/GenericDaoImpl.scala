@@ -31,6 +31,8 @@ abstract class GenericDaoImpl[
 
   def getById(id: PK): Future[Option[E]] = db.run(tableQuery.filter(_.id === id).result.headOption)
 
+  def getByIds(ids: Seq[PK]): Future[Seq[E]] = db.run(tableQuery.filter(_.id.inSet(ids)).result)
+
   def tryGetById(id: PK): Future[E] = db.run(tableQuery.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
