@@ -21,6 +21,7 @@
     --default: #FFC640;
     --gray: #B0B0B0;
     --card-dark: #030301;
+    --accent-blue: #6FB4B5;
     --font-type-1: 'Work Sans';
     --font-type-2: 'Lato';
     --size-bezel: .5rem;
@@ -1122,61 +1123,44 @@ article:first-child{
     margin-top: 100px;
 }
 .hero-section .heroSectionRow .heroSectionCol1 button{
-    font-family: var(--font-type-2);
-    font-size: 20px;
-    font-weight: 600;
-    width: 200px;
     border: 0;
-    padding: 12px 10px;
+    padding: 9px 0;
+    width: 200px;
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 19px;
+    text-align: center;
+    text-transform: capitalize;
+    border: none;
     outline: none;
-    color: #2C2C2C;
-    background: var(--radial);
-    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.25), inset -4px -4px 8px rgba(0, 0, 0, 0.25), inset 4px 4px 8px #FFC942;;
-    border-radius: 12px;
+    border-radius: 32px;
     cursor: pointer;
-    position: relative;
+    color: var(--button-text);
+    background-color: var(--default);
     overflow: hidden;
-    height: 50px;
-    line-height: 10px;
+    position: relative;
+    z-index: 950;
 }
-.hero-section .heroSectionRow .heroSectionCol1 .button-1::before {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    content: 'Explore';
-    transition: all .3s;
-}
-.hero-section .heroSectionRow .heroSectionCol1 .button-1::after {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 60px;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    content: 'Coming Soon!';
-    transition: all .3s;
-}
-.hero-section .heroSectionRow .heroSectionCol1 .button-1:hover::before {
-    top: -60px;
-}
-.hero-section .heroSectionRow .heroSectionCol1 .button-1:hover::after {
-    top: 0;
+.hero-section .heroSectionRow .heroSectionCol1 button:hover{
+    box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.5);
 }
 
 .hero-section .heroSectionRow .heroSectionCol1 .buttons .button-2{
-    background:transparent;
-    border: 2px solid var(--dark);
-    color: var(--dark);
-    box-shadow: none;
-    position: relative;
+    background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+    background-color: transparent;
+    border: 1px solid var(--dark);
     overflow: hidden;
+    position: relative;
+    z-index: 950;
+}
+.hero-section .heroSectionRow .heroSectionCol1 .buttons .button-2:hover{
+    box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.3);
 }
 .hero-section .heroSectionRow .heroSectionCol2{
     position: relative;
@@ -1702,8 +1686,13 @@ article:first-child{
     justify-content: center;
 }
 .landing-page-info-section .info-step-button button{
+    padding: 9px 0;
+    font-style: normal;
+    line-height: 19px;
+    text-transform: capitalize;
+    outline: none;
     font-family: var(--font-type-2);
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 600;
     text-align: center;
     /*background: radial-gradient(45% 45% at 223.6% -90.33%, #FFC942 0%, #FEC73E 28%, #FBC131 57%, #F5B71D 86%, #F2B110 100%);*/
@@ -1712,15 +1701,18 @@ article:first-child{
     /*background-clip: text;*/
     /*text-fill-color: transparent;*/
     width: 216px;
-    height: 46px;
+    height: 36px;
     border:none;
     border: 1px solid var(--dark);
-    border-radius: 12px;
+    border-radius: 32px;
     cursor: pointer;
     position: relative;
     overflow: hidden;
     color:var(--dark);
     background: transparent;
+}
+.landing-page-info-section .info-step-button button:hover{
+    box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.3);
 }
 .landing-page-info-section .info-step-button button::before {
     display: flex;

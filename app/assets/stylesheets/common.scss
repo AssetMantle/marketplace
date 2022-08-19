@@ -167,3 +167,32 @@
     display: none;
   }
 }
+
+// New Components
+.mntlButton{
+  @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--button-text));
+  text-transform: capitalize;
+  width: 200px;
+  padding: 9px 0px;
+  border: none;
+  outline: none;
+  border-radius: 32px;
+  &.primaryButton{
+    &.active{
+      background-color: var(--default);
+      &:hover{
+        box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.5);
+      }
+    }
+    &.disable{
+      background-color: var(--disable-yellow);
+      cursor: none;
+      pointer-events: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  }
+}
