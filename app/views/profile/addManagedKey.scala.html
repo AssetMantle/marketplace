@@ -1,6 +1,5 @@
 @import views.profile.companion.AddManagedKey
 @import views.html.base.form._
-@import views.html.base.forms.{commonFieldErrorMessage}
 
 @(managedAddressForm: Form[AddManagedKey.Data] = AddManagedKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
