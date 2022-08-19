@@ -17,6 +17,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import play.api.libs.json.Json
 import transactions.blockchain.BroadcastTxSync
 import transactions.responses.blockchain.BroadcastTxSyncResponse
+import utilities.MicroNumber
 
 import scala.concurrent.duration.Duration
 import scala.jdk.CollectionConverters.IterableHasAsJava
@@ -114,21 +115,25 @@ class SendCoins @Inject()(
 
     def tryGet(accountId: String, txHash: String): Future[SendCoin] = tryGetById(id1 = accountId, id2 = txHash).map(_.deserialize)
 
-    def updateSendCoin(sendCoin: SendCoin): Future[Unit] = update(sendCoin.serialize())
+    def updateSendCoin(sendCoin: SendCoin): Future[SendCoin] = {
+      for {
+        _ <- update(sendCoin.serialize())
+      } yield sendCoin
+    }
 
     def getAllPendingStatus: Future[Seq[SendCoin]] = filter(_.status.?.isEmpty).map(_.map(_.deserialize))
   }
 
   object Utility {
 
-    def transaction(accountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], fee: Coin, gasLimit: Int, ecKey: ECKey, memo: String = ""): Future[String] = {
+    def transaction(accountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: MicroNumber, gasLimit: Int, ecKey: ECKey, memo: String = ""): Future[SendCoin] = {
       val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val unconfirmedTxs = getUnconfirmedTxs.Service.get()
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, unconfirmedTxHashes: Seq[String]) = {
         val (txHash, txRawHex) = utilities.BlockchainTransaction.getTxHashAndRawHex(
           messages = Seq(com.google.protobuf.Any.newBuilder().setTypeUrl(constants.Blockchain.TransactionMessage.SEND_COIN).setValue(Tx.MsgSend.newBuilder().setFromAddress(fromAddress).setToAddress(toAddress).addAllAmount(amount.map(_.toProtoCoin).asJava).build().toByteString).build()),
-          fee = fee,
+          fee = Coin(denom = constants.Blockchain.StakingToken, amount = gasPrice * gasLimit),
           gasLimit = gasLimit,
           account = bcAccount,
           ecKey = ecKey,
@@ -147,16 +152,16 @@ class SendCoins @Inject()(
 
         for {
           (successResponse, errorResponse) <- broadcastTxSync.Service.get(sendCoin.txRawHex)
-          _ <- update(successResponse, errorResponse)
-        } yield ()
+          updatedSendCoin <- update(successResponse, errorResponse)
+        } yield updatedSendCoin
       }
 
       for {
         bcAccount <- bcAccount
         unconfirmedTxs <- unconfirmedTxs
         sendCoin <- checkMempoolAndAddTx(bcAccount, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        _ <- broadcastTxAndUpdate(sendCoin)
-      } yield sendCoin.txHash
+        updatedSendCoin <- broadcastTxAndUpdate(sendCoin)
+      } yield updatedSendCoin
     }
 
     private val txSchedulerRunnable = new Runnable {
@@ -166,7 +171,7 @@ class SendCoins @Inject()(
         def checkAndUpdate(sendCoins: Seq[SendCoin]) = utilitiesOperations.traverse(sendCoins) { sendCoin =>
           val transaction = blockchainTransactions.Service.get(sendCoin.txHash)
 
-          def update(transaction: Option[models.blockchain.Transaction]) = transaction.fold[Future[Unit]](Future())(tx => Service.updateSendCoin(sendCoin.copy(status = Option(tx.status), log = if (tx.rawLog != "") Option(tx.rawLog) else None)))
+          def update(transaction: Option[models.blockchain.Transaction]) = transaction.fold[Future[Option[SendCoin]]](Future(None))(tx => Service.updateSendCoin(sendCoin.copy(status = Option(tx.status), log = if (tx.rawLog != "") Option(tx.rawLog) else None)).map(Option(_)))
 
           for {
             transaction <- transaction

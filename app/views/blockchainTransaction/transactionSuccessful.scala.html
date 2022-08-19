@@ -1,3 +1,3 @@
-@(txHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(broadcasted: Boolean, status: Option[Boolean], txHash: String, log: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @txHash

@@ -57,8 +57,8 @@ class BlockchainTransactionController @Inject()(
               fromAddress = sendCoinData.fromAddress,
               toAddress = sendCoinData.toAddress,
               amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = sendCoinData.sendCoinAmount)),
-              fee = Coin(denom = constants.Blockchain.StakingToken, amount = sendCoinData.feeAmount),
               gasLimit = sendCoinData.gasAmount,
+              gasPrice = sendCoinData.gasPrice,
               ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, sendCoinData.password)),
             )
           }
@@ -67,8 +67,8 @@ class BlockchainTransactionController @Inject()(
           (for {
             balance <- balance
             (validatePassword, key) <- validateAndKey
-            txHash <- checkBalanceAndBroadcast(balance, validatePassword, key)
-          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(txHash))
+            sendCoin <- checkBalanceAndBroadcast(balance, validatePassword, key)
+          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(broadcasted = sendCoin.broadcasted, status = sendCoin.status, txHash = sendCoin.txHash, log = sendCoin.log.getOrElse("")))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.blockchainTransaction.sendCoin(SendCoin.form.withGlobalError(baseException.failure.message), sendCoinData.fromAddress))
           }

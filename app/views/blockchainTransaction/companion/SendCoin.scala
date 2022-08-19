@@ -11,11 +11,11 @@ object SendCoin {
       constants.FormField.FROM_ADDRESS.mapping,
       constants.FormField.TO_ADDRESS.mapping,
       constants.FormField.SEND_COIN_AMOUNT.mapping,
-      constants.FormField.FEE_AMOUNT.mapping,
       constants.FormField.GAS_AMOUNT.mapping,
+      constants.FormField.GAS_PRICE.mapping,
       constants.FormField.PASSWORD.mapping,
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.sendCoinConstraint))
 
-  case class Data(fromAddress: String, toAddress: String, sendCoinAmount: MicroNumber, feeAmount: MicroNumber, gasAmount: Int, password: String)
+  case class Data(fromAddress: String, toAddress: String, sendCoinAmount: MicroNumber, gasAmount: Int, gasPrice: MicroNumber, password: String)
 
 }
