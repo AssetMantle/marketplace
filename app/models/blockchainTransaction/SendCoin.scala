@@ -91,6 +91,7 @@ class SendCoins @Inject()(
                            blockchainTransactions: models.blockchain.Transactions,
                            broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                            utilitiesOperations: utilities.Operations,
+                           getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
                          )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl2[SendCoins.SendCoinTable, SendCoins.SendCoinSerialized, String, String](
     databaseConfigProvider,
@@ -122,8 +123,9 @@ class SendCoins @Inject()(
 
     def transaction(accountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], fee: Coin, gasLimit: Int, ecKey: ECKey, memo: String = ""): Future[String] = {
       val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
+      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
 
-      def addTx(bcAccount: models.blockchain.Account) = {
+      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, unconfirmedTxHashes: Seq[String]) = {
         val (txHash, txRawHex) = utilities.BlockchainTransaction.getTxHashAndRawHex(
           messages = Seq(com.google.protobuf.Any.newBuilder().setTypeUrl(constants.Blockchain.TransactionMessage.SEND_COIN).setValue(Tx.MsgSend.newBuilder().setFromAddress(fromAddress).setToAddress(toAddress).addAllAmount(amount.map(_.toProtoCoin).asJava).build().toByteString).build()),
           fee = fee,
@@ -131,8 +133,9 @@ class SendCoins @Inject()(
           account = bcAccount,
           ecKey = ecKey,
           memo = memo)
+
         for {
-          sendCoin <- Service.add(accountId = accountId, txHash = txHash, txRawHex = txRawHex, fromAddress = fromAddress, toAddress = toAddress, amount = amount, broadcasted = false, status = None)
+          sendCoin <- if (!unconfirmedTxHashes.contains(txHash)) Service.add(accountId = accountId, txHash = txHash, txRawHex = txRawHex, fromAddress = fromAddress, toAddress = toAddress, amount = amount, broadcasted = false, status = None) else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
         } yield sendCoin
       }
 
@@ -150,7 +153,8 @@ class SendCoins @Inject()(
 
       for {
         bcAccount <- bcAccount
-        sendCoin <- addTx(bcAccount)
+        unconfirmedTxs <- unconfirmedTxs
+        sendCoin <- checkMempoolAndAddTx(bcAccount, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
         _ <- broadcastTxAndUpdate(sendCoin)
       } yield sendCoin.txHash
     }
@@ -174,7 +178,7 @@ class SendCoins @Inject()(
         val forComplete = (for {
           sendCoins <- sendCoins
           _ <- checkAndUpdate(sendCoins)
-        } yield ()).recover{
+        } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.failure.logMessage)
         }
 

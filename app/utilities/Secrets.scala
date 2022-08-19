@@ -63,8 +63,14 @@ object Secrets {
 
   def sha256HashString(value: String): String = java.lang.String.format("%064x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8))))
 
-  def base64URLDecoder(s: String): String = try {
+  def base64URLDecodeToString(s: String): String = try {
     Base64.getUrlDecoder.decode(s.replace("+", "-").replace("/", "_")).map(_.toChar).mkString
+  } catch {
+    case exception: Exception => throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+  }
+
+  def base64URLDecode(s: String): Array[Byte] = try {
+    Base64.getUrlDecoder.decode(s.replace("+", "-").replace("/", "_"))
   } catch {
     case exception: Exception => throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
   }
