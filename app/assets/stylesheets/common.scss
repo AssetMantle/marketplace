@@ -196,3 +196,31 @@
     }
   }
 }
+.bi{
+  font-size: 20px;
+  line-height: 20px;
+  &.iconDefault{
+    color: var(--default);
+  }
+  &.iconBlack{
+    color: var(--card-dark);
+  }
+  &.iconWhite{
+    color: var(--mantle-off-white);
+  }
+  &.iconSuccess{
+    color: var(--connected);
+  }
+  &.iconError{
+    color: var(--error);
+  }
+  &.iconLarge{
+    font-size: 30px;
+  }
+  &.iconMedium{
+    font-size: 18px;
+  }
+  &.iconSmall{
+    font-size: 14px;
+  }
+}

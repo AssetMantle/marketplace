@@ -3,7 +3,7 @@
 @(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="walletPopupContainer">
     <div class="d-flex flex-row justify-content-end">
-        <img id="openWalletMenu" src="@routes.Assets.versioned("images/icon/hamburgerMenuYellow.png")" width="22px" height="14px"/>
+        <i id="openWalletMenu" class="bi bi-list iconDefault iconLarge"></i>
     </div>
 
     <div class="separator"></div>
@@ -15,9 +15,11 @@
                 <div class="userName">@loginState.username</div>
             </div>
         </div>
-        <div class="row p-2 mx-0 mt-4 align-items-center userAddressBox">
+        <div class="row p-2 mx-0 mt-4 justify-content-between align-items-center userAddressBox">
             <div class="col-10 p-0 userAddressData username-data" data-value="@loginState.address">@loginState.address</div>
-            <div class="col-2 text-end copyIcon" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copy.png")"/></div>
+            <div class="col-2 text-end copyIcon" onclick="copyToClipboard(this)">
+                <i id="openWalletMenu" class="bi bi-files iconDefault iconMedium"></i>
+            </div>
         </div>
         <div class="innerSeparator"></div>
         <div class="walletMessage">
@@ -34,7 +36,7 @@
         <!-- Wallet Menu -->
     <div id="walletMenu" class="walletMenu">
         <div class="d-flex flow-row justify-content-end">
-            <img id="closeWalletMenu" src="@routes.Assets.versioned("images/icon/closeYellow.png")" class="icon"/>
+            <i id="closeWalletMenu" class="bi bi-x iconDefault iconLarge icon"></i>
         </div>
         <div class="d-flex flex-column justify-content-between h-100 menuContainer">
             <div class="d-flex flex-column gap-2 align-items-end topMenu">
@@ -48,7 +50,7 @@
                 </span>
                 <div class="innerSeparator"></div>
                 <a href="@routes.ProfileController.viewProfile()">
-                    <img src="@routes.Assets.versioned("images/icon/settings.png")" class="mt-1 icon"/>
+                    <i class="bi bi-gear iconDefault mt-1 icon"></i>
                 </a>
             </div>
         </div>
@@ -57,7 +59,7 @@
         <!-- Address Book -->
     <div id="addressBook" class="addressBook">
         <div class="d-flex flex-row gap-2 align-items-center mb-3 headerWithBackButton">
-            <img id="addressBookCloseBtn" src="@routes.Assets.versioned("images/icon/backArrowYellow.png")" class="icon"/>
+            <i id="addressBookCloseBtn" class="bi bi-chevron-left iconDefault mt-1 icon"></i>
             <div class="headerTitle">@Messages(constants.View.ADDRESS_BOOK_TITLE)</div>
         </div>
         <div class="d-flex flex-column justify-content-between">
@@ -80,7 +82,7 @@
                 <button id="newAddressOptionOpenBtn" class="primaryButton" onclick="getForm(jsRoutes.controllers.ProfileController.addNewKey())">@Messages(constants.View.ADD_NEW_ADDRESS_LABEL)</button>
                 <div class="innerSeparator"></div>
                 <a href="@routes.ProfileController.viewProfile()">
-                    <img src="@routes.Assets.versioned("images/icon/settings.png")" class="mt-1 icon"/>
+                    <i class="bi bi-gear iconDefault mt-1 icon"></i>
                 </a>
             </div>
         </div>

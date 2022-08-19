@@ -376,7 +376,7 @@
     width: 40px;
     aspect-ratio: 1;
     border-radius: 50%;
-    padding: 4px 0 0 0;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -686,7 +686,7 @@ dl .info:after {
     display: none;
     position: absolute;
     right: 15px;
-    top: 32px;
+    top: 36px;
     width: 20px;
     height: 20px;
 }
@@ -699,13 +699,12 @@ dl .info:after {
 .showPassword .eyeIcon {
     position: absolute;
     right: 15px;
-    top: 32px;
+    top: 30px;
     cursor: pointer;
     width: 20px;
     height: 20px;
-}
-.showPassword .eyeIcon.openEye{
-    top: 34px;
+    font-size: 22px;
+    color: var(--default);
 }
 .inputField .errorMessage,
 .seedPhraseError #phraseError{
@@ -805,9 +804,15 @@ dl dd.error{
 }
 dl dd.error:before{
     content: '';
-    background-image: url("../images/icon/error.png");
     position: absolute;
     left:0px;
+    width: 16px;
+    height: 16px;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='%23E44651' class='bi bi-x' viewBox='0 0 14 14'> <path d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/> </svg>");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-top: 1px;
 }
 
 /* Global Level Error */

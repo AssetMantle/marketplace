@@ -56,17 +56,17 @@
                 <span class="me-2">@Messages(constants.View.PROFILE_VERIFY_WALLET_MNEMONICS_SHOW_HIDE_MESSAGE)</span>
                 <div class="iconContainer" onclick="showHideSeed()">
                     <span class="eyeIcon closeEye">
-                        <img src="@routes.Assets.versioned("images/icon/hidePassword.png")" width="22px" height="20px"/>
+                        <i class="bi bi-eye-slash iconDefault"></i>
                     </span>
                     <span class="eyeIcon openEye hidden">
-                        <img src="@routes.Assets.versioned("images/icon/showPassword.png")" width="22px" height="17px"/>
+                        <i class="bi bi-eye iconDefault"></i>
                     </span>
                 </div>
             </div>
             <div class="d-flex flex-row mb-3" id="pasteSeeds" onclick="pasteSeeds()">
                 <span class="me-2">@Messages(constants.View.PASTE_MNEMONICS_MESSAGE)</span>
                 <span>
-                    <img src="@routes.Assets.versioned("images/icon/editYellow.png")" width="20px" height="20px"/>
+                    <i class="bi bi-pencil iconDefault"></i>
                 </span>
             </div>
         </div>
