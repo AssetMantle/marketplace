@@ -860,3 +860,6 @@ dl dd.error:before{
     align-items: baseline;
     gap: 10px;
 }
+#signUpUsername_field label{
+    display: none;
+}

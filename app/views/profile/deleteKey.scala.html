@@ -1,6 +1,5 @@
 @import views.profile.companion.DeleteKey
 @import views.html.base.form._
-@import views.html.base.label._
 
 @(deleteKeyForm: Form[DeleteKey.Data] = DeleteKey.form, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
@@ -9,14 +8,12 @@
             <div class="mb-3">
                 <div class="inputField">
                     <div class="inputFieldBody">
-                        @commonLabel(constants.FormField.WALLET_ADDRESS.name)
                         @commonInputText(deleteKeyForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly")
                     </div>
                 </div>
 
                 <div class="mt-3 inputField">
                     <div class="inputFieldBody">
-                        @commonLabel(constants.FormField.PASSWORD.name)
                         @commonInputPassword(deleteKeyForm, constants.FormField.PASSWORD, Symbol("autocomplete") -> "off", Symbol("id") -> "deleteAccountPassword")
                     </div>
                 </div>

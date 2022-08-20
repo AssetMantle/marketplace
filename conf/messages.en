@@ -146,6 +146,11 @@ RESPONSE.FAILURE.PASSWORD_VALIDATION_FAILED=Password does not match minimum crit
 PLACEHOLDER.PASSWORD=Enter Password
 PLACEHOLDER.WALLET_ADDRESS=Wallet Address
 SHARE_USERNAME_TWEET=Share on Twitter
+PUSH_NOTIFICATION_TOKEN=
+SEED_PHRASE_1=1
+SEED_PHRASE_2=2
+SEED_PHRASE_3=3
+SEED_PHRASE_4=4
 
 #//Sign Out
 SIGN_OUT_CONFIRMATION=Are you sure you want to sign out?
@@ -288,6 +293,7 @@ KEY_NAME_ERROR=Minimum length 3
 WALLET_ADDRESS_ERROR=Invalid wallet address
 PASSWORD_ERROR=Minimum length 5
 PASTE_MNEMONICS_MESSAGE=Paste all Mnemonics
+SEEDS=
 
 #//Unmanaged Address
 FORM.ADD_UNMANAGED_KEY.TITLE=Add New Address
