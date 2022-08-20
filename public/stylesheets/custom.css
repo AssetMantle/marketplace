@@ -22,6 +22,7 @@
     --gray: #B0B0B0;
     --card-dark: #030301;
     --accent-blue: #6FB4B5;
+    --background-dark: #111111;
     --font-type-1: 'Work Sans';
     --font-type-2: 'Lato';
     --size-bezel: .5rem;
@@ -45,8 +46,8 @@ ul{
 }
 body{
     /*height: 100vh;*/
-    background-color:#030301 !important;
-    background-image: url("../images/background.webp");
+    background-color:var(--background-dark) !important;
+    /*background-image: url("../images/background.webp");*/
     /*background-repeat: no-repeat;*/
     /*background-size: cover;*/
     background-position: center;
@@ -1320,7 +1321,7 @@ article:first-child{
     border-radius: 10px;
     position: relative;
     overflow: hidden;
-    filter: drop-shadow(0px 0px 30px #000000);
+    /*filter: drop-shadow(0px 0px 30px #000000);*/
 }
 .featured-container .featured-card{
     position: relative;
@@ -1404,7 +1405,7 @@ article:first-child{
 }
 .featured-container .swiper-slide-active{
     /* width: 400px; */
-    filter: drop-shadow(0px 0px 50px #000000);
+    /*filter: drop-shadow(0px 0px 50px #000000);*/
 }
 
 
