@@ -8,8 +8,38 @@
     @commonInputText(sendCoin, constants.FormField.FROM_ADDRESS, Symbol("value") -> fromAddress, Symbol("readonly") -> "readonly")
     @commonInputText(sendCoin, constants.FormField.TO_ADDRESS)
     @commonInputMicornumber(sendCoin, constants.FormField.SEND_COIN_AMOUNT)
-    @commonInputInt(sendCoin, constants.FormField.GAS_AMOUNT,  Symbol("value") -> constants.Blockchain.DefaultSendCoinGasAmount)
-    @* @commonSelect(sendCoin, constants.FormField.GAS_PRICE) *@
-    @commonDropDown("Gas Price", Seq("0.0", "0.001", "0.01"))
+    @commonInputInt(sendCoin, constants.FormField.GAS_AMOUNT,  Symbol("value") -> constants.Blockchain.DefaultSendCoinGasAmount, Symbol("class") -> "hidden")
+    @commonSelect(sendCoin, constants.FormField.GAS_PRICE, Symbol("class") -> "hidden")
+    <div class="btn-group mt-2 mt-sm-2 mt-md-0 w-100 toggleBtn" role="group">
+        <span id="option1" type="button" class="btn p-2 toggleOption" onclick="setOption(this)">
+            <div>@Messages(constants.View.GAS_LOW)</div>
+            <div class="gasCharges">00</div>
+        </span>
+        <span id="option2" type="button" class="btn p-2 active toggleOption" onclick="setOption(this)">
+            <div>@Messages(constants.View.GAS_AVERAGE)</div>
+            <div class="gasCharges">00</div>
+        </span>
+        <span id="option3" type="button" class="btn p-2 toggleOption" onclick="setOption(this)">
+            <div>@Messages(constants.View.GAS_HIGH)</div>
+            <div class="gasCharges">00</div>
+        </span>
+    </div>
     @commonInputPassword(sendCoin, constants.FormField.PASSWORD)
 }
+<script>
+    // Gas Price
+    elementIndex = 0;
+    $("#GAS_PRICE option").each(function()
+    {
+        if($(this).val()){
+           $(".gasCharges").eq(elementIndex).text($(this).val() * $("#GAS_AMOUNT").val() + " MNTL");
+           elementIndex++;
+        }
+    });
+
+    // Gas Toggle Button
+    function setOption(element) {
+        $(".toggleOption").removeClass("active");
+        $(element).addClass("active");
+    }
+</script>
