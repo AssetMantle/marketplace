@@ -9,6 +9,7 @@
     @commonInputText(sendCoin, constants.FormField.TO_ADDRESS)
     @commonInputMicornumber(sendCoin, constants.FormField.SEND_COIN_AMOUNT)
     @commonInputInt(sendCoin, constants.FormField.GAS_AMOUNT,  Symbol("value") -> constants.Blockchain.DefaultSendCoinGasAmount)
-    @commonSelect(sendCoin, constants.FormField.GAS_PRICE)
+    @* @commonSelect(sendCoin, constants.FormField.GAS_PRICE) *@
+    @commonDropDown("Gas Price", Seq("0.0", "0.001", "0.01"))
     @commonInputPassword(sendCoin, constants.FormField.PASSWORD)
 }

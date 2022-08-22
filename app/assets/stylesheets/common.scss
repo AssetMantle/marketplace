@@ -53,7 +53,7 @@
   }
   .dropdownBody{
     @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
-    padding: 10px 12px;
+    //padding: 10px 12px;
     position: relative;
     .dropdownBodyInner{
       position: absolute;
