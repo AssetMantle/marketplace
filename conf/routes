@@ -74,5 +74,9 @@ POST        /viewMnemonics                   controllers.ProfileController.viewM
 GET         /deleteKey                       controllers.ProfileController.deleteKeyForm(address: String)
 POST        /deleteKey                       controllers.ProfileController.deleteKey()
 
+GET         /addToWishList                   controllers.NFTController.addToWishList(nftId: String)
+GET         /deleteFromWishList              controllers.NFTController.deleteFromWishList(nftId: String)
+GET         /allWishList                     controllers.NFTController.allWishList(pageNumber: Int)
+
 #GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()
