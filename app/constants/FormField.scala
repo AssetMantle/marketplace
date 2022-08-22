@@ -54,8 +54,9 @@ object FormField {
   val ACTIVE = new BooleanFormField("ACTIVE")
   val MANAGED_KEY_DISCLAIMER = new BooleanFormField("MANAGED_KEY_DISCLAIMER")
 
+  val GAS_PRICE = new SelectFormField("GAS_PRICE", Seq(constants.CommonConfig.Blockchain.LowGasPrice.toString, constants.CommonConfig.Blockchain.MediumGasPrice.toString, constants.CommonConfig.Blockchain.HighGasPrice.toString))
+
   val SEND_COIN_AMOUNT = new MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.zero, MicroNumber(Int.MaxValue), 6)
-  val GAS_PRICE = new MicroNumberFormField("GAS_PRICE", MicroNumber.zero, MicroNumber(Int.MaxValue), 6)
 
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName

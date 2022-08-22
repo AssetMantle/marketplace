@@ -1,3 +1,9 @@
 @(broadcasted: Boolean, status: Option[Boolean], txHash: String, log: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@txHash
+@if(status.nonEmpty) {
+    @if(!status.get) {
+        @log
+    }
+} else {
+    @txHash
+}

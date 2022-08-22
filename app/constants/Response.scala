@@ -104,6 +104,7 @@ object Response {
   val UNKNOWN_GRANT_AUTHORIZATION_RESPONSE_STRUCTURE = new Failure("UNKNOWN_GRANT_AUTHORIZATION_RESPONSE_STRUCTURE")
   val TRANSACTION_PROCESSING_FAILED = new Failure("TRANSACTION_PROCESSING_FAILED")
   val TRANSACTION_ALREADY_IN_MEMPOOL = new Failure("TRANSACTION_ALREADY_IN_MEMPOOL")
+  val INVALID_NUMBER_FORMAT = new Failure("INVALID_NUMBER_FORMAT")
 
   class Failure(response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

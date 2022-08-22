@@ -1,6 +1,7 @@
 package constants
 
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
+import utilities.MicroNumber
 import views.account.companion._
 import views.profile.companion._
 import views.blockchainTransaction.companion._
@@ -70,6 +71,7 @@ object FormConstraint {
       if (!sendCoin.fromAddress.startsWith("mantle") || sendCoin.fromAddress.length != 45) Option(ValidationError(constants.Response.INVALID_FROM_ADDRESS.message)) else None,
       if (!sendCoin.toAddress.startsWith("mantle") || sendCoin.toAddress.length != 45) Option(ValidationError(constants.Response.INVALID_TO_ADDRESS.message)) else None,
       if (sendCoin.fromAddress == sendCoin.toAddress) Option(ValidationError(constants.Response.FROM_AND_TO_ADDRESS_SAME.message)) else None,
+      if (sendCoin.gasPrice.toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_NUMBER_FORMAT.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })
