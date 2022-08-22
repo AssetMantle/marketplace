@@ -29,9 +29,9 @@ object CommonConfig {
     val RestEndPoint: String = config.get[String]("blockchain.restURL")
     val TransactionMode: String = config.get[String]("blockchain.transactionMode")
     val IBCDenoms: Seq[IBCDenom] = config.get[Seq[Configuration]]("blockchain.ibcDenomList").map { ibcDenoms => IBCDenom(hash = ibcDenoms.get[String]("hash"), name = ibcDenoms.get[String]("name")) }
-    val LowGasPrice: Int = config.get[Int]("blockchain.lowGasPrice")
-    val MediumGasPrice: Int = config.get[Int]("blockchain.mediumGasPrice")
-    val HighGasPrice: Int = config.get[Int]("blockchain.highGasPrice")
+    val LowGasPrice: Double = config.get[Double]("blockchain.lowGasPrice")
+    val MediumGasPrice: Double = config.get[Double]("blockchain.mediumGasPrice")
+    val HighGasPrice: Double = config.get[Double]("blockchain.highGasPrice")
   }
 
   object Collections {
