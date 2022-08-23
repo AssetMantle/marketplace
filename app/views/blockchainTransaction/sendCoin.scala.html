@@ -11,15 +11,15 @@
     @commonInputInt(sendCoin, constants.FormField.GAS_AMOUNT,  Symbol("value") -> constants.Blockchain.DefaultSendCoinGasAmount, Symbol("class") -> "hidden")
     @commonSelect(sendCoin, constants.FormField.GAS_PRICE, Symbol("class") -> "hidden")
     <div class="btn-group mt-2 mt-sm-2 mt-md-0 w-100 toggleBtn" role="group">
-        <span id="option1" type="button" class="btn p-2 toggleOption" onclick="setOption(this)">
+        <span id="option1" type="button" class="btn p-2 toggleOption" onclick="setOption(this, 1)">
             <div>@Messages(constants.View.GAS_LOW)</div>
             <div class="gasCharges">00</div>
         </span>
-        <span id="option2" type="button" class="btn p-2 active toggleOption" onclick="setOption(this)">
+        <span id="option2" type="button" class="btn p-2 active toggleOption" onclick="setOption(this, 2)">
             <div>@Messages(constants.View.GAS_AVERAGE)</div>
             <div class="gasCharges">00</div>
         </span>
-        <span id="option3" type="button" class="btn p-2 toggleOption" onclick="setOption(this)">
+        <span id="option3" type="button" class="btn p-2 toggleOption" onclick="setOption(this, 3)">
             <div>@Messages(constants.View.GAS_HIGH)</div>
             <div class="gasCharges">00</div>
         </span>
@@ -27,6 +27,9 @@
     @commonInputPassword(sendCoin, constants.FormField.PASSWORD)
 }
 <script>
+    // Set Average Gas fees as Default
+    $('#GAS_PRICE option:eq(2)').prop('selected', true);
+
     // Gas Price
     elementIndex = 0;
     $("#GAS_PRICE option").each(function()
@@ -38,8 +41,10 @@
     });
 
     // Gas Toggle Button
-    function setOption(element) {
+    function setOption(element, optionIndex) {
         $(".toggleOption").removeClass("active");
         $(element).addClass("active");
+        $('#GAS_PRICE option:eq('+optionIndex+')').prop('selected', true);
     }
+
 </script>
