@@ -749,7 +749,7 @@ dl .info:after {
     font: inherit;
     width: 18px;
     height: 18px;
-    border: 2px solid var(--default);
+    border: 1px solid var(--default);
     border-radius: 0.15em;
     transform: translateY(-0.075em);
     display: grid;

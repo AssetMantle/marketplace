@@ -1135,6 +1135,7 @@ article:first-child{
     border: 0;
     padding: 9px 0;
     width: 200px;
+    height: 44px;
     font-family: var(--font-type-2);
     font-style: normal;
     font-weight: 600;
@@ -1710,7 +1711,7 @@ article:first-child{
     /*background-clip: text;*/
     /*text-fill-color: transparent;*/
     width: 216px;
-    height: 36px;
+    height: 44px;
     border:none;
     border: 1px solid var(--dark);
     border-radius: 32px;
