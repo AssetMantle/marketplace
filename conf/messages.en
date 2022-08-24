@@ -364,6 +364,7 @@ BLOCKCHAIN_TRANSACTION_SUCCESS_TITLE=Transaction Successful
 BLOCKCHAIN_TRANSACTION_SUCCESS_SUBTITLE=Please wait sometime for tx to get committed to block
 BLOCKCHAIN_TRANSACTION_FAILURE_TITLE=Transaction Failed
 HASH=Hash
+RESPONSE.FAILURE.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED=Amount cannot have more than 6 digits after decimal
 
 #Logs
 CONTROLLERS_REQUEST=REQUEST "{0} {1}" from {2} by username: {3}
