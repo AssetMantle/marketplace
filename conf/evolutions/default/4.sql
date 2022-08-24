@@ -33,8 +33,8 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WhiteListInvite"
 (
     "id"                VARCHAR NOT NULL,
     "whiteListId"       VARCHAR NOT NULL,
-    "startTime"         BIGINT  NOT NULL,
-    "endTime"           BIGINT  NOT NULL,
+    "startEpoch"        BIGINT  NOT NULL,
+    "endEpoch"          BIGINT  NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
