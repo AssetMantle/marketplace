@@ -287,6 +287,17 @@
     display: flex;
     align-items: center;
 }
+.form-address-box .address-box-text .username-data{
+    color: var(--mantle-off-white);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 350px;
+}
+@media (max-width: 650px){
+    .form-address-box .address-box-text .username-data{
+        max-width: 175px;
+    }
+}
 .form-address-box .form-copy-icon{
     margin-left: 5px;
 }

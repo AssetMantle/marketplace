@@ -4,8 +4,8 @@
 
 @if(status.nonEmpty) {
     @if(!status.get) {
-        @errorModal(heading = constants.View.BLOCKCHAIN_TRANSACTION_FAILURE_TITLE)
-        @log
+        @errorModal(heading = constants.View.BLOCKCHAIN_TRANSACTION_FAILURE_TITLE, subHeading = Messages(log))
+        @* @log *@
     }
 } else {
     @successModal(heading = constants.View.BLOCKCHAIN_TRANSACTION_SUCCESS_TITLE, subHeading = constants.View.BLOCKCHAIN_TRANSACTION_SUCCESS_SUBTITLE)

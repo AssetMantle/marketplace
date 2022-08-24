@@ -1,7 +1,6 @@
 @import views.blockchainTransaction.companion.SendCoin
 @import views.html.base.form._
 @import utilities.MicroNumber
-@import views.html.base.forms.commonFieldErrorMessage
 
 @(sendCoin: Form[SendCoin.Data] = SendCoin.form, fromAddress: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -11,7 +10,7 @@
     @commonInputMicornumber(sendCoin, constants.FormField.SEND_COIN_AMOUNT)
     @commonInputInt(sendCoin, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultSendCoinGasAmount, Symbol("class") -> "hidden")
     @commonSelect(sendCoin, constants.FormField.GAS_PRICE, Symbol("class") -> "hidden")
-    <div class="btn-group mt-2 mt-sm-2 mt-md-0 w-100 toggleBtn" role="group">
+    <div id="gasPriceToggleButton" class="btn-group mt-2 mt-sm-2 mt-md-0 w-100 toggleBtn" role="group">
         <span id="option1" type="button" class="btn p-2 toggleOption" onclick="setOption(this, 1)">
             <div>@Messages(constants.View.GAS_LOW)</div>
             <div class="gasCharges">00</div>
@@ -30,26 +29,6 @@
     </div>
     @commonInputPassword(sendCoin, constants.FormField.PASSWORD)
 }
-<script>
-        // Set Average Gas fees as Default
-        $('#GAS_PRICE option:eq(2)').prop('selected', true);
-        let mntlPrice = 0.0; //get from fetchPrice.js
-        // Gas Price
-        elementIndex = 0;
-        $("#GAS_PRICE option").each(function () {
-            if ($(this).val()) {
-                let totalGas = $(this).val() * $("#GAS_AMOUNT").val() / @MicroNumber.factor;
-                $(".gasCharges").eq(elementIndex).text(totalGas + " MNTL");
-                $(".gasChargesPrice").eq(elementIndex).text(totalGas * mntlPrice + "$");
-                elementIndex++;
-            }
-        });
 
-        // Gas Toggle Button
-        function setOption(element, optionIndex) {
-            $(".toggleOption").removeClass("active");
-            $(element).addClass("active");
-            $('#GAS_PRICE option:eq(' + optionIndex + ')').prop('selected', true);
-        }
-
-</script>
+<script src="@routes.Assets.versioned("javascripts/blockchainTransactions/fetchPrice.js")" type="text/javascript"></script>
+<script src="@routes.Assets.versioned("javascripts/blockchainTransactions/sendCoin.js")" type="text/javascript"></script>
