@@ -1,4 +1,4 @@
-@(heading:String = "")
+@(heading: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="header-success">
     <div class="form-top">
@@ -9,7 +9,7 @@
     </div>
     <div class="form-body">
         <div class="form-success-message">
-            <div class="form-success-message-heading">@heading</div>
+            <div class="form-success-message-heading">@Messages(heading)</div>
         </div>
     </div>
 </div>

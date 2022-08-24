@@ -175,13 +175,13 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
 
 object MicroNumber {
 
-  private val factor = 1000000
-
   private val module: String = constants.Module.UTILITIES_MICRO_NUMBER
 
   private val logger: Logger = Logger(this.getClass)
 
   val zero = new MicroNumber(0)
+
+  val factor = 1000000
 
   def apply(value: BigInt): MicroNumber = new MicroNumber(value)
 

@@ -126,14 +126,14 @@ class SendCoins @Inject()(
 
   object Utility {
 
-    def transaction(accountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: MicroNumber, gasLimit: Int, ecKey: ECKey, memo: String = ""): Future[SendCoin] = {
+    def transaction(accountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: Double, gasLimit: Int, ecKey: ECKey, memo: String = ""): Future[SendCoin] = {
       val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val unconfirmedTxs = getUnconfirmedTxs.Service.get()
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, unconfirmedTxHashes: Seq[String]) = {
         val (txHash, txRawHex) = utilities.BlockchainTransaction.getTxHashAndRawHex(
           messages = Seq(com.google.protobuf.Any.newBuilder().setTypeUrl(constants.Blockchain.TransactionMessage.SEND_COIN).setValue(Tx.MsgSend.newBuilder().setFromAddress(fromAddress).setToAddress(toAddress).addAllAmount(amount.map(_.toProtoCoin).asJava).build().toByteString).build()),
-          fee = Coin(denom = constants.Blockchain.StakingToken, amount = gasPrice * gasLimit),
+          fee = Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber((gasPrice * gasLimit) / MicroNumber.factor)),
           gasLimit = gasLimit,
           account = bcAccount,
           ecKey = ecKey,

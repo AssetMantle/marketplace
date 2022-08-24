@@ -11,7 +11,7 @@ object Blockchain {
   val CoinType = 118
   val MnemonicShown = 4
   val ChainId: String = CommonConfig.Blockchain.ChainId
-  val StakingToken: String =  CommonConfig.Blockchain.StakingToken
+  val StakingToken: String = CommonConfig.Blockchain.StakingToken
   val DefaultSendCoinGasAmount = 100000
   val DefaultHDPath: Seq[ChildNumber] = Seq(
     new ChildNumber(44, true),

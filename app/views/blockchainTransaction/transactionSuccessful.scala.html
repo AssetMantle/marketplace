@@ -1,14 +1,14 @@
 @import views.html.base.forms._
+
 @(broadcasted: Boolean, status: Option[Boolean], txHash: String, log: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @if(status.nonEmpty) {
     @if(!status.get) {
+        @errorModal(heading = constants.View.BLOCKCHAIN_TRANSACTION_FAILURE_TITLE)
         @log
     }
 } else {
-    @successModal(heading = constants.View.SEND_COIN_SUCCESS_TITLE, subHeading = constants.View.SEND_COIN_SUCCESS_SUBTITLE)
-
-    <!-- Show Hash -->
+    @successModal(heading = constants.View.BLOCKCHAIN_TRANSACTION_SUCCESS_TITLE, subHeading = constants.View.BLOCKCHAIN_TRANSACTION_SUCCESS_SUBTITLE)
     <div class="form-address-box">
         <div class="form-address-box-item">
                 <span class="address-box-label">@Messages(constants.View.HASH)</span>
@@ -19,6 +19,4 @@
                 </span>
         </div>
     </div>
-    <!-- Show Hash End -->
-    @* @txHash *@
 }

@@ -26,6 +26,7 @@ class BlockchainTransactionController @Inject()(
                                                  masterKeys: master.Keys,
                                                  blockchainBalances: models.blockchain.Balances,
                                                  blockchainTransactionSendCoins: models.blockchainTransaction.SendCoins,
+                                                 masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                                  withUsernameToken: WithUsernameToken,
                                                  withLoginActionAsync: WithLoginActionAsync,
                                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -58,7 +59,7 @@ class BlockchainTransactionController @Inject()(
               toAddress = sendCoinData.toAddress,
               amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = sendCoinData.sendCoinAmount)),
               gasLimit = sendCoinData.gasAmount,
-              gasPrice = sendCoinData.gasPrice,
+              gasPrice = sendCoinData.gasPrice.toDouble,
               ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, sendCoinData.password)),
             )
           }
