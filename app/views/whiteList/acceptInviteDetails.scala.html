@@ -1,0 +1,10 @@
+@import models.master.WhiteList
+@import models.masterTransaction.WhiteListInvite
+@import views.html.base.buttons._
+
+@(whiteList: WhiteList, whiteListInvite: WhiteListInvite)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@whiteList.name
+@whiteList.description
+@whiteList.maxMembers
+@whiteListInvite.endEpoch

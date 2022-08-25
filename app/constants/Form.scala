@@ -31,4 +31,7 @@ object Form {
 
   val CHANGE_MANAGED_TO_UNMANAGED = new Form("CHANGE_MANAGED_TO_UNMANAGED", routes.javascript.ProfileController.deleteKeyForm, routes.ProfileController.deleteKey())
 
+  val CREATE_WHITE_LIST = new Form("CREATE_WHITE_LIST", routes.javascript.WhiteListController.createWhiteListForm, routes.WhiteListController.createWhiteList())
+  val WHITE_LIST_INVITE = new Form("WHITE_LIST_INVITE", routes.javascript.WhiteListController.whiteListInviteForm, routes.WhiteListController.whiteListInvite())
+
 }

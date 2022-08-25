@@ -74,5 +74,14 @@ POST        /viewMnemonics                   controllers.ProfileController.viewM
 GET         /deleteKey                       controllers.ProfileController.deleteKeyForm(address: String)
 POST        /deleteKey                       controllers.ProfileController.deleteKey()
 
+GET         /createWhiteList                 controllers.WhiteListController.createWhiteListForm()
+POST        /createWhiteList                 controllers.WhiteListController.createWhiteList()
+
+GET         /whiteListInvite                 controllers.WhiteListController.whiteListInviteForm(whiteListId: String)
+POST        /whiteListInvite                 controllers.WhiteListController.whiteListInvite()
+
+GET         /acceptInviteDetails             controllers.WhiteListController.acceptInviteDetails(whiteListId: String)
+GET         /acceptInvite                    controllers.WhiteListController.acceptInvite(whiteListId: String)
+
 #GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()

@@ -23,7 +23,7 @@ class IndexController @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.HOME_CONTROLLER
+  private implicit val module: String = constants.Module.INDEX_CONTROLLER
 
   def index: EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit optionalLoginState =>

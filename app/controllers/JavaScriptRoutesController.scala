@@ -50,7 +50,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.changeKeyNameForm,
         routes.javascript.ProfileController.viewMnemonicsForm,
         routes.javascript.ProfileController.deleteKeyForm,
-//        routes.javascript.ProfileController.changeManagedToUnmanagedForm,
+        //        routes.javascript.ProfileController.changeManagedToUnmanagedForm,
+
+        routes.javascript.WhiteListController.createWhiteListForm,
+        routes.javascript.WhiteListController.whiteListInviteForm,
+        routes.javascript.WhiteListController.acceptInviteDetails,
+        routes.javascript.WhiteListController.acceptInvite,
 
       )
     ).as("text/javascript")

@@ -85,6 +85,8 @@ object Response {
   val INVALID_WALLET_ADDRESS = new Failure("INVALID_WALLET_ADDRESS")
   val CANNOT_DELETE_ACTIVE_KEY = new Failure("CANNOT_DELETE_ACTIVE_KEY")
 
+  val WHITE_LIST_INVITATION_EXPIRED = new Failure("WHITE_LIST_INVITATION_EXPIRED")
+
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
     val action: String = utilities.JsRoutes.getJsRouteString(actionController)

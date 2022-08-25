@@ -32,6 +32,9 @@ object FormField {
   val SEEDS = new StringFormField("SEEDS", 3, 500, RegularExpression.ALL_SMALL_LETTERS_WITH_SPACE, Response.INVALID_SEEDS.message)
   val KEY_NAME = new StringFormField("KEY_NAME", 3, 128, RegularExpression.ALL_NUMBERS_ALL_LETTERS, Response.INVALID_KEY_NAME.message)
   val CONFIRM_USERNAME = new StringFormField("CONFIRM_USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
+  val WHITE_LIST_NAME = new StringFormField("WHITE_LIST_NAME", 3, 50, RegularExpression.WHITE_LIST_NAME)
+  val WHITE_LIST_DESCRIPTION = new StringFormField("WHITE_LIST_DESCRIPTION", 3, 256)
+  val WHITE_LIST_ID = new StringFormField("WHITE_LIST_ID", 16, 16)
 
   val MANAGED_KEY_NAME = new StringFormField("MANAGED_KEY_NAME", 3, 50)
   val MANAGED_KEY_ADDRESS = new StringFormField("MANAGED_KEY_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
@@ -39,6 +42,10 @@ object FormField {
   val UNMANAGED_KEY_ADDRESS = new StringFormField("UNMANAGED_KEY_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
   val CHANGE_KEY_NAME = new StringFormField("CHANGE_KEY_NAME", 3, 50)
   val CHANGE_KEY_ADDRESS = new StringFormField("CHANGE_KEY_ADDRESS", 3, 50)
+
+  val WHITE_LIST_MAX_MEMBERS = new IntFormField("WHITE_LIST_MAX_MEMBERS", 1, Int.MaxValue)
+  val WHITE_LIST_INVITE_START_EPOCH = new IntFormField("WHITE_LIST_INVITE_START_EPOCH", 1, Int.MaxValue)
+  val WHITE_LIST_INVITE_END_EPOCH = new IntFormField("WHITE_LIST_INVITE_END_EPOCH", 1, Int.MaxValue)
 
   //BooleanFormField
   val RECEIVE_NOTIFICATIONS = new BooleanFormField("RECEIVE_NOTIFICATIONS")
@@ -52,6 +59,7 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[String]) = name -> field
   }
 
@@ -59,6 +67,7 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[String] = text.verifying(constraint = field => options contains field, error = errorMessage)
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[String]) = name -> field
   }
 
@@ -66,12 +75,15 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[String] = text
     val placeHolder: String = "PLACEHOLDER." + name
+
+    def mapping: (String, Mapping[String]) = name -> field
   }
 
   class IntFormField(fieldName: String, val minimumValue: Int, val maximumValue: Int) {
     val name: String = fieldName
     val field: Mapping[Int] = number(min = minimumValue, max = maximumValue)
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[Int]) = name -> field
   }
 
@@ -79,6 +91,7 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[Date] = date
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[Date]) = name -> field
   }
 
@@ -86,6 +99,7 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[Double]) = name -> field
   }
 
@@ -93,6 +107,7 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[BigDecimal] = of(bigDecimalFormat).verifying(Constraints.max[BigDecimal](maximumValue), Constraints.min[BigDecimal](minimumValue))
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[BigDecimal]) = name -> field
   }
 
@@ -100,6 +115,7 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[Boolean] = boolean
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[Boolean]) = name -> field
   }
 
