@@ -56,8 +56,8 @@ abstract class GenericDaoImpl[
     }
   }
 
-  def create(entity: E): Future[Unit] = db.run((tableQuery += entity).asTry).map {
-    case Success(result) => ()
+  def create(entity: E): Future[PK] = db.run((tableQuery returning tableQuery.map(_.id) += entity).asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_INSERT_FAILED"), psqlException)
     }

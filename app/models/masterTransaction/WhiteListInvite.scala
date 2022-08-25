@@ -1,10 +1,8 @@
 package models.masterTransaction
 
-import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.i18n.Lang
 import slick.jdbc.H2Profile.api._
 
 import java.sql.Timestamp
@@ -80,5 +78,23 @@ class WhiteListInvites @Inject()(
 
 
   object Service {
+
+    def add(whiteListId: String, startEpoch: Int, endEpoch: Int): Future[String] = {
+      val id = utilities.IdGenerator.getRandomHexadecimal
+      create(WhiteListInvite(id = id, whiteListId = whiteListId, startEpoch = startEpoch, endEpoch = endEpoch).serialize())
+    }
+
+    def tryGet(whiteListId: String): Future[WhiteListInvite] = tryGetById(whiteListId).map(_.deserialize)
+
+    def updateEndEpoch(whiteListId: String, endEpoch: Int): Future[Unit] = {
+      val whiteListInvite = tryGet(whiteListId)
+      for {
+        whiteListInvite <- whiteListInvite
+        _ <- update(whiteListInvite.copy(endEpoch = endEpoch).serialize())
+      } yield ()
+    }
+
+    def deleteInvite(whiteListId: String): Future[Int] = delete(whiteListId)
+
   }
 }

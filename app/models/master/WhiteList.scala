@@ -83,5 +83,19 @@ class WhiteLists @Inject()(
 
 
   object Service {
+
+    def addWhiteList(ownerId: String, name: String, description: String, maxMembers: Int): Future[String] = {
+      val id = utilities.IdGenerator.getRandomHexadecimal
+      for {
+        _ <- create(WhiteList(id = id, ownerId = ownerId, name = name, description = description, maxMembers = maxMembers).serialize())
+      } yield id
+    }
+
+    def tryGet(id: String): Future[WhiteList] = tryGetById(id).map(_.deserialize)
+
+    def getByOwner(ownerId: String): Future[Seq[WhiteList]] = filter(_.ownerId === ownerId).map(_.map(_.deserialize))
+
+    def deleteById(id: String): Future[Int] = delete(id)
+
   }
 }

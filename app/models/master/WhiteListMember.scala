@@ -80,5 +80,15 @@ class WhiteListMembers @Inject()(
 
 
   object Service {
+
+    def add(whiteListId: String, accountId: String): Future[Unit] = create(WhiteListMember(whiteListId = whiteListId, accountId = accountId).serialize())
+
+    def getAllForWhiteList(whiteListId: String): Future[Seq[String]] = filter(_.whiteListId === whiteListId).map(_.map(_.accountId))
+
+    def getAllForMember(accountId: String): Future[Seq[String]] = filter(_.accountId === accountId).map(_.map(_.whiteListId))
+
+    def deleteAllMembers(whiteListId: String): Future[Int] = filterAndDelete(_.whiteListId === whiteListId)
+
+    def deleteMember(whiteListId: String, accountId: String): Future[Int] = delete(id1 = whiteListId, id2 = accountId)
   }
 }
