@@ -190,13 +190,13 @@
 }
 
 /* Form Button */
-.form-button{
+.horizontal-align{
     display: flex;
     justify-content: end;
     margin-top: 40px;
     gap: 30px;
 }
-.form-button button{
+.horizontal-align button{
     padding: 9px 0;
     width: 200px;
     font-family: var(--font-type-2);
@@ -210,7 +210,7 @@
     border-radius: 8px;
     cursor: pointer;
 }
-.form-button .form-primary-button{
+.horizontal-align .form-primary-button{
     color: var(--button-text);
     background-color: var(--dark);
     box-shadow: inset -4px -4px 8px rgba(0, 0, 0, 0.2), inset 4px 4px 8px #FFD365;
@@ -220,7 +220,7 @@
     transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
     border: 1px solid var(--dark);
 }
-.form-button .form-primary-button.disable{
+.horizontal-align .form-primary-button.disable{
     border: none !important;
     box-shadow: none !important;
     background: var(--disable-yellow) !important;
@@ -232,7 +232,7 @@
     -ms-user-select: none;
     user-select: none;
 }
-.form-button .form-secondary-button{
+.horizontal-align .form-secondary-button{
     color: var(--dark);
     background-color: transparent;
     border: 1px solid var(--dark);

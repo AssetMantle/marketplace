@@ -32,8 +32,8 @@
         </label>
     </div>
 </div>
-<div class="mt-3 form-button">
-    @views.html.base.buttons.commonPrimaryButton(label = Messages(constants.View.NEXT), route = null, Symbol("id") -> "nextBtn", Symbol("class") -> "disable")
+<div class="mt-3 horizontal-align">
+    @views.html.base.buttons.commonPrimaryButton(constants.View.NEXT, JavaScript(s""),Symbol("id") -> "nextBtn", Symbol("class") -> "disable")
 </div>
 
 <script>

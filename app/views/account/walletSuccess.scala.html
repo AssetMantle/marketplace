@@ -7,8 +7,8 @@
     <div class="form-information-icon"><img src="@routes.Assets.versioned("images/icon/info.png")"/></div>
     <div class="form-information-text">@Messages(constants.View.CREATE_WALLET_SUCCESS_INFO)</div>
 </div>
-<div class="form-button">
-    @views.html.base.buttons.commonSecondaryButton(label = Messages(constants.View.SIGN_IN), route = constants.Form.SIGN_IN.get)
+<div class="horizontal-align">
+    @views.html.base.buttons.commonModalSecondaryButton(constants.View.SIGN_IN, constants.Form.SIGN_IN.get)
     @defining(s"https://twitter.com/intent/tweet?text=I just claimed my username ${username} on MantlePlace @AssetMantle $$MNTL. Claim yours at &url=https://marketplace.assetmantle.one&hashtags=DID&hashtags=InterNFT") { uri =>
         <a href='@uri' target="_blank">
             <button class="form-primary-button">
