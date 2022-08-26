@@ -28,8 +28,10 @@
 </div>
 
 <div class="form-button">
-    <button class="form-secondary-button" onclick="closeModal()" data-bs-dismiss="modal" aria-label="Close">@Messages(constants.View.CANCEL)</button>
-    <button class="form-primary-button" onclick="showHideModalScreen('#verificationForm', '#walletMnemonics')">@Messages(constants.View.NEXT)</button>
+    <span data-bs-dismiss="modal" aria-label="Close">
+        @views.html.base.buttons.commonSecondaryButton(label = Messages(constants.View.CANCEL), route = null, Symbol("onclick") -> "closeModal()")
+    </span>
+    @views.html.base.buttons.commonPrimaryButton(label = Messages(constants.View.NEXT), route = null, Symbol("onclick") -> "showHideModalScreen('#verificationForm', '#walletMnemonics')")
 </div>
 </div>
 

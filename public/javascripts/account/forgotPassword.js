@@ -37,7 +37,6 @@ function checkNewPassword(){
     var flag1,flag2,flag3,flag4 = 0;
     let passwordValue = document.getElementById('forgotNewPassword').value;
     if($.trim(passwordValue).length) {
-        // var completeRegularExpression = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,128}$/;
 
         let numberMatchPattern = passwordValue.match(/\d+/g);
         const isUpperCase = (x) => /[A-Z]/.test(x);

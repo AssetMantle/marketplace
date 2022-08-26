@@ -1,0 +1,15 @@
+@import play.api.routing.JavaScriptReverseRoute
+
+@(label: String, route : JavaScriptReverseRoute , arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+@if(route != null) {
+    <button type="@arguments.toMap.get(Symbol("type")).map(_.toString).getOrElse("button")"  class="@Seq("form-primary-button", arguments.toMap.get('class).map(_.toString).getOrElse("")).mkString(" ")" id='@arguments.toMap.get(Symbol("id")).map(_.toString).getOrElse("")' onclick="getForm(@utilities.JsRoutes.getJsRouteString(route, ""))">@Messages(label)</button>
+}else{
+    <button type="@arguments.toMap.get(Symbol("type")).map(_.toString).getOrElse("button")" class="@Seq("form-primary-button", arguments.toMap.get('class).map(_.toString).getOrElse("")).mkString(" ")" id='@arguments.toMap.get(Symbol("id")).map(_.toString).getOrElse("")' onclick="@arguments.toMap.get(Symbol("onclick")).map(_.toString).getOrElse("")">@Messages(label)</button>
+}
+
+@* Example Usage:
+    - If have JSRoute:
+        @commonPrimaryButton(label = Messages(constants.View.SIGN_IN), route = constants.Form.SIGN_IN.get)
+    - If have function call on click:
+        @commonPrimaryButton(label = Messages(constants.View.SIGN_IN), route = null, Symbol("onclick") -> "closeModal()")
+*@

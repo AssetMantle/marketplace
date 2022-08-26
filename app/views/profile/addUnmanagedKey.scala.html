@@ -27,7 +27,7 @@
             </div>
         </div>
         <div class="form-button">
-            <button type="button" id="newUnmanagedAddressScreenBtn" class="form-primary-button disable" onclick="showHideUnmanagedAddressModalScreen('#newUnmanagedAddressPasswordScreen', '#newUnmanagedAddressScreen')">@Messages(constants.View.NEXT)</button>
+            @views.html.base.buttons.commonPrimaryButton(label = Messages(constants.View.NEXT), route = null, Symbol("id") -> "newUnmanagedAddressScreenBtn", Symbol("class") -> "disable", Symbol("onclick") -> "showHideUnmanagedAddressModalScreen('#newUnmanagedAddressPasswordScreen', '#newUnmanagedAddressScreen')")
         </div>
     </div>
 

@@ -1,5 +1,4 @@
 function getForm(route, modal = '#commonModal', modalContent = '#modal-content') {
-    // let modalID = $('#' + modal);
     let myModal = new bootstrap.Modal($(modal), {});
     $.ajax({
         url: route.url,
@@ -7,12 +6,9 @@ function getForm(route, modal = '#commonModal', modalContent = '#modal-content')
         async: true,
         statusCode: {
             200: function (data) {
-                // $(modalContent).html(data);
                 $(modal).addClass('active');
-                // $(modal + " .modalContainer").addClass('active');
                 $(modalContent).html(data);
                 myModal.show();
-                // $("body").addClass('modal-active');
             },
             500: function (data) {
                 replaceDocument(data);
@@ -30,5 +26,4 @@ function replaceDocument(data) {
     const newDocument = document.open("text/html", "replace");
     newDocument.write(data);
     newDocument.close();
-    // webSocket.close();
 }

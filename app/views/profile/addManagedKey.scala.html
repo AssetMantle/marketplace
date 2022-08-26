@@ -27,7 +27,7 @@
             </div>
         </div>
         <div class="form-button">
-            <button type="button" id="newManagedAddressScreenBtn" class="form-primary-button disable" onclick="showHideManagedModalScreen('#disclaimerScreen', '#newManagedAddressScreen', 1)">@Messages(constants.View.NEXT)</button>
+            @views.html.base.buttons.commonPrimaryButton(label = Messages(constants.View.NEXT), route = null, Symbol("id") -> "newManagedAddressScreenBtn", Symbol("class") -> "disable", Symbol("onclick") -> "showHideManagedModalScreen('#disclaimerScreen', '#newManagedAddressScreen', 1)")
         </div>
     </div>
 
@@ -45,7 +45,7 @@
             </span>
         </div>
         <div class="form-button">
-            <button type="button" id="disclaimerButton" class="form-primary-button disable" onclick="showHideManagedModalScreen('#newWalletMnemonicsScreen','#disclaimerScreen', 2)">@Messages(constants.View.CONFIRM_BUTTON)</button>
+            @views.html.base.buttons.commonPrimaryButton(label = Messages(constants.View.CONFIRM_BUTTON), route = null, Symbol("id") -> "disclaimerButton", Symbol("class") -> "disable", Symbol("onclick") -> "showHideManagedModalScreen('#newWalletMnemonicsScreen','#disclaimerScreen', 2)")
         </div>
     </div>
 
@@ -73,7 +73,7 @@
         <div class="seedsSection1 active"></div>
         <div class="seedsSection2"></div>
         <div class="form-button">
-            <button type="button" id="newManagedAddressMnemonicsBtn" class="form-primary-button disable" onclick="showHideManagedModalScreen('#newWalletPasswordScreen','#newWalletMnemonicsScreen',3)">@Messages(constants.View.NEXT)</button>
+            @views.html.base.buttons.commonPrimaryButton(label = Messages(constants.View.NEXT), route = null, Symbol("id") -> "newManagedAddressMnemonicsBtn", Symbol("class") -> "disable", Symbol("onclick") -> "showHideManagedModalScreen('#newWalletPasswordScreen','#newWalletMnemonicsScreen',3)")
         </div>
     </div>
 

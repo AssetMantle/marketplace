@@ -46,7 +46,6 @@ function showOptions(current)
         $(parent).find(".dropdownBodyInner").slideDown(400);
     else
         $(parent).find(".dropdownBodyInner").slideUp(400);
-    // });
 }
 
 function findParent(element, parentclass){
