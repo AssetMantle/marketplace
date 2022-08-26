@@ -1,4 +1,4 @@
-function submitForm(isModal,source, targetID) {
+function submitForm(isModal, source, targetID) {
     const target = '#' + targetID;
     const form = $(source).closest("form");
     if (validateForm(form)) {
@@ -12,21 +12,22 @@ function submitForm(isModal,source, targetID) {
             statusCode: {
                 400: function (data) {
                     result.html(data.responseText);
+
                     function clearFormElements(target_id) {
-                        jQuery("#"+target_id).find(':input').each(function() {
-                            switch(this.type) {
-                                case 'password':
-                                case 'text':
-                                case 'textarea':
-                                case 'file':
-                                case 'select-one':
-                                case 'select-multiple':
-                                case 'date':
-                                case 'number':
-                                case 'tel':
-                                case 'email':
-                                    jQuery(this).val('');
-                                    break;
+                        jQuery("#" + target_id).find(':input').each(function () {
+                            switch (this.type) {
+                                // case 'password':
+                                // case 'text':
+                                // case 'textarea':
+                                // case 'file':
+                                // case 'select-one':
+                                // case 'select-multiple':
+                                // case 'date':
+                                // case 'number':
+                                // case 'tel':
+                                // case 'email':
+                                //     jQuery(this).val('');
+                                //     break;
                                 case 'checkbox':
                                 case 'radio':
                                     this.checked = false;
@@ -34,8 +35,9 @@ function submitForm(isModal,source, targetID) {
                             }
                         });
                     }
+
                     clearFormElements("formBody");
-                    $(".error").closest("dd").prev().find('input').css({"border-color":"var(--error)"});
+                    $(".error").closest("dd").prev().find('input').css({"border-color": "var(--error)"});
                 },
                 401: function (data) {
                     replaceDocument(data.responseText);
@@ -47,14 +49,13 @@ function submitForm(isModal,source, targetID) {
                     replaceDocument(data);
                 },
                 206: function (data) {
-                    if(isModal === "true"){
+                    if (isModal === "true") {
                         $(".modalContainer").removeClass('active');
                         // setTimeout(function(){
-                            $(target).html(data);
-                            $(".modalContainer").addClass('active');
+                        $(target).html(data);
+                        $(".modalContainer").addClass('active');
                         // },1000);
-                    }
-                    else{
+                    } else {
                         $(target).html(data);
                     }
                 },

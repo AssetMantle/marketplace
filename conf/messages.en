@@ -84,6 +84,7 @@ RESPONSE.FAILURE.INVALID_MNEMONICS_OR_USERNAME=Invalid mnemonics or username.
 RESPONSE.FAILURE.INVALID_SEEDS_OR_ADDRESS=Invalid Seeds or Address
 RESPONSE.FAILURE.INVALID_SEEDS_OR_ADDRESS_OR_PASSWORD=Invalid Seeds or Address or Password
 RESPONSE.FAILURE.INVALID_WALLET_ADDRESS=Invalid wallet address
+RESPONSE.FAILURE.CANNOT_DELETE_ACTIVE_KEY=Cannot delete an active key.
 RESPONSE.FAILURE.MASTER_KEY_INSERT_FAILED=Key already exists or account doesn't exist
 SIGN_UP_SIGN_IN_MESSAGE=Already have an account?
 PLACEHOLDER.SIGNUP_PASSWORD=Enter Password
@@ -144,6 +145,7 @@ RESPONSE.FAILURE.OLD_AND_NEW_SAME_PASSWORD=Old & new password cannot be same.
 RESPONSE.FAILURE.PASSWORD_VALIDATION_FAILED=Password does not match minimum criteria. It should contain at least a small letter, a capital letter, a number and a symbol: !@#$%^&*._-.
 PLACEHOLDER.PASSWORD=Enter Password
 PLACEHOLDER.WALLET_ADDRESS=Wallet Address
+SHARE_USERNAME_TWEET=Share on Twitter
 
 #//Sign Out
 SIGN_OUT_CONFIRMATION=Are you sure you want to sign out?
@@ -343,5 +345,11 @@ FORM.MIGRATE_WALLET_TO_KEY.SUBTITLE=Enter your password and 4 seeds
 #//Wish List
 WISHLIST_MENU=Wishlist
 
+FORM.MIGRATE_WALLET_TO_KEY.SUBMIT=Submit
+FORM.MIGRATE_WALLET_TO_KEY.BUTTON=Submit
 
 RESPONSE.FAILURE.MNEMONICS_LENGTH_NOT_12_OR_24=Mnemonics length must be 12 or 24
+
+#Logs
+CONTROLLERS_REQUEST=REQUEST "{0} {1}" from {2} by username: {3}
+CONTROLLERS_RESPONSE=RESPONSE "{0} {1}" {4} from {2} by username: {3} in {5}ms

@@ -1,7 +1,6 @@
 @import controllers.actions.LoginState
 
 @(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
-<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
 <div class="profileSettingsContainer">
     <div class="title">@Messages(constants.View.PROFILE_SETTINGS_TITLE)</div>
     <div class="subTitle">@Messages(constants.View.PROFILE_SETTINGS_SUBTITLE)</div>
@@ -52,7 +51,9 @@
                                     <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.viewMnemonicsForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
                                 }
                             <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.changeKeyNameForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
-                            <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.deleteKeyForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
+                                @if(!key.active) {
+                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.deleteKeyForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
+                                }
         </div>
         </span>
         </div>
@@ -71,3 +72,4 @@
 <script>
         checkAndPushState(jsRoutes.controllers.ProfileController.viewProfile().url, '', "profile");
 </script>
+

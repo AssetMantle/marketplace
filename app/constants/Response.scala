@@ -83,6 +83,7 @@ object Response {
   val INVALID_PASSWORD_OR_SEEDS = new Failure("INVALID_PASSWORD_OR_SEEDS")
   val HD_PATH_NOT_FOUND = new Failure("HD_PATH_NOT_FOUND")
   val INVALID_WALLET_ADDRESS = new Failure("INVALID_WALLET_ADDRESS")
+  val CANNOT_DELETE_ACTIVE_KEY = new Failure("CANNOT_DELETE_ACTIVE_KEY")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

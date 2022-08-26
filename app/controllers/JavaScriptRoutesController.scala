@@ -54,8 +54,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.viewWishList,
         routes.javascript.ProfileController.wishList,
         routes.javascript.ProfileController.wishListNFTs,
-
-
       )
     ).as("text/javascript")
 

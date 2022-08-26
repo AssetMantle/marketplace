@@ -186,8 +186,8 @@
                             <li id="userWallet" class="user-wallet">
                                     <!-- Wallet Start -->
                                 <div id="walletPopup" class="walletPopup"></div>
-                                <a class="desktop-link" target="_blank">
-                                    <img class="lazyload wallet icon" src="@routes.Assets.versioned("images/icon/wallet.png")" onclick="componentResource('walletPopup', jsRoutes.controllers.ProfileController.walletPopup())"/>
+                                <a class="desktop-link" target="_blank" onclick="componentResource('walletPopup', jsRoutes.controllers.ProfileController.walletPopup())">
+                                    <img class="lazyload wallet icon" src="@routes.Assets.versioned("images/icon/wallet.png")"/>
                                 </a>
                                     <!-- Wallet End -->
                             </li>
