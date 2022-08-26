@@ -80,6 +80,7 @@ POST        /createWhiteList                           controllers.WhiteListCont
 GET         /whiteListInvite                           controllers.WhiteListController.whiteListInviteForm(whiteListId: String)
 POST        /whiteListInvite                           controllers.WhiteListController.whiteListInvite()
 
+# Should be not changed it will be public
 GET         /acceptWhiteListInvite/:whiteListId        controllers.WhiteListController.acceptInviteDetails(whiteListId: String)
 GET         /acceptWhiteListInvite                     controllers.WhiteListController.acceptInvite(whiteListId: String)
 
