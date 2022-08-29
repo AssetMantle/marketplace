@@ -93,115 +93,121 @@
     top: 70px;
     opacity: 1;
     visibility: visible;
-    transition: all 0.3s ease;
+    //transition: all 0.3s ease;
   }
 
-  .walletPopupContainer{
-    background: var(--popup-bg);
-    border: 2px solid var(--popup-stroke);
-    border-radius: 20px;
-    padding: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-  .detailContainer{
-    margin: 24px 12px;
-    .userDetails{
-      .userName{
-        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
-      }
-      .userBalance{
-        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--text-medium));
-      }
-    }
-    .userAddressBox{
-      background-color: var(--card-dark);
-      border-radius: 8px;
-      line-height: 0;
-      .userAddressData {
-        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
-        word-break: break-word;
-      }
-      .copyIcon {
-        padding: 4px 0 0 0;
-        cursor: pointer;
-      }
-    }
 
-    .walletMessage{
-      @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
-      margin-bottom: 32px;
+}
+
+.walletPopupContainer{
+  background: var(--popup-bg);
+  border: 2px solid var(--popup-stroke);
+  border-radius: 20px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.detailContainer{
+  margin: 24px 12px;
+  .userDetails{
+    .userName{
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
     }
-    .buttons{
-      line-height: 0px;
+    .userBalance{
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--text-medium));
     }
   }
-  .nftLink{
-    div{
-      line-height: 0px;
-      @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--mantle-off-white));
-      text-transform: capitalize;
+  .userAddressBox{
+    background-color: var(--card-dark);
+    border-radius: 8px;
+    line-height: 0;
+    .userAddressData {
+      @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+      word-break: break-word;
+    }
+    .copyIcon {
+      padding: 4px 0 0 0;
+      cursor: pointer;
     }
   }
-  .icon{
-    height: 20px;
-    width: 20px;
-    cursor: pointer;
+
+  .walletMessage{
+    @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+    margin-bottom: 32px;
   }
-  #openWalletMenu{
-    cursor: pointer;
-  }
-  .walletMenu{
-    //height: 512px;
-    height: 460px;
-    width: 254px;
-    position: absolute;
-    right: -255px;
-    top: 1px;
-    z-index: 999;
-    background: var(--card-dark);
-    border-radius: 10px 10px 0px 0px;
-    padding: 20px;
+  .buttons{
     line-height: 0px;
-    transition: right 0.3s ease;
-    &.open{
-      right: 0px;
-    }
-    .topMenu{
-      margin-top: 24px;
-      .menuItem{
-        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
-        cursor: pointer;
-      }
-    }
-    .bottomMenu{
-      padding-bottom: 20px;
-      .menuItem{
-        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
-        cursor: pointer;
-      }
+  }
+}
+.nftLink{
+  div{
+    line-height: 0px;
+    @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--mantle-off-white));
+    text-transform: capitalize;
+  }
+}
+.icon{
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
+}
+#openWalletMenu{
+  cursor: pointer;
+}
+.walletMenu{
+  //height: 512px;
+  //height: 460px;
+  height: 100%;
+  //width: 254px;
+  width: 275px;
+  position: absolute;
+  right: -276px;
+  top: 1px;
+  z-index: 999;
+  background: var(--card-dark);
+  border-radius: 10px 10px 0px 0px;
+  padding: 20px;
+  line-height: 0px;
+  transition: right 0.3s ease;
+  &.open{
+    right: 0px;
+  }
+  .topMenu{
+    margin-top: 24px;
+    .menuItem{
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+      cursor: pointer;
     }
   }
-  .addressBook{
-    //height: 512px;
-    height: 450px;
-    width: 254px;
-    position: absolute;
-    right: -255px;
-    //right: 0px;
-    top: 1px;
-    z-index: 1000;
-    background: var(--card-dark);
-    border-radius: 10px 10px 0px 0px;
-    padding: 20px;
-    line-height: 0px;
-    transition: right 0.3s ease;
-    &.open{
-      right: 0px;
+  .bottomMenu{
+    padding-bottom: 20px;
+    .menuItem{
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+      cursor: pointer;
     }
+  }
+}
+.addressBook{
+  //height: 512px;
+  //height: 450px;
+  height: 100%;
+  //width: 254px;
+  width: 275px;
+  position: absolute;
+  right: -276px;
+  //right: 0px;
+  top: 1px;
+  z-index: 1000;
+  background: var(--card-dark);
+  border-radius: 10px 10px 0px 0px;
+  padding: 20px;
+  line-height: 0px;
+  transition: right 0.3s ease;
+  &.open{
+    right: 0px;
+  }
 
     .walletAddressList{
-      //height: 330px;
       height: 220px;
       overflow-y: auto;
       padding-right: 12px;
@@ -234,27 +240,27 @@
             transform: scale(0);
             transition: 120ms transform ease-in-out;
             box-shadow: inset 1em 1em var(--default);
+        }
+        &:checked{
+          border-color: var(--default);
+          + label{
+            @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--default));
           }
-          &:checked{
-            border-color: var(--default);
-            + label{
-              @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--default));
-            }
-          }
-          &:checked::before{
-            transform: scale(1);
-          }
-          &:focus{
-            outline: none;
-          }
+        }
+        &:checked::before{
+          transform: scale(1);
+        }
+        &:focus{
+          outline: none;
         }
       }
     }
-    .bottomMenu{
-      margin-top: 37px;
-    }
+  }
+  .bottomMenu{
+    padding-bottom: 20px;
   }
 }
+
 #walletBackDrop{
   display: flex;
   align-items: center;
@@ -272,10 +278,10 @@
   transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
   z-index: 9998;
   cursor: auto;
-}
-#walletBackDrop.active{
-  opacity: 1;
-  visibility: visible;
+  &.active{
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 // User Profile Menu
@@ -341,5 +347,13 @@
       opacity: 1;
       visibility: visible;
     }
+  }
+}
+
+#modal-content{
+  .walletPopupContainer{
+    border:none;
+    margin: -32px;
+    border-radius: 10px;
   }
 }
