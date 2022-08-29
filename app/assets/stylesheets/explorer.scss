@@ -133,6 +133,25 @@
       }
     }
   }
+  .nftOffersContainer{
+    background: var(--card-dark);
+    border-radius: 10px;
+    margin-top: 20px;
+    padding: 20px;
+    .title{
+      @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+      text-transform: capitalize;
+      .cardLink{
+        @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--mantle-off-white));
+        background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-fill-color: transparent;
+        cursor: pointer;
+      }
+    }
+  }
 }
 
 

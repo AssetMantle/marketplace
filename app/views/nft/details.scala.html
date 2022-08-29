@@ -35,6 +35,14 @@
             }
         </div>
     </div>
+    <div class="nftOffersContainer">
+        <div class="title">
+            <ul class="d-flex flex-row justify-content-between">
+                <li>@Messages(constants.View.OFFERS)</li>
+                <li class="cardLink">@Messages(constants.View.COLLECTION_OFFERS_LINK)</li>
+            </ul>
+        </div>
+    </div>
 </div>
 <script>
         getImage(jsRoutes.controllers.NFTController.file('@nft.fileName'), 'nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)');
