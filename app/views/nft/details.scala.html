@@ -13,7 +13,11 @@
     </div>
     <div class="nftImagePreview">
         <a href="https://ipfs.io/ipfs/@nft.ipfsLink" target="_blank">
-            <div id="nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)"></div>
+            <div id="nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)">
+                @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.name.replaceAll(" ", "+") + "/nfts/" + nft.fileName) {uri =>
+                    <img src="@uri">
+                }
+            </div>
         </a>
     </div>
     <div class="nftPropertyContainer">
@@ -37,6 +41,5 @@
     </div>
 </div>
 <script>
-        getImage(jsRoutes.controllers.NFTController.file('@nft.fileName'), 'nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)');
         checkAndPushState(jsRoutes.controllers.NFTController.viewNFT('@nft.fileName').url, '@nft.fileName', "nft");
 </script>
