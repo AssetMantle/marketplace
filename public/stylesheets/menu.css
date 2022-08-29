@@ -45,7 +45,7 @@ nav .content .links
     gap: 10px;
     align-items: center;
     color: #fff;
-    font-size: 30px; /* font-weight: 600; */
+    font-size: 30px;
 }
 .content .logo a .appVersion{
     font-size: 12px;
@@ -118,7 +118,7 @@ nav .content .links
 .right-menu .links > li:hover::before
 {
     content: '';
-    position: absolute; /* bottom: 13px; */
+    position: absolute;
     left: 50%;
     transform: translateX(-50%);
     width: 7px;
@@ -143,16 +143,6 @@ nav .content .links
     }
 }
 
-.content .links li.active,
-.right-menu .links li.active
-{ /* background-color: #FFC640; */
-}
-
-.content .links li:hover,
-.right-menu .links li:hover
-{ /* background-color: #FFC640; */
-}
-
 .wrapper .search-icon, .wrapper .menu-icon {
     color: #fff;
     font-size: 18px;
@@ -168,7 +158,7 @@ nav .content .links
 
 .wrapper .menu-icon {
     display: none;
-    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='%23FFFDFA' class='bi bi-list' viewBox='0 0 16 16'> <path fill-rule='evenodd' d='M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z'/> </svg>");
+    background-image: url("../images/icon/hamburgerMenu.svg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -186,7 +176,6 @@ nav .content .links
     display: flex;
     align-items: center;
     cursor: pointer;
-    /*gap: 10px;*/
 }
 .right-menu .links{
     display: flex;
@@ -203,7 +192,6 @@ nav .content .links
     display: flex;
     justify-content: center;
     align-items: center;
-    /*gap: 20px;*/
 }
 .right-menu .account-menu img{
     padding: 0 10px;
@@ -384,7 +372,7 @@ nav .content .links
     }
 
     .wrapper #show-menu:checked ~ .menu-icon{
-        background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='%23FFFDFA' class='bi bi-x' viewBox='0 0 16 16'> <path d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/> </svg>");
+        background-image: url("../images/icon/closeWhite.svg");
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
@@ -534,8 +522,6 @@ nav .content .links
 }
 #submenu-main > ul > li {
     display: inline-block;
-    /*background-color: red;*/
-    /*border:1px solid black;*/
 }
 #submenu-main ul li {
     position: relative;
@@ -659,8 +645,6 @@ nav .content .links
     opacity: 1;
     visibility: visible;
 }
-
-
 
 /* Bootstrap Menu */
 .navbar {

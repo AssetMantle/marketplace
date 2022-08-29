@@ -683,7 +683,7 @@
 .error-info .error-icon{
     width: 16px;
     height: 16px;
-    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='%23E44651' class='bi bi-x' viewBox='0 0 14 14'> <path d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/> </svg>");
+    background-image: url("../images/icon/closeRed.svg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -692,7 +692,7 @@
 .error-info .error-icon.active{
     width: 16px;
     height: 16px;
-    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='%23FFC640' class='bi bi-check-circle' viewBox='0 0 22 22'> <path d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/> <path d='M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z'/> </svg>");
+    background-image: url("../images/icon/checkCircleYellow.svg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: 3px 2px;
@@ -818,11 +818,7 @@ ul.timeline li .item-title{
     flex-grow: 2;
     max-width: 1000px;
     padding: 0 50px 0 0;
-    /*padding: 0 200px;*/
 }
-/*.collections-right-panel-content{*/
-
-/*}*/
 .collection-right-panel-header{
     font-family: var(--font-type-1);
     font-size: 38px;
@@ -837,41 +833,6 @@ ul.timeline li .item-title{
     color: var(--inactive-gray);
 }
 
-/* Select Collection Grid */
-/*.collections-grid{*/
-/*    margin-top: 30px;*/
-/*    display: flex;*/
-/*    gap: 30px;*/
-/*    flex-wrap: wrap;*/
-/*}*/
-/*.collections-grid-box{*/
-/*    height: 240px;*/
-/*    max-width: 300px;*/
-/*    width: 100%;*/
-/*    background-color: var(--card-color);*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*    justify-content: center;*/
-/*    align-items: center;*/
-/*    border-radius: 20px;*/
-/*    cursor: pointer;*/
-/*    flex: 1 0 1;*/
-/*}*/
-/*.new-collections{*/
-/*    background-color: var(--tooltip-bg);*/
-/*}*/
-
-/*.collections-grid-box img{*/
-/*    width: 70px;*/
-/*}*/
-/*.collections-grid-box span{*/
-/*    font-family: var(--font-type-1);*/
-/*    font-size: 14px;*/
-/*    color: var(--mantle-off-white);*/
-/*    font-weight: 700;*/
-/*    margin-top: 30px;*/
-/*}*/
-
 @media screen and (min-width: 768px) {
 
 }
@@ -882,7 +843,6 @@ ul.timeline li .item-title{
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     max-width: 1200px;
-    /*margin-left: 2.5rem;*/
     margin-right: 2.5rem;
     align-items: center;
     gap: 2rem;
@@ -921,14 +881,12 @@ article:first-child{
 }
 @media screen and (min-width: 1200px) {
     .bg-grid{
-        /*margin-left: auto;*/
         margin-right: auto;
     }
 }
 
 /* Mint Card */
 .mint_card{
-    /*width: 300px;*/
     height: 200px;
     padding: 25px 20px 80px;
     font-family: var(--font-type-2);
@@ -1176,7 +1134,6 @@ article:first-child{
     width: 100%;
     height: 50px;
     border-radius: 8px;
-    /*padding: 8px 12px;*/
     outline: none;
     border: 2px solid var(--inactive-gray);
     background: transparent;
@@ -1214,7 +1171,6 @@ article:first-child{
     margin: 12px 12px;
     color: var(--inactive-gray);
     white-space: nowrap;
-    /*opacity: .3;*/
 }
 
 .file-input > .label.active{
@@ -1304,9 +1260,6 @@ article:first-child{
     border-radius: 3px;
     position: absolute;
     z-index: 9999;
-    /*bottom: 0%;*/
-    /*left: -52%;*/
-    /*top: -75px;*/
     bottom: calc(100% + 20px);
     left: -80px;
     opacity: 0;
@@ -1430,8 +1383,6 @@ article:first-child{
     border: none;
 }
 .daterangepicker.opensleft:before{
-    /*right: px !important;*/
-    /*border-bottom: var(--tooltip-bg) !important;*/
     z-index: 9999;
 }
 .daterangepicker:before{

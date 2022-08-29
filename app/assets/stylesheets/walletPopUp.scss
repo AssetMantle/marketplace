@@ -64,9 +64,6 @@
 }
 .right-menu .links li.user-wallet .walletPopup{
   text-transform: none;
-  //background: var(--popup-bg);
-  //border: 2px solid var(--popup-stroke);
-  //border-radius: 20px;
   height: 512px;
   width: 312px;
   position: absolute;
@@ -74,11 +71,9 @@
   top: 90px;
   transform: translateX(-73px);
   z-index: 9999;
-  //padding: 20px;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
-  //overflow: hidden;
   cursor: auto;
   &::before{
     content: '';
@@ -152,7 +147,6 @@
     cursor: pointer;
   }
   .walletMenu{
-    //height: 512px;
     height: 460px;
     width: 254px;
     position: absolute;
@@ -183,12 +177,10 @@
     }
   }
   .addressBook{
-    //height: 512px;
     height: 450px;
     width: 254px;
     position: absolute;
     right: -255px;
-    //right: 0px;
     top: 1px;
     z-index: 1000;
     background: var(--card-dark);
@@ -201,7 +193,6 @@
     }
 
     .walletAddressList{
-      //height: 330px;
       height: 220px;
       overflow-y: auto;
       padding-right: 12px;
