@@ -37,10 +37,60 @@
     </div>
     <div class="nftOffersContainer">
         <div class="title">
-            <ul class="d-flex flex-row justify-content-between">
+            <ul class="d-flex flex-row flex-wrap justify-content-between">
                 <li>@Messages(constants.View.OFFERS)</li>
                 <li class="cardLink">@Messages(constants.View.COLLECTION_OFFERS_LINK)</li>
             </ul>
+        </div>
+        <div class="container p-0 contentTableContainer" id="nftOffersTable">
+            <div class="row">
+                <div class="col-sm-12 col-md-12">
+                    <div class="table-responsive">
+                        <table class="table contentTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-end tableFieldNo">@Messages(constants.View.OFFERS_TABLE_TITLE_NO)</th>
+                                    <th class="tableFieldOfferName">@Messages(constants.View.OFFERS_TABLE_TITLE_NAME)</th>
+                                    <th class="tableFieldPrice">@Messages(constants.View.OFFERS_TABLE_TITLE_PRICE)</th>
+                                    <th class="text-end tableFieldFloorDifference">@Messages(constants.View.OFFERS_TABLE_TITLE_FLOOR_DIFFERENCE)</th>
+                                    <th class="tableFieldDuration">@Messages(constants.View.OFFERS_TABLE_TITLE_DURATION)</th>
+                                    <th class="tableFieldAction"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-end tableFieldNo">1</td>
+                                    <td class="d-flex align-items-center gap-2 tableFieldOfferName">
+                                        <img src="@routes.Assets.versioned("images/defaultOfferCover.png")" width="34px" height="34px" class="rounded-circle"/>
+                                        @Messages(constants.View.OFFERS_USERNAME)
+                                    </td>
+                                    <td class="text-end tableFieldPrice">00</td>
+                                    <td class="text-end tableFieldFloorDifference aboveFloor">@Messages(constants.View.OFFERS_FLOOR_DIFFERENCE)</td>
+                                    <td class="tableFieldDuration">@Messages(constants.View.OFFERS_DURATION)</td>
+                                    <td class="d-flex gap-4 tableFieldAction">
+                                        <img src="@routes.Assets.versioned("images/icon/verifiedUsername.png")"/>
+                                        <img src="@routes.Assets.versioned("images/icon/closeYellow.png")"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end tableFieldNo">2</td>
+                                    <td class="d-flex align-items-center gap-2 tableFieldOfferName">
+                                        <img src="@routes.Assets.versioned("images/defaultOfferCover.png")" width="34px" height="34px" class="rounded-circle"/>
+                                        @Messages(constants.View.OFFERS_USERNAME)
+                                    </td>
+                                    <td class="text-end tableFieldPrice">00</td>
+                                    <td class="text-end tableFieldFloorDifference belowFloor">@Messages(constants.View.OFFERS_FLOOR_DIFFERENCE)</td>
+                                    <td class="tableFieldDuration">@Messages(constants.View.OFFERS_DURATION)</td>
+                                    <td class="d-flex gap-4 tableFieldAction">
+                                        <img src="@routes.Assets.versioned("images/icon/verifiedUsername.png")"/>
+                                        <img src="@routes.Assets.versioned("images/icon/closeYellow.png")"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

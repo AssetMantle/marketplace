@@ -56,8 +56,8 @@
                                                             </div>
                                                         </div>
                                                         <div id="content">
-                                                            <h1>@Messages(constants.View.COLLECTION)</h1>
-                                                            <p>@Messages(constants.View.DESCRIPTION)</p>
+                                                            <h1>@Messages(constants.View.COLLECTION_NAME)</h1>
+                                                            <p>@Messages(constants.View.COLLECTION_DESCRIPTION)</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -95,52 +95,32 @@
                                     <tbody>
                                         <tr>
                                             <td class="text-end tableFieldNo">1</td>
-                                            <td class="d-flex gap-2 tableFieldOfferName">
+                                            <td class="d-flex align-items-center gap-2 tableFieldOfferName">
                                                 <img src="@routes.Assets.versioned("images/defaultOfferCover.png")" width="34px" height="34px" class="rounded"/>
-                                                @Messages(constants.View.OFFERS_NAME)
+                                                @Messages(constants.View.OFFERS_USERNAME)
                                             </td>
-                                            <td class="text-end tableFieldPrice">90</td>
-                                            <td class="tableFieldDuration">01 Aug 2022 - 09 Aug 2022 (8 Days)</td>
+                                            <td class="text-end tableFieldPrice">00</td>
+                                            <td class="tableFieldDuration">@Messages(constants.View.OFFERS_DURATION)</td>
                                             <td class="tableFieldRequestStatus statusAccepted">@Messages(constants.View.REQUEST_STATUS_ACCEPTED)</td>
                                         </tr>
                                         <tr>
                                             <td class="text-end tableFieldNo">2</td>
-                                            <td class="d-flex gap-2 tableFieldOfferName">
+                                            <td class="d-flex align-items-center gap-2 tableFieldOfferName">
                                                 <img src="@routes.Assets.versioned("images/defaultOfferCover.png")" width="34px" height="34px" class="rounded"/>
-                                                @Messages(constants.View.OFFERS_NAME)
+                                                @Messages(constants.View.OFFERS_USERNAME)
                                             </td>
-                                            <td class="text-end tableFieldPrice">90</td>
-                                            <td class="tableFieldDuration">01 Aug 2022 - 09 Aug 2022 (8 Days)</td>
+                                            <td class="text-end tableFieldPrice">00</td>
+                                            <td class="tableFieldDuration">@Messages(constants.View.OFFERS_DURATION)</td>
                                             <td class="tableFieldRequestStatus statusPending">@Messages(constants.View.REQUEST_STATUS_PENDING)</td>
                                         </tr>
                                         <tr>
                                             <td class="text-end tableFieldNo">3</td>
-                                            <td class="d-flex gap-2 tableFieldOfferName">
+                                            <td class="d-flex align-items-center gap-2 tableFieldOfferName">
                                                 <img src="@routes.Assets.versioned("images/defaultOfferCover.png")" width="34px" height="34px" class="rounded"/>
-                                                @Messages(constants.View.OFFERS_NAME)
+                                                @Messages(constants.View.OFFERS_USERNAME)
                                             </td>
-                                            <td class="text-end tableFieldPrice">90</td>
-                                            <td class="tableFieldDuration">01 Aug 2022 - 09 Aug 2022 (8 Days)</td>
-                                            <td class="tableFieldRequestStatus statusDeclined">@Messages(constants.View.REQUEST_STATUS_DECLINED)</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-end tableFieldNo">4</td>
-                                            <td class="d-flex gap-2 tableFieldOfferName">
-                                                <img src="@routes.Assets.versioned("images/defaultOfferCover.png")" width="34px" height="34px" class="rounded"/>
-                                                @Messages(constants.View.OFFERS_NAME)
-                                            </td>
-                                            <td class="text-end tableFieldPrice">90</td>
-                                            <td class="tableFieldDuration">01 Aug 2022 - 09 Aug 2022 (8 Days)</td>
-                                            <td class="tableFieldRequestStatus statusAccepted">@Messages(constants.View.REQUEST_STATUS_ACCEPTED)</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-end tableFieldNo">5</td>
-                                            <td class="d-flex gap-2 tableFieldOfferName">
-                                                <img src="@routes.Assets.versioned("images/defaultOfferCover.png")" width="34px" height="34px" class="rounded"/>
-                                                @Messages(constants.View.OFFERS_NAME)
-                                            </td>
-                                            <td class="text-end tableFieldPrice">90</td>
-                                            <td class="tableFieldDuration">01 Aug 2022 - 09 Aug 2022 (8 Days)</td>
+                                            <td class="text-end tableFieldPrice">00</td>
+                                            <td class="tableFieldDuration">@Messages(constants.View.OFFERS_DURATION)</td>
                                             <td class="tableFieldRequestStatus statusDeclined">@Messages(constants.View.REQUEST_STATUS_DECLINED)</td>
                                         </tr>
                                     </tbody>
