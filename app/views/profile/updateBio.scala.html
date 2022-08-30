@@ -1,0 +1,26 @@
+@import views.profile.companion.UpdateBio
+@import views.html.base.form._
+
+@(updateBioForm: Form[UpdateBio.Data] = UpdateBio.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.UPDATE_BIO, updateBioForm) {
+    <div class="inputField">
+        <div class="inputFieldBody">
+            <textarea class="commonTextarea" onkeyup="characterCounter(this);"></textarea>
+            <span id="remainingCharacterLabel" class="mt-2 remainingCharacterLabel"></span>
+            @commonInputText(updateBioForm, constants.FormField.USER_BIO, Symbol("class") -> "hidden")
+        </div>
+    </div>
+}
+<script>
+    let maxLimit = 200;
+    $("#remainingCharacterLabel").text(maxLimit +"/"+maxLimit+" characters remaining");
+    function characterCounter(field)
+    {
+        if (field.value.length > maxLimit) {
+            field.value = field.value.substring( 0, maxLimit );
+            return false;
+        } else {
+            $("#remainingCharacterLabel").text(maxLimit - field.value.length +"/"+maxLimit+" characters remaining");
+        }
+    }
+</script>

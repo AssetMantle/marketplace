@@ -267,4 +267,8 @@ class ProfileController @Inject()(
       Ok(views.html.profile.wishList.wishListNFTs())
     }
   }
+
+  def updateBioForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.updateBio())
+  }
 }

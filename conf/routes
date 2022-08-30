@@ -80,3 +80,5 @@ POST        /changeManagedToUnmanaged        controllers.ProfileController.chang
 GET         /viewWishList                    controllers.ProfileController.viewWishList()
 GET         /wishList                        controllers.ProfileController.wishList()
 GET         /wishListNFTs                    controllers.ProfileController.wishListNFTs()
+
+GET         /updateBio                       controllers.ProfileController.updateBioForm()

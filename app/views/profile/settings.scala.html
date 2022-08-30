@@ -16,6 +16,11 @@
             <div id="userPassword" class="flex-grow-1 fieldValue">@constants.View.PROFILE_PASSWORD</div>
             <div class="m-0 me-2 mt-2 mt-xl-0 mt-md-2 iconContainer" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CHANGE_PASSWORD.get, ""))"><img src="@routes.Assets.versioned("images/icon/edit.png")" class="icon"/></div>
         </div>
+        <div class="d-flex flex-row align-items-center flex-wrap infoField">
+            <div class="ps-0 ps-xl-5 pe-2 fieldLabel">@Messages(constants.View.PROFILE_BIO)</div>
+            <div class="flex-grow-1 fieldValue">@constants.View.PROFILE_BIO</div>
+            <div class="m-0 me-2 mt-2 mt-xl-0 mt-md-2 iconContainer" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.UPDATE_BIO.get, ""))"><img src="@routes.Assets.versioned("images/icon/edit.png")" class="icon"/></div>
+        </div>
         <div class="d-flex flex-row align-items-center flex-wrap walletInfoField">
             <div class=" pe-2 fieldLabel">@Messages(constants.View.PROFILE_IDENTITY_ADDRESS)</div>
             <div class=" fieldValue username-data" data-value="@keys.find(_.active).fold(Messages(constants.View.ACTIVE_ADDRESS_NOT_FOUND))(_.address)">@keys.find(_.active).fold(Messages(constants.View.ACTIVE_ADDRESS_NOT_FOUND))(_.address)</div>

@@ -30,5 +30,6 @@ object Form {
   val DELETE_KEY = new Form("DELETE_KEY", routes.javascript.ProfileController.deleteKeyForm, routes.ProfileController.deleteKey())
 
   val CHANGE_MANAGED_TO_UNMANAGED = new Form("CHANGE_MANAGED_TO_UNMANAGED", routes.javascript.ProfileController.deleteKeyForm, routes.ProfileController.deleteKey())
+  val UPDATE_BIO = new Form("UPDATE_BIO", routes.javascript.ProfileController.updateBioForm, routes.ProfileController.updateBioForm())
 
 }

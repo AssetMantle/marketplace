@@ -244,6 +244,10 @@ ADD_NEW_WALLET_OPTION_UNMANAGED=Unmanaged
 WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS=View mnemonic seed phrase
 WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME=Change Name
 WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT=Delete account
+FORM.UPDATE_BIO.TITLE=Edit your bio
+FORM.UPDATE_BIO.SUBTITLE=This bio is displayed publicly on your profile
+FORM.UPDATE_BIO.SUBMIT=Update
+PROFILE_BIO=Bio:
 
 #//Wallet
 POPUP_WALLET_BODY_MESSAGE=You will be redirected to another page on clicking buy more. Some other details user needs to know.

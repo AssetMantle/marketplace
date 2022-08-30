@@ -48,6 +48,8 @@
       padding: 20px 0px;
       border-bottom: 1px solid var(--line-2);
       .fieldLabel{
+        width: 120px;
+        text-align: right;
         @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
         text-transform: capitalize;
       }

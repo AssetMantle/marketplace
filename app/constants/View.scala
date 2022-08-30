@@ -224,6 +224,7 @@ object View {
   val WARNING = "WARNING"
   val WISHLIST = "WISHLIST"
   val WISHLIST_MENU = "WISHLIST_MENU"
+  val PROFILE_BIO = "PROFILE_BIO"
 
   object Button {
     val NEXT = "NEXT"

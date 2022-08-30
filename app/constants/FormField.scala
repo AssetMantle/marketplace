@@ -39,6 +39,7 @@ object FormField {
   val UNMANAGED_KEY_ADDRESS = new StringFormField("UNMANAGED_KEY_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
   val CHANGE_KEY_NAME = new StringFormField("CHANGE_KEY_NAME", 3, 50)
   val CHANGE_KEY_ADDRESS = new StringFormField("CHANGE_KEY_ADDRESS", 3, 50)
+  val USER_BIO = new StringFormField("USER_BIO", 3, 200)
 
   //BooleanFormField
   val RECEIVE_NOTIFICATIONS = new BooleanFormField("RECEIVE_NOTIFICATIONS")
