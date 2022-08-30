@@ -361,7 +361,7 @@ nav .content .links
 @media screen and (max-width: 900px) {
 
     .hiddenMenu{
-        display: flex !important;
+        display: block !important;
     }
     .right-menu ul li{
         display: none;
@@ -434,9 +434,12 @@ nav .content .links
     .content .links #show-features:checked ~ ul,
     .content .links #show-features2:checked ~ ul,
     .content .links #show-features3:checked ~ ul,
+    .content .links #profileMenu:checked ~ ul,
     .content .links #show-services:checked ~ ul,
     .content .links #show-items:checked ~ ul {
-        max-height: 112px;
+        /*max-height: 112px;*/
+        max-height: 500px;
+        height: fit-content;
         border-color: var(--popup-stroke);
     }
 
@@ -453,7 +456,8 @@ nav .content .links
     }
     .content .links #show-features:checked ~ ul:before,
     .content .links #show-features2:checked ~ ul:before,
-    .content .links #show-features3:checked ~ ul:before
+    .content .links #show-features3:checked ~ ul:before,
+    .content .links #profileMenu:checked ~ ul:before
     {
         transform: rotate(0deg);
     }

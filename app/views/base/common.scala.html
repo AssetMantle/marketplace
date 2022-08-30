@@ -99,6 +99,7 @@
                         </li>
                         @optionalLoginState match {
                             case Some(loginState) => {
+
                                 <li class="d-flex hiddenMenu">
                                     <a href="https://wallet.assetmantle.one/dashboard/@loginState.address" target="_blank">
                                         <i class="bi bi-wallet2 iconWhite wallet"></i>
@@ -108,6 +109,36 @@
                                     </a>
                                 </li>
 
+                                <div class="hiddenMenu">
+                                    <li>
+                                        <a class="desktop-link">@Messages(constants.View.PROFILE)</a>
+                                        <input type="checkbox" id="profileMenu">
+                                        <label for="profileMenu" class="d-flex align-items-center gap-3">
+                                            <img class="lazyload wallet icon" src="@routes.Assets.versioned("images/icon/profileWhite.png")"/>
+                                            <span>@Messages(constants.View.PROFILE)</span>
+                                        </label>
+                                        <ul>
+                                            <li>
+                                                <a href="@routes.ProfileController.viewProfile()" class="d-flex flex-row align-items-center gap-3">
+                                                    <img class="icon" src="@routes.Assets.versioned("images/icon/settingsWhite.png")"/>
+                                                    <div class="profileMenuLabel">@Messages(constants.View.MENU_SETTINGS)</div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li id="userWalletMobile" class="user-wallet">
+                                        <a onclick="getForm(jsRoutes.controllers.ProfileController.walletPopup())" class="d-flex align-items-center gap-3">
+                                            <img class="lazyload wallet icon" src="@routes.Assets.versioned("images/icon/wallet.png")"/>
+                                            <span>@Messages(constants.View.WALLET)</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))" class="d-flex align-items-center gap-3">
+                                            <img class="lazyload" src="@routes.Assets.versioned("images/icon/logout.png")" class="logout" width="22" height="22"/>
+                                            <span>@Messages(constants.View.SIGN_OUT)</span>
+                                        </a>
+                                    </li>
+                                </div>
                             }
                             case _ => {
                                 <li class="hiddenMenu"><a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_UP.get, ""))">@Messages(constants.View.SIGN_UP)</a></li>

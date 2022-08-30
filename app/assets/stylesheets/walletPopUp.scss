@@ -88,40 +88,40 @@
     top: 70px;
     opacity: 1;
     visibility: visible;
-    transition: all 0.3s ease;
+    //transition: all 0.3s ease;
   }
 
-  .walletPopupContainer{
-    background: var(--popup-bg);
-    border: 2px solid var(--popup-stroke);
-    border-radius: 20px;
-    padding: 20px;
-    position: relative;
-    overflow: hidden;
+.walletPopupContainer{
+  background: var(--popup-bg);
+  border: 2px solid var(--popup-stroke);
+  border-radius: 20px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.detailContainer{
+  margin: 24px 12px;
+  .userDetails{
+    .userName{
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+    }
+    .userBalance{
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--text-medium));
+    }
   }
-  .detailContainer{
-    margin: 24px 12px;
-    .userDetails{
-      .userName{
-        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
-      }
-      .userBalance{
-        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--text-medium));
-      }
+  .userAddressBox{
+    background-color: var(--card-dark);
+    border-radius: 8px;
+    line-height: 0;
+    .userAddressData {
+      @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+      word-break: break-word;
     }
-    .userAddressBox{
-      background-color: var(--card-dark);
-      border-radius: 8px;
-      line-height: 0;
-      .userAddressData {
-        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
-        word-break: break-word;
-      }
-      .copyIcon {
-        padding: 4px 0 0 0;
-        cursor: pointer;
-      }
+    .copyIcon {
+      padding: 4px 0 0 0;
+      cursor: pointer;
     }
+  }
 
     .walletMessage{
       @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
@@ -263,10 +263,10 @@
   transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
   z-index: 9998;
   cursor: auto;
-}
-#walletBackDrop.active{
-  opacity: 1;
-  visibility: visible;
+  &.active{
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 // User Profile Menu
@@ -332,5 +332,13 @@
       opacity: 1;
       visibility: visible;
     }
+  }
+}
+
+#modal-content{
+  .walletPopupContainer{
+    border:none;
+    margin: -32px;
+    border-radius: 10px;
   }
 }
