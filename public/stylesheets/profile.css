@@ -43,6 +43,10 @@ profileContainer .item-sticky .profile-card{
     /*border-radius: 20px;*/
     padding: 20px 20px 40px 20px;
 }
+.item-center.nftContainer .profile-card{
+    padding: 0px;
+    padding-bottom: 40px;
+}
 /* Creator Profile Card */
 .profile-card{
     /*width: 228px !important;*/
