@@ -50,6 +50,7 @@ object CommonConfig {
     val AccessKeyID: String = config.get[String]("amazonS3.accessKeyID")
     val SecretKey: String = config.get[String]("amazonS3.secretKey")
     val MaxMultiPartUploadTime: Int = config.get[Int]("amazonS3.maxMultiPartUploadTime")
+    val s3BucketURL: String = config.get[String]("amazonS3.s3BucketURL")
   }
 
   object IPFS {

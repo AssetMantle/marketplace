@@ -13,6 +13,7 @@
         <entry key="BLOCKCHAIN_CHAIN_ID" value="test" />
         <entry key="BLOCKCHAIN_STAKING_DENOM" value="stake" />
         <entry key="AMAZON_S3_SECRET_KEY" value="DXW8VyWpkvgV9Q8kVpzacip3KZVxGYCnlL/HoT7A" />
+        <entry key="AMAZON_S3_BUCKET_URL" value="https://assetmantle-test-collection.s3.ap-south-1.amazonaws.com/" />
         <entry key="APPLICATION_SECRET" value="d7oJaPFAnguWe8OU8aeST964GeR_XJ5TS[ho@_];VBq8sQ0kNBM@v/psglncUr&amp;gt;x" />
         <entry key="COLLECTION_PATH" value="/Users/abhinav/collections" />
         <entry key="DEFAULT_PUBLIC_FOLDER" value="$PROJECT_DIR$/public" />
