@@ -30,7 +30,7 @@ class ProfileController @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
+  private implicit val module: String = constants.Module.PROFILE_CONTROLLER
 
   def viewProfile(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
@@ -249,6 +249,24 @@ class ProfileController @Inject()(
       )
   }
 
+  def viewWishList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.wishList.viewWishList()))
+    }
+  }
+
+  def wishList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginAction { implicit request =>
+      Ok(views.html.profile.wishList.wishList())
+    }
+  }
+
+  def wishListNFTs(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginAction { implicit request =>
+      Ok(views.html.profile.wishList.wishListNFTs())
+    }
+  }
   def viewOffers(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>

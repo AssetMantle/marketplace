@@ -17,3 +17,8 @@ function viewProfile() {
     componentResource('centerContent', jsRoutes.controllers.ProfileController.settings());
     $('#leftContent').html('');
 }
+
+function viewWishListCollection() {
+    componentResource('centerContent', jsRoutes.controllers.ProfileController.wishListNFTs());
+    $('#leftContent').html('');
+}

@@ -50,10 +50,16 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.changeKeyNameForm,
         routes.javascript.ProfileController.viewMnemonicsForm,
         routes.javascript.ProfileController.deleteKeyForm,
+
 //        routes.javascript.ProfileController.changeManagedToUnmanagedForm,
         routes.javascript.ProfileController.viewOffers,
         routes.javascript.ProfileController.offers,
 
+        routes.javascript.BlockchainTransactionController.sendCoinForm,
+        
+        routes.javascript.ProfileController.viewWishList,
+        routes.javascript.ProfileController.wishList,
+        routes.javascript.ProfileController.wishListNFTs,
       )
     ).as("text/javascript")
 
