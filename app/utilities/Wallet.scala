@@ -3,6 +3,7 @@ package utilities
 import com.google.common.collect
 import com.google.common.collect.ImmutableList
 import exceptions.BaseException
+import org.bitcoinj.core.{ECKey, Sha256Hash, Utils}
 import org.bitcoinj.crypto.ChildNumber
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.script.Script
@@ -12,7 +13,9 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import play.api.Logger
 import scodec.bits.ByteVector
 
+import java.nio.charset.StandardCharsets
 import java.security.{MessageDigest, Security}
+import java.util.Base64
 import scala.util.{Failure, Success}
 
 case class Wallet(address: String, hdPath: Seq[ChildNumber], publicKey: Array[Byte], privateKey: Array[Byte], mnemonics: Seq[String])
@@ -74,5 +77,15 @@ object Wallet {
   }
 
   def getRandomWallet: Wallet = getWallet(Bip39.creatRandomMnemonics())
+
+  def hashAndEcdsaSign(message: String, ecKey: ECKey): Array[Byte] = {
+    val ecdsaSignature = ecKey.sign(Sha256Hash.wrap(Sha256Hash.hash(message.getBytes(StandardCharsets.UTF_8))))
+    Utils.bigIntegerToBytes(ecdsaSignature.r, 32) ++ Utils.bigIntegerToBytes(ecdsaSignature.s, 32)
+  }
+
+  def ecdsaSign(data: Array[Byte], ecKey: ECKey): Array[Byte] = {
+    val ecdsaSignature = ecKey.sign(Sha256Hash.wrap(data))
+    Utils.bigIntegerToBytes(ecdsaSignature.r, 32) ++ Utils.bigIntegerToBytes(ecdsaSignature.s, 32)
+  }
 
 }

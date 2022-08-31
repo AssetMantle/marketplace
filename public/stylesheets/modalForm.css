@@ -266,6 +266,17 @@
     display: flex;
     align-items: center;
 }
+.form-address-box .address-box-text .username-data{
+    color: var(--mantle-off-white);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 350px;
+}
+@media (max-width: 650px){
+    .form-address-box .address-box-text .username-data{
+        max-width: 175px;
+    }
+}
 .form-address-box .form-copy-icon{
     margin-left: 5px;
 }
@@ -533,7 +544,9 @@
     color: var(--inactive-gray);
 }
 #formBody dd input[type=text],
-#formBody dd input[type=password]{
+#formBody dd input[type=password],
+#formBody dd input[type=number]
+{
     font-family: var(--font-type-2);
     height: 36px;
     box-sizing: border-box;
@@ -552,13 +565,23 @@
     margin-top: 8px;
 }
 #formBody dd input[type=text]:focus,
-#formBody dd input[type=password]:focus{
+#formBody dd input[type=password]:focus,
+#formBody dd input[type=number]:focus
+{
     border-color: var(--dark);
 }
 #formBody dd input[type=text]:not(:focus),
-#formBody dd input[type=password]:not(:focus){
+#formBody dd input[type=password]:not(:focus),
+#formBody dd input[type=number]:not(:focus)
+{
     color: var(--inactive-gray);
     border-color: var(--gray) !important;
+}
+#formBody dd input[type=number]::-webkit-inner-spin-button,
+#formBody dd input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 #formBody button{
     font-size: 16px;
