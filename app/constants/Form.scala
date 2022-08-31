@@ -33,4 +33,6 @@ object Form {
   val UPDATE_BIO = new Form("UPDATE_BIO", routes.javascript.ProfileController.updateBioForm, routes.ProfileController.updateBioForm())
   val ADD_INSTAGRAM = new Form("ADD_INSTAGRAM", routes.javascript.ProfileController.addInstagramForm, routes.ProfileController.addInstagramForm())
 
+  val SEND_COIN = new Form("SEND_COIN", routes.javascript.BlockchainTransactionController.sendCoinForm, routes.BlockchainTransactionController.sendCoin())
+
 }

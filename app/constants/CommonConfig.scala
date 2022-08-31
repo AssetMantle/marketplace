@@ -4,16 +4,35 @@ import com.typesafe.config.ConfigFactory
 import play.api.Configuration
 import play.api.i18n.Lang
 
-import scala.concurrent.duration.{Duration, MILLISECONDS}
+import scala.concurrent.duration.{Duration, DurationInt, FiniteDuration, MILLISECONDS}
 
 object CommonConfig {
   private val config: Configuration = Configuration(ConfigFactory.load())
   val logLang: Lang = Lang(config.get[String]("play.log.lang"))
   val webAppUrl: String = config.get[String]("webApp.url")
   val WebAppCacheDuration: Duration = Duration(config.get[Int]("webApp.cacheDuration"), MILLISECONDS)
-  val DefaultPublicFolder: String= config.get[String]("webApp.defaultPublicFolder")
+  val DefaultPublicFolder: String = config.get[String]("webApp.defaultPublicFolder")
 
   val sessionTokenTimeout: Int = config.get[Int]("play.http.session.token.timeout")
+
+  object Scheduler {
+    val InitialDelay: FiniteDuration = config.get[Int]("scheduler.initialDelay").millis
+    val FixedDelay: FiniteDuration = config.get[Int]("scheduler.fixedDelay").millis
+  }
+
+  object Blockchain {
+    case class IBCDenom(hash: String, name: String)
+
+    val ChainId: String = config.get[String]("blockchain.chainId")
+    val StakingToken: String = config.get[String]("blockchain.stakingToken")
+    val RPCEndPoint: String = config.get[String]("blockchain.rpcURL")
+    val RestEndPoint: String = config.get[String]("blockchain.restURL")
+    val TransactionMode: String = config.get[String]("blockchain.transactionMode")
+    val IBCDenoms: Seq[IBCDenom] = config.get[Seq[Configuration]]("blockchain.ibcDenomList").map { ibcDenoms => IBCDenom(hash = ibcDenoms.get[String]("hash"), name = ibcDenoms.get[String]("name")) }
+    val LowGasPrice: Double = config.get[Double]("blockchain.lowGasPrice")
+    val MediumGasPrice: Double = config.get[Double]("blockchain.mediumGasPrice")
+    val HighGasPrice: Double = config.get[Double]("blockchain.highGasPrice")
+  }
 
   object Collections {
     val CollectionsPerPage: Int = config.get[Int]("webApp.collectionsPerPage")
@@ -31,6 +50,7 @@ object CommonConfig {
     val AccessKeyID: String = config.get[String]("amazonS3.accessKeyID")
     val SecretKey: String = config.get[String]("amazonS3.secretKey")
     val MaxMultiPartUploadTime: Int = config.get[Int]("amazonS3.maxMultiPartUploadTime")
+    val s3BucketURL: String = config.get[String]("amazonS3.s3BucketURL")
   }
 
   object IPFS {

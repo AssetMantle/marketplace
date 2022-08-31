@@ -4,6 +4,8 @@ import play.api.data.Forms._
 import play.api.data.Mapping
 import play.api.data.format.Formats.{bigDecimalFormat, doubleFormat}
 import play.api.data.validation.Constraints
+import utilities.MicroNumber
+import utilities.NumericOperation.checkPrecision
 
 import java.util.Date
 import scala.util.matching.Regex
@@ -32,6 +34,8 @@ object FormField {
   val SEEDS = new StringFormField("SEEDS", 3, 500, RegularExpression.ALL_SMALL_LETTERS_WITH_SPACE, Response.INVALID_SEEDS.message)
   val KEY_NAME = new StringFormField("KEY_NAME", 3, 128, RegularExpression.ALL_NUMBERS_ALL_LETTERS, Response.INVALID_KEY_NAME.message)
   val CONFIRM_USERNAME = new StringFormField("CONFIRM_USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
+  val FROM_ADDRESS = new StringFormField("FROM_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
+  val TO_ADDRESS = new StringFormField("TO_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
 
   val MANAGED_KEY_NAME = new StringFormField("MANAGED_KEY_NAME", 3, 50)
   val MANAGED_KEY_ADDRESS = new StringFormField("MANAGED_KEY_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
@@ -42,6 +46,8 @@ object FormField {
   val USER_BIO = new StringFormField("USER_BIO", 3, 200)
   val INSTAGRAM_USERNAME = new StringFormField("INSTAGRAM_USERNAME", 3, 50)
 
+  val GAS_AMOUNT = new IntFormField("GAS_AMOUNT", 20000, 2000000)
+
   //BooleanFormField
   val RECEIVE_NOTIFICATIONS = new BooleanFormField("RECEIVE_NOTIFICATIONS")
   val USERNAME_AVAILABLE = new BooleanFormField("USERNAME_AVAILABLE")
@@ -50,10 +56,15 @@ object FormField {
   val ACTIVE = new BooleanFormField("ACTIVE")
   val MANAGED_KEY_DISCLAIMER = new BooleanFormField("MANAGED_KEY_DISCLAIMER")
 
+  val GAS_PRICE = new SelectFormField("GAS_PRICE", Seq(constants.CommonConfig.Blockchain.LowGasPrice.toString, constants.CommonConfig.Blockchain.MediumGasPrice.toString, constants.CommonConfig.Blockchain.HighGasPrice.toString))
+
+  val SEND_COIN_AMOUNT = new MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.zero, MicroNumber(Int.MaxValue), 6)
+
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName
     val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[String]) = name -> field
   }
 
@@ -61,6 +72,7 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[String] = text.verifying(constraint = field => options contains field, error = errorMessage)
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[String]) = name -> field
   }
 
@@ -74,6 +86,7 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[Int] = number(min = minimumValue, max = maximumValue)
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[Int]) = name -> field
   }
 
@@ -81,6 +94,7 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[Date] = date
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[Date]) = name -> field
   }
 
@@ -88,6 +102,7 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[Double]) = name -> field
   }
 
@@ -95,6 +110,7 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[BigDecimal] = of(bigDecimalFormat).verifying(Constraints.max[BigDecimal](maximumValue), Constraints.min[BigDecimal](minimumValue))
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[BigDecimal]) = name -> field
   }
 
@@ -102,7 +118,16 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[Boolean] = boolean
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[Boolean]) = name -> field
+  }
+
+  class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, precision: Int = 2) {
+    val name: String = fieldName
+    val field: Mapping[MicroNumber] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
+    val placeHolder: String = "PLACEHOLDER." + name
+
+    def mapping: (String, Mapping[MicroNumber]) = name -> field
   }
 
   class NestedFormField(fieldName: String) {
