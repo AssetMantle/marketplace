@@ -1,7 +1,9 @@
 @(id : String = "", message : String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div id="@id" class="errorMessage">
     <div class="errorContainer">
-        <span><img src="@routes.Assets.versioned("images/icon/error.png")"/></span>
+        <span>
+            <i class="bi bi-exclamation-circle iconError iconSmall"></i>
+        </span>
         <span>@message</span>
     </div>
 </div>

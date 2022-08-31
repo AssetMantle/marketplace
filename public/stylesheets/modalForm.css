@@ -1,7 +1,3 @@
-/**
- * Overlay
- * -- only show for tablet and up
- */
 @media only screen and (min-width: 10em) {
     .modal-overlay {
         display: flex;
@@ -18,46 +14,36 @@
         -webkit-backface-visibility: hidden;
         backface-visibility: hidden;
         transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
-        /*transition: opacity 0.6s ease, visibility 0.6s ease;*/
         z-index: 9999;
     }
     .modal-overlay.active {
         opacity: 1;
         visibility: visible;
-        /*transform: translate(0,0);*/
     }
     .modal.fade .modal-dialog{
         transition: transform 0.6s ease;
     }
 }
-/**
- * Modal
- */
 .modalContainer {
     background-color: var(--popup-bg);
     border: 2px solid var(--popup-stroke);
     backdrop-filter: blur(20px);
     border-radius: 10px;
     display: flex;
-    /*align-items: center;*/
-    /*justify-content: center;*/
     position: relative;
     margin: 0 auto;
     width: 648px;
     max-width: 75rem;
     min-height: auto;
     padding: 32px;
-    /*opacity: 0;*/
     visibility: hidden;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    /*transform: scale(1.2);*/
     transition: all 0.6s cubic-bezier(0.55, 0, 0.1, 1);
 }
 .modalContainer .modal-content {
     width: 100%;
-    /*opacity: 0;*/
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1);
@@ -65,8 +51,6 @@
 }
 .modalContainer.active {
     visibility: visible;
-    /*opacity: 1;*/
-    /*transform: scale(1);*/
 }
 .modalContainer.active .modal-content {
     opacity: 1;
@@ -75,10 +59,6 @@
     transform: translateY(0px);
     opacity: 1;
 }
-
-/**
- * Mobile styling
- */
 @media only screen and (max-width: 39.9375em) {
     .modalContainer {
         margin: 0 auto;
@@ -91,10 +71,7 @@
 /* Form Header Start*/
 /* Close Button */
 .modalContainer .form-close-btn{
-    /*position: absolute;*/
     cursor: pointer;
-    /*top: 5px;*/
-    /*right: 15px;*/
     opacity: 0;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
@@ -203,26 +180,25 @@
     font-style: normal;
     font-weight: 600;
     font-size: 16px;
+    line-height: 19px;
     text-align: center;
     text-transform: capitalize;
     border: none;
     outline: none;
-    border-radius: 8px;
+    border-radius: 32px;
     cursor: pointer;
 }
 .form-button .form-primary-button{
     color: var(--button-text);
-    background-color: var(--dark);
-    box-shadow: inset -4px -4px 8px rgba(0, 0, 0, 0.2), inset 4px 4px 8px #FFD365;
+    background-color: var(--default);
     overflow: hidden;
     position: relative;
     z-index: 950;
-    transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
-    border: 1px solid var(--dark);
+}
+.form-button .form-primary-button:hover{
+    box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.5);
 }
 .form-button .form-primary-button.disable{
-    border: none !important;
-    box-shadow: none !important;
     background: var(--disable-yellow) !important;
     cursor: none;
     pointer-events: none;
@@ -233,15 +209,20 @@
     user-select: none;
 }
 .form-button .form-secondary-button{
-    color: var(--dark);
+    background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
     background-color: transparent;
     border: 1px solid var(--dark);
     overflow: hidden;
     position: relative;
     z-index: 950;
-    transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
 }
-
+.form-button .form-secondary-button:hover{
+    box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.3);
+}
 /* Error Modal */
 .wallet-error-message{
     font-family: var(--font-type-2);
@@ -256,8 +237,6 @@
 .wallet-error-message a{
     color:var(--dark);
 }
-
-
 
 /* Form Address Box */
 .form-address-box{
@@ -328,8 +307,6 @@
     }
 }
 
-
-
 /* Create Wallet */
 .sub-heading-link{
     font-family: var(--font-type-2);
@@ -348,8 +325,6 @@
     margin-left: 5px;
     position: relative;
 }
-
-
 
 /* Form Copy Item */
 .form-input-text{
@@ -372,7 +347,7 @@
     width: 40px;
     aspect-ratio: 1;
     border-radius: 50%;
-    padding: 4px 0 0 0;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -382,11 +357,7 @@
     background-color: var(--popup-stroke);
 }
 
-
-
 /* Form Information Message */
-
-
 /* Form Accordion */
 .accordion-toggle {
     cursor:pointer;
@@ -455,7 +426,6 @@
     }
 }
 
-
 /* Multi Step */
 .progress-bar {
     width: 100%;
@@ -494,9 +464,6 @@
     border-radius: 10px;
     height: 20px;
     aspect-ratio: 1;
-    /*border: 2px solid #ff8552;*/
-    /*background-color: white;*/
-    /*cursor: pointer;*/
     transition: all 0.5s ease;
     background: var(--popup-bg);
     box-shadow: inset 0px 0px 0px 2px var(--popup-bg), 0px 0px 0px 2px var(--mantle-off-white);
@@ -515,9 +482,6 @@
 }
 
 /* Common Form Field */
-.commonField{
-    /*background-color: red;*/
-}
 .commonField label {
     font-family: var(--font-type-2);
     font-style: normal;
@@ -597,28 +561,28 @@
     border-color: var(--gray) !important;
 }
 #formBody button{
+    font-size: 16px;
+    line-height: 19px;
+    border-radius: 32px;
     padding: 9px 0;
     width: 220px;
     font-family: var(--font-type-2);
-    font-size: 18px;
     font-weight: 600;
     text-align: center;
     text-transform: capitalize;
     border: none;
     outline: none;
-    border-radius: 8px;
     cursor: pointer;
     color: var(--button-text);
-    background-color: var(--dark);
-    box-shadow: inset -4px -4px 8px rgba(0, 0, 0, 0.2), inset 4px 4px 8px #FFD365;
+    background-color: var(--default);
     overflow: hidden;
     position: relative;
     z-index: 950;
-    transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+}
+#formBody button:hover{
+    box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.5);
 }
 #formBody button.disable{
-    border: none !important;
-    box-shadow: none !important;
     background: var(--disable-yellow) !important;
     cursor: none;
     pointer-events: none;
@@ -682,7 +646,7 @@ dl .info:after {
     display: none;
     position: absolute;
     right: 15px;
-    top: 32px;
+    top: 36px;
     width: 20px;
     height: 20px;
 }
@@ -695,13 +659,12 @@ dl .info:after {
 .showPassword .eyeIcon {
     position: absolute;
     right: 15px;
-    top: 32px;
+    top: 30px;
     cursor: pointer;
     width: 20px;
     height: 20px;
-}
-.showPassword .eyeIcon.openEye{
-    top: 34px;
+    font-size: 22px;
+    color: var(--default);
 }
 .inputField .errorMessage,
 .seedPhraseError #phraseError{
@@ -719,9 +682,6 @@ dl .info:after {
     line-height: 17px;
     color: var(--error);
     gap: 4px;
-}
-.inputField .errorMessage.show{
-    /*display: block;*/
 }
 .inputField .errorMessage img,
 .seedPhraseError .errorContainer img{
@@ -746,7 +706,7 @@ dl .info:after {
     font: inherit;
     width: 18px;
     height: 18px;
-    border: 2px solid var(--default);
+    border: 1px solid var(--default);
     border-radius: 0.15em;
     transform: translateY(-0.075em);
     display: grid;
@@ -801,9 +761,15 @@ dl dd.error{
 }
 dl dd.error:before{
     content: '';
-    background-image: url("../images/icon/error.png");
     position: absolute;
     left:0px;
+    width: 16px;
+    height: 16px;
+    background-image: url("../images/icon/closeRed.svg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-top: 1px;
 }
 
 /* Global Level Error */
@@ -827,7 +793,6 @@ dl dd.error:before{
     justify-content: center;
     height: 30px;
     min-width: 30px;
-    /*background-color: var(--dark);*/
     border-radius: 50%;
 }
 .toast-content .message {
@@ -853,7 +818,8 @@ dl dd.error:before{
 #termsCondition_field dt label{
     display: none;
 }
-#RECEIVE_NOTIFICATIONS_field{
+#RECEIVE_NOTIFICATIONS_field,
+#acceptPolicy_field{
     display: flex;
     flex-direction: row-reverse;
     justify-content: start;
