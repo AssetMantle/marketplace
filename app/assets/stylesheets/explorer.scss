@@ -25,9 +25,6 @@
     width: calc(100% + 40px);
     background-color: #383838;
     margin: 20px -20px 20px;
-    //margin-left: -20px;
-    //margin-top: 20px;
-    //margin-bottom: 20px;
   }
   a, .icon{
     height: 22px;
@@ -84,7 +81,6 @@
     background: var(--card-dark);
     border-radius: 10px;
     padding: 20px;
-    //margin-top: 20px;
     div{
       overflow: hidden;
       img{
@@ -95,9 +91,6 @@
         height: auto;
         margin: auto;
         border-radius: 10px;
-        //object-fit: cover;
-        //width: 100%;
-        //height: 250px;
       }
     }
   }
@@ -111,8 +104,6 @@
       text-transform: capitalize;
     }
     .propertyList{
-      //max-height: 310px;
-      //overflow-y: auto;
       padding-right: 20px;
       margin-top: 20px;
       .singleProperty{
