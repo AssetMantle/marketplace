@@ -5,10 +5,9 @@ $(document).click(function (e) {
         $("body").removeClass("modal-active");
     }
 });
+
 function checkNewPassword() {
     let passwordValue = document.getElementById('password').value;
-    // var completeRegularExpression = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,128}$/;
-
     let numberMatchPattern = passwordValue.match(/\d+/g);
     const isUpperCase = (x) => /[A-Z]/.test(x);
     let isSpecialCharacter = (x) => /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(x);
@@ -25,7 +24,6 @@ function collectionCardSelect(card) {
     $(card).addClass('active');
     $(".form-next-button").removeClass('disable-button');
 }
-
 
 // Create Collection : Input type=file
 inputs = document.querySelectorAll('.file-input')
@@ -59,14 +57,8 @@ $(document).click(function () {
     $('.dropdown-el').removeClass('expanded');
 });
 
-// Create Collection : Add More Property
-function addCollectionProperty() {
-
-}
-
 // Create Collection : Add More Tags
 function addCollectionTag() {
-
     let element = document.createElement("div");
     element.innerHTML = `<div class="form-field-2-columns">
                             <div class="form-field-2-columns-row-main">
@@ -89,7 +81,6 @@ function addCollectionTag() {
 // Create Collection : Remove Tags
 function removeCollectionTag(e) {
     let element = e.parentNode.parentNode.parentNode.parentNode;
-    // console.log(element.);
     document.getElementsByClassName("collection-form-tag-field")[0].removeChild(element);
 }
 
@@ -106,187 +97,6 @@ function removeCollectionTag(e) {
 //     document.getElementsByClassName("dateRangeField")[0].setAttribute("name","daterange");
 //     console.log(document.getElementsByClassName("dateRangeField")[0].getAttribute('name'));
 // }
-
-
-// Hero Section Swiper/Slider 2
-
-// Featured Swiper/Slider
-
-
-
-// New Drops Swiper/Slider
-// var swiper = new Swiper(".new-drops-section .swiper-container", {
-//     slidesPerView: "auto",
-//     grid: {
-//         rows: 2,
-//     },
-//     spaceBetween: 20,
-//     pagination: {
-//         el: ".swiper-pagination",
-//         clickable: true,
-//     },
-//     autoplay: {
-//         delay: 3000,
-//         disableOnInteraction: false
-//     },
-// });
-
-
-// Title tag marquee
-// (function titleMarquee() {
-//     document.title = document.title.substring(1)+document.title.substring(0,1);
-//     setTimeout(titleMarquee, 200);
-// })();
-
-// var currentLocation = 'firstPage';
-// // No need to set these inside the event listener since they are always the same.
-// var firstHeight = $('#firstPage').offset().top,
-//     secondHeight = $('#secondPage').offset().top,
-//     thirdHeight = $('#thirdPage').offset().top;
-//
-// // Helper so we can check if the scroll is triggered by user or by animation.
-// var autoScrolling = false;
-//
-// $(document).scroll(function(e){
-//     var scrolled = $(window).scrollTop();
-//
-//     // Only check if the user scrolled
-//     if (!autoScrolling) {
-//         if (scrolled > 1 && currentLocation == 'firstPage') {
-//             scrollPage(secondHeight, 'secondPage');
-//         } else if (scrolled > secondHeight + 1 && currentLocation == 'secondPage') {
-//             scrollPage(thirdHeight, 'thirdPage');
-//         } else if (scrolled < thirdHeight - 1 && currentLocation == 'thirdPage') {
-//             scrollPage(secondHeight, 'secondPage');
-//         } else if (scrolled < secondHeight - 1 && currentLocation == 'secondPage') {
-//             scrollPage(firstHeight, 'firstPage');
-//         }
-//     }
-//
-//     // Since they all have the same animation, you can avoid repetition
-//     function scrollPage(nextHeight, page) {
-//         currentLocation = page;
-//
-//         // At this point, the page will start scrolling by the animation
-//         // So we switch this var so the listener does not trigger all the if/else
-//         autoScrolling = true;
-//         $('body,html').animate({scrollTop:nextHeight}, 500, function () {
-//             // Once the animation is over, we can reset the helper.
-//             // Now it is back to detecting user scroll.
-//             autoScrolling = false;
-//         });
-//     }
-//
-// })
-// document.addEventListener("mousewheel", this.mousewheel.bind(this), { passive: false });
-
-
-// const scrollElement =
-//     window.document.scrollingElement ||
-//     window.document.body ||
-//     window.document;
-
-
-// Sections are zero indexed to match array from getElementsByClassName
-// var scroll = {
-//     activeSection: 0,
-//     totalSections: document.getElementsByClassName('section').length,
-//     throttled: false,
-//     throttleDur: 500,
-// }
-//
-// var downSection = () => {
-//     if (scroll.activeSection < 7) {
-//         ++scroll.activeSection;
-//         console.log(scroll.activeSection);
-//         scrollToSection(scroll.activeSection)
-//     }
-// }
-//
-// var upSection = () => {
-//     if (scroll.activeSection > 0) {
-//         --scroll.activeSection;
-//         console.log(scroll.activeSection);
-//         scrollToSection(scroll.activeSection)
-//
-//     }
-// }
-//
-// var scrollToSection = (section) => {
-//     anime({
-//         targets: scrollElement,
-//         scrollTop: (section) * window.innerHeight,
-//         duration: scroll.throttleDur,
-//         easing: 'linear'
-//     })
-//
-//     scroll.activeSection = section
-// }
-//
-// window.addEventListener('scroll', function(e) {
-//     e.preventDefault()
-// }, false)
-//
-// window.addEventListener('wheel', function(e) {
-//     e.preventDefault()
-//
-//     if (!scroll.throttled) {
-//         scroll.throttled = true
-//
-//         setTimeout(function() {
-//             scroll.throttled = false
-//         }, 1.5 * scroll.throttleDur)
-//
-//         if(e.deltaY < 0) {
-//             upSection()
-//         } else {
-//             downSection()
-//         }
-//     }
-// }, false)
-
-
-// Don't use following code
-// var initialY = null
-//
-// window.addEventListener('touchstart', function(e) {
-//     initialY = e.touches[0].clientY
-// }, false)
-
-// window.addEventListener('touchmove', function(e) {
-//     e.preventDefault()
-//
-//     if (initialY === null) {
-//         return
-//     }
-//
-//     var currentY = e.touches[0].clientY;
-//
-//     var diffY = initialY - currentY;
-//
-//     if(!scroll.throttled) {
-//         scroll.throttled = true
-//
-//         setTimeout(function() {
-//             scroll.throttled = false
-//         }, 1.5 * scroll.throttleDur)
-//
-//         if (diffY > 0) {
-//             downSection()
-//         } else {
-//             upSection()
-//         }
-//     }
-//
-//     initialy = null
-//
-// }, {passive: false})
-
-
-// Scroll back to correct section when resized.
-// window.addEventListener('resize', function(e) {
-//     scrollToSection(scroll.activeSection)
-// }, false)
 
 // Goto top when refresh the page
 window.onbeforeunload = function () {
@@ -309,49 +119,19 @@ for (let i = 0; i < dots.length; ++i) {
 
 function goToStep(stepNumber) {
     currentStep = stepNumber
-
     let indicators = document.getElementsByClassName('progress-bar__dot')
-
     for (let i = indicators.length - 1; i >= currentStep; --i) {
         indicators[i].classList.remove('full')
     }
-
     for (let i = 0; i < currentStep; ++i) {
         indicators[i].classList.add('full')
     }
 }
 
-// Reveal Navbar on Scroll
-// const body = document.body;
-// let lastScroll = 0;
-//
-// window.addEventListener("scroll", () => {
-//     const currentScroll = window.pageYOffset;
-//     if (currentScroll <= 0) {
-//         body.classList.remove("scroll-up");
-//         return;
-//     }
-//
-//     if (currentScroll > lastScroll && !body.classList.contains("scroll-down")) {
-//         body.classList.remove("scroll-up");
-//         body.classList.add("scroll-down");
-//     } else if (
-//         currentScroll < lastScroll &&
-//         body.classList.contains("scroll-down")
-//     ) {
-//         body.classList.remove("scroll-down");
-//         body.classList.add("scroll-up");
-//     }
-//     lastScroll = currentScroll;
-// });
-
-
 // Show and hide modal screen
 function showHideModalScreen(showScreen="", hideScreen="") {
     $(".modalContainer").removeClass('active');
-    // setTimeout(function () {
-        $(hideScreen).hide()
-        $(showScreen).show();
-        $(".modalContainer").addClass('active');
-    // }, 1000);
+    $(hideScreen).hide()
+    $(showScreen).show();
+    $(".modalContainer").addClass('active');
 }

@@ -79,3 +79,7 @@ POST        /deleteKey                       controllers.ProfileController.delet
 
 GET         /sendCoin                        controllers.BlockchainTransactionController.sendCoinForm(fromAddress: String)
 POST        /sendCoin                        controllers.BlockchainTransactionController.sendCoin()
+
+GET         /viewWishList                    controllers.ProfileController.viewWishList()
+GET         /wishList                        controllers.ProfileController.wishList()
+GET         /wishListNFTs                    controllers.ProfileController.wishListNFTs()
