@@ -8,7 +8,7 @@
         @if(showBackButton){
             <div class="modal-header mb-3">
                 <div class="title-icon back-button-icon" id="modalBackButton" onclick="showHideModalScreen('@showScreen', '@hideScreen')">
-                    <img src="@routes.Assets.versioned("images/icon/backArrow.png")"/>
+                    <i class="bi bi-chevron-left iconDefault"></i>
                 </div>
                 <h5 class="modal-title" id="staticBackdropLabel">@Messages(formTemplate.title)</h5>
                 @if(closeButton) {
@@ -36,7 +36,7 @@
         @if(showBackButton){
             <div class="modal-header mb-3">
                 <div class="title-icon back-button-icon" onclick="showHideModalScreen('@showScreen', '@hideScreen')">
-                    <img src="@routes.Assets.versioned("images/icon/backArrow.png")"/>
+                    <i class="bi bi-chevron-left iconDefault"></i>
                 </div>
                 <h5 class="modal-title" id="staticBackdropLabel">@Messages(formTemplate.title)</h5>
                 @if(closeButton) {
@@ -60,7 +60,7 @@
             <div class="toastContainer active">
 
                 <div class="toast-content">
-                    <img src="@routes.Assets.versioned("images/icon/error.png")" class="check"/>
+                    <i class="bi bi-exclamation-circle iconError iconLarge"></i>
                     <div class="message">
                         <span class="text text-1">Error</span>
                         @for(error <- formData.globalErrors) {
