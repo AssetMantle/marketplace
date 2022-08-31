@@ -46,10 +46,10 @@
                         @views.html.base.label.commonLabel(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name)
                         <div class="fieldIcon showPassword" id="showPassword" onclick="showPassword()">
                             <span class="eyeIcon closeEye">
-                                <img src="@routes.Assets.versioned("images/icon/hidePassword.png")" width="24px" height="22px"/>
+                                <i class="bi bi-eye-slash iconDefault"></i>
                             </span>
                             <span class="eyeIcon openEye hidden">
-                                <img src="@routes.Assets.versioned("images/icon/showPassword.png")" width="24px" height="18px"/>
+                                <i class="bi bi-eye iconDefault"></i>
                             </span>
                         </div>
                         @commonInputPassword(walletMnemonicsForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, Symbol("id") -> "signUpConfirmPassword", Symbol("oninput") -> """checkPasswords();""")
@@ -79,8 +79,10 @@
                 @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_4, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
             </div>
         </div>
-        <div class="d-flex form-information-message">
-            <div class="form-information-icon"><img src="@routes.Assets.versioned("images/icon/info.png")"/></div>
+        <div class="d-flex align-items-center form-information-message">
+            <div class="form-information-icon">
+                <i class="bi bi-info-circle iconDefault iconSmall"></i>
+            </div>
             <div class="form-information-text">@Messages(constants.View.PHRASE_VERIFICATION_WARNING)</div>
         </div>
     }

@@ -45,7 +45,7 @@ nav .content .links
     gap: 10px;
     align-items: center;
     color: #fff;
-    font-size: 30px; /* font-weight: 600; */
+    font-size: 30px;
 }
 .content .logo a .appVersion{
     font-size: 12px;
@@ -118,7 +118,7 @@ nav .content .links
 .right-menu .links > li:hover::before
 {
     content: '';
-    position: absolute; /* bottom: 13px; */
+    position: absolute;
     left: 50%;
     transform: translateX(-50%);
     width: 7px;
@@ -143,16 +143,6 @@ nav .content .links
     }
 }
 
-.content .links li.active,
-.right-menu .links li.active
-{ /* background-color: #FFC640; */
-}
-
-.content .links li:hover,
-.right-menu .links li:hover
-{ /* background-color: #FFC640; */
-}
-
 .wrapper .search-icon, .wrapper .menu-icon {
     color: #fff;
     font-size: 18px;
@@ -168,10 +158,12 @@ nav .content .links
 
 .wrapper .menu-icon {
     display: none;
-    background-image: url("../images/icon/hamburgerMenu.png");
+    background-image: url("../images/icon/hamburgerMenu.svg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
     width: 24px;
     height: 24px;
-    background-repeat: no-repeat;
 }
 .right-menu{
     font-family: var(--font-type-1);
@@ -184,7 +176,6 @@ nav .content .links
     display: flex;
     align-items: center;
     cursor: pointer;
-    /*gap: 10px;*/
 }
 .right-menu .links{
     display: flex;
@@ -194,14 +185,13 @@ nav .content .links
     vertical-align: middle !important;
 }
 .right-menu .links li a{
-    padding: 9px 10px;
+    padding: 0px 10px;
 }
 .right-menu .account-menu{
     height: 70px;
     display: flex;
     justify-content: center;
     align-items: center;
-    /*gap: 20px;*/
 }
 .right-menu .account-menu img{
     padding: 0 10px;
@@ -382,7 +372,12 @@ nav .content .links
     }
 
     .wrapper #show-menu:checked ~ .menu-icon{
-        background-image: url("../images/icon/menuClose.png");
+        background-image: url("../images/icon/closeWhite.svg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 24px;
+        height: 24px;
     }
 
     nav .content .links {
@@ -531,8 +526,6 @@ nav .content .links
 }
 #submenu-main > ul > li {
     display: inline-block;
-    /*background-color: red;*/
-    /*border:1px solid black;*/
 }
 #submenu-main ul li {
     position: relative;
@@ -656,8 +649,6 @@ nav .content .links
     opacity: 1;
     visibility: visible;
 }
-
-
 
 /* Bootstrap Menu */
 .navbar {
