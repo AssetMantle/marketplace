@@ -21,24 +21,29 @@
   position: relative;
   z-index: 950;
   border: 1px solid var(--dark);
-  background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
-  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2), inset -4px -4px 8px rgba(0, 0, 0, 0.2), inset 4px 4px 8px #FFD365;
-  border-radius: 8px;
+  border-radius: 32px;
+  padding: 9px 0;
+  background-color: var(--default);
+  &:hover{
+    box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.5);
+  }
 }
 .secondaryButton{
-  @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--button-text));
+  @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--dark));
   text-align: center;
   text-transform: capitalize;
   width: 216px;
   height: 36px;
-  border-radius: 8px;
-  color: var(--dark);
+  margin-top: 20px;
+  border-radius: 32px;
   background-color: transparent;
   border: 1px solid var(--dark);
   overflow: hidden;
   position: relative;
   z-index: 950;
-  margin-top: 20px;
+  &:hover{
+    box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.3);
+  }
 }
 .separator{
   height: 2px;
@@ -59,9 +64,6 @@
 }
 .right-menu .links li.user-wallet .walletPopup{
   text-transform: none;
-  //background: var(--popup-bg);
-  //border: 2px solid var(--popup-stroke);
-  //border-radius: 20px;
   height: 512px;
   width: 312px;
   position: absolute;
@@ -69,11 +71,9 @@
   top: 90px;
   transform: translateX(-73px);
   z-index: 9999;
-  //padding: 20px;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
-  //overflow: hidden;
   cursor: auto;
   &::before{
     content: '';
@@ -88,40 +88,40 @@
     top: 70px;
     opacity: 1;
     visibility: visible;
-    transition: all 0.3s ease;
+    //transition: all 0.3s ease;
   }
 
-  .walletPopupContainer{
-    background: var(--popup-bg);
-    border: 2px solid var(--popup-stroke);
-    border-radius: 20px;
-    padding: 20px;
-    position: relative;
-    overflow: hidden;
+.walletPopupContainer{
+  background: var(--popup-bg);
+  border: 2px solid var(--popup-stroke);
+  border-radius: 20px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.detailContainer{
+  margin: 24px 12px;
+  .userDetails{
+    .userName{
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+    }
+    .userBalance{
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--text-medium));
+    }
   }
-  .detailContainer{
-    margin: 24px 12px;
-    .userDetails{
-      .userName{
-        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
-      }
-      .userBalance{
-        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--text-medium));
-      }
+  .userAddressBox{
+    background-color: var(--card-dark);
+    border-radius: 8px;
+    line-height: 0;
+    .userAddressData {
+      @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+      word-break: break-word;
     }
-    .userAddressBox{
-      background-color: var(--card-dark);
-      border-radius: 8px;
-      line-height: 0;
-      .userAddressData {
-        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
-        word-break: break-word;
-      }
-      .copyIcon {
-        padding: 4px 0 0 0;
-        cursor: pointer;
-      }
+    .copyIcon {
+      padding: 4px 0 0 0;
+      cursor: pointer;
     }
+  }
 
     .walletMessage{
       @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
@@ -147,7 +147,6 @@
     cursor: pointer;
   }
   .walletMenu{
-    //height: 512px;
     height: 460px;
     width: 254px;
     position: absolute;
@@ -178,12 +177,10 @@
     }
   }
   .addressBook{
-    //height: 512px;
     height: 450px;
     width: 254px;
     position: absolute;
     right: -255px;
-    //right: 0px;
     top: 1px;
     z-index: 1000;
     background: var(--card-dark);
@@ -196,8 +193,7 @@
     }
 
     .walletAddressList{
-      //height: 330px;
-      height: 200px;
+      height: 220px;
       overflow-y: auto;
       padding-right: 12px;
       margin-bottom: 24px;
@@ -267,10 +263,10 @@
   transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
   z-index: 9998;
   cursor: auto;
-}
-#walletBackDrop.active{
-  opacity: 1;
-  visibility: visible;
+  &.active{
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 // User Profile Menu
@@ -336,5 +332,13 @@
       opacity: 1;
       visibility: visible;
     }
+  }
+}
+
+#modal-content{
+  .walletPopupContainer{
+    border:none;
+    margin: -32px;
+    border-radius: 10px;
   }
 }
