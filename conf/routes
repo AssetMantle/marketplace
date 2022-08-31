@@ -82,3 +82,4 @@ GET         /wishList                        controllers.ProfileController.wishL
 GET         /wishListNFTs                    controllers.ProfileController.wishListNFTs()
 
 GET         /updateBio                       controllers.ProfileController.updateBioForm()
+GET         /addInstagram                    controllers.ProfileController.addInstagramForm()

@@ -68,3 +68,32 @@ function changeActive(setAddress, oldAddress) {
         }
     });
 }
+
+// Edit Bio
+function initialCharacterCounter(maxLimit)
+{
+    $("#remainingCharacterLabel").text(maxLimit +"/"+maxLimit+" characters remaining");
+}
+function characterCounter(field, maxLimit)
+{
+    if (field.value.length > maxLimit) {
+        field.value = field.value.substring( 0, maxLimit );
+        return false;
+    } else {
+        $("#remainingCharacterLabel").text(maxLimit - field.value.length +"/"+maxLimit+" characters remaining");
+    }
+}
+
+// Show/Hide social media field value
+function showHideUsername() {
+    let password = $('#instagramUsername')[0];
+    if (password.type === "password") {
+        password.type = "text";
+        $(".closeEye").addClass("hidden");
+        $(".openEye").removeClass("hidden");
+    } else {
+        password.type = "password";
+        $(".closeEye").removeClass("hidden");
+        $(".openEye").addClass("hidden");
+    }
+}

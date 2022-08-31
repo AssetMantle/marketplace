@@ -1,0 +1,32 @@
+@import views.profile.companion.AddInstagram
+@import views.html.base.form._
+@import views.html.base.label._
+
+@(addInstagramForm: Form[AddInstagram.Data] = AddInstagram.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.ADD_INSTAGRAM, addInstagramForm) {
+    <div class="mb-2 modal-body">
+        <div>
+            <div class="inputField">
+                <div class="inputFieldBody">
+                    <div class="usernameAvailability">
+                        @commonLabel(constants.FormField.INSTAGRAM_USERNAME.name)
+                        <div class="fieldIcon showPassword" id="showPassword" onclick="showHideUsername()">
+                            <span class="eyeIcon closeEye">
+                                <img src="@routes.Assets.versioned("images/icon/hidePassword.png")" width="24px" height="22px"/>
+                            </span>
+                            <span class="eyeIcon openEye hidden">
+                                <img src="@routes.Assets.versioned("images/icon/showPassword.png")" width="24px" height="18px"/>
+                            </span>
+                        </div>
+                        @commonInputPassword(addInstagramForm, constants.FormField.INSTAGRAM_USERNAME, Symbol("autocomplete") -> "off", Symbol("id") -> "instagramUsername")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex mt-1 form-information-message">
+        <div class="form-information-icon"><img src="@routes.Assets.versioned("images/icon/info.png")"/></div>
+        <div class="form-information-text">@Messages(constants.View.ADD_INSTAGRAM_USER_INFO)</div>
+    </div>
+}
+<script src="@routes.Assets.versioned("javascripts/profile/settings.js")"></script>

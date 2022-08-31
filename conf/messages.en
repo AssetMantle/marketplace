@@ -248,6 +248,12 @@ FORM.UPDATE_BIO.TITLE=Edit your bio
 FORM.UPDATE_BIO.SUBTITLE=This bio is displayed publicly on your profile
 FORM.UPDATE_BIO.SUBMIT=Update
 PROFILE_BIO=Bio:
+FORM.ADD_INSTAGRAM.TITLE=Connect instagram
+FORM.ADD_INSTAGRAM.SUBTITLE=Enter your Instagram username.
+FORM.ADD_INSTAGRAM.SUBMIT=Next
+PLACEHOLDER.INSTAGRAM_USERNAME=Username
+INSTAGRAM_USERNAME=Username
+ADD_INSTAGRAM_USER_INFO=You will be redirected to instagram
 
 #//Wallet
 POPUP_WALLET_BODY_MESSAGE=You will be redirected to another page on clicking buy more. Some other details user needs to know.

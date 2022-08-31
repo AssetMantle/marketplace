@@ -31,5 +31,6 @@ object Form {
 
   val CHANGE_MANAGED_TO_UNMANAGED = new Form("CHANGE_MANAGED_TO_UNMANAGED", routes.javascript.ProfileController.deleteKeyForm, routes.ProfileController.deleteKey())
   val UPDATE_BIO = new Form("UPDATE_BIO", routes.javascript.ProfileController.updateBioForm, routes.ProfileController.updateBioForm())
+  val ADD_INSTAGRAM = new Form("ADD_INSTAGRAM", routes.javascript.ProfileController.addInstagramForm, routes.ProfileController.addInstagramForm())
 
 }

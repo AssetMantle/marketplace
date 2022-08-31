@@ -271,4 +271,8 @@ class ProfileController @Inject()(
   def updateBioForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.profile.updateBio())
   }
+
+  def addInstagramForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.addInstagram())
+  }
 }

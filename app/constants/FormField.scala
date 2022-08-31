@@ -40,6 +40,7 @@ object FormField {
   val CHANGE_KEY_NAME = new StringFormField("CHANGE_KEY_NAME", 3, 50)
   val CHANGE_KEY_ADDRESS = new StringFormField("CHANGE_KEY_ADDRESS", 3, 50)
   val USER_BIO = new StringFormField("USER_BIO", 3, 200)
+  val INSTAGRAM_USERNAME = new StringFormField("INSTAGRAM_USERNAME", 3, 50)
 
   //BooleanFormField
   val RECEIVE_NOTIFICATIONS = new BooleanFormField("RECEIVE_NOTIFICATIONS")

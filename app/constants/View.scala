@@ -225,6 +225,7 @@ object View {
   val WISHLIST = "WISHLIST"
   val WISHLIST_MENU = "WISHLIST_MENU"
   val PROFILE_BIO = "PROFILE_BIO"
+  val ADD_INSTAGRAM_USER_INFO = "ADD_INSTAGRAM_USER_INFO"
 
   object Button {
     val NEXT = "NEXT"

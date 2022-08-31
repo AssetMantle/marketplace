@@ -55,6 +55,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.wishList,
         routes.javascript.ProfileController.wishListNFTs,
         routes.javascript.ProfileController.updateBioForm,
+        routes.javascript.ProfileController.addInstagramForm,
       )
     ).as("text/javascript")
 
