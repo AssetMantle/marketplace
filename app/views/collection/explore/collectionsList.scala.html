@@ -1,4 +1,6 @@
-@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import controllers.actions.LoginState
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider,loginState: Option[LoginState])
 
 <div class="item item-center collectionContainer">
     <div class="profile-card">
@@ -7,6 +9,9 @@
                 <div class="left-option">
                     <div class="row">
                         <div class="col mx-3 p-0 active">@Messages(constants.View.ART)</div>
+                        @if(loginState.nonEmpty) {
+                            <div class="col mx-3 p-0">@Messages(constants.View.WISHLIST_MENU)</div>
+                        }
                     </div>
                 </div>
             </div>

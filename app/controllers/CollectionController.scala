@@ -52,8 +52,9 @@ class CollectionController @Inject()(
   }
 
   def collectionsList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginAction { implicit request =>
-      Ok(views.html.collection.explore.collectionsList())
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.collection.explore.collectionsList()))
     }
   }
 
