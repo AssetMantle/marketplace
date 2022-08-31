@@ -1,8 +1,6 @@
 @import views.account.companion.MigrateWalletToKey
 @import views.html.base.form._
 @import views.html.base.label._
-@import views.html.base.forms.commonFieldErrorMessage
-@import views.html.base.label._
 
 @(migrateWalletToKeyForm: Form[MigrateWalletToKey.Data] = MigrateWalletToKey.form, username: String, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 

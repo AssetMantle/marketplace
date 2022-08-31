@@ -53,7 +53,7 @@
                             </span>
                         </div>
                         @commonInputPassword(walletMnemonicsForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, Symbol("id") -> "signUpConfirmPassword", Symbol("oninput") -> """checkPasswords();""")
-                        @views.html.base.forms.commonFieldErrorMessage(id = "repeatPasswordError",message = Messages(constants.View.REPEAT_PASSWORD_MISMATCH))
+                        @commonFieldErrorMessage(id = "repeatPasswordError",message = Messages(constants.View.REPEAT_PASSWORD_MISMATCH))
                     </div>
                 </div>
             </div>
