@@ -1,0 +1,8 @@
+@import views.html.nft._
+@import controllers.actions.LoginState
+
+@(collections: Seq[master.Collection], nfts: Seq[master.NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+@nfts.map { nft =>
+    @commonNFTCard(collections.find(_.id == nft.collectionId).getOrElse(master.Collection("", None, "", "", "", Seq.empty)), nft)
+}

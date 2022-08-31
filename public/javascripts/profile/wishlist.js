@@ -1,4 +1,4 @@
-const heartButtons = document.querySelectorAll(".addToWishlist");
+const heartButtons = document.querySelectorAll(".wishlist");
 
 heartButtons.forEach((button) => {
     button.addEventListener("click", () => {

@@ -162,3 +162,32 @@
 #comingSoonBtn:hover::after {
   top: 0;
 }
+// Add To Wishlist Button
+.addToWishlist{
+  border: none;
+  background: none;
+  transition: transform 0.4s ease;
+  &:hover{
+    cursor: pointer;
+  }
+  &:active{
+    transform: scale(1.3);
+  }
+  .heartIcon {
+    width: 18px;
+    height: 18px;
+    path {
+      fill: none;
+      stroke-width: 2;
+      stroke: var(--icon-white);
+    }
+  }
+  &.clicked {
+    .heartIcon {
+      path {
+        fill: var(--default);
+        stroke-width: 0;
+      }
+    }
+  }
+}

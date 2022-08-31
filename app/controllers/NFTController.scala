@@ -5,6 +5,7 @@ import akka.util.ByteString
 import controllers.actions.{WithLoginActionAsync, WithoutLoginAction, WithoutLoginActionAsync}
 import exceptions.BaseException
 import models.master
+import models.master.WishList
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -23,6 +24,7 @@ class NFTController @Inject()(
                                masterAccounts: master.Accounts,
                                masterCollections: master.Collections,
                                masterNFTs: master.NFTs,
+                               masterWishLists: master.WishLists,
                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -88,6 +90,45 @@ class NFTController @Inject()(
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
+  }
+
+  def addToWishList(nftId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      (for {
+        _ <- masterWishLists.Service.add(accountId = loginState.username, nftId = nftId)
+      } yield Ok
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def deleteFromWishList(nftId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      (for {
+        _ <- masterWishLists.Service.deleteWishItem(accountId = loginState.username, nftId = nftId)
+      } yield Ok
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def allWishList(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+
+        def nfts(wishLists: Seq[WishList]) = masterNFTs.Service.getByIds(wishLists.map(_.nftId))
+
+        def collections(nfts: Seq[master.NFT]) = masterCollections.Service.getList(nfts.map(_.collectionId))
+
+        (for {
+          wishLists <- masterWishLists.Service.getByPageNumber(accountId = loginState.username, pageNumber = pageNumber, perPage = 6)
+          nfts <- nfts(wishLists)
+          collections <- collections(nfts)
+        } yield Ok
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
   }
 
 }

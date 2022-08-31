@@ -1,6 +1,7 @@
 @import views.html.nft._
+@import controllers.actions.LoginState
 
-@(collection: master.Collection, nfts: Seq[master.NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(collection: master.Collection, nfts: Seq[master.NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <div class="row m-0 nftPage">
     @if(nfts.nonEmpty) {
         @nfts.map { nft =>
@@ -12,6 +13,14 @@
 </div>
 
 <script>
+    // Add to Wishlist
+    // var heartButtons = document.querySelectorAll(".addToWishlist");
+    // heartButtons.forEach((button) => {
+    //     button.addEventListener("click", () => {
+    //         button.classList.toggle("clicked");
+    //     });
+    // });
+
     // Hide Load More button if NFTs are <= 5
     $(document).ready(function() {
         console.log($(".singleNFTCard").length);
@@ -20,3 +29,4 @@
         }
     });
 </script>
+<script src="@routes.Assets.versioned("javascripts/nfts/wishlist.js")"></script>
