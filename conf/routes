@@ -80,3 +80,10 @@ GET         /allWishList                     controllers.NFTController.allWishLi
 
 #GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()
+
+GET         /sendCoin                        controllers.BlockchainTransactionController.sendCoinForm(fromAddress: String)
+POST        /sendCoin                        controllers.BlockchainTransactionController.sendCoin()
+
+GET         /viewWishList                    controllers.ProfileController.viewWishList()
+GET         /wishList                        controllers.ProfileController.wishList()
+GET         /wishListNFTs                    controllers.ProfileController.wishListNFTs()

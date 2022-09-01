@@ -186,43 +186,5 @@ html {
 }
 .section-footer{
     padding: 0rem;
-    /*height: 360px;*/
-    /*height: 185px;*/
     height: fit-content;
 }
-
-/* Custom Cursor */
-/*.cursor{*/
-/*    width: 8px;*/
-/*    height: 8px;*/
-/*    border-radius: 50%;*/
-/*    background: white;*/
-/*    position: fixed;*/
-/*    z-index: 999;*/
-/*    pointer-events: none;*/
-/*    mix-blend-mode: difference;*/
-/*    opacity: 0;*/
-/*    display: none;*/
-/*}*/
-/*.cursor.hovered{*/
-/*    opacity: 0.08;*/
-/*}*/
-/*.cursor-follower{*/
-/*    width: 36px;*/
-/*    height: 36px;*/
-/*    position: fixed;*/
-/*    top: 0;*/
-/*    left: 0;*/
-/*    border:2px solid white;*/
-/*    background-size: cover;*/
-/*    mix-blend-mode: difference;*/
-/*    pointer-events: none;*/
-/*    transform: translate(-3px, -3px);*/
-/*    border-radius: 10px;*/
-/*    z-index: 999;*/
-/*    opacity: 0;*/
-/*    display: none;*/
-/*}*/
-/*.cursor-follower.hovered{*/
-/*    opacity: 0.08;*/
-/*}*/

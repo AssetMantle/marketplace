@@ -8,7 +8,12 @@
         <entry key="AMAZON_S3_ACCESS_KEY_ID" value="AKIAYNFEJ2MUSSZZ7NIW" />
         <entry key="AMAZON_S3_BUCKET_NAME" value="assetmantle-test-collection" />
         <entry key="AMAZON_S3_REGION" value="ap-south-1" />
+        <entry key="BLOCKCHAIN_RPC" value="http://127.0.0.1:26657" />
+        <entry key="BLOCKCHAIN_REST" value="http://127.0.0.1:1317" />
+        <entry key="BLOCKCHAIN_CHAIN_ID" value="test" />
+        <entry key="BLOCKCHAIN_STAKING_DENOM" value="stake" />
         <entry key="AMAZON_S3_SECRET_KEY" value="DXW8VyWpkvgV9Q8kVpzacip3KZVxGYCnlL/HoT7A" />
+        <entry key="AMAZON_S3_BUCKET_URL" value="https://assetmantle-test-collection.s3.ap-south-1.amazonaws.com/" />
         <entry key="APPLICATION_SECRET" value="d7oJaPFAnguWe8OU8aeST964GeR_XJ5TS[ho@_];VBq8sQ0kNBM@v/psglncUr&amp;gt;x" />
         <entry key="COLLECTION_PATH" value="/Users/abhinav/collections" />
         <entry key="DEFAULT_PUBLIC_FOLDER" value="$PROJECT_DIR$/public" />
@@ -19,6 +24,10 @@
         <entry key="POSTGRES_PASSWORD" value="mantlePlace" />
         <entry key="POSTGRES_URL" value="localhost:5432" />
         <entry key="POSTGRES_USER" value="mantlePlace" />
+        <entry key="EXPLORER_POSTGRES_DB" value="assetMantle" />
+        <entry key="EXPLORER_POSTGRES_PASSWORD" value="assetMantle" />
+        <entry key="EXPLORER_POSTGRES_URL" value="localhost:5432" />
+        <entry key="EXPLORER_POSTGRES_USER" value="assetMantle" />
         <entry key="ROOT_FILE_PATH" value="/Users/abhinav/" />
         <entry key="SITE_URL" value="https://staging.marketplace.assetmantle.one" />
       </map>

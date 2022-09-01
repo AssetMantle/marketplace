@@ -1,0 +1,22 @@
+@import views.html.base.modal._
+
+@(broadcasted: Boolean, status: Option[Boolean], txHash: String, log: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@if(status.nonEmpty) {
+    @if(!status.get) {
+        @errorModal(heading = constants.View.BLOCKCHAIN_TRANSACTION_FAILURE_TITLE, subHeading = log)
+        @* @log *@
+    }
+} else {
+    @successModal(heading = constants.View.BLOCKCHAIN_TRANSACTION_SUCCESS_TITLE, subHeading = constants.View.BLOCKCHAIN_TRANSACTION_SUCCESS_SUBTITLE)
+    <div class="form-address-box">
+        <div class="form-address-box-item">
+                <span class="address-box-label">@Messages(constants.View.HASH)</span>
+                <span class="address-box-text">
+                    <span class="username-data" data-value="@txHash">@txHash</span>
+                    <span class="form-copy-icon" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copy.png")"/></span>
+                    <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
+                </span>
+        </div>
+    </div>
+}
