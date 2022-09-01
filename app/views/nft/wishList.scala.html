@@ -1,7 +1,0 @@
-@import views.html.nft._
-
-@(collections: Seq[master.Collection], nfts: Seq[master.NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-
-@nfts.map { nft =>
-    @commonNFTCard(collections.find(_.id == nft.collectionId).getOrElse(master.Collection("", None, "", "", "", Seq.empty)), nft)
-}

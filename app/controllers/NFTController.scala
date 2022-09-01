@@ -72,7 +72,7 @@ class NFTController @Inject()(
         (for {
           nft <- nft
           liked <- liked
-        } yield Ok(views.html.nft.info(nft))
+        } yield Ok(views.html.nft.info(nft, liked))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -100,7 +100,8 @@ class NFTController @Inject()(
   def addToWishList(nftId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       (for {
-        _ <- masterWishLists.Service.add(accountId = loginState.username, nftId = nftId)
+        nft <- masterNFTs.Service.tryGet(nftId)
+        _ <- masterWishLists.Service.add(accountId = loginState.username, nftId = nftId, collectionId = nft.collectionId)
       } yield Ok
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
@@ -115,25 +116,6 @@ class NFTController @Inject()(
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
-  }
-
-  def allWishList(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
-    withLoginActionAsync { implicit loginState =>
-      implicit request =>
-
-        def nfts(wishLists: Seq[WishList]) = masterNFTs.Service.getByIds(wishLists.map(_.nftId))
-
-        def collections(nfts: Seq[master.NFT]) = masterCollections.Service.getList(nfts.map(_.collectionId))
-
-        (for {
-          wishLists <- masterWishLists.Service.getByPageNumber(accountId = loginState.username, pageNumber = pageNumber, perPage = 6)
-          nfts <- nfts(wishLists)
-          collections <- collections(nfts)
-        } yield Ok
-          ).recover {
-          case baseException: BaseException => BadRequest(baseException.failure.message)
-        }
-    }
   }
 
 }

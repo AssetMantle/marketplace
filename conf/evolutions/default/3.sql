@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS MASTER."WishList"
 (
     "accountId"         VARCHAR NOT NULL,
     "nftId"             VARCHAR NOT NULL,
+    "collectionId"      VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -43,6 +44,8 @@ ALTER TABLE MASTER."WishList"
     ADD CONSTRAINT WishList_Account_Id FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."WishList"
     ADD CONSTRAINT WishList_NFT_Id FOREIGN KEY ("nftId") REFERENCES MASTER."NFT" ("fileName");
+ALTER TABLE MASTER."WishList"
+    ADD CONSTRAINT WishList_NFT_Id FOREIGN KEY ("collectionId") REFERENCES MASTER."Collection" ("id");
 
 CREATE TRIGGER SEND_COIN_LOG
     BEFORE INSERT OR UPDATE
