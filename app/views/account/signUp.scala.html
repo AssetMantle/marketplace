@@ -1,6 +1,5 @@
 @import views.account.companion.SignUp
 @import views.html.base.form._
-@import views.html.base.forms.commonFieldErrorMessage
 @import views.html.base.label._
 
 @(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
@@ -13,7 +12,7 @@
                         <div class="usernameAvailability">
                             @commonLabelIcon(constants.FormField.USERNAME.name, Messages(constants.View.SIGN_UP_TOOLTIP))
                             <div id="checkIcon" class="fieldIcon checkIcon">
-                                <img src="@routes.Assets.versioned("images/icon/verifiedUsername.png")" width="24px" height="22px"/>
+                                <i class="bi bi-check-circle iconDefault iconMedium"></i>
                             </div>
                             @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("class") -> "inputBox", Symbol("id") -> "signUpUsername", Symbol("autocomplete") -> "off", 'oninput -> """checkUsernameAvailable(this,'#USERNAME_AVAILABLE'); activeButton();""", Symbol("onblur") -> "changeFieldBorder()", Symbol("onfocus") -> "changeFieldBorder()")
                             @commonFieldErrorMessage(id = "usernameAvailableError",message = Messages(constants.View.USERNAME_NOT_AVAILABLE))

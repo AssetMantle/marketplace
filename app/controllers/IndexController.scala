@@ -9,7 +9,8 @@ import play.api.mvc._
 import service.Starter
 
 import javax.inject._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class IndexController @Inject()(
@@ -18,12 +19,13 @@ class IndexController @Inject()(
                                  withoutLoginActionAsync: WithoutLoginActionAsync,
                                  withoutLoginAction: WithoutLoginAction,
                                  withUsernameToken: WithUsernameToken,
-                                 starter: Starter
+                                 starter: Starter,
+                                 blockchainAccounts: models.blockchain.Accounts
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.HOME_CONTROLLER
+  private implicit val module: String = constants.Module.INDEX_CONTROLLER
 
   def index: EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit optionalLoginState =>
@@ -37,5 +39,5 @@ class IndexController @Inject()(
     }
   }
 
-//  starter.start()
+  //  starter.start()
 }

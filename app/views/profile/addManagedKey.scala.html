@@ -1,6 +1,5 @@
 @import views.profile.companion.AddManagedKey
 @import views.html.base.form._
-@import views.html.base.forms.{commonFieldErrorMessage}
 
 @(managedAddressForm: Form[AddManagedKey.Data] = AddManagedKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
@@ -38,11 +37,6 @@
         </div>
         <div class="d-flex align-items-center mt-4">
             @commonCheckbox(managedAddressForm, constants.FormField.MANAGED_KEY_DISCLAIMER, Symbol("id") -> "acceptPolicy", Symbol("onclick") -> "enableNavigationButton(1);")
-            <span class="termsConditionMessage">
-                <label for="acceptPolicy">
-                    @Messages(constants.View.DISCLAIMER_POLICY_MESSAGE)
-                </label>
-            </span>
         </div>
         <div class="horizontal-align">
             @views.html.base.buttons.commonPrimaryButton(constants.View.CONFIRM_BUTTON, JavaScript(s"showHideManagedModalScreen('#newWalletMnemonicsScreen','#disclaimerScreen', 2)"),Symbol("id") -> "disclaimerButton", Symbol("class") -> "disable")
@@ -56,17 +50,17 @@
                 <span class="me-2">@Messages(constants.View.PROFILE_VERIFY_WALLET_MNEMONICS_SHOW_HIDE_MESSAGE)</span>
                 <div class="iconContainer" onclick="showHideSeed()">
                     <span class="eyeIcon closeEye">
-                        <img src="@routes.Assets.versioned("images/icon/hidePassword.png")" width="22px" height="20px"/>
+                        <i class="bi bi-eye-slash iconDefault"></i>
                     </span>
                     <span class="eyeIcon openEye hidden">
-                        <img src="@routes.Assets.versioned("images/icon/showPassword.png")" width="22px" height="17px"/>
+                        <i class="bi bi-eye iconDefault"></i>
                     </span>
                 </div>
             </div>
             <div class="d-flex flex-row mb-3" id="pasteSeeds" onclick="pasteSeeds()">
                 <span class="me-2">@Messages(constants.View.PASTE_MNEMONICS_MESSAGE)</span>
                 <span>
-                    <img src="@routes.Assets.versioned("images/icon/editYellow.png")" width="20px" height="20px"/>
+                    <i class="bi bi-pencil iconDefault"></i>
                 </span>
             </div>
         </div>

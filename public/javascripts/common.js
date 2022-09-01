@@ -30,6 +30,15 @@ $("#walletBackDrop").click(function (){
     },200);
 });
 
+// Resize window for wallet popup
+$(window).resize(function(){
+    if(($(window).width() <= 900) && ($("#walletPopup").hasClass("active"))) {
+        $("#walletPopup").removeClass("active");
+        $("#walletBackDrop").removeClass("active");
+        $("body").removeClass("modal-open");
+    }
+});
+
 function showOptions(current)
 {
     console.log($(current));
@@ -123,15 +132,11 @@ addresses.forEach(address => {
 // Copy to Clipboard
 function copyToClipboard(e) {
     var element = $(e).next('.form-copy-message');
-    // var copyText = $(e).prevAll('.username-data');
     var copyText = $(e).prevAll('.username-data').attr("data-value");
-
     element.addClass("active");
     element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function () {
         element.removeClass('active');
     });
-
-    // navigator.clipboard.writeText(copyText.text());
     navigator.clipboard.writeText(copyText);
 }
 
@@ -142,3 +147,11 @@ $(document).click(function (e) {
         $("body").removeClass("modal-active");
     }
 });
+
+// Close Modal
+elements = $('.modal-overlay, .modalContainer');
+
+function closeModal() {
+    elements.removeClass('active');
+    $("body").removeClass("modal-active");
+}

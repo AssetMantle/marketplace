@@ -5,9 +5,9 @@ $(document).click(function (e) {
         $("body").removeClass("modal-active");
     }
 });
+
 function checkNewPassword() {
     let passwordValue = document.getElementById('password').value;
-
     let numberMatchPattern = passwordValue.match(/\d+/g);
     const isUpperCase = (x) => /[A-Z]/.test(x);
     let isSpecialCharacter = (x) => /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(x);
@@ -24,7 +24,6 @@ function collectionCardSelect(card) {
     $(card).addClass('active');
     $(".form-next-button").removeClass('disable-button');
 }
-
 
 // Create Collection : Input type=file
 inputs = document.querySelectorAll('.file-input')
@@ -58,14 +57,8 @@ $(document).click(function () {
     $('.dropdown-el').removeClass('expanded');
 });
 
-// Create Collection : Add More Property
-function addCollectionProperty() {
-
-}
-
 // Create Collection : Add More Tags
 function addCollectionTag() {
-
     let element = document.createElement("div");
     element.innerHTML = `<div class="form-field-2-columns">
                             <div class="form-field-2-columns-row-main">
@@ -112,13 +105,10 @@ for (let i = 0; i < dots.length; ++i) {
 
 function goToStep(stepNumber) {
     currentStep = stepNumber
-
     let indicators = document.getElementsByClassName('progress-bar__dot')
-
     for (let i = indicators.length - 1; i >= currentStep; --i) {
         indicators[i].classList.remove('full')
     }
-
     for (let i = 0; i < currentStep; ++i) {
         indicators[i].classList.add('full')
     }
@@ -130,4 +120,5 @@ function showHideModalScreen(showScreen="", hideScreen="") {
         $(hideScreen).hide()
         $(showScreen).show();
         $(".modalContainer").addClass('active');
+
 }
