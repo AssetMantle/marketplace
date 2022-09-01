@@ -12,7 +12,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, EssentialAction, MessagesControllerComponents}
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class NFTController @Inject()(
@@ -48,13 +48,15 @@ class NFTController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val nft = masterNFTs.Service.tryGet(nftId)
+        val liked = loginState.fold[Future[Option[Boolean]]](Future(None))(x => masterWishLists.Service.checkExists(accountId = x.username, nftId = nftId).map(Option(_)))
 
         def getCollection(collectionID: String) = masterCollections.Service.tryGet(collectionID)
 
         (for {
           nft <- nft
+          liked <- liked
           collection <- getCollection(nft.collectionId)
-        } yield Ok(views.html.nft.details(collection, nft))
+        } yield Ok(views.html.nft.details(collection, nft, liked))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -65,8 +67,11 @@ class NFTController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val nft = masterNFTs.Service.tryGet(nftId)
+        val liked = loginState.fold[Future[Option[Boolean]]](Future(None))(x => masterWishLists.Service.checkExists(accountId = x.username, nftId = nftId).map(Option(_)))
+
         (for {
           nft <- nft
+          liked <- liked
         } yield Ok(views.html.nft.info(nft))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)

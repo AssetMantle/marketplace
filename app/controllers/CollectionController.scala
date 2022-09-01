@@ -25,6 +25,7 @@ class CollectionController @Inject()(
                                       masterCollections: master.Collections,
                                       masterNFTs: master.NFTs,
                                       masterCollectionFiles: master.CollectionFiles,
+                                      masterWishLists: master.WishLists,
                                     )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -137,6 +138,27 @@ class CollectionController @Inject()(
         (for {
           collection <- collection
         } yield Ok(views.html.collection.details.collectionInfo(collection))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def wishListCollections(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val allNFTIds = masterWishLists.Service.getAllForAccount(loginState.username)
+
+        def getAllCollectionIds(nftIds: Seq[String]) = masterNFTs.Service.getAllCollectionIds(nftIds)
+
+        def allCollections(collectionIds: Seq[String]) = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        else masterCollections.Service.getByPageNumber(pageNumber)
+
+        (for {
+          allNFTIds <- allNFTIds
+          collectionIds <- getAllCollectionIds(allNFTIds)
+          collections <- allCollections(collectionIds)
+        } yield Ok(views.html.collection.explore.collectionsPerPage(collections))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

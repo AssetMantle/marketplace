@@ -137,6 +137,5 @@ class Collections @Inject()(
 
     def deleteById(id: String): Future[Int] = delete(id)
 
-    def getList(ids: Seq[String]): Future[Seq[Collection]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
   }
 }

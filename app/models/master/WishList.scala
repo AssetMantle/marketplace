@@ -85,5 +85,9 @@ class WishLists @Inject()(
 
     def deleteWishItem(accountId: String, nftId: String): Future[Int] = delete(id1 = accountId, id2 = nftId)
 
+    def checkExists(accountId: String, nftId: String): Future[Boolean] = exists(id1 = accountId, id2 = nftId)
+
+    def getAllForAccount(id: String): Future[Seq[String]] = filter(_.accountId === id).map(_.map(_.nftId))
+
   }
 }
