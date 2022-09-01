@@ -10,6 +10,9 @@ window.addEventListener('popstate', e => {
         case "collection":
             viewCollection(lastPart);
             break;
+        case "wishListCollection":
+            viewWishListCollection(lastPart);
+            break;
         case "nft":
             viewNFT(lastPart);
             break;
