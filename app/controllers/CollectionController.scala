@@ -53,8 +53,9 @@ class CollectionController @Inject()(
   }
 
   def collectionsList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginAction { implicit request =>
-      Ok(views.html.collection.explore.collectionsList())
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.collection.explore.collectionsList()))
     }
   }
 
@@ -122,7 +123,7 @@ class CollectionController @Inject()(
         else masterCollections.Service.tryGet(id)
         val nfts = masterNFTs.Service.getByPageNumber(id, pageNumber)
 
-        val likedNFTs = loginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollectionAndPageNumber(accountId = x.username, collectionId = id, pageNumber = pageNumber, perPage = constants.CommonConfig.Collections.NFTsPerPage))
+        val likedNFTs = loginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollection(accountId = x.username, collectionId = id))
 
         (for {
           collection <- collection

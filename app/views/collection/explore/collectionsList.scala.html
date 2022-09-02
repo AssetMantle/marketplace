@@ -1,12 +1,19 @@
-@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import controllers.actions.LoginState
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider,loginState: Option[LoginState])
 
 <div class="item item-center collectionContainer">
     <div class="profile-card">
         <div class="profiles-container">
             <div class="d-flex flex-xl-row flex-lg-column align-items-center justify-content-between card-header">
                 <div class="left-option">
-                    <div class="row">
-                        <div class="col mx-3 p-0 active">@Messages(constants.View.ART)</div>
+                    <div class="row" id="sectionMenu">
+                        <div class="col mx-3 p-0 menuItem active" onclick="componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.collectionsPerPage(1, 'art'));">@Messages(constants.View.ART)</div>
+                        @if(loginState.nonEmpty) {
+                            <div class="col mx-3 p-0 menuItem" onclick="componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.wishListCollections(1, 'wishlist'));">
+                               @Messages(constants.View.WISHLIST_MENU)
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -17,7 +24,13 @@
     </div>
 </div>
 <script>
-        componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.collectionsPerPage(1));
+    $("#sectionMenu .menuItem").on('click', function(){
+        $("#sectionMenu").find(".active").removeClass("active");
+        $(this).addClass("active");
+    });
+</script>
+<script>
+        componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.collectionsPerPage(1, 'art'));
         checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections().url, '', "collections");
 </script>
 <script src="@routes.Assets.versioned("javascripts/collections/loadMore.js")" type="text/javascript"></script>
