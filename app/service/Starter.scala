@@ -60,7 +60,7 @@ class Starter @Inject()(
       JsPath.read[JsObject]
     ) (msgApply _)
 
-  case class UploadCollection(name: String, description: String, jsonPath: String, imagePath: String, imageIPFSLink: Boolean, website: String, uploadToIPFS: Boolean, downloadFromIPFS: Boolean, process: Boolean, profile: String, cover: String, twitter: String, instagram: String, updateDetails: Boolean)
+  case class UploadCollection(name: String, description: String, jsonPath: String, imagePath: String, website: String, uploadToIPFS: Boolean, downloadFromIPFS: Boolean, process: Boolean, profile: String, cover: String, twitter: String, instagram: String, updateDetails: Boolean)
 
   case class NFT(name: String, description: String, image: String, properties: Seq[NftProperty], edition: Option[Int] = None)
 
@@ -88,7 +88,8 @@ class Starter @Inject()(
       try {
         val ipfsDetails = nftDetails.image.split("/").takeRight(2)
         val ipfsHash = ipfsDetails(0)
-        val fileName = ipfsDetails(1)
+        //        val fileName = ipfsDetails(1)
+        val fileName = nftDetails.name + ".png"
         val oldFilePath = constants.CommonConfig.Files.CollectionPath + "/" + uploadCollection.imagePath + "/" + fileName
         val ipfsPath = if (uploadCollection.uploadToIPFS) {
           val file = new File(oldFilePath)
@@ -97,8 +98,7 @@ class Starter @Inject()(
           utilities.IPFS.pinFile(file, newFileName).IpfsHash
         } else ipfsHash + "/" + fileName
         if (uploadCollection.downloadFromIPFS) {
-          if (uploadCollection.imageIPFSLink) utilities.IPFS.downloadFile(nftDetails.image, oldFilePath, completeUrl = true)
-          else utilities.IPFS.downloadFile(ipfsHash + "/" + fileName, oldFilePath)
+          utilities.IPFS.downloadFile(ipfsHash + "/" + fileName, oldFilePath)
         }
         val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
         val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(fileName)
