@@ -29,14 +29,14 @@
                         <span onclick="addRemoveWishlist(this, '@nft.fileName')">
                             @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
                         </span>
-                        <div class="nft-likes">00</div>
+                        <div class="nft-likes" data-id="@nft.fileName">00</div>
                     </div>
                 }else{
                     <div class="d-flex align-items-center gap-1 mt-3" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN.get, ""))">
                         <span>
                             @views.html.nft.commonCardWishlistButton(false)
                         </span>
-                        <div class="nft-likes">00</div>
+                        <div class="nft-likes" data-id="@nft.fileName">00</div>
                     </div>
                 }
             </div>

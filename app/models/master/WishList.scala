@@ -94,5 +94,7 @@ class WishLists @Inject()(
 
     def checkExists(accountId: String, nftId: String): Future[Boolean] = exists(id1 = accountId, id2 = nftId)
 
+    def countLikes(nftId: String): Future[Int] = filter(_.nftId === nftId).map(_.length)
+
   }
 }
