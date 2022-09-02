@@ -28,7 +28,7 @@
         <entry key="POSTGRES_PASSWORD" value="mantlePlace" />
         <entry key="POSTGRES_URL" value="localhost:5432" />
         <entry key="POSTGRES_USER" value="mantlePlace" />
-        <entry key="ROOT_FILE_PATH" value="$PROJECT_DIR$/../../" />
+        <entry key="ROOT_FILE_PATH" value="$PROJECT_DIR$/../.." />
         <entry key="SITE_URL" value="https://staging.marketplace.assetmantle.one" />
       </map>
     </option>
@@ -45,7 +45,7 @@
     </option>
     <option name="play2NeedOpenInBrowser" value="true" />
     <option name="play2NonDefaultInstallDir" value="" />
-    <option name="play2OpenUrl" value="http://localhost:9000" />
+    <option name="play2OpenUrl" value="http://localhost:9001" />
     <option name="play2isAutoReloadEnabled" value="true" />
     <option name="projectPathOnTarget" />
     <option name="selectedOptions">
