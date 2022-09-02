@@ -118,4 +118,17 @@ class NFTController @Inject()(
       }
   }
 
+  def likesCounter(nftId: String): EssentialAction = cached.apply(req => req.path + "/" + nftId, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val countLikes = masterWishLists.Service.countLikes(nftId)
+        (for {
+          countLikes <- countLikes
+        } yield Ok(countLikes.toString)
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
+  }
+
 }
