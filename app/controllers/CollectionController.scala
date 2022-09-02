@@ -32,10 +32,10 @@ class CollectionController @Inject()(
 
   private implicit val module: String = constants.Module.COLLECTION_CONTROLLER
 
-  def viewCollections(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollections(section: String): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.collection.viewCollections()))
+        Future(Ok(views.html.collection.viewCollections(section)))
     }
   }
 
@@ -52,10 +52,10 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionsList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+  def collectionsList(section: String): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.collection.explore.collectionsList()))
+        Future(Ok(views.html.collection.explore.collectionsList(section)))
     }
   }
 
@@ -148,14 +148,6 @@ class CollectionController @Inject()(
         }
     }
   }
-
-  def wishListCollections(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
-    withLoginActionAsync { implicit loginState =>
-      implicit request =>
-        Future(Ok(views.html.collection.explore.wishListCollections()))
-    }
-  }
-
   def wishListCollectionPerPage(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>

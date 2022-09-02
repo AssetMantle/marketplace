@@ -1,5 +1,5 @@
-function viewCollections() {
-    componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsList());
+function viewCollections(section) {
+    componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsList(section));
     $('#leftContent').html('');
 }
 

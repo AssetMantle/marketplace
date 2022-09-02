@@ -39,17 +39,16 @@ POST        /migrateWalletToKey                   controllers.AccountController.
 
 GET         /changeActiveKey                      controllers.AccountController.changeActiveKey(address: String)
 
-GET         /collections                          controllers.CollectionController.viewCollections()
+GET         /collections/:section                 controllers.CollectionController.viewCollections(section: String)
 GET         /collection/:id                       controllers.CollectionController.viewCollection(id: String)
-GET         /collectionsList                      controllers.CollectionController.collectionsList()
+GET         /collectionsList                      controllers.CollectionController.collectionsList(section: String)
 GET         /collectionsPerPage                   controllers.CollectionController.collectionsPerPage(pageNumber: Int)
 GET         /collectionNFTs                       controllers.CollectionController.collectionNFTs(id: String)
 GET         /collectionNFTsPerPage                controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionFile                       controllers.CollectionController.collectionFile(id: String, documentType:String, compress: Boolean)
 GET         /collectionInfo                       controllers.CollectionController.info(id: String)
-GET         /wishListCollections                  controllers.CollectionController.wishListCollections()
 GET         /wishListCollectionPerPage            controllers.CollectionController.wishListCollectionPerPage(pageNumber: Int)
-GET         /wishListCollectionNFTs               controllers.CollectionController.wishListCollectionNFTs(id: String)
+GET         /wishListCollectionNFTs/:id           controllers.CollectionController.wishListCollectionNFTs(id: String)
 GET         /wishListCollectionNFTsPerPage        controllers.CollectionController.wishListCollectionNFTsPerPage(id: String, pageNumber: Int)
 
 GET         /nft/:nftId                           controllers.NFTController.viewNFT( nftId: String)
