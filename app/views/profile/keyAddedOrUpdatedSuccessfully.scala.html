@@ -1,4 +1,4 @@
-@import views.html.base.forms._
+@import views.html.base.modal._
 
 @(address: String, name: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @successModal(heading = constants.View.ADD_WALLET_ADDRESS_SUCCESS_TITLE)
@@ -14,7 +14,9 @@
         <span class="address-box-label">@Messages(constants.View.PROFILE_IDENTITY_ADDRESS)</span>
         <span class="address-box-text">
             <span class="username-data" data-value="@address">@address</span>
-            <span class="form-copy-icon" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copy.png")"/></span>
+            <span class="form-copy-icon" onclick="copyToClipboard(this)">
+                <i class="bi bi-files iconDefault iconMedium"></i>
+            </span>
             <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
         </span>
     </div>

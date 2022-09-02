@@ -2,7 +2,7 @@ package controllers
 
 import akka.stream.scaladsl.{Source, StreamConverters}
 import akka.util.ByteString
-import controllers.actions.{WithLoginActionAsync, WithoutLoginAction, WithoutLoginActionAsync}
+import controllers.actions.{LoginState, WithLoginActionAsync, WithoutLoginAction, WithoutLoginActionAsync}
 import exceptions.BaseException
 import models.master
 import play.api.Logger
@@ -25,6 +25,7 @@ class CollectionController @Inject()(
                                       masterCollections: master.Collections,
                                       masterNFTs: master.NFTs,
                                       masterCollectionFiles: master.CollectionFiles,
+                                      masterWishLists: master.WishLists,
                                     )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -121,10 +122,14 @@ class CollectionController @Inject()(
         val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
         else masterCollections.Service.tryGet(id)
         val nfts = masterNFTs.Service.getByPageNumber(id, pageNumber)
+
+        val likedNFTs = loginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollectionAndPageNumber(accountId = x.username, collectionId = id, pageNumber = pageNumber, perPage = constants.CommonConfig.Collections.NFTsPerPage))
+
         (for {
           collection <- collection
           nfts <- nfts
-        } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts))
+          likedNFTs <- likedNFTs
+        } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts, likedNFTs))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -138,6 +143,67 @@ class CollectionController @Inject()(
         (for {
           collection <- collection
         } yield Ok(views.html.collection.details.collectionInfo(collection))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def wishListCollections(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.collection.explore.wishListCollections()))
+    }
+  }
+
+  def wishListCollectionPerPage(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val allCollectionIds = masterWishLists.Service.getCollections(loginState.username)
+
+        def allCollections(collectionIds: Seq[String]) = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        else masterCollections.Service.getCollectionsByPage(collectionIds, pageNumber)
+
+        (for {
+          collectionIds <- allCollectionIds
+          collections <- allCollections(collectionIds)
+        } yield Ok(views.html.collection.explore.wishListCollectionPerPage(collections))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def wishListCollectionNFTs(id: String): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collection = masterCollections.Service.tryGet(id)
+        (for {
+          collection <- collection
+        } yield Ok(views.html.collection.details.wishListCollectionNFTs(collection))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def wishListCollectionNFTsPerPage(id: String, pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + id + "/" + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        else masterCollections.Service.tryGet(id)
+        val nftIds = masterWishLists.Service.getByCollectionAndPageNumber(accountId = loginState.username, collectionId = id, pageNumber = pageNumber, perPage = constants.CommonConfig.Collections.NFTsPerPage)
+
+        def getNFTs(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds)
+
+        (for {
+          collection <- collection
+          nftIds <- nftIds
+          nfts <- getNFTs(nftIds)
+        } yield {
+          implicit val implicitLoginState: Option[LoginState] = Option(loginState)
+          Ok(views.html.collection.details.nftsPerPage(collection, nfts, nfts.map(_.fileName)))
+        }
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

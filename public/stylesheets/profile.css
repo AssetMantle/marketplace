@@ -1,8 +1,4 @@
 .profileContainer {
-    /*display: flex;*/
-    /*position: relative;*/
-    /*top:110px;*/
-    /*margin: 0px 50px;*/
     padding-bottom: 100px;
 }
 
@@ -30,17 +26,12 @@
     margin-bottom: 100px;
 }
 profileContainer .item-sticky .profile-card{
-    /*width: 228px;*/
     height: fit-content;
     background-color: var(--card-color);
     border-radius: 20px;
     padding: 16px;
 }
 .item-center .profile-card{
-    /*width: 100%;*/
-    /*height: fit-content;*/
-    /*background-color: var(--card-color);*/
-    /*border-radius: 20px;*/
     padding: 20px 20px 40px 20px;
 }
 .item-center.nftContainer .profile-card{
@@ -49,18 +40,12 @@ profileContainer .item-sticky .profile-card{
 }
 /* Creator Profile Card */
 .profile-card{
-    /*width: 228px !important;*/
-    /*height: fit-content;*/
     background-color: var(--card-color);
-    /*border-radius: 10px;*/
-    /*padding: 20px !important;*/
-
 }
 .profile-card .user-profile-top{
     display: flex;
     align-items: center;
     gap: 12px;
-    /*justify-content: center;*/
 }
 .profile-card .user-profile-top .user-profile-pic{
     height: 40px;
@@ -96,9 +81,6 @@ profileContainer .item-sticky .profile-card{
 }
 .profile-card .user-address-box .copy-icon{
     padding: 4px 0 0 0;
-    /*display: flex;*/
-    /*justify-content: center;*/
-    /*align-items: center;*/
     cursor: pointer;
 }
 .profile-card .user-join-date{
@@ -132,10 +114,6 @@ profileContainer .item-sticky .profile-card{
     gap: 16px;
     margin: 0px;
 }
-/*.profile-card img{*/
-/*    height: 22px;*/
-/*    width: 22px;*/
-/*}*/
 .profile-card .profile-icon{
     height: 22px;
     width: 22px;
@@ -161,7 +139,6 @@ profileContainer .item-sticky .profile-card{
     font-size: 12px;
     line-height: 14px;
     color: var(--gray);
-    /*margin-top: 8px;*/
 }
 .profile-card .profile-stats .stats-card .stats-number{
     font-family: var(--font-type-1);
@@ -299,9 +276,7 @@ profileContainer .item-sticky .profile-card{
     color: var(--mantle-off-white);
 }
 .profile-card .profiles-container .profile-list{
-    /*overflow-y: auto;*/
     margin-top: 20px;
-    /*padding-right: 20px;*/
 }
 
 
@@ -392,7 +367,6 @@ profileContainer .item-sticky .profile-card{
 }
 .single-profile-card #content {
     text-align: center;
-    /*width: 320px;*/
     margin: 0 auto;
 }
 .single-profile-card #content h1 {
@@ -484,9 +458,6 @@ profileContainer .item-sticky .profile-card{
     .item + .item {
         margin-left: 0%;
     }
-    .item-sticky{
-        /*position: unset;*/
-    }
 }
 @media (max-width: 426px) {
 
@@ -494,7 +465,6 @@ profileContainer .item-sticky .profile-card{
 
 /* Bootstrap */
 .nftContainer .row [class^="col-"]{
-    /*border:1px solid red;*/
     padding:0px 8px;
 }
 /* NFT Card */
@@ -510,10 +480,7 @@ profileContainer .item-sticky .profile-card{
     border-radius: 10px;
 }
 .nft-list .card .card-img{
-    /*position: relative;*/
-    /*height: 250px;*/
     overflow: hidden;
-    /*display: block;*/
 }
 .nft-list .card .card-img img{
     display: block;
@@ -522,16 +489,6 @@ profileContainer .item-sticky .profile-card{
     width: auto;
     height: auto;
     margin: auto;
-
-    /*display: block;*/
-    /*max-width: 275px;*/
-    /*max-height: 275px;*/
-    /*width: auto;*/
-    /*height: auto;*/
-    /*position: absolute;*/
-    /*top:50%;*/
-    /*left: 50%;*/
-    /*transform: translate(-50%, -50%);*/
 }
 .nft-list .card .nft-separator{
     height: 2px;
@@ -586,11 +543,6 @@ profileContainer .item-sticky .profile-card{
     line-height: 19px;
     text-align: right;
     text-transform: capitalize;
-    /*background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);*/
-    /*-webkit-background-clip: text;*/
-    /*-webkit-text-fill-color: transparent;*/
-    /*background-clip: text;*/
-    /*text-fill-color: transparent;*/
     color: var(--disable);
 }
 .nft-list .header-with-icon .back-button-icon img{
@@ -609,7 +561,6 @@ profileContainer .item-sticky .profile-card{
 .nft-list .form-top{
     display: flex;
     align-items: center;
-    /*gap: 8px;*/
 }
 .nft-bottom{
     margin: 24px 16px;
@@ -653,8 +604,6 @@ profileContainer .item-sticky .profile-card{
     display: block;
     max-width: 836px;
     max-height: 300px;
-    /*width: auto;*/
-    /*height: auto;*/
     width: 100%;
     height: 100%;
     position: absolute;
@@ -678,12 +627,6 @@ profileContainer .item-sticky .profile-card{
     }
 }
 
-
-.profileCoverContainer{
-    /*max-width: 100%;*/
-    /*width: 900px;*/
-    /*margin: auto;*/
-}
 .profileCoverContainer::after {
     content: '';
     position: absolute;
