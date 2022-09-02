@@ -1,4 +1,5 @@
 @import controllers.actions.LoginState
+
 @(collection: master.Collection, nft: master.NFT, liked: Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 @*<div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3" onclick="viewNFT('@nft.fileName')">*@
@@ -26,7 +27,14 @@
                 @if(loginState.nonEmpty) {
                     <div class="d-flex align-items-center gap-1 mt-3">
                         <span onclick="addRemoveWishlist(this, '@nft.fileName')">
-                            @views.html.nft.commonCardWishlistButton(liked)
+                            @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
+                        </span>
+                        <div class="nft-likes">00</div>
+                    </div>
+                }else{
+                    <div class="d-flex align-items-center gap-1 mt-3" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN.get, ""))">
+                        <span>
+                            @views.html.nft.commonCardWishlistButton(false)
                         </span>
                         <div class="nft-likes">00</div>
                     </div>
