@@ -15,7 +15,7 @@
         <entry key="BLOCKCHAIN_REST" value="http://127.0.0.1:1317" />
         <entry key="BLOCKCHAIN_RPC" value="http://127.0.0.1:26657" />
         <entry key="BLOCKCHAIN_STAKING_DENOM" value="stake" />
-        <entry key="COLLECTION_PATH" value="$USER_HOME$/collections" />
+        <entry key="COLLECTION_PATH" value="$PROJECT_DIR$/../../collections" />
         <entry key="DEFAULT_PUBLIC_FOLDER" value="$PROJECT_DIR$/public" />
         <entry key="EXPLORER_POSTGRES_DB" value="assetMantle" />
         <entry key="EXPLORER_POSTGRES_PASSWORD" value="assetMantle" />
@@ -28,7 +28,7 @@
         <entry key="POSTGRES_PASSWORD" value="mantlePlace" />
         <entry key="POSTGRES_URL" value="localhost:5432" />
         <entry key="POSTGRES_USER" value="mantlePlace" />
-        <entry key="ROOT_FILE_PATH" value="$USER_HOME$/" />
+        <entry key="ROOT_FILE_PATH" value="$PROJECT_DIR$/../.." />
         <entry key="SITE_URL" value="https://staging.marketplace.assetmantle.one" />
       </map>
     </option>
