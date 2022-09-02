@@ -98,9 +98,9 @@ object IPFS {
     postOrPutRequest("POST", RequestBody.create(MediaType.parse("application/json"), bodyContent.toString))
   }
 
-  def downloadFile(fileUrl: String, downloadPath: String, completeUrl: Boolean = false): Boolean = {
+  def downloadFile(fileUrl: String, downloadPath: String): Boolean = {
     try {
-      val url = if (!completeUrl) new URL(constants.CommonConfig.IPFS.DownloadEndPoint + "/" + fileUrl) else new URL(fileUrl)
+      val url = new URL(constants.CommonConfig.IPFS.DownloadEndPoint + "/" + fileUrl)
       val connection = url.openConnection().asInstanceOf[HttpsURLConnection]
       connection.setRequestMethod("GET")
       var in = connection.getInputStream
