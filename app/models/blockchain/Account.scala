@@ -16,7 +16,7 @@ import play.db.NamedDatabase
 
 case class Account(address: String, username: String, accountType: Option[String], publicKey: Option[PublicKey], accountNumber: Int, sequence: Int, vestingParameters: Option[VestingParameters], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
 
-  def serialize(account: Account): Accounts.AccountSerialized = Accounts.AccountSerialized(address = account.address, username = account.username, accountType = account.accountType, publicKey = account.publicKey.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), accountNumber = account.accountNumber, sequence = account.sequence, vestingParameters = account.vestingParameters.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
+  def serialize(): Accounts.AccountSerialized = Accounts.AccountSerialized(address = this.address, username = this.username, accountType = this.accountType, publicKey = this.publicKey.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), accountNumber = this.accountNumber, sequence = this.sequence, vestingParameters = this.vestingParameters.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), createdBy = this.createdBy, createdOn = this.createdOn, createdOnTimeZone = this.createdOnTimeZone, updatedBy = this.updatedBy, updatedOn = this.updatedOn, updatedOnTimeZone = this.updatedOnTimeZone)
 
 }
 
@@ -89,10 +89,6 @@ class Accounts @Inject()(
     def get(address: String): Future[Option[Account]] = getById(address).map(_.map(_.deserialize))
 
     def checkAccountExists(address: String): Future[Boolean] = exists(address)
-
-  }
-
-  object Utility {
 
   }
 
