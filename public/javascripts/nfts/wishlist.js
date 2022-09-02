@@ -23,7 +23,6 @@ function wishlistCounter(source, route) {
         }
     });
 }
-
 updateWishlist();
 
 function wishlist(route, wishlistButton) {
