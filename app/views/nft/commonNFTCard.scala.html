@@ -2,10 +2,9 @@
 
 @(collection: master.Collection, nft: master.NFT, liked: Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
-@*<div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3" onclick="viewNFT('@nft.fileName')">*@
 <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3">
     <div class="card border-0" style="cursor: pointer;">
-        <div class="card-img rounded-0">
+        <div class="card-img rounded-0" onclick="viewNFT('@nft.fileName')">
             <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(nft.file)"/>
         </div>
         <div class="nft-detail p-3">

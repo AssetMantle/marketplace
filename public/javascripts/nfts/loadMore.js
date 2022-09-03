@@ -15,7 +15,6 @@ function loadMoreNFTs(collectionId, sectionName) {
     console.log($(".nftPage").length);
     if ($(".noNFT").length === 0) {
         let route = "";
-        console.log(sectionName);
         switch (sectionName) {
             case "art":
                 route = jsRoutes.controllers.CollectionController.collectionNFTsPerPage(collectionId, $(".nftPage").length + 1);

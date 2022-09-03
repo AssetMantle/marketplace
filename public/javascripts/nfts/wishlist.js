@@ -2,8 +2,6 @@ function updateWishlist() {
     $(".nft-likes").each(function () {
         wishlistCounter(this, jsRoutes.controllers.NFTController.likesCounter($(this).attr("data-id")));
     });
-
-
 }
 
 function wishlistCounter(source, route) {
@@ -13,7 +11,6 @@ function wishlistCounter(source, route) {
         async: true,
         statusCode: {
             200: function (data) {
-                console.log(data)
                 $(source).text(data);
             },
             401: function () {
@@ -27,7 +24,6 @@ function wishlistCounter(source, route) {
 updateWishlist();
 
 function wishlist(route, wishlistButton) {
-    console.log(route);
     $.ajax({
         url: route.url,
         type: route.type,

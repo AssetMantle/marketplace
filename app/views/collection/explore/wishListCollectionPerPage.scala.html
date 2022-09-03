@@ -1,7 +1,7 @@
 @import views.html.collection._
 
 @(collections: Seq[master.Collection])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<div class="m-0 p-0 collectionPage">
+<div class="m-0 p-0 collectionPage wishlistCollectionsPerPage">
     @if(collections.nonEmpty) {
         @collections.map { collection =>
             <div class="mt-3 singleCollection">
@@ -11,12 +11,11 @@
     } else {
         <div class="noCollection"></div>
     }
-
-    <!-- Loader -->
-<div class="loading">
-    <div class="ball"></div>
-    <div class="ball"></div>
-    <div class="ball"></div>
 </div>
-    <!-- End -->
-</div>
+<script>
+        $(document).ready(function () {
+            if ($(".wishlistCollectionsPerPage .singleCollection").length <= 5) {
+                $("#loadMoreBtnContainer").addClass("hide");
+            }
+        });
+</script>

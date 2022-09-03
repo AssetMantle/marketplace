@@ -8,16 +8,16 @@
             <div class="d-flex flex-xl-row flex-lg-column align-items-center justify-content-between card-header">
                 <div class="left-option">
                     <div class="row" id="sectionMenu">
-                        <div class="col mx-3 p-0 menuItem active" onclick="componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.collectionsPerPage(1, 'art')); showLoadMoreButton();">@Messages(constants.View.ART)</div>
+                        <div class="col mx-3 p-0 menuItem active" onclick="componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.collectionsPerPage(1, 'art'));">@Messages(constants.View.ART)</div>
                         @if(loginState.nonEmpty) {
-                            <div class="col mx-3 p-0 menuItem" onclick="componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.wishListCollections(1, 'wishlist')); showLoadMoreButton();">
+                            <div class="col mx-3 p-0 menuItem" onclick="componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.wishListCollectionPerPage(1, 'wishlist'));">
                             @Messages(constants.View.WISHLIST_MENU)
                             </div>
                         }
                     </div>
                 </div>
             </div>
-            <div class="profile-list">
+            <div class="profile-list" id="art">
                 <div id="collectionsPerPage" class="w-100 list grid-view-filter collectionsPerPage"></div>
             </div>
 
@@ -31,17 +31,11 @@
 
                 <!-- Load more button -->
             <div id="loadMoreBtnContainer" class="d-flex justify-content-center form-button">
-                <button id="loadMoreCollectionButton" class="form-primary-button" onclick="loadCo()">@Messages(constants.View.LOAD_MORE_BUTTON)</button>
+                <button id="loadMoreCollectionButton" class="form-primary-button" onclick="loadCollection()">@Messages(constants.View.LOAD_MORE_BUTTON)</button>
             </div>
         </div>
     </div>
 </div>
-<script>
-        $("#sectionMenu .menuItem").on('click', function(){
-            $("#sectionMenu").find(".active").removeClass("active");
-            $(this).addClass("active");
-        });
-</script>
 <script>
         componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.collectionsPerPage(1, 'art'));
         checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections().url, '', "collections");

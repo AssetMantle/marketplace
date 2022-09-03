@@ -15,7 +15,6 @@ function loadMoreCollections() {
     const loading = document.querySelector('.loading');
     if ($(".noCollection").length === 0) {
         let sectionMenu = $.trim($("#sectionMenu").find(".menuItem.active").text());
-
         let route = "";
         let loadMore = "";
         switch (sectionMenu) {
@@ -25,7 +24,7 @@ function loadMoreCollections() {
                 break;
             case "Wishlist":
                 route = jsRoutes.controllers.CollectionController.wishListCollectionPerPage($(".collectionPage").length + 1);
-                loadMore = $(".collectionsPerPage");
+                loadMore = $(".wishlistCollectionsPerPage");
                 break;
             default:
                 break;
@@ -49,7 +48,6 @@ function loadMoreCollections() {
             },
             statusCode: {
                 200: function (data) {
-                    const loadMore = $(".collectionsPerPage");
                     loadMore.append(data);
                     if ($(".noCollection").length !== 0) {
                         $("#loadMoreBtnContainer").addClass("hide");
@@ -65,18 +63,9 @@ function loadMoreCollections() {
     }
 }
 
-function getDocHeight() {
-    let D = document;
-    return Math.max(
-        D.body.scrollHeight, D.documentElement.scrollHeight,
-        D.body.offsetHeight, D.documentElement.offsetHeight,
-        D.body.clientHeight, D.documentElement.clientHeight
-    );
-}
-
 collectionPageTimeout = 0;
 
-function loadCo() {
+function loadCollection() {
     if (!clicked) {
         clicked = true;
         loadMoreCollections();
@@ -86,3 +75,9 @@ function loadCo() {
 function showLoadMoreButton(){
     $("#loadMoreBtnContainer").removeClass("hide");
 }
+
+$("#sectionMenu .menuItem").on('click', function(){
+    showLoadMoreButton();
+    $("#sectionMenu").find(".active").removeClass("active");
+    $(this).addClass("active");
+});
