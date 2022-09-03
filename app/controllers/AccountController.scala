@@ -177,7 +177,7 @@ class AccountController @Inject()(
 
                   for {
                     _ <- pushNotificationTokenUpdate
-                    result <- withUsernameToken.Ok(views.html.collection.viewCollections())
+                    result <- withUsernameToken.Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION))
                   } yield result
                 }
               }
@@ -218,7 +218,7 @@ class AccountController @Inject()(
             def getResult(username: String, address: String) = {
               implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = username, address = address))
               implicit val loginState: LoginState = LoginState(username = username, address = address)
-              withUsernameToken.Ok(views.html.collection.viewCollections())
+              withUsernameToken.Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION))
             }
 
             for {

@@ -133,8 +133,11 @@ class Collections @Inject()(
 
     def tryGetByName(name: String): Future[Collection] = filterHead(_.name === name).map(_.deserialize)
 
-    def getByPageNumber(pageNumber: Int): Future[Seq[Collection]] = getAll.map(_.sortBy(_.createdOn).slice((pageNumber - 1) * constants.CommonConfig.Collections.CollectionsPerPage, pageNumber * constants.CommonConfig.Collections.CollectionsPerPage).map(_.deserialize))
+    def getByPageNumber(pageNumber: Int): Future[Seq[Collection]] = getAllByPageNumber(offset = (pageNumber - 1) * constants.CommonConfig.Collections.CollectionsPerPage, limit = constants.CommonConfig.Collections.CollectionsPerPage)(_.createdOn).map(_.map(_.deserialize))
 
     def deleteById(id: String): Future[Int] = delete(id)
+
+    def getCollectionsByPage(collectionIds: Seq[String], pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Collections.CollectionsPerPage, limit = constants.CommonConfig.Collections.CollectionsPerPage)(_.id.inSet(collectionIds))(_.createdOn).map(_.map(_.deserialize))
+
   }
 }

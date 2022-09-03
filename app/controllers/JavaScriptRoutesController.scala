@@ -35,11 +35,17 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.collectionNFTs,
         routes.javascript.CollectionController.collectionNFTsPerPage,
         routes.javascript.CollectionController.info,
+        routes.javascript.CollectionController.wishListCollectionPerPage,
+        routes.javascript.CollectionController.wishListCollectionNFTs,
+        routes.javascript.CollectionController.wishListCollectionNFTsPerPage,
 
         routes.javascript.NFTController.viewNFT,
         routes.javascript.NFTController.info,
         routes.javascript.NFTController.details,
         routes.javascript.NFTController.file,
+        routes.javascript.NFTController.addToWishList,
+        routes.javascript.NFTController.deleteFromWishList,
+        routes.javascript.NFTController.likesCounter,
 
         routes.javascript.ProfileController.viewProfile,
         routes.javascript.ProfileController.settings,
@@ -50,11 +56,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.changeKeyNameForm,
         routes.javascript.ProfileController.viewMnemonicsForm,
         routes.javascript.ProfileController.deleteKeyForm,
-
-//        routes.javascript.ProfileController.changeManagedToUnmanagedForm,
+        //        routes.javascript.ProfileController.changeManagedToUnmanagedForm,
 
         routes.javascript.BlockchainTransactionController.sendCoinForm,
-        
+
         routes.javascript.ProfileController.viewWishList,
         routes.javascript.ProfileController.wishList,
         routes.javascript.ProfileController.wishListNFTs,

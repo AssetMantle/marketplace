@@ -276,7 +276,7 @@ profileContainer .item-sticky .profile-card{
     color: var(--mantle-off-white);
 }
 .profile-card .profiles-container .profile-list{
-    margin-top: 20px;
+    /*margin-top: 20px;*/
 }
 
 
