@@ -88,7 +88,7 @@ class WishLists @Inject()(
 
     def getByCollectionAndPageNumber(accountId: String, collectionId: String, pageNumber: Int, perPage: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * perPage, limit = perPage)(x => x.accountId === accountId && x.collectionId === collectionId)(_.createdOn).map(_.map(_.nftId))
 
-    def getCollections(accountId: String): Future[Seq[String]] = filter(_.accountId === accountId).map(_.map(_.collectionId))
+    def getCollections(accountId: String): Future[Seq[String]] = filter(_.accountId === accountId).map(_.map(_.collectionId).distinct)
 
     def deleteWishItem(accountId: String, nftId: String): Future[Int] = delete(id1 = accountId, id2 = nftId)
 
