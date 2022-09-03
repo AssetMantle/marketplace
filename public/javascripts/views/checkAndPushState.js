@@ -1,6 +1,4 @@
 function checkAndPushState(route, parameter, functionName) {
-    console.log(route)
-    console.log(parameter)
     if (addState === true) {
         if (route === "" && parameter === "") {
             window.history.pushState(functionName, "assetMantle", "/");
@@ -11,7 +9,6 @@ function checkAndPushState(route, parameter, functionName) {
             } else {
                 address = "/" + route.split('/')[1];
             }
-            console.log(address)
             window.history.pushState(functionName, "assetMantle", address);
         }
     } else {

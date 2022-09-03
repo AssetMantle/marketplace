@@ -14,15 +14,15 @@ clicked = false;
 function loadMoreCollections() {
     const loading = document.querySelector('.loading');
     if ($(".noCollection").length === 0) {
-        let sectionMenu = $.trim($("#sectionMenu").find(".menuItem.active").text());
+        const activeSection = $.trim($("#sectionMenu").find(".menuItem.active").attr('id'));
         let route = "";
         let loadMore = "";
-        switch (sectionMenu) {
-            case "Art":
+        switch (activeSection) {
+            case "art":
                 route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
                 loadMore = $(".collectionsPerPage");
                 break;
-            case "Wishlist":
+            case "wishListCollections":
                 route = jsRoutes.controllers.CollectionController.wishListCollectionPerPage($(".collectionPage").length + 1);
                 loadMore = $(".wishlistCollectionsPerPage");
                 break;
@@ -44,6 +44,12 @@ function loadMoreCollections() {
                 loading.classList.remove('show');
                 if ($(".noCollection").length === 0) {
                     $("#loadMoreBtnContainer").removeClass("hide");
+                }
+                if (activeSection === 'art' && $(".artCollection").length % 6 !== 0) {
+                    $("#loadMoreBtnContainer").addClass("hide");
+                }
+                if (activeSection === 'wishListCollections' && $(".wishListCollection").length % 6 !== 0) {
+                    $("#loadMoreBtnContainer").addClass("hide");
                 }
             },
             statusCode: {
@@ -72,11 +78,11 @@ function loadCollection() {
     }
 }
 
-function showLoadMoreButton(){
+function showLoadMoreButton() {
     $("#loadMoreBtnContainer").removeClass("hide");
 }
 
-$("#sectionMenu .menuItem").on('click', function(){
+$("#sectionMenu .menuItem").on('click', function () {
     showLoadMoreButton();
     $("#sectionMenu").find(".active").removeClass("active");
     $(this).addClass("active");
