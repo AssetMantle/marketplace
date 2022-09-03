@@ -5,7 +5,7 @@ window.addEventListener('popstate', e => {
 
     switch (this.history.state) {
         case "collections":
-            viewCollections();
+            viewCollections(lastPart);
             break;
         case "collection":
             viewCollection(lastPart);

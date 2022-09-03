@@ -35,7 +35,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.collectionNFTs,
         routes.javascript.CollectionController.collectionNFTsPerPage,
         routes.javascript.CollectionController.info,
-        routes.javascript.CollectionController.wishListCollections,
         routes.javascript.CollectionController.wishListCollectionPerPage,
         routes.javascript.CollectionController.wishListCollectionNFTs,
         routes.javascript.CollectionController.wishListCollectionNFTsPerPage,

@@ -1,9 +1,9 @@
 @import controllers.actions.LoginState
 
-@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(section: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 @views.html.base.common(constants.View.COLLECTIONS, failures, warnings, successes, infos)
 
 <script>
-        componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsList());
+        componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsList('@section'));
 </script>
