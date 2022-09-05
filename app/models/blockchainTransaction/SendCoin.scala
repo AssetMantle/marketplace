@@ -93,6 +93,7 @@ class SendCoins @Inject()(
                            broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                            utilitiesOperations: utilities.Operations,
                            getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
+                           getAccount: queries.blockchain.GetAccount,
                          )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl2[SendCoins.SendCoinTable, SendCoins.SendCoinSerialized, String, String](
     databaseConfigProvider,
@@ -127,7 +128,9 @@ class SendCoins @Inject()(
   object Utility {
 
     def transaction(accountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: Double, gasLimit: Int, ecKey: ECKey, memo: String = ""): Future[SendCoin] = {
-      val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
+      // TODO
+      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
+      val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount(fromAddress))
       val unconfirmedTxs = getUnconfirmedTxs.Service.get()
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, unconfirmedTxHashes: Seq[String]) = {
