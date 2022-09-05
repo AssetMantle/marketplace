@@ -11,7 +11,7 @@ getMNTLPrice().then(response => {
         if ($(this).val()) {
             let totalGas = $(this).val() * $("#GAS_AMOUNT").val() / factor;
             $(".gasCharges").eq(elementIndex).text(totalGas + " MNTL");
-            $(".gasChargesPrice").eq(elementIndex).text(totalGas * mntlPrice + "$");
+            $(".gasChargesPrice").eq(elementIndex).text((totalGas * mntlPrice).toFixed(5) + "$");
             elementIndex++;
         }
     });
