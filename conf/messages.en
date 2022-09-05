@@ -86,6 +86,7 @@ RESPONSE.FAILURE.INVALID_SEEDS_OR_ADDRESS_OR_PASSWORD=Invalid Seeds or Address o
 RESPONSE.FAILURE.INVALID_WALLET_ADDRESS=Invalid wallet address
 RESPONSE.FAILURE.CANNOT_DELETE_ACTIVE_KEY=Cannot delete an active key.
 RESPONSE.FAILURE.MASTER_KEY_INSERT_FAILED=Key already exists or account doesn't exist
+RESPONSE.FAILURE.BLOCKCHAIN_ACCOUNT_NOT_FOUND=Address doesn't exist on chain. Please send some tokens to it.
 SIGN_UP_SIGN_IN_MESSAGE=Already have an account?
 PLACEHOLDER.SIGNUP_PASSWORD=Enter Password
 PLACEHOLDER.CONFIRM_PASSWORD=Enter Password

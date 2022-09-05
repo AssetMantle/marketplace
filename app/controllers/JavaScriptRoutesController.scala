@@ -56,7 +56,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.changeKeyNameForm,
         routes.javascript.ProfileController.viewMnemonicsForm,
         routes.javascript.ProfileController.deleteKeyForm,
-        //        routes.javascript.ProfileController.changeManagedToUnmanagedForm,
+        routes.javascript.ProfileController.walletBalance,
 
         routes.javascript.BlockchainTransactionController.sendCoinForm,
 

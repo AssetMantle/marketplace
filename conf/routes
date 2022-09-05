@@ -77,6 +77,8 @@ POST        /viewMnemonics                        controllers.ProfileController.
 GET         /deleteKey                            controllers.ProfileController.deleteKeyForm(address: String)
 POST        /deleteKey                            controllers.ProfileController.deleteKey()
 
+GET         /walletBalance                        controllers.ProfileController.walletBalance(address: String)
+
 GET         /addToWishList                        controllers.NFTController.addToWishList(nftId: String)
 GET         /deleteFromWishList                   controllers.NFTController.deleteFromWishList(nftId: String)
 GET         /likesCounter                         controllers.NFTController.likesCounter(nftId: String)
