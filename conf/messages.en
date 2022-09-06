@@ -287,7 +287,7 @@ PLACEHOLDER.MANAGED_KEY_ADDRESS=Type address here
 KEY_NAME_ERROR=Minimum length 3
 WALLET_ADDRESS_ERROR=Invalid wallet address
 PASSWORD_ERROR=Minimum length 5
-PASTE_MNEMONICS_MESSAGE=Paste all Mnemonics
+PASTE_MNEMONICS_MESSAGE=Paste Mnemonic
 MANAGED_KEY_DISCLAIMER=I agree to AssetMantle managing my wallet address through the custody solution
 
 #//Unmanaged Address

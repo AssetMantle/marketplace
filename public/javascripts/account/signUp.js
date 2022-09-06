@@ -71,6 +71,51 @@ function checkPasswords() {
     }
 }
 
+function checkNewPassword(){
+    var flag1,flag2,flag3,flag4 = 0;
+    let passwordValue = document.getElementById('signUpPassword').value;
+    if($.trim(passwordValue).length) {
+
+        let numberMatchPattern = passwordValue.match(/\d+/g);
+        const isUpperCase = (x) => /[A-Z]/.test(x);
+        let isSpecialCharacter = (x) => /[ `!@@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(x);
+
+        if (passwordValue.length > 7 && passwordValue.length < 129) {
+            $(".error-info-1 .error-icon").addClass('active');
+            flag1 = 0;
+        } else {
+            $(".error-info-1 .error-icon").removeClass('active');
+            flag1 = 1;
+        }
+        if (numberMatchPattern != null) {
+            $(".error-info-2 .error-icon").addClass('active');
+            flag2 = 0;
+        } else {
+            $(".error-info-2 .error-icon").removeClass('active');
+            flag2 = 1;
+        }
+        if (isUpperCase(passwordValue)) {
+            $(".error-info-3 .error-icon").addClass('active');
+            flag3 = 0;
+        } else {
+            $(".error-info-3 .error-icon").removeClass('active');
+            flag3 = 1;
+        }
+        if (isSpecialCharacter(passwordValue)) {
+            $(".error-info-4 .error-icon").addClass('active');
+            flag4 = 0;
+        } else {
+            $(".error-info-4 .error-icon").removeClass('active');
+            flag4 = 1;
+        }
+        if (flag1 == 1 || flag2 == 1 || flag3 == 1 || flag4 == 1) {
+            $(".error-message").slideDown();
+        } else {
+            $(".error-message").slideUp();
+        }
+    }
+}
+
 function activeButton() {
     let signUpUsername = document.getElementById("signUpUsername");
     // let signUpPassword = document.getElementById("signUpPassword");
