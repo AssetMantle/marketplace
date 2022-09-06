@@ -40,6 +40,9 @@ function loadMoreNFTs(collectionId, sectionName) {
                 if ($(".noNFT").length === 0) {
                     $("#loadMoreBtnContainer").removeClass("hide");
                 }
+                if ($(".singleNFTCard").length % 6 !== 0) {
+                    $("#loadMoreBtnContainer").addClass("hide");
+                }
             },
             statusCode: {
                 200: function (data) {
