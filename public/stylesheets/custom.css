@@ -933,12 +933,13 @@ article:first-child{
 /* Date Range Picker */
 
 .daterangepicker{
+    position: fixed !important;
     border: none !important;
     font-family: var(--font-type-2) !important;
     font-size: 16px !important;
     border-radius: 0px 0px 8px 8px !important;
-    left: auto !important;
-    right: 310px !important;
+    /*left: auto !important;*/
+    /*right: 310px !important;*/
     margin-top: 0px !important;
     background-color: var(--popup-bg) !important;
     color: var(--dark) !important;
@@ -1047,6 +1048,31 @@ article:first-child{
 }
 .daterangepicker.opensleft:before{
     z-index: 9999;
+}
+@media (max-width: 575px) {
+    .daterangepicker {
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%,-50%);
+        border: 1px solid var(--dark) !important;
+    }
+    .daterangepicker.show-calendar .ranges{
+        margin-top: 0px !important;
+    }
+    .daterangepicker .drp-calendar.left{
+        border-left: none !important;
+    }
+    .daterangepicker .drp-calendar.right{
+        border-right: none !important;
+    }
+    .daterangepicker .drp-buttons{
+        text-align: center !important;
+    }
+    .daterangepicker .drp-buttons button{
+        display: block;
+        width: 95%;
+        margin-top: 10px;
+    }
 }
 
 /* Create NFT : Toggle Button (bottom) */
