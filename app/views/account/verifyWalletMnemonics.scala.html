@@ -33,6 +33,14 @@
                 <div class="inputFieldBody">
                     <div class="usernameAvailability">
                         @views.html.base.label.commonLabel(constants.FormField.SIGNUP_PASSWORD.name)
+                        <div class="fieldIcon showPassword" id="showPassword" onclick="showPassword()">
+                            <span class="eyeIcon closeEye">
+                                <i class="bi bi-eye-slash iconDefault"></i>
+                            </span>
+                            <span class="eyeIcon openEye hidden">
+                                <i class="bi bi-eye iconDefault"></i>
+                            </span>
+                        </div>
                         @commonInputPassword(walletMnemonicsForm, constants.FormField.SIGNUP_PASSWORD, Symbol("id") -> "signUpPassword")
                     </div>
                 </div>
@@ -44,16 +52,9 @@
                 <div class="inputFieldBody">
                     <div class="usernameAvailability">
                         @views.html.base.label.commonLabel(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name)
-                        <div class="fieldIcon showPassword" id="showPassword" onclick="showPassword()">
-                            <span class="eyeIcon closeEye">
-                                <i class="bi bi-eye-slash iconDefault"></i>
-                            </span>
-                            <span class="eyeIcon openEye hidden">
-                                <i class="bi bi-eye iconDefault"></i>
-                            </span>
-                        </div>
+
                         @commonInputPassword(walletMnemonicsForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD, Symbol("id") -> "signUpConfirmPassword", Symbol("oninput") -> """checkPasswords();""")
-                        @commonFieldErrorMessage(id = "repeatPasswordError",message = Messages(constants.View.REPEAT_PASSWORD_MISMATCH))
+                        @commonFieldErrorMessage(id = "repeatPasswordError", message = Messages(constants.View.REPEAT_PASSWORD_MISMATCH))
                     </div>
                 </div>
             </div>
