@@ -77,7 +77,6 @@ function fetchBalances(walletAddresses) {
 }
 
 function fetchBalance(address) {
-    console.log("fetchBalance" + address)
     let route = jsRoutes.controllers.ProfileController.walletBalance(address);
     $.ajax({
         url: route.url,

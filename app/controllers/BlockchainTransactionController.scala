@@ -35,6 +35,19 @@ class BlockchainTransactionController @Inject()(
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CONTROLLER
 
+  def gasTokenPrice: EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val tokenPrice = masterTransactionTokenPrices.Service.tryGetLatestTokenPrice(constants.Blockchain.StakingToken)
+        (for {
+          tokenPrice <- tokenPrice
+        } yield Ok(tokenPrice.price.toString)
+          ).recover {
+          case _: BaseException => BadRequest
+        }
+    }
+  }
+
   def sendCoinForm(fromAddress: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.blockchainTransaction.sendCoin(fromAddress = fromAddress))
   }
