@@ -23,9 +23,7 @@
             </div>
         </div>
         <div class="innerSeparator"></div>
-        <div class="walletMessage">
-        @Messages(constants.View.POPUP_WALLET_BODY_MESSAGE)
-        </div>
+        <div id="walletBalance_@loginState.address"></div>
         <div class="text-center buttons">
             <a href="https://app.osmosis.zone/?from=USDC&to=MNTL" target="_blank"><button class="primaryButton">@Messages(constants.View.BUY_MORE)</button></a>
             @commonSecondaryFormButton(constants.Form.SEND_COIN, Symbol("parameters") -> s"'${loginState.address}'")
@@ -92,3 +90,4 @@
     </div>
 </div>
 <script src="@routes.Assets.versioned("javascripts/profile/settings.js")" type="text/javascript"></script>
+<script>fetchBalance('@loginState.address')</script>
