@@ -4,7 +4,7 @@
 @(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="walletPopupContainer">
     <div class="d-flex flex-row justify-content-end">
-        <i id="openWalletMenu" class="bi bi-list iconDefault iconLarge" onclick="openCloseWalletScreen(this, 'walletMenu')"></i>
+        <i id="openWalletMenu" class="bi bi-list iconDefault iconLarge" onclick="openCloseWalletScreen(this, 'addressBook')"></i>
     </div>
 
     <div class="separator"></div>
@@ -12,8 +12,9 @@
     <div class="detailContainer">
         <div class="d-flex flex-row align-content-between gap-2 userDetails">
             <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="40" height="40"/>
-            <div class="ml-3 d-flex align-items-center">
+            <div class="ms-2 d-flex flex-column justify-content-between">
                 <div class="userName">@loginState.username</div>
+                <div class="userBalance" id="walletBalance_@loginState.address"></div>
             </div>
         </div>
         <div class="row p-2 mx-0 mt-4 justify-content-between align-items-center userAddressBox">
@@ -29,30 +30,6 @@
             @commonSecondaryFormButton(constants.Form.SEND_COIN, Symbol("parameters") -> s"'${loginState.address}'")
         </div>
         <div class="innerSeparator"></div>
-    </div>
-
-
-        <!-- Wallet Menu -->
-    <div id="walletMenu" class="walletMenu">
-        <div class="d-flex flow-row justify-content-end">
-            <i id="closeWalletMenu" class="bi bi-x iconDefault iconLarge icon" onclick="openCloseWalletScreen(this, 'walletMenu')"></i>
-        </div>
-        <div class="d-flex flex-column justify-content-between h-100 menuContainer">
-            <div class="d-flex flex-column gap-2 align-items-end topMenu">
-                <span class="menuItem" onclick="openCloseWalletScreen(this, 'addressBook')">@Messages(constants.View.ADDRESS_BOOK)</span>
-            </div>
-            <div class="d-flex flex-column align-items-end bottomMenu">
-                <span class="mb-2 menuItem">
-                    <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))">
-                    @Messages(constants.View.SIGN_OUT)
-                    </a>
-                </span>
-                <div class="innerSeparator"></div>
-                <a href="@routes.ProfileController.viewProfile()">
-                    <i class="bi bi-gear iconDefault mt-1 icon"></i>
-                </a>
-            </div>
-        </div>
     </div>
 
         <!-- Address Book -->
