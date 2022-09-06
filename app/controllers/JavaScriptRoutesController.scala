@@ -58,6 +58,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.deleteKeyForm,
         routes.javascript.ProfileController.walletBalance,
 
+        routes.javascript.BlockchainTransactionController.gasTokenPrice,
         routes.javascript.BlockchainTransactionController.sendCoinForm,
 
         routes.javascript.ProfileController.viewWishList,

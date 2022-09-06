@@ -72,3 +72,10 @@ function submitForm(isModal, source, targetID) {
         console.log("Form validation failed")
     }
 }
+
+function submitFormOnEnter(event, isModal, source, targetID) {
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        submitForm(isModal, source, targetID);
+    }
+}

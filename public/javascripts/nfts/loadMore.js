@@ -12,7 +12,6 @@ clicked = false;
 
 function loadMoreNFTs(collectionId, sectionName) {
     const loading = document.querySelector('.loading');
-    console.log($(".nftPage").length);
     if ($(".noNFT").length === 0) {
         let route = "";
         switch (sectionName) {
@@ -39,6 +38,9 @@ function loadMoreNFTs(collectionId, sectionName) {
                 loading.classList.remove('show');
                 if ($(".noNFT").length === 0) {
                     $("#loadMoreBtnContainer").removeClass("hide");
+                }
+                if ($(".singleNFTCard").length % 6 !== 0) {
+                    $("#loadMoreBtnContainer").addClass("hide");
                 }
             },
             statusCode: {

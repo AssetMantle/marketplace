@@ -1,4 +1,3 @@
-@import views.html.home._
 @import views.html.base._
 @import controllers.actions.LoginState
 
@@ -18,7 +17,6 @@
             width: 0px;
         }
 </style>
-@opener()
 
 <div class="parent">
     <section class="smooth-scroll-section">
@@ -449,7 +447,7 @@
         </div>
     </section>
     <section class="smooth-scroll-section section-footer">
-    @footer()
+    @views.html.home.footer()
     </section>
 </div>
 <script>

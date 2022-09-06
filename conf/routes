@@ -86,6 +86,7 @@ GET         /likesCounter                         controllers.NFTController.like
 #GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()
 
+GET         /gasTokenPrice                        controllers.BlockchainTransactionController.gasTokenPrice()
 GET         /sendCoin                             controllers.BlockchainTransactionController.sendCoinForm(fromAddress: String)
 POST        /sendCoin                             controllers.BlockchainTransactionController.sendCoin()
 

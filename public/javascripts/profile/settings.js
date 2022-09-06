@@ -72,19 +72,35 @@ function changeActive(setAddress, oldAddress) {
 function fetchBalances(walletAddresses) {
     const addresses = walletAddresses.split(",");
     for (let i = 0; i < addresses.length; i++) {
-        let route = jsRoutes.controllers.ProfileController.walletBalance(addresses[i]);
-        $.ajax({
-            url: route.url,
-            type: route.type,
-            async: true,
-            statusCode: {
-                200: function (data) {
-                    $("#walletBalance_" + addresses[i]).html(data + " $MNTL");
-                },
-                400: function (data) {
-                    $("#walletBalance_" + addresses[i]).html(data.responseText + " $MNTL");
-                }
-            }
-        });
+        fetchBalance(addresses[i]);
     }
+}
+
+function fetchBalance(address) {
+    let route = jsRoutes.controllers.ProfileController.walletBalance(address);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                let balanceLayout = "";
+                if (parseFloat(data) % 1 != 0) {
+                    let number = data.toString().split(".");
+                    balanceLayout = `
+                           <span class="start">${number[0]}.</span>
+                            <span class="end">${number[1]} $MNTL</span>`;
+
+                } else {
+                    balanceLayout = `
+                        <span class="start">${data}</span>
+                        <span class="end">$MNTL</span>`;
+                }
+                $("#walletBalance_" + address).html(balanceLayout);
+            },
+            400: function (data) {
+                $("#walletBalance_" + address).html(data.responseText + " $MNTL");
+            }
+        }
+    });
 }

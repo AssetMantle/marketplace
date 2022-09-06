@@ -43,9 +43,8 @@
                 </div>
                 <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
                 <div class="ms-xl-auto ms-lg-3 ms-0 ms-sm-3 mt-2 mt-xl-0 mt-lg-2">
-
                     <div class="d-flex flex-row justify-content-between align-items-center walletAddressItem">
-                        <div class="me-3 align-self-start fieldValue">
+                        <div class="me-3 align-self-start fieldValue walletBalance">
                             <span id="walletBalance_@key.address"></span>
                         </div>
                         @if(key.encryptedPrivateKey.nonEmpty) {
@@ -54,6 +53,8 @@
                             } else {
                                 <input type="radio" name="walletAddress" id='@key.address' onclick="changeActive('@key.address', '@keys.find(_.active).getOrElse("")')"/>
                             }
+                        } else{
+                            <input type="radio" name="walletAddress" style="visibility: hidden;"/>
                         }
                     <div class="me-3 iconContainer menuToolTip">
                         <img src="@routes.Assets.versioned("images/icon/kebabMenuYellow.png")" class="ms-3" width="5px" height="20px"/>
@@ -73,7 +74,9 @@
         </div>
         </div>
         </div>
+
         }
+
         <div class="d-flex flex-row gap-2 align-items-center addNewWalletBtn" onclick="getForm(jsRoutes.controllers.ProfileController.addNewKey())">
             <div class="iconContainer">
                 <i class="bi bi-plus-circle iconDefault iconMedium icon"></i>

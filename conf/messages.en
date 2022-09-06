@@ -79,8 +79,8 @@ TERMS_CONDITION_MESSAGE=By creating an account, the user agrees to AssetMantle''
 TERMS_CONDITION_LABEL=Terms and conditions
 RESPONSE.FAILURE.USERNAME_UNAVAILABLE=Username is not available.
 RESPONSE.FAILURE.PASSWORDS_DO_NOT_MATCH=Password do not match.
-RESPONSE.FAILURE.INVALID_MNEMONICS=Invalid mnemonics.
-RESPONSE.FAILURE.INVALID_MNEMONICS_OR_USERNAME=Invalid mnemonics or username.
+RESPONSE.FAILURE.INVALID_MNEMONICS=Invalid mnemonic
+RESPONSE.FAILURE.INVALID_MNEMONICS_OR_USERNAME=Invalid mnemonic or username.
 RESPONSE.FAILURE.INVALID_SEEDS_OR_ADDRESS=Invalid Seeds or Address
 RESPONSE.FAILURE.INVALID_SEEDS_OR_ADDRESS_OR_PASSWORD=Invalid Seeds or Address or Password
 RESPONSE.FAILURE.INVALID_WALLET_ADDRESS=Invalid wallet address
@@ -248,7 +248,7 @@ WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT=Delete account
 
 #//Wallet
 POPUP_WALLET_BODY_MESSAGE=You will be redirected to another page on clicking buy more. Some other details user needs to know.
-BUY_MORE=Buy more
+BUY_MORE=Buy $MNTL
 SEND=Send
 POPUP_WALLET_FOOTER_MESSAGE=Lorem ipusm set dorem amit etc
 MY_NFTS_LINK=My NFTs
@@ -287,7 +287,7 @@ PLACEHOLDER.MANAGED_KEY_ADDRESS=Type address here
 KEY_NAME_ERROR=Minimum length 3
 WALLET_ADDRESS_ERROR=Invalid wallet address
 PASSWORD_ERROR=Minimum length 5
-PASTE_MNEMONICS_MESSAGE=Paste all Mnemonics
+PASTE_MNEMONICS_MESSAGE=Paste Mnemonic
 MANAGED_KEY_DISCLAIMER=I agree to AssetMantle managing my wallet address through the custody solution
 
 #//Unmanaged Address
@@ -338,8 +338,8 @@ PLACEHOLDER.CHANGE_CONFIRM_PASSWORD=Type confirm password here
 LOAD_MORE_BUTTON=Load More
 UNMANAGED_KEY=Unmanaged Key
 MANAGED_KEY=Managed Key
-MANAGED_KEY_DESCRIPTION=Private key is encrypted and stored. Can be used to do tx.
-UNMANAGED_KEY_DESCRIPTION=Only address is stored. Cannot be used to do tx.
+MANAGED_KEY_DESCRIPTION=Private key is encrypted and stored. This wallet can be used to do transaction.
+UNMANAGED_KEY_DESCRIPTION=Only address is stored. This wallet cannot be used to do transaction.
 FORM.MIGRATE_WALLET_TO_KEY.TITLE=Security Update
 FORM.MIGRATE_WALLET_TO_KEY.SUBTITLE=Enter your password and 4 seeds
 
@@ -349,16 +349,17 @@ WISHLIST_MENU=Wishlist
 FORM.MIGRATE_WALLET_TO_KEY.SUBMIT=Submit
 FORM.MIGRATE_WALLET_TO_KEY.BUTTON=Submit
 
-RESPONSE.FAILURE.MNEMONICS_LENGTH_NOT_12_OR_24=Mnemonics length must be 12 or 24
+RESPONSE.FAILURE.MNEMONICS_LENGTH_NOT_12_OR_24=Mnemonic words length must be 12 or 24
 
-FORM.SEND_COIN.BUTTON=Send Coin
-FORM.SEND_COIN.TITLE=Send Coin
+FORM.SEND_COIN.BUTTON=Send $MNTL
+FORM.SEND_COIN.TITLE=Send $MNTL
 FORM.SEND_COIN.SUBTITLE=Transfer tokens to another Mantle Wallet
 FORM.SEND_COIN.SUBMIT=Submit
+FROM_ADDRESS=
 TO_ADDRESS=Recipient Address
 PLACEHOLDER.TO_ADDRESS=Recipient Address
-SEND_COIN_AMOUNT=Coin Amount
-PLACEHOLDER.SEND_COIN_AMOUNT=Coin Amount
+SEND_COIN_AMOUNT=Amount
+PLACEHOLDER.SEND_COIN_AMOUNT=Amount
 GAS_AMOUNT=
 PLACEHOLDER.GAS_AMOUNT=Gas Amount
 GAS_PRICE=
@@ -371,6 +372,7 @@ BLOCKCHAIN_TRANSACTION_SUCCESS_SUBTITLE=Please wait sometime for tx to get commi
 BLOCKCHAIN_TRANSACTION_FAILURE_TITLE=Transaction Failed
 HASH=Hash
 RESPONSE.FAILURE.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED=Amount cannot have more than 6 digits after decimal
+RESPONSE.FAILURE.TERMS_AND_CONDITION_NOT_ACCEPTED=Terms & Conditions not accepted
 
 #Logs
 CONTROLLERS_REQUEST=REQUEST "{0} {1}" from {2} by username: {3}
