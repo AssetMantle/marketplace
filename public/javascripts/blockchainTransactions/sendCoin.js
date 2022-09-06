@@ -2,7 +2,6 @@
 $('#GAS_PRICE option:eq(2)').prop('selected', true);
 
 // Gas Price
-let gasElementIndex = 0;
 const microFactor = 1000000;
 let route = jsRoutes.controllers.BlockchainTransactionController.gasTokenPrice();
 $.ajax({
@@ -12,6 +11,7 @@ $.ajax({
     statusCode: {
         200: function (data) {
             const mntlPrice = data
+            let gasElementIndex = 0;
             $("#GAS_PRICE option").each(function () {
                 if ($(this).val()) {
                     let totalGas = $(this).val() * $("#GAS_AMOUNT").val() / microFactor;
