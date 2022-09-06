@@ -107,6 +107,12 @@
     }
     .userBalance{
       @include setFont(var(--font-type-2), normal, 600, 14px, 17px, var(--text-medium));
+      .start{
+        @include setFont(var(--font-type-2), normal, 700, 16px, 17px, var(--text-medium));
+      }
+      .end{
+        @include setFont(var(--font-type-2), normal, 700, 12px, 17px, var(--text-medium));
+      }
     }
   }
   .userAddressBox{

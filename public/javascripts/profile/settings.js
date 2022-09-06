@@ -84,7 +84,19 @@ function fetchBalance(address) {
         async: true,
         statusCode: {
             200: function (data) {
-                $("#walletBalance_" + address).html(data + " $MNTL");
+                let balanceLayout = "";
+                if (parseFloat(data) % 1 != 0) {
+                    let number = data.toString().split(".");
+                    balanceLayout = `
+                           <span class="start">${number[0]}.</span>
+                            <span class="end">${number[1]} $MNTL</span>`;
+
+                } else {
+                    balanceLayout = `
+                        <span class="start">${data}</span>
+                        <span class="end">$MNTL</span>`;
+                }
+                $("#walletBalance_" + address).html(balanceLayout);
             },
             400: function (data) {
                 $("#walletBalance_" + address).html(data.responseText + " $MNTL");
