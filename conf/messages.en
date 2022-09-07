@@ -398,3 +398,4 @@ WHITELIST_MEMBER_NAME=Username
 PLACEHOLDER.WHITELIST_MEMBER_NAME=Username
 WHITELIST_MEMBER_COPY_LINK=Copy and share the link with the users.
 WHITELIST_FIELD_MESSAGE=Add members by writing their username and press enter to add.
+WHITELIST_FIELD_ACTION_LEAVE=Leave

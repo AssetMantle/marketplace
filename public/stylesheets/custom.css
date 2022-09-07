@@ -1060,9 +1060,13 @@ article:first-child{
         margin-top: 0px !important;
     }
     .daterangepicker .drp-calendar.left{
+        width: 100%;
+        max-width: 100%;
         border-left: none !important;
     }
     .daterangepicker .drp-calendar.right{
+        width: 100%;
+        max-width: 100%;
         border-right: none !important;
     }
     .daterangepicker .drp-buttons{

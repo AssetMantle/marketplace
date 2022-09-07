@@ -562,6 +562,7 @@
               overflow-x: hidden;
               height: fit-content;
               max-height: 550px;
+              display: list-item;
               tr{
                 border-color: var(--line-2);
                 td{
@@ -698,11 +699,16 @@
         }
         #joinedWhitelist{
           .tableFieldNo{min-width: 50px;}
-          .tableFieldName{min-width: 160px;max-width: 160px;}
-          .tableFieldStatus{min-width: 110px;}
-          .tableFieldTotalMembers{min-width: 130px;}
+          .tableFieldName{min-width: 130px;max-width: 130px;}
+          .tableFieldStatus{min-width: 90px;}
+          .tableFieldTotalMembers{min-width: 120px;}
           .tableFieldMaxMembers{min-width: 120px;}
           .tableFieldSale{min-width: 140px;}
+          .tableFieldAction{
+            min-width: 50px;
+            width: 50px;
+            @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--dark));
+          }
         }
         #whitelistRequests{
           .tableFieldNo{min-width: 50px;}
@@ -715,6 +721,9 @@
             &.statusPending{color: var(--disable);}
             &.statusAccepted{color: var(--connected);}
             &.statusDeclined{color: var(--error);}
+          }
+          #whitelistRequestsReceived{
+            .tableFieldAction{min-width: 80px;}
           }
         }
       }
