@@ -1,4 +1,3 @@
-@import views.html.home._
 @import views.html.base._
 @import controllers.actions.LoginState
 
@@ -18,7 +17,6 @@
             width: 0px;
         }
 </style>
-@opener()
 
 <div class="parent">
     <section class="smooth-scroll-section">
@@ -28,7 +26,7 @@
                     <h2 class="m-0">@Messages(constants.View.HERO_SECTION_TITLE)</h2>
                     <p>@Messages(constants.View.HERO_SECTION_PARAGRAPH)</p>
                     <div class="buttons">
-                        <a href="@routes.CollectionController.viewCollections()"><button>@Messages(constants.View.EXPLORE)</button></a>
+                        <a href="@routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)"><button>@Messages(constants.View.EXPLORE)</button></a>
                         <button class="button-2" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_UP.get, ""))">@Messages(constants.View.SIGN_UP)</button>
                     </div>
                 </div>
@@ -449,7 +447,7 @@
         </div>
     </section>
     <section class="smooth-scroll-section section-footer">
-    @footer()
+    @views.html.home.footer()
     </section>
 </div>
 <script>

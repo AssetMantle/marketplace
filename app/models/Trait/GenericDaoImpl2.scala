@@ -6,7 +6,7 @@ import play.api.Logger
 import play.api.db.slick._
 import slick.jdbc.H2Profile.api._
 import slick.jdbc.JdbcProfile
-import slick.lifted.{CanBeQueryCondition, Ordered}
+import slick.lifted.{CanBeQueryCondition, ColumnOrdered, Ordered}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -51,6 +51,15 @@ abstract class GenericDaoImpl2[
   }
 
   def filterAndSortHead[C1 <: Rep[_], C2 <: Rep[_]](expr: T => C1)(sortExpr: T => C2)(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[E] = db.run(tableQuery.filter(expr).sortBy(sortExpr).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
+    }
+  }
+
+  def filterAndSortWithPagination[C1 <: Rep[_], C2 <: Rep[_]](offset: Int, limit: Int)(expr: T => C1)(sortExpr: T => C2)(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[Seq[E]] = db.run(tableQuery.filter(expr).sortBy(sortExpr).drop(offset).take(limit).result)
+
+  def filterAndSortWithOrderHead[C1 <: Rep[_], C2 <: Rep[_]](expr: T => C1)(sortExpr: T => ColumnOrdered[_])(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[E] = db.run(tableQuery.filter(expr).sortBy(sortExpr).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
