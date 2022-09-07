@@ -17,7 +17,7 @@ object FormField {
   val ADD_CURRENT_PASSWORD = new StringFormField("ADD_CURRENT_PASSWORD", 5, 128)
   val ADD_KEY_PASSWORD = new StringFormField("ADD_KEY_PASSWORD", 5, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val ADD_KEY_CONFIRM_PASSWORD = new StringFormField("ADD_KEY_CONFIRM_PASSWORD", 5, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val WALLET_ADDRESS = new StringFormField("WALLET_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
+  val WALLET_ADDRESS = new StringFormField("WALLET_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val PARTIAL_MNEMONICS = new StringFormField("PARTIAL_MNEMONICS", 3, 128)
   val PUSH_NOTIFICATION_TOKEN = new StringFormField("PUSH_NOTIFICATION_TOKEN", 0, 200)
   val SIGNUP_PASSWORD = new StringFormField("SIGNUP_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
@@ -34,17 +34,18 @@ object FormField {
   val SEEDS = new StringFormField("SEEDS", 3, 500, RegularExpression.ALL_SMALL_LETTERS_WITH_SPACE, Response.INVALID_SEEDS.message)
   val KEY_NAME = new StringFormField("KEY_NAME", 3, 128, RegularExpression.ALL_NUMBERS_ALL_LETTERS, Response.INVALID_KEY_NAME.message)
   val CONFIRM_USERNAME = new StringFormField("CONFIRM_USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
-  val FROM_ADDRESS = new StringFormField("FROM_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
-  val TO_ADDRESS = new StringFormField("TO_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
+  val FROM_ADDRESS = new StringFormField("FROM_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
+  val TO_ADDRESS = new StringFormField("TO_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
 
   val MANAGED_KEY_NAME = new StringFormField("MANAGED_KEY_NAME", 3, 50)
-  val MANAGED_KEY_ADDRESS = new StringFormField("MANAGED_KEY_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
+  val MANAGED_KEY_ADDRESS = new StringFormField("MANAGED_KEY_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val UNMANAGED_KEY_NAME = new StringFormField("UNMANAGED_KEY_NAME", 3, 50)
-  val UNMANAGED_KEY_ADDRESS = new StringFormField("UNMANAGED_KEY_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
+  val UNMANAGED_KEY_ADDRESS = new StringFormField("UNMANAGED_KEY_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val CHANGE_KEY_NAME = new StringFormField("CHANGE_KEY_NAME", 3, 50)
-  val CHANGE_KEY_ADDRESS = new StringFormField("CHANGE_KEY_ADDRESS", 3, 50)
+
   val USER_BIO = new StringFormField("USER_BIO", 3, 200)
   val INSTAGRAM_USERNAME = new StringFormField("INSTAGRAM_USERNAME", 3, 50)
+  val CHANGE_KEY_ADDRESS = new StringFormField("CHANGE_KEY_ADDRESS", 3, 50, RegularExpression.MANTLE_ADDRESS)
 
   val GAS_AMOUNT = new IntFormField("GAS_AMOUNT", 20000, 2000000)
 

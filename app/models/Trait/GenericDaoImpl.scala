@@ -42,6 +42,8 @@ abstract class GenericDaoImpl[
 
   def getAll: Future[Seq[E]] = db.run(tableQuery.result)
 
+  def getAllByPageNumber[C1 <: Rep[_]](offset: Int, limit: Int)(sortExpr: T => C1)(implicit ev: C1 => Ordered): Future[Seq[E]] = db.run(tableQuery.sortBy(sortExpr).drop(offset).take(limit).result)
+
   def filter[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Seq[E]] = db.run(tableQuery.filter(expr).result)
 
   def filterHead[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[E] = db.run(tableQuery.filter(expr).result.head.asTry).map {
@@ -57,6 +59,10 @@ abstract class GenericDaoImpl[
       case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
     }
   }
+
+  def filterAndSort[C1 <: Rep[_], C2 <: Rep[_]](expr: T => C1)(sortExpr: T => C2)(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[Seq[E]] = db.run(tableQuery.filter(expr).sortBy(sortExpr).result)
+
+  def filterAndSortWithPagination[C1 <: Rep[_], C2 <: Rep[_]](offset: Int, limit: Int)(expr: T => C1)(sortExpr: T => C2)(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[Seq[E]] = db.run(tableQuery.filter(expr).sortBy(sortExpr).drop(offset).take(limit).result)
 
   def filterAndSortWithOrderHead[C1 <: Rep[_], C2 <: Rep[_]](expr: T => C1)(sortExpr: T => ColumnOrdered[_])(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[E] = db.run(tableQuery.filter(expr).sortBy(sortExpr).result.head.asTry).map {
     case Success(result) => result

@@ -45,7 +45,7 @@ function copyToClipboard(e) {
 }
 
 // Open/Close wallet screens
-function openCloseWalletScreen(e, elementID){
+function openCloseWalletScreen(e, elementID) {
     $(e).parent().closest(".walletPopupContainer").find(`#${elementID}`).toggleClass("open");
 }
 
@@ -96,4 +96,29 @@ function showHideUsername() {
         $(".closeEye").removeClass("hidden");
         $(".openEye").addClass("hidden");
     }
+}
+
+function fetchBalances(walletAddresses) {
+    const addresses = walletAddresses.split(",");
+    for (let i = 0; i < addresses.length; i++) {
+        fetchBalance(addresses[i]);
+    }
+}
+
+function fetchBalance(address) {
+    let route = jsRoutes.controllers.ProfileController.walletBalance(address);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                $("#walletBalance_" + address).html(data);
+            },
+            400: function (data) {
+                console.log(data.responseText)
+                $("#walletBalance_" + address).html(data.responseText);
+            }
+        }
+    });
 }
