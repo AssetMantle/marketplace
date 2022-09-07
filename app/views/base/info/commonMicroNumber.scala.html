@@ -1,7 +1,6 @@
 @import utilities.MicroNumber
 
-@(value: MicroNumber)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(value: MicroNumber, units: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@utilities.NumericOperation.formatNumber(value.wholePart)
-    .
-@value.decimalPart.toString
+<span class="start">@utilities.NumericOperation.formatNumber(value.wholePart)</span>
+<span class="end">.@value.decimalPart.toString @Messages(units)</span>

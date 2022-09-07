@@ -276,9 +276,9 @@ class ProfileController @Inject()(
         val balance = blockchainBalances.Service.tryGet(address)
         (for {
           balance <- balance
-        } yield Ok(views.html.base.info.commonMicroNumber(balance.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount)))
+        } yield Ok(views.html.base.info.commonMicroNumber(balance.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount), constants.View.STAKING_TOKEN_UNITS))
           ).recover {
-          case _: BaseException => BadRequest(views.html.base.info.commonMicroNumber(MicroNumber.zero))
+          case _: BaseException => BadRequest(views.html.base.info.commonMicroNumber(MicroNumber.zero, constants.View.STAKING_TOKEN_UNITS))
         }
     }
   }
