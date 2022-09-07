@@ -99,7 +99,10 @@ function fetchBalance(address) {
                 $("#walletBalance_" + address).html(balanceLayout);
             },
             400: function (data) {
-                $("#walletBalance_" + address).html(data.responseText + " $MNTL");
+                let balanceLayout = `
+                        <span class="start">${data.responseText}</span>
+                        <span class="end">$MNTL</span>`;
+                $("#walletBalance_" + address).html(balanceLayout);
             }
         }
     });
