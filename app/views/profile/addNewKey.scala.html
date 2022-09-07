@@ -12,7 +12,7 @@
 <div class="optionBoxContainer">
     <div class="options">
         <label class="option" for="sendCoin" onclick="setNextButton('managed')">
-            <input type="radio" name="addressType" id="sendCoin" value="managed"/>
+            <input type="radio" name="addressType" id="sendCoin" value="managed" checked="checked"/>
             <div class="optionContent">
                 <div class="optionDetails">
                     <span>@Messages(constants.View.MANAGED_KEY)</span>
@@ -37,6 +37,7 @@
 </div>
 
 <script>
+    setNextButton('managed');
     function setNextButton(addressType){
         $("#nextBtn").removeClass("disable");
         if(addressType === "managed"){

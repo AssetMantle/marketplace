@@ -782,18 +782,6 @@ dl dd.error{
     color: var(--error);
     position: relative;
 }
-dl dd.error:before{
-    content: '';
-    position: absolute;
-    left:0px;
-    width: 16px;
-    height: 16px;
-    background-image: url("../images/icon/closeRed.svg");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    margin-top: 1px;
-}
 
 /* Global Level Error */
 .toastContainer {

@@ -33,11 +33,11 @@ class IndexController @Inject()(
         optionalLoginState match {
           case Some(loginState) =>
             implicit val loginStateImplicit: LoginState = loginState
-            withUsernameToken.Ok(views.html.collection.viewCollections())
+            Future(Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)))
           case None => Future(Ok(views.html.index()))
         }
     }
   }
 
-  //  starter.start()
+    starter.start()
 }
