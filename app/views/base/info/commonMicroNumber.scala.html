@@ -2,5 +2,4 @@
 
 @(value: MicroNumber, units: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<span class="start">@utilities.NumericOperation.formatNumber(value.wholePart)</span>
-<span class="end">.@value.decimalPart.toString @Messages(units)</span>
+<span class="start">@utilities.NumericOperation.formatNumber(value.wholePart)</span><span class="end">.@value.decimalPart.toString @Messages(units)</span>
