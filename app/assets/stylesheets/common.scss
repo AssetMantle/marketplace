@@ -53,7 +53,6 @@
   }
   .dropdownBody{
     @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
-    padding: 10px 12px;
     position: relative;
     .dropdownBodyInner{
       position: absolute;
@@ -162,8 +161,143 @@
 #comingSoonBtn:hover::after {
   top: 0;
 }
-.commonCheckBox{
-  label{
-    display: none;
+
+// New Components
+.mntlButton{
+  @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--button-text));
+  text-transform: capitalize;
+  width: 200px;
+  padding: 9px 0px;
+  border: none;
+  outline: none;
+  border-radius: 32px;
+  &.primaryButton{
+    &.active{
+      background-color: var(--default);
+      &:hover{
+        box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.5);
+      }
+    }
+    &.disable{
+      background-color: var(--disable-yellow);
+      cursor: none;
+      pointer-events: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
   }
+}
+.bi {
+  font-size: 20px;
+  line-height: 20px;
+
+  &.iconDefault {
+    color: var(--default);
+  }
+
+  &.iconBlack {
+    color: var(--card-dark);
+  }
+
+  &.iconWhite {
+    color: var(--mantle-off-white);
+  }
+
+  &.iconSuccess {
+    color: var(--connected);
+  }
+
+  &.iconError {
+    color: var(--error);
+  }
+
+  &.iconLarge {
+    font-size: 30px;
+  }
+
+  &.iconMedium {
+    font-size: 18px;
+  }
+
+  &.iconSmall {
+    font-size: 14px;
+  }
+
+  &.iconSize16 {
+    font-size: 16px;
+  }
+
+  &.iconSize20 {
+    font-size: 20px;
+  }
+
+  &.iconSize24 {
+    font-size: 24px;
+  }
+}
+// Add To Wishlist Button
+.addToWishlist{
+  border: none;
+  background: none;
+  transition: transform 0.4s ease;
+  &:hover{
+    cursor: pointer;
+  }
+  &:active{
+    transform: scale(1.3);
+  }
+  .heartIcon {
+    width: 18px;
+    height: 18px;
+    path {
+      fill: none;
+      stroke-width: 2;
+      stroke: var(--icon-white);
+    }
+  }
+  &.clicked {
+    .heartIcon {
+      path {
+        fill: var(--default);
+        stroke-width: 0;
+      }
+    }
+  }
+}
+
+// Toggle Button
+.toggleBtn{
+  position: relative;
+  right: 0;
+  span{
+    box-shadow: none !important;
+    border: 2px solid var(--line);
+    background: var(--popup-bg);
+    @include setFont(var(--font-type-2), normal, 600, 14px, 17px, var(--text-medium));
+    &:first-child{
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+    &:last-child{
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+    &:hover{
+      background: var(--dark);
+      border: 2px solid var(--line);
+    }
+    &.active{
+      background: var(--dark);
+      border: 2px solid var(--line);
+      @include setFont(var(--font-type-2), normal, 600, 14px, 17px, var(--card-color));
+    }
+  }
+}
+#gasPriceToggleButton{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: column;
 }

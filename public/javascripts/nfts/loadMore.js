@@ -1,40 +1,53 @@
 window.onbeforeunload = function () {
-    if($(".nftContainer").length !== 0) {
+    if ($(".nftContainer").length !== 0) {
         window.scrollTo(0, 0);
     }
 }
 document.onload = function () {
-    if($(".nftContainer").length !== 0) {
+    if ($(".nftContainer").length !== 0) {
         window.scrollTo(0, 0);
     }
 }
 clicked = false;
-function loadMoreNFTs(collectionId) {
+
+function loadMoreNFTs(collectionId, sectionName) {
     const loading = document.querySelector('.loading');
-    console.log($(".nftPage").length);
     if ($(".noNFT").length === 0) {
-        let route = jsRoutes.controllers.CollectionController.collectionNFTsPerPage(collectionId, $(".nftPage").length + 1);
+        let route = "";
+        switch (sectionName) {
+            case "art":
+                route = jsRoutes.controllers.CollectionController.collectionNFTsPerPage(collectionId, $(".nftPage").length + 1);
+                break;
+            case "wishlist":
+                route = jsRoutes.controllers.CollectionController.wishListCollectionNFTsPerPage(collectionId, $(".nftPage").length + 1);
+                break;
+            default:
+                break;
+        }
         $.ajax({
             url: route.url,
             type: route.type,
             async: true,
             beforeSend: function () {
                 loading.classList.add('show');
-                if($(".noNFT").length === 0) {
+                if ($(".noNFT").length === 0) {
                     $("#loadMoreBtnContainer").addClass("hide");
                 }
             },
             complete: function () {
                 loading.classList.remove('show');
-                if($(".noNFT").length === 0) {
+                if ($(".noNFT").length === 0) {
                     $("#loadMoreBtnContainer").removeClass("hide");
+                }
+                if ($(".singleNFTCard").length % 6 !== 0) {
+                    $("#loadMoreBtnContainer").addClass("hide");
                 }
             },
             statusCode: {
                 200: function (data) {
                     const loadMore = $(".nftsPerPage");
                     loadMore.append(data);
-                    if($(".noNFT").length !== 0){
+                    if ($(".noNFT").length !== 0) {
                         $("#loadMoreBtnContainer").addClass("hide");
                     }
                     clicked = false;
@@ -50,10 +63,11 @@ function loadMoreNFTs(collectionId) {
 
 nftPageTimeout = 0;
 collectionId = '';
-function loadCollections(){
-    if(!clicked){
+
+function loadCollections(section) {
+    if (!clicked) {
         clicked = true;
-        loadMoreNFTs(collectionId);
+        loadMoreNFTs(collectionId, section);
     }
 }
 

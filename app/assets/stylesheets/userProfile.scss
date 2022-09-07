@@ -30,7 +30,6 @@
   height: fit-content;
   background-color: var(--card-color);
   border-radius: 20px;
-  //overflow: hidden;
   margin-bottom: 100px;
   padding: 20px;
   .title{
@@ -70,6 +69,7 @@
         @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
         text-transform: capitalize;
         cursor: pointer;
+        word-break: break-all;
       }
       .fieldValue{
         @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
@@ -101,6 +101,12 @@
         transition: all 0.5s ease;
         label{
           cursor: pointer !important;
+        }
+        .start{
+          @include setFont(var(--font-type-2), normal, 700, 16px, 17px, var(--text-medium));
+        }
+        .end{
+          @include setFont(var(--font-type-2), normal, 700, 12px, 17px, var(--text-medium));
         }
       }
       .walletAddressItem{
@@ -206,7 +212,6 @@
 
 .menuToolTip {
   position: relative;
-  //position: absolute;
   display: inline-block;
 }
 .menuToolTip .tooltiptext {
@@ -325,6 +330,8 @@
   display: flex;
   padding: 20px;
   border-radius: 10px;
+  min-height: 160px;
+  height: 100%;
 }
 
 .options .option .optionDetails span {
@@ -351,7 +358,6 @@
 
 @media screen and (max-width: 991px) {
   .options {
-    //margin: 0 20px;
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     -ms-flex-direction: column;
@@ -360,15 +366,10 @@
     -ms-flex-align: start;
     align-items: flex-start;
     gap: 12px;
-    //padding: 40px;
   }
 
   .options .option {
     width: 100%;
-  }
-
-  .option:last-child {
-    //margin-top: 20px;
   }
 
   .options .option .optionContent .optionDetails {
@@ -409,43 +410,31 @@
   }
 }
 
-// Add To Favorites Button
-.addToFavoritesButton{
-  .label {
-    display: grid;
-    place-items: center;
+// Add To Wishlist Button
+.addToWishlist{
+  border: none;
+  background: none;
+  transition: transform 0.4s ease;
+  &:hover{
     cursor: pointer;
-    .heart {
-      display: grid;
-      place-items: center;
-      position: relative;
-      svg {
-        height: 14px;
-        fill: rgb(255,255,255);
-        transition: all 500ms ease-in-out;
-        &:nth-child(2) {
-          height: 12px;
-          fill: var(--card-dark);
-          position: absolute;
-          z-index: 2;
-        }
-      }
+  }
+  &:active{
+    transform: scale(1.3);
+  }
+  .heartIcon {
+    width: 18px;
+    height: 18px;
+    path {
+      fill: none;
+      stroke-width: 2;
+      stroke: var(--icon-white);
     }
-    input {
-      display: none;
-      &:checked + .heart svg {
-        fill: var(--dark);
-      }
-      &:checked + .heart svg:nth-child(2) {
-        filter: opacity(1);
-        animation: heart 0.3s linear forwards;
-      }
-      @keyframes heart {
-        to {
-          transform: scale(2.5);
-          filter: opacity(0);
-          fill: var(--dark);
-        }
+  }
+  &.clicked {
+    .heartIcon {
+      path {
+        fill: var(--default);
+        stroke-width: 0;
       }
     }
   }

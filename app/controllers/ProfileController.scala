@@ -3,13 +3,14 @@ package controllers
 import controllers.actions._
 import controllers.result.WithUsernameToken
 import exceptions.BaseException
-import models.{master, masterTransaction}
+import models.{blockchain, master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import views.profile.companion._
 import play.api.mvc._
+import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,6 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ProfileController @Inject()(
                                    messagesControllerComponents: MessagesControllerComponents,
                                    cached: Cached,
+                                   blockchainBalances: blockchain.Balances,
                                    withoutLoginActionAsync: WithoutLoginActionAsync,
                                    withoutLoginAction: WithoutLoginAction,
                                    masterAccounts: master.Accounts,
@@ -25,12 +27,12 @@ class ProfileController @Inject()(
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                    masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                                    withUsernameToken: WithUsernameToken,
-                                   withLoginActionAsync: WithLoginActionAsync,
+                                   withLoginActionAsync: WithLoginActionAsync
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
+  private implicit val module: String = constants.Module.PROFILE_CONTROLLER
 
   def viewProfile(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
@@ -156,7 +158,7 @@ class ProfileController @Inject()(
     implicit request =>
       ChangeKeyName.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.changeKeyName(formWithErrors, formWithErrors.get.address)))
+          Future(BadRequest(views.html.profile.changeKeyName(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CHANGE_KEY_ADDRESS.name, ""))))
         },
         changeKeyNameData => {
           val update = masterKeys.Service.updateKeyName(accountId = loginState.username, address = changeKeyNameData.address, keyName = changeKeyNameData.keyName)
@@ -179,12 +181,16 @@ class ProfileController @Inject()(
     implicit request =>
       ViewMnemonics.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.viewMnemonics(formWithErrors, formWithErrors.get.address)))
+          Future(BadRequest(views.html.profile.viewMnemonics(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.WALLET_ADDRESS.name, ""))))
         },
         viewMnemonicsData => {
           val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = viewMnemonicsData.address, password = viewMnemonicsData.password)
+
+          def update(validated: Boolean, key: master.Key) = if (validated) masterKeys.Service.updateKey(key.copy(backupUsed = true)) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+
           (for {
             (validated, key) <- validateAndGetKey
+            _ <- update(validated, key)
           } yield if (validated) PartialContent(views.html.profile.seedPhrase(key.partialMnemonics.getOrElse(constants.Response.SEEDS_NOT_FOUND.throwBaseException()))) else constants.Response.INVALID_PASSWORD.throwBaseException()
             ).recover {
             case baseException: BaseException => BadRequest(views.html.profile.viewMnemonics(ViewMnemonics.form.withGlobalError(baseException.failure.message), viewMnemonicsData.address))
@@ -206,7 +212,9 @@ class ProfileController @Inject()(
         deleteKeyData => {
           val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = deleteKeyData.address, password = deleteKeyData.password)
 
-          def delete(validated: Boolean, key: master.Key) = if (validated) masterKeys.Service.deleteKey(accountId = key.accountId, address = key.address) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+          def delete(validated: Boolean, key: master.Key) = if (!key.active) {
+            if (validated) masterKeys.Service.deleteKey(accountId = key.accountId, address = key.address) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+          } else constants.Response.CANNOT_DELETE_ACTIVE_KEY.throwFutureBaseException()
 
           (for {
             (validated, key) <- validateAndGetKey
@@ -227,7 +235,7 @@ class ProfileController @Inject()(
     implicit request =>
       ChangeManagedToUnmanaged.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.profile.changeManagedToUnmanaged(formWithErrors, formWithErrors.get.address)))
+          Future(BadRequest(views.html.profile.changeManagedToUnmanaged(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.MANAGED_KEY_ADDRESS.name, ""))))
         },
         changeManagedToUnmanagedData => {
           val validate = masterKeys.Service.changeManagedToUnmanaged(accountId = loginState.username, address = changeManagedToUnmanagedData.address, password = changeManagedToUnmanagedData.password)
@@ -262,6 +270,19 @@ class ProfileController @Inject()(
     }
   }
 
+  def walletBalance(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val balance = blockchainBalances.Service.tryGet(address)
+        (for {
+          balance <- balance
+        } yield Ok(views.html.base.info.commonMicroNumber(balance.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount), constants.View.STAKING_TOKEN_UNITS))
+          ).recover {
+          case _: BaseException => BadRequest(views.html.base.info.commonMicroNumber(MicroNumber.zero, constants.View.STAKING_TOKEN_UNITS))
+        }
+    }
+  }
+
   def viewWhitelist(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
@@ -277,7 +298,6 @@ class ProfileController @Inject()(
 
   def createWhitelistForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.profile.whitelist.createWhitelist())
-//    Ok(views.html.profile.whitelist.createWhitelistSuccessfully())
   }
 
   def editWhitelistForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
@@ -299,6 +319,5 @@ class ProfileController @Inject()(
 
   def addWhitelistMemberForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.profile.whitelist.addWhitelistMember())
-    //    Ok(views.html.profile.whitelist.createWhitelistSuccessfully())
   }
 }

@@ -1,0 +1,42 @@
+package queries.blockchain
+
+import constants.Response.Failure
+import exceptions.BaseException
+import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.{Configuration, Logger}
+import queries.responses.blockchain.UnconfirmedTxsResponse
+
+import java.net.ConnectException
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
+
+@Singleton
+class GetUnconfirmedTxs @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+
+  private implicit val module: String = constants.Module.UNCONFIRMED_TXS
+
+  private implicit val logger: Logger = Logger(this.getClass)
+
+  private val path1 = "/unconfirmed_txs"
+
+  private val path2 = "/unconfirmed_txs?limit="
+
+  private val url1 = constants.CommonConfig.Blockchain.RPCEndPoint + path1
+
+  private val url2 = constants.CommonConfig.Blockchain.RPCEndPoint + path2
+
+  private def action(): Future[UnconfirmedTxsResponse.Response] = utilities.JSON.getResponseFromJson[UnconfirmedTxsResponse.Response](wsClient.url(url1).get)
+
+  private def actionWithLimit(limit: Int): Future[UnconfirmedTxsResponse.Response] = utilities.JSON.getResponseFromJson[UnconfirmedTxsResponse.Response](wsClient.url(url2 + limit.toString).get)
+
+  object Service {
+    def get(): Future[UnconfirmedTxsResponse.Response] = action().recover {
+      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+    }
+
+    def get(limit: Int): Future[UnconfirmedTxsResponse.Response] = actionWithLimit(limit).recover {
+      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+    }
+  }
+
+}

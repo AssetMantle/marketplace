@@ -1,4 +1,6 @@
-@(nft: master.NFT)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import controllers.actions.LoginState
+
+@(nft: master.NFT, liked: Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 @*
 <div>

@@ -1,78 +1,89 @@
 window.onbeforeunload = function () {
-    if($(".collectionsPerPage").length !== 0) {
+    if ($(".collectionsPerPage").length !== 0) {
         window.scrollTo(0, 0);
     }
 }
 document.onload = function () {
-    if($(".collectionsPerPage").length !== 0) {
+    if ($(".collectionsPerPage").length !== 0) {
         window.scrollTo(0, 0);
     }
 }
 
+clicked = false;
+
 function loadMoreCollections() {
     const loading = document.querySelector('.loading');
-    // if ($(".noCollection").length === 0 && $(".collectionPage").length !== 0) {
     if ($(".noCollection").length === 0) {
-        let route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
+        const activeSection = $.trim($("#sectionMenu").find(".menuItem.active").attr('id'));
+        let route = "";
+        let loadMore = "";
+        switch (activeSection) {
+            case "art":
+                route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
+                loadMore = $(".collectionsPerPage");
+                break;
+            case "wishListCollections":
+                route = jsRoutes.controllers.CollectionController.wishListCollectionPerPage($(".collectionPage").length + 1);
+                loadMore = $(".wishlistCollectionsPerPage");
+                break;
+            default:
+                break;
+        }
+
         $.ajax({
             url: route.url,
             type: route.type,
             async: true,
-            // global: showSpinner('recentActivity'),
             beforeSend: function () {
                 loading.classList.add('show');
+                if ($(".noCollection").length === 0) {
+                    $("#loadMoreBtnContainer").addClass("hide");
+                }
             },
             complete: function () {
                 loading.classList.remove('show');
+                if ($(".noCollection").length === 0) {
+                    $("#loadMoreBtnContainer").removeClass("hide");
+                }
+                if (activeSection === 'art' && $(".artCollection").length % 6 !== 0) {
+                    $("#loadMoreBtnContainer").addClass("hide");
+                }
+                if (activeSection === 'wishListCollections' && $(".wishListCollection").length % 6 !== 0) {
+                    $("#loadMoreBtnContainer").addClass("hide");
+                }
             },
             statusCode: {
                 200: function (data) {
-                    const loadMore = $(".collectionsPerPage");
                     loadMore.append(data);
+                    if ($(".noCollection").length !== 0) {
+                        $("#loadMoreBtnContainer").addClass("hide");
+                    }
+                    clicked = false;
                 }
             }
         });
     } else {
         console.log("NO COLLECTION LEFT")
         $(".collectionPage:last").css("margin-top", "0px");
+        $("#loadMoreBtnContainer").addClass("hide");
     }
-}
-
-function getDocHeight() {
-    let D = document;
-    return Math.max(
-        D.body.scrollHeight, D.documentElement.scrollHeight,
-        D.body.offsetHeight, D.documentElement.offsetHeight,
-        D.body.clientHeight, D.documentElement.clientHeight
-    );
 }
 
 collectionPageTimeout = 0;
-// window.addEventListener('scroll', () => {
-//     clearTimeout(collectionPageTimeout);
-//     collectionPageTimeout = setTimeout(function () {
-//         console.log("SCROLL 1")
-//         if ($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10) && $(".collectionsPerPage").length !== 0) {
-//             console.log("SCROLL 2")
-//             loadMoreCollections();
-//         }
-//     }, 100);
-// }, {
-//     passive: true
-// });
 
-
-window.addEventListener('scroll', () => {
-    if($(".collectionsPerPage").length !== 0) {
-        clearTimeout(collectionPageTimeout);
-        collectionPageTimeout = setTimeout(function () {
-            console.log("SCROLL 1")
-            if ($(window).scrollTop() + $(window).height() >= (getDocHeight() - 10)) {
-                console.log("SCROLL 2")
-                loadMoreCollections();
-            }
-        }, 100);
+function loadCollection() {
+    if (!clicked) {
+        clicked = true;
+        loadMoreCollections();
     }
-}, {
-    passive: true
+}
+
+function showLoadMoreButton() {
+    $("#loadMoreBtnContainer").removeClass("hide");
+}
+
+$("#sectionMenu .menuItem").on('click', function () {
+    showLoadMoreButton();
+    $("#sectionMenu").find(".active").removeClass("active");
+    $(this).addClass("active");
 });

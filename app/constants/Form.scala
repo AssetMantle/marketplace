@@ -29,7 +29,9 @@ object Form {
   val VIEW_MNEMONICS = new Form("VIEW_MNEMONICS", routes.javascript.ProfileController.viewMnemonicsForm, routes.ProfileController.viewMnemonics())
   val DELETE_KEY = new Form("DELETE_KEY", routes.javascript.ProfileController.deleteKeyForm, routes.ProfileController.deleteKey())
 
-  val CHANGE_MANAGED_TO_UNMANAGED = new Form("CHANGE_MANAGED_TO_UNMANAGED", routes.javascript.ProfileController.changeManagedToUnmanagedForm, routes.ProfileController.changeManagedToUnmanaged())
+  val CHANGE_MANAGED_TO_UNMANAGED = new Form("CHANGE_MANAGED_TO_UNMANAGED", routes.javascript.ProfileController.deleteKeyForm, routes.ProfileController.deleteKey())
+
+  val SEND_COIN = new Form("SEND_COIN", routes.javascript.BlockchainTransactionController.sendCoinForm, routes.BlockchainTransactionController.sendCoin())
 
   val CREATE_WHITELIST = new Form("CREATE_WHITELIST", routes.javascript.ProfileController.createWhitelistForm, routes.ProfileController.createWhitelistForm())
   val EDIT_WHITELIST = new Form("EDIT_WHITELIST", routes.javascript.ProfileController.editWhitelistForm, routes.ProfileController.editWhitelistForm())
