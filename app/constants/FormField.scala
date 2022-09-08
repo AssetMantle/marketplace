@@ -69,6 +69,7 @@ object FormField {
     val name: String = fieldName
     val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
     val placeHolder: String = "PLACEHOLDER." + name
+
     def mapping: (String, Mapping[String]) = name -> field
   }
 

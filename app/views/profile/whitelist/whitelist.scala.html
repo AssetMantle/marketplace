@@ -1,0 +1,338 @@
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="item item-center centerContainer">
+    <div class="centerCard">
+        <div class="contentContainer">
+            <div class="d-flex flex-xl-row flex-lg-column align-items-center justify-content-between contentHeader">
+                <div class="leftOptions">
+                    <div class="row">
+                        <div class="col mx-3 p-0 active">
+                            <div class="dropdownContainer">
+                                <input class="dropdown" type="checkbox" id="whitelist" name="dropdown"/>
+                                <label class="forDropdown d-flex align-items-center gap-1" for="whitelist">
+                                    @Messages(constants.View.WHITELIST_MENU)
+                                    <img src="@routes.Assets.versioned("images/icon/downArrowYellow.png")" width="20px" height="15px"/>
+                                </label>
+                                <div class="sectionDropdown">
+                                    <a href="#">@Messages(constants.View.CREATED_WHITELISTS)</a>
+                                    <div class="innerSeparator"></div>
+                                    <a href="#">@Messages(constants.View.JOINED_WHITELISTS)</a>
+                                    <div class="innerSeparator"></div>
+                                    <a href="#">@Messages(constants.View.WHITELIST_REQUESTS)</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center contentTitle">
+                <!-- Created Whitelist Start -->
+                   <div class="title">@Messages(constants.View.CREATED_WHITELISTS)</div>
+                    <div class="titleMenu">
+                        <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_WHITELIST.get, ""))">@Messages(constants.View.CREATE_NEW_WHITELIST)</a>
+                    </div>
+                <!-- Created Whitelist End -->
+
+                <!-- Joined Whitelist Start -->
+                     <div class="title">@Messages(constants.View.JOINED_WHITELISTS)</div>
+                <!-- Joined Whitelist End -->
+
+                <!-- Whitelist Requests Start -->
+                     <div class="title">@Messages(constants.View.WHITELIST_REQUESTS)</div>
+                        <div class="titleMenu">
+                            <div class="d-flex flex-row flex-wrap justify-content-between align-items-center">
+                                <div class="btn-group mt-2 mt-sm-2 mt-md-0 toggleBtn" role="group">
+                                    <button id="option1" type="button" class="btn p-2 active" value="test" onclick="setOption1()">@Messages(constants.View.WHITELIST_SENT)</button>
+                                    <button id="option2" type="button" class="btn p-2" onclick="setOption2()">@Messages(constants.View.WHITELIST_RECEIVED)</button>
+                                </div>
+                            </div>
+                        </div>
+                <!-- Whitelist Requests End -->
+            </div>
+            <div class="contentBody">
+                <!-- Empty Whitelist Start -->
+                <div class="d-flex flex-column justify-content-center align-items-center h-100 emptyWhitelist">
+                    <div class="message">@Messages(constants.View.EMPTY_WHITELIST)</div>
+                    <div class="d-flex justify-content-center form-button">
+                        <button class="form-primary-button">@Messages(constants.View.CREATE_WHITELIST)</button>
+                    </div>
+                </div>
+                <!-- Empty Whitelist End -->
+
+
+                <!-- Created Whitelist Start -->
+                  <div class="container contentTableContainer" id="createdWhitelist">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="table-responsive">
+                                <table class="table contentTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-end tableFieldNo">@Messages(constants.View.WHITELIST_TABLE_TITLE_NO)</th>
+                                            <th class="tableFieldName">@Messages(constants.View.WHITELIST_TABLE_TITLE_NAME)</th>
+                                            <th class="tableFieldStatus">@Messages(constants.View.WHITELIST_TABLE_TITLE_STATUS)</th>
+                                            <th class="text-end tableFieldTotalMembers">@Messages(constants.View.WHITELIST_TABLE_TITLE_TOTAL_MEMBERS)</th>
+                                            <th class="text-end tableFieldMaxMembers">@Messages(constants.View.WHITELIST_TABLE_TITLE_MAX_MEMBERS)</th>
+                                            <th class="text-end tableFieldCollectionOnSale">@Messages(constants.View.WHITELIST_TABLE_TITLE_COLLECTIONS_ON_SALE)</th>
+                                            <th class="tableFieldAction"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-end tableFieldNo">1</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_NAME)</td>
+                                            <td class="tableFieldStatus">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="statusCircle onGoing"></span>
+                                                    @Messages(constants.View.WHITELIST_TABLE_STATUS_ONGOING)
+                                                </div>
+                                            </td>
+                                            <td class="text-end tableFieldTotalMembers">00</td>
+                                            <td class="text-end tableFieldMaxMembers">00</td>
+                                            <td class="text-end tableFieldSale">00</td>
+                                            <td class="d-flex text-end tableFieldAction whitelistActionButton">
+                                                <img src="@routes.Assets.versioned("images/icon/profileYellow.png")" width="18px" height="22px"/>
+                                                <img onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.EDIT_WHITELIST.get, ""))" src="@routes.Assets.versioned("images/icon/editYellow.png")" width="22px" height="22px"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end tableFieldNo">2</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_NAME)</td>
+                                            <td class="tableFieldStatus">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="statusCircle ended"></span>
+                                                    @Messages(constants.View.WHITELIST_TABLE_STATUS_ENDED)
+                                                </div>
+                                            </td>
+                                            <td class="text-end tableFieldTotalMembers">00</td>
+                                            <td class="text-end tableFieldMaxMembers">00</td>
+                                            <td class="text-end tableFieldSale">00</td>
+                                            <td class="d-flex text-end tableFieldAction whitelistActionButton">
+                                                <img src="@routes.Assets.versioned("images/icon/profileYellow.png")" width="18px" height="22px"/>
+                                                <img onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.EDIT_WHITELIST.get, ""))" src="@routes.Assets.versioned("images/icon/editYellow.png")" width="22px" height="22px"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Created Whitelist End -->
+
+
+                <!-- Joined Whitelist Start -->
+                 <div class="container contentTableContainer" id="joinedWhitelist">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="table-responsive">
+                                <table class="table contentTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-end tableFieldNo">@Messages(constants.View.WHITELIST_TABLE_TITLE_NO)</th>
+                                            <th class="tableFieldName">@Messages(constants.View.WHITELIST_TABLE_TITLE_NAME)</th>
+                                            <th class="tableFieldStatus">@Messages(constants.View.WHITELIST_TABLE_TITLE_STATUS)</th>
+                                            <th class="text-end tableFieldTotalMembers">@Messages(constants.View.WHITELIST_TABLE_TITLE_TOTAL_MEMBERS)</th>
+                                            <th class="text-end tableFieldMaxMembers">@Messages(constants.View.WHITELIST_TABLE_TITLE_MAX_MEMBERS)</th>
+                                            <th class="text-end tableFieldSale">@Messages(constants.View.WHITELIST_TABLE_TITLE_COLLECTIONS_ON_SALE)</th>
+                                            <th class="tableFieldAction"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-end tableFieldNo">1</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_NAME)</td>
+                                            <td class="tableFieldStatus">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="statusCircle onGoing"></span>
+                                                    @Messages(constants.View.WHITELIST_TABLE_STATUS_ONGOING)
+                                                </div>
+                                            </td>
+                                            <td class="text-end tableFieldTotalMembers">00</td>
+                                            <td class="text-end tableFieldMaxMembers">00</td>
+                                            <td class="text-end tableFieldSale">00</td>
+                                            <td class="tableFieldAction">@Messages(constants.View.WHITELIST_FIELD_ACTION_LEAVE)</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end tableFieldNo">2</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_NAME)</td>
+                                            <td class="tableFieldStatus">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="statusCircle ended"></span>
+                                                    @Messages(constants.View.WHITELIST_TABLE_STATUS_ENDED)
+                                                </div>
+                                            </td>
+                                            <td class="text-end tableFieldTotalMembers">00</td>
+                                            <td class="text-end tableFieldMaxMembers">00</td>
+                                            <td class="text-end tableFieldSale">00</td>
+                                            <td class="tableFieldAction">@Messages(constants.View.WHITELIST_FIELD_ACTION_LEAVE)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Joined Whitelist End -->
+
+
+                <!-- Whitelist Requests Start -->
+                 <div class="container contentTableContainer" id="whitelistRequests">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="table-responsive">
+                                <table class="table contentTable show" id="whitelistRequestsSent">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-end tableFieldNo">@Messages(constants.View.WHITELIST_TABLE_TITLE_NO)</th>
+                                            <th class="tableFieldName">@Messages(constants.View.WHITELIST_TABLE_TITLE_OWNER_NAME)</th>
+                                            <th class="tableFieldName">@Messages(constants.View.WHITELIST_TABLE_TITLE_WHITELIST_NAME)</th>
+                                            <th class="tableFieldStatus">@Messages(constants.View.WHITELIST_TABLE_TITLE_STATUS)</th>
+                                            <th class="text-end tableFieldTotalMembers">@Messages(constants.View.WHITELIST_TABLE_TITLE_TOTAL_MEMBERS)</th>
+                                            <th class="text-end tableFieldMaxMembers">@Messages(constants.View.WHITELIST_TABLE_TITLE_MAX_MEMBERS)</th>
+                                            <th class="tableFieldRequestStatus">@Messages(constants.View.WHITELIST_TABLE_TITLE_REQUEST_STATUS)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-end tableFieldNo">1</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_OWNER_NAME)</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_NAME)</td>
+                                            <td class="tableFieldStatus">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="statusCircle onGoing"></span>
+                                                    @Messages(constants.View.WHITELIST_TABLE_STATUS_ONGOING)
+                                                </div>
+                                            </td>
+                                            <td class="text-end tableFieldTotalMembers">00</td>
+                                            <td class="text-end tableFieldMaxMembers">00</td>
+                                            <td class="tableFieldRequestStatus statusPending">@Messages(constants.View.REQUEST_STATUS_PENDING)</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end tableFieldNo">2</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_OWNER_NAME)</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_NAME)</td>
+                                            <td class="tableFieldStatus">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="statusCircle onGoing"></span>
+                                                    @Messages(constants.View.WHITELIST_TABLE_STATUS_ONGOING)
+                                                </div>
+                                            </td>
+                                            <td class="text-end tableFieldTotalMembers">00</td>
+                                            <td class="text-end tableFieldMaxMembers">00</td>
+                                            <td class="tableFieldRequestStatus statusAccepted">@Messages(constants.View.REQUEST_STATUS_ACCEPTED)</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end tableFieldNo">3</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_OWNER_NAME)</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_NAME)</td>
+                                            <td class="tableFieldStatus">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="statusCircle ended"></span>
+                                                    @Messages(constants.View.WHITELIST_TABLE_STATUS_ENDED)
+                                                </div>
+                                            </td>
+                                            <td class="text-end tableFieldTotalMembers">00</td>
+                                            <td class="text-end tableFieldMaxMembers">00</td>
+                                            <td class="tableFieldRequestStatus statusDeclined">@Messages(constants.View.REQUEST_STATUS_DECLINED)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table contentTable" id="whitelistRequestsReceived">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-end tableFieldNo">@Messages(constants.View.WHITELIST_TABLE_TITLE_NO)</th>
+                                            <th class="tableFieldName">@Messages(constants.View.WHITELIST_TABLE_TITLE_OWNER_NAME)</th>
+                                            <th class="tableFieldName">@Messages(constants.View.WHITELIST_TABLE_TITLE_WHITELIST_NAME)</th>
+                                            <th class="tableFieldStatus">@Messages(constants.View.WHITELIST_TABLE_TITLE_STATUS)</th>
+                                            <th class="text-end tableFieldTotalMembers">@Messages(constants.View.WHITELIST_TABLE_TITLE_TOTAL_MEMBERS)</th>
+                                            <th class="text-end tableFieldMaxMembers">@Messages(constants.View.WHITELIST_TABLE_TITLE_MAX_MEMBERS)</th>
+                                            <th class="tableFieldAction"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-end tableFieldNo">1</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_OWNER_NAME)</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_NAME)</td>
+                                            <td class="tableFieldStatus">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="statusCircle onGoing"></span>
+                                                    @Messages(constants.View.WHITELIST_TABLE_STATUS_ONGOING)
+                                                </div>
+                                            </td>
+                                            <td class="text-end tableFieldTotalMembers">00</td>
+                                            <td class="text-end tableFieldMaxMembers">00</td>
+                                            <td class="d-flex text-end tableFieldAction whitelistActionButton">
+                                                <img src="@routes.Assets.versioned("images/icon/verifiedUsername.png")" width="18px" height="18px"/>
+                                                <img src="@routes.Assets.versioned("images/icon/closeYellow.png")" width="18px" height="18px"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end tableFieldNo">2</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_OWNER_NAME)</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_NAME)</td>
+                                            <td class="tableFieldStatus">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="statusCircle onGoing"></span>
+                                                    @Messages(constants.View.WHITELIST_TABLE_STATUS_ONGOING)
+                                                </div>
+                                            </td>
+                                            <td class="text-end tableFieldTotalMembers">00</td>
+                                            <td class="text-end tableFieldMaxMembers">00</td>
+                                            <td class="d-flex text-end tableFieldAction whitelistActionButton">
+                                                <img src="@routes.Assets.versioned("images/icon/verifiedUsername.png")" width="18px" height="18px"/>
+                                                <img src="@routes.Assets.versioned("images/icon/closeYellow.png")" width="18px" height="18px"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end tableFieldNo">3</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_OWNER_NAME)</td>
+                                            <td class="tableFieldName">@Messages(constants.View.WHITELIST_NAME)</td>
+                                            <td class="tableFieldStatus">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="statusCircle ended"></span>
+                                                    @Messages(constants.View.WHITELIST_TABLE_STATUS_ENDED)
+                                                </div>
+                                            </td>
+                                            <td class="text-end tableFieldTotalMembers">00</td>
+                                            <td class="text-end tableFieldMaxMembers">00</td>
+                                            <td class="d-flex text-end tableFieldAction whitelistActionButton">
+                                                <img src="@routes.Assets.versioned("images/icon/verifiedUsername.png")" width="18px" height="18px"/>
+                                                <img src="@routes.Assets.versioned("images/icon/closeYellow.png")" width="18px" height="18px"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Whitelist Requests End -->
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        $('table').on('scroll', function() {
+            $("#" + this.id + " > *").width($(this).width() + $(this).scrollLeft());
+        });
+
+        // Toggle Button
+        function setOption1(){
+            $("#option1").addClass("active");
+            $("#option2").removeClass("active");
+            $("#whitelistRequestsSent").addClass("show");
+            $("#whitelistRequestsReceived").removeClass("show");
+        }
+        function setOption2(){
+            $("#option2").addClass("active");
+            $("#option1").removeClass("active");
+            $("#whitelistRequestsSent").removeClass("show");
+            $("#whitelistRequestsReceived").addClass("show");
+        }
+</script>

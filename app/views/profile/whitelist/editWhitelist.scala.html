@@ -1,0 +1,36 @@
+@import views.profile.companion.CreateWhitelist
+@import views.html.base.form._
+@import views.html.base.label._
+
+@(createWhitelistForm: Form[CreateWhitelist.Data] = CreateWhitelist.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.EDIT_WHITELIST, createWhitelistForm) {
+    <div class="inputField">
+        <div class="inputFieldBody">
+            <div class="usernameAvailability">
+                @commonLabel(constants.FormField.WHITELIST_NAME.name)
+                @commonInputText(createWhitelistForm, constants.FormField.WHITELIST_NAME, Symbol("id") -> "whitelistName", Symbol("oninput") -> """checkWhitelistNameAvailable(this)""")
+                @commonFieldErrorMessage(id = "whitelistNameAvailableError",message = Messages(constants.View.WHITELIST_NAME_NOT_AVAILABLE))
+            </div>
+        </div>
+    </div>
+
+    <div class="inputField">
+        <div class="inputFieldBody">
+            <div class="usernameAvailability">
+                @commonLabel(constants.FormField.WHITELIST_DURATION.name)
+                @commonInputText(createWhitelistForm, constants.FormField.WHITELIST_DURATION, Symbol("id") -> "picker")
+            </div>
+        </div>
+    </div>
+
+    <div class="inputField">
+        <div class="inputFieldBody">
+        @commonInputInt(createWhitelistForm, constants.FormField.WHITELIST_MAX_MEMBERS)
+        </div>
+    </div>
+}
+<script>
+    $("#WHITELIST_MAX_MEMBERS_field dt").css({display:'flex', justifyContent:"space-between"});
+    $("#WHITELIST_MAX_MEMBERS_field dt").append("<span class='whitelistMemberList'>@Messages(constants.View.WHITELIST_MEMBER_LIST)</span>");
+</script>
+<script src="@routes.Assets.versioned("javascripts/profile/whitelist.js")" type="text/javascript"></script>

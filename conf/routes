@@ -102,3 +102,14 @@ POST        /sendCoin                             controllers.BlockchainTransact
 GET         /viewWishList                         controllers.ProfileController.viewWishList()
 GET         /wishList                             controllers.ProfileController.wishList()
 GET         /wishListNFTs                         controllers.ProfileController.wishListNFTs()
+
+GET         /viewWhitelist                   controllers.ProfileController.viewWhitelist()
+GET         /whitelist                       controllers.ProfileController.whitelist()
+
+GET         /createWhitelist                 controllers.ProfileController.createWhitelistForm()
+GET         /editWhitelist                   controllers.ProfileController.editWhitelistForm()
+
+GET         /viewWhitelistMembers            controllers.ProfileController.viewWhitelistMembers()
+GET         /whitelistMembers                controllers.ProfileController.whitelistMembers()
+
+GET         /addWhitelistMember              controllers.ProfileController.addWhitelistMemberForm()

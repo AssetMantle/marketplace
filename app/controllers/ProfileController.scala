@@ -282,4 +282,42 @@ class ProfileController @Inject()(
         }
     }
   }
+
+  def viewWhitelist(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.whitelist.viewWhitelist()))
+    }
+  }
+
+  def whitelist(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginAction { implicit request =>
+      Ok(views.html.profile.whitelist.whitelist())
+    }
+  }
+
+  def createWhitelistForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.whitelist.createWhitelist())
+  }
+
+  def editWhitelistForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.whitelist.editWhitelist())
+  }
+
+  def viewWhitelistMembers(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.whitelist.viewWhitelistMembers()))
+    }
+  }
+
+  def whitelistMembers(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginAction { implicit request =>
+      Ok(views.html.profile.whitelist.whitelistMembers())
+    }
+  }
+
+  def addWhitelistMemberForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.profile.whitelist.addWhitelistMember())
+  }
 }
