@@ -1,6 +1,5 @@
 @import views.account.companion.SignIn
 @import views.html.base.form._
-@import views.html.base.label._
 
 @(signInForm: Form[SignIn.Data] = SignIn.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -10,7 +9,6 @@
             <div class="mb-3">
                 <div class="inputField">
                     <div class="inputFieldBody">
-                        @commonLabel(constants.FormField.USERNAME.name)
                         @commonInputText(signInForm, constants.FormField.USERNAME, Symbol("autocomplete") -> "off", Symbol("id") -> "signInUsername")
                         @commonFieldErrorMessage(id = "incorrectUsernameError", message = Messages(constants.View.INCORRECT_USERNAME))
                     </div>
@@ -21,7 +19,6 @@
                 <div class="inputField">
                     <div class="inputFieldBody">
                         <div class="usernameAvailability">
-                        @commonLabel(constants.FormField.SIGNUP_PASSWORD.name)
                         <div class="fieldIcon showPassword" id="showPassword" onclick="showPassword()">
                             <span class="eyeIcon closeEye">
                                 <i class="bi bi-eye-slash iconDefault"></i>
