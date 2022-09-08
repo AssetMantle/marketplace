@@ -10,7 +10,6 @@ heroSwiper = new Swiper(".mySwiper2", {
 
 featuredSwiper = new Swiper(".featured-container .swiper-container", {
     autoplay: true,
-    // speed:1000,
     effect: "coverflow",
     grabCursor: true,
     centeredSlides: true,
@@ -87,7 +86,6 @@ swiperPopular = new Swiper(".popular-container .swiper-container", {
     },
 });
 
-// checkAndPushState(jsRoutes.controllers.IndexController.index().url, '', '');
 // Pre-loader
 function HideScrollbar() {
     var style = document.createElement("style");
@@ -96,12 +94,6 @@ function HideScrollbar() {
 }
 HideScrollbar()
 
-// function ShowScrollbar() {
-//     var style = document.createElement("style");
-//     style.innerHTML = `body::-webkit-scrollbar {display: block;}`;
-//     document.head.appendChild(style);
-// }
-
 intro = document.querySelector('.intro');
 
 window.addEventListener('DOMContentLoaded', ()=>{
@@ -109,7 +101,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
         setTimeout(()=>{
             intro.style.top = '-100vh';
             intro.style.visibility = 'hidden';
-            // ShowScrollbar();
         },3500);
     });
 });

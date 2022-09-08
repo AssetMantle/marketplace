@@ -147,6 +147,11 @@ RESPONSE.FAILURE.PASSWORD_VALIDATION_FAILED=Password does not match minimum crit
 PLACEHOLDER.PASSWORD=Enter Password
 PLACEHOLDER.WALLET_ADDRESS=Wallet Address
 SHARE_USERNAME_TWEET=Share on Twitter
+PUSH_NOTIFICATION_TOKEN=
+SEED_PHRASE_1=1
+SEED_PHRASE_2=2
+SEED_PHRASE_3=3
+SEED_PHRASE_4=4
 
 #//Sign Out
 SIGN_OUT_CONFIRMATION=Are you sure you want to sign out?
@@ -280,6 +285,7 @@ FORM.ADD_MANAGED_KEY.TITLE=Add New Address
 FORM.ADD_MANAGED_KEY.SUBTITLE=Enter details to add an address
 FORM.ADD_MANAGED_KEY.SUBMIT=Confirm
 DISCLAIMER_MESSAGE=AssetMantle wallet provides an option to store separate wallet addresses for custody and transaction management for blockchain-based digital wallets. This allows the user to operate multiple addresses and restore their MantlePlace account via any of these addresses using the custody solution managed by AssetMantle.
+DISCLAIMER_POLICY_MESSAGE=I agree to AssetMantle managing my wallet address through the custody solution
 MANAGED_KEY_NAME=Wallet Name
 MANAGED_KEY_ADDRESS=Address
 PLACEHOLDER.MANAGED_KEY_NAME=Type wallet name here
@@ -289,6 +295,7 @@ WALLET_ADDRESS_ERROR=Invalid wallet address
 PASSWORD_ERROR=Minimum length 5
 PASTE_MNEMONICS_MESSAGE=Paste Mnemonic
 MANAGED_KEY_DISCLAIMER=I agree to AssetMantle managing my wallet address through the custody solution
+SEEDS=
 
 #//Unmanaged Address
 FORM.ADD_UNMANAGED_KEY.TITLE=Add New Address

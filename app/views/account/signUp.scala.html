@@ -1,6 +1,5 @@
 @import views.account.companion.SignUp
 @import views.html.base.form._
-@import views.html.base.label._
 
 @(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div id="signUpForm">
@@ -10,7 +9,13 @@
                 <div class="inputField">
                     <div class="inputFieldBody">
                         <div class="usernameAvailability">
-                            @commonLabelIcon(constants.FormField.USERNAME.name, Messages(constants.View.SIGN_UP_TOOLTIP))
+                            <div class="label-container">
+                                <label for="signUpUsername">@Messages(constants.FormField.USERNAME.name)</label>
+                                <i class="bi bi-info-circle iconDefault iconSmall toolTipReference"></i>
+                                <a class="toolTip">
+                                    <span class="toolTipText">@Messages(constants.View.SIGN_UP_TOOLTIP)</span>
+                                </a>
+                            </div>
                             <div id="checkIcon" class="fieldIcon checkIcon">
                                 <i class="bi bi-check-circle iconDefault iconMedium"></i>
                             </div>

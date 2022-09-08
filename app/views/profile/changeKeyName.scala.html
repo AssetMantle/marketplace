@@ -8,7 +8,6 @@
         <div class="mb-3">
             <div class="inputField">
                 <div class="inputFieldBody">
-                    @views.html.base.label.commonLabel(constants.FormField.CHANGE_KEY_ADDRESS.name)
                     @commonInputText(changeKeyNameForm, constants.FormField.CHANGE_KEY_ADDRESS, Symbol("autocomplete") -> "off", Symbol("id") -> "changeKeyAddress", Symbol("value") -> address, Symbol("readonly") -> "readonly")
                 </div>
             </div>
@@ -16,7 +15,6 @@
         <div class="mb-3">
             <div class="inputField">
                 <div class="inputFieldBody">
-                    @views.html.base.label.commonLabel(constants.FormField.CHANGE_KEY_NAME.name)
                     @commonInputText(changeKeyNameForm, constants.FormField.CHANGE_KEY_NAME, Symbol("autocomplete") -> "off", Symbol("id") -> "changeKeyName")
                 </div>
             </div>

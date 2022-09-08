@@ -84,20 +84,6 @@ function removeCollectionTag(e) {
     document.getElementsByClassName("collection-form-tag-field")[0].removeChild(element);
 }
 
-// $(function() {
-//     $('input[name="daterange"]').daterangepicker({
-//         opens: 'left'
-//     }, function(start, end, label) {
-//         console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-//     });
-// });
-//
-// // Date Range Picker
-// function setDateRange(){
-//     document.getElementsByClassName("dateRangeField")[0].setAttribute("name","daterange");
-//     console.log(document.getElementsByClassName("dateRangeField")[0].getAttribute('name'));
-// }
-
 // Goto top when refresh the page
 window.onbeforeunload = function () {
     window.scrollTo(0, 0);
@@ -131,7 +117,8 @@ function goToStep(stepNumber) {
 // Show and hide modal screen
 function showHideModalScreen(showScreen="", hideScreen="") {
     $(".modalContainer").removeClass('active');
-    $(hideScreen).hide()
-    $(showScreen).show();
-    $(".modalContainer").addClass('active');
+        $(hideScreen).hide()
+        $(showScreen).show();
+        $(".modalContainer").addClass('active');
+
 }

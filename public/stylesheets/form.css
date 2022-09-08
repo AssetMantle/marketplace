@@ -295,13 +295,13 @@
 }
 
 /* Form Button */
-.form-button{
+.horizontal-align{
     display: flex;
     justify-content: end;
     margin-top: 40px;
     gap: 30px;
 }
-.form-button button{
+.horizontal-align button{
     padding: 9px 0;
     width: 220px;
     font-family: var(--font-type-2);
@@ -314,8 +314,8 @@
     border-radius: 8px;
     cursor: pointer;
 }
-.form-button .form-cancel-button,
-.form-button .form-back-button{
+.horizontal-align .form-cancel-button,
+.horizontal-align .form-back-button{
     color: var(--dark);
     background-color: transparent;
     border: 1px solid var(--dark);
@@ -324,8 +324,8 @@
     z-index: 950;
     transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
 }
-.form-button .form-cancel-button::before,
-.form-button .form-back-button::before{
+.horizontal-align .form-cancel-button::before,
+.horizontal-align .form-back-button::before{
     content: '';
     position: absolute;
     top:0;
@@ -337,16 +337,16 @@
     transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
     z-index: -1;
 }
-.form-button .form-cancel-button:hover,
-.form-button .form-back-button:hover{
+.horizontal-align .form-cancel-button:hover,
+.horizontal-align .form-back-button:hover{
     color: var(--button-text);
 }
-.form-button .form-cancel-button:hover::before,
-.form-button .form-back-button:hover::before{
+.horizontal-align .form-cancel-button:hover::before,
+.horizontal-align .form-back-button:hover::before{
     transform: translateX(103%);
     box-shadow: inset -4px -4px 8px rgba(0, 0, 0, 0.2), inset 4px 4px 8px #FFD365;
 }
-.form-button .form-next-button{
+.horizontal-align .form-next-button{
     color: var(--button-text);
     background-color: var(--dark);
     box-shadow: inset -4px -4px 8px rgba(0, 0, 0, 0.2), inset 4px 4px 8px #FFD365;
@@ -356,7 +356,7 @@
     transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
     border: 1px solid var(--dark);
 }
-.form-button .form-next-button::before {
+.horizontal-align .form-next-button::before {
     content: '';
     position: absolute;
     top:0;
@@ -368,10 +368,10 @@
     transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
     z-index: -1;
 }
-.form-button .form-next-button:hover{
+.horizontal-align .form-next-button:hover{
     color: var(--dark);
 }
-.form-button .form-next-button:hover::before{
+.horizontal-align .form-next-button:hover::before{
     transform: translateX(103%);
 }
 
