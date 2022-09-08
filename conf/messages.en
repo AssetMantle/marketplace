@@ -339,8 +339,8 @@ STAKING_TOKEN_UNITS=$MNTL
 LOAD_MORE_BUTTON=Load More
 UNMANAGED_KEY=Unmanaged Key
 MANAGED_KEY=Managed Key
-MANAGED_KEY_DESCRIPTION=Private key is encrypted and stored. This wallet can be used to do transaction.
-UNMANAGED_KEY_DESCRIPTION=Only address is stored. This wallet cannot be used to do transaction.
+MANAGED_KEY_DESCRIPTION=The private key is encrypted and stored. This wallet can be used to do transactions.
+UNMANAGED_KEY_DESCRIPTION=Only the wallet address is stored. This wallet cannot be used to do any transactions.
 FORM.MIGRATE_WALLET_TO_KEY.TITLE=Security Update
 FORM.MIGRATE_WALLET_TO_KEY.SUBTITLE=Enter your password and 4 seeds
 
