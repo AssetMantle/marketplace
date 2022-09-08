@@ -1,0 +1,5 @@
+@(name: String, function: JavaScript, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<button type="@arguments.toMap.get(Symbol("type")).map(_.toString).getOrElse("button")" class="@Seq("form-primary-button", arguments.toMap.get('class).map(_.toString).getOrElse("")).mkString(" ")" id='@arguments.toMap.get(Symbol("id")).map(_.toString).getOrElse("")'  onclick="@function">
+    @Messages(name)
+</button>

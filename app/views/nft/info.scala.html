@@ -2,19 +2,6 @@
 
 @(nft: master.NFT, liked: Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
-@*
-<div>
-    @nft.name
-    @nft.description
-        <div id="nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)"></div>
-        <div>
-        @defining("https://ipfs.io/ipfs/" + nft.ipfsLink) { ipfsLink =>
-            @ipfsLink
-        }
-    </div>
-</div>
-*@
-
 <div class="sticky-top item-sticky">
     <div class="card leftInfoCard">
         <div class="title">@nft.name</div>
