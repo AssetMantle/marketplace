@@ -837,3 +837,6 @@ dl dd.error{
     align-items: baseline;
     gap: 10px;
 }
+#signUpUsername_field label{
+    display: none;
+}

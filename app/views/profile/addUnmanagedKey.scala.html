@@ -9,7 +9,6 @@
             <div class="mb-3">
                 <div class="inputField">
                     <div class="inputFieldBody">
-                        @views.html.base.label.commonLabel(constants.FormField.UNMANAGED_KEY_NAME.name)
                         @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_KEY_NAME, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedKeyName", Symbol("oninput") -> "enableNavigationButton(0)")
                         @commonFieldErrorMessage(id = "keyNameError", message = Messages(constants.View.KEY_NAME_ERROR))
                     </div>
@@ -18,7 +17,6 @@
             <div class="mb-3">
                 <div class="inputField">
                     <div class="inputFieldBody">
-                        @views.html.base.label.commonLabel(constants.FormField.UNMANAGED_KEY_ADDRESS.name)
                         @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_KEY_ADDRESS, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedKeyAddress", Symbol("oninput") -> "enableNavigationButton(0)")
                         @commonFieldErrorMessage(id = "walletAddressError", message = Messages(constants.View.WALLET_ADDRESS_ERROR))
                     </div>
