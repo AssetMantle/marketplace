@@ -1,4 +1,6 @@
-@(collection: master.Collection, nft: master.NFT)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import controllers.actions.LoginState
+
+@(collection: master.Collection, nft: master.NFT, liked: Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 <div class="item item-center nftPreviewContainer">
     <div class="d-flex justify-content-between">
@@ -7,13 +9,19 @@
         </ul>
         @if(collection.website != "") {
             <ul class="d-flex gap-3 rightOptions">
-                <li><a href="@collection.website" target="_blank"><img src="@routes.Assets.versioned("images/icon/website.png")" class="icon"/></a></li>
+                <li><a href="@collection.website" target="_blank">
+                    <i class="bi bi-globe2 iconDefault iconMedium icon"></i>
+                </a></li>
             </ul>
         }
     </div>
-    <div class="nftImagePreview">
+    <div class="mt-2 nftImagePreview">
         <a href="https://ipfs.io/ipfs/@nft.ipfsLink" target="_blank">
-            <div id="nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)"></div>
+            <div id="nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)">
+                @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.name.replaceAll(" ", "+") + "/nfts/" + nft.fileName) {uri =>
+                    <img src="@uri">
+                }
+            </div>
         </a>
     </div>
     <div class="nftPropertyContainer">
@@ -37,6 +45,5 @@
     </div>
 </div>
 <script>
-        getImage(jsRoutes.controllers.NFTController.file('@nft.fileName'), 'nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)');
         checkAndPushState(jsRoutes.controllers.NFTController.viewNFT('@nft.fileName').url, '@nft.fileName', "nft");
 </script>

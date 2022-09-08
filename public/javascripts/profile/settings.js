@@ -33,7 +33,6 @@ addresses.forEach(address => {
 // Copy to Clipboard
 function copyToClipboard(e) {
     var element = $(e).next('.form-copy-message');
-    // var copyText = $(e).prevAll('.username-data');
     var copyText = $(e).prevAll('.username-data').attr("data-value");
 
     if ($(window).width() > 1200) {
@@ -42,28 +41,13 @@ function copyToClipboard(e) {
             element.removeClass('active');
         });
     }
-
     navigator.clipboard.writeText(copyText);
 }
 
-$("#openWalletMenu").click(function(){
-    $("#walletMenu").addClass("open");
-});
-
-// Close wallet menu
-$("#closeWalletMenu").click(function(){
-    $("#walletMenu").removeClass("open");
-});
-
-// Open Address Book
-$("#addressBookOpenBtn").click(function(){
-    $("#addressBook").addClass("open");
-});
-
-// Close Address Book
-$("#addressBookCloseBtn").click(function(){
-    $("#addressBook").removeClass("open");
-});
+// Open/Close wallet screens
+function openCloseWalletScreen(e, elementID) {
+    $(e).parent().closest(".walletPopupContainer").find(`#${elementID}`).toggleClass("open");
+}
 
 function changeActive(setAddress, oldAddress) {
     let route = jsRoutes.controllers.AccountController.changeActiveKey(setAddress);
@@ -81,6 +65,31 @@ function changeActive(setAddress, oldAddress) {
             204: function (data) {
 
             },
+        }
+    });
+}
+
+function fetchBalances(walletAddresses) {
+    const addresses = walletAddresses.split(",");
+    for (let i = 0; i < addresses.length; i++) {
+        fetchBalance(addresses[i]);
+    }
+}
+
+function fetchBalance(address) {
+    let route = jsRoutes.controllers.ProfileController.walletBalance(address);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                $("#walletBalance_" + address).html(data);
+            },
+            400: function (data) {
+                console.log(data.responseText)
+                $("#walletBalance_" + address).html(data.responseText);
+            }
         }
     });
 }

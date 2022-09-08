@@ -9,7 +9,8 @@ import play.api.mvc._
 import service.Starter
 
 import javax.inject._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class IndexController @Inject()(
@@ -18,7 +19,8 @@ class IndexController @Inject()(
                                  withoutLoginActionAsync: WithoutLoginActionAsync,
                                  withoutLoginAction: WithoutLoginAction,
                                  withUsernameToken: WithUsernameToken,
-                                 starter: Starter
+                                 starter: Starter,
+                                 blockchainAccounts: models.blockchain.Accounts
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -31,11 +33,11 @@ class IndexController @Inject()(
         optionalLoginState match {
           case Some(loginState) =>
             implicit val loginStateImplicit: LoginState = loginState
-            withUsernameToken.Ok(views.html.collection.viewCollections())
+            Future(Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)))
           case None => Future(Ok(views.html.index()))
         }
     }
   }
 
-//  starter.start()
+    starter.start()
 }

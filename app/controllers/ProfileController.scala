@@ -3,13 +3,14 @@ package controllers
 import controllers.actions._
 import controllers.result.WithUsernameToken
 import exceptions.BaseException
-import models.{master, masterTransaction}
+import models.{blockchain, master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import views.profile.companion._
 import play.api.mvc._
+import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,6 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ProfileController @Inject()(
                                    messagesControllerComponents: MessagesControllerComponents,
                                    cached: Cached,
+                                   blockchainBalances: blockchain.Balances,
                                    withoutLoginActionAsync: WithoutLoginActionAsync,
                                    withoutLoginAction: WithoutLoginAction,
                                    masterAccounts: master.Accounts,
@@ -25,12 +27,12 @@ class ProfileController @Inject()(
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                    masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                                    withUsernameToken: WithUsernameToken,
-                                   withLoginActionAsync: WithLoginActionAsync,
+                                   withLoginActionAsync: WithLoginActionAsync
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
+  private implicit val module: String = constants.Module.PROFILE_CONTROLLER
 
   def viewProfile(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
@@ -249,4 +251,35 @@ class ProfileController @Inject()(
       )
   }
 
+  def viewWishList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.wishList.viewWishList()))
+    }
+  }
+
+  def wishList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginAction { implicit request =>
+      Ok(views.html.profile.wishList.wishList())
+    }
+  }
+
+  def wishListNFTs(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginAction { implicit request =>
+      Ok(views.html.profile.wishList.wishListNFTs())
+    }
+  }
+
+  def walletBalance(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val balance = blockchainBalances.Service.tryGet(address)
+        (for {
+          balance <- balance
+        } yield Ok(views.html.base.info.commonMicroNumber(balance.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount), constants.View.STAKING_TOKEN_UNITS))
+          ).recover {
+          case _: BaseException => BadRequest(views.html.base.info.commonMicroNumber(MicroNumber.zero, constants.View.STAKING_TOKEN_UNITS))
+        }
+    }
+  }
 }

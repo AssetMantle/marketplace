@@ -7,6 +7,7 @@ object RegularExpression {
   val ALL_NUMBERS_ALL_LETTERS: Regex = """^[A-Za-z0-9]*$""".r
   val ALL_NUMBERS_ALL_CAPITAL_LETTERS: Regex = """^[A-Z0-9]*$""".r
   val ALL_NUMBERS_ALL_SMALL_LETTERS: Regex = """^[a-z0-9]*$""".r
+  val MANTLE_ADDRESS: Regex = """^mantle[a-z0-9]{39}$""".r
   val ALL_SMALL_LETTERS: Regex = """^[a-z]*$""".r
   val ALL_SMALL_LETTERS_WITH_SPACE: Regex = """^[a-z ]*$""".r
   val PASSWORD: Regex = """^[A-Za-z0-9!@#$%^&*._-]*$""".r

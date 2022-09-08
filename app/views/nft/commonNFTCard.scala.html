@@ -1,13 +1,12 @@
-@(collection: master.Collection, nft: master.NFT)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import controllers.actions.LoginState
 
-<div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3" onclick="viewNFT('@nft.fileName')">
+@(collection: master.Collection, nft: master.NFT, liked: Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+<div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3">
     <div class="card border-0" style="cursor: pointer;">
-        <div class="card-img rounded-0">
-@*            <a href="https://ipfs.io/ipfs/@nft.ipfsLink" target="_blank">*@
-                <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(nft.file)"/>
-@*            </a>*@
+        <div class="card-img rounded-0" onclick="viewNFT('@nft.fileName')">
+            <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(nft.file)"/>
         </div>
-@*        <button onclick="viewNFT('@collection.id', '@nft.fileName')">@Messages(constants.View.NFT_DETAILS)</button>*@
         <div class="nft-detail p-3">
             <div class="d-flex flex-row gap-2 nft-creator-detail">
                 <div class="creator-profile">
@@ -24,10 +23,21 @@
                     <div class="nft-mantle-price">--</div>
                     <div class="nft-dollar-price">($--)</div>
                 </div>
-                @*                                            <div class="d-flex align-items-center gap-1 mt-3">*@
-                @*                                                <div class=""><img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/like.png")" width="16" height="16"/></div>*@
-                @*                                                <div class="nft-likes">150</div>*@
-                @*                                            </div>*@
+                @if(loginState.nonEmpty) {
+                    <div class="d-flex align-items-center gap-1 mt-3">
+                        <span onclick="addRemoveWishlist(this, '@nft.fileName')">
+                            @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
+                        </span>
+                        <div class="nft-likes" data-id="@nft.fileName">00</div>
+                    </div>
+                }else{
+                    <div class="d-flex align-items-center gap-1 mt-3" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN.get, ""))">
+                        <span>
+                            @views.html.nft.commonCardWishlistButton(false)
+                        </span>
+                        <div class="nft-likes" data-id="@nft.fileName">00</div>
+                    </div>
+                }
             </div>
         </div>
         <div class="m-0 nft-separator"></div>

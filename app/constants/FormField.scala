@@ -4,6 +4,8 @@ import play.api.data.Forms._
 import play.api.data.Mapping
 import play.api.data.format.Formats.{bigDecimalFormat, doubleFormat}
 import play.api.data.validation.Constraints
+import utilities.MicroNumber
+import utilities.NumericOperation.checkPrecision
 
 import java.util.Date
 import scala.util.matching.Regex
@@ -15,7 +17,7 @@ object FormField {
   val ADD_CURRENT_PASSWORD = new StringFormField("ADD_CURRENT_PASSWORD", 5, 128)
   val ADD_KEY_PASSWORD = new StringFormField("ADD_KEY_PASSWORD", 5, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val ADD_KEY_CONFIRM_PASSWORD = new StringFormField("ADD_KEY_CONFIRM_PASSWORD", 5, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val WALLET_ADDRESS = new StringFormField("WALLET_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
+  val WALLET_ADDRESS = new StringFormField("WALLET_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val PARTIAL_MNEMONICS = new StringFormField("PARTIAL_MNEMONICS", 3, 128)
   val PUSH_NOTIFICATION_TOKEN = new StringFormField("PUSH_NOTIFICATION_TOKEN", 0, 200)
   val SIGNUP_PASSWORD = new StringFormField("SIGNUP_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
@@ -32,16 +34,20 @@ object FormField {
   val SEEDS = new StringFormField("SEEDS", 3, 500, RegularExpression.ALL_SMALL_LETTERS_WITH_SPACE, Response.INVALID_SEEDS.message)
   val KEY_NAME = new StringFormField("KEY_NAME", 3, 128, RegularExpression.ALL_NUMBERS_ALL_LETTERS, Response.INVALID_KEY_NAME.message)
   val CONFIRM_USERNAME = new StringFormField("CONFIRM_USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
+  val FROM_ADDRESS = new StringFormField("FROM_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
+  val TO_ADDRESS = new StringFormField("TO_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val WHITE_LIST_NAME = new StringFormField("WHITE_LIST_NAME", 3, 50, RegularExpression.WHITE_LIST_NAME)
   val WHITE_LIST_DESCRIPTION = new StringFormField("WHITE_LIST_DESCRIPTION", 3, 256)
   val WHITE_LIST_ID = new StringFormField("WHITE_LIST_ID", 16, 16)
 
   val MANAGED_KEY_NAME = new StringFormField("MANAGED_KEY_NAME", 3, 50)
-  val MANAGED_KEY_ADDRESS = new StringFormField("MANAGED_KEY_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
+  val MANAGED_KEY_ADDRESS = new StringFormField("MANAGED_KEY_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val UNMANAGED_KEY_NAME = new StringFormField("UNMANAGED_KEY_NAME", 3, 50)
-  val UNMANAGED_KEY_ADDRESS = new StringFormField("UNMANAGED_KEY_ADDRESS", 45, 45, RegularExpression.ALL_NUMBERS_ALL_SMALL_LETTERS)
+  val UNMANAGED_KEY_ADDRESS = new StringFormField("UNMANAGED_KEY_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val CHANGE_KEY_NAME = new StringFormField("CHANGE_KEY_NAME", 3, 50)
-  val CHANGE_KEY_ADDRESS = new StringFormField("CHANGE_KEY_ADDRESS", 3, 50)
+  val CHANGE_KEY_ADDRESS = new StringFormField("CHANGE_KEY_ADDRESS", 3, 50, RegularExpression.MANTLE_ADDRESS)
+
+  val GAS_AMOUNT = new IntFormField("GAS_AMOUNT", 20000, 2000000)
 
   val WHITE_LIST_MAX_MEMBERS = new IntFormField("WHITE_LIST_MAX_MEMBERS", 1, Int.MaxValue)
   val WHITE_LIST_INVITE_START_EPOCH = new IntFormField("WHITE_LIST_INVITE_START_EPOCH", 1, Int.MaxValue)
@@ -55,11 +61,14 @@ object FormField {
   val ACTIVE = new BooleanFormField("ACTIVE")
   val MANAGED_KEY_DISCLAIMER = new BooleanFormField("MANAGED_KEY_DISCLAIMER")
 
+  val GAS_PRICE = new SelectFormField("GAS_PRICE", Seq(constants.CommonConfig.Blockchain.LowGasPrice.toString, constants.CommonConfig.Blockchain.MediumGasPrice.toString, constants.CommonConfig.Blockchain.HighGasPrice.toString))
+
+  val SEND_COIN_AMOUNT = new MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.zero, MicroNumber(Int.MaxValue), 6)
+
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName
     val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
     val placeHolder: String = "PLACEHOLDER." + name
-
     def mapping: (String, Mapping[String]) = name -> field
   }
 
@@ -117,6 +126,14 @@ object FormField {
     val placeHolder: String = "PLACEHOLDER." + name
 
     def mapping: (String, Mapping[Boolean]) = name -> field
+  }
+
+  class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, precision: Int = 2) {
+    val name: String = fieldName
+    val field: Mapping[MicroNumber] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
+    val placeHolder: String = "PLACEHOLDER." + name
+
+    def mapping: (String, Mapping[MicroNumber]) = name -> field
   }
 
   class NestedFormField(fieldName: String) {

@@ -1,7 +1,7 @@
 @(message:String = "", toolTip:String = "")(implicit messagesProvider: MessagesProvider)
 <div class="label-container">
     <label for="@message">@Messages(message)</label>
-    <img src="@routes.Assets.versioned("images/icon/info.png")" class="toolTipReference"/>
+    <i class="bi bi-info-circle iconDefault iconSmall toolTipReference"></i>
     <a class="toolTip">
         <span class="toolTipText">@toolTip</span>
     </a>

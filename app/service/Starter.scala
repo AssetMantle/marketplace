@@ -81,23 +81,6 @@ class Starter @Inject()(
     obj
   }
 
-  def deleteOsmoNOTs(): Future[Unit] = {
-    val collection = Await.result(masterCollections.Service.getByName(name = "OsmoNOTs"), Duration.Inf)
-
-    if (collection.nonEmpty) {
-      val deleteNFTs = masterNFTs.Service.deleteByCollectionId(collection.get.id)
-      val deleteCollectionFiles = masterCollectionFiles.Service.deleteByCollectionId(collection.get.id)
-      val deleteCollection = masterCollections.Service.deleteById(collection.get.id)
-
-      for {
-        _ <- deleteNFTs
-        _ <- deleteCollectionFiles
-        _ <- deleteCollection
-      } yield ()
-    } else Future()
-
-  }
-
   def addNfts(collectionID: String, nftDetails: NFT, uploadCollection: UploadCollection): Future[String] = {
     println(nftDetails.name)
     println(uploadCollection.name)
@@ -105,7 +88,8 @@ class Starter @Inject()(
       try {
         val ipfsDetails = nftDetails.image.split("/").takeRight(2)
         val ipfsHash = ipfsDetails(0)
-        val fileName = ipfsDetails(1)
+        //        val fileName = ipfsDetails(1)
+        val fileName = nftDetails.name + ".png"
         val oldFilePath = constants.CommonConfig.Files.CollectionPath + "/" + uploadCollection.imagePath + "/" + fileName
         val ipfsPath = if (uploadCollection.uploadToIPFS) {
           val file = new File(oldFilePath)
@@ -178,24 +162,6 @@ class Starter @Inject()(
     } yield ()
   } else Future()
 
-  def correctMasterAccount(): Future[Unit] = {
-    val accounts = masterAccounts.Service.getAllIncorrectLang()
-
-    def update(accounts: Seq[master.Account]) = if (accounts.nonEmpty) {
-      utilitiesOperations.traverse(accounts) { account =>
-        val update = masterAccounts.Service.updateAccount(account.copy(language = Lang("en"), accountType = constants.User.USER))
-        for {
-          _ <- update
-        } yield ()
-      }
-    } else Future(Seq())
-
-    for {
-      accounts <- accounts
-      _ <- update(accounts)
-    } yield ()
-  }
-
   def start(): Future[Unit] = {
     val uploads = readFile[Seq[UploadCollection]](uploadCollectionFilePath)
 
@@ -239,8 +205,6 @@ class Starter @Inject()(
     }
 
     (for {
-      _ <- correctMasterAccount()
-      _ <- deleteOsmoNOTs()
       uploads <- uploads
       _ <- processDir(uploads)
     } yield ()
