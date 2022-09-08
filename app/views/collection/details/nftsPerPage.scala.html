@@ -1,10 +1,15 @@
 @import views.html.nft._
+@import controllers.actions.LoginState
 
-@(collection: master.Collection, nfts: Seq[master.NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(collection: master.Collection, nfts: Seq[master.NFT], likedNFTIds: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <div class="row m-0 nftPage">
     @if(nfts.nonEmpty) {
         @nfts.map { nft =>
-            @commonNFTCard(collection, nft)
+            @if(loginState.isEmpty) {
+                @commonNFTCard(collection, nft, None)
+            } else {
+                @commonNFTCard(collection, nft, Option(likedNFTIds.contains(nft.fileName)))
+            }
         }
     } else {
         <div class="noNFT"></div>
@@ -12,11 +17,12 @@
 </div>
 
 <script>
-    // Hide Load More button if NFTs are <= 5
-    $(document).ready(function() {
-        console.log($(".singleNFTCard").length);
-        if($(".nftPage .singleNFTCard").length <= 5){
-            $("#loadMoreBtnContainer").addClass("hide");
-        }
-    });
+        // Hide Load More button if NFTs are <= 5
+        $(document).ready(function () {
+            console.log($(".singleNFTCard").length);
+            if ($(".nftPage .singleNFTCard").length <= 5) {
+                $("#loadMoreBtnContainer").addClass("hide");
+            }
+        });
 </script>
+<script src="@routes.Assets.versioned("javascripts/nfts/wishlist.js")"></script>

@@ -171,6 +171,10 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
   def isProbablePrime(certainty: Int): Boolean = if (this.isWhole) BigInt(this.toLong).isProbablePrime(certainty) else throw new BaseException(constants.Response.NUMBER_FORMAT_EXCEPTION)(MicroNumber.module, MicroNumber.logger)
 
   def +(that: String): String = this.toString + that
+
+  def wholePart: BigInt = this.value / MicroNumber.factor
+
+  def decimalPart: Int = (this.value - (wholePart * MicroNumber.factor)).toInt
 }
 
 object MicroNumber {

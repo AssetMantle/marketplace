@@ -1,11 +1,16 @@
-function viewCollections() {
-    componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsList());
+function viewCollections(section) {
+    componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsList(section));
     $('#leftContent').html('');
 }
 
 function viewCollection(collectionId) {
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs(collectionId));
+}
+
+function viewWishListCollection(collectionId) {
+    componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
+    componentResource('centerContent', jsRoutes.controllers.CollectionController.wishListCollectionNFTs(collectionId));
 }
 
 function viewNFT(nftId) {
@@ -15,10 +20,5 @@ function viewNFT(nftId) {
 
 function viewProfile() {
     componentResource('centerContent', jsRoutes.controllers.ProfileController.settings());
-    $('#leftContent').html('');
-}
-
-function viewWishListCollection() {
-    componentResource('centerContent', jsRoutes.controllers.ProfileController.wishListNFTs());
     $('#leftContent').html('');
 }
