@@ -12,16 +12,16 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class WithLoginActionAsync @Inject()(
-                                      messagesControllerComponents: MessagesControllerComponents,
-                                      withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter,
-                                      masterKeys: master.Keys,
-                                      masterTransactionSessionTokens: masterTransaction.SessionTokens,
-                                    )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class WithLoginAction @Inject()(
+                                 messagesControllerComponents: MessagesControllerComponents,
+                                 withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter,
+                                 masterKeys: master.Keys,
+                                 masterTransactionSessionTokens: masterTransaction.SessionTokens,
+                               )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN_ACTION
 
-  def apply(f: => LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
+  def apply(f: => LoginState => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLoggingFilter.next { implicit request =>
 
       val username = Future(request.session.get(constants.Session.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
@@ -38,7 +38,7 @@ class WithLoginActionAsync @Inject()(
         } yield (key.accountId == username && key.address == address && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.sessionTokenTimeout))
       }
 
-      def getResult(verify: Boolean, loginState: LoginState): Future[Result] = if (verify) f(loginState)(request)
+      def getResult(verify: Boolean, loginState: LoginState): Result = if (verify) f(loginState)(request)
       else throw new BaseException(constants.Response.INVALID_SESSION)
 
       (for {
@@ -46,8 +46,8 @@ class WithLoginActionAsync @Inject()(
         address <- address
         token <- token
         verify <- verify(username, address, token)
-        result <- getResult(verify, LoginState(username = username, address = address))
-      } yield result).recover {
+      } yield getResult(verify, LoginState(username = username, address = address))
+        ).recover {
         case baseException: BaseException =>
           logger.info(baseException.failure.message, baseException)
           Results.Unauthorized(views.html.index()).withNewSession

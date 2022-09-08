@@ -64,10 +64,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.BlockchainTransactionController.gasTokenPrice,
         routes.javascript.BlockchainTransactionController.sendCoinForm,
 
-        routes.javascript.WhiteListController.createWhiteListForm,
-        routes.javascript.WhiteListController.whiteListInviteForm,
-        routes.javascript.WhiteListController.acceptInviteDetails,
-        routes.javascript.WhiteListController.acceptInvite,
+        routes.javascript.WhitelistController.whitelist,
+        routes.javascript.WhitelistController.createWhitelistForm,
+        routes.javascript.WhitelistController.editWhitelistForm,
+        routes.javascript.WhitelistController.acceptInviteDetails,
+        routes.javascript.WhitelistController.acceptInvite,
 
       )
     ).as("text/javascript")

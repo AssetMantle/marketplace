@@ -1,0 +1,9 @@
+@import models.master.Whitelist
+@import views.html.base.buttons._
+
+@(whitelist: Whitelist)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@whitelist.name
+@whitelist.description
+@whitelist.maxMembers
+@whitelist.endEpoch

@@ -107,8 +107,7 @@ object Response {
   val INVALID_NUMBER_FORMAT = new Failure("INVALID_NUMBER_FORMAT")
   val ACCOUNT_TYPE_NOT_FOUND = new Failure("ACCOUNT_TYPE_NOT_FOUND")
 
-  class Failure(response: String, private val actionController: JavaScriptReverseRoute = null) {
-  val WHITE_LIST_INVITATION_EXPIRED = new Failure("WHITE_LIST_INVITATION_EXPIRED")
+  val WHITELIST_INVITATION_EXPIRED = new Failure("WHITELIST_INVITATION_EXPIRED")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

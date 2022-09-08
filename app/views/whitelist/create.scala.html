@@ -1,0 +1,10 @@
+@import views.whitelist.companion.Create
+@import views.html.base.form._
+
+@(createForm: Form[Create.Data] = Create.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.CREATE_WHITELIST, createForm) {
+    @commonInputText(createForm, constants.FormField.WHITELIST_NAME)
+    @commonInputText(createForm, constants.FormField.WHITELIST_DESCRIPTION)
+    @commonInputInt(createForm, constants.FormField.WHITELIST_MAX_MEMBERS)
+}

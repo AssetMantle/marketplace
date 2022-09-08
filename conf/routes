@@ -39,16 +39,17 @@ POST        /migrateWalletToKey                        controllers.AccountContro
 
 GET         /changeActiveKey                           controllers.AccountController.changeActiveKey(address: String)
 
-GET         /collections              /:section                 controllers.CollectionController.viewCollections(section: String)
+GET         /collections/:section                      controllers.CollectionController.viewCollections(section: String)
 GET         /collection/:id                            controllers.CollectionController.viewCollection(id: String)
 GET         /collectionsList                           controllers.CollectionController.collectionsList(section: String)
 GET         /collectionsPerPage                        controllers.CollectionController.collectionsPerPage(pageNumber: Int)
 GET         /collectionNFTs                            controllers.CollectionController.collectionNFTs(id: String)
 GET         /collectionNFTsPerPage                     controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionFile                            controllers.CollectionController.collectionFile(id: String, documentType:String, compress: Boolean)
-GET         /collectionInfo                            controllers.CollectionController.info(id: String)GET         /wishListCollectionPerPage            controllers.CollectionController.wishListCollectionPerPage(pageNumber: Int)
-GET         /wishListCollectionNFTs/:id           controllers.CollectionController.wishListCollectionNFTs(id: String)
-GET         /wishListCollectionNFTsPerPage        controllers.CollectionController.wishListCollectionNFTsPerPage(id: String, pageNumber: Int)
+GET         /collectionInfo                            controllers.CollectionController.info(id: String)
+GET         /wishListCollectionPerPage                 controllers.CollectionController.wishListCollectionPerPage(pageNumber: Int)
+GET         /wishListCollectionNFTs/:id                controllers.CollectionController.wishListCollectionNFTs(id: String)
+GET         /wishListCollectionNFTsPerPage             controllers.CollectionController.wishListCollectionNFTsPerPage(id: String, pageNumber: Int)
 
 GET         /nft/:nftId                                controllers.NFTController.viewNFT( nftId: String)
 GET         /nftDetails                                controllers.NFTController.details( nftId: String)
@@ -76,40 +77,31 @@ POST        /viewMnemonics                             controllers.ProfileContro
 GET         /deleteKey                                 controllers.ProfileController.deleteKeyForm(address: String)
 POST        /deleteKey                                 controllers.ProfileController.deleteKey()
 
-GET         /walletBalance                        controllers.ProfileController.walletBalance(address: String)
+GET         /walletBalance                             controllers.ProfileController.walletBalance(address: String)
 
-GET         /addToWishList                        controllers.NFTController.addToWishList(nftId: String)
-GET         /deleteFromWishList                   controllers.NFTController.deleteFromWishList(nftId: String)
-GET         /likesCounter                         controllers.NFTController.likesCounter(nftId: String)
+GET         /addToWishList                             controllers.NFTController.addToWishList(nftId: String)
+GET         /deleteFromWishList                        controllers.NFTController.deleteFromWishList(nftId: String)
+GET         /likesCounter                              controllers.NFTController.likesCounter(nftId: String)
 
-GET         /createWhiteList                           controllers.WhiteListController.createWhiteListForm()
-POST        /createWhiteList                           controllers.WhiteListController.createWhiteList()
+GET         /whitelist                                 controllers.WhitelistController.whitelist()
 
-GET         /whiteListInvite                           controllers.WhiteListController.whiteListInviteForm(whiteListId: String)
-POST        /whiteListInvite                           controllers.WhiteListController.whiteListInvite()
+GET         /createWhitelist                           controllers.WhitelistController.createWhitelistForm()
+POST        /createWhitelist                           controllers.WhitelistController.createWhitelist()
+
+GET         /editWhitelist                             controllers.WhitelistController.editWhitelistForm(whiteListId: String)
+POST        /editWhitelist                             controllers.WhitelistController.editWhitelist()
 
 # Should be not changed it will be public
-GET         /acceptWhiteListInvite/:whiteListId        controllers.WhiteListController.acceptInviteDetails(whiteListId: String)
-GET         /acceptWhiteListInvite                     controllers.WhiteListController.acceptInvite(whiteListId: String)
+GET         /acceptWhitelistInvite/:whiteListId        controllers.WhitelistController.acceptInviteDetails(whiteListId: String)
+GET         /acceptWhitelistInvite                     controllers.WhitelistController.acceptInvite(whiteListId: String)
 
 #GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()
 
-GET         /gasTokenPrice                        controllers.BlockchainTransactionController.gasTokenPrice()
-GET         /sendCoin                             controllers.BlockchainTransactionController.sendCoinForm(fromAddress: String)
-POST        /sendCoin                             controllers.BlockchainTransactionController.sendCoin()
+GET         /gasTokenPrice                             controllers.BlockchainTransactionController.gasTokenPrice()
+GET         /sendCoin                                  controllers.BlockchainTransactionController.sendCoinForm(fromAddress: String)
+POST        /sendCoin                                  controllers.BlockchainTransactionController.sendCoin()
 
-GET         /viewWishList                         controllers.ProfileController.viewWishList()
-GET         /wishList                             controllers.ProfileController.wishList()
-GET         /wishListNFTs                         controllers.ProfileController.wishListNFTs()
-
-GET         /viewWhitelist                   controllers.ProfileController.viewWhitelist()
-GET         /whitelist                       controllers.ProfileController.whitelist()
-
-GET         /createWhitelist                 controllers.ProfileController.createWhitelistForm()
-GET         /editWhitelist                   controllers.ProfileController.editWhitelistForm()
-
-GET         /viewWhitelistMembers            controllers.ProfileController.viewWhitelistMembers()
-GET         /whitelistMembers                controllers.ProfileController.whitelistMembers()
-
-GET         /addWhitelistMember              controllers.ProfileController.addWhitelistMemberForm()
+GET         /viewWishList                              controllers.ProfileController.viewWishList()
+GET         /wishList                                  controllers.ProfileController.wishList()
+GET         /wishListNFTs                              controllers.ProfileController.wishListNFTs()

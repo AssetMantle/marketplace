@@ -36,9 +36,9 @@ object FormField {
   val CONFIRM_USERNAME = new StringFormField("CONFIRM_USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
   val FROM_ADDRESS = new StringFormField("FROM_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val TO_ADDRESS = new StringFormField("TO_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
-  val WHITE_LIST_NAME = new StringFormField("WHITE_LIST_NAME", 3, 50, RegularExpression.WHITE_LIST_NAME)
-  val WHITE_LIST_DESCRIPTION = new StringFormField("WHITE_LIST_DESCRIPTION", 3, 256)
-  val WHITE_LIST_ID = new StringFormField("WHITE_LIST_ID", 16, 16)
+  val WHITELIST_NAME = new StringFormField("WHITELIST_NAME", 3, 50, RegularExpression.WHITELIST_NAME)
+  val WHITELIST_DESCRIPTION = new StringFormField("WHITELIST_DESCRIPTION", 3, 256)
+  val WHITELIST_ID = new StringFormField("WHITELIST_ID", 16, 16)
 
   val MANAGED_KEY_NAME = new StringFormField("MANAGED_KEY_NAME", 3, 50)
   val MANAGED_KEY_ADDRESS = new StringFormField("MANAGED_KEY_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
@@ -49,9 +49,9 @@ object FormField {
 
   val GAS_AMOUNT = new IntFormField("GAS_AMOUNT", 20000, 2000000)
 
-  val WHITE_LIST_MAX_MEMBERS = new IntFormField("WHITE_LIST_MAX_MEMBERS", 1, Int.MaxValue)
-  val WHITE_LIST_INVITE_START_EPOCH = new IntFormField("WHITE_LIST_INVITE_START_EPOCH", 1, Int.MaxValue)
-  val WHITE_LIST_INVITE_END_EPOCH = new IntFormField("WHITE_LIST_INVITE_END_EPOCH", 1, Int.MaxValue)
+  val WHITELIST_MAX_MEMBERS = new IntFormField("WHITELIST_MAX_MEMBERS", 1, Int.MaxValue)
+  val WHITELIST_INVITE_START_EPOCH = new IntFormField("WHITELIST_INVITE_START_EPOCH", 1, Int.MaxValue)
+  val WHITELIST_INVITE_END_EPOCH = new IntFormField("WHITELIST_INVITE_END_EPOCH", 1, Int.MaxValue)
 
   //BooleanFormField
   val RECEIVE_NOTIFICATIONS = new BooleanFormField("RECEIVE_NOTIFICATIONS")

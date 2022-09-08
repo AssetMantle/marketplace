@@ -22,6 +22,10 @@ function changeActive(section) {
             checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections('wishListCollections').url, 'wishListCollections', "collections");
             showLoadMoreButton();
             break;
+        case 'whitelist':
+            componentResource('collectionsPerPage', jsRoutes.controllers.WhitelistController.whitelist());
+            checkAndPushState(jsRoutes.controllers.WhitelistController.whitelist().url, '', "whitelist");
+            break;
         default:
             componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.collectionsPerPage(1));
             checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections('art').url, 'art', "collections");
