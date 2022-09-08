@@ -1,6 +1,9 @@
-# Mantleplace
+## Mantleplace
 
-## Local development setupw
+![image](https://user-images.githubusercontent.com/69121168/187856359-0a8afc1a-acfe-40ac-966d-4593fff82426.png)
+
+
+## Local development setup
 
 - Install docker on your machine
 
@@ -14,6 +17,7 @@
   docker version
   docker buildx version
   ```
+  
 
 - Install `docker-compose` on your machine
 
@@ -27,8 +31,23 @@
   sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
   docker-compose version
   ```
+  
+ ## Note 
+ 
+Before running the mantleplace on your local, make sure that your postgresql database is enabled.
 
-- Run mantleplace
+
+## Running Mantleplace directly from Intellij Idea
+
+- Install Intellij Ultimate version from there [website https://www.jetbrains.com/idea/](https://www.jetbrains.com/idea/)
+- Follow the steps given in client repo from [here https://github.com/AssetMantle/client](https://github.com/AssetMantle/client)
+- To setup the database properly follow the steps [here https://github.com/AssetMantle/client#starting-client-in-intellij](https://github.com/AssetMantle/client#starting-client-in-intellij)
+
+
+  
+ 
+
+## Run mantleplace
 
 ```shell
 docker-compose up
