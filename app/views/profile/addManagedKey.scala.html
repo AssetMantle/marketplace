@@ -9,7 +9,6 @@
             <div class="mb-3">
                 <div class="inputField">
                     <div class="inputFieldBody">
-                        @views.html.base.label.commonLabel(constants.FormField.MANAGED_KEY_NAME.name)
                         @commonInputText(managedAddressForm, constants.FormField.MANAGED_KEY_NAME, Symbol("autocomplete") -> "off", Symbol("id") -> "managedKeyName", Symbol("oninput") -> "enableNavigationButton(0)")
                         @commonFieldErrorMessage(id = "keyNameError", message = Messages(constants.View.KEY_NAME_ERROR))
                     </div>
@@ -18,15 +17,14 @@
             <div class="mb-3">
                 <div class="inputField">
                     <div class="inputFieldBody">
-                        @views.html.base.label.commonLabel(constants.FormField.MANAGED_KEY_ADDRESS.name)
                         @commonInputText(managedAddressForm, constants.FormField.MANAGED_KEY_ADDRESS, Symbol("autocomplete") -> "off", Symbol("id") -> "managedKeyAddress", Symbol("oninput") -> "enableNavigationButton(0)")
                         @commonFieldErrorMessage(id = "walletAddressError", message = Messages(constants.View.WALLET_ADDRESS_ERROR))
                     </div>
                 </div>
             </div>
         </div>
-        <div class="form-button">
-            <button type="button" id="newManagedAddressScreenBtn" class="form-primary-button disable" onclick="showHideManagedModalScreen('#disclaimerScreen', '#newManagedAddressScreen', 1)">@Messages(constants.View.NEXT)</button>
+        <div class="horizontal-align">
+            @views.html.base.buttons.commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideManagedModalScreen('#disclaimerScreen', '#newManagedAddressScreen', 1)"), Symbol("id") -> "newManagedAddressScreenBtn", Symbol("class") -> "disable")
         </div>
     </div>
 
@@ -38,8 +36,8 @@
         <div class="d-flex align-items-center mt-4">
             @commonCheckbox(managedAddressForm, constants.FormField.MANAGED_KEY_DISCLAIMER, Symbol("id") -> "acceptPolicy", Symbol("onclick") -> "enableNavigationButton(1);")
         </div>
-        <div class="form-button">
-            <button type="button" id="disclaimerButton" class="form-primary-button disable" onclick="showHideManagedModalScreen('#newWalletMnemonicsScreen','#disclaimerScreen', 2)">@Messages(constants.View.CONFIRM_BUTTON)</button>
+        <div class="horizontal-align">
+            @views.html.base.buttons.commonPrimaryButton(constants.View.CONFIRM_BUTTON, JavaScript(s"showHideManagedModalScreen('#newWalletMnemonicsScreen','#disclaimerScreen', 2)"),Symbol("id") -> "disclaimerButton", Symbol("class") -> "disable")
         </div>
     </div>
 
@@ -66,8 +64,8 @@
         </div>
         <div class="seedsSection1 active"></div>
         <div class="seedsSection2"></div>
-        <div class="form-button">
-            <button type="button" id="newManagedAddressMnemonicsBtn" class="form-primary-button disable" onclick="showHideManagedModalScreen('#newWalletPasswordScreen','#newWalletMnemonicsScreen',3)">@Messages(constants.View.NEXT)</button>
+        <div class="horizontal-align">
+            @views.html.base.buttons.commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideManagedModalScreen('#newWalletPasswordScreen','#newWalletMnemonicsScreen',3)"),Symbol("id") -> "newManagedAddressMnemonicsBtn", Symbol("class") -> "disable")
         </div>
     </div>
 

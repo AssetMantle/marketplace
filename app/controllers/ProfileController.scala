@@ -270,6 +270,19 @@ class ProfileController @Inject()(
     }
   }
 
+  def viewOffers(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.offers.viewOffers()))
+    }
+  }
+
+  def offers(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginAction { implicit request =>
+      Ok(views.html.profile.offers.offers())
+    }
+  }
+
   def walletBalance(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>

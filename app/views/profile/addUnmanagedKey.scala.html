@@ -9,7 +9,6 @@
             <div class="mb-3">
                 <div class="inputField">
                     <div class="inputFieldBody">
-                        @views.html.base.label.commonLabel(constants.FormField.UNMANAGED_KEY_NAME.name)
                         @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_KEY_NAME, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedKeyName", Symbol("oninput") -> "enableNavigationButton(0)")
                         @commonFieldErrorMessage(id = "keyNameError", message = Messages(constants.View.KEY_NAME_ERROR))
                     </div>
@@ -18,15 +17,14 @@
             <div class="mb-3">
                 <div class="inputField">
                     <div class="inputFieldBody">
-                        @views.html.base.label.commonLabel(constants.FormField.UNMANAGED_KEY_ADDRESS.name)
                         @commonInputText(unmanagedAddressForm, constants.FormField.UNMANAGED_KEY_ADDRESS, Symbol("autocomplete") -> "off", Symbol("id") -> "unmanagedKeyAddress", Symbol("oninput") -> "enableNavigationButton(0)")
                         @commonFieldErrorMessage(id = "walletAddressError", message = Messages(constants.View.WALLET_ADDRESS_ERROR))
                     </div>
                 </div>
             </div>
         </div>
-        <div class="form-button">
-            <button type="button" id="newUnmanagedAddressScreenBtn" class="form-primary-button disable" onclick="showHideUnmanagedAddressModalScreen('#newUnmanagedAddressPasswordScreen', '#newUnmanagedAddressScreen')">@Messages(constants.View.NEXT)</button>
+        <div class="horizontal-align">
+            @views.html.base.buttons.commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideUnmanagedAddressModalScreen('#newUnmanagedAddressPasswordScreen', '#newUnmanagedAddressScreen')"),Symbol("id") -> "newUnmanagedAddressScreenBtn", Symbol("class") -> "disable")
         </div>
     </div>
 

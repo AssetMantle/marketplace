@@ -61,6 +61,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.wishList,
         routes.javascript.ProfileController.wishListNFTs,
 
+        routes.javascript.ProfileController.viewOffers,
+        routes.javascript.ProfileController.offers,
+
         routes.javascript.BlockchainTransactionController.gasTokenPrice,
         routes.javascript.BlockchainTransactionController.sendCoinForm,
 

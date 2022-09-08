@@ -167,13 +167,13 @@
 }
 
 /* Form Button */
-.form-button{
+.horizontal-align{
     display: flex;
     justify-content: end;
     margin-top: 40px;
     gap: 30px;
 }
-.form-button button{
+.horizontal-align button{
     padding: 9px 0;
     width: 200px;
     font-family: var(--font-type-2);
@@ -188,17 +188,16 @@
     border-radius: 32px;
     cursor: pointer;
 }
-.form-button .form-primary-button{
+.horizontal-align .form-primary-button{
     color: var(--button-text);
     background-color: var(--default);
     overflow: hidden;
     position: relative;
     z-index: 950;
 }
-.form-button .form-primary-button:hover{
-    box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.5);
-}
-.form-button .form-primary-button.disable{
+.horizontal-align .form-primary-button.disable{
+    border: none !important;
+    box-shadow: none !important;
     background: var(--disable-yellow) !important;
     cursor: none;
     pointer-events: none;
@@ -208,21 +207,16 @@
     -ms-user-select: none;
     user-select: none;
 }
-.form-button .form-secondary-button{
-    background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
+.horizontal-align .form-secondary-button{
+    color: var(--dark);
     background-color: transparent;
     border: 1px solid var(--dark);
     overflow: hidden;
     position: relative;
     z-index: 950;
+    transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
 }
-.form-button .form-secondary-button:hover{
-    box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.3);
-}
+
 /* Error Modal */
 .wallet-error-message{
     font-family: var(--font-type-2);
@@ -842,4 +836,7 @@ dl dd.error{
     justify-content: start;
     align-items: baseline;
     gap: 10px;
+}
+#signUpUsername_field label{
+    display: none;
 }
