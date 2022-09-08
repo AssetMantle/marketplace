@@ -1,0 +1,9 @@
+@import controllers.actions.LoginState
+
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
+@views.html.base.common(constants.View.OFFERS, failures, warnings, successes, infos)
+
+<script>
+        componentResource('centerContent', jsRoutes.controllers.ProfileController.offers());
+</script>

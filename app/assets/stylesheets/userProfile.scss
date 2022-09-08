@@ -433,3 +433,485 @@
     }
   }
 }
+
+// Center Container
+.centerContainer{
+  width: 100%;
+  height: fit-content;
+  background-color: var(--card-color);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 100px;
+  .centerCard{
+    background-color: var(--card-color);
+    padding: 20px 20px 20px 20px;
+    .contentContainer{
+      .header-with-icon{
+        .form-top{
+          .title-text{
+            @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--default));
+            text-transform: capitalize;
+          }
+        }
+      }
+      .contentSubHeader{
+        .subHeader{
+          @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+        }
+        .filterOption{
+          .filterTitle{
+            @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+            text-transform: capitalize;
+          }
+        }
+      }
+      .contentHeader{
+        .leftOptions {
+          @include setFont(var(--font-type-1), normal, 400, 14px, 17px, var(--gray));
+          list-style: none;
+          text-transform: capitalize;
+          .row{
+            .col{
+              cursor: pointer;
+            }
+            .col.active{
+              font-weight: 700;
+              color: var(--default);
+            }
+          }
+        }
+      }
+      .contentTitle{
+        text-transform: capitalize;
+        margin-top: 20px;
+        .title{
+          @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--mantle-off-white));
+        }
+        .titleMenu{
+          a{
+            @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--mantle-off-white));
+            background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+          }
+          .toggleBtn{
+            button{
+              width: 70px;
+            }
+          }
+        }
+      }
+      .contentBody{
+        background-color: var(--card-dark);
+        width: 100%;
+        height: fit-content;
+        //min-height: 664px;
+        border-radius: 10px;
+        margin-top: 20px;
+        .emptyWhitelist{
+          .message{
+            @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+          }
+        }
+        .contentTableContainer{
+          padding: 20px 32px 20px 32px;
+          .contentTable{
+            border-collapse: collapse;
+            width: 100%;
+            overflow-x: auto;
+            display: block;
+            thead{
+              //display: block;
+              tr{
+                border-color: var(--line-2);
+                th{
+                  @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+                  text-transform: capitalize;
+                  min-width: 140px;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  max-width: 140px;
+                  display: table-cell;
+                  vertical-align: middle;
+                  padding: 20px 20px 20px 0px !important;
+                }
+
+              }
+            }
+            tbody{
+              //display: block;
+              overflow-y: auto;
+              overflow-x: hidden;
+              height: fit-content;
+              max-height: 550px;
+              tr{
+                border-color: var(--line-2);
+                td{
+                  @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+                  min-width: 140px;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  max-width: 140px;
+                  display: table-cell;
+                  vertical-align: middle;
+                  padding: 20px 20px 20px 0px !important;
+                  .statusCircle{
+                    display: inline-block;
+                    width: 12px;
+                    height: 12px;
+                    aspect-ratio: 1;
+                    border-radius: 50%;
+                    &:first-child{
+                      margin-right: 4px;
+                    }
+                    &.onGoing{
+                      background: var(--connected);
+                      box-shadow: 1.41818px 1.41818px 2.83636px rgba(0, 0, 0, 0.2), inset -1.41818px -1.41818px 2.83636px rgba(0, 0, 0, 0.2), inset 1.41818px 1.41818px 2.83636px #61A956;
+                    }
+                    &.ended{
+                      background: var(--error);
+                      box-shadow: 0.531818px 0.531818px 1.06364px rgba(0, 0, 0, 0.2), inset -0.531818px -0.531818px 1.06364px rgba(0, 0, 0, 0.2), inset 0.531818px 0.531818px 1.06364px #EC6969;
+                    }
+                  }
+                  &.whitelistActionButton{
+                    img{
+                      margin-left: 20px;
+                      cursor: pointer;
+                    }
+                  }
+                  &.tableFieldName{
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    color: var(--dark);
+                    white-space: nowrap;
+                  }
+                }
+              }
+            }
+          }
+          #whitelistRequestsSent{
+            display: none;
+            &.show{
+              display: block;
+            }
+          }
+          #whitelistRequestsReceived{
+            display: none;
+            &.show{
+              display: block;
+            }
+          }
+
+          .searchBox{
+            position: relative;
+            width: 100%;
+            input{
+              @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+              box-sizing: border-box;
+              padding: 10px 12px;
+              margin-top: 8px;
+              letter-spacing: 1px;
+              width: 100%;
+              height: 36px;
+              border: 1px solid var(--inactive-gray);
+              border-radius: 8px;
+              background-color: transparent;
+              outline: none;
+              display: block;
+              &::placeholder{
+                color: var(--inactive-gray);
+                text-transform: capitalize;
+              }
+              &:focus{
+                border-color: var(--dark);
+              }
+              &:not(:focus){
+                color: var(--inactive-gray);
+                border-color: var(--gray);
+              }
+            }
+            .autocomplete-items{
+              position: absolute;
+              width: 100%;
+              height: fit-content;
+              max-height: 500px;
+              overflow-y: auto;
+              background-color: var(--card-color);
+              border:1px solid var(--dark);
+              padding: 6px 0px 6px 0px;
+              border-radius: 0px 0px 8px 8px;
+              &>div{
+                @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--gray));
+                padding: 6px 12px 6px 10px;
+                strong{
+                  color: var(--mantle-off-white);
+                }
+              }
+              &::-webkit-scrollbar{
+                margin-right: 10px;
+              }
+            }
+          }
+          .whitelistMembers{
+            overflow-y: auto;
+            height: fit-content;
+            max-height: 530px;
+            .singleMemberName{
+              @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--dark));
+              text-align: center;
+              display: inline-block;
+              background: rgba(242, 175, 19, 0.1);
+              border: 1px solid var(--dark);
+              border-radius: 24px;
+              margin-right: 12px;
+              margin-bottom: 16px;
+            }
+          }
+          &#offersHistory{
+            .contentTable{
+              tbody{
+                display: inline-block;
+                max-height: 230px;
+                overflow-y: scroll;
+                height: fit-content;
+              }
+            }
+          }
+        }
+        #createdWhitelist{
+          .tableFieldNo{min-width: 50px;}
+          .tableFieldName{min-width: 100px;max-width: 100px;}
+          .tableFieldStatus{min-width: 90px;}
+          .tableFieldTotalMembers{min-width: 120px;}
+          .tableFieldMaxMembers{min-width: 110px;}
+          .tableFieldSale{min-width: 130px;}
+          .tableFieldAction{min-width: 100px;width: 116px;}
+        }
+        #joinedWhitelist{
+          .tableFieldNo{min-width: 50px;}
+          .tableFieldName{min-width: 160px;max-width: 160px;}
+          .tableFieldStatus{min-width: 110px;}
+          .tableFieldTotalMembers{min-width: 130px;}
+          .tableFieldMaxMembers{min-width: 120px;}
+          .tableFieldSale{min-width: 140px;}
+        }
+        #whitelistRequests,
+        #offersHistory{
+          .tableFieldNo{min-width: 50px;}
+          .tableFieldName{min-width: 130px;max-width: 130px;}
+          .tableFieldStatus{min-width: 90px;}
+          .tableFieldTotalMembers{min-width: 120px;}
+          .tableFieldMaxMembers{min-width: 110px;}
+          .tableFieldSale{min-width: 140px;}
+          .tableFieldRequestStatus{min-width: 120px;
+            &.statusPending{color: var(--disable);}
+            &.statusAccepted{color: var(--connected);}
+            &.statusDeclined{color: var(--error);}
+          }
+          .tableFieldOfferName{min-width: 200px;}
+          .tableFieldPrice{min-width: 50px;}
+          .tableFieldDuration{min-width: 280px;}
+        }
+      }
+    }
+  }
+}
+
+
+// Dropdown Menu
+.dropdownContainer {
+  position: relative;
+  max-width: 100%;
+  text-align: center;
+  z-index: 200;
+  [type="checkbox"]:checked,
+  [type="checkbox"]:not(:checked){
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .dropdown:checked + label:before,
+  .dropdown:not(:checked) + label:before{
+    position: fixed;
+    top: 0;
+    left: 0;
+    content: '';
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    cursor: auto;
+    pointer-events: none;
+  }
+  .dropdown:checked + label:before{
+    pointer-events: auto;
+  }
+  .dropdown:not(:checked) + label.forDropdown{
+    cursor: pointer;
+  }
+  .dropdown:not(:checked) + label.forDropdown img{
+    margin-left: 4px;
+    transition: transform 0.3s ease;
+  }
+  .dropdown:checked + label.forDropdown img{
+    transform: rotate(180deg);
+    margin-left: 4px;
+    transition: transform 0.3s ease;
+  }
+  .sectionDropdown {
+    position: absolute;
+    padding: 24px;
+    background-color: var(--card-dark);
+    border: 2px solid var(--line-2);
+    border-radius: 20px;
+    top: 35px;
+    left: calc(100% - 50px);
+    min-width: 314px;
+    width: 100%;
+    display: block;
+    z-index: 2;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    &:before {
+      position: absolute;
+      top: -20px;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      content: '';
+      display: block;
+      z-index: 1;
+    }
+    &:after {
+      position: absolute;
+      top: -8px;
+      left: 30px;
+      width: 0;
+      height: 0;
+      border-left: 9px solid transparent;
+      border-right: 9px solid transparent;
+      border-bottom: 9px solid var(--card-dark);
+      content: '';
+      display: block;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+    a{
+      @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--icon-white));
+      padding-left: 8px;
+      transition: all 0.3s ease;
+      display: flex;
+      -webkit-align-items: center;
+      -moz-align-items: center;
+      -ms-align-items: center;
+      align-items: center;
+      justify-content: space-between;
+      -ms-flex-pack: distribute;
+      cursor: pointer;
+    }
+    .dropdownSub:checked + label,
+    .dropdownSub:not(:checked) + label{
+      @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--icon-white));
+      transition: all 0.3s ease;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-align-items: center;
+      -moz-align-items: center;
+      -ms-align-items: center;
+      align-items: center;
+      justify-content: space-between;
+      -ms-flex-pack: distribute;
+      cursor: pointer;
+    }
+    .sectionDropdownSub{
+      position: relative;
+      display: block;
+      width: 100%;
+      pointer-events: none;
+      opacity: 0;
+      max-height: 0;
+      padding-left: 10px;
+      padding-right: 3px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .dropdownSub:checked ~ .sectionDropdownSub{
+      pointer-events: auto;
+      opacity: 1;
+      max-height: 999px;
+    }
+  }
+  .dropdown:checked ~ .sectionDropdown{
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .separator{
+    height: 2px;
+    width: calc(100% + 41px);
+    background-color: var(--line-2);
+    margin: 20px -20px 20px;
+  }
+  .innerSeparator{
+    height: 2px;
+    width: 100%;
+    background-color: var(--line-2);
+    margin: 12px 0px;
+  }
+}
+
+// Whitelist Success Modal
+.whitelistInfo{
+  &.form-address-box{
+    font-size: 14px;
+    .form-address-box-item{
+      .address-box-label{
+        white-space: nowrap;
+      }
+      .address-box-text{
+        height: 30px;
+        .username-data{
+          @media (max-width: 600px) {
+            width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+      }
+    }
+  }
+}
+.whitelistInfoFooter{
+  a{
+    color: var(--dark);
+  }
+}
+.whitelistMemberList{
+  color:var(--dark);
+  @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--icon-white));
+  text-transform: capitalize;
+  background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+.whitelistFormInfo{
+  .whitelistName{
+    @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--dark));
+    text-transform: capitalize;
+  }
+  .copyInfo{
+    span{
+      @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
+    }
+  }
+}
+.whitelistFieldMessage{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
+}
