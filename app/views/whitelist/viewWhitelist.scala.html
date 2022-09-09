@@ -5,42 +5,20 @@
 <div class="item item-center centerContainer">
     <div class="centerCard">
         <div class="contentContainer">
-            <div class="d-flex flex-xl-row flex-lg-column align-items-center justify-content-between contentHeader">
-                <div class="leftOptions">
-                    <div class="row">
-                        <div class="col mx-3 p-0 active">
-                            <div class="dropdownContainer">
-                                <input class="dropdown" type="checkbox" id="whitelist" name="dropdown"/>
-                                <label class="forDropdown d-flex align-items-center gap-1" for="whitelist">
-                                    @Messages(constants.View.WHITELIST_MENU)
-                                <img src="@routes.Assets.versioned("images/icon/downArrowYellow.png")" width="20px" height="15px"/>
-                                </label>
-                                <div class="sectionDropdown">
-                                    <a href="#">@Messages(constants.View.CREATED_WHITELISTS)</a>
-                                    <div class="innerSeparator"></div>
-                                    <a href="#">@Messages(constants.View.JOINED_WHITELISTS)</a>
-                                    <div class="innerSeparator"></div>
-                                    <a href="#">@Messages(constants.View.WHITELIST_REQUESTS)</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="d-flex justify-content-between align-items-center contentTitle">
-                    <!-- Created Whitelist Start -->
-                <div class="title">@Messages(constants.View.CREATED_WHITELISTS)</div>
+                <!-- Created Whitelist Start -->
+                <!-- <div class="title">@Messages(constants.View.CREATED_WHITELISTS)</div>
                 <div class="titleMenu">
                     <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_WHITELIST.get, ""))">@Messages(constants.View.CREATE_NEW_WHITELIST)</a>
-                </div>
-                    <!-- Created Whitelist End -->
+                </div> -->
+                <!-- Created Whitelist End -->
 
-                    <!-- Joined Whitelist Start -->
-                <div class="title">@Messages(constants.View.JOINED_WHITELISTS)</div>
-                    <!-- Joined Whitelist End -->
+                <!-- Joined Whitelist Start -->
+                     <!-- <div class="title">@Messages(constants.View.JOINED_WHITELISTS)</div> -->
+                <!-- Joined Whitelist End -->
 
-                    <!-- Whitelist Requests Start -->
-                <div class="title">@Messages(constants.View.WHITELIST_REQUESTS)</div>
+                <!-- Whitelist Requests Start -->
+                <!-- <div class="title">@Messages(constants.View.WHITELIST_REQUESTS)</div>
                 <div class="titleMenu">
                     <div class="d-flex flex-row flex-wrap justify-content-between align-items-center">
                         <div class="btn-group mt-2 mt-sm-2 mt-md-0 toggleBtn" role="group">
@@ -48,22 +26,22 @@
                             <button id="option2" type="button" class="btn p-2" onclick="setOption2()">@Messages(constants.View.WHITELIST_RECEIVED)</button>
                         </div>
                     </div>
-                </div>
-                    <!-- Whitelist Requests End -->
+                </div> -->
+                <!-- Whitelist Requests End -->
             </div>
             <div class="contentBody">
-                    <!-- Empty Whitelist Start -->
-                <div class="d-flex flex-column justify-content-center align-items-center h-100 emptyWhitelist">
+                <!-- Empty Whitelist Start -->
+                <div class="h-100 d-flex flex-column justify-content-center align-items-center  emptyWhitelist">
                     <div class="message">@Messages(constants.View.EMPTY_WHITELIST)</div>
-                    <div class="d-flex justify-content-center form-button">
-                        <button class="form-primary-button">@Messages(constants.View.CREATE_WHITELIST)</button>
+                    <div class="d-flex justify-content-center horizontal-align">
+                        @views.html.base.buttons.commonModalPrimaryButton(constants.View.CREATE_WHITELIST, constants.Form.CREATE_WHITELIST.get)
                     </div>
                 </div>
-                    <!-- Empty Whitelist End -->
+                <!-- Empty Whitelist End -->
 
 
-                    <!-- Created Whitelist Start -->
-                <div class="container contentTableContainer" id="createdWhitelist">
+                <!-- Created Whitelist Start -->
+                <!-- <div class="container contentTableContainer" id="createdWhitelist">
                     <div class="row">
                         <div class="col-sm-12 col-md-12">
                             <div class="table-responsive">
@@ -119,12 +97,12 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                    <!-- Created Whitelist End -->
+                </div> -->
+                <!-- Created Whitelist End -->
 
 
-                    <!-- Joined Whitelist Start -->
-                <div class="container contentTableContainer" id="joinedWhitelist">
+                <!-- Joined Whitelist Start -->
+                <!-- <div class="container contentTableContainer" id="joinedWhitelist">
                     <div class="row">
                         <div class="col-sm-12 col-md-12">
                             <div class="table-responsive">
@@ -174,12 +152,12 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                    <!-- Joined Whitelist End -->
+                </div> -->
+                <!-- Joined Whitelist End -->
 
 
-                    <!-- Whitelist Requests Start -->
-                <div class="container contentTableContainer" id="whitelistRequests">
+                <!-- Whitelist Requests Start -->
+                 <!-- <div class="container contentTableContainer" id="whitelistRequests">
                     <div class="row">
                         <div class="col-sm-12 col-md-12">
                             <div class="table-responsive">
@@ -310,8 +288,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                    <!-- Whitelist Requests End -->
+                </div>-->
+                <!-- Whitelist Requests End -->
 
 
             </div>

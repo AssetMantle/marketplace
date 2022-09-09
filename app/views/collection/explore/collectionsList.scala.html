@@ -14,27 +14,44 @@
                             @Messages(constants.View.WISHLIST_MENU)
                             </div>
                             <div id="whitelist" class="col mx-3 p-0 menuItem" onclick="changeActive('whitelist')">
-                            @Messages(constants.View.WHITELIST)
+                                <div class="dropdownContainer d-flex align-items-center gap-1">
+                                    @Messages(constants.View.WHITELIST)
+                                    <input class="dropdown" type="checkbox" id="whitelistMenu" name="dropdown"/>
+
+                                    <label class="forDropdown " for="whitelistMenu">
+                                        <img src="@routes.Assets.versioned("images/icon/downArrowYellow.png")" width="20px" height="15px"/>
+                                    </label>
+                                    <div class="sectionDropdown">
+                                        <a href="#">@Messages(constants.View.CREATED_WHITELISTS)</a>
+                                        <div class="innerSeparator"></div>
+                                        <a href="#">@Messages(constants.View.JOINED_WHITELISTS)</a>
+                                        <div class="innerSeparator"></div>
+                                        <a href="#">@Messages(constants.View.WHITELIST_REQUESTS)</a>
+                                    </div>
+                                </div>
                             </div>
                         }
                     </div>
                 </div>
             </div>
+
             <div class="profile-list" id="art">
                 <div id="collectionsPerPage" class="w-100 list grid-view-filter collectionsPerPage"></div>
             </div>
 
-                <!-- Loader -->
-            <div class="loading">
-                <div class="ball"></div>
-                <div class="ball"></div>
-                <div class="ball"></div>
-            </div>
-                <!-- End -->
+            <div class="loadMoreElement">
+                    <!-- Loader -->
+                <div class="loading">
+                    <div class="ball"></div>
+                    <div class="ball"></div>
+                    <div class="ball"></div>
+                </div>
+                    <!-- End -->
 
-                <!-- Load more button -->
-            <div id="loadMoreBtnContainer" class="d-flex justify-content-center horizontal-align">
+                    <!-- Load more button -->
+                <div id="loadMoreBtnContainer" class="d-flex justify-content-center horizontal-align">
                 @views.html.base.buttons.commonPrimaryButton(constants.View.LOAD_MORE_BUTTON, JavaScript(s"loadCollection()"), Symbol("id") -> "loadMoreCollectionButton")
+                </div>
             </div>
         </div>
     </div>
