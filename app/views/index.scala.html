@@ -1,18 +1,19 @@
 @import views.html.base._
 @import controllers.actions.LoginState
 
-@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider,loginState: Option[LoginState] = None)
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState] = None)
 @views.html.base.common(constants.View.HOME)
 
 <link rel="stylesheet" type="text/css" href="@routes.Assets.versioned("stylesheets/library/swiper-bundle.min.css")"/>
 <script src="@routes.Assets.versioned("javascripts/library/swiperBundle.min.js")" type="text/javascript"></script>
-<!-- Smooth Scroll CSS -->
+    <!-- Smooth Scroll CSS -->
 <script src="@routes.Assets.versioned("javascripts/library/cssScrollSnap.js")"></script>
 <style>
-        html{
+        html {
             scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none;  /* Internet Explorer 10+ */
+            -ms-overflow-style: none; /* Internet Explorer 10+ */
         }
+
         ::-webkit-scrollbar {
             width: 0px;
         }
@@ -69,7 +70,7 @@
                                     <div class="creator-main">
                                         <div class="creator-data">
                                             <div class="creator-img">
-                                                @commonCdnImage(lowQuality = Option(5), highQuality = 40, blur = Option(5), fileFormat = "webp", fileName = "profileHowRare.jpg")
+                                            @commonCdnImage(lowQuality = Option(5), highQuality = 40, blur = Option(5), fileFormat = "webp", fileName = "profileHowRare.jpg")
                                             </div>
                                             <div class="creator-detail">
                                                 <a href="https://twitter.com/how_rare_" target="_blank">
@@ -240,7 +241,7 @@
                         <div class="swiper-slide">
                             <div class="nft-card">
                                 <div class="nft-card-image">
-                                    @commonCdnImage(lowQuality = Option(5), highQuality = 40, blur = Option(5), fileFormat = "webp", fileName = "New Drop 2.png", height = Option(296), width = Option(296))
+                                @commonCdnImage(lowQuality = Option(5), highQuality = 40, blur = Option(5), fileFormat = "webp", fileName = "New Drop 2.png", height = Option(296), width = Option(296))
                                 </div>
                                 <div class="nft-card-bottom-section">
                                     <div class="mt-3 mt-sm-3 mt-md-0 nft-creator-info">
@@ -271,7 +272,7 @@
                         <div class="swiper-slide">
                             <div class="nft-card">
                                 <div class="nft-card-image">
-                                    @commonCdnImage(lowQuality = Option(5), highQuality = 40, blur = Option(5), fileFormat = "webp", fileName = "New_Drop_3.png", height = Option(296), width = Option(296))
+                                @commonCdnImage(lowQuality = Option(5), highQuality = 40, blur = Option(5), fileFormat = "webp", fileName = "New_Drop_3.png", height = Option(296), width = Option(296))
                                 </div>
                                 <div class="nft-card-bottom-section">
                                     <div class="mt-3 mt-sm-3 mt-md-0 nft-creator-info">
@@ -302,7 +303,7 @@
                         <div class="swiper-slide">
                             <div class="nft-card">
                                 <div class="nft-card-image">
-                                    @commonCdnImage(lowQuality = Option(5), highQuality = 40, blur = Option(5), fileFormat = "webp", fileName = "New Drop.jpg", height = Option(296), width = Option(296))
+                                @commonCdnImage(lowQuality = Option(5), highQuality = 40, blur = Option(5), fileFormat = "webp", fileName = "New Drop.jpg", height = Option(296), width = Option(296))
                                 </div>
                                 <div class="nft-card-bottom-section">
                                     <div class="mt-3 mt-sm-3 mt-md-0 nft-creator-info">
