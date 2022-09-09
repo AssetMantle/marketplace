@@ -81,7 +81,7 @@ class Starter @Inject()(
     obj
   }
 
-  def addNfts(collectionID: String, nftDetails: NFT, uploadCollection: UploadCollection): Future[String] = {
+  def addNfts(collectionID: String, nftDetails: NFT, uploadCollection: UploadCollection) = {
     println(nftDetails.name)
     println(uploadCollection.name)
     if (!Await.result(masterNFTs.Service.checkExistsByName(nftDetails.name), Duration.Inf)) {
