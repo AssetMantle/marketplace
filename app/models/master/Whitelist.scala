@@ -107,8 +107,9 @@ class Whitelists @Inject()(
 
     def getByOwner(ownerId: String): Future[Seq[Whitelist]] = filter(_.ownerId === ownerId).map(_.map(_.deserialize))
 
-    def deleteById(id: String): Future[Int] = delete(id)
+    def getByIds(whitelistIds: Seq[String]): Future[Seq[Whitelist]] = filter(_.id.inSet(whitelistIds)).map(_.map(_.deserialize))
 
+    def deleteById(id: String): Future[Int] = delete(id)
 
     def checkInviteValid(whiteListId: String): Future[Boolean] = {
       val invite = tryGet(whiteListId)

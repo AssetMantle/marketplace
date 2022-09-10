@@ -83,17 +83,20 @@ GET         /addToWishList                             controllers.NFTController
 GET         /deleteFromWishList                        controllers.NFTController.deleteFromWishList(nftId: String)
 GET         /likesCounter                              controllers.NFTController.likesCounter(nftId: String)
 
-GET         /whitelist                                 controllers.WhitelistController.whitelist()
+GET         /profile                                   controllers.ProfileController.viewPersonalProfile()
+GET         /personalProfile                           controllers.ProfileController.personalProfile()
+GET         /createdWhitelists                         controllers.ProfileController.createdWhitelists()
+GET         /joinedWhitelists                          controllers.ProfileController.joinedWhitelists(pageNumber: Int)
 
-GET         /createWhitelist                           controllers.WhitelistController.createWhitelistForm()
-POST        /createWhitelist                           controllers.WhitelistController.createWhitelist()
+GET         /createWhitelist                           controllers.ProfileController.createWhitelistForm()
+POST        /createWhitelist                           controllers.ProfileController.createWhitelist()
 
-GET         /editWhitelist                             controllers.WhitelistController.editWhitelistForm(whiteListId: String)
-POST        /editWhitelist                             controllers.WhitelistController.editWhitelist()
+GET         /editWhitelist                             controllers.ProfileController.editWhitelistForm(whiteListId: String)
+POST        /editWhitelist                             controllers.ProfileController.editWhitelist()
 
 # Should be not changed it will be public
-GET         /acceptWhitelistInvite/:whiteListId        controllers.WhitelistController.acceptInviteDetails(whiteListId: String)
-GET         /acceptWhitelistInvite                     controllers.WhitelistController.acceptInvite(whiteListId: String)
+GET         /acceptWhitelistInvite/:whiteListId        controllers.ProfileController.acceptInviteDetails(whiteListId: String)
+GET         /acceptWhitelistInvite                     controllers.ProfileController.acceptInvite(whiteListId: String)
 
 #GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()

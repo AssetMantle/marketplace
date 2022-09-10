@@ -1,0 +1,17 @@
+@import controllers.actions.LoginState
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+<div>
+    <div id="profileNavBar">
+        <div class="active">
+            @Messages(constants.View.WHITELIST)
+        </div>
+    </div>
+
+    <div id="personalProfileContent"></div>
+
+</div>
+
+    <script>
+        checkAndPushState(jsRoutes.controllers.ProfileController.viewPersonalProfile().url, '', "profile")
+    </script>

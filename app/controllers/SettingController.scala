@@ -27,18 +27,18 @@ class SettingController @Inject()(
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                    masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                                    withUsernameToken: WithUsernameToken,
-                                   withLoginActionAsync: WithLoginActionAsync
+                                   withLoginActionAsync: WithLoginActionAsync,
+                                   withLoginAction: WithLoginAction
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.PROFILE_CONTROLLER
+  private implicit val module: String = constants.Module.SETTING_CONTROLLER
 
   def viewSettings(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
-    withLoginActionAsync { implicit loginState =>
+    withLoginAction { implicit loginState =>
       implicit request =>
-        implicit val optionalLoginState: Option[LoginState] = Option(loginState)
-        Future(Ok(views.html.setting.viewSettings()))
+        Ok(views.html.setting.viewSettings())
     }
   }
 

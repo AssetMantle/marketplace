@@ -34,9 +34,10 @@ object CommonConfig {
     val HighGasPrice: Double = config.get[Double]("blockchain.highGasPrice")
   }
 
-  object Collections {
+  object Pagination {
     val CollectionsPerPage: Int = config.get[Int]("webApp.collectionsPerPage")
     val NFTsPerPage: Int = config.get[Int]("webApp.nftsPerPage")
+    val WhitelistPerPage: Int = config.get[Int]("webApp.whitelistPerPage")
   }
 
   object Files {

@@ -1,0 +1,18 @@
+@import controllers.actions.LoginState
+@import views.html.base.buttons._
+
+@(whitelists: Seq[master.Whitelist])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@if(whitelists.nonEmpty) {
+    @commonModalPrimaryButton(constants.Form.CREATE_WHITELIST.button, constants.Form.CREATE_WHITELIST.get)
+    @whitelists.map { x =>
+        @x.name
+        @x.description
+        @x.maxMembers
+        @x.startEpoch
+        @x.endEpoch
+        @commonModalPrimaryButton(constants.Form.EDIT_WHITELIST.button, constants.Form.EDIT_WHITELIST.get)
+    }
+} else {
+    @commonModalPrimaryButton(constants.Form.CREATE_WHITELIST.button, constants.Form.CREATE_WHITELIST.get)
+}

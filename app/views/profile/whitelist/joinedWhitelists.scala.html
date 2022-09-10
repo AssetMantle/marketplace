@@ -1,0 +1,4 @@
+@import controllers.actions.LoginState
+@import views.html.base.buttons._
+
+@(whitelists: Seq[master.Whitelist])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)

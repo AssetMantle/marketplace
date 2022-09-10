@@ -120,7 +120,7 @@ class NFTs @Inject()(
 
     def tryGet(nftId: String): Future[NFT] = tryGetById(nftId).map(_.deserialize)
 
-    def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[NFT]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Collections.NFTsPerPage, limit = constants.CommonConfig.Collections.NFTsPerPage)(_.collectionId === collectionId)(_.createdOn).map(_.map(_.deserialize))
+    def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[NFT]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.collectionId === collectionId)(_.createdOn).map(_.map(_.deserialize))
 
     def getAllForCollection(collectionId: String): Future[Seq[NFT]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize))
 

@@ -18,7 +18,12 @@ function viewNFT(nftId) {
     componentResource('centerContent', jsRoutes.controllers.NFTController.details(nftId));
 }
 
-function viewSettings() {
+function viewSetting() {
     componentResource('centerContent', jsRoutes.controllers.SettingController.settings());
+    $('#leftContent').html('');
+}
+
+function viewPersonalProfile() {
+    componentResource('centerContent', jsRoutes.controllers.ProfileController.personalProfile());
     $('#leftContent').html('');
 }
