@@ -3,7 +3,7 @@ package constants
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import utilities.MicroNumber
 import views.account.companion._
-import views.profile.companion._
+import views.setting.companion._
 import views.blockchainTransaction.companion._
 
 object FormConstraint {

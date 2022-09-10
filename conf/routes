@@ -56,28 +56,28 @@ GET         /nftDetails                                controllers.NFTController
 GET         /nftInfo                                   controllers.NFTController.info( nftId: String)
 GET         /nftFile                                   controllers.NFTController.file( nftId: String)
 
-GET         /profile                                   controllers.ProfileController.viewProfile()
-GET         /settings                                  controllers.ProfileController.settings()
-GET         /walletPopup                               controllers.ProfileController.walletPopup()
+GET         /settings                                  controllers.SettingController.viewSettings()
+GET         /profileSettings                           controllers.SettingController.settings()
+GET         /walletPopup                               controllers.SettingController.walletPopup()
 
-GET         /addNewKey                                 controllers.ProfileController.addNewKey()
+GET         /addNewKey                                 controllers.SettingController.addNewKey()
 
-GET         /addManagedKey                             controllers.ProfileController.addManagedKeyForm()
-POST        /addManagedKey                             controllers.ProfileController.addManagedKey()
+GET         /addManagedKey                             controllers.SettingController.addManagedKeyForm()
+POST        /addManagedKey                             controllers.SettingController.addManagedKey()
 
-GET         /addUnmanagedKey                           controllers.ProfileController.addUnmanagedKeyForm()
-POST        /addUnmanagedKey                           controllers.ProfileController.addUnmanagedKey()
+GET         /addUnmanagedKey                           controllers.SettingController.addUnmanagedKeyForm()
+POST        /addUnmanagedKey                           controllers.SettingController.addUnmanagedKey()
 
-GET         /changeKeyName                             controllers.ProfileController.changeKeyNameForm(address: String)
-POST        /changeKeyName                             controllers.ProfileController.changeKeyName()
+GET         /changeKeyName                             controllers.SettingController.changeKeyNameForm(address: String)
+POST        /changeKeyName                             controllers.SettingController.changeKeyName()
 
-GET         /viewMnemonics                             controllers.ProfileController.viewMnemonicsForm(address: String)
-POST        /viewMnemonics                             controllers.ProfileController.viewMnemonics()
+GET         /viewMnemonics                             controllers.SettingController.viewMnemonicsForm(address: String)
+POST        /viewMnemonics                             controllers.SettingController.viewMnemonics()
 
-GET         /deleteKey                                 controllers.ProfileController.deleteKeyForm(address: String)
-POST        /deleteKey                                 controllers.ProfileController.deleteKey()
+GET         /deleteKey                                 controllers.SettingController.deleteKeyForm(address: String)
+POST        /deleteKey                                 controllers.SettingController.deleteKey()
 
-GET         /walletBalance                             controllers.ProfileController.walletBalance(address: String)
+GET         /walletBalance                             controllers.SettingController.walletBalance(address: String)
 
 GET         /addToWishList                             controllers.NFTController.addToWishList(nftId: String)
 GET         /deleteFromWishList                        controllers.NFTController.deleteFromWishList(nftId: String)
@@ -102,8 +102,8 @@ GET         /gasTokenPrice                             controllers.BlockchainTra
 GET         /sendCoin                                  controllers.BlockchainTransactionController.sendCoinForm(fromAddress: String)
 POST        /sendCoin                                  controllers.BlockchainTransactionController.sendCoin()
 
-GET         /viewWishList                              controllers.ProfileController.viewWishList()
-GET         /wishList                                  controllers.ProfileController.wishList()
-GET         /wishListNFTs                              controllers.ProfileController.wishListNFTs()
-GET         /viewOffers                                controllers.ProfileController.viewOffers()
-GET         /offers                                    controllers.ProfileController.offers()
+GET         /viewWishList                              controllers.SettingController.viewWishList()
+GET         /wishList                                  controllers.SettingController.wishList()
+GET         /wishListNFTs                              controllers.SettingController.wishListNFTs()
+GET         /viewOffers                                controllers.SettingController.viewOffers()
+GET         /offers                                    controllers.SettingController.offers()

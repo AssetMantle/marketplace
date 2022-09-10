@@ -1,4 +1,4 @@
-@import views.profile.companion.AddManagedKey
+@import views.setting.companion.AddManagedKey
 @import views.html.base.form._
 
 @(managedAddressForm: Form[AddManagedKey.Data] = AddManagedKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
@@ -79,4 +79,4 @@
         </div>
     </div>
 }
-<script src="@routes.Assets.versioned("javascripts/profile/managedAddress.js")" type="text/javascript"></script>
+<script src="@routes.Assets.versioned("../../../public/javascripts/settings/managedAddress.js")" type="text/javascript"></script>

@@ -16,8 +16,8 @@ window.addEventListener('popstate', e => {
         case "nft":
             viewNFT(lastPart);
             break;
-        case "profile":
-            viewProfile();
+        case "settings":
+            viewSettings();
             break;
         case "index":
             window.location = "/";

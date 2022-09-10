@@ -115,7 +115,7 @@
                                         </label>
                                         <ul>
                                             <li>
-                                                <a href="@routes.ProfileController.viewProfile()" class="d-flex flex-row align-items-center gap-3">
+                                                <a href="@routes.SettingController.viewSettings()" class="d-flex flex-row align-items-center gap-3">
                                                     <img class="icon" src="@routes.Assets.versioned("images/icon/settingsWhite.png")"/>
                                                     <div class="profileMenuLabel">@Messages(constants.View.MENU_SETTINGS)</div>
                                                 </a>
@@ -173,7 +173,7 @@
                                         @* </a>*@
                                         @* </div>*@
                                         <div class="profileMenuItem">
-                                            <a href="@routes.ProfileController.viewProfile()" class="d-flex flex-row align-items-center p-0 profileItemLink">
+                                            <a href="@routes.SettingController.viewSettings()" class="d-flex flex-row align-items-center p-0 profileItemLink">
                                                 <i class="bi bi-gear iconDefault"></i>
                                                 <div class="profileMenuLabel">@Messages(constants.View.MENU_SETTINGS)</div>
                                             </a>
@@ -185,7 +185,7 @@
                             <li id="userWallet" class="user-wallet">
                                     <!-- Wallet Start -->
                                 <div id="walletPopup" class="walletPopup"></div>
-                                <a class="desktop-link" target="_blank" onclick="componentResource('walletPopup', jsRoutes.controllers.ProfileController.walletPopup())">
+                                <a class="desktop-link" target="_blank" onclick="componentResource('walletPopup', jsRoutes.controllers.SettingController.walletPopup())">
                                     <i class="bi bi-wallet2 iconWhite wallet"></i>
                                 </a>
                                     <!-- Wallet End -->

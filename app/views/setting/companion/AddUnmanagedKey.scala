@@ -1,4 +1,4 @@
-package views.profile.companion
+package views.setting.companion
 
 import play.api.data.Form
 import play.api.data.Forms.mapping

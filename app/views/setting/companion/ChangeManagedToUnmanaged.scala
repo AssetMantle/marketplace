@@ -1,13 +1,13 @@
-package views.profile.companion
+package views.setting.companion
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
-object ViewMnemonics {
+object ChangeManagedToUnmanaged {
 
   val form: Form[Data] = Form(
     mapping(
-      constants.FormField.WALLET_ADDRESS.mapping,
+      constants.FormField.MANAGED_KEY_ADDRESS.mapping,
       constants.FormField.PASSWORD.mapping,
     )(Data.apply)(Data.unapply))
 

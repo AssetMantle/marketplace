@@ -61,11 +61,11 @@
                         <span class="tooltiptext">
                             <div class="menuOption">
                                 @if(key.partialMnemonics.isDefined) {
-                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.viewMnemonicsForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
+                                    <div class="option" onclick="getForm(jsRoutes.controllers.SettingController.viewMnemonicsForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
                                 }
-                            <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.changeKeyNameForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
+                            <div class="option" onclick="getForm(jsRoutes.controllers.SettingController.changeKeyNameForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
                                 @if(!key.active) {
-                                    <div class="option" onclick="getForm(jsRoutes.controllers.ProfileController.deleteKeyForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
+                                    <div class="option" onclick="getForm(jsRoutes.controllers.SettingController.deleteKeyForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
                                 }
         </div>
         </span>
@@ -77,7 +77,7 @@
 
         }
 
-        <div class="d-flex flex-row gap-2 align-items-center addNewWalletBtn" onclick="getForm(jsRoutes.controllers.ProfileController.addNewKey())">
+        <div class="d-flex flex-row gap-2 align-items-center addNewWalletBtn" onclick="getForm(jsRoutes.controllers.SettingController.addNewKey())">
             <div class="iconContainer">
                 <i class="bi bi-plus-circle iconDefault iconMedium icon"></i>
             </div>
@@ -85,9 +85,9 @@
         </div>
     </div>
 </div>
-<script src="@routes.Assets.versioned("javascripts/profile/settings.js")" type="text/javascript"></script>
+<script src="@routes.Assets.versioned("../../../public/javascripts/settings/settings.js")" type="text/javascript"></script>
 <script>
         fetchBalances('@keys.map(_.address).mkString(",")')
-        checkAndPushState(jsRoutes.controllers.ProfileController.viewProfile().url, '', "profile");
+        checkAndPushState(jsRoutes.controllers.SettingController.viewSettings().url, '', "profile");
 </script>
 
