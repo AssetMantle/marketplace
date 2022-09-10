@@ -8,4 +8,8 @@
     @whitelist.maxMembers
     @whitelist.endEpoch
 
-    @commonPrimaryButton(constants.View.ACCEPT_WHITELIST_INVITE, JavaScript(s"""getForm(jsRoutes.controllers.ProfileController.acceptInviteDetails('${whitelist}'))"""))
+    @if((System.currentTimeMillis / 1000) <= whitelist.endEpoch) {
+        @commonPrimaryButton(constants.View.ACCEPT_WHITELIST_INVITE, JavaScript(s"""getForm(jsRoutes.controllers.ProfileController.acceptInvite('${whitelist.id}'))"""))
+    } else {
+        @Messages(constants.View.WHITELIST_INVITE_EXPIRED)
+    }

@@ -112,10 +112,10 @@ class Whitelists @Inject()(
     def deleteById(id: String): Future[Int] = delete(id)
 
     def checkInviteValid(whiteListId: String): Future[Boolean] = {
-      val invite = tryGet(whiteListId)
+      val whitelist = tryGet(whiteListId)
       for {
-        invite <- invite
-      } yield (System.currentTimeMillis / 1000) <= invite.endEpoch
+        whitelist <- whitelist
+      } yield (System.currentTimeMillis / 1000) <= whitelist.endEpoch
     }
 
   }
