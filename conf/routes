@@ -85,6 +85,8 @@ GET         /likesCounter                              controllers.NFTController
 
 GET         /profile                                   controllers.ProfileController.viewPersonalProfile()
 GET         /personalProfile                           controllers.ProfileController.personalProfile()
+#GET         /profile/:accountId                        controllers.ProfileController.viewVisitorProfile(accountId: String)
+#GET         /visitorProfile                            controllers.ProfileController.visitorProfile(accountId: String)
 GET         /createdWhitelists                         controllers.ProfileController.createdWhitelists(pageNumber: Int)
 GET         /joinedWhitelists                          controllers.ProfileController.joinedWhitelists(pageNumber: Int)
 

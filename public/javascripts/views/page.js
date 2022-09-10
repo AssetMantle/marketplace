@@ -27,3 +27,8 @@ function viewPersonalProfile() {
     componentResource('centerContent', jsRoutes.controllers.ProfileController.personalProfile());
     $('#leftContent').html('');
 }
+
+function viewVisitorProfile(accountId) {
+    componentResource('centerContent', jsRoutes.controllers.ProfileController.visitorProfile(accountId));
+    $('#leftContent').html('');
+}

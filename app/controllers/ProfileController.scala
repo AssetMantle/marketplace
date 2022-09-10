@@ -44,6 +44,20 @@ class ProfileController @Inject()(
     }
   }
 
+  def viewVisitorProfile(accountId: String): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.viewVisitorProfile(accountId)))
+    }
+  }
+
+  def visitorProfile(accountId: String): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.visitorProfile(accountId)))
+    }
+  }
+
   def createdWhitelists(pageNmber: Int): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>

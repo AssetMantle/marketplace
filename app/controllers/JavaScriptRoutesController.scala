@@ -61,14 +61,16 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SettingController.wishList,
         routes.javascript.SettingController.wishListNFTs,
 
-//        routes.javascript.ProfileController.viewOffers,
-//        routes.javascript.ProfileController.offers,
+        //        routes.javascript.ProfileController.viewOffers,
+        //        routes.javascript.ProfileController.offers,
 
         routes.javascript.BlockchainTransactionController.gasTokenPrice,
         routes.javascript.BlockchainTransactionController.sendCoinForm,
 
         routes.javascript.ProfileController.viewPersonalProfile,
         routes.javascript.ProfileController.personalProfile,
+        //        routes.javascript.ProfileController.viewVisitorProfile,
+        //        routes.javascript.ProfileController.visitorProfile,
         routes.javascript.ProfileController.createdWhitelists,
         routes.javascript.ProfileController.joinedWhitelists,
         routes.javascript.ProfileController.createWhitelistForm,
