@@ -44,13 +44,16 @@ class ProfileController @Inject()(
     }
   }
 
-  def createdWhitelists(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+  def createdWhitelists(pageNmber: Int): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
-        val whitelists = masterWhitelists.Service.getByOwner(loginState.username)
+        val whitelists = masterWhitelists.Service.getByOwner(loginState.username, pageNmber)
         (for {
           whitelists <- whitelists
-        } yield Ok(views.html.profile.whitelist.createdWhitelists(whitelists)))
+        } yield Ok(views.html.profile.whitelist.createdWhitelists(whitelists))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
     }
   }
 
@@ -114,7 +117,10 @@ class ProfileController @Inject()(
         (for {
           whitelistIds <- whitelistIds
           whitelists <- whitelists(whitelistIds)
-        } yield Ok(views.html.profile.whitelist.joinedWhitelists(whitelists)))
+        } yield Ok(views.html.profile.whitelist.joinedWhitelists(whitelists))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
     }
   }
 

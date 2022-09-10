@@ -105,7 +105,7 @@ class Whitelists @Inject()(
 
     def tryGet(id: String): Future[Whitelist] = tryGetById(id).map(_.deserialize)
 
-    def getByOwner(ownerId: String): Future[Seq[Whitelist]] = filter(_.ownerId === ownerId).map(_.map(_.deserialize))
+    def getByOwner(ownerId: String, pageNumber: Int, perPage: Int = constants.CommonConfig.Pagination.WhitelistPerPage): Future[Seq[Whitelist]] = filterAndSortWithPagination((pageNumber - 1) * perPage, limit = perPage)(_.ownerId === ownerId)(_.updatedOn).map(_.map(_.deserialize))
 
     def getByIds(whitelistIds: Seq[String]): Future[Seq[Whitelist]] = filter(_.id.inSet(whitelistIds)).map(_.map(_.deserialize))
 

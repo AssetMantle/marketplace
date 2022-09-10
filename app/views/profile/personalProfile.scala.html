@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
 <div>
     <div id="profileNavBar">
         <div class="active">
@@ -10,8 +11,13 @@
 
     <div id="personalProfileContent"></div>
 
+    <div id="personalProfileContent_1"></div>
+    <div id="personalProfileContent_2"></div>
+
 </div>
 
-    <script>
-        checkAndPushState(jsRoutes.controllers.ProfileController.viewPersonalProfile().url, '', "profile")
-    </script>
+<script>
+        componentResource("personalProfileContent_1", jsRoutes.controllers.ProfileController.createdWhitelists(1));
+        componentResource("personalProfileContent_2", jsRoutes.controllers.ProfileController.joinedWhitelists(1));
+        checkAndPushState(jsRoutes.controllers.ProfileController.viewPersonalProfile().url, '', "profile");
+</script>
