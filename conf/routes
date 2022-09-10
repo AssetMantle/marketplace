@@ -93,12 +93,13 @@ GET         /joinedWhitelists                          controllers.ProfileContro
 GET         /createWhitelist                           controllers.ProfileController.createWhitelistForm()
 POST        /createWhitelist                           controllers.ProfileController.createWhitelist()
 
-GET         /editWhitelist                             controllers.ProfileController.editWhitelistForm(whiteListId: String)
+GET         /editWhitelist                             controllers.ProfileController.editWhitelistForm(whitelistId: String)
 POST        /editWhitelist                             controllers.ProfileController.editWhitelist()
 
 # Should be not changed it will be public
-GET         /acceptWhitelistInvite/:whiteListId        controllers.ProfileController.acceptInviteDetails(whiteListId: String)
-GET         /acceptWhitelistInvite                     controllers.ProfileController.acceptInvite(whiteListId: String)
+GET         /acceptWhitelistInvite/:whitelistId        controllers.ProfileController.viewAcceptInviteDetails(whitelistId: String)
+GET         /whitelistInviteDetails                    controllers.ProfileController.acceptInviteDetails(whitelistId: String)
+GET         /acceptWhitelistInvite                     controllers.ProfileController.acceptInvite(whitelistId: String)
 
 #GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()

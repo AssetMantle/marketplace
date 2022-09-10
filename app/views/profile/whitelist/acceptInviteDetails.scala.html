@@ -3,7 +3,9 @@
 
 @(whitelist: Whitelist)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@whitelist.name
-@whitelist.description
-@whitelist.maxMembers
-@whitelist.endEpoch
+    @whitelist.name
+    @whitelist.description
+    @whitelist.maxMembers
+    @whitelist.endEpoch
+
+    @commonPrimaryButton(constants.View.ACCEPT_WHITELIST_INVITE, JavaScript(s"""getForm(jsRoutes.controllers.ProfileController.acceptInviteDetails('${whitelist}'))"""))

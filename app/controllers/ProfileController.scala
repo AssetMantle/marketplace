@@ -138,9 +138,14 @@ class ProfileController @Inject()(
     }
   }
 
-  def acceptInviteDetails(whitelistInviteId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def viewAcceptInviteDetails(whitelistId: String): Action[AnyContent] = withLoginAction { implicit loginState =>
     implicit request =>
-      val whitelist = masterWhitelists.Service.tryGet(whitelistInviteId)
+      Ok(views.html.profile.whitelist.viewAcceptInviteDetails(whitelistId = whitelistId))
+  }
+
+  def acceptInviteDetails(whitelistId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val whitelist = masterWhitelists.Service.tryGet(whitelistId)
 
       for {
         whitelist <- whitelist
