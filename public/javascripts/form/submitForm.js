@@ -63,7 +63,7 @@ function submitForm(isModal, source, targetID) {
                     result.html(data.responseText);
                 },
                 201: function (callbackUrl) {
-                    window.location = callbackUrl.split('_').join('/');
+                    window.location = callbackUrl;
                 }
             }
         }).fail(function (XMLHttpRequest) {
