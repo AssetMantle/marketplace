@@ -135,8 +135,8 @@ class SendCoins @Inject()(
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, unconfirmedTxHashes: Seq[String]) = {
         val (txHash, txRawHex) = utilities.BlockchainTransaction.getTxHashAndRawHex(
-          messages = Seq(com.google.protobuf.Any.newBuilder().setTypeUrl(constants.Blockchain.TransactionMessage.SEND_COIN).setValue(Tx.MsgSend.newBuilder().setFromAddress(fromAddress).setToAddress(toAddress).addAllAmount(amount.map(_.toProtoCoin).asJava).build().toByteString).build()),
-          fee = Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber((gasPrice * gasLimit) / MicroNumber.factor)),
+          messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = amount)),
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = gasLimit),
           gasLimit = gasLimit,
           account = bcAccount,
           ecKey = ecKey,
