@@ -48,9 +48,8 @@ class WithLoginAction @Inject()(
         verify <- verify(username, address, token)
       } yield getResult(verify, LoginState(username = username, address = address))
         ).recover {
-        case baseException: BaseException =>
-          logger.info(baseException.failure.message, baseException)
-          Results.Unauthorized(views.html.index()).withNewSession
+        case baseException: BaseException => logger.info(baseException.failure.message, baseException)
+          Results.Unauthorized(views.html.indexWithLoginFormPopup()).withNewSession
       }
     }
   }
