@@ -288,7 +288,8 @@
     left: -175px;
     top: 90px;
     transform: translateX(-73px);
-    z-index: -1;
+    //z-index: -1;
+    z-index:99;
     padding: 20px;
     opacity: 0;
     visibility: hidden;
