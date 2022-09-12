@@ -4,6 +4,7 @@ import cosmos.tx.v1beta1.TxOuterClass
 
 import scala.jdk.CollectionConverters.IterableHasAsJava
 import com.google.protobuf.{ByteString, Any => protoBufAny}
+import cosmos.bank.v1beta1.Tx
 import cosmos.crypto.secp256k1.Keys
 import models.common.Coin
 import org.bitcoinj.core.ECKey
@@ -39,5 +40,9 @@ object BlockchainTransaction {
 
     (utilities.Secrets.sha256Hash(txRaw.toByteArray).map("%02x".format(_)).mkString.toUpperCase, txRaw.toByteArray.map("%02x".format(_)).mkString.toUpperCase)
   }
+
+  def getFee(gasPrice: Double, gasLimit: Int): Coin = Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber((gasPrice * gasLimit) / MicroNumber.factor))
+
+  def getSendCoinMsgAsAny(fromAddress: String, toAddress: String, amount: Seq[Coin]): protoBufAny = protoBufAny.newBuilder().setTypeUrl(constants.Blockchain.TransactionMessage.SEND_COIN).setValue(Tx.MsgSend.newBuilder().setFromAddress(fromAddress).setToAddress(toAddress).addAllAmount(amount.map(_.toProtoCoin).asJava).build().toByteString).build()
 
 }
