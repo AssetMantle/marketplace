@@ -395,7 +395,8 @@ CONTROLLERS_REQUEST=REQUEST "{0} {1}" from {2} by username: {3}
 CONTROLLERS_RESPONSE=RESPONSE "{0} {1}" {4} from {2} by username: {3} in {5}ms
 
 #//White List
-WHITELIST=whitelist
+WHITELIST=Whitelist
+WHITELIST_INVITE_EXPIRED=Invitation Expired
 WHITELIST_MENU=Whitelist
 JOINED_WHITELISTS=Joined whitelists
 CREATED_WHITELISTS=Created whitelists
@@ -436,7 +437,7 @@ WHITELIST_DESCRIPTION=Description
 PLACEHOLDER.WHITELIST_DURATION=Duration
 PLACEHOLDER.WHITELIST_DESCRIPTION=Description
 CREATE_WHITELIST_SUCCESS_TITLE=Whitelist Created Successfully
-CREATE_WHITELIST_SUCCESS_SUBTITLE=Below are the details of your whitelist. Please share the link with the participants of the whitelist.
+CREATE_WHITELIST_SUCCESS_SUBTITLE=Please share the link with the participants to add them to the whitelist.
 WHITELIST_UNIQUE_URL=Unique URL:
 WHITELIST_VIEW_DETAILS=View Details
 EDIT_WHITELIST=Edit Whitelist
