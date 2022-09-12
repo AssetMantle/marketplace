@@ -58,10 +58,10 @@ class ProfileController @Inject()(
     }
   }
 
-  def createdWhitelists(pageNmber: Int): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+  def createdWhitelists(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + pageNumber.toString + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
-        val whitelists = masterWhitelists.Service.getByOwner(loginState.username, pageNmber)
+        val whitelists = masterWhitelists.Service.getByOwner(loginState.username, pageNumber)
         (for {
           whitelists <- whitelists
         } yield Ok(views.html.profile.whitelist.createdWhitelists(whitelists))

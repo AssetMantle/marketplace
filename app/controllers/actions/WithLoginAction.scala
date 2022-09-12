@@ -49,7 +49,7 @@ class WithLoginAction @Inject()(
       } yield getResult(verify, LoginState(username = username, address = address))
         ).recover {
         case baseException: BaseException => logger.info(baseException.failure.message, baseException)
-          Results.Unauthorized(views.html.indexWithLoginFormPopup()).withNewSession
+          Results.Unauthorized(views.html.indexWithLoginFormPopup(request.path.replace("/", "_"))).withNewSession
       }
     }
   }

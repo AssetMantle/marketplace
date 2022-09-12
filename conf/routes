@@ -25,6 +25,9 @@ POST        /verifyWalletMnemonics                     controllers.AccountContro
 GET         /signIn                                    controllers.AccountController.signInForm()
 POST        /signIn                                    controllers.AccountController.signIn()
 
+GET         /signInWithCallback                        controllers.AccountController.signInWithCallbackForm(callbackUrl: String)
+POST        /signInWithCallback                        controllers.AccountController.signInWithCallback()
+
 GET         /signOut                                   controllers.AccountController.signOutForm()
 POST        /signOut                                   controllers.AccountController.signOut()
 

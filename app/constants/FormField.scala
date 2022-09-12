@@ -39,6 +39,7 @@ object FormField {
   val WHITELIST_NAME = new StringFormField("WHITELIST_NAME", 3, 50, RegularExpression.WHITELIST_NAME)
   val WHITELIST_DESCRIPTION = new StringFormField("WHITELIST_DESCRIPTION", 3, 256)
   val WHITELIST_ID = new StringFormField("WHITELIST_ID", 16, 16)
+  val CALLBACK_URL = new StringFormField("CALLBACK_URL", 1, 1024, RegularExpression.ANY_STRING)
 
   val MANAGED_KEY_NAME = new StringFormField("MANAGED_KEY_NAME", 3, 50)
   val MANAGED_KEY_ADDRESS = new StringFormField("MANAGED_KEY_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)

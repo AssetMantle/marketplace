@@ -1,0 +1,54 @@
+@import views.account.companion.SignInWithCallback
+@import views.html.base.form._
+
+@(signInWithCallbackForm: Form[SignInWithCallback.Data] = SignInWithCallback.form, callbackUrl: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div id="signInForm">
+    @commonForm(constants.Form.SIGN_IN_WITH_CALLBACK, signInWithCallbackForm) {
+        <div class="modal-body">
+            <div class="mb-3">
+                <div class="inputField">
+                    <div class="inputFieldBody">
+                        @commonInputText(signInWithCallbackForm, constants.FormField.USERNAME, Symbol("autocomplete") -> "off", Symbol("id") -> "signInUsername")
+                        @commonFieldErrorMessage(id = "incorrectUsernameError", message = Messages(constants.View.INCORRECT_USERNAME))
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="inputField">
+                    <div class="inputFieldBody">
+                        <div class="usernameAvailability">
+                        <div class="fieldIcon showPassword" id="showPassword" onclick="showPassword()">
+                            <span class="eyeIcon closeEye">
+                                <i class="bi bi-eye-slash iconDefault"></i>
+                            </span>
+                            <span class="eyeIcon openEye hidden">
+                                <i class="bi bi-eye iconDefault"></i>
+                            </span>
+                        </div>
+                        @commonInputPassword(signInWithCallbackForm, constants.FormField.PASSWORD, 'id -> "signInPassword")
+                        @commonFieldErrorMessage(id = "incorrectPasswordError", message = Messages(constants.View.INCORRECT_PASSWORD))
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @commonInputText(signInWithCallbackForm, constants.FormField.PUSH_NOTIFICATION_TOKEN, Symbol("class") -> "hidden")
+            @commonInputText(signInWithCallbackForm, constants.FormField.CALLBACK_URL, Symbol("value") -> callbackUrl, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
+
+            <div class="mb-3">
+                <a class="link" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.FORGET_PASSWORD.get, ""))">@Messages(constants.View.SIGN_IN_FORGOT_PASSWORD)</a>
+            </div>
+
+            <div>
+                <div class="footerMessage">
+                    <span>@Messages(constants.View.SIGN_IN_SIGN_UP_MESSAGE)</span>
+                    <a class="link" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_UP.get, ""))">@Messages(constants.View.SIGN_IN_SIGN_UP)</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<script src="@routes.Assets.versioned("javascripts/firebase/pushNotification.js")" type="text/javascript"></script>
+<script src="@routes.Assets.versioned("javascripts/account/signIn.js")" type="text/javascript"></script>
