@@ -4,6 +4,7 @@ import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import utilities.MicroNumber
 import views.account.companion._
 import views.setting.companion._
+import views.profile.whitelist.companion._
 import views.blockchainTransaction.companion._
 
 object FormConstraint {
@@ -72,6 +73,20 @@ object FormConstraint {
       if (!sendCoin.toAddress.startsWith("mantle") || sendCoin.toAddress.length != 45) Option(ValidationError(constants.Response.INVALID_TO_ADDRESS.message)) else None,
       if (sendCoin.fromAddress == sendCoin.toAddress) Option(ValidationError(constants.Response.FROM_AND_TO_ADDRESS_SAME.message)) else None,
       if (sendCoin.gasPrice.toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_NUMBER_FORMAT.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val createWhitelistInviteConstraint: Constraint[Create.Data] = Constraint("constraints.CreateWhitelist")({ createWhitelistData: Create.Data =>
+    val errors = Seq(
+      if (createWhitelistData.startEpoch >= createWhitelistData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val editWhitelistInviteConstraint: Constraint[Edit.Data] = Constraint("constraints.EditWhitelist")({ editWhitelistData: Edit.Data =>
+    val errors = Seq(
+      if (editWhitelistData.startEpoch >= editWhitelistData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })
