@@ -265,6 +265,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 350px;
+    white-space: nowrap;
 }
 @media (max-width: 650px){
     .form-address-box .address-box-text .username-data{

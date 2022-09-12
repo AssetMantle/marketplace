@@ -486,12 +486,16 @@
             }
           }
         }
+        .headerTitle{
+          @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+          text-transform: capitalize;
+        }
       }
       .contentTitle{
         text-transform: capitalize;
         margin-top: 20px;
         .title{
-          @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--mantle-off-white));
+          @include setFont(var(--font-type-1), normal, 400, 16px, 19px, var(--gray));
         }
         .titleMenu{
           a{
@@ -512,8 +516,8 @@
       .contentBody{
         background-color: var(--card-dark);
         width: 100%;
-        height: fit-content;
-        //min-height: 664px;
+        height: 664px;
+        min-height: 664px;
         border-radius: 10px;
         margin-top: 20px;
         .emptyWhitelist{
@@ -591,6 +595,11 @@
                     overflow: hidden;
                     text-overflow: ellipsis;
                     color: var(--dark);
+                    white-space: nowrap;
+                  }
+                  &.tableFieldDescription{
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                     white-space: nowrap;
                   }
                 }
@@ -686,22 +695,25 @@
             }
           }
         }
-        #createdWhitelist{
+        #createdWhitelists{
           .tableFieldNo{min-width: 50px;}
           .tableFieldName{min-width: 100px;max-width: 100px;}
+          .tableFieldDescription{ min-width: 150px;}
           .tableFieldStatus{min-width: 90px;}
           .tableFieldTotalMembers{min-width: 120px;}
           .tableFieldMaxMembers{min-width: 110px;}
+          .tableFieldStartEpoch{min-width: 170px;}
+          .tableFieldEndEpoch{min-width: 170px;}
           .tableFieldSale{min-width: 130px;}
-          .tableFieldAction{min-width: 100px;width: 116px;}
+          .tableFieldAction{min-width: 105px;width:105px; i{cursor: pointer;}}
         }
         #joinedWhitelist{
           .tableFieldNo{min-width: 50px;}
-          .tableFieldName{min-width: 160px;max-width: 160px;}
-          .tableFieldStatus{min-width: 110px;}
+          .tableFieldName{min-width: 120px;max-width: 120px;}
+          .tableFieldStatus{min-width: 80px;}
           .tableFieldTotalMembers{min-width: 130px;}
           .tableFieldMaxMembers{min-width: 120px;}
-          .tableFieldSale{min-width: 140px;}
+          .tableFieldSale{min-width: 130px;}
         }
         #whitelistRequests,
         #offersHistory{

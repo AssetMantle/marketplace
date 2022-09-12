@@ -155,3 +155,12 @@ function closeModal() {
     elements.removeClass('active');
     $("body").removeClass("modal-active");
 }
+
+function epochToDateTime(elementId){
+    let epochVal = $("#"+elementId).text();
+    console.log(epochVal);
+    let epochSeconds = eval(epochVal * 1000);
+    let dateTime = new Date(epochSeconds);
+
+    $("#"+elementId).text(dateTime.toLocaleDateString() + " " + dateTime.toLocaleTimeString());
+}
