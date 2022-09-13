@@ -1,6 +1,6 @@
 // Date Picker
 $(function() {
-    $('input[name="startEpoch"]').daterangepicker({
+    $('input[name="createWhitelistStartEpoch"]').daterangepicker({
         timePicker: true,
         singleDatePicker: true,
         startDate: moment().startOf('minute'),
@@ -11,7 +11,7 @@ $(function() {
         }
     });
 
-    $('input[name="startEpoch"]').on('apply.daterangepicker', function(ev, picker) {
+    $('input[name="createWhitelistStartEpoch"]').on('apply.daterangepicker', function(ev, picker) {
         $(this).val(picker.startDate.format('MM/DD/YYYY hh:mm A'));
         let dateStr = picker.startDate.format('MM/DD/YYYY hh:mm A');
         let date = new Date(dateStr);
@@ -19,12 +19,12 @@ $(function() {
         $("#WHITELIST_INVITE_START_EPOCH").val(seconds);
     });
 
-    $('input[name="startEpoch"]').on('cancel.daterangepicker', function(ev, picker) {
+    $('input[name="createWhitelistStartEpoch"]').on('cancel.daterangepicker', function(ev, picker) {
         $(this).val('');
     });
 
     function setInitialTime(){
-        let dateStr = $('input[name="startEpoch"]').val();
+        let dateStr = $('input[name="createWhitelistStartEpoch"]').val();
         let date = new Date(dateStr);
         const seconds = Math.floor(date.getTime() / 1000);
         $("#WHITELIST_INVITE_START_EPOCH").val(seconds);
@@ -32,7 +32,7 @@ $(function() {
 
     setInitialTime();
 
-    $('input[name="endEpoch"]').daterangepicker({
+    $('input[name="createWhitelistEndEpoch"]').daterangepicker({
         autoUpdateInput: false,
         timePicker: true,
         singleDatePicker: true,
@@ -42,7 +42,7 @@ $(function() {
         }
     });
 
-    $('input[name="endEpoch"]').on('apply.daterangepicker', function(ev, picker) {
+    $('input[name="createWhitelistEndEpoch"]').on('apply.daterangepicker', function(ev, picker) {
         $(this).val(picker.startDate.format('MM/DD/YYYY hh:mm A'));
         let dateStr = picker.startDate.format('MM/DD/YYYY hh:mm A');
         let date = new Date(dateStr);
@@ -51,7 +51,7 @@ $(function() {
         $("#WHITELIST_INVITE_END_EPOCH").val(seconds);
     });
 
-    $('input[name="endEpoch"]').on('cancel.daterangepicker', function(ev, picker) {
+    $('input[name="createWhitelistEndEpoch"]').on('cancel.daterangepicker', function(ev, picker) {
         $(this).val('');
     });
 });

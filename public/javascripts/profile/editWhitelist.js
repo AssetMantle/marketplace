@@ -4,7 +4,7 @@ $(function() {
     let startEpochSeconds = eval(startEpochVal * 1000);
     let startDateTime = new Date(startEpochSeconds);
 
-    $('input[name="startEpoch"]').daterangepicker({
+    $('input[name="editWhitelistStartEpoch"]').daterangepicker({
         timePicker: true,
         singleDatePicker: true,
         startDate: startDateTime,
@@ -15,7 +15,7 @@ $(function() {
         }
     });
 
-    $('input[name="startEpoch"]').on('apply.daterangepicker', function(ev, picker) {
+    $('input[name="editWhitelistStartEpoch"]').on('apply.daterangepicker', function(ev, picker) {
         $(this).val(picker.startDate.format('MM/DD/YYYY hh:mm A'));
         let dateStr = picker.startDate.format('MM/DD/YYYY hh:mm A');
         let date = new Date(dateStr);
@@ -23,12 +23,12 @@ $(function() {
         $("#WHITELIST_INVITE_START_EPOCH").val(seconds);
     });
 
-    $('input[name="startEpoch"]').on('cancel.daterangepicker', function(ev, picker) {
+    $('input[name="editWhitelistStartEpoch"]').on('cancel.daterangepicker', function(ev, picker) {
         $(this).val('');
     });
 
     function setInitialTime(){
-        let dateStr = $('input[name="startEpoch"]').val();
+        let dateStr = $('input[name="editWhitelistStartEpoch"]').val();
         let date = new Date(dateStr);
         const seconds = Math.floor(date.getTime() / 1000);
         $("#WHITELIST_INVITE_START_EPOCH").val(seconds);
@@ -40,7 +40,7 @@ $(function() {
     let endEpochSeconds = eval(endEpochVal * 1000);
     let endDateTime = new Date(endEpochSeconds);
 
-    $('input[name="endEpoch"]').daterangepicker({
+    $('input[name="editWhitelistEndEpoch"]').daterangepicker({
         timePicker: true,
         singleDatePicker: true,
         startDate: endDateTime,
@@ -51,7 +51,7 @@ $(function() {
         }
     });
 
-    $('input[name="endEpoch"]').on('apply.daterangepicker', function(ev, picker) {
+    $('input[name="editWhitelistEndEpoch"]').on('apply.daterangepicker', function(ev, picker) {
         $(this).val(picker.startDate.format('MM/DD/YYYY hh:mm A'));
         let dateStr = picker.startDate.format('MM/DD/YYYY hh:mm A');
         let date = new Date(dateStr);
@@ -60,7 +60,7 @@ $(function() {
         $("#WHITELIST_INVITE_END_EPOCH").val(seconds);
     });
 
-    $('input[name="endEpoch"]').on('cancel.daterangepicker', function(ev, picker) {
+    $('input[name="editWhitelistEndEpoch"]').on('cancel.daterangepicker', function(ev, picker) {
         $(this).val('');
     });
 });

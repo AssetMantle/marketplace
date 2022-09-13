@@ -413,9 +413,9 @@
   height: fit-content;
   background-color: var(--card-color);
   border-radius: 20px;
-  overflow: hidden;
   .centerCard{
     background-color: var(--card-color);
+    border-radius: 20px;
     .contentContainer{
       .header-with-icon{
         .form-top{

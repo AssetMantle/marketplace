@@ -471,6 +471,8 @@ EDIT_WHITELIST_SUCCESS_TITLE=Whitelist Updated Successfully
 WHITELIST_INVITE_LINK=Invite link
 WHITELIST_JOIN_TITLE=Whitelist Invitation
 CLOSE_WHITELIST_INVITE=Cancel
+CHARACTERS_REMAINING_LABEL=characters remaining
+EMPTY_WHITELIST_JOINED=No whitelist joined
 
 #Offers
 OFFERS=Offers

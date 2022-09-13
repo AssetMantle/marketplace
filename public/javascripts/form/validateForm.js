@@ -11,26 +11,64 @@ function validateForm(form) {
         } catch {
         }
 
-        if (dlElement.find(("select"))[0] !== undefined) {
+        if (dlElement.find(("textarea"))[0] !== undefined) {
+            const inputElement = dlElement.find("textarea")[0];
+            const inputValue = inputElement.value;
+            inputElement.classList.remove("errorInput");
 
-            let selectElement=dlElement.find(("select"))[0];
+            dlElement.find(".info").each(function () {
+                    if (errorStatement !== "") {
+                        return;
+                    }
+                    const ddInfoElement = $(this)[0];
+                    const ddValidationInfo = ddInfoElement.innerHTML.split(": ");
+                    switch (ddValidationInfo[0]) {
+                        case "Minimum length":
+                            if (inputValue.length < parseInt(ddValidationInfo[1].replace(/,/g, ""))) {
+                                errorStatement = "Minimum length is " + ddValidationInfo[1];
+
+                            }
+                            break;
+                        case "Maximum length":
+                            if (inputValue.length > parseInt(ddValidationInfo[1].replace(/,/g, ""))) {
+                                errorStatement = "Maximum length is " + ddValidationInfo[1];
+
+                            }
+                            break;
+                        default :
+                            const newRegEx = new RegExp(ddInfoElement.innerHTML);
+                            if (!(newRegEx.test(inputValue))) {
+                                errorStatement = "Invalid Input";
+                            }
+                    }
+                }
+            );
+            if (errorStatement !== "") {
+                formValidationBoolean = false;
+                inputElement.classList.add("errorInput");
+                dlElement.append("<dd class=\"error\">" + errorStatement + "</dd>")
+            }
+
+        } else if (dlElement.find(("select"))[0] !== undefined) {
+
+            let selectElement = dlElement.find(("select"))[0];
             selectElement.classList.remove("errorInput");
-            if(selectElement.disabled){
+            if (selectElement.disabled) {
                 return;
-            }else if(selectElement.value ===""){
-                errorStatement="No Input";
+            } else if (selectElement.value === "") {
+                errorStatement = "No Input";
                 formValidationBoolean = false;
                 selectElement.classList.add("errorInput");
                 dlElement.append("<dd class=\"error\">" + errorStatement + "</dd>");
                 return;
-            }else{
+            } else {
                 return;
             }
-        }else{
+        } else {
             const inputElement = dlElement.find("input")[0];
             const inputValue = inputElement.value;
             inputElement.classList.remove("errorInput");
-            if(inputElement.type === "checkbox" || (inputElement.getAttribute("required") === "false" && inputValue === "") || inputElement.disabled === true){
+            if (inputElement.type === "checkbox" || (inputElement.getAttribute("required") === "false" && inputValue === "") || inputElement.disabled === true) {
                 return;
             }
             dlElement.find(".info").each(function () {
@@ -82,8 +120,8 @@ function validateForm(form) {
                             }
                             break;
                         case "Date ('yyyy-MM-dd')":
-                            if(inputValue === ""){
-                                errorStatement="Invalid Input";
+                            if (inputValue === "") {
+                                errorStatement = "Invalid Input";
                             }
                             break;
                         default :
