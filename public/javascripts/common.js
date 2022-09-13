@@ -13,35 +13,33 @@ $(document).on('hide.bs.modal', '.modal', function () {
 });
 
 // Show wallet popup
-$("#userWallet").click(function(){
-   $("#walletPopup").addClass("active");
-   $("#walletBackDrop").addClass("active");
-   $("body").addClass("modal-open");
+$("#userWallet").click(function () {
+    $("#walletPopup").addClass("active");
+    $("#walletBackDrop").addClass("active");
+    $("body").addClass("modal-open");
 });
 
 // Close wallet popup
-$("#walletBackDrop").click(function (){
+$("#walletBackDrop").click(function () {
     $("#walletPopup").removeClass("active");
     $("#walletBackDrop").removeClass("active");
     $("body").removeClass("modal-open");
-    setTimeout(()=>{
+    setTimeout(() => {
         $("#walletMenu").removeClass("open");
         $("#addressBook").removeClass("open");
-    },200);
+    }, 200);
 });
 
 // Resize window for wallet popup
-$(window).resize(function(){
-    if(($(window).width() <= 900) && ($("#walletPopup").hasClass("active"))) {
+$(window).resize(function () {
+    if (($(window).width() <= 900) && ($("#walletPopup").hasClass("active"))) {
         $("#walletPopup").removeClass("active");
         $("#walletBackDrop").removeClass("active");
         $("body").removeClass("modal-open");
     }
 });
 
-function showOptions(current)
-{
-    console.log($(current));
+function showOptions(current) {
     if ($(current).hasClass("active")) {
         $(current).removeClass("active");
     } else {
@@ -57,11 +55,13 @@ function showOptions(current)
         $(parent).find(".dropdownBodyInner").slideUp(400);
 }
 
-function findParent(element, parentclass){
-    for (var i = 0; i < 10; i++) { if($(element).hasClass(parentclass)) return $(element); else element = $(element).parent(); }
+function findParent(element, parentclass) {
+    for (var i = 0; i < 10; i++) {
+        if ($(element).hasClass(parentclass)) return $(element); else element = $(element).parent();
+    }
 }
 
-function setOption(currentOption){
+function setOption(currentOption) {
     var parent = findParent($(currentOption), "dropdown");
     var selectedItem = $(currentOption);
 
@@ -71,62 +71,17 @@ function setOption(currentOption){
 
     changeSelected(parent, selectedItem);
 }
-function changeSelected(parent, selectedItem){
+
+function changeSelected(parent, selectedItem) {
     $(parent).find(".currentSelected").text($(selectedItem).text());
     $(parent).find("input.dp-input").val($(selectedItem).attr("value"));
 }
-// $(function(){
-//     // $(".dropdown .dropdownHead").click(function(){
-//     function showOptions(current)
-//     {
-//         console.log($(current));
-//         if ($(current).hasClass("active")) {
-//             $(current).removeClass("active");
-//         } else {
-//             $(current).addClass("active");
-//         }
-//
-//         var parent = findParent($(current), "dropdown");
-//
-//         $(parent).toggleClass("is-open");
-//         if ($(parent).hasClass("is-open"))
-//             $(parent).find(".dropdownBodyInner").slideDown(400);
-//         else
-//             $(parent).find(".dropdownBodyInner").slideUp(400);
-//         // });
-//     }
-//
-//     $(".dropdownItem").click(function(){
-//         if($(".dropdown .dropdownHead").hasClass("active")) {
-//             $(".dropdown .dropdownHead").removeClass("active");
-//         }
-//         else{
-//             $(".dropdown .dropdownHead").addClass("active");
-//         }
-//
-//         var parent = findParent($(this), "dropdown");
-//         var selectedItem = $(this);
-//
-//         $(parent).removeClass("is-open");
-//         $(parent).find(".dropdownBodyInner").slideUp(400);
-//
-//         changeSelected(parent, selectedItem);
-//     });
-//
-//     function findParent(element, parentclass){
-//         for (var i = 0; i < 10; i++) { if($(element).hasClass(parentclass)) return $(element); else element = $(element).parent(); }
-//     }
-//
-//     function changeSelected(parent, selectedItem){
-//         $(parent).find(".currentSelected").text($(selectedItem).text());
-//         $(parent).find("input.dp-input").val($(selectedItem).attr("value"));
-//     }
-// });
+
 
 // Address Shorter
 var addresses = document.querySelectorAll('.username-data');
 addresses.forEach(address => {
-    $(address).text($(address).text().substr(0,8) + "..." + $(address).text().substr($(address).length - 8));
+    $(address).text($(address).text().substr(0, 8) + "..." + $(address).text().substr($(address).length - 8));
 });
 
 // Copy to Clipboard
@@ -154,4 +109,21 @@ elements = $('.modal-overlay, .modalContainer');
 function closeModal() {
     elements.removeClass('active');
     $("body").removeClass("modal-active");
+}
+
+function epochToDateTime(elementId) {
+    let epochVal = $("#" + elementId).text();
+    let epochSeconds = eval(epochVal * 1000);
+    let dateTime = new Date(epochSeconds);
+
+    $("#" + elementId).text(dateTime.toLocaleDateString() + " " + dateTime.toLocaleTimeString());
+}
+
+function callSnackBar(message) {
+    let commonSnackBar = $("#commonSnackBar");
+    commonSnackBar.addClass("show");
+    commonSnackBar.html(message);
+    setTimeout(function () {
+        commonSnackBar.removeClass("show");
+    }, 3000);
 }

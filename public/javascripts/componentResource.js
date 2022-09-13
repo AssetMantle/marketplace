@@ -15,6 +15,9 @@ function componentResource(source, route, loadingSpinnerID = 'commonSpinner', ev
             200: function (data) {
                 div.html(data);
             },
+            400: function (data) {
+                div.html(data);
+            },
             401: function (data) {
                 replaceDocument(data.responseText);
             },

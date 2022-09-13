@@ -47,12 +47,9 @@ class WithLoginActionAsync @Inject()(
         token <- token
         verify <- verify(username, address, token)
         result <- getResult(verify, LoginState(username = username, address = address))
-      } yield {
-        result
-      }).recover {
-        case baseException: BaseException =>
-          logger.info(baseException.failure.message, baseException)
-          Results.Unauthorized(views.html.index()).withNewSession
+      } yield result).recover {
+        case baseException: BaseException => logger.info(baseException.failure.message, baseException)
+          Results.Unauthorized(views.html.indexWithLoginFormPopup(request.path)).withNewSession
       }
     }
   }

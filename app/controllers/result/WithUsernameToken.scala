@@ -4,6 +4,7 @@ import constants.Session
 import controllers.actions.LoginState
 import models.masterTransaction
 import play.api.http.Writeable
+import play.api.mvc.Results.{Created, Redirect}
 import play.api.mvc.{RequestHeader, Result, Results}
 
 import javax.inject.Inject
@@ -26,6 +27,16 @@ class WithUsernameToken @Inject()(masterTransactionSessionTokens: masterTransact
     for {
       newToken <- newToken
     } yield Results.Ok.withSession(request.session
+      - Session.TOKEN + (Session.TOKEN -> newToken)
+      - Session.USERNAME + (Session.USERNAME -> loginState.username)
+      - Session.ADDRESS + (Session.ADDRESS -> loginState.address))
+  }
+
+  def InternalRedirectOnSubmitForm(callbackUrl: String)(implicit request: RequestHeader, loginState: LoginState): Future[Result] = {
+    val newToken = masterTransactionSessionTokens.Service.refresh(loginState.username)
+    for {
+      newToken <- newToken
+    } yield Created(callbackUrl).withSession(request.session
       - Session.TOKEN + (Session.TOKEN -> newToken)
       - Session.USERNAME + (Session.USERNAME -> loginState.username)
       - Session.ADDRESS + (Session.ADDRESS -> loginState.address))

@@ -1,0 +1,9 @@
+@(id : String = "", label:String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="commonInputInt">
+    <dl id="field_@id">
+        <dt><label for="@id">@label</label></dt>
+        <dd>
+            <input type="text" id="@id" name="@id" value="" class="cmuk-input">
+        </dd>
+    </dl>
+</div>

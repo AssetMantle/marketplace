@@ -18,7 +18,17 @@ function viewNFT(nftId) {
     componentResource('centerContent', jsRoutes.controllers.NFTController.details(nftId));
 }
 
-function viewProfile() {
-    componentResource('centerContent', jsRoutes.controllers.ProfileController.settings());
+function viewSetting() {
+    componentResource('centerContent', jsRoutes.controllers.SettingController.settings());
+    $('#leftContent').html('');
+}
+
+function viewPersonalProfile() {
+    componentResource('centerContent', jsRoutes.controllers.ProfileController.personalProfile());
+    $('#leftContent').html('');
+}
+
+function viewVisitorProfile(accountId) {
+    componentResource('centerContent', jsRoutes.controllers.ProfileController.visitorProfile(accountId));
     $('#leftContent').html('');
 }

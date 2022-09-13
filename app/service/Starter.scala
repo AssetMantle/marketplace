@@ -81,7 +81,7 @@ class Starter @Inject()(
     obj
   }
 
-  def addNfts(collectionID: String, nftDetails: NFT, uploadCollection: UploadCollection): Future[Unit] = {
+  def addNfts(collectionID: String, nftDetails: NFT, uploadCollection: UploadCollection) = {
     println(nftDetails.name)
     println(uploadCollection.name)
     if (!Await.result(masterNFTs.Service.checkExistsByName(nftDetails.name), Duration.Inf)) {
@@ -119,9 +119,9 @@ class Starter @Inject()(
       } catch {
         case exception: Exception => logger.error(exception.getLocalizedMessage)
           //          throw new BaseException(constants.Response.FILE_UPLOAD_ERROR)
-          Future()
+          Future("")
       }
-    } else Future()
+    } else Future("")
   }
 
   def addCollectionFiles(collectionID: String, uploadCollection: UploadCollection): Future[Unit] = if (uploadCollection.updateDetails) {

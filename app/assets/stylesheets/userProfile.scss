@@ -19,6 +19,12 @@
   width: 20px;
   cursor: pointer;
 }
+.whitelistSeparator{
+  height: 2px;
+  width: calc(100% + 18px);
+  background-color: #383838;
+  margin: 24px -9px 24px;
+}
 .profileSettingsContainer{
   width: 100%;
   height: fit-content;
@@ -440,11 +446,11 @@
   height: fit-content;
   background-color: var(--card-color);
   border-radius: 20px;
-  overflow: hidden;
   margin-bottom: 100px;
   .centerCard{
     background-color: var(--card-color);
     padding: 20px 20px 20px 20px;
+    border-radius: 20px;
     .contentContainer{
       .header-with-icon{
         .form-top{
@@ -480,12 +486,16 @@
             }
           }
         }
+        .headerTitle{
+          @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+          text-transform: capitalize;
+        }
       }
       .contentTitle{
         text-transform: capitalize;
         margin-top: 20px;
         .title{
-          @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--mantle-off-white));
+          @include setFont(var(--font-type-1), normal, 400, 16px, 19px, var(--gray));
         }
         .titleMenu{
           a{
@@ -506,8 +516,8 @@
       .contentBody{
         background-color: var(--card-dark);
         width: 100%;
-        height: fit-content;
-        //min-height: 664px;
+        height: 664px;
+        min-height: 664px;
         border-radius: 10px;
         margin-top: 20px;
         .emptyWhitelist{
@@ -574,6 +584,10 @@
                       background: var(--error);
                       box-shadow: 0.531818px 0.531818px 1.06364px rgba(0, 0, 0, 0.2), inset -0.531818px -0.531818px 1.06364px rgba(0, 0, 0, 0.2), inset 0.531818px 0.531818px 1.06364px #EC6969;
                     }
+                    &.statusGray{
+                      background: var(--gray);
+                      box-shadow: 0.531818px 0.531818px 1.06364px rgba(0, 0, 0, 0.2), inset -0.531818px -0.531818px 1.06364px rgba(0, 0, 0, 0.2), inset 0.531818px 0.531818px 1.06364px var(--gray);
+                    }
                   }
                   &.whitelistActionButton{
                     img{
@@ -585,6 +599,11 @@
                     overflow: hidden;
                     text-overflow: ellipsis;
                     color: var(--dark);
+                    white-space: nowrap;
+                  }
+                  &.tableFieldDescription{
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                     white-space: nowrap;
                   }
                 }
@@ -666,7 +685,7 @@
               border: 1px solid var(--dark);
               border-radius: 24px;
               margin-right: 12px;
-              margin-bottom: 16px;
+              //margin-bottom: 16px;
             }
           }
           &#offersHistory{
@@ -680,22 +699,26 @@
             }
           }
         }
-        #createdWhitelist{
+        #createdWhitelists{
           .tableFieldNo{min-width: 50px;}
           .tableFieldName{min-width: 100px;max-width: 100px;}
+          .tableFieldDescription{ min-width: 150px;}
           .tableFieldStatus{min-width: 90px;}
           .tableFieldTotalMembers{min-width: 120px;}
           .tableFieldMaxMembers{min-width: 110px;}
-          .tableFieldSale{min-width: 130px;}
-          .tableFieldAction{min-width: 100px;width: 116px;}
+          .tableFieldStartEpoch{min-width: 170px;}
+          .tableFieldEndEpoch{min-width: 170px;}
+          .tableFieldSale{min-width: 140px;}
+          .tableFieldAction{min-width: 105px;width:105px; i{cursor: pointer;}}
         }
         #joinedWhitelist{
           .tableFieldNo{min-width: 50px;}
-          .tableFieldName{min-width: 160px;max-width: 160px;}
-          .tableFieldStatus{min-width: 110px;}
-          .tableFieldTotalMembers{min-width: 130px;}
-          .tableFieldMaxMembers{min-width: 120px;}
-          .tableFieldSale{min-width: 140px;}
+          .tableFieldName{min-width: 250px;max-width: 250px;}
+          .tableFieldStatus{min-width: 100px;}
+          .tableFieldTotalMembers{min-width: 160px;}
+          .tableFieldMaxMembers{min-width: 150px;}
+          .tableFieldSale{min-width: 130px;}
+          .tableFieldAction{min-width: 100px;width:100px; i{cursor: pointer;}}
         }
         #whitelistRequests,
         #offersHistory{

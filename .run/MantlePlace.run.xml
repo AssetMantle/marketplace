@@ -29,7 +29,7 @@
         <entry key="EXPLORER_POSTGRES_URL" value="localhost:5432" />
         <entry key="EXPLORER_POSTGRES_USER" value="assetMantle" />
         <entry key="ROOT_FILE_PATH" value="/Users/abhinav/" />
-        <entry key="SITE_URL" value="https://staging.marketplace.assetmantle.one" />
+        <entry key="SITE_URL" value="http://localhost:9000" />
       </map>
     </option>
     <option name="play2IsNonDefaultInstallDirUsed" value="false" />

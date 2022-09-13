@@ -61,6 +61,9 @@ function submitForm(isModal, source, targetID) {
                 },
                 404: function (data) {
                     result.html(data.responseText);
+                },
+                201: function (callbackUrl) {
+                    window.location = callbackUrl;
                 }
             }
         }).fail(function (XMLHttpRequest) {

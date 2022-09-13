@@ -87,7 +87,7 @@ class Wallets @Inject()(
 
   object Service {
 
-    def add(address: String, partialMnemonics: Seq[String], accountId: String, provisioned: Option[Boolean], verified: Option[Boolean]): Future[Unit] = create(Wallet(address = address, partialMnemonics = partialMnemonics, accountId = accountId, provisioned = provisioned, verified = verified, preference = 0).serialize())
+    def add(address: String, partialMnemonics: Seq[String], accountId: String, provisioned: Option[Boolean], verified: Option[Boolean]): Future[String] = create(Wallet(address = address, partialMnemonics = partialMnemonics, accountId = accountId, provisioned = provisioned, verified = verified, preference = 0).serialize())
 
     def tryGet(address: String): Future[Wallet] = tryGetById(address).map(_.deserialize)
 

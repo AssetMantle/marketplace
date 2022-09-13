@@ -27,12 +27,15 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/explorer.css")"/>
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/walletPopUp.css")"/>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/library/daterangepicker.min.css")"/>
             <!-- JS -->
         <script src="@routes.Assets.versioned("javascripts/constants.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/firebase/firebase.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/library/jquery.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/library/swiperBundle.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/componentResource.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/common.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/views/page.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/views/checkAndPushState.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/views/backButtonCapture.js")" type="text/javascript"></script>
             <!-- LazyLoad -->
@@ -42,9 +45,15 @@
         <script src="@routes.Assets.versioned("javascripts/form/closeForm.js")"></script>
         <script src="@routes.Assets.versioned("javascripts/form/submitForm.js")"></script>
         <script src="@routes.Assets.versioned("javascripts/form/validateForm.js")"></script>
+        <script src="@routes.Assets.versioned("javascripts/form/formField.js")"></script>
             <!-- JSRoute -->
         <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" ></script>
         <script src="@routes.Assets.versioned("javascripts/file/images.js")"></script>
+            <!-- Date Range Picker -->
+        <script src="@routes.Assets.versioned("javascripts/library/moment.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/library/dateRangePicker.min.js")" type="text/javascript"></script>
+            <!-- Search Bar Autocomplete-->
+        <script src="@routes.Assets.versioned("javascripts/library/bootstrap3-typeahead.min.js")" type="text/javascript"></script>
 
         <script src="@routes.Assets.versioned("javascripts/custom.js")" type="text/javascript"></script>
 
@@ -78,7 +87,7 @@
                     <ul class="links">
                         <li><a href="@routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)">@Messages(constants.View.EXPLORE)</a></li>
                         <li>
-                            <a href="@routes.ProfileController.viewOffers()" class="desktop-link">@Messages(constants.View.CREATE)</a>
+                            <a class="desktop-link">@Messages(constants.View.CREATE)</a>
                             <input type="checkbox" id="show-features2">
                             <label for="show-features2">@Messages(constants.View.CREATE)</label>
                             <ul>
@@ -104,28 +113,35 @@
                                         <a class="desktop-link">@Messages(constants.View.PROFILE)</a>
                                         <input type="checkbox" id="profileMenu">
                                         <label for="profileMenu" class="d-flex align-items-center gap-3">
-                                            <img class="lazyload wallet icon" src="@routes.Assets.versioned("images/icon/profileWhite.png")"/>
+                                            <i class="bi bi-person iconWhite profile"></i>
                                             <span>@Messages(constants.View.PROFILE)</span>
                                         </label>
                                         <ul>
                                             <li>
-                                                <a href="@routes.ProfileController.viewProfile()" class="d-flex flex-row align-items-center gap-3">
-                                                    <img class="icon" src="@routes.Assets.versioned("images/icon/settingsWhite.png")"/>
+                                                <a href="@routes.SettingController.viewSettings()" class="d-flex flex-row align-items-center gap-3">
+                                                    <i class="bi bi-gear iconWhite"></i>
                                                     <div class="profileMenuLabel">@Messages(constants.View.MENU_SETTINGS)</div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="@routes.ProfileController.viewPersonalProfile()" class="d-flex flex-row align-items-center gap-3">
+                                                    <i class="bi bi-person-lines-fill iconWhite"></i>
+                                                    <div class="profileMenuLabel">@Messages(constants.View.PROFILE)</div>
                                                 </a>
                                             </li>
                                         </ul>
                                     </li>
                                     <li id="userWalletMobile" class="user-wallet">
                                         <a onclick="" class="d-flex align-items-center gap-3">
-                                            <img class="lazyload wallet icon" src="@routes.Assets.versioned("images/icon/wallet.png")"/>
+                                            <i class="bi bi-wallet2 iconWhite wallet"></i>
                                             <span>@Messages(constants.View.WALLET)</span>
                                         </a>
                                     </li>
                                 </div>
                                 <li class="d-flex hiddenMenu">
-                                    <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))">
+                                    <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))" class="d-flex align-items-center gap-3">
                                         <i class="bi bi-box-arrow-right iconWhite logout"></i>
+                                        <span>@Messages(constants.View.SIGN_OUT)</span>
                                     </a>
                                 </li>
                             }
@@ -167,7 +183,13 @@
                                         @* </a>*@
                                         @* </div>*@
                                         <div class="profileMenuItem">
-                                            <a href="@routes.ProfileController.viewProfile()" class="d-flex flex-row align-items-center p-0 profileItemLink">
+                                            <a href="@routes.ProfileController.viewPersonalProfile()" class="d-flex flex-row align-items-center p-0 profileItemLink">
+                                                <i class="bi bi-person-lines-fill iconDefault"></i>
+                                                <div class="profileMenuLabel">@Messages(constants.View.PROFILE)</div>
+                                            </a>
+                                        </div>
+                                        <div class="profileMenuItem">
+                                            <a href="@routes.SettingController.viewSettings()" class="d-flex flex-row align-items-center p-0 profileItemLink">
                                                 <i class="bi bi-gear iconDefault"></i>
                                                 <div class="profileMenuLabel">@Messages(constants.View.MENU_SETTINGS)</div>
                                             </a>
@@ -179,7 +201,7 @@
                             <li id="userWallet" class="user-wallet">
                                     <!-- Wallet Start -->
                                 <div id="walletPopup" class="walletPopup"></div>
-                                <a class="desktop-link" target="_blank" onclick="componentResource('walletPopup', jsRoutes.controllers.ProfileController.walletPopup())">
+                                <a class="desktop-link" target="_blank" onclick="componentResource('walletPopup', jsRoutes.controllers.SettingController.walletPopup())">
                                     <i class="bi bi-wallet2 iconWhite wallet"></i>
                                 </a>
                                     <!-- Wallet End -->
@@ -223,8 +245,6 @@
                 <div id="rightContent" class="col-12 col-md-3 col-lg-3 col-xl-2"></div>
             </div>
         </div>
-
+        <div id="commonSnackBar"></div>
     </body>
-    <script src="@routes.Assets.versioned("javascripts/common.js")" type="text/javascript"></script>
-    <script src="@routes.Assets.versioned("javascripts/views/page.js")" type="text/javascript"></script>
 </html>

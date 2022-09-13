@@ -1,0 +1,45 @@
+@import controllers.actions.LoginState
+@import views.html.base.buttons._
+
+@(totalWhitelists: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@if(totalWhitelists > 0) {
+    <div class="contentBody">
+        <div class="container contentTableContainer" id="createdWhitelists">
+            <div class="row">
+                <div class="col-sm-12 col-md-12">
+                    <div class="table-responsive">
+                        <table class="table contentTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-end tableFieldNo">@Messages(constants.View.WHITELIST_TABLE_TITLE_NO)</th>
+                                    <th class="tableFieldName">@Messages(constants.View.WHITELIST_TABLE_TITLE_NAME)</th>
+                                    <th class="text-end tableFieldMaxMembers">@Messages(constants.View.WHITELIST_TABLE_TITLE_MAX_MEMBERS)</th>
+                                    <th class="text-end tableFieldStartEpoch">@Messages(constants.View.WHITELIST_TABLE_TITLE_START_EPOCH)</th>
+                                    <th class="text-end tableFieldEndEpoch">@Messages(constants.View.WHITELIST_TABLE_TITLE_END_EPOCH)</th>
+                                    <th class="tableFieldAction"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="createdWhitelistTableBody"></tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="createdWhitelistPagination" class="horizontal-align">
+        @commonSecondaryButton(constants.View.BACK, JavaScript(s"createdWhitelistPaginationOnBack()"), Symbol("id") -> "createdWhitelistPaginationBack")
+        @commonPrimaryButton(constants.View.NEXT, JavaScript(s"createdWhitelistPaginationOnNext(${totalWhitelists}, ${constants.CommonConfig.Pagination.WhitelistPerPage})"), Symbol("id") -> "createdWhitelistPaginationNext")
+    </div>
+    <script>createdWhitelistPaginationOnNext(@totalWhitelists, @constants.CommonConfig.Pagination.WhitelistPerPage)</script>
+} else {
+    <div class="contentBody">
+        <div class="h-100 d-flex flex-column justify-content-center align-items-center  emptyWhitelist">
+            <div class="message">@Messages(constants.View.EMPTY_WHITELIST)</div>
+            <div class="d-flex justify-content-center horizontal-align">
+            @commonModalPrimaryButton(constants.Form.CREATE_WHITELIST.button, constants.Form.CREATE_WHITELIST.get)
+            </div>
+        </div>
+    </div>
+}

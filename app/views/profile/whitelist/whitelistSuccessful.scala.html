@@ -1,0 +1,33 @@
+@(whitelistId: String, edited: Boolean = false)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
+
+@if(!edited) {
+    @views.html.base.modal.successModal(heading = constants.View.CREATE_WHITELIST_SUCCESS_TITLE, subHeading = constants.View.CREATE_WHITELIST_SUCCESS_SUBTITLE)
+    <div class="whitelistInfo form-address-box">
+        <div class="form-address-box-item">
+            <span class="address-box-label">@Messages(constants.View.WHITELIST_INVITE_LINK)</span>
+            <span class="address-box-text">
+                <span class="username-data">@constants.CommonConfig.webAppUrl.concat(s"""/acceptWhitelistInvite/${whitelistId}""")</span>
+                <div class="p-0 userAddressData username-data" data-value="@constants.CommonConfig.webAppUrl.concat(s"""/acceptWhitelistInvite/${whitelistId}""")"></div>
+                <div class="text-end copyIcon" onclick="copyToClipboard(this); callSnackBar('@Messages(constants.View.LINK_COPIED)');">
+                    <i id="openWalletMenu" class="bi bi-files iconDefault iconMedium"></i>
+                </div>
+            </span>
+        </div>
+    </div>
+} else {
+    @views.html.base.modal.successModal(heading = constants.View.EDIT_WHITELIST_SUCCESS_TITLE, subHeading = constants.View.CREATE_WHITELIST_SUCCESS_SUBTITLE)
+    <div class="whitelistInfo form-address-box">
+        <div class="form-address-box-item">
+            <span class="address-box-label">@Messages(constants.View.WHITELIST_INVITE_LINK)</span>
+            <span class="address-box-text">
+                <span class="username-data">@constants.CommonConfig.webAppUrl.concat(s"""/acceptWhitelistInvite/${whitelistId}""")</span>
+                <div class="p-0 userAddressData username-data" data-value="@constants.CommonConfig.webAppUrl.concat(s"""/acceptWhitelistInvite/${whitelistId}""")"></div>
+                <div class="text-end copyIcon" onclick="copyToClipboard(this); callSnackBar('@Messages(constants.View.LINK_COPIED)');">
+                    <i id="openWalletMenu" class="bi bi-files iconDefault iconMedium"></i>
+                </div>
+            </span>
+        </div>
+    </div>
+}

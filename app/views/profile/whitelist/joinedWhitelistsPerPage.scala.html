@@ -1,0 +1,24 @@
+@import controllers.actions.LoginState
+@import views.html.base.buttons._
+
+@(whitelists: Seq[master.Whitelist])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@whitelists.zipWithIndex.map { case (whitelist, index) =>
+<tr>
+    <td class="text-end tableFieldNo">@(index + 1)</td>
+    <td class="tableFieldName">@whitelist.name</td>
+    <td id="memberCount_@whitelist.id" class="text-end tableFieldTotalMembers">00</td>
+    <td class="text-end tableFieldMaxMembers">@whitelist.maxMembers</td>
+    <td  class="text-end tableFieldAction">
+        <div class="d-flex gap-3">
+            <div data-toggle="tooltip" data-placement="top" title="@whitelist.description">
+                <i class="bi bi-info-circle iconDefault iconMedium"></i>
+            </div>
+            <div onclick="getForm(jsRoutes.controllers.ProfileController.leaveWhitelistDetails('@whitelist.id'))">
+                <i class="bi bi-box-arrow-right iconDefault iconMedium"></i>
+            </div>
+        </div>
+    </td>
+</tr>
+<script>componentResource('memberCount_@whitelist.id', jsRoutes.controllers.ProfileController.whitelistTotalMembers('@whitelist.id'))</script>
+}
