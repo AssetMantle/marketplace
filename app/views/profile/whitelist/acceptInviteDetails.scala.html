@@ -41,8 +41,9 @@
         @commonPrimaryButton(constants.View.ACCEPT_WHITELIST_INVITE, JavaScript(s"""getForm(jsRoutes.controllers.ProfileController.acceptInvite('${whitelist.id}'))"""))
     </div>
 } else {
-    <div class="mt-3 footerMessage">
-        @Messages(constants.View.WHITELIST_INVITE_EXPIRED)
+    <div class="d-flex gap-2 align-items-center justify-content-center mt-3 footerMessage">
+        <i class="bi bi-info-circle iconError iconSmall"></i>
+        <div class="errorMessage">@Messages(constants.View.WHITELIST_INVITE_EXPIRED)</div>
     </div>
 }
 <script>

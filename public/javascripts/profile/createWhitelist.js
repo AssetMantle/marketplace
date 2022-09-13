@@ -4,8 +4,10 @@ $(function() {
         timePicker: true,
         singleDatePicker: true,
         startDate: moment().startOf('minute'),
+        drops:'up',
         locale: {
             format: 'MM/DD/YYYY hh:mm A',
+            cancelLabel: 'Clear',
         }
     });
 

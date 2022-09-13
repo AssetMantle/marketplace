@@ -8,8 +8,10 @@ $(function() {
         timePicker: true,
         singleDatePicker: true,
         startDate: startDateTime,
+        drops:'up',
         locale: {
             format: 'MM/DD/YYYY hh:mm A',
+            cancelLabel: 'Clear',
         }
     });
 
@@ -45,6 +47,7 @@ $(function() {
         drops:'up',
         locale: {
             format: 'MM/DD/YYYY hh:mm A',
+            cancelLabel: 'Clear',
         }
     });
 
