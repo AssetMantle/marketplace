@@ -155,7 +155,7 @@ class ProfileController @Inject()(
       (for {
         whitelistIds <- whitelistIds
         whitelists <- whitelists(whitelistIds)
-      } yield Ok(views.html.profile.whitelist.joinedWhitelistsPerPage(whitelists))
+      } yield Ok(views.html.profile.whitelist.joinedWhitelistsPerPage(whitelists.sortBy(_.startEpoch)))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
