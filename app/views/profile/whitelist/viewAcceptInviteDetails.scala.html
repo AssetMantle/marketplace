@@ -1,12 +1,10 @@
-@import models.master.Whitelist
-@import views.html.base.buttons._
 @import controllers.actions.LoginState
 
 @(whitelistId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@views.html.base.common(constants.View.COLLECTIONS)(requestHeader, messagesProvider, Option(loginState))
-
-<script>
-        componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsList('art'));
+    @views.html.base.common(constants.View.PROFILE)(requestHeader, messagesProvider, Option(loginState))
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
+    <script>
+        componentResource('centerContent', jsRoutes.controllers.ProfileController.personalProfile());
         getForm(jsRoutes.controllers.ProfileController.acceptInviteDetails('@whitelistId'));
-</script>
+    </script>

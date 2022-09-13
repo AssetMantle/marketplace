@@ -189,9 +189,12 @@ class ProfileController @Inject()(
       implicit request =>
         val whitelist = masterWhitelists.Service.tryGet(whitelistId)
 
-        for {
+        (for {
           whitelist <- whitelist
         } yield Ok(views.html.profile.whitelist.acceptInviteDetails(whitelist = whitelist))
+          ).recover {
+          case baseException: BaseException => BadRequest(views.html.base.modal.errorModal(heading = constants.View.JOIN_WHITELIST_FAILED, subHeading = baseException.failure.message))
+        }
     }
   }
 
@@ -216,9 +219,12 @@ class ProfileController @Inject()(
       implicit request =>
         val whitelist = masterWhitelists.Service.tryGet(whitelistId)
 
-        for {
+        (for {
           whitelist <- whitelist
         } yield Ok(views.html.profile.whitelist.leaveWhitelistDetails(whitelist = whitelist))
+          ).recover {
+          case baseException: BaseException => BadRequest(views.html.base.modal.errorModal(heading = constants.View.LEAVE_WHITELIST_FAILED, subHeading = baseException.failure.message))
+        }
     }
   }
 
