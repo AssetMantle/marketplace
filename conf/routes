@@ -106,6 +106,8 @@ POST        /editWhitelist                             controllers.ProfileContro
 GET         /acceptWhitelistInvite/:whitelistId        controllers.ProfileController.viewAcceptInviteDetails(whitelistId: String)
 GET         /whitelistInviteDetails                    controllers.ProfileController.acceptInviteDetails(whitelistId: String)
 GET         /acceptWhitelistInvite                     controllers.ProfileController.acceptInvite(whitelistId: String)
+GET         /leaveWhitelistDetails                     controllers.ProfileController.leaveWhitelistDetails(whitelistId: String)
+GET         /leaveWhitelist                            controllers.ProfileController.leaveWhitelist(whitelistId: String)
 
 #GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()

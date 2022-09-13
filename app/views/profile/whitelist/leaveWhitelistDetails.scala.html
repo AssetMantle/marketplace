@@ -3,7 +3,7 @@
 
 @(whitelist: Whitelist)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="modal-header mb-0">
-    <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.WHITELIST_JOIN_TITLE)</h5>
+    <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.WHITELIST_LEAVE_TITLE)</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
                 &times;
     </button>
@@ -27,23 +27,8 @@
             <span class="username-data">@whitelist.maxMembers</span>
         </span>
     </div>
-    <div class="form-address-box-item">
-        <span class="address-box-label">@Messages(constants.View.WHITELIST_END_EPOCH)</span>
-        <span class="address-box-text">
-            <span class="username-data" id="expiryDate">@whitelist.endEpoch</span>
-        </span>
-    </div>
 </div>
-
-@if((System.currentTimeMillis / 1000) <= whitelist.endEpoch) {
-    <div class="d-flex justify-content-end horizontal-align">
-        @commonSecondaryButton(constants.View.CLOSE_WHITELIST_INVITE, JavaScript(s"""closeModal()"""))
-        @commonPrimaryButton(constants.View.ACCEPT_WHITELIST_INVITE, JavaScript(s"""getForm(jsRoutes.controllers.ProfileController.acceptInvite('${whitelist.id}'))"""))
-    </div>
-} else {
-    <div class="d-flex gap-2 align-items-center justify-content-center mt-3 footerMessage">
-        <i class="bi bi-info-circle iconError iconSmall"></i>
-        <div class="errorMessage">@Messages(constants.View.WHITELIST_INVITE_EXPIRED)</div>
-    </div>
-}
-<script>epochToDateTime("expiryDate")</script>
+<div class="d-flex justify-content-end horizontal-align">
+    @commonSecondaryButton(constants.View.CLOSE_LEAVE_WHITELIST, JavaScript(s"""closeModal()"""))
+    @commonPrimaryButton(constants.View.LEAVE_WHITELIST, JavaScript(s"""getForm(jsRoutes.controllers.ProfileController.leaveWhitelist('${whitelist.id}'))"""))
+</div>

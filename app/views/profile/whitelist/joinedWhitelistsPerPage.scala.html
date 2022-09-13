@@ -7,16 +7,18 @@
 <tr>
     <td class="text-end tableFieldNo">@(index + 1)</td>
     <td class="tableFieldName">@whitelist.name</td>
-    <td class="tableFieldStatus">
-        <div class="d-flex align-items-center gap-1">
-            <span class="statusCircle onGoing"></span>
-            @Messages(constants.View.WHITELIST_TABLE_STATUS_ONGOING)
-        </div>
-    </td>
     <td id="memberCount_@whitelist.id" class="text-end tableFieldTotalMembers">00</td>
     <td class="text-end tableFieldMaxMembers">@whitelist.maxMembers</td>
-    <td class="text-end tableFieldSale">00</td>
-    <td class="tableFieldAction">@Messages(constants.View.WHITELIST_FIELD_ACTION_LEAVE)</td>
+    <td  class="text-end tableFieldAction">
+        <div class="d-flex gap-3">
+            <div data-toggle="tooltip" data-placement="top" title="@whitelist.description">
+                <i class="bi bi-info-circle iconDefault iconMedium"></i>
+            </div>
+            <div onclick="getForm(jsRoutes.controllers.ProfileController.leaveWhitelistDetails('@whitelist.id'))">
+                <i class="bi bi-box-arrow-right iconDefault iconMedium"></i>
+            </div>
+        </div>
+    </td>
 </tr>
 <script>componentResource('memberCount_@whitelist.id', jsRoutes.controllers.ProfileController.whitelistTotalMembers('@whitelist.id'))</script>
 }

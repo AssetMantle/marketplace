@@ -10,20 +10,22 @@
     <td class="text-end tableFieldMaxMembers">@x.maxMembers</td>
     <td id="startEpoch_@x.id" class="text-end tableFieldStartEpoch epochValue">@x.startEpoch</td>
     <td  id="endEpoch_@x.id" class="text-end tableFieldEndEpoch epochValue">@x.endEpoch</td>
-    <td class="d-flex gap-3 text-end tableFieldAction whitelistActionButton">
-        <div data-toggle="tooltip" data-placement="top" title="@x.description">
-            <i class="bi bi-info-circle iconDefault iconMedium"></i>
+    <td class="text-end tableFieldAction whitelistActionButton">
+        <div class="d-flex gap-3">
+            <div data-toggle="tooltip" data-placement="top" title="@x.description">
+                <i class="bi bi-info-circle iconDefault iconMedium"></i>
+            </div>
+            <div onclick="getForm(jsRoutes.controllers.ProfileController.editWhitelistForm('@x.id'))">
+                <i class="bi bi-pencil iconDefault iconMedium icon"></i>
+            </div>
+            <div>
+                <div class="p-0 userAddressData username-data" data-value="@constants.CommonConfig.webAppUrl.concat(s"""/acceptWhitelistInvite/${x.id}""")"></div>
+                <div class="text-end copyIcon" onclick="copyToClipboard(this)">
+                    <i id="openWalletMenu" class="bi bi-share iconDefault iconMedium"></i>
+                </div>
+            </div>
         </div>
-        <div onclick="getForm(jsRoutes.controllers.ProfileController.editWhitelistForm('@x.id'))">
-            <i class="bi bi-pencil iconDefault iconMedium icon"></i>
-        </div>
-        <div>
-            <div class="p-0 userAddressData username-data" data-value="@constants.CommonConfig.webAppUrl.concat(s"""/acceptWhitelistInvite/${x.id}""")"></div>
-    <div class="text-end copyIcon" onclick="copyToClipboard(this)">
-        <i id="openWalletMenu" class="bi bi-share iconDefault iconMedium"></i>
-    </div>
-</div>
-</td>
+    </td>
 </tr>
 <script>
     epochToDateTime('startEpoch_@x.id');

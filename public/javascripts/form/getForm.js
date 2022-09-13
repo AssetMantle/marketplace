@@ -13,6 +13,11 @@ function getForm(route, modal = '#commonModal', modalContent = '#modal-content')
             500: function (data) {
                 replaceDocument(data);
             },
+            400: function (data) {
+                $(modal).addClass('active');
+                $(modalContent).html(data.responseText);
+                myModal.show();
+            },
         }
     }).fail(function (XMLHttpRequest) {
         if (XMLHttpRequest.readyState === 0) {

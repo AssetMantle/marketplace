@@ -2,3 +2,4 @@
 
 @(whitelist: Whitelist)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
+@views.html.base.modal.successModal(heading = constants.View.ACCEPT_INVITE_SUCCESS_TITLE, subHeading = Messages(constants.View.ACCEPT_INVITE_SUCCESS_SUBTITLE, whitelist.name))

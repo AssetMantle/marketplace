@@ -584,6 +584,10 @@
                       background: var(--error);
                       box-shadow: 0.531818px 0.531818px 1.06364px rgba(0, 0, 0, 0.2), inset -0.531818px -0.531818px 1.06364px rgba(0, 0, 0, 0.2), inset 0.531818px 0.531818px 1.06364px #EC6969;
                     }
+                    &.statusGray{
+                      background: var(--gray);
+                      box-shadow: 0.531818px 0.531818px 1.06364px rgba(0, 0, 0, 0.2), inset -0.531818px -0.531818px 1.06364px rgba(0, 0, 0, 0.2), inset 0.531818px 0.531818px 1.06364px var(--gray);
+                    }
                   }
                   &.whitelistActionButton{
                     img{
@@ -681,7 +685,7 @@
               border: 1px solid var(--dark);
               border-radius: 24px;
               margin-right: 12px;
-              margin-bottom: 16px;
+              //margin-bottom: 16px;
             }
           }
           &#offersHistory{
@@ -704,16 +708,17 @@
           .tableFieldMaxMembers{min-width: 110px;}
           .tableFieldStartEpoch{min-width: 170px;}
           .tableFieldEndEpoch{min-width: 170px;}
-          .tableFieldSale{min-width: 130px;}
+          .tableFieldSale{min-width: 140px;}
           .tableFieldAction{min-width: 105px;width:105px; i{cursor: pointer;}}
         }
         #joinedWhitelist{
           .tableFieldNo{min-width: 50px;}
-          .tableFieldName{min-width: 120px;max-width: 120px;}
-          .tableFieldStatus{min-width: 80px;}
-          .tableFieldTotalMembers{min-width: 130px;}
-          .tableFieldMaxMembers{min-width: 120px;}
+          .tableFieldName{min-width: 250px;max-width: 250px;}
+          .tableFieldStatus{min-width: 100px;}
+          .tableFieldTotalMembers{min-width: 160px;}
+          .tableFieldMaxMembers{min-width: 150px;}
           .tableFieldSale{min-width: 130px;}
+          .tableFieldAction{min-width: 100px;width:100px; i{cursor: pointer;}}
         }
         #whitelistRequests,
         #offersHistory{
