@@ -77,52 +77,6 @@ function changeSelected(parent, selectedItem) {
     $(parent).find("input.dp-input").val($(selectedItem).attr("value"));
 }
 
-// $(function(){
-//     // $(".dropdown .dropdownHead").click(function(){
-//     function showOptions(current)
-//     {
-//         if ($(current).hasClass("active")) {
-//             $(current).removeClass("active");
-//         } else {
-//             $(current).addClass("active");
-//         }
-//
-//         var parent = findParent($(current), "dropdown");
-//
-//         $(parent).toggleClass("is-open");
-//         if ($(parent).hasClass("is-open"))
-//             $(parent).find(".dropdownBodyInner").slideDown(400);
-//         else
-//             $(parent).find(".dropdownBodyInner").slideUp(400);
-//         // });
-//     }
-//
-//     $(".dropdownItem").click(function(){
-//         if($(".dropdown .dropdownHead").hasClass("active")) {
-//             $(".dropdown .dropdownHead").removeClass("active");
-//         }
-//         else{
-//             $(".dropdown .dropdownHead").addClass("active");
-//         }
-//
-//         var parent = findParent($(this), "dropdown");
-//         var selectedItem = $(this);
-//
-//         $(parent).removeClass("is-open");
-//         $(parent).find(".dropdownBodyInner").slideUp(400);
-//
-//         changeSelected(parent, selectedItem);
-//     });
-//
-//     function findParent(element, parentclass){
-//         for (var i = 0; i < 10; i++) { if($(element).hasClass(parentclass)) return $(element); else element = $(element).parent(); }
-//     }
-//
-//     function changeSelected(parent, selectedItem){
-//         $(parent).find(".currentSelected").text($(selectedItem).text());
-//         $(parent).find("input.dp-input").val($(selectedItem).attr("value"));
-//     }
-// });
 
 // Address Shorter
 var addresses = document.querySelectorAll('.username-data');
@@ -163,4 +117,13 @@ function epochToDateTime(elementId) {
     let dateTime = new Date(epochSeconds);
 
     $("#" + elementId).text(dateTime.toLocaleDateString() + " " + dateTime.toLocaleTimeString());
+}
+
+function callSnackBar(message) {
+    let commonSnackBar = $("#commonSnackBar");
+    commonSnackBar.addClass("show");
+    commonSnackBar.html(message);
+    setTimeout(function () {
+        commonSnackBar.removeClass("show");
+    }, 3000);
 }
