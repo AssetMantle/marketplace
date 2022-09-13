@@ -8,17 +8,6 @@ $("#picker").daterangepicker({
     }
 });
 
-// Check Whitelist Name Exist or Not
-function checkWhitelistNameAvailable(source) {
-    const whitelistName = $(source).val();
-    if (whitelistName.length > 0 && whitelistName === "test") {
-        $("#whitelistNameAvailableError").show(300);
-        $("#whitelistName").css("border-color", "var(--error)");
-    } else {
-        $("#whitelistNameAvailableError").hide(300);
-        $("#whitelistName:focus").css("border-color", "var(--dark)");
-    }
-}
 
 function showWhitelistScreen(screenID) {
     switch (screenID) {
@@ -36,16 +25,6 @@ function showWhitelistScreen(screenID) {
             break;
     }
 }
-
-// Convert Epoch to Date and Time
-$(".tableFieldEndEpoch.epochValue, .tableFieldStartEpoch.epochValue").each(function () {
-    let seconds = $(this).text();
-    let dt = eval(seconds * 1000);
-    let date = new Date(dt);
-    let epochDate = date.toLocaleDateString();
-    let epochTime = date.toLocaleTimeString();
-    $(this).html(`${epochDate} &nbsp;${epochTime}`)
-});
 
 function setCreatedWhitelistCurrentPage(page) {
     createdWhitelistCurrentPageNumber = page;

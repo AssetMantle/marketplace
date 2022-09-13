@@ -8,8 +8,8 @@
     <td class="text-end tableFieldNo">@(index + 1)</td>
     <td class="tableFieldName">@x.name</td>
     <td class="text-end tableFieldMaxMembers">@x.maxMembers</td>
-    <td class="text-end tableFieldStartEpoch epochValue">@x.startEpoch</td>
-    <td class="text-end tableFieldEndEpoch epochValue">@x.endEpoch</td>
+    <td id="startEpoch_@x.id" class="text-end tableFieldStartEpoch epochValue">@x.startEpoch</td>
+    <td  id="endEpoch_@x.id" class="text-end tableFieldEndEpoch epochValue">@x.endEpoch</td>
     <td class="d-flex gap-3 text-end tableFieldAction whitelistActionButton">
         <div data-toggle="tooltip" data-placement="top" title="@x.description">
             <i class="bi bi-info-circle iconDefault iconMedium"></i>
@@ -25,4 +25,9 @@
 </div>
 </td>
 </tr>
+<script>
+    epochToDateTime('startEpoch_@x.id');
+    epochToDateTime('endEpoch_@x.id');
+</script>
 }
+
