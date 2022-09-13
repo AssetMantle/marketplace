@@ -15,7 +15,7 @@ function getForm(route, modal = '#commonModal', modalContent = '#modal-content')
             },
             400: function (data) {
                 $(modal).addClass('active');
-                $(modalContent).html(data);
+                $(modalContent).html(data.responseText);
                 myModal.show();
             },
         }
