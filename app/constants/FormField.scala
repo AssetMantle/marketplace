@@ -37,7 +37,7 @@ object FormField {
   val FROM_ADDRESS = new StringFormField("FROM_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val TO_ADDRESS = new StringFormField("TO_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val WHITELIST_NAME = new StringFormField("WHITELIST_NAME", 3, 50, RegularExpression.WHITELIST_NAME)
-  val WHITELIST_DESCRIPTION = new StringFormField("WHITELIST_DESCRIPTION", 3, 256)
+  val WHITELIST_DESCRIPTION = new StringFormField("WHITELIST_DESCRIPTION", 0, 256)
   val WHITELIST_ID = new StringFormField("WHITELIST_ID", 16, 16)
   val CALLBACK_URL = new StringFormField("CALLBACK_URL", 1, 1024, RegularExpression.ANY_STRING)
 
@@ -66,76 +66,67 @@ object FormField {
 
   val SEND_COIN_AMOUNT = new MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.zero, MicroNumber(Int.MaxValue), 6)
 
-  class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
+  class StringFormField(fieldName: String, val minimumLength: Int, val maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName
-    val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
     val placeHolder: String = "PLACEHOLDER." + name
 
-    def mapping: (String, Mapping[String]) = name -> field
+    def mapping: (String, Mapping[String]) = name -> text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
   }
 
   class SelectFormField(fieldName: String, val options: Seq[String], errorMessage: String = "Error Response") {
     val name: String = fieldName
-    val field: Mapping[String] = text.verifying(constraint = field => options contains field, error = errorMessage)
     val placeHolder: String = "PLACEHOLDER." + name
 
-    def mapping: (String, Mapping[String]) = name -> field
+    def mapping: (String, Mapping[String]) = name -> text.verifying(constraint = field => options contains field, error = errorMessage)
   }
 
   class CustomSelectFormField(fieldName: String) {
     val name: String = fieldName
-    val field: Mapping[String] = text
     val placeHolder: String = "PLACEHOLDER." + name
 
-    def mapping: (String, Mapping[String]) = name -> field
+    def mapping: (String, Mapping[String]) = name -> text
   }
 
   class IntFormField(fieldName: String, val minimumValue: Int, val maximumValue: Int) {
     val name: String = fieldName
-    val field: Mapping[Int] = number(min = minimumValue, max = maximumValue)
     val placeHolder: String = "PLACEHOLDER." + name
 
-    def mapping: (String, Mapping[Int]) = name -> field
+    def mapping: (String, Mapping[Int]) = name -> number(min = minimumValue, max = maximumValue)
   }
 
   class DateFormField(fieldName: String) {
     val name: String = fieldName
-    val field: Mapping[Date] = date
     val placeHolder: String = "PLACEHOLDER." + name
 
-    def mapping: (String, Mapping[Date]) = name -> field
+    def mapping: (String, Mapping[Date]) = name -> date
   }
 
   class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
     val name: String = fieldName
-    val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
     val placeHolder: String = "PLACEHOLDER." + name
 
-    def mapping: (String, Mapping[Double]) = name -> field
+    def mapping: (String, Mapping[Double]) = name -> of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
   }
 
   class BigDecimalFormField(fieldName: String, val minimumValue: BigDecimal, val maximumValue: BigDecimal) {
     val name: String = fieldName
-    val field: Mapping[BigDecimal] = of(bigDecimalFormat).verifying(Constraints.max[BigDecimal](maximumValue), Constraints.min[BigDecimal](minimumValue))
     val placeHolder: String = "PLACEHOLDER." + name
 
-    def mapping: (String, Mapping[BigDecimal]) = name -> field
+    def mapping: (String, Mapping[BigDecimal]) = name -> of(bigDecimalFormat).verifying(Constraints.max[BigDecimal](maximumValue), Constraints.min[BigDecimal](minimumValue))
   }
 
   class BooleanFormField(fieldName: String) {
     val name: String = fieldName
-    val field: Mapping[Boolean] = boolean
     val placeHolder: String = "PLACEHOLDER." + name
 
-    def mapping: (String, Mapping[Boolean]) = name -> field
+    def mapping: (String, Mapping[Boolean]) = name -> boolean
   }
 
   class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, precision: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[MicroNumber] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
     val placeHolder: String = "PLACEHOLDER." + name
 
-    def mapping: (String, Mapping[MicroNumber]) = name -> field
+    def mapping: (String, Mapping[MicroNumber]) = name -> of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
   }
 
   class NestedFormField(fieldName: String) {

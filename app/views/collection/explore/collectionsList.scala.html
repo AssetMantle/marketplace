@@ -13,23 +13,6 @@
                             <div id="wishListCollections" class="col mx-3 p-0 menuItem" onclick="changeActive('wishListCollections')">
                             @Messages(constants.View.WISHLIST_MENU)
                             </div>
-                            <div id="whitelist" class="col mx-3 p-0 menuItem" onclick="changeActive('whitelist')">
-                                <div class="dropdownContainer d-flex align-items-center gap-1">
-                                    @Messages(constants.View.WHITELIST)
-                                    <input class="dropdown" type="checkbox" id="whitelistMenu" name="dropdown"/>
-
-                                    <label class="forDropdown " for="whitelistMenu">
-                                        <img src="@routes.Assets.versioned("images/icon/downArrowYellow.png")" width="20px" height="15px"/>
-                                    </label>
-                                    <div class="sectionDropdown">
-                                        <a href="#">@Messages(constants.View.CREATED_WHITELISTS)</a>
-                                        <div class="innerSeparator"></div>
-                                        <a href="#">@Messages(constants.View.JOINED_WHITELISTS)</a>
-                                        <div class="innerSeparator"></div>
-                                        <a href="#">@Messages(constants.View.WHITELIST_REQUESTS)</a>
-                                    </div>
-                                </div>
-                            </div>
                         }
                     </div>
                 </div>
@@ -59,6 +42,6 @@
 <script src="@routes.Assets.versioned("javascripts/collections/loadMore.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/collections/collectionsList.js")" type="text/javascript"></script>
 <script>
-    changeActive('@section');
-    $('#art').addClass("active");
+        changeActive('@section');
+        $('#art').addClass("active");
 </script>
