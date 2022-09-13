@@ -1,9 +1,9 @@
 @import controllers.actions.LoginState
 @import views.html.base.buttons._
 
-@(whitelists: Seq[master.Whitelist])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(totalWhitelists: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@if(whitelists.nonEmpty) {
+@if(totalWhitelists > 0) {
     <div class="contentBody">
         <div class="container contentTableContainer" id="createdWhitelists">
             <div class="row">
@@ -20,37 +20,18 @@
                                     <th class="tableFieldAction"></th>
                                 </tr>
                             </thead>
-                            <tbody>
-                            @whitelists.zipWithIndex.map { case (x,index) =>
-                                <tr>
-                                    <td class="text-end tableFieldNo">@((index.toInt) + 1)</td>
-                                    <td class="tableFieldName">@x.name</td>
-                                    <td class="text-end tableFieldMaxMembers">@x.maxMembers</td>
-                                    <td class="text-end tableFieldStartEpoch epochValue">@x.startEpoch</td>
-                                    <td class="text-end tableFieldEndEpoch epochValue">@x.endEpoch</td>
-                                    <td class="d-flex gap-3 text-end tableFieldAction whitelistActionButton">
-                                        <div data-toggle="tooltip" data-placement="top" title="@x.description">
-                                            <i class="bi bi-info-circle iconDefault iconMedium"></i>
-                                        </div>
-                                        <div onclick="getForm(jsRoutes.controllers.ProfileController.editWhitelistForm('@x.id'))">
-                                            <i class="bi bi-pencil iconDefault iconMedium icon"></i>
-                                        </div>
-                                        <div>
-                                            <div class="p-0 userAddressData username-data" data-value="@constants.CommonConfig.webAppUrl.concat(s"""/acceptWhitelistInvite/${x.id}""")"></div>
-                                            <div class="text-end copyIcon" onclick="copyToClipboard(this)">
-                                                <i id="openWalletMenu" class="bi bi-share iconDefault iconMedium"></i>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                            </tbody>
+                            <tbody id="createdWhitelistTableBody"></tbody>
                         </table>
+                        <div id="createdWhitelistPagination">
+                            @commonSecondaryButton(constants.View.BACK, JavaScript(s"createdWhitelistPaginationOnBack()"), Symbol("id") -> "createdWhitelistPaginationBack")
+                            @commonPrimaryButton(constants.View.NEXT, JavaScript(s"createdWhitelistPaginationOnNext(${totalWhitelists}, ${constants.CommonConfig.Pagination.WhitelistPerPage})"), Symbol("id") -> "createdWhitelistPaginationNext")
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>createdWhitelistPaginationOnNext(@totalWhitelists, @constants.CommonConfig.Pagination.WhitelistPerPage)</script>
 } else {
     <div class="contentBody">
         <div class="h-100 d-flex flex-column justify-content-center align-items-center  emptyWhitelist">
@@ -61,4 +42,3 @@
         </div>
     </div>
 }
-<script src="@routes.Assets.versioned("javascripts/profile/whitelist.js")"></script>

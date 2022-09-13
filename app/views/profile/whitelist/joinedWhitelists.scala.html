@@ -1,9 +1,9 @@
 @import controllers.actions.LoginState
 @import views.html.base.buttons._
 
-@(whitelists: Seq[master.Whitelist])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(totalWhitelists: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@if(whitelists.nonEmpty) {
+@if(totalWhitelists > 0) {
     <div class="contentBody">
         <div class="container contentTableContainer" id="joinedWhitelist">
             <div class="row">
@@ -21,31 +21,19 @@
                                     <th class="tableFieldAction"></th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @whitelists.zipWithIndex.map { case (x,index) =>
-                                    <tr>
-                                        <td class="text-end tableFieldNo">@((index.toInt) + 1)</td>
-                                        <td class="tableFieldName">@x.name</td>
-                                        <td class="tableFieldStatus">
-                                            <div class="d-flex align-items-center gap-1">
-                                                <span class="statusCircle onGoing"></span>
-                                                @Messages(constants.View.WHITELIST_TABLE_STATUS_ONGOING)
-                                            </div>
-                                        </td>
-                                        <td class="text-end tableFieldTotalMembers">00</td>
-                                        <td class="text-end tableFieldMaxMembers">@x.maxMembers</td>
-                                        <td class="text-end tableFieldSale">00</td>
-                                        <td class="tableFieldAction">@Messages(constants.View.WHITELIST_FIELD_ACTION_LEAVE)</td>
-                                    </tr>
-                                }
-                            </tbody>
+                            <tbody id="joinedWhitelistTableBody"></tbody>
                         </table>
+                        <div id="joinedWhitelistPagination">
+                            @commonSecondaryButton(constants.View.BACK, JavaScript(s"joinedWhitelistPaginationOnBack()"), Symbol("id") -> "joinedWhitelistPaginationBack")
+                            @commonPrimaryButton(constants.View.NEXT, JavaScript(s"joinedWhitelistPaginationOnNext(${totalWhitelists}, ${constants.CommonConfig.Pagination.WhitelistPerPage})"), Symbol("id") -> "joinedWhitelistPaginationNext")
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-}else {
+    <script>joinedWhitelistPaginationOnNext(@totalWhitelists, @constants.CommonConfig.Pagination.WhitelistPerPage)</script>
+} else {
     <div class="contentBody">
         <div class="h-100 d-flex flex-column justify-content-center align-items-center  emptyWhitelist">
             <div class="message">@Messages(constants.View.EMPTY_WHITELIST_JOINED)</div>

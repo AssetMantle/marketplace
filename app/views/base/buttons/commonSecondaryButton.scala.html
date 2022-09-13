@@ -1,5 +1,5 @@
 @(name: String, function: JavaScript, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
 
-<button type="@arguments.toMap.get(Symbol("type")).map(_.toString).getOrElse("button")" class="@Seq("form-secondary-button", arguments.toMap.get('class).map(_.toString).getOrElse("")).mkString(" ")" id='@arguments.toMap.get(Symbol("id")).map(_.toString).getOrElse("")' onclick="@function" data-bs-dismiss='@arguments.toMap.get(Symbol("data-bs-dismiss")).map(_.toString).getOrElse("")' aria-label='@arguments.toMap.get(Symbol("aria-label")).map(_.toString).getOrElse("")'>
+<button type="@arguments.toMap.get(Symbol("type")).map(_.toString).getOrElse("button")" class="@Seq("form-secondary-button", arguments.toMap.get(Symbol("class")).map(_.toString).getOrElse("")).mkString(" ")" id='@arguments.toMap.get(Symbol("id")).map(_.toString).getOrElse("")' onclick="@function" data-bs-dismiss='@arguments.toMap.get(Symbol("data-bs-dismiss")).map(_.toString).getOrElse("")' aria-label='@arguments.toMap.get(Symbol("aria-label")).map(_.toString).getOrElse("")'>
     @Messages(name)
 </button>

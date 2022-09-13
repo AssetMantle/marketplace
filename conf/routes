@@ -90,8 +90,11 @@ GET         /profile                                   controllers.ProfileContro
 GET         /personalProfile                           controllers.ProfileController.personalProfile()
 #GET         /profile/:accountId                        controllers.ProfileController.viewVisitorProfile(accountId: String)
 #GET         /visitorProfile                            controllers.ProfileController.visitorProfile(accountId: String)
-GET         /createdWhitelists                         controllers.ProfileController.createdWhitelists(pageNumber: Int)
-GET         /joinedWhitelists                          controllers.ProfileController.joinedWhitelists(pageNumber: Int)
+GET         /createdWhitelists                         controllers.ProfileController.createdWhitelists()
+GET         /createdWhitelistsPerPage                  controllers.ProfileController.createdWhitelistsPerPage(pageNumber: Int)
+GET         /joinedWhitelists                          controllers.ProfileController.joinedWhitelists()
+GET         /joinedWhitelistsPerPage                   controllers.ProfileController.joinedWhitelistsPerPage(pageNumber: Int)
+GET         /whitelistTotalMembers                     controllers.ProfileController.whitelistTotalMembers(id: String)
 
 GET         /createWhitelist                           controllers.ProfileController.createWhitelistForm()
 POST        /createWhitelist                           controllers.ProfileController.createWhitelist()

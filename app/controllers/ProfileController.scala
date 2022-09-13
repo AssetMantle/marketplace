@@ -58,13 +58,26 @@ class ProfileController @Inject()(
     }
   }
 
-  def createdWhitelists(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + pageNumber.toString + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+  def createdWhitelists(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val whitelistsMade = masterWhitelists.Service.totalWhitelistsByOwner(loginState.username)
+        (for {
+          whitelistsMade <- whitelistsMade
+        } yield Ok(views.html.profile.whitelist.createdWhitelists(whitelistsMade))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def createdWhitelistsPerPage(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + pageNumber.toString + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val whitelists = masterWhitelists.Service.getByOwner(loginState.username, pageNumber)
         (for {
           whitelists <- whitelists
-        } yield Ok(views.html.profile.whitelist.createdWhitelists(whitelists))
+        } yield Ok(views.html.profile.whitelist.createdWhitelistsPerPage(whitelists))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -121,7 +134,21 @@ class ProfileController @Inject()(
       )
   }
 
-  def joinedWhitelists(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + pageNumber.toString + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+  def joinedWhitelists(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val totalWhitelistsJoined = masterWhitelistMembers.Service.totalJoined(loginState.username)
+
+        (for {
+          totalWhitelistsJoined <- totalWhitelistsJoined
+        } yield Ok(views.html.profile.whitelist.joinedWhitelists(totalWhitelistsJoined))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def joinedWhitelistsPerPage(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + pageNumber.toString + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val whitelistIds = masterWhitelistMembers.Service.getAllForMember(loginState.username, pageNumber = pageNumber, perPage = constants.CommonConfig.Pagination.WhitelistPerPage)
@@ -131,7 +158,21 @@ class ProfileController @Inject()(
         (for {
           whitelistIds <- whitelistIds
           whitelists <- whitelists(whitelistIds)
-        } yield Ok(views.html.profile.whitelist.joinedWhitelists(whitelists))
+        } yield Ok(views.html.profile.whitelist.joinedWhitelistsPerPage(whitelists))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def whitelistTotalMembers(id: String): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val whitelistsMemberCount = masterWhitelistMembers.Service.getWhitelistsMemberCount(id)
+
+        (for {
+          whitelistsMemberCount <- whitelistsMemberCount
+        } yield Ok(whitelistsMemberCount.toString)
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -152,19 +193,17 @@ class ProfileController @Inject()(
       } yield Ok(views.html.profile.whitelist.acceptInviteDetails(whitelist = whitelist))
   }
 
-
   def acceptInvite(whitelistId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val checkInviteValid = masterWhitelists.Service.checkInviteValid(whitelistId)
+      val checkInviteValidAndGetWhitelist = masterWhitelists.Service.checkInviteValidAndGetWhitelist(whitelistId)
 
-      def checkAndAdd(inviteValid: Boolean) = if (inviteValid) {
-        masterWhitelistMembers.Service.add(whitelistId = whitelistId, accountId = loginState.username)
-      } else constants.Response.WHITELIST_INVITATION_EXPIRED.throwFutureBaseException()
+      def checkAndAdd(inviteValid: Boolean) = if (inviteValid) masterWhitelistMembers.Service.add(whitelistId = whitelistId, accountId = loginState.username)
+      else constants.Response.WHITELIST_INVITATION_EXPIRED.throwFutureBaseException()
 
       (for {
-        inviteValid <- checkInviteValid
+        (inviteValid, whitelist) <- checkInviteValidAndGetWhitelist
         _ <- checkAndAdd(inviteValid)
-      } yield PartialContent(views.html.profile.whitelist.acceptInviteSuccessful())
+      } yield Ok(views.html.profile.whitelist.acceptInviteSuccessful(whitelist))
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
