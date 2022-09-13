@@ -38,7 +38,7 @@
 @if((System.currentTimeMillis / 1000) <= whitelist.endEpoch) {
     <div class="d-flex justify-content-end horizontal-align">
         @commonSecondaryButton(constants.View.CLOSE_WHITELIST_INVITE, JavaScript(s"""closeModal()"""))
-        @commonPrimaryButton(constants.View.ACCEPT_WHITELIST_INVITE, JavaScript(s"""getForm(jsRoutes.controllers.ProfileController.acceptInvite('${whitelist.id}'))"""))
+        @commonPrimaryButton(constants.View.ACCEPT_WHITELIST_INVITE, JavaScript(s"""getForm(jsRoutes.controllers.ProfileController.acceptInvite('${whitelist.id}'), '#commonModal', '#modal-content', resetCreatedWhitelistPage)"""))
     </div>
 } else {
     <div class="d-flex gap-2 align-items-center justify-content-center mt-3 footerMessage">

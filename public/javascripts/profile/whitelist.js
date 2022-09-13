@@ -8,20 +8,27 @@ $("#picker").daterangepicker({
     }
 });
 
+function resetCreatedWhitelistPage() {
+    setCreatedWhitelistCurrentPage(0);
+    componentResource("personalProfileContent", jsRoutes.controllers.ProfileController.createdWhitelists());
+}
+
+function resetJoinedWhitelistPage() {
+    setJoinedWhitelistCurrentPage(0);
+    componentResource("personalProfileContent", jsRoutes.controllers.ProfileController.joinedWhitelists());
+}
 
 function showWhitelistScreen(screenID) {
     switch (screenID) {
         case "created":
             $(".contentContainer .contentTitle .title .titleLabel").text("Created");
             $(".contentContainer .contentTitle .titleMenu").show();
-            setCreatedWhitelistCurrentPage(0);
-            componentResource("personalProfileContent", jsRoutes.controllers.ProfileController.createdWhitelists());
+            resetCreatedWhitelistPage();
             break;
         case "joined":
             $(".contentContainer .contentTitle .title .titleLabel").text("Joined");
             $(".contentContainer .contentTitle .titleMenu").hide();
-            setJoinedWhitelistCurrentPage(0);
-            componentResource("personalProfileContent", jsRoutes.controllers.ProfileController.joinedWhitelists());
+            resetJoinedWhitelistPage();
             break;
     }
 }

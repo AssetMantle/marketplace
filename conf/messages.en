@@ -486,6 +486,7 @@ LEAVE_WHITELIST_SUCCESS_SUBTITLE={0} left successfully
 ACCEPT_INVITE_SUCCESS_TITLE=Join Whitelist
 ACCEPT_INVITE_SUCCESS_SUBTITLE={0} joined successfully
 
+LINK_COPIED=Link Copied!
 
 #Offers
 OFFERS=Offers

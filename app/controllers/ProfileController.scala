@@ -71,17 +71,15 @@ class ProfileController @Inject()(
     }
   }
 
-  def createdWhitelistsPerPage(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + pageNumber.toString + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
-    withLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val whitelists = masterWhitelists.Service.getByOwner(loginState.username, pageNumber)
-        (for {
-          whitelists <- whitelists
-        } yield Ok(views.html.profile.whitelist.createdWhitelistsPerPage(whitelists))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
+  def createdWhitelistsPerPage(pageNumber: Int): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val whitelists = masterWhitelists.Service.getByOwner(loginState.username, pageNumber)
+      (for {
+        whitelists <- whitelists
+      } yield Ok(views.html.profile.whitelist.createdWhitelistsPerPage(whitelists))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def createWhitelistForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
@@ -148,21 +146,19 @@ class ProfileController @Inject()(
     }
   }
 
-  def joinedWhitelistsPerPage(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + pageNumber.toString + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
-    withLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val whitelistIds = masterWhitelistMembers.Service.getAllForMember(loginState.username, pageNumber = pageNumber, perPage = constants.CommonConfig.Pagination.WhitelistPerPage)
+  def joinedWhitelistsPerPage(pageNumber: Int): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val whitelistIds = masterWhitelistMembers.Service.getAllForMember(loginState.username, pageNumber = pageNumber, perPage = constants.CommonConfig.Pagination.WhitelistPerPage)
 
-        def whitelists(whitelistIds: Seq[String]) = masterWhitelists.Service.getByIds(whitelistIds)
+      def whitelists(whitelistIds: Seq[String]) = masterWhitelists.Service.getByIds(whitelistIds)
 
-        (for {
-          whitelistIds <- whitelistIds
-          whitelists <- whitelists(whitelistIds)
-        } yield Ok(views.html.profile.whitelist.joinedWhitelistsPerPage(whitelists))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
+      (for {
+        whitelistIds <- whitelistIds
+        whitelists <- whitelists(whitelistIds)
+      } yield Ok(views.html.profile.whitelist.joinedWhitelistsPerPage(whitelists))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def whitelistTotalMembers(id: String): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {

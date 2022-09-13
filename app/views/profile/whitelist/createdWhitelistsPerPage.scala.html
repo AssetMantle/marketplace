@@ -20,7 +20,7 @@
             </div>
             <div>
                 <div class="p-0 userAddressData username-data" data-value="@constants.CommonConfig.webAppUrl.concat(s"""/acceptWhitelistInvite/${x.id}""")"></div>
-                <div class="text-end copyIcon" onclick="copyToClipboard(this)">
+                <div class="text-end copyIcon" onclick="copyToClipboard(this); callSnackBar('@Messages(constants.View.LINK_COPIED)');">
                     <i id="openWalletMenu" class="bi bi-share iconDefault iconMedium"></i>
                 </div>
             </div>

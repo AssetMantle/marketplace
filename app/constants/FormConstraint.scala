@@ -88,7 +88,6 @@ object FormConstraint {
   val editWhitelistInviteConstraint: Constraint[Edit.Data] = Constraint("constraints.EditWhitelist")({ editWhitelistData: Edit.Data =>
     val errors = Seq(
       if (editWhitelistData.startEpoch >= editWhitelistData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
-      if (editWhitelistData.startEpoch < (System.currentTimeMillis / 1000 - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })
