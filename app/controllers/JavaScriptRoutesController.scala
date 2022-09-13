@@ -81,6 +81,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.editWhitelistForm,
         routes.javascript.ProfileController.acceptInviteDetails,
         routes.javascript.ProfileController.acceptInvite,
+        routes.javascript.ProfileController.leaveWhitelistDetails,
+        routes.javascript.ProfileController.leaveWhitelist,
 
       )
     ).as("text/javascript")

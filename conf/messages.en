@@ -132,6 +132,11 @@ FORM.VERIFY_WALLET_MNEMONICS.SUBTITLE=Confirm username and recovery phrase.
 FORM.VERIFY_WALLET_MNEMONICS.SUBMIT=Next
 CONFIRM_RECOVERY_PHRASE=Confirm your Recovery Phrase
 PHRASE_VERIFICATION_WARNING=Do not share recovery phrase with anyone.
+LEAVE_WHITELIST_FAILED=Leaving Whitelist Failed
+JOIN_WHITELIST_FAILED=Joining Whitelist Failed
+LEAVE_WHITELIST=Leave
+CLOSE_LEAVE_WHITELIST=Cancel
+WHITELIST_LEAVE_TITLE=Leave Whitelist
 
 #//Sign In
 FORM.SIGN_IN.TITLE=Sign In

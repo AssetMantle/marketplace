@@ -16,7 +16,7 @@
     <td id="memberCount_@whitelist.id" class="text-end tableFieldTotalMembers">00</td>
     <td class="text-end tableFieldMaxMembers">@whitelist.maxMembers</td>
     <td class="text-end tableFieldSale">00</td>
-    <td class="tableFieldAction">@Messages(constants.View.WHITELIST_FIELD_ACTION_LEAVE)</td>
+    <td onclick="getForm(jsRoutes.controllers.ProfileController.leaveWhitelistDetails('@whitelist.id'))" class="tableFieldAction">@Messages(constants.View.WHITELIST_FIELD_ACTION_LEAVE)</td>
 </tr>
 <script>componentResource('memberCount_@whitelist.id', jsRoutes.controllers.ProfileController.whitelistTotalMembers('@whitelist.id'))</script>
 }
