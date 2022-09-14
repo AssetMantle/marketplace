@@ -3,7 +3,6 @@ function emptyCallBack() {
 
 function getForm(route, modal = '#commonModal', modalContent = '#modal-content', callback = emptyCallBack) {
     let myModal = new bootstrap.Modal($(modal), {});
-    console.log(route.url)
     $.ajax({
         url: route.url,
         type: route.type,
