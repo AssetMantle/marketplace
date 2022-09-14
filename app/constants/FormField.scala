@@ -19,6 +19,7 @@ object FormField {
   private val NESTED_ERROR_PREFIX = "NESTED_ERROR_PREFIX."
   private val MINIMUM_FIELD_ERROR_PREFIX = "MINIMUM_FIELD_ERROR_PREFIX."
   private val MAXIMUM_FIELD_ERROR_PREFIX = "MAXIMUM_FIELD_ERROR_PREFIX."
+  private val CUSTOM_FIELD_ERROR_PREFIX = "CUSTOM_FIELD_ERROR_PREFIX."
 
   //StringFormField
   val USERNAME: StringFormField = StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
@@ -102,6 +103,8 @@ object FormField {
     def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_FIELD_ERROR_PREFIX + name, minimumValue)
 
     def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_FIELD_ERROR_PREFIX + name, maximumValue)
+
+    def getCustomFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(CUSTOM_FIELD_ERROR_PREFIX + name, minimumValue, maximumValue)
 
   }
 

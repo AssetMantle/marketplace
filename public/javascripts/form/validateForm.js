@@ -73,9 +73,11 @@ function validateForm(form) {
                                     formValidationBoolean = false;
                                     $('#minimumFieldError_' + fieldName).removeClass("hidden");
                                     $('#maximumFieldError_' + fieldName).removeClass("hidden");
+                                    $('#customFieldError_' + fieldName).removeClass("hidden");
                                 } else {
                                     $('#minimumFieldError_' + fieldName).addClass("hidden");
                                     $('#maximumFieldError_' + fieldName).addClass("hidden");
+                                    $('#customFieldError_' + fieldName).addClass("hidden");
                                 }
                                 break;
                             case "Real":
@@ -83,25 +85,31 @@ function validateForm(form) {
                                     formValidationBoolean = false;
                                     $('#minimumFieldError_' + fieldName).removeClass("hidden");
                                     $('#maximumFieldError_' + fieldName).removeClass("hidden");
+                                    $('#customFieldError_' + fieldName).removeClass("hidden");
                                 } else {
                                     $('#minimumFieldError_' + fieldName).addClass("hidden");
                                     $('#maximumFieldError_' + fieldName).addClass("hidden");
+                                    $('#customFieldError_' + fieldName).addClass("hidden");
                                 }
                                 break;
                             case "Minimum value":
                                 if (inputValue < parseFloat(ddValidationInfo[1].replace(/,/g, ""))) {
                                     formValidationBoolean = false;
                                     $('#minimumFieldError_' + fieldName).removeClass("hidden");
+                                    $('#customFieldError_' + fieldName).removeClass("hidden");
                                 } else {
                                     $('#minimumFieldError_' + fieldName).addClass("hidden");
+                                    $('#customFieldError_' + fieldName).addClass("hidden");
                                 }
                                 break;
                             case "Maximum value":
                                 if (inputValue > parseFloat(ddValidationInfo[1].replace(/,/g, ""))) {
                                     formValidationBoolean = false;
                                     $('#maximumFieldError_' + fieldName).removeClass("hidden");
+                                    $('#customFieldError_' + fieldName).removeClass("hidden");
                                 } else {
                                     $('#maximumFieldError_' + fieldName).addClass("hidden");
+                                    $('#customFieldError_' + fieldName).addClass("hidden");
                                 }
                                 break;
                             case "Minimum length":
