@@ -22,7 +22,6 @@
                             </thead>
                             <tbody id="createdWhitelistTableBody"></tbody>
                         </table>
-
                     </div>
                 </div>
             </div>
@@ -34,7 +33,7 @@
     </div>
     <script>createdWhitelistPaginationOnNext(@totalWhitelists, @constants.CommonConfig.Pagination.WhitelistPerPage)</script>
 } else {
-    <div class="contentBody">
+    <div class="contentBody emptyBody">
         <div class="h-100 d-flex flex-column justify-content-center align-items-center  emptyWhitelist">
             <div class="message">@Messages(constants.View.EMPTY_WHITELIST)</div>
             <div class="d-flex justify-content-center horizontal-align">

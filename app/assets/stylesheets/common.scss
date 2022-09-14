@@ -456,6 +456,7 @@
   font-family: var(--font-type-2);
   color: var(--default);
   font-size: 14px;
+  border: 2px solid var(--popup-bg);
 }
 
 #commonSnackBar.show {
