@@ -21,18 +21,18 @@
                             </thead>
                             <tbody id="joinedWhitelistTableBody"></tbody>
                         </table>
-                        <div id="joinedWhitelistPagination">
-                            @commonSecondaryButton(constants.View.BACK, JavaScript(s"joinedWhitelistPaginationOnBack()"), Symbol("id") -> "joinedWhitelistPaginationBack")
-                            @commonPrimaryButton(constants.View.NEXT, JavaScript(s"joinedWhitelistPaginationOnNext(${totalWhitelists}, ${constants.CommonConfig.Pagination.WhitelistPerPage})"), Symbol("id") -> "joinedWhitelistPaginationNext")
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <div id="joinedWhitelistPagination" class="mt-4 horizontal-align">
+        @commonSecondaryIconButton(constants.View.BACK, JavaScript(s"joinedWhitelistPaginationOnBack()"), icon = "bi-chevron-left", size = "small", iconFirst = true, Symbol("id") -> "joinedWhitelistPaginationBack")
+        @commonPrimaryIconButton(constants.View.NEXT, JavaScript(s"joinedWhitelistPaginationOnNext(${totalWhitelists}, ${constants.CommonConfig.Pagination.WhitelistPerPage})"), icon = "bi-chevron-right", size = "small", iconFirst = false, Symbol("id") -> "joinedWhitelistPaginationNext")
+    </div>
     <script>joinedWhitelistPaginationOnNext(@totalWhitelists, @constants.CommonConfig.Pagination.WhitelistPerPage)</script>
 } else {
-    <div class="contentBody">
+    <div class="contentBody emptyBody">
         <div class="h-100 d-flex flex-column justify-content-center align-items-center  emptyWhitelist">
             <div class="message">@Messages(constants.View.EMPTY_WHITELIST_JOINED)</div>
         </div>
