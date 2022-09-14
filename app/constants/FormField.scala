@@ -15,10 +15,11 @@ object FormField {
   private val PLACEHOLDER_PREFIX = "PLACEHOLDER."
   private val SELECT_ERROR_PREFIX = "SELECT_ERROR_PREFIX."
   private val DATE_ERROR_PREFIX = "DATE_ERROR_PREFIX."
-  private val BOOLEAN_ERROR_PREFIX = "BOOLEAN_ERROR_PREFIX."
   private val NESTED_ERROR_PREFIX = "NESTED_ERROR_PREFIX."
-  private val MINIMUM_FIELD_ERROR_PREFIX = "MINIMUM_FIELD_ERROR_PREFIX."
-  private val MAXIMUM_FIELD_ERROR_PREFIX = "MAXIMUM_FIELD_ERROR_PREFIX."
+  private val MINIMUM_LENGTH_ERROR = "MINIMUM_LENGTH_ERROR"
+  private val MAXIMUM_LENGTH_ERROR = "MAXIMUM_LENGTH_ERROR"
+  private val MINIMUM_VALUE_ERROR = "MINIMUM_VALUE_ERROR"
+  private val MAXIMUM_VALUE_ERROR = "MAXIMUM_VALUE_ERROR"
   private val CUSTOM_FIELD_ERROR_PREFIX = "CUSTOM_FIELD_ERROR_PREFIX."
 
   //StringFormField
@@ -72,9 +73,9 @@ object FormField {
 
     def mapping: (String, Mapping[String]) = name -> text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regex, name = regularExpression.regex.pattern.toString, error = errorMessage))
 
-    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_FIELD_ERROR_PREFIX + name, minimumLength)
+    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_LENGTH_ERROR, minimumLength)
 
-    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_FIELD_ERROR_PREFIX + name, maximumLength)
+    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_LENGTH_ERROR, maximumLength)
 
     def getRegexErrorMessage()(implicit messagesProvider: MessagesProvider): String = regularExpression.getRegExErrorMessage()
   }
@@ -100,9 +101,9 @@ object FormField {
 
     def mapping: (String, Mapping[Int]) = name -> number(min = minimumValue, max = maximumValue)
 
-    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_FIELD_ERROR_PREFIX + name, minimumValue)
+    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_VALUE_ERROR, minimumValue)
 
-    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_FIELD_ERROR_PREFIX + name, maximumValue)
+    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_VALUE_ERROR, maximumValue)
 
     def getCustomFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(CUSTOM_FIELD_ERROR_PREFIX + name, minimumValue, maximumValue)
 
@@ -121,9 +122,9 @@ object FormField {
 
     def mapping: (String, Mapping[Double]) = name -> of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
 
-    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_FIELD_ERROR_PREFIX + name, minimumValue)
+    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_VALUE_ERROR, minimumValue)
 
-    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_FIELD_ERROR_PREFIX + name, maximumValue)
+    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_VALUE_ERROR, maximumValue)
 
   }
 
@@ -132,9 +133,9 @@ object FormField {
 
     def mapping: (String, Mapping[BigDecimal]) = name -> of(bigDecimalFormat).verifying(Constraints.max[BigDecimal](maximumValue), Constraints.min[BigDecimal](minimumValue))
 
-    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_FIELD_ERROR_PREFIX + name, minimumValue)
+    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_VALUE_ERROR, minimumValue)
 
-    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_FIELD_ERROR_PREFIX + name, maximumValue)
+    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_VALUE_ERROR, maximumValue)
 
   }
 
@@ -142,8 +143,6 @@ object FormField {
     val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[Boolean]) = name -> boolean
-
-    def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(BOOLEAN_ERROR_PREFIX + name)
   }
 
   case class MicroNumberFormField(name: String, minimumValue: MicroNumber, maximumValue: MicroNumber, precision: Int = 2) {
@@ -151,9 +150,9 @@ object FormField {
 
     def mapping: (String, Mapping[MicroNumber]) = name -> of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
 
-    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_FIELD_ERROR_PREFIX + name, minimumValue)
+    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_VALUE_ERROR, minimumValue)
 
-    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_FIELD_ERROR_PREFIX + name, maximumValue)
+    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_VALUE_ERROR, maximumValue)
 
   }
 

@@ -513,11 +513,10 @@ REGEX_ERROR.PASSWORD=Must contain 1 small letter, 1 capital letter, 1 number and
 REGEX_ERROR.ACCOUNT_ID=Only small letters, capital letters and special characters !@#$._- are allowed
 REGEX_ERROR.WHITELIST_NAME=Only small letters, capital letters, spaces and special characters !@#$._- are allowed
 
-MINIMUM_FIELD_ERROR_PREFIX.USERNAME=Minimum length should be {0}
-MAXIMUM_FIELD_ERROR_PREFIX.USERNAME=Maximum length should be {0}
-MINIMUM_FIELD_ERROR_PREFIX.PASSWORD=Minimum length should be {0}
-MAXIMUM_FIELD_ERROR_PREFIX.PASSWORD=Maximum length should be {0}
-MINIMUM_FIELD_ERROR_PREFIX.SIGNUP_PASSWORD=Minimum length should be {0}
-MAXIMUM_FIELD_ERROR_PREFIX.SIGNUP_PASSWORD=Minimum length should be {0}
+MINIMUM_LENGTH_ERROR=Minimum length should be {0}
+MAXIMUM_LENGTH_ERROR=Maximum length should be {0}
+MINIMUM_VALUE_ERROR=Minimum value should be {0}
+MAXIMUM_VALUE_ERROR=Maximum value should be {0}
 CUSTOM_FIELD_ERROR_PREFIX.WHITELIST_INVITE_START_EPOCH=Invalid date time.
 CUSTOM_FIELD_ERROR_PREFIX.WHITELIST_INVITE_END_EPOCH=Invalid date time.
+SELECT_ERROR_PREFIX.GAS_PRICE=Invalid gas price selection.
