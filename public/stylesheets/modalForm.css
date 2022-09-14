@@ -216,7 +216,19 @@
     z-index: 950;
     transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
 }
-
+.horizontal-align .form-primary-button.small,
+.horizontal-align .form-secondary-button.small{
+    width: 100px;
+    font-size: 14px;
+    padding: 6px 0;
+    line-height: 19px;
+    border: 1px solid var(--dark);
+}
+.horizontal-align .form-primary-button.small i,
+.horizontal-align .form-secondary-button.small i {
+    font-size: 14px;
+    line-height: 19px;
+}
 /* Error Modal */
 .wallet-error-message{
     font-family: var(--font-type-2);

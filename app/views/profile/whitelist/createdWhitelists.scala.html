@@ -28,9 +28,9 @@
             </div>
         </div>
     </div>
-    <div id="createdWhitelistPagination" class="horizontal-align">
-        @commonSecondaryButton(constants.View.BACK, JavaScript(s"createdWhitelistPaginationOnBack()"), Symbol("id") -> "createdWhitelistPaginationBack")
-        @commonPrimaryButton(constants.View.NEXT, JavaScript(s"createdWhitelistPaginationOnNext(${totalWhitelists}, ${constants.CommonConfig.Pagination.WhitelistPerPage})"), Symbol("id") -> "createdWhitelistPaginationNext")
+    <div id="createdWhitelistPagination" class="mt-4 horizontal-align">
+        @commonSecondaryIconButton(constants.View.BACK, JavaScript(s"createdWhitelistPaginationOnBack()"), icon = "bi-chevron-left", size = "small", iconFirst = true, Symbol("id") -> "createdWhitelistPaginationBack")
+        @commonPrimaryIconButton(constants.View.NEXT, JavaScript(s"createdWhitelistPaginationOnNext(${totalWhitelists}, ${constants.CommonConfig.Pagination.WhitelistPerPage})"), icon = "bi-chevron-right", size = "small", iconFirst = false, Symbol("id") -> "createdWhitelistPaginationNext")
     </div>
     <script>createdWhitelistPaginationOnNext(@totalWhitelists, @constants.CommonConfig.Pagination.WhitelistPerPage)</script>
 } else {
