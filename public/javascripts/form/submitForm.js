@@ -12,30 +12,6 @@ function submitForm(isModal, source, targetID) {
             statusCode: {
                 400: function (data) {
                     result.html(data.responseText);
-
-                    function clearFormElements(target_id) {
-                        jQuery("#" + target_id).find(':input').each(function () {
-                            switch (this.type) {
-                                // case 'password':
-                                // case 'text':
-                                // case 'textarea':
-                                // case 'file':
-                                // case 'select-one':
-                                // case 'select-multiple':
-                                // case 'date':
-                                // case 'number':
-                                // case 'tel':
-                                // case 'email':
-                                //     jQuery(this).val('');
-                                //     break;
-                                case 'checkbox':
-                                case 'radio':
-                                    this.checked = false;
-                                    break;
-                            }
-                        });
-                    }
-
                     clearFormElements("formBody");
                     $(".error").closest("dd").prev().find('input').css({"border-color": "var(--error)"});
                 },
@@ -81,4 +57,15 @@ function submitFormOnEnter(event, isModal, source, targetID) {
         event.preventDefault();
         submitForm(isModal, source, targetID);
     }
+}
+
+function clearFormElements(target_id) {
+    jQuery("#" + target_id).find(':input').each(function () {
+        switch (this.type) {
+            case 'checkbox':
+            case 'radio':
+                this.checked = false;
+                break;
+        }
+    });
 }
