@@ -13,14 +13,14 @@ $(document).on('hide.bs.modal', '.modal', function () {
 });
 
 // Show wallet popup
-$("#userWallet").click(function () {
+function showWallet(){
     $("#walletPopup").addClass("active");
     $("#walletBackDrop").addClass("active");
     $("body").addClass("modal-open");
-});
+}
 
 // Close wallet popup
-$("#walletBackDrop").click(function () {
+function closeWallet(){
     $("#walletPopup").removeClass("active");
     $("#walletBackDrop").removeClass("active");
     $("body").removeClass("modal-open");
@@ -28,7 +28,7 @@ $("#walletBackDrop").click(function () {
         $("#walletMenu").removeClass("open");
         $("#addressBook").removeClass("open");
     }, 200);
-});
+}
 
 // Resize window for wallet popup
 $(window).resize(function () {
@@ -76,7 +76,6 @@ function changeSelected(parent, selectedItem) {
     $(parent).find(".currentSelected").text($(selectedItem).text());
     $(parent).find("input.dp-input").val($(selectedItem).attr("value"));
 }
-
 
 // Address Shorter
 var addresses = document.querySelectorAll('.username-data');
