@@ -25,6 +25,7 @@ $(function() {
 
     $('input[name="editWhitelistStartEpoch"]').on('cancel.daterangepicker', function(ev, picker) {
         $(this).val('');
+        $("#WHITELIST_INVITE_START_EPOCH").val('');
     });
 
     function setInitialTime(){
@@ -62,5 +63,6 @@ $(function() {
 
     $('input[name="editWhitelistEndEpoch"]').on('cancel.daterangepicker', function(ev, picker) {
         $(this).val('');
+        $("#WHITELIST_INVITE_END_EPOCH").val('');
     });
 });

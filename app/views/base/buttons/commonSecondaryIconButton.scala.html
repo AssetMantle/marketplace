@@ -1,0 +1,13 @@
+@(name: String, function: JavaScript, icon: String, size: String, iconFirst: Boolean, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<button type="@arguments.toMap.get(Symbol("type")).map(_.toString).getOrElse("button")" class="@Seq("form-secondary-button", arguments.toMap.get(Symbol("class")).map(_.toString).getOrElse(""), size).mkString(" ")" id='@arguments.toMap.get(Symbol("id")).map(_.toString).getOrElse("")' onclick="@function" data-bs-dismiss='@arguments.toMap.get(Symbol("data-bs-dismiss")).map(_.toString).getOrElse("")' aria-label='@arguments.toMap.get(Symbol("aria-label")).map(_.toString).getOrElse("")'>
+    <div class="d-flex gap-1 justify-content-center">
+    @if(iconFirst) {
+        <i class="bi @icon iconDefault"></i>
+        @Messages(name)
+    } else {
+        @Messages(name)
+        <i class="bi @icon iconDefault"></i>
+    }
+    </div>
+</button>
