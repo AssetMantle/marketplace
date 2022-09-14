@@ -35,6 +35,7 @@
         }
     ) { field =>
         @checkbox(field, defaultArguments ++ arguments: _*)
+        <div id="fieldError_@formField.name" class="hidden">@formField.getFieldErrorMessage()</div>
     }
 }
 </div>

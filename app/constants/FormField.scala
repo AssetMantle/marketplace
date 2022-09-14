@@ -4,133 +4,159 @@ import play.api.data.Forms._
 import play.api.data.Mapping
 import play.api.data.format.Formats.{bigDecimalFormat, doubleFormat}
 import play.api.data.validation.Constraints
+import play.api.i18n.{Messages, MessagesProvider}
 import utilities.MicroNumber
 import utilities.NumericOperation.checkPrecision
 
 import java.util.Date
-import scala.util.matching.Regex
 
 object FormField {
+
+  private val PLACEHOLDER_PREFIX = "PLACEHOLDER."
+  private val SELECT_ERROR_PREFIX = "SELECT_ERROR_PREFIX."
+  private val DATE_ERROR_PREFIX = "DATE_ERROR_PREFIX."
+  private val BOOLEAN_ERROR_PREFIX = "BOOLEAN_ERROR_PREFIX."
+  private val NESTED_ERROR_PREFIX = "NESTED_ERROR_PREFIX."
+  private val MINIMUM_FIELD_ERROR_PREFIX = "MINIMUM_FIELD_ERROR_PREFIX."
+  private val MAXIMUM_FIELD_ERROR_PREFIX = "MAXIMUM_FIELD_ERROR_PREFIX."
+
   //StringFormField
-  val USERNAME = new StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
-  val PASSWORD = new StringFormField("PASSWORD", 5, 128)
-  val ADD_CURRENT_PASSWORD = new StringFormField("ADD_CURRENT_PASSWORD", 5, 128)
-  val ADD_KEY_PASSWORD = new StringFormField("ADD_KEY_PASSWORD", 5, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val ADD_KEY_CONFIRM_PASSWORD = new StringFormField("ADD_KEY_CONFIRM_PASSWORD", 5, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val WALLET_ADDRESS = new StringFormField("WALLET_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
-  val PARTIAL_MNEMONICS = new StringFormField("PARTIAL_MNEMONICS", 3, 128)
-  val PUSH_NOTIFICATION_TOKEN = new StringFormField("PUSH_NOTIFICATION_TOKEN", 0, 200)
-  val SIGNUP_PASSWORD = new StringFormField("SIGNUP_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val SIGNUP_CONFIRM_PASSWORD = new StringFormField("CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val SEED_PHRASE_1 = new StringFormField("SEED_PHRASE_1", 3, 20, RegularExpression.ALL_SMALL_LETTERS, Response.INVALID_SEEDS.message)
-  val SEED_PHRASE_2 = new StringFormField("SEED_PHRASE_2", 3, 20, RegularExpression.ALL_SMALL_LETTERS, Response.INVALID_SEEDS.message)
-  val SEED_PHRASE_3 = new StringFormField("SEED_PHRASE_3", 3, 20, RegularExpression.ALL_SMALL_LETTERS, Response.INVALID_SEEDS.message)
-  val SEED_PHRASE_4 = new StringFormField("SEED_PHRASE_4", 3, 20, RegularExpression.ALL_SMALL_LETTERS, Response.INVALID_SEEDS.message)
-  val FORGOT_PASSWORD = new StringFormField("FORGOT_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val FORGOT_CONFIRM_PASSWORD = new StringFormField("FORGOT_CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val OLD_PASSWORD = new StringFormField("OLD_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val CHANGE_PASSWORD = new StringFormField("CHANGE_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val CHANGE_CONFIRM_PASSWORD = new StringFormField("CHANGE_CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val SEEDS = new StringFormField("SEEDS", 3, 500, RegularExpression.ALL_SMALL_LETTERS_WITH_SPACE, Response.INVALID_SEEDS.message)
-  val KEY_NAME = new StringFormField("KEY_NAME", 3, 128, RegularExpression.ALL_NUMBERS_ALL_LETTERS, Response.INVALID_KEY_NAME.message)
-  val CONFIRM_USERNAME = new StringFormField("CONFIRM_USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
-  val FROM_ADDRESS = new StringFormField("FROM_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
-  val TO_ADDRESS = new StringFormField("TO_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
-  val WHITELIST_NAME = new StringFormField("WHITELIST_NAME", 3, 50, RegularExpression.WHITELIST_NAME)
-  val WHITELIST_DESCRIPTION = new StringFormField("WHITELIST_DESCRIPTION", 0, 256)
-  val WHITELIST_ID = new StringFormField("WHITELIST_ID", 16, 16)
-  val CALLBACK_URL = new StringFormField("CALLBACK_URL", 1, 1024, RegularExpression.ANY_STRING)
+  val USERNAME: StringFormField = StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
+  val PASSWORD: StringFormField = StringFormField("PASSWORD", 5, 128)
+  val WALLET_ADDRESS: StringFormField = StringFormField("WALLET_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
+  val PUSH_NOTIFICATION_TOKEN: StringFormField = StringFormField("PUSH_NOTIFICATION_TOKEN", 0, 200)
+  val SIGNUP_PASSWORD: StringFormField = StringFormField("SIGNUP_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val SIGNUP_CONFIRM_PASSWORD: StringFormField = StringFormField("CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val SEED_PHRASE_1: StringFormField = StringFormField("SEED_PHRASE_1", 3, 20, RegularExpression.ALL_SMALL_LETTERS, Response.INVALID_SEEDS.message)
+  val SEED_PHRASE_2: StringFormField = StringFormField("SEED_PHRASE_2", 3, 20, RegularExpression.ALL_SMALL_LETTERS, Response.INVALID_SEEDS.message)
+  val SEED_PHRASE_3: StringFormField = StringFormField("SEED_PHRASE_3", 3, 20, RegularExpression.ALL_SMALL_LETTERS, Response.INVALID_SEEDS.message)
+  val SEED_PHRASE_4: StringFormField = StringFormField("SEED_PHRASE_4", 3, 20, RegularExpression.ALL_SMALL_LETTERS, Response.INVALID_SEEDS.message)
+  val FORGOT_PASSWORD: StringFormField = StringFormField("FORGOT_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val FORGOT_CONFIRM_PASSWORD: StringFormField = StringFormField("FORGOT_CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val OLD_PASSWORD: StringFormField = StringFormField("OLD_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val CHANGE_PASSWORD: StringFormField = StringFormField("CHANGE_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val CHANGE_CONFIRM_PASSWORD: StringFormField = StringFormField("CHANGE_CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val SEEDS: StringFormField = StringFormField("SEEDS", 3, 500, RegularExpression.ALL_SMALL_LETTERS_WITH_SPACE, Response.INVALID_SEEDS.message)
+  val CONFIRM_USERNAME: StringFormField = StringFormField("CONFIRM_USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
+  val FROM_ADDRESS: StringFormField = StringFormField("FROM_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
+  val TO_ADDRESS: StringFormField = StringFormField("TO_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
+  val WHITELIST_NAME: StringFormField = StringFormField("WHITELIST_NAME", 3, 50, RegularExpression.WHITELIST_NAME)
+  val WHITELIST_DESCRIPTION: StringFormField = StringFormField("WHITELIST_DESCRIPTION", 0, 256)
+  val WHITELIST_ID: StringFormField = StringFormField("WHITELIST_ID", 16, 16)
+  val CALLBACK_URL: StringFormField = StringFormField("CALLBACK_URL", 1, 1024, RegularExpression.ANY_STRING)
+  val MANAGED_KEY_NAME: StringFormField = StringFormField("MANAGED_KEY_NAME", 3, 50)
+  val MANAGED_KEY_ADDRESS: StringFormField = StringFormField("MANAGED_KEY_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
+  val UNMANAGED_KEY_NAME: StringFormField = StringFormField("UNMANAGED_KEY_NAME", 3, 50)
+  val UNMANAGED_KEY_ADDRESS: StringFormField = StringFormField("UNMANAGED_KEY_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
+  val CHANGE_KEY_NAME: StringFormField = StringFormField("CHANGE_KEY_NAME", 3, 50)
+  val CHANGE_KEY_ADDRESS: StringFormField = StringFormField("CHANGE_KEY_ADDRESS", 3, 50, RegularExpression.MANTLE_ADDRESS)
 
-  val MANAGED_KEY_NAME = new StringFormField("MANAGED_KEY_NAME", 3, 50)
-  val MANAGED_KEY_ADDRESS = new StringFormField("MANAGED_KEY_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
-  val UNMANAGED_KEY_NAME = new StringFormField("UNMANAGED_KEY_NAME", 3, 50)
-  val UNMANAGED_KEY_ADDRESS = new StringFormField("UNMANAGED_KEY_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
-  val CHANGE_KEY_NAME = new StringFormField("CHANGE_KEY_NAME", 3, 50)
-  val CHANGE_KEY_ADDRESS = new StringFormField("CHANGE_KEY_ADDRESS", 3, 50, RegularExpression.MANTLE_ADDRESS)
-
-  val GAS_AMOUNT = new IntFormField("GAS_AMOUNT", 20000, 2000000)
-
-  val WHITELIST_MAX_MEMBERS = new IntFormField("WHITELIST_MAX_MEMBERS", 1, Int.MaxValue)
-  val WHITELIST_INVITE_START_EPOCH = new IntFormField("WHITELIST_INVITE_START_EPOCH", 1, Int.MaxValue)
-  val WHITELIST_INVITE_END_EPOCH = new IntFormField("WHITELIST_INVITE_END_EPOCH", 1, Int.MaxValue)
+  val GAS_AMOUNT: IntFormField = IntFormField("GAS_AMOUNT", 20000, 2000000)
+  val WHITELIST_MAX_MEMBERS: IntFormField = IntFormField("WHITELIST_MAX_MEMBERS", 1, Int.MaxValue)
+  val WHITELIST_INVITE_START_EPOCH: IntFormField = IntFormField("WHITELIST_INVITE_START_EPOCH", 1, Int.MaxValue)
+  val WHITELIST_INVITE_END_EPOCH: IntFormField = IntFormField("WHITELIST_INVITE_END_EPOCH", 1, Int.MaxValue)
 
   //BooleanFormField
-  val RECEIVE_NOTIFICATIONS = new BooleanFormField("RECEIVE_NOTIFICATIONS")
-  val USERNAME_AVAILABLE = new BooleanFormField("USERNAME_AVAILABLE")
-  val SIGNUP_TERMS_CONDITIONS = new BooleanFormField("SIGNUP_TERMS_CONDITIONS")
-  val STATUS = new BooleanFormField("STATUS")
-  val ACTIVE = new BooleanFormField("ACTIVE")
-  val MANAGED_KEY_DISCLAIMER = new BooleanFormField("MANAGED_KEY_DISCLAIMER")
+  val RECEIVE_NOTIFICATIONS: BooleanFormField = BooleanFormField("RECEIVE_NOTIFICATIONS")
+  val USERNAME_AVAILABLE: BooleanFormField = BooleanFormField("USERNAME_AVAILABLE")
+  val SIGNUP_TERMS_CONDITIONS: BooleanFormField = BooleanFormField("SIGNUP_TERMS_CONDITIONS")
+  val MANAGED_KEY_DISCLAIMER: BooleanFormField = BooleanFormField("MANAGED_KEY_DISCLAIMER")
 
-  val GAS_PRICE = new SelectFormField("GAS_PRICE", Seq(constants.CommonConfig.Blockchain.LowGasPrice.toString, constants.CommonConfig.Blockchain.MediumGasPrice.toString, constants.CommonConfig.Blockchain.HighGasPrice.toString))
+  val GAS_PRICE: SelectFormField = SelectFormField("GAS_PRICE", Seq(constants.CommonConfig.Blockchain.LowGasPrice.toString, constants.CommonConfig.Blockchain.MediumGasPrice.toString, constants.CommonConfig.Blockchain.HighGasPrice.toString))
 
-  val SEND_COIN_AMOUNT = new MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.zero, MicroNumber(Int.MaxValue), 6)
+  val SEND_COIN_AMOUNT: MicroNumberFormField = MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.zero, MicroNumber(Int.MaxValue), 6)
 
-  class StringFormField(fieldName: String, val minimumLength: Int, val maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
-    val name: String = fieldName
-    val placeHolder: String = "PLACEHOLDER." + name
+  case class StringFormField(name: String, minimumLength: Int, maximumLength: Int, regularExpression: RegularExpression = RegularExpression.ANY_STRING, errorMessage: String = "Regular expression validation failed!") {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
 
-    def mapping: (String, Mapping[String]) = name -> text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
+    def mapping: (String, Mapping[String]) = name -> text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regex, name = regularExpression.regex.pattern.toString, error = errorMessage))
+
+    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_FIELD_ERROR_PREFIX + name, minimumLength)
+
+    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_FIELD_ERROR_PREFIX + name, maximumLength)
+
+    def getRegexErrorMessage()(implicit messagesProvider: MessagesProvider): String = regularExpression.getRegExErrorMessage()
   }
 
-  class SelectFormField(fieldName: String, val options: Seq[String], errorMessage: String = "Error Response") {
-    val name: String = fieldName
-    val placeHolder: String = "PLACEHOLDER." + name
+  case class SelectFormField(name: String, options: Seq[String], errorMessage: String = "Option not found") {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[String]) = name -> text.verifying(constraint = field => options contains field, error = errorMessage)
+
+    def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(SELECT_ERROR_PREFIX + name)
   }
 
-  class CustomSelectFormField(fieldName: String) {
-    val name: String = fieldName
-    val placeHolder: String = "PLACEHOLDER." + name
+  case class CustomSelectFormField(name: String) {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[String]) = name -> text
+
+    def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(SELECT_ERROR_PREFIX + name)
   }
 
-  class IntFormField(fieldName: String, val minimumValue: Int, val maximumValue: Int) {
-    val name: String = fieldName
-    val placeHolder: String = "PLACEHOLDER." + name
+  case class IntFormField(name: String, minimumValue: Int, maximumValue: Int) {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[Int]) = name -> number(min = minimumValue, max = maximumValue)
+
+    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_FIELD_ERROR_PREFIX + name, minimumValue)
+
+    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_FIELD_ERROR_PREFIX + name, maximumValue)
+
   }
 
-  class DateFormField(fieldName: String) {
-    val name: String = fieldName
-    val placeHolder: String = "PLACEHOLDER." + name
+  case class DateFormField(name: String) {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[Date]) = name -> date
+
+    def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(DATE_ERROR_PREFIX + name)
   }
 
-  class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
-    val name: String = fieldName
-    val placeHolder: String = "PLACEHOLDER." + name
+  case class DoubleFormField(name: String, minimumValue: Double, maximumValue: Double) {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[Double]) = name -> of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
+
+    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_FIELD_ERROR_PREFIX + name, minimumValue)
+
+    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_FIELD_ERROR_PREFIX + name, maximumValue)
+
   }
 
-  class BigDecimalFormField(fieldName: String, val minimumValue: BigDecimal, val maximumValue: BigDecimal) {
-    val name: String = fieldName
-    val placeHolder: String = "PLACEHOLDER." + name
+  case class BigDecimalFormField(name: String, minimumValue: BigDecimal, maximumValue: BigDecimal) {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[BigDecimal]) = name -> of(bigDecimalFormat).verifying(Constraints.max[BigDecimal](maximumValue), Constraints.min[BigDecimal](minimumValue))
+
+    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_FIELD_ERROR_PREFIX + name, minimumValue)
+
+    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_FIELD_ERROR_PREFIX + name, maximumValue)
+
   }
 
-  class BooleanFormField(fieldName: String) {
-    val name: String = fieldName
-    val placeHolder: String = "PLACEHOLDER." + name
+  case class BooleanFormField(name: String) {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[Boolean]) = name -> boolean
+
+    def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(BOOLEAN_ERROR_PREFIX + name)
   }
 
-  class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, precision: Int = 2) {
-    val name: String = fieldName
-    val placeHolder: String = "PLACEHOLDER." + name
+  case class MicroNumberFormField(name: String, minimumValue: MicroNumber, maximumValue: MicroNumber, precision: Int = 2) {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[MicroNumber]) = name -> of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
+
+    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_FIELD_ERROR_PREFIX + name, minimumValue)
+
+    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_FIELD_ERROR_PREFIX + name, maximumValue)
+
   }
 
-  class NestedFormField(fieldName: String) {
-    val name: String = fieldName
-    val placeHolder: String = "PLACEHOLDER." + name
+  case class NestedFormField(name: String) {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
+
+    def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(NESTED_ERROR_PREFIX + name)
   }
 }
