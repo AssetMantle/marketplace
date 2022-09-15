@@ -4,6 +4,7 @@ function validateForm(form) {
 
     form.find("dl").each(function () {
             let fieldName = "";
+            let fieldError = false;
             const dlElement = $(this);
             try {
                 dlElement.find(".error").remove();
@@ -16,13 +17,13 @@ function validateForm(form) {
                 fieldName = inputElement.getAttribute("name");
 
                 dlElement.find(".info").each(function () {
-
                         const ddInfoElement = $(this)[0];
                         const ddValidationInfo = ddInfoElement.innerHTML.split(": ");
                         switch (ddValidationInfo[0]) {
                             case "Minimum length":
                                 if (inputValue.length < parseInt(ddValidationInfo[1].replace(/,/g, ""))) {
                                     formValidationBoolean = false;
+                                    fieldError = true;
                                     $('#minimumFieldError_' + fieldName).removeClass("hidden");
                                 } else {
                                     $('#minimumFieldError_' + fieldName).addClass("hidden");
@@ -31,6 +32,7 @@ function validateForm(form) {
                             case "Maximum length":
                                 if (inputValue.length > parseInt(ddValidationInfo[1].replace(/,/g, ""))) {
                                     formValidationBoolean = false;
+                                    fieldError = true;
                                     $('#maximumFieldError_' + fieldName).removeClass("hidden");
                                 } else {
                                     $('#maximumFieldError_' + fieldName).addClass("hidden");
@@ -40,6 +42,7 @@ function validateForm(form) {
                                 const newRegEx = new RegExp(ddInfoElement.innerHTML);
                                 if (!(newRegEx.test(inputValue))) {
                                     formValidationBoolean = false;
+                                    fieldError = true;
                                     $('#regexFieldError_' + fieldName).removeClass("hidden");
                                 } else {
                                     $('#regexFieldError_' + fieldName).addClass("hidden");
@@ -52,6 +55,7 @@ function validateForm(form) {
                 fieldName = selectElement.getAttribute("name");
                 if (!selectElement.disabled && selectElement.value === "") {
                     formValidationBoolean = false;
+                    fieldError = true;
                     $('#fieldError_' + fieldName).removeClass("hidden");
                 } else {
                     $('#fieldError_' + fieldName).addClass("hidden");
@@ -71,6 +75,7 @@ function validateForm(form) {
                             case "Numeric":
                                 if (inputValue === "" || isNaN(inputValue)) {
                                     formValidationBoolean = false;
+                                    fieldError = true;
                                     $('#minimumFieldError_' + fieldName).removeClass("hidden");
                                     $('#maximumFieldError_' + fieldName).removeClass("hidden");
                                     $('#customFieldError_' + fieldName).removeClass("hidden");
@@ -83,6 +88,7 @@ function validateForm(form) {
                             case "Real":
                                 if (inputValue === "" || isNaN(inputValue)) {
                                     formValidationBoolean = false;
+                                    fieldError = true;
                                     $('#minimumFieldError_' + fieldName).removeClass("hidden");
                                     $('#maximumFieldError_' + fieldName).removeClass("hidden");
                                     $('#customFieldError_' + fieldName).removeClass("hidden");
@@ -95,6 +101,7 @@ function validateForm(form) {
                             case "Minimum value":
                                 if (inputValue < parseFloat(ddValidationInfo[1].replace(/,/g, ""))) {
                                     formValidationBoolean = false;
+                                    fieldError = true;
                                     $('#minimumFieldError_' + fieldName).removeClass("hidden");
                                     $('#customFieldError_' + fieldName).removeClass("hidden");
                                 } else {
@@ -105,6 +112,7 @@ function validateForm(form) {
                             case "Maximum value":
                                 if (inputValue > parseFloat(ddValidationInfo[1].replace(/,/g, ""))) {
                                     formValidationBoolean = false;
+                                    fieldError = true;
                                     $('#maximumFieldError_' + fieldName).removeClass("hidden");
                                     $('#customFieldError_' + fieldName).removeClass("hidden");
                                 } else {
@@ -115,6 +123,7 @@ function validateForm(form) {
                             case "Minimum length":
                                 if (inputValue.length < parseInt(ddValidationInfo[1].replace(/,/g, ""))) {
                                     formValidationBoolean = false;
+                                    fieldError = true;
                                     $('#minimumFieldError_' + fieldName).removeClass("hidden");
                                 } else {
                                     $('#minimumFieldError_' + fieldName).addClass("hidden");
@@ -123,6 +132,7 @@ function validateForm(form) {
                             case "Maximum length":
                                 if (inputValue.length > parseInt(ddValidationInfo[1].replace(/,/g, ""))) {
                                     formValidationBoolean = false;
+                                    fieldError = true;
                                     $('#maximumFieldError_' + fieldName).removeClass("hidden");
                                 } else {
                                     $('#maximumFieldError_' + fieldName).addClass("hidden");
@@ -131,6 +141,7 @@ function validateForm(form) {
                             case "Date ('yyyy-MM-dd')":
                                 if (inputValue === "") {
                                     formValidationBoolean = false;
+                                    fieldError = true;
                                     $('#fieldError_' + fieldName).removeClass("hidden");
                                 } else {
                                     $('#fieldError_' + fieldName).addClass("hidden");
@@ -140,16 +151,23 @@ function validateForm(form) {
                                 const newRegEx = new RegExp(ddInfoElement.innerHTML);
                                 if (!(newRegEx.test(inputValue))) {
                                     formValidationBoolean = false;
+                                    fieldError = true;
                                     $('#regexFieldError_' + fieldName).removeClass("hidden");
                                 } else {
                                     $('#regexFieldError_' + fieldName).addClass("hidden");
                                 }
                         }
-                        if(!formValidationBoolean){
-                            inputElement.style.borderColor = "red";
-                        }
                     }
                 );
+            }
+            if (fieldError) {
+                $("#" + fieldName).addClass("errorField");
+            } else {
+                $("#" + fieldName).removeClass("errorField");
+            }
+            let nonEpochField = $("#" + fieldName.replace("epoch_", ""));
+            if (nonEpochField.length !== 0 && nonEpochField.hasClass("errorField")) {
+                $("#" + fieldName).addClass("errorField");
             }
         }
     )
