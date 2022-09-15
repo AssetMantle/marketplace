@@ -1,11 +1,11 @@
 @import controllers.actions.LoginState
 @import views.html.base.buttons._
 
-@(whitelists: Seq[master.Whitelist])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(whitelists: Seq[master.Whitelist], lastIndex: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @whitelists.zipWithIndex.map { case (whitelist, index) =>
 <tr>
-    <td class="text-end tableFieldNo">@(index + 1)</td>
+    <td class="text-end tableFieldNo">@(lastIndex + index + 1)</td>
     <td class="tableFieldName">@whitelist.name</td>
     <td id="memberCount_@whitelist.id" class="text-end tableFieldTotalMembers">00</td>
     <td class="text-end tableFieldMaxMembers">@whitelist.maxMembers</td>
