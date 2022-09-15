@@ -126,3 +126,7 @@ function callSnackBar(message) {
         commonSnackBar.removeClass("show");
     }, 3000);
 }
+
+function loadSwitcherContent(divID) {
+    $('#' + divID).click();
+}

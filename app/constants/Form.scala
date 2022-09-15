@@ -33,7 +33,7 @@ object Form {
 
   val SEND_COIN = new Form("SEND_COIN", routes.javascript.BlockchainTransactionController.sendCoinForm, routes.BlockchainTransactionController.sendCoin())
 
-  val CREATE_WHITELIST = new Form("CREATE_WHITELIST", routes.javascript.ProfileController.createWhitelistForm, routes.ProfileController.createWhitelist())
-  val EDIT_WHITELIST = new Form("EDIT_WHITELIST", routes.javascript.ProfileController.editWhitelistForm, routes.ProfileController.editWhitelist())
+  val CREATE_WHITELIST = new Form("CREATE_WHITELIST", routes.javascript.WhitelistController.createWhitelistForm, routes.WhitelistController.createWhitelist())
+  val EDIT_WHITELIST = new Form("EDIT_WHITELIST", routes.javascript.WhitelistController.editWhitelistForm, routes.WhitelistController.editWhitelist())
 
 }

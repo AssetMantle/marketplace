@@ -94,5 +94,16 @@ class WhitelistMembers @Inject()(
     def deleteMember(whitelistId: String, accountId: String): Future[Int] = delete(id1 = whitelistId, id2 = accountId)
 
     def getWhitelistsMemberCount(whitelistId: String): Future[Int] = filterAndCount(_.whitelistId === whitelistId)
+
+    def checkAndAdd(whitelist: Whitelist, accountId: String): Future[Unit] = {
+      val totalMembers = getWhitelistsMemberCount(whitelist.id)
+
+      def addMember(totalMembers: Int) = if (totalMembers < whitelist.maxMembers) add(whitelistId = whitelist.id, accountId = accountId) else constants.Response.WHITELIST_MAX_MEMBERS_REACHED.throwFutureBaseException()
+
+      for {
+        totalMembers <- totalMembers
+        _ <- addMember(totalMembers)
+      } yield ()
+    }
   }
 }

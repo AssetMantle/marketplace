@@ -23,12 +23,7 @@ function viewSetting() {
     $('#leftContent').html('');
 }
 
-function viewPersonalProfile() {
-    componentResource('centerContent', jsRoutes.controllers.ProfileController.personalProfile());
-    $('#leftContent').html('');
-}
-
-function viewVisitorProfile(accountId) {
-    componentResource('centerContent', jsRoutes.controllers.ProfileController.visitorProfile(accountId));
+function viewProfile(accountId) {
+    componentResource('centerContent', jsRoutes.controllers.ProfileController.profile(accountId));
     $('#leftContent').html('');
 }

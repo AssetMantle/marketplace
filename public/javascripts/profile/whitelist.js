@@ -10,12 +10,12 @@ $("#picker").daterangepicker({
 
 function resetCreatedWhitelistPage() {
     setCreatedWhitelistCurrentPage(0);
-    componentResource("personalProfileContent", jsRoutes.controllers.ProfileController.createdWhitelists());
+    componentResource("whitelistSectionContent", jsRoutes.controllers.WhitelistController.createdWhitelists());
 }
 
 function resetJoinedWhitelistPage() {
     setJoinedWhitelistCurrentPage(0);
-    componentResource("personalProfileContent", jsRoutes.controllers.ProfileController.joinedWhitelists());
+    componentResource("whitelistSectionContent", jsRoutes.controllers.WhitelistController.joinedWhitelists());
 }
 
 function showWhitelistScreen(screenID) {
@@ -38,7 +38,7 @@ function setCreatedWhitelistCurrentPage(page) {
 }
 
 function createdWhitelistPaginationOnNext(totalWhitelists, whitelistPerPage) {
-    componentResource('createdWhitelistTableBody', jsRoutes.controllers.ProfileController.createdWhitelistsPerPage(createdWhitelistCurrentPageNumber + 1));
+    componentResource('createdWhitelistTableBody', jsRoutes.controllers.WhitelistController.createdWhitelistsPerPage(createdWhitelistCurrentPageNumber + 1));
     let lastPage = Math.ceil(totalWhitelists / whitelistPerPage);
     if ((createdWhitelistCurrentPageNumber + 1) === lastPage) {
         $('#createdWhitelistPaginationNext').hide();
@@ -53,7 +53,7 @@ function createdWhitelistPaginationOnNext(totalWhitelists, whitelistPerPage) {
 
 function createdWhitelistPaginationOnBack() {
     if (createdWhitelistCurrentPageNumber > 1) {
-        componentResource('createdWhitelistTableBody', jsRoutes.controllers.ProfileController.createdWhitelistsPerPage(createdWhitelistCurrentPageNumber - 1));
+        componentResource('createdWhitelistTableBody', jsRoutes.controllers.WhitelistController.createdWhitelistsPerPage(createdWhitelistCurrentPageNumber - 1));
         if ((createdWhitelistCurrentPageNumber - 1) === 1) {
             $('#createdWhitelistPaginationBack').hide();
         }
@@ -67,7 +67,7 @@ function setJoinedWhitelistCurrentPage(page) {
 }
 
 function joinedWhitelistPaginationOnNext(totalWhitelists, whitelistPerPage) {
-    componentResource('joinedWhitelistTableBody', jsRoutes.controllers.ProfileController.joinedWhitelistsPerPage(joinedWhitelistCurrentPageNumber + 1));
+    componentResource('joinedWhitelistTableBody', jsRoutes.controllers.WhitelistController.joinedWhitelistsPerPage(joinedWhitelistCurrentPageNumber + 1));
     let lastPage = Math.ceil(totalWhitelists / whitelistPerPage);
     if ((joinedWhitelistCurrentPageNumber + 1) === lastPage) {
         $('#joinedWhitelistPaginationNext').hide();
@@ -82,7 +82,7 @@ function joinedWhitelistPaginationOnNext(totalWhitelists, whitelistPerPage) {
 
 function joinedWhitelistPaginationOnBack() {
     if (joinedWhitelistCurrentPageNumber > 1) {
-        componentResource('joinedWhitelistTableBody', jsRoutes.controllers.ProfileController.joinedWhitelistsPerPage(joinedWhitelistCurrentPageNumber - 1));
+        componentResource('joinedWhitelistTableBody', jsRoutes.controllers.WhitelistController.joinedWhitelistsPerPage(joinedWhitelistCurrentPageNumber - 1));
         if ((joinedWhitelistCurrentPageNumber - 1) === 1) {
             $('#joinedWhitelistPaginationBack').hide();
         }

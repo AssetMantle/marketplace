@@ -19,7 +19,7 @@ class WithLoginActionAsync @Inject()(
                                       masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                     )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN_ACTION
+  private implicit val module: String = constants.Module.ASYNC_ACTIONS_WITH_LOGIN
 
   def apply(f: => LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLoggingFilter.next { implicit request =>
