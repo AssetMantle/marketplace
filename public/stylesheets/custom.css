@@ -893,7 +893,7 @@ article:first-child{
     color: var(--mantle-off-white) !important;
     border: none !important;
     outline: none !important;
-    border: 1px solid var(--dark) !important;
+    border: 1px solid var(--gray) !important;
 }
 .daterangepicker .drp-calendar.right
 {
@@ -964,7 +964,7 @@ article:first-child{
 .daterangepicker .drp-buttons{
     border-radius: 0 0 8px 8px;
     border: none !important;
-    border: 1px solid var(--dark) !important;
+    border: 1px solid var(--gray) !important;
 }
 .drp-buttons button{
     border-radius: 20px !important;
@@ -1025,6 +1025,12 @@ article:first-child{
 }
 .daterangepicker.drop-up .drp-buttons{
     border-radius: 0px 0px 0px 0px;
+}
+.daterangepicker.drop-up .drp-buttons .cancelBtn{
+    background-color: var(--popup-bg) !important;
+    border: 1px solid var(--dark) !important;
+    color: var(--mantle-off-white) !important;
+    overflow: hidden;
 }
 
 /* Create NFT : Toggle Button (bottom) */
