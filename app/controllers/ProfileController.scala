@@ -76,7 +76,7 @@ class ProfileController @Inject()(
       val whitelists = masterWhitelists.Service.getByOwner(loginState.username, pageNumber)
       (for {
         whitelists <- whitelists
-      } yield Ok(views.html.profile.whitelist.createdWhitelistsPerPage(whitelists))
+      } yield Ok(views.html.profile.whitelist.createdWhitelistsPerPage(whitelists, (pageNumber - 1) * constants.CommonConfig.Pagination.WhitelistPerPage))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -155,7 +155,7 @@ class ProfileController @Inject()(
       (for {
         whitelistIds <- whitelistIds
         whitelists <- whitelists(whitelistIds)
-      } yield Ok(views.html.profile.whitelist.joinedWhitelistsPerPage(whitelists.sortBy(_.startEpoch)))
+      } yield Ok(views.html.profile.whitelist.joinedWhitelistsPerPage(whitelists.sortBy(_.startEpoch), (pageNumber - 1) * constants.CommonConfig.Pagination.WhitelistPerPage))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
