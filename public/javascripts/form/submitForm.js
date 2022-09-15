@@ -52,11 +52,17 @@ function submitForm(isModal, source, targetID) {
     }
 }
 
-function submitFormOnEnter(event, isModal, source, targetID) {
+function onKeyPress(event, isModal, source, targetID) {
     if (event.keyCode === 13) {
         event.preventDefault();
         submitForm(isModal, source, targetID);
     }
+}
+
+function onKeyUp(source) {
+    const form = $(source).closest("form");
+    let allFiled = checkAllFieldsFilled(form);
+    console.log(allFiled);
 }
 
 function clearFormElements(target_id) {
