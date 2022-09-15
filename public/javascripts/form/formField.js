@@ -18,6 +18,7 @@ function commonInputEpochTime(epochFieldName, fieldName, showCurrentTime) {
         locale: {
             format: 'MM/DD/YYYY hh:mm A',
             cancelLabel: 'Clear',
+            applyLabel: 'Ok'
         }
     });
 

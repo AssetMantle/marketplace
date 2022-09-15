@@ -145,6 +145,9 @@ function validateForm(form) {
                                     $('#regexFieldError_' + fieldName).addClass("hidden");
                                 }
                         }
+                        if(!formValidationBoolean){
+                            inputElement.style.borderColor = "red";
+                        }
                     }
                 );
             }

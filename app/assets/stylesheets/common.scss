@@ -489,15 +489,15 @@
 .commonError{
   @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--error));
   position: relative;
-  margin-left: 20px;
 }
-.commonError::before{
-  content: "";
-  position: absolute;
-  height: 16px;
-  width: 16px;
-  background-image: url("../images/icon/closeRed.svg");
-  background-size: cover;
-  background-repeat: no-repeat;
-  left:-20px;
+
+// Pagination Button
+.paginationButton{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--default));
+  cursor: pointer;
+  &.small{
+    i{
+      font-size: 14px;
+    }
+  }
 }
