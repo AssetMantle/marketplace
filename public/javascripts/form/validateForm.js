@@ -174,3 +174,48 @@ function validateForm(form) {
     ;
     return formValidationBoolean;
 }
+
+function checkAllFieldsFilled(form) {
+
+    let allFilled = true;
+
+    form.find("dl").each(function () {
+            const dlElement = $(this);
+
+            if (dlElement.find(("textarea"))[0] !== undefined) {
+                const inputElement = dlElement.find("textarea")[0];
+                if (inputElement.value === "") {
+                    allFilled = false;
+                }
+            } else if (dlElement.find(("select"))[0] !== undefined) {
+                let selectElement = dlElement.find(("select"))[0];
+                if (selectElement.value === "") {
+                    allFilled = false;
+                }
+            } else {
+                const inputElement = dlElement.find("input")[0];
+                const inputValue = inputElement.value;
+
+                if ((inputElement.getAttribute("required") === "false" && inputValue === "") || inputElement.disabled) {
+                    return;
+                }
+
+                switch (inputElement.type) {
+                    case "number":
+                        if (inputValue === "" || isNaN(inputValue)) {
+                            allFilled = false;
+                        }
+                        break;
+                    case "text":
+                    case "password":
+                    case "date":
+                        if (inputValue === "") {
+                            allFilled = false;
+                        }
+                        break;
+                }
+            }
+        }
+    );
+    return allFilled;
+}

@@ -42,3 +42,10 @@ function setCurrentTimeForEpochField(epochFieldName, fieldName) {
     const seconds = Math.floor(date.getTime() / 1000);
     $("#" + fieldName).val(seconds);
 }
+
+function validateInputText(name, minimumLength, maximumLength, regex) {
+    console.log(name)
+    console.log(minimumLength)
+    console.log(maximumLength)
+    console.log(regex)
+}
