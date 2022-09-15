@@ -14,7 +14,9 @@ function validateForm(form) {
                 const inputElement = dlElement.find("textarea")[0];
                 const inputValue = inputElement.value;
                 fieldName = inputElement.getAttribute("name");
-
+                if ((inputElement.getAttribute("required") === "false" && inputValue === "") || inputElement.disabled === true) {
+                    return;
+                }
                 dlElement.find(".info").each(function () {
 
                         const ddInfoElement = $(this)[0];
@@ -163,7 +165,12 @@ function checkAllFieldsFilled(form) {
 
             if (dlElement.find(("textarea"))[0] !== undefined) {
                 const inputElement = dlElement.find("textarea")[0];
-                if (inputElement.value === "") {
+                const inputValue = inputElement.value;
+                if ((inputElement.getAttribute("required") === "false" && inputValue === "") || inputElement.disabled) {
+                    return;
+                }
+                // TODO Check if minimum length is not 0;
+                if (inputValue === "") {
                     allFilled = false;
                 }
             } else if (dlElement.find(("select"))[0] !== undefined) {
@@ -187,6 +194,11 @@ function checkAllFieldsFilled(form) {
                         break;
                     case "text":
                     case "password":
+                        // TODO Check if minimum length is not 0;
+                        if (inputValue === "") {
+                            allFilled = false;
+                        }
+                        break;
                     case "date":
                         if (inputValue === "") {
                             allFilled = false;
