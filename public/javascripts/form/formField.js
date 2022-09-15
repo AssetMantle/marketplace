@@ -8,8 +8,9 @@ function commonDescriptionInputOnKeyPress(fieldId, maximumCharacters) {
     }
 }
 
-function commonInputEpochTime(epochFieldName, fieldName) {
+function commonInputEpochTime(epochFieldName, fieldName, showCurrentTime) {
     $('#' + epochFieldName).daterangepicker({
+        autoUpdateInput: showCurrentTime,
         timePicker: true,
         singleDatePicker: true,
         startDate: moment().startOf('minute'),
@@ -35,17 +36,8 @@ function commonInputEpochTime(epochFieldName, fieldName) {
 }
 
 function setCurrentTimeForEpochField(epochFieldName, fieldName) {
-    console.log("setCurrentTimeForEpochField")
-    console.log(epochFieldName)
-    console.log(fieldName)
     let dateStr = $('#' + epochFieldName).val();
     let date = new Date(dateStr);
     const seconds = Math.floor(date.getTime() / 1000);
     $("#" + fieldName).val(seconds);
-}
-
-function removeCurrentTimeForEpochField(fieldName) {
-    console.log("removeCurrentTimeForEpochField")
-    console.log(fieldName)
-    $("#" + fieldName).val('');
 }

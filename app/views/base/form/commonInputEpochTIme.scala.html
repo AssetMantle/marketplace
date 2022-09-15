@@ -44,14 +44,12 @@
             <dt><label for="epoch_@formField.name">@Messages(formField.name)</label></dt>
             <dd>
                 <input type="text" id="epoch_@formField.name" name="epoch_@formField.name" value="" class="cmuk-input">
-                <div id="customFieldError_@formField.name" class="hidden">@formField.getCustomFieldErrorMessage()</div>
+                <div id="customFieldError_@formField.name" class="mt-2 commonError hidden">@formField.getCustomFieldErrorMessage()</div>
             </dd>
         </dl>
     </div>
-    <script>commonInputEpochTime('epoch_@formField.name', '@formField.name')</script>
+    <script>commonInputEpochTime('epoch_@formField.name', '@formField.name', @setCurrentTime)</script>
     @if(setCurrentTime) {
         <script>setCurrentTimeForEpochField('epoch_@formField.name', '@formField.name')</script>
-    } else {
-        <script>removeCurrentTimeForEpochField('@formField.name')</script>
     }
 </div>

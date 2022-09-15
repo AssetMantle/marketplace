@@ -35,8 +35,8 @@
         }
     ) { field =>
         @inputText(if(arguments.toMap.get(Symbol("value")).map(_.toString).isDefined) field.copy(value = arguments.toMap.get('value).map(_.toString)) else field, defaultArguments ++ arguments: _*)
-        <div id="minimumFieldError_@formField.name" class="hidden">@formField.getMinimumFieldErrorMessage()</div>
-        <div id="maximumFieldError_@formField.name" class="hidden">@formField.getMaximumFieldErrorMessage()</div>
+        <div id="minimumFieldError_@formField.name" class="mt-2 commonError hidden">@formField.getMinimumFieldErrorMessage()</div>
+        <div id="maximumFieldError_@formField.name" class="mt-2 commonError hidden">@formField.getMaximumFieldErrorMessage()</div>
     }
 }
 </div>@()

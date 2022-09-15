@@ -35,7 +35,7 @@
         }
     ) { field =>
         @select(if(arguments.toMap.get(Symbol("value")).map(_.toString).isDefined) field.copy(value = arguments.toMap.get(Symbol("value")).map(_.toString)) else field, for(option <- options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
-        <div id="fieldError_@formField.name" class="hidden">@formField.getFieldErrorMessage()</div>
+        <div id="fieldError_@formField.name" class="mt-2 commonError hidden">@formField.getFieldErrorMessage()</div>
     }
 }
 </div>
