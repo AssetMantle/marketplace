@@ -27,14 +27,14 @@ function commonInputEpochTime(epochFieldName, fieldName, showCurrentTime) {
         let dateStr = picker.startDate.format('MM/DD/YYYY hh:mm A');
         let date = new Date(dateStr);
         const seconds = Math.floor(date.getTime() / 1000);
-        $("#epochInt_" + fieldName).val(seconds);
-        $("#epochInt_" + fieldName).trigger("keyup");
+        $("#" + fieldName).val(seconds);
+        $("#" + fieldName).trigger("keyup");
     });
 
     $('#' + epochFieldName).on('cancel.daterangepicker', function (ev, picker) {
         $(this).val('');
-        $("#epochInt_" + fieldName).val('');
-        $("#epochInt_" + fieldName).trigger("keyup");
+        $("#" + fieldName).val('');
+        $("#" + fieldName).trigger("keyup");
     });
 }
 
@@ -43,7 +43,7 @@ function setCurrentTimeForEpochField(epochFieldName, fieldName) {
     $('#' + epochFieldName).val(dateStr);
     let date = new Date(dateStr);
     const seconds = Math.floor(date.getTime() / 1000);
-    $("#epochInt_" + fieldName).val(seconds);
+    $("#" + fieldName).val(seconds);
 }
 
 function clearEpochField(fieldName, showCurrentTime) {
@@ -55,9 +55,10 @@ function clearEpochField(fieldName, showCurrentTime) {
     }
 }
 
-function validateInputText(name, minimumLength, maximumLength, regex) {
-    console.log(name)
-    console.log(minimumLength)
-    console.log(maximumLength)
-    console.log(regex)
+function copyFieldsValue(sourceField, destinationField) {
+    let sourceValue = $('#' + sourceField).val();
+    if (sourceValue != "" && !isNaN(sourceValue)) {
+        let dateTime = moment.unix(sourceValue).format('MM/DD/YYYY hh:mm A');
+        $('#' + destinationField).val(dateTime);
+    }
 }

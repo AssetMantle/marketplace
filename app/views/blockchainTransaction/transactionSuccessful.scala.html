@@ -4,11 +4,11 @@
 
 @if(status.nonEmpty) {
     @if(!status.get) {
-        @errorModal(heading = constants.View.BLOCKCHAIN_TRANSACTION_FAILURE_TITLE, subHeading = log)
+        @errorModal(heading = constants.View.BROADCASTING_BLOCKCHAIN_TRANSACTION_FAILURE_TITLE, subHeading = log)
         @* @log *@
     }
 } else {
-    @successModal(heading = constants.View.BLOCKCHAIN_TRANSACTION_SUCCESS_TITLE, subHeading = constants.View.BLOCKCHAIN_TRANSACTION_SUCCESS_SUBTITLE)
+    @successModal(heading = constants.View.BROADCASTING_BLOCKCHAIN_TRANSACTION_SUCCESS_TITLE, subHeading = constants.View.BLOCKCHAIN_TRANSACTION_SUCCESS_SUBTITLE)
     <div class="form-address-box">
         <div class="form-address-box-item">
                 <span class="address-box-label">@Messages(constants.View.HASH)</span>
