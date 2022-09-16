@@ -597,6 +597,12 @@
     height: 120px;
     padding: 10px 12px;
 }
+#formBody dd input[type=text].errorField,
+#formBody dd input[type=password].errorField,
+#formBody dd input[type=number].errorField,
+#formBody dd textarea.errorField{
+    border: 1px solid var(--error) !important;
+}
 #formBody dd input[type=number]::-webkit-inner-spin-button,
 #formBody dd input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;

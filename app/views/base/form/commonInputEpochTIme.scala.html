@@ -1,0 +1,55 @@
+@import constants.FormField.{IntFormField, NestedFormField}
+@import helper._
+@import play.api.data.Field
+
+@(formData: Form[_], formField: IntFormField, setCurrentTime: Boolean, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialFormField: Option[Field] = None)
+
+<div>
+    <div id='@arguments.toMap.get(Symbol("containerDivID")).map(_.toString).getOrElse("")' class='hidden'>
+    @defining(Seq(Symbol("type") -> "number", Symbol("_label") -> Messages(formField.name), Symbol("placeholder") -> Messages(formField.placeHolder), Symbol("min") -> formField.minimumValue, Symbol("max") -> formField.maximumValue, Symbol("class") -> "cmuk-input", Symbol("id") -> ("epochInt_" + formField.name))) { defaultArguments =>
+        @defining(
+            sequentialFormField match {
+                case Some(sequentialField: Field) => {
+                    nestedFormField match {
+                        case Some(nestedField: NestedFormField) => {
+                            //This case handles sequential subForms under a nested field. See userAddOrUpdateUBOs for example.
+                            sequentialField.apply(formField.name)
+                        }
+                        case None => {
+                            //This case handles seq fields on basic data types. See negotiationDocumentList for example.
+                            sequentialField
+                        }
+                    }
+                }
+                case None => {
+                    nestedFormField match {
+                        case Some(field: NestedFormField) => {
+                            //This case handles nested fields. See AddOrganization for example.
+                            formData(Seq(field.name, formField.name).mkString("."))
+                        }
+                        case None => {
+                            //This case handles generic fields.
+                            formData(formField.name)
+                        }
+                    }
+                }
+            }
+        ) { field =>
+            @inputText(if(arguments.toMap.get(Symbol("value")).map(_.toString).isDefined) field.copy(value = arguments.toMap.get(Symbol("value")).map(_.toString)) else field, defaultArguments ++ arguments: _*)
+        }
+    }
+    </div>
+    <div id="formField_@formField.name" class="mb-0 commonInputInt">
+        <dl id="field_@formField.name">
+            <dt><label for="epoch_@formField.name">@Messages(formField.name)</label></dt>
+            <dd>
+                <input type="text" id="epoch_@formField.name" name="epoch_@formField.name" value="" class="cmuk-input" onkeyup="clearEpochField('@formField.name', @setCurrentTime)">
+                <div id="customFieldError_@formField.name" class="mt-2 commonError hidden">@formField.getCustomFieldErrorMessage()</div>
+            </dd>
+        </dl>
+    </div>
+    <script>commonInputEpochTime('epoch_@formField.name', '@formField.name', @setCurrentTime)</script>
+    @if(setCurrentTime) {
+        <script>setCurrentTimeForEpochField('epoch_@formField.name', '@formField.name')</script>
+    }
+</div>

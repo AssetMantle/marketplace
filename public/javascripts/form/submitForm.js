@@ -52,10 +52,20 @@ function submitForm(isModal, source, targetID) {
     }
 }
 
-function submitFormOnEnter(event, isModal, source, targetID) {
+function onKeyPress(event, isModal, source, targetID) {
     if (event.keyCode === 13) {
         event.preventDefault();
         submitForm(isModal, source, targetID);
+    }
+}
+
+function onKeyUp(source, submitButtonId) {
+    const form = $(source).closest("form");
+    let allFiled = checkAllFieldsFilled(form);
+    if(allFiled){
+        $('#' + submitButtonId).removeClass("disable");
+    } else{
+        $('#' + submitButtonId).addClass("disable");
     }
 }
 
