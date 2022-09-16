@@ -17,11 +17,11 @@ class WithLoginAction @Inject()(
                                  withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter,
                                  masterKeys: master.Keys,
                                  masterTransactionSessionTokens: masterTransaction.SessionTokens,
-                               )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+                               )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN
 
-  def apply(f: => LoginState => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
+  def apply(f: => LoginState => Request[AnyContent] => Result)(implicit logger: Logger, callbackOnSessionTimeout: Call): Action[AnyContent] = {
     withActionAsyncLoggingFilter.next { implicit request =>
 
       val username = Future(request.session.get(constants.Session.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
@@ -49,7 +49,7 @@ class WithLoginAction @Inject()(
       } yield getResult(verify, LoginState(username = username, address = address))
         ).recover {
         case baseException: BaseException => logger.info(baseException.failure.message, baseException)
-          Results.Unauthorized(views.html.indexWithLoginFormPopup(request.path)).withNewSession
+          Results.Unauthorized(views.html.indexWithLoginFormPopup(callbackOnSessionTimeout.url)).withNewSession
       }
     }
   }

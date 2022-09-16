@@ -10,7 +10,7 @@ function viewCollection(collectionId) {
 
 function viewWishListCollection(collectionId) {
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
-    componentResource('centerContent', jsRoutes.controllers.CollectionController.wishListCollectionNFTs(collectionId));
+    componentResource('centerContent', jsRoutes.controllers.WishlistController.collectionNFTs(collectionId));
 }
 
 function viewNFT(nftId) {

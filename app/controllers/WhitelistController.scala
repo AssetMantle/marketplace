@@ -30,6 +30,8 @@ class WhitelistController @Inject()(
 
   private implicit val module: String = constants.Module.WHITELIST_CONTROLLER
 
+  implicit val callbackOnSessionTimeout: Call = routes.ProfileController.viewDefaultProfile()
+
   def whitelistSection(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>

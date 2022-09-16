@@ -22,10 +22,6 @@ function loadMoreCollections() {
                 route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
                 loadMore = $(".collectionsPerPage");
                 break;
-            case "wishListCollections":
-                route = jsRoutes.controllers.CollectionController.wishListCollectionPerPage($(".collectionPage").length + 1);
-                loadMore = $(".wishlistCollectionsPerPage");
-                break;
             default:
                 break;
         }

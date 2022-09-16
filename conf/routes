@@ -47,9 +47,11 @@ GET         /collectionNFTs                            controllers.CollectionCon
 GET         /collectionNFTsPerPage                     controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionFile                            controllers.CollectionController.collectionFile(id: String, documentType:String, compress: Boolean)
 GET         /collectionInfo                            controllers.CollectionController.info(id: String)
-GET         /wishListCollectionPerPage                 controllers.CollectionController.wishListCollectionPerPage(pageNumber: Int)
-GET         /wishListCollectionNFTs/:id                controllers.CollectionController.wishListCollectionNFTs(id: String)
-GET         /wishListCollectionNFTsPerPage             controllers.CollectionController.wishListCollectionNFTsPerPage(id: String, pageNumber: Int)
+
+GET         /wishlistSection                           controllers.WishlistController.wishlistSection()
+GET         /wishListCollectionPerPage                 controllers.WishlistController.collectionPerPage(pageNumber: Int)
+GET         /wishListCollectionNFTs/:id                controllers.WishlistController.collectionNFTs(id: String)
+GET         /wishListCollectionNFTsPerPage             controllers.WishlistController.collectionNFTsPerPage(id: String, pageNumber: Int)
 
 GET         /nft/:nftId                                controllers.NFTController.viewNFT( nftId: String)
 GET         /nftDetails                                controllers.NFTController.details( nftId: String)
@@ -83,6 +85,7 @@ GET         /addToWishList                             controllers.NFTController
 GET         /deleteFromWishList                        controllers.NFTController.deleteFromWishList(nftId: String)
 GET         /likesCounter                              controllers.NFTController.likesCounter(nftId: String)
 
+GET         /defaultProfile                            controllers.ProfileController.viewDefaultProfile()
 GET         /profile/:accountId                        controllers.ProfileController.viewProfile(accountId: String)
 GET         /profileSection                            controllers.ProfileController.profile(accountId: String)
 

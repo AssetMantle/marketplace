@@ -18,12 +18,6 @@ function changeActive(section) {
             $(".loadMoreElement").addClass("show");
             showLoadMoreButton();
             break;
-        case 'wishListCollections':
-            componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.wishListCollectionPerPage(1));
-            checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections('wishListCollections').url, 'wishListCollections', "collections");
-            $(".loadMoreElement").addClass("show");
-            showLoadMoreButton();
-            break;
         default:
             componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.collectionsPerPage(1));
             checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections('art').url, 'art', "collections");

@@ -35,6 +35,8 @@ class BlockchainTransactionController @Inject()(
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CONTROLLER
 
+  implicit val callbackOnSessionTimeout: Call = routes.ProfileController.viewDefaultProfile()
+
   def gasTokenPrice: EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>

@@ -35,6 +35,8 @@ class SettingController @Inject()(
 
   private implicit val module: String = constants.Module.SETTING_CONTROLLER
 
+  implicit val callbackOnSessionTimeout: Call = routes.SettingController.viewSettings()
+
   def viewSettings(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
     withLoginAction { implicit loginState =>
       implicit request =>
