@@ -3,13 +3,6 @@
 <div class="mt-2 mb-0 item item-center collectionContainer">
     <div class="p-0 profile-card">
         <div class="profiles-container">
-            <div class="d-flex flex-xl-row flex-lg-column align-items-center justify-content-between card-header hidden">
-                <div class="left-option">
-                    <div class="row" id="sectionMenu">
-                        <div id="wishlist" class="col mx-3 p-0 menuItem active" onclick="changeActive('wishlist')">@Messages(constants.View.WISHLIST)</div>
-                    </div>
-                </div>
-            </div>
 
             <div class="profile-list" id="art">
                 <div id="collectionsPerPage" class="w-100 list grid-view-filter collectionsPerPage"></div>
@@ -26,17 +19,13 @@
 
                     <!-- Load more button -->
                 <div id="loadMoreBtnContainer" class="d-flex justify-content-center horizontal-align">
-                @views.html.base.buttons.commonPrimaryButton(constants.View.LOAD_MORE_BUTTON, JavaScript(s"loadCollection()"), Symbol("id") -> "loadMoreCollectionButton")
+                @views.html.base.buttons.commonPrimaryButton(constants.View.LOAD_MORE_BUTTON, JavaScript(s"loadMoreCollections()"), Symbol("id") -> "loadMoreCollectionButton")
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<script src="@routes.Assets.versioned("javascripts/collections/loadMore.js")" type="text/javascript"></script>
-<script src="@routes.Assets.versioned("javascripts/collections/collectionsList.js")" type="text/javascript"></script>
+<script src="@routes.Assets.versioned("javascripts/profile/wishlist/loadMore.js")" type="text/javascript"></script>
 <script>componentResource("collectionsPerPage", jsRoutes.controllers.WishlistController.collectionPerPage(1))</script>
-<script>
-        $('#wishlist').addClass("active");
-</script>
 

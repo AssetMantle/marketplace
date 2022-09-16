@@ -28,7 +28,7 @@
 
                     <!-- Load more button -->
                 <div id="loadMoreBtnContainer" class="d-flex justify-content-center horizontal-align">
-                @views.html.base.buttons.commonPrimaryButton(constants.View.LOAD_MORE_BUTTON, JavaScript(s"loadCollection()"), Symbol("id") -> "loadMoreCollectionButton")
+                @views.html.base.buttons.commonPrimaryButton(constants.View.LOAD_MORE_BUTTON, JavaScript(s"onLoadMoreClick()"), Symbol("id") -> "loadMoreCollectionButton")
                 </div>
             </div>
         </div>
