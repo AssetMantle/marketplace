@@ -485,6 +485,23 @@
   to {bottom: 0; opacity: 0;}
 }
 
+// Common Error
+.commonError{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--error));
+  position: relative;
+}
+
+// Pagination Button
+.paginationButton{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--default));
+  cursor: pointer;
+  &.small{
+    i{
+      font-size: 14px;
+    }
+  }
+}
+
 .gasFeesLabel{
   @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
 }
