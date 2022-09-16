@@ -59,10 +59,14 @@ function onKeyPress(event, isModal, source, targetID) {
     }
 }
 
-function onKeyUp(source) {
+function onKeyUp(source, submitButtonId) {
     const form = $(source).closest("form");
     let allFiled = checkAllFieldsFilled(form);
-    console.log(allFiled);
+    if(allFiled){
+        $('#' + submitButtonId).removeClass("disable");
+    } else{
+        $('#' + submitButtonId).addClass("disable");
+    }
 }
 
 function clearFormElements(target_id) {

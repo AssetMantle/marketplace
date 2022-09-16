@@ -27,20 +27,32 @@ function commonInputEpochTime(epochFieldName, fieldName, showCurrentTime) {
         let dateStr = picker.startDate.format('MM/DD/YYYY hh:mm A');
         let date = new Date(dateStr);
         const seconds = Math.floor(date.getTime() / 1000);
-        $("#" + fieldName).val(seconds);
+        $("#epochInt_" + fieldName).val(seconds);
+        $("#epochInt_" + fieldName).trigger("keyup");
     });
 
     $('#' + epochFieldName).on('cancel.daterangepicker', function (ev, picker) {
         $(this).val('');
-        $("#" + fieldName).val('');
+        $("#epochInt_" + fieldName).val('');
+        $("#epochInt_" + fieldName).trigger("keyup");
     });
 }
 
 function setCurrentTimeForEpochField(epochFieldName, fieldName) {
-    let dateStr = $('#' + epochFieldName).val();
+    let dateStr = moment().format('MM/DD/YYYY hh:mm A');
+    $('#' + epochFieldName).val(dateStr);
     let date = new Date(dateStr);
     const seconds = Math.floor(date.getTime() / 1000);
-    $("#" + fieldName).val(seconds);
+    $("#epochInt_" + fieldName).val(seconds);
+}
+
+function clearEpochField(fieldName, showCurrentTime) {
+    if (!showCurrentTime) {
+        $("#epoch_" + fieldName).val('');
+        $("#" + fieldName).val('');
+    } else {
+        setCurrentTimeForEpochField("epoch_" + fieldName, fieldName);
+    }
 }
 
 function validateInputText(name, minimumLength, maximumLength, regex) {

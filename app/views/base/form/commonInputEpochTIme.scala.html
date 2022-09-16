@@ -6,7 +6,7 @@
 
 <div>
     <div id='@arguments.toMap.get(Symbol("containerDivID")).map(_.toString).getOrElse("")' class='hidden'>
-    @defining(Seq(Symbol("type") -> "number", Symbol("_label") -> Messages(formField.name), Symbol("placeholder") -> Messages(formField.placeHolder), Symbol("min") -> formField.minimumValue, Symbol("max") -> formField.maximumValue, Symbol("class") -> "cmuk-input")) { defaultArguments =>
+    @defining(Seq(Symbol("type") -> "number", Symbol("_label") -> Messages(formField.name), Symbol("placeholder") -> Messages(formField.placeHolder), Symbol("min") -> formField.minimumValue, Symbol("max") -> formField.maximumValue, Symbol("class") -> "cmuk-input", Symbol("id") -> ("epochInt_" + formField.name))) { defaultArguments =>
         @defining(
             sequentialFormField match {
                 case Some(sequentialField: Field) => {
@@ -43,7 +43,7 @@
         <dl id="field_@formField.name">
             <dt><label for="epoch_@formField.name">@Messages(formField.name)</label></dt>
             <dd>
-                <input type="text" id="epoch_@formField.name" name="epoch_@formField.name" value="" class="cmuk-input">
+                <input type="text" id="epoch_@formField.name" name="epoch_@formField.name" value="" class="cmuk-input" onkeyup="clearEpochField('@formField.name', @setCurrentTime)">
                 <div id="customFieldError_@formField.name" class="mt-2 commonError hidden">@formField.getCustomFieldErrorMessage()</div>
             </dd>
         </dl>

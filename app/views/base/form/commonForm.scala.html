@@ -1,9 +1,9 @@
 @import helper._
 @import views.html.base.buttons._
 
-@(formTemplate: constants.Form, formData: Form[_], showBackButton: Boolean = false, closeButton: Boolean = true, showSubtitle: Boolean = true, showScreen: String = "", hideScreen: String = "", isModal: Boolean = false, submitDisable: Boolean = false, target: String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+@(formTemplate: constants.Form, formData: Form[_], showBackButton: Boolean = false, closeButton: Boolean = true, showSubtitle: Boolean = true, showScreen: String = "", hideScreen: String = "", isModal: Boolean = false, submitDisable: Boolean = true, target: String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
-@form(action = formTemplate.post, Symbol("onkeypress") -> s"onKeyPress(event,'${isModal}',this, '${target}')", Symbol("onkeyup") -> s"onKeyUp(this)") {
+@form(action = formTemplate.post, Symbol("onkeypress") -> s"onKeyPress(event,'${isModal}',this, '${target}')", Symbol("onkeyup") -> s"onKeyUp(this, '${formTemplate.submit.replace(".", "_")}')") {
     @if(showSubtitle) {
         @if(showBackButton) {
             <div class="modal-header mb-3">

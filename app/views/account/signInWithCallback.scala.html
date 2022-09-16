@@ -33,8 +33,8 @@
                 </div>
             </div>
 
-            @commonInputText(signInWithCallbackForm, constants.FormField.PUSH_NOTIFICATION_TOKEN, Symbol("containerDivClass") -> "hidden")
-            @commonInputText(signInWithCallbackForm, constants.FormField.CALLBACK_URL, Symbol("value") -> callbackUrl, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
+            @commonInputText(signInWithCallbackForm, constants.FormField.PUSH_NOTIFICATION_TOKEN, Symbol("class") -> "hidden")
+            @commonInputText(signInWithCallbackForm, constants.FormField.CALLBACK_URL, Symbol("value") -> callbackUrl, Symbol("readonly") -> "readonly", Symbol("class") -> "hidden")
 
             <div class="mb-3">
                 <a class="link" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.FORGET_PASSWORD.get, ""))">@Messages(constants.View.SIGN_IN_FORGOT_PASSWORD)</a>

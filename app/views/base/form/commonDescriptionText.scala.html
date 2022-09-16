@@ -39,7 +39,7 @@
             <span id="remainingCharacter_@formField.name" >@formField.maximumLength/@formField.maximumLength</span>
             <span>@Messages(constants.View.CHARACTERS_REMAINING_LABEL)</span>
         </div>
-        <div id="minimumFieldError_@formField.name" class="mt-2 commonError hidden">@formField.getMinimumFieldErrorMessage()</div>
+        <div id="minimumFieldError_@formField.name" data-minimum-length="@formField.minimumLength" class="mt-2 commonError hidden">@formField.getMinimumFieldErrorMessage()</div>
         <div id="maximumFieldError_@formField.name" class="mt-2 commonError hidden">@formField.getMaximumFieldErrorMessage()</div>
         <div id="regexFieldError_@formField.name" class="mt-2 commonError hidden">@formField.getRegexErrorMessage()</div>
     }

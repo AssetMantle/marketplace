@@ -15,7 +15,9 @@ function validateForm(form) {
                 const inputElement = dlElement.find("textarea")[0];
                 const inputValue = inputElement.value;
                 fieldName = inputElement.getAttribute("name");
-
+                if ((inputElement.getAttribute("required") === "false" && inputValue === "") || inputElement.disabled === true) {
+                    return;
+                }
                 dlElement.find(".info").each(function () {
                         const ddInfoElement = $(this)[0];
                         const ddValidationInfo = ddInfoElement.innerHTML.split(": ");
@@ -184,7 +186,23 @@ function checkAllFieldsFilled(form) {
 
             if (dlElement.find(("textarea"))[0] !== undefined) {
                 const inputElement = dlElement.find("textarea")[0];
-                if (inputElement.value === "") {
+                const inputValue = inputElement.value;
+                if ((inputElement.getAttribute("required") === "false" && inputValue === "") || inputElement.disabled) {
+                    return;
+                }
+                let hasZeroLength = false;
+                let fieldParent = $(dlElement[0].parentNode);
+                fieldParent.find(".commonError").each(function () {
+                    const commonErrorElement = $(this)[0];
+                    if ($(commonErrorElement)[0].hasAttribute("data-minimum-length")) {
+                        const minimumLengthValue = $(commonErrorElement)[0].getAttribute("data-minimum-length");
+                        if (minimumLengthValue == 0) {
+                            hasZeroLength = true;
+                        }
+                    }
+                });
+
+                if (inputValue === "" && !hasZeroLength) {
                     allFilled = false;
                 }
             } else if (dlElement.find(("select"))[0] !== undefined) {
@@ -196,7 +214,7 @@ function checkAllFieldsFilled(form) {
                 const inputElement = dlElement.find("input")[0];
                 const inputValue = inputElement.value;
 
-                if ((inputElement.getAttribute("required") === "false" && inputValue === "") || inputElement.disabled) {
+                if ((inputElement.getAttribute("required") === "false" && inputValue === "") || inputElement.disabled || inputElement.classList.contains("hidden")) {
                     return;
                 }
 
@@ -208,6 +226,22 @@ function checkAllFieldsFilled(form) {
                         break;
                     case "text":
                     case "password":
+                        let hasZeroLength = false;
+                        let fieldParent = $(dlElement[0].parentNode);
+                        fieldParent.find(".commonError").each(function () {
+                            const commonErrorElement = $(this)[0];
+                            if ($(commonErrorElement)[0].hasAttribute("data-minimum-length")) {
+                                const minimumLengthValue = $(commonErrorElement)[0].getAttribute("data-minimum-length");
+                                if (minimumLengthValue == 0) {
+                                    hasZeroLength = true;
+                                }
+                            }
+                        });
+
+                        if (inputValue === "" && !hasZeroLength) {
+                            allFilled = false;
+                        }
+                        break;
                     case "date":
                         if (inputValue === "") {
                             allFilled = false;
