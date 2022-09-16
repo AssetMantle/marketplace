@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+   <properties>
+    
+    <site.url>foo</site.url>
+    
+</properties>
+
+<!-- Use my.variable -->
+ ${site.url} 
+
+      <lastmod>2005-01-01</lastmod>
+
+      <changefreq>monthly</changefreq>
+
+      <priority>1</priority>
+<properties>
+    
+    <site.url1>foo</site.url1>
+    
+</properties>
+
+ ${site.url1}
+<properties>
+    
+    <site.url2>foo</site.url2>
+</properties>
+
+ ${site.url2} 
+
+
+      <changefreq>weekly</changefreq>
+
+      <lastmod>2022-09-05</lastmod>
+
+      <changefreq>weekly</changefreq>
+
+
+</urlset>
