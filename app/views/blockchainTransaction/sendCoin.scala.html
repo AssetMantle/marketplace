@@ -1,6 +1,6 @@
 @import views.blockchainTransaction.companion.SendCoin
+@import views.html.blockchainTransaction.commonSelectGas
 @import views.html.base.form._
-@import utilities.MicroNumber
 
 @(sendCoin: Form[SendCoin.Data] = SendCoin.form, fromAddress: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -9,25 +9,6 @@
     @commonInputText(sendCoin, constants.FormField.TO_ADDRESS)
     @commonInputMicornumber(sendCoin, constants.FormField.SEND_COIN_AMOUNT)
     @commonInputInt(sendCoin, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultSendCoinGasAmount, Symbol("class") -> "hidden")
-    @commonSelect(sendCoin, constants.FormField.GAS_PRICE, Symbol("class") -> "hidden")
-    <div id="gasPriceToggleButton" class="btn-group mt-2 mt-sm-2 mt-md-0 w-100 toggleBtn" role="group">
-        <span id="option1" type="button" class="btn p-2 toggleOption" onclick="setOption(this, 1)">
-            <div>@Messages(constants.View.GAS_LOW)</div>
-            <div class="gasCharges">00</div>
-            <div class="gasChargesPrice">00</div>
-        </span>
-        <span id="option2" type="button" class="btn p-2 active toggleOption" onclick="setOption(this, 2)">
-            <div>@Messages(constants.View.GAS_MEDIUM)</div>
-            <div class="gasCharges">00</div>
-            <div class="gasChargesPrice">00</div>
-        </span>
-        <span id="option3" type="button" class="btn p-2 toggleOption" onclick="setOption(this, 3)">
-            <div>@Messages(constants.View.GAS_HIGH)</div>
-            <div class="gasCharges">00</div>
-            <div class="gasChargesPrice">00</div>
-        </span>
-    </div>
+    @commonSelectGas(sendCoin)
     @commonInputPassword(sendCoin, constants.FormField.PASSWORD)
 }
-
-<script src="@routes.Assets.versioned("javascripts/blockchainTransactions/sendCoin.js")" type="text/javascript"></script>
