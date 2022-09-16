@@ -488,3 +488,41 @@
 .gasFeesLabel{
   @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
 }
+
+// Horizontal Switcher
+.nav{
+  --bs-nav-link-padding-x: 1rem;
+  --bs-nav-link-padding-y: 0rem;
+  --bs-nav-link-color: var(--gray);
+  --bs-nav-link-hover-color: var(--gray);
+  --bs-nav-link-disabled-color: var(--disable);
+
+  &.nav-tabs{
+    --bs-nav-tabs-border-width: 0px;
+    --bs-nav-tabs-border-color: transparent;
+    --bs-nav-tabs-border-radius: 0rem;
+    --bs-nav-tabs-link-hover-border-color: transparent;
+    --bs-nav-tabs-link-active-color: var(--default);
+    --bs-nav-tabs-link-active-bg: transparent;
+    --bs-nav-tabs-link-active-border-color: transparent;
+    border-bottom: none;
+
+    .nav-link{
+      @include setFont(var(--font-type-1), normal, 500, 14px, 17px, var(--gray));
+      &.active{
+        @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--default));
+      }
+      &:first-child{
+        padding-left: 0px;
+      }
+    }
+  }
+}
+.tab-content{
+  .tab-pane{
+    &.fade{
+      transition-duration: 0.2s;
+      transition-timing-function: ease-in-out;
+    }
+  }
+}

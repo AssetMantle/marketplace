@@ -7,8 +7,6 @@
     <ul class="nav nav-tabs" id="commonHorizontalSwitcher_@items.keys.mkString("_")" role="tablist">
     @for(((itemHeader, itemValue), index) <- items.zipWithIndex) {
         @defining(index == 0) { firstIndex =>
-            @println(index)
-            @println(firstIndex)
             @itemValue match {
                 case html: Html => {
                     <li class="nav-item" role="presentation">
@@ -36,10 +34,10 @@
         @defining(index == 0) { firstIndex =>
             @itemValue match {
                 case html: Html => {
-                    <div class='@Seq("tab-pane", if(firstIndex) "active" else "").mkString(" ")' id="switcherContent@itemHeader" role="tabpanel" aria-labelledby='@Seq(itemHeader, "-tab").mkString("")'>@itemValue</div>
+                    <div class='@Seq("tab-pane", if(firstIndex) "fade show active" else "fade").mkString(" ")' id="switcherContent@itemHeader" role="tabpanel" aria-labelledby='@Seq(itemHeader, "-tab").mkString("")'>@itemValue</div>
                 }
                 case route: JavaScriptReverseRoute => {
-                    <div class='@Seq("tab-pane", if(firstIndex) "active" else "").mkString(" ")' id="switcherContent@itemHeader" role="tabpanel" aria-labelledby='@Seq(itemHeader, "-tab").mkString("")'>
+                    <div class='@Seq("tab-pane", if(firstIndex) "fade show active" else "fade").mkString(" ")' id="switcherContent@itemHeader" role="tabpanel" aria-labelledby='@Seq(itemHeader, "-tab").mkString("")'>
                     @if(firstIndex) {
                         <script>
                                 loadSwitcherContent('@Seq(itemHeader, "-tab").mkString("")');
@@ -48,7 +46,7 @@
                     </div>
                 }
                 case _ => {
-                    <div class='@Seq("tab-pane", if(firstIndex) "active" else "").mkString(" ")' id="switcherContent@itemHeader" role="tabpanel" aria-labelledby='@Seq(itemHeader, "-tab").mkString("")'>@itemValue.toString</div>
+                    <div class='@Seq("tab-pane", if(firstIndex) "fade show active" else "fade").mkString(" ")' id="switcherContent@itemHeader" role="tabpanel" aria-labelledby='@Seq(itemHeader, "-tab").mkString("")'>@itemValue.toString</div>
                 }
             }
         }
@@ -58,7 +56,7 @@
 </div>
 <script>
         let switcherId = 'commonHorizontalSwitcher_@items.keys.mkString("_")';
-        let firstTabEl = document.querySelector('#' + switcherId + ' li:last-child a')
+        let firstTabEl = document.querySelector('#' + switcherId + ' li:first-child a')
         let firstTab = new bootstrap.Tab(firstTabEl)
 
         firstTab.show()

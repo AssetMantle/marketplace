@@ -493,7 +493,6 @@
       }
       .contentTitle{
         text-transform: capitalize;
-        margin-top: 20px;
         .title{
           @include setFont(var(--font-type-1), normal, 400, 16px, 19px, var(--gray));
         }

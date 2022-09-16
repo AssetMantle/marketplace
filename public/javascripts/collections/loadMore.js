@@ -22,6 +22,10 @@ function loadMoreCollections() {
                 route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
                 loadMore = $(".collectionsPerPage");
                 break;
+            case "wishlist":
+                route = jsRoutes.controllers.WishlistController.collectionPerPage($(".wishlistCollectionsPerPage").length + 1);
+                loadMore = $(".collectionsPerPage");
+                break;
             default:
                 break;
         }
@@ -44,7 +48,7 @@ function loadMoreCollections() {
                 if (activeSection === 'art' && $(".artCollection").length % 6 !== 0) {
                     $("#loadMoreBtnContainer").addClass("hide");
                 }
-                if (activeSection === 'wishListCollections' && $(".wishListCollection").length % 6 !== 0) {
+                if (activeSection === 'wishlist' && $(".wishListCollection").length % 6 !== 0) {
                     $("#loadMoreBtnContainer").addClass("hide");
                 }
             },
