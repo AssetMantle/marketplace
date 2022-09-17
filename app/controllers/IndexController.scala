@@ -27,6 +27,8 @@ class IndexController @Inject()(
 
   private implicit val module: String = constants.Module.INDEX_CONTROLLER
 
+  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections("art")
+
   def index: EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit optionalLoginState =>
       implicit request =>

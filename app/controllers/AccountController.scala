@@ -7,7 +7,7 @@ import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{AbstractController, Action, AnyContent, Call, MessagesControllerComponents, Result}
 import views.account.companion._
 
 import javax.inject.{Inject, Singleton}
@@ -31,6 +31,8 @@ class AccountController @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
+
+  implicit val callbackOnSessionTimeout: Call = routes.SettingController.viewSettings()
 
   def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.account.signUp())

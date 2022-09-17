@@ -5,5 +5,5 @@
 @views.html.base.common(constants.View.PROFILE, failures, warnings, successes, infos)
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
 <script>
-        componentResource('centerContent', jsRoutes.controllers.ProfileController.visitorProfile('@accountId'));
-</script>@()
+        componentResource('centerContent', jsRoutes.controllers.ProfileController.profile('@accountId'));
+</script>

@@ -9,22 +9,12 @@ document.onload = function () {
     }
 }
 
-clicked = false;
-
 function loadMoreCollections() {
     const loading = document.querySelector('.loading');
     if ($(".noCollection").length === 0) {
         const activeSection = $.trim($("#sectionMenu").find(".menuItem.active").attr('id'));
-        let route = "";
-        let loadMore = "";
-        switch (activeSection) {
-            case "art":
-                route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
-                loadMore = $(".collectionsPerPage");
-                break;
-            default:
-                break;
-        }
+        let route = jsRoutes.controllers.WishlistController.collectionPerPage($(".wishlistCollectionsPerPage").length + 1);
+        let loadMore = $(".collectionsPerPage");
 
         $.ajax({
             url: route.url,
@@ -41,7 +31,7 @@ function loadMoreCollections() {
                 if ($(".noCollection").length === 0) {
                     $("#loadMoreBtnContainer").removeClass("hide");
                 }
-                if (activeSection === 'art' && $(".artCollection").length % 6 !== 0) {
+                if ($(".wishListCollection").length % 6 !== 0) {
                     $("#loadMoreBtnContainer").addClass("hide");
                 }
             },
@@ -51,32 +41,11 @@ function loadMoreCollections() {
                     if ($(".noCollection").length !== 0) {
                         $("#loadMoreBtnContainer").addClass("hide");
                     }
-                    clicked = false;
                 }
             }
         });
     } else {
-        console.log("NO COLLECTION LEFT")
         $(".collectionPage:last").css("margin-top", "0px");
         $("#loadMoreBtnContainer").addClass("hide");
     }
 }
-
-collectionPageTimeout = 0;
-
-function onLoadMoreClick() {
-    if (!clicked) {
-        clicked = true;
-        loadMoreCollections();
-    }
-}
-
-function showLoadMoreButton() {
-    $("#loadMoreBtnContainer").removeClass("hide");
-}
-
-$("#sectionMenu .menuItem").on('click', function () {
-    showLoadMoreButton();
-    $("#sectionMenu").find(".active").removeClass("active");
-    $(this).addClass("active");
-});

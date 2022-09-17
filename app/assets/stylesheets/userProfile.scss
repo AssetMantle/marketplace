@@ -493,7 +493,6 @@
       }
       .contentTitle{
         text-transform: capitalize;
-        margin-top: 20px;
         .title{
           @include setFont(var(--font-type-1), normal, 400, 16px, 19px, var(--gray));
         }
@@ -517,13 +516,13 @@
         background-color: var(--card-dark);
         width: 100%;
         //height: fit-content;
-        height: 664px;
-        min-height: 664px;
+        height: 500px;
+        min-height: 500px;
         border-radius: 10px;
         margin-top: 20px;
         &.emptyBody{
-          height: 664px;
-          min-height: 664px;
+          height: 500px;
+          min-height: 500px;
         }
         .emptyWhitelist{
           .message{

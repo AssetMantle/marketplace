@@ -18,9 +18,6 @@ function loadMoreNFTs(collectionId, sectionName) {
             case "art":
                 route = jsRoutes.controllers.CollectionController.collectionNFTsPerPage(collectionId, $(".nftPage").length + 1);
                 break;
-            case "wishlist":
-                route = jsRoutes.controllers.CollectionController.wishListCollectionNFTsPerPage(collectionId, $(".nftPage").length + 1);
-                break;
             default:
                 break;
         }

@@ -124,7 +124,7 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="@routes.ProfileController.viewPersonalProfile()" class="d-flex flex-row align-items-center gap-3">
+                                                <a href="@routes.ProfileController.viewProfile(loginState.username)" class="d-flex flex-row align-items-center gap-3">
                                                     <i class="bi bi-person-lines-fill iconWhite"></i>
                                                     <div class="profileMenuLabel">@Messages(constants.View.PROFILE)</div>
                                                 </a>
@@ -183,7 +183,7 @@
                                         @* </a>*@
                                         @* </div>*@
                                         <div class="profileMenuItem">
-                                            <a href="@routes.ProfileController.viewPersonalProfile()" class="d-flex flex-row align-items-center p-0 profileItemLink">
+                                            <a href="@routes.ProfileController.viewProfile(loginState.username)" class="d-flex flex-row align-items-center p-0 profileItemLink">
                                                 <i class="bi bi-person-lines-fill iconDefault"></i>
                                                 <div class="profileMenuLabel">@Messages(constants.View.PROFILE)</div>
                                             </a>

@@ -1,7 +1,7 @@
 @import models.master.Whitelist
 @import views.html.base.buttons._
 
-@(whitelist: Whitelist)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(whitelist: Whitelist, maxReached: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="modal-header mb-0">
     <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.WHITELIST_JOIN_TITLE)</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
@@ -35,15 +35,15 @@
     </div>
 </div>
 
-@if((System.currentTimeMillis / 1000) <= whitelist.endEpoch) {
+@if(maxReached) {
     <div class="d-flex justify-content-end horizontal-align">
         @commonSecondaryButton(constants.View.CLOSE_WHITELIST_INVITE, JavaScript(s"""closeModal()"""))
-        @commonPrimaryButton(constants.View.ACCEPT_WHITELIST_INVITE, JavaScript(s"""getForm(jsRoutes.controllers.ProfileController.acceptInvite('${whitelist.id}'), '#commonModal', '#modal-content', resetCreatedWhitelistPage)"""))
+        @commonPrimaryButton(constants.View.ACCEPT_WHITELIST_INVITE, JavaScript(s"""getForm(jsRoutes.controllers.WhitelistController.acceptInvite('${whitelist.id}'), '#commonModal', '#modal-content', resetCreatedWhitelistPage)"""))
     </div>
 } else {
     <div class="d-flex gap-2 align-items-center justify-content-center mt-3 footerMessage">
         <i class="bi bi-info-circle iconError iconSmall"></i>
-        <div class="errorMessage">@Messages(constants.View.WHITELIST_INVITE_EXPIRED)</div>
+        <div class="errorMessage">@Messages(constants.View.WHITELIST_MAXIMUM_MEMBERS_REACHED)</div>
     </div>
 }
 <script>epochToDateTime("expiryDate")</script>
