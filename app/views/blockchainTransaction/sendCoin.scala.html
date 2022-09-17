@@ -7,8 +7,12 @@
 @commonForm(constants.Form.SEND_COIN, sendCoin) {
     @commonInputText(sendCoin, constants.FormField.FROM_ADDRESS, Symbol("value") -> fromAddress, Symbol("readonly") -> "readonly")
     @commonInputText(sendCoin, constants.FormField.TO_ADDRESS)
-    @commonInputMicornumber(sendCoin, constants.FormField.SEND_COIN_AMOUNT)
+    <div class="sendCoinAmountField">
+        <div id="availableBalance" class="availableBalance" onclick="setAvailableBalance('@constants.FormField.SEND_COIN_AMOUNT.name',0.0039)">@Messages(constants.View.SEND_COIN_AVAILABLE_BALANCE, 0.0039)</div>
+        @commonInputMicornumber(sendCoin, constants.FormField.SEND_COIN_AMOUNT)
+    </div>
     @commonInputInt(sendCoin, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultSendCoinGasAmount, Symbol("class") -> "hidden")
     @commonSelectGas(sendCoin)
     @commonInputPassword(sendCoin, constants.FormField.PASSWORD)
 }
+<script src="@routes.Assets.versioned("javascripts/blockchainTransactions/sendCoin.js")" type="text/javascript"></script>

@@ -11,10 +11,10 @@
   width: 20px;
 }
 .primaryButton{
-  @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--button-text));
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--button-text));
   text-align: center;
   text-transform: capitalize;
-  max-width: 216px;
+  max-width: 100px;
   width: 100%;
   height: 36px;
   overflow: hidden;
@@ -29,12 +29,12 @@
   }
 }
 .secondaryButton{
-  @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--dark));
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--dark));
   text-align: center;
   text-transform: capitalize;
-  width: 216px;
+  width: 100px;
   height: 36px;
-  margin-top: 20px;
+  //margin-top: 20px;
   border-radius: 32px;
   background-color: transparent;
   border: 1px solid var(--dark);
@@ -98,6 +98,22 @@
   padding: 20px;
   position: relative;
   overflow: hidden;
+  .headerContainer{
+    .userDetails{
+      .userName{
+        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--default));
+      }
+      .userBalance{
+        @include setFont(var(--font-type-2), normal, 600, 14px, 17px, var(--text-medium));
+        .start{
+          @include setFont(var(--font-type-2), normal, 700, 16px, 17px, var(--text-medium));
+        }
+        .end{
+          @include setFont(var(--font-type-2), normal, 700, 12px, 17px, var(--text-medium));
+        }
+      }
+    }
+  }
 }
 .detailContainer{
   margin: 24px 12px;
@@ -136,6 +152,12 @@
     .buttons{
       line-height: 0px;
     }
+  .bottomOption{
+    a{
+      height: 0px;
+      line-height:0px;
+    }
+  }
   }
   .nftLink{
     div{
@@ -184,9 +206,9 @@
   }
   .addressBook{
     height: 450px;
-    width: 254px;
+    width: 274px;
     position: absolute;
-    right: -255px;
+    right: -275px;
     top: 1px;
     z-index: 1000;
     background: var(--card-dark);
@@ -248,7 +270,12 @@
       }
     }
     .bottomMenu{
-      margin-top: 37px;
+      .primaryButton{
+        background-color: transparent;
+        color: var(--default);
+        border: none;
+        box-shadow: none;
+      }
     }
   }
 }

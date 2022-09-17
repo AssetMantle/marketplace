@@ -3,20 +3,22 @@
 
 @(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="walletPopupContainer">
-    <div class="d-flex flex-row justify-content-end">
+    <div class="d-flex flex-row justify-content-between headerContainer">
+        <div class="d-flex flex-row align-content-between gap-2 userDetails">
+            <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="40" height="40"/>
+            <div class="ms-2 d-flex flex-column justify-content-between">
+                <a href="@routes.ProfileController.viewProfile(loginState.username)" class="d-flex flex-row align-items-center p-0 profileItemLink">
+                    <div class="userName">@loginState.username</div>
+                </a>
+                <div class="userBalance" id="walletBalance_@loginState.address"></div>
+            </div>
+        </div>
         <i id="openWalletMenu" class="bi bi-list iconDefault iconLarge" onclick="openCloseWalletScreen(this, 'addressBook')"></i>
     </div>
 
     <div class="separator"></div>
 
     <div class="detailContainer">
-        <div class="d-flex flex-row align-content-between gap-2 userDetails">
-            <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="40" height="40"/>
-            <div class="ms-2 d-flex flex-column justify-content-between">
-                <div class="userName">@loginState.username</div>
-                <div class="userBalance" id="walletBalance_@loginState.address"></div>
-            </div>
-        </div>
         <div class="row p-2 mx-0 mt-4 justify-content-between align-items-center userAddressBox">
             <div class="col-10 p-0 userAddressData username-data" data-value="@loginState.address">@loginState.address</div>
             <div class="col-2 text-end copyIcon" onclick="copyToClipboard(this)">
@@ -25,37 +27,52 @@
         </div>
         <div class="innerSeparator"></div>
         <div id="walletBalance_@loginState.address"></div>
-        <div class="text-center buttons">
-            <a href="https://app.osmosis.zone/?from=USDC&to=MNTL" target="_blank"><button class="primaryButton">@Messages(constants.View.BUY_MORE)</button></a>
-            @commonSecondaryFormButton(constants.Form.SEND_COIN, Symbol("parameters") -> s"'${loginState.address}'")
+        <div class="d-flex justify-content-around text-center buttons">
+            <a href="https://app.osmosis.zone/?from=USDC&to=MNTL" target="_blank"><button class="secondaryButton">@Messages(constants.View.BUY_MORE)</button></a>
+            @commonFormButton(constants.Form.SEND_COIN, Symbol("parameters") -> s"'${loginState.address}'", Symbol("class") -> "primaryButton")
         </div>
         <div class="innerSeparator"></div>
+        <div class="d-flex justify-content-end mt-4 bottomOption">
+            <a href="@routes.SettingController.viewSettings()">
+                <i class="bi bi-gear iconDefault icon"></i>
+            </a>
+            <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))">
+                <i class="bi bi-box-arrow-right iconDefault logout"></i>
+            </a>
+        </div>
     </div>
 
         <!-- Address Book -->
     <div id="addressBook" class="addressBook">
-        <div class="d-flex flex-row gap-2 align-items-center mb-3 headerWithBackButton">
-            <i id="addressBookCloseBtn" class="bi bi-chevron-left iconDefault mt-1 icon" onclick="openCloseWalletScreen(this, 'addressBook')"></i>
+        <div class="d-flex flex-row gap-2 align-items-center justify-content-between mb-3 headerWithBackButton">
             <div class="headerTitle">@Messages(constants.View.ADDRESS_BOOK_TITLE)</div>
+            <i id="addressBookCloseBtn" class="bi bi-x iconDefault iconLarge mt-1" onclick="openCloseWalletScreen(this, 'addressBook')"></i>
         </div>
          <div class="d-flex flex-column justify-content-between">
             <div class="mt-2 walletAddressList">
             @keys.map { key =>
                 <div class="d-flex flex-row-reverse justify-content-between walletAddressItem">
+
                     @if(key.encryptedPrivateKey.nonEmpty) {
                         @if(key.active) {
                             <input type="radio" name="address" id='@key.address' checked/>
                         } else {
                             <input type="radio" name="address" id='@key.address' onclick="changeActive('@key.address', '@keys.find(_.active).getOrElse("")')"/>
                         }
-                    }
-                <label for="radio1" class="walletAddressLabel username-data">@key.address</label>
+                    }else{
+                        <input type="radio" class="invisible"/>
+            }
+                <label for="radio1" class="walletAddressLabel">@key.name</label>
                 </div>
             }
             </div>
+
             <div class="text-center d-flex flex-column align-items-end bottomMenu buttons">
                 <div class="d-flex justify-content-center w-100">
-                    <button id="newAddressOptionOpenBtn" class="primaryButton" onclick="getForm(jsRoutes.controllers.SettingController.addNewKey())">@Messages(constants.View.ADD_NEW_ADDRESS_LABEL)</button>
+                    <button id="newAddressOptionOpenBtn" class="d-flex gap-2 align-items-center primaryButton" onclick="getForm(jsRoutes.controllers.SettingController.addNewKey())">
+                        <i class="bi bi-plus-circle iconDefault iconSmall"></i>
+                        @Messages(constants.View.ADD_NEW_ADDRESS_LABEL)
+                    </button>
                 </div>
                 <div class="innerSeparator"></div>
                 <a href="@routes.SettingController.viewSettings()">
