@@ -6,7 +6,7 @@
 
 <div>
     <div id='@arguments.toMap.get(Symbol("containerDivID")).map(_.toString).getOrElse("")' class='hidden'>
-    @defining(Seq(Symbol("type") -> "number", Symbol("_label") -> Messages(formField.name), Symbol("placeholder") -> Messages(formField.placeHolder), Symbol("min") -> formField.minimumValue, Symbol("max") -> formField.maximumValue, Symbol("class") -> "cmuk-input", Symbol("id") -> ("epochInt_" + formField.name))) { defaultArguments =>
+    @defining(Seq(Symbol("type") -> "number", Symbol("_label") -> Messages(formField.name), Symbol("placeholder") -> Messages(formField.placeHolder), Symbol("min") -> formField.minimumValue, Symbol("max") -> formField.maximumValue, Symbol("class") -> "cmuk-input")) { defaultArguments =>
         @defining(
             sequentialFormField match {
                 case Some(sequentialField: Field) => {
@@ -51,5 +51,7 @@
     <script>commonInputEpochTime('epoch_@formField.name', '@formField.name', @setCurrentTime)</script>
     @if(setCurrentTime) {
         <script>setCurrentTimeForEpochField('epoch_@formField.name', '@formField.name')</script>
+    } else {
+        <script>copyFieldsValue('@formField.name', 'epoch_@formField.name')</script>
     }
 </div>

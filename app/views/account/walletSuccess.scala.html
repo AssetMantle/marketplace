@@ -1,4 +1,5 @@
 @import views.html.base.modal._
+@import views.html.base.buttons._
 
 @(username: String, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @successModal(heading = constants.View.CREATE_WALLET_SUCCESS_TITLE, subHeading = constants.View.CREATE_WALLET_SUCCESS_SUBTITLE)
@@ -10,14 +11,14 @@
     <div class="form-information-text">@Messages(constants.View.CREATE_WALLET_SUCCESS_INFO)</div>
 </div>
 <div class="horizontal-align">
-    @views.html.base.buttons.commonModalSecondaryButton(constants.View.SIGN_IN, constants.Form.SIGN_IN_WITH_CALLBACK.get)
     @defining(s"https://twitter.com/intent/tweet?text=I just claimed my username ${username} on MantlePlace @AssetMantle $$MNTL. Claim yours at &url=https://marketplace.assetmantle.one&hashtags=DID&hashtags=InterNFT") { uri =>
         <a href='@uri' target="_blank">
-            <button class="form-primary-button">
+            <button class="form-secondary-button">
                 <span>
-                    <i class="bi bi-twitter iconBlack"></i>
+                    <i class="bi bi-twitter iconDefault"></i>
                 </span>
             </button>
         </a>
     }
+    @commonModalPrimaryButton(constants.View.SIGN_IN, constants.Form.SIGN_IN_WITH_CALLBACK.get)
 </div>

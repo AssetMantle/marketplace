@@ -1,4 +1,4 @@
-function submitForm(isModal, source, targetID) {
+function submitForm(refreshOverlay, source, targetID) {
     const target = '#' + targetID;
     const form = $(source).closest("form");
     if (validateForm(form)) {
@@ -25,7 +25,7 @@ function submitForm(isModal, source, targetID) {
                     replaceDocument(data);
                 },
                 206: function (data) {
-                    if (isModal === "true") {
+                    if (refreshOverlay === "true") {
                         $(".modalContainer").removeClass('active');
                         // setTimeout(function(){
                         $(target).html(data);
@@ -52,10 +52,10 @@ function submitForm(isModal, source, targetID) {
     }
 }
 
-function onKeyPress(event, isModal, source, targetID) {
+function onKeyPress(event, refreshOverlay, source, targetID) {
     if (event.keyCode === 13) {
         event.preventDefault();
-        submitForm(isModal, source, targetID);
+        submitForm(refreshOverlay, source, targetID);
     }
 }
 

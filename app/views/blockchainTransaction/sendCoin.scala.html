@@ -1,8 +1,9 @@
 @import views.blockchainTransaction.companion.SendCoin
 @import views.html.blockchainTransaction.commonSelectGas
 @import views.html.base.form._
+@import utilities.MicroNumber
 
-@(sendCoin: Form[SendCoin.Data] = SendCoin.form, fromAddress: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(sendCoin: Form[SendCoin.Data] = SendCoin.form, fromAddress: String, balance: MicroNumber)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.SEND_COIN, sendCoin) {
     @commonInputText(sendCoin, constants.FormField.FROM_ADDRESS, Symbol("value") -> fromAddress, Symbol("readonly") -> "readonly")

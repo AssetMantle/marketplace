@@ -3,7 +3,7 @@
 
 @(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div id="signUpForm">
-    @commonForm(constants.Form.SIGN_UP, signUpForm, isModal=true, submitDisable=true){
+    @commonForm(constants.Form.SIGN_UP, signUpForm, refreshOverlay = true, submitDisable = false) {
         <div class="modal-body">
             <div class="mb-3">
                 <div class="inputField">
@@ -19,8 +19,8 @@
                             <div id="checkIcon" class="fieldIcon checkIcon">
                                 <i class="bi bi-check-circle iconDefault iconMedium"></i>
                             </div>
-                            @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("class") -> "inputBox", Symbol("id") -> "signUpUsername", Symbol("autocomplete") -> "off", 'oninput -> """checkUsernameAvailable(this,'#USERNAME_AVAILABLE'); activeButton();""", Symbol("onblur") -> "changeFieldBorder()", Symbol("onfocus") -> "changeFieldBorder()")
-                            @commonFieldErrorMessage(id = "usernameAvailableError",message = Messages(constants.View.USERNAME_NOT_AVAILABLE))
+                            @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("class") -> "inputBox", Symbol("id") -> "signUpUsername", Symbol("autocomplete") -> "off", Symbol("oninput") -> """checkUsernameAvailable(this,'#USERNAME_AVAILABLE'); activeButton();""", Symbol("onblur") -> "changeFieldBorder()", Symbol("onfocus") -> "changeFieldBorder()")
+                            @commonFieldErrorMessage(id = "usernameAvailableError", message = Messages(constants.View.USERNAME_NOT_AVAILABLE))
                         </div>
                     </div>
                 </div>
@@ -29,7 +29,7 @@
             @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE, Symbol("class") -> "hidden")
 
             <div class="d-flex align-items-center mt-4">
-                @commonCheckbox(signUpForm, constants.FormField.SIGNUP_TERMS_CONDITIONS, 'id -> "termsCondition", 'oninput -> """activeButton()""")
+                @commonCheckbox(signUpForm, constants.FormField.SIGNUP_TERMS_CONDITIONS, Symbol("id") -> "termsCondition", Symbol("oninput") -> """activeButton()""")
                 <span class="termsConditionMessage">
                     <label for="termsCondition">
                     @Messages(constants.View.TERMS_CONDITION_MESSAGE)

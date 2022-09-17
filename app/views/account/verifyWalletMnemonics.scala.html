@@ -4,13 +4,13 @@
 @(walletMnemonicsForm: Form[VerifyMnemonics.Data] = VerifyMnemonics.form, username: String, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div>
-    @commonForm(constants.Form.VERIFY_WALLET_MNEMONICS, walletMnemonicsForm, isModal = true, showScreen = "#walletMnemonics", hideScreen = "#verificationForm") {
+    @commonForm(constants.Form.VERIFY_WALLET_MNEMONICS, walletMnemonicsForm, refreshOverlay = true, showScreen = "#walletMnemonics", hideScreen = "#verificationForm") {
 
         <div class="mb-3">
             <div class="inputField">
                 <div class="inputFieldBody">
                     <div class="usernameAvailability">
-                        @commonInputText(walletMnemonicsForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly")
+                    @commonInputText(walletMnemonicsForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly")
                     </div>
                 </div>
             </div>
@@ -20,7 +20,7 @@
             <div class="inputField">
                 <div class="inputFieldBody">
                     <div class="usernameAvailability">
-                        @commonInputText(walletMnemonicsForm, constants.FormField.CONFIRM_USERNAME)
+                    @commonInputText(walletMnemonicsForm, constants.FormField.CONFIRM_USERNAME, Symbol("value") -> username, Symbol("readonly") -> "readonly")
                     </div>
                 </div>
             </div>
@@ -77,16 +77,16 @@
         </div>
         <div class="d-flex mb-3 form-seed-box-list">
             <div class="form-seed-box">
-                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_1, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
+            @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_1, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
             </div>
             <div class="form-seed-box">
-                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_2, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
+            @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_2, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
             </div>
             <div class="form-seed-box">
-                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_3, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
+            @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_3, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
             </div>
             <div class="form-seed-box">
-                @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_4, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
+            @commonInputText(walletMnemonicsForm, constants.FormField.SEED_PHRASE_4, Symbol("class") -> "form-seed-box-phrase", Symbol("autocomplete") -> "off")
             </div>
         </div>
         <div class="d-flex align-items-center form-information-message">

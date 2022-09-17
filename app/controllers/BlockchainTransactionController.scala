@@ -50,15 +50,22 @@ class BlockchainTransactionController @Inject()(
     }
   }
 
-  def sendCoinForm(fromAddress: String): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.blockchainTransaction.sendCoin(fromAddress = fromAddress))
+  def sendCoinForm(fromAddress: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val balance = blockchainBalances.Service.get(fromAddress)
+      (for {
+        balance <- balance
+      } yield Ok(views.html.blockchainTransaction.sendCoin(fromAddress = fromAddress, balance = balance.fold(MicroNumber.zero)(_.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount))))
+        ).recover {
+        case _: BaseException => Ok(views.html.blockchainTransaction.sendCoin(SendCoin.form.withGlobalError(constants.Response.BALANCE_FETCH_FAILED.message), fromAddress = fromAddress, balance = MicroNumber.zero))
+      }
   }
 
   def sendCoin(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       SendCoin.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.blockchainTransaction.sendCoin(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.FROM_ADDRESS.name, ""))))
+          Future(BadRequest(views.html.blockchainTransaction.sendCoin(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.FROM_ADDRESS.name, ""), formWithErrors.data.get(constants.FormField.SEND_COIN_AMOUNT.name).fold(MicroNumber.zero)(MicroNumber(_)))))
         },
         sendCoinData => {
           val balance = blockchainBalances.Service.get(sendCoinData.fromAddress)
@@ -86,7 +93,7 @@ class BlockchainTransactionController @Inject()(
             sendCoin <- checkBalanceAndBroadcast(balance, validatePassword, key)
           } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(broadcasted = sendCoin.broadcasted, status = sendCoin.status, txHash = sendCoin.txHash, log = sendCoin.log.getOrElse("")))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.blockchainTransaction.sendCoin(SendCoin.form.withGlobalError(baseException.failure.message), sendCoinData.fromAddress))
+            case baseException: BaseException => BadRequest(views.html.blockchainTransaction.sendCoin(SendCoin.form.withGlobalError(baseException.failure.message), sendCoinData.fromAddress, sendCoinData.sendCoinAmount))
           }
         }
       )
