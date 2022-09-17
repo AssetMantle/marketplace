@@ -9,10 +9,10 @@ document.onload = function () {
     }
 }
 
-function loadMoreNFTs(collectionId) {
+function loadMoreNFTs(accountId, collectionId) {
     const loading = document.querySelector('.loading');
     if ($(".noNFT").length === 0) {
-        let route = jsRoutes.controllers.CollectionController.collectionNFTsPerPage(collectionId, $(".nftPage").length + 1);
+        let route = jsRoutes.controllers.WishlistController.collectionNFTsPerPage(accountId, collectionId, $(".nftPage").length + 1);
         $.ajax({
             url: route.url,
             type: route.type,

@@ -38,6 +38,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.WishlistController.wishlistSection,
         routes.javascript.WishlistController.collectionPerPage,
+        routes.javascript.WishlistController.viewCollectionNFTs,
         routes.javascript.WishlistController.collectionNFTs,
         routes.javascript.WishlistController.collectionNFTsPerPage,
 

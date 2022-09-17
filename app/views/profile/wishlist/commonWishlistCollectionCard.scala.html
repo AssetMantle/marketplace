@@ -1,6 +1,6 @@
-@(collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(accountId: String, collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<a onclick="viewWishListCollection('@collection.id')">
+<a onclick="viewWishListCollection('@accountId/wishListNFTs/@collection.id')">
     <div class="single-profile-card commonCollectionCard wishListCollection">
         <div class="profile-section">
             <div id="collectionCoverImage_@collection.id"></div>
