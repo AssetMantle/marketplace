@@ -81,14 +81,3 @@ function loadFirstNFTBulk(source, route, loadingSpinnerID = 'commonSpinner', eve
         }
     });
 }
-
-function checkAndLoadWishListCollectionNFTs(accountId, collectionId, collectionFileType) {
-    let commonContent = document.getElementById('centerContent');
-    if (commonContent === null) {
-        window.location = '/profile/' + accountId;
-    } else {
-        loadFirstNFTBulk('nftsPerPage', jsRoutes.controllers.WishlistController.collectionNFTsPerPage(accountId, collectionId, 1));
-        checkAndPushState(jsRoutes.controllers.WishlistController.viewCollectionNFTs(accountId, collectionId).url, (accountId + '/wishListNFTs/' + collectionId), "wishListCollection");
-        getImage(jsRoutes.controllers.CollectionController.collectionFile(collectionId, collectionFileType, false), ('collectionUncompressedCoverImage_' + collectionId));
-    }
-}

@@ -1,5 +1,6 @@
 @import views.html.profile.wishlist.commonWishlistCollectionCard
 @import controllers.actions.LoginState
+@import views.html.base.buttons.commonPrimaryCallButton
 
 @(accountId: String, collections: Seq[master.Collection])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
@@ -11,13 +12,12 @@
             </div>
         }
     } else {
-        <div class="noCollection"></div>
+        <div class="noCollectionLeft"></div>
+        <div id="noCollection" class="hidden">
+            @Messages(constants.View.NO_NFTS_LIKED)
+            @commonPrimaryCallButton(constants.View.EXPLORE, routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION))
+        </div>
     }
 </div>
-<script>
-        $(document).ready(function () {
-            if ($(".wishlistCollectionsPerPage .singleCollection").length <= 5) {
-                $("#loadMoreBtnContainer").addClass("hide");
-            }
-        });
-</script>
+<script src="@routes.Assets.versioned("javascripts/profile/wishlist/collectionPerPage.js")" type="text/javascript"></script>
+<script>checkNoCollection()</script>

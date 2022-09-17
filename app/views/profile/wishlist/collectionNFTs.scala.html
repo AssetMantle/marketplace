@@ -31,4 +31,8 @@
     </div>
 </div>
 <script src="@routes.Assets.versioned("javascripts/profile/wishlist/nftLoadMore.js")" type="text/javascript"></script>
-<script>checkAndLoadWishListCollectionNFTs('@accountId', '@collection.id', '@constants.Collection.File.COVER')</script>
+<script>
+     loadFirstNFTBulk('nftsPerPage', jsRoutes.controllers.WishlistController.collectionNFTsPerPage('@accountId', '@collection.id', 1));
+     checkAndPushState(jsRoutes.controllers.WishlistController.viewCollectionNFTs('@accountId', '@collection.id').url, ('@accountId' + '/wishListNFTs/' + '@collection.id'), "wishListCollection");
+     getImage(jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.Collection.File.COVER', false), ('collectionUncompressedCoverImage_' + '@collection.id'));
+</script>

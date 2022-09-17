@@ -1,0 +1,7 @@
+@(name: String, call: Call, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<a href="@call.url">
+<button type="button" class="@Seq("form-primary-button", arguments.toMap.get(Symbol("class")).map(_.toString).getOrElse("")).mkString(" ")" id='@arguments.toMap.get(Symbol("id")).map(_.toString).getOrElse("")'>
+    @Messages(name)
+</button>
+</a>
