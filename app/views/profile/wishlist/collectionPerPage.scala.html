@@ -1,12 +1,13 @@
 @import views.html.profile.wishlist.commonWishlistCollectionCard
+@import controllers.actions.LoginState
 
-@(collections: Seq[master.Collection])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(accountId: String, collections: Seq[master.Collection])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 <div class="m-0 p-0 collectionPage wishlistCollectionsPerPage">
     @if(collections.nonEmpty) {
         @collections.map { collection =>
             <div class="mt-3 singleCollection">
-                @commonWishlistCollectionCard(collection)
+                @commonWishlistCollectionCard(accountId, collection)
             </div>
         }
     } else {

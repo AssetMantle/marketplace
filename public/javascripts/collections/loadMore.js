@@ -9,23 +9,12 @@ document.onload = function () {
     }
 }
 
-clicked = false;
-
 function loadMoreCollections() {
     const loading = document.querySelector('.loading');
     if ($(".noCollection").length === 0) {
         const activeSection = $.trim($("#sectionMenu").find(".menuItem.active").attr('id'));
-        let route = "";
-        let loadMore = "";
-        switch (activeSection) {
-            case "art":
-                route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
-                loadMore = $(".collectionsPerPage");
-                break;
-            default:
-                break;
-        }
-
+        let route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
+        let loadMore = $(".collectionsPerPage");
         $.ajax({
             url: route.url,
             type: route.type,
@@ -51,23 +40,12 @@ function loadMoreCollections() {
                     if ($(".noCollection").length !== 0) {
                         $("#loadMoreBtnContainer").addClass("hide");
                     }
-                    clicked = false;
                 }
             }
         });
     } else {
-        console.log("NO COLLECTION LEFT")
         $(".collectionPage:last").css("margin-top", "0px");
         $("#loadMoreBtnContainer").addClass("hide");
-    }
-}
-
-collectionPageTimeout = 0;
-
-function onLoadMoreClick() {
-    if (!clicked) {
-        clicked = true;
-        loadMoreCollections();
     }
 }
 

@@ -9,13 +9,11 @@ document.onload = function () {
     }
 }
 
-function loadMoreCollections() {
+function loadMoreCollections(accountId) {
     const loading = document.querySelector('.loading');
     if ($(".noCollection").length === 0) {
-        const activeSection = $.trim($("#sectionMenu").find(".menuItem.active").attr('id'));
-        let route = jsRoutes.controllers.WishlistController.collectionPerPage($(".wishlistCollectionsPerPage").length + 1);
-        let loadMore = $(".collectionsPerPage");
-
+        let route = jsRoutes.controllers.WishlistController.collectionPerPage(accountId, ($(".wishlistCollectionsPerPage").length + 1));
+        console.log(route.url)
         $.ajax({
             url: route.url,
             type: route.type,
@@ -37,7 +35,7 @@ function loadMoreCollections() {
             },
             statusCode: {
                 200: function (data) {
-                    loadMore.append(data);
+                    $(".collectionsPerPage").append(data);
                     if ($(".noCollection").length !== 0) {
                         $("#loadMoreBtnContainer").addClass("hide");
                     }

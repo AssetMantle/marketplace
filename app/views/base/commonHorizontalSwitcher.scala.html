@@ -54,13 +54,7 @@
     </div>
     @* @commonSpinner(items.hashCode().toString)*@
 </div>
-<script>
-        let switcherId = 'commonHorizontalSwitcher_@items.keys.mkString("_")';
-        let firstTabEl = document.querySelector('#' + switcherId + ' li:first-child a')
-        let firstTab = new bootstrap.Tab(firstTabEl)
-
-        firstTab.show()
-</script>
+<script>switcher('commonHorizontalSwitcher_@items.keys.mkString("_")')</script>
 @*Example Usage: @commonHorizontalSwitcher(
 ListMap(
 "HEADER_1" -> views.html.component.master.scalaTemplate("parameters"),

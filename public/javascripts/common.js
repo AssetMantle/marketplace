@@ -13,14 +13,14 @@ $(document).on('hide.bs.modal', '.modal', function () {
 });
 
 // Show wallet popup
-function showWallet(){
+function showWallet() {
     $("#walletPopup").addClass("active");
     $("#walletBackDrop").addClass("active");
     $("body").addClass("modal-open");
 }
 
 // Close wallet popup
-function closeWallet(){
+function closeWallet() {
     $("#walletPopup").removeClass("active");
     $("#walletBackDrop").removeClass("active");
     $("body").removeClass("modal-open");
@@ -129,4 +129,11 @@ function callSnackBar(message) {
 
 function loadSwitcherContent(divID) {
     $('#' + divID).click();
+}
+
+function switcher(id) {
+    let firstTabEl = document.querySelector('#' + id + ' li:first-child a')
+    let firstTab = new bootstrap.Tab(firstTabEl)
+
+    firstTab.show()
 }

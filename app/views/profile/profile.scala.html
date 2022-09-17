@@ -14,21 +14,24 @@
                             ListMap(
                                 constants.View.WHITELIST -> routes.javascript.WhitelistController.whitelistSection,
                                 constants.View.WISHLIST -> routes.javascript.WishlistController.wishlistSection
-                            )
+                            ),
+                            Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
                         )
                     } else {
                         @commonHorizontalSwitcher(
                             ListMap(
-                                constants.View.WISHLIST -> views.html.base.modal.errorModal("failed")
-                            )
+                                constants.View.WISHLIST -> routes.javascript.WishlistController.wishlistSection
+                            ),
+                            Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
                         )
                     }
                 }
                 case _ => {
                     @commonHorizontalSwitcher(
                         ListMap(
-                            constants.View.WISHLIST -> views.html.base.modal.errorModal("failed")
-                        )
+                            constants.View.WISHLIST -> routes.javascript.WishlistController.wishlistSection
+                        ),
+                        Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
                     )
                 }
             }

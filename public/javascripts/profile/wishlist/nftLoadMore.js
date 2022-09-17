@@ -9,10 +9,10 @@ document.onload = function () {
     }
 }
 
-function loadMoreNFTs(collectionId) {
+function loadMoreNFTs(accountId, collectionId) {
     const loading = document.querySelector('.loading');
     if ($(".noNFT").length === 0) {
-        let route = jsRoutes.controllers.CollectionController.collectionNFTsPerPage(collectionId, $(".nftPage").length + 1);
+        let route = jsRoutes.controllers.WishlistController.collectionNFTsPerPage(accountId, collectionId, $(".nftPage").length + 1);
         $.ajax({
             url: route.url,
             type: route.type,
@@ -80,4 +80,15 @@ function loadFirstNFTBulk(source, route, loadingSpinnerID = 'commonSpinner', eve
             }
         }
     });
+}
+
+function checkAndLoadWishListCollectionNFTs(accountId, collectionId, collectionFileType) {
+    let commonContent = document.getElementById('centerContent');
+    if (commonContent === null) {
+        window.location = '/profile/' + accountId;
+    } else {
+        loadFirstNFTBulk('nftsPerPage', jsRoutes.controllers.WishlistController.collectionNFTsPerPage(accountId, collectionId, 1));
+        checkAndPushState(jsRoutes.controllers.WishlistController.viewCollectionNFTs(accountId, collectionId).url, (accountId + '/wishListNFTs/' + collectionId), "wishListCollection");
+        getImage(jsRoutes.controllers.CollectionController.collectionFile(collectionId, collectionFileType, false), ('collectionUncompressedCoverImage_' + collectionId));
+    }
 }

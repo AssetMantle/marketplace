@@ -1,3 +1,9 @@
+$(document).ready(function () {
+    if ($(".nftPage .singleNFTCard").length <= 5) {
+        $("#loadMoreBtnContainer").addClass("hide");
+    }
+});
+
 function updateWishlist() {
     $(".nft-likes").each(function () {
         wishlistCounter(this, jsRoutes.controllers.NFTController.likesCounter($(this).attr("data-id")));
