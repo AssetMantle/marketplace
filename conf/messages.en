@@ -527,3 +527,4 @@ SELECT_ERROR_PREFIX.GAS_PRICE=Invalid gas price selection.
 RESPONSE.FAILURE.CONNECT_EXCEPTION=Unable to connect to blockchain!
 NO_NFTS_LIKED=No NFTs liked!
 SEND_COIN_AVAILABLE_BALANCE=Balance: {0} MNTL
+ADDRESS_COPIED=Address Copied!
