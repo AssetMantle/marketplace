@@ -1,4 +1,4 @@
-@mixin setFont($type, $style, $weight, $size, $lineHeight, $color){
+@mixin setFont($type, $style, $weight, $size, $lineHeight, $color) {
   font-family: $type;
   font-style: $style;
   font-weight: $weight;
@@ -6,11 +6,13 @@
   line-height: $lineHeight;
   color: $color;
 }
-.icon{
+
+.icon {
   height: 20px;
   width: 20px;
 }
-.primaryButton{
+
+.primaryButton {
   @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--button-text));
   text-align: center;
   text-transform: capitalize;
@@ -24,11 +26,13 @@
   border-radius: 32px;
   padding: 9px 0;
   background-color: var(--default);
-  &:hover{
+
+  &:hover {
     box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.5);
   }
 }
-.secondaryButton{
+
+.secondaryButton {
   @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--dark));
   text-align: center;
   text-transform: capitalize;
@@ -40,28 +44,33 @@
   overflow: hidden;
   position: relative;
   z-index: 950;
-  &:hover{
+
+  &:hover {
     box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.3);
   }
 }
-.separator{
+
+.separator {
   height: 2px;
   width: calc(100% + 41px);
   background-color: #383838;
   margin: 20px -20px 20px;
 }
-.innerSeparator{
+
+.innerSeparator {
   height: 2px;
   width: 100%;
   background-color: #383838;
   margin: 16px 0px;
 }
-.headerWithBackButton{
-  .headerTitle{
+
+.headerWithBackButton {
+  .headerTitle {
     @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
   }
 }
-.right-menu .links li.user-wallet .walletPopup{
+
+.right-menu .links li.user-wallet .walletPopup {
   text-transform: none;
   width: 312px;
   position: absolute;
@@ -73,7 +82,8 @@
   visibility: hidden;
   transition: all 0.3s ease;
   cursor: auto;
-  &::before{
+
+  &::before {
     content: '';
     border-left: 9px solid transparent;
     border-right: 9px solid transparent;
@@ -82,98 +92,146 @@
     top: -9px;
     right: 35px;
   }
-  &.active{
+
+  &.active {
     top: 70px;
     opacity: 1;
     visibility: visible;
     //transition: all 0.3s ease;
   }
 
-.walletPopupContainer{
-  background: var(--popup-bg);
-  border: 2px solid var(--popup-stroke);
-  border-radius: 20px;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
-  .headerContainer{
-    .userDetails{
-      .userName{
-        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--default));
+  .walletPopupContainer {
+    background: var(--popup-bg);
+    border: 2px solid var(--popup-stroke);
+    border-radius: 20px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+
+    .headerContainer {
+      .userDetails {
+        .userName {
+          @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--default));
+        }
+
+        .userBalance {
+          @include setFont(var(--font-type-2), normal, 600, 14px, 17px, var(--text-medium));
+
+          .start {
+            @include setFont(var(--font-type-2), normal, 700, 16px, 17px, var(--text-medium));
+          }
+
+          .end {
+            @include setFont(var(--font-type-2), normal, 700, 12px, 17px, var(--text-medium));
+          }
+        }
       }
-      .userBalance{
+    }
+
+    .userAddressBox {
+      background-color: var(--card-dark);
+      border-radius: 8px;
+      line-height: 0;
+
+      .userAddressData {
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+        word-break: break-word;
+      }
+
+      .copyIcon {
+        padding: 4px 0 0 0;
+        cursor: pointer;
+      }
+    }
+
+    .buttons {
+      line-height: 0px;
+    }
+  }
+
+  .detailContainer {
+    margin: 24px 0px 12px 0px;
+
+    .userDetails {
+      .userName {
+        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+      }
+
+      .userBalance {
         @include setFont(var(--font-type-2), normal, 600, 14px, 17px, var(--text-medium));
-        .start{
+
+        .start {
           @include setFont(var(--font-type-2), normal, 700, 16px, 17px, var(--text-medium));
         }
-        .end{
+
+        .end {
           @include setFont(var(--font-type-2), normal, 700, 12px, 17px, var(--text-medium));
         }
       }
     }
-  }
-}
-.detailContainer{
-  margin: 24px 12px;
-  .userDetails{
-    .userName{
-      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
-    }
-    .userBalance{
-      @include setFont(var(--font-type-2), normal, 600, 14px, 17px, var(--text-medium));
-      .start{
-        @include setFont(var(--font-type-2), normal, 700, 16px, 17px, var(--text-medium));
-      }
-      .end{
-        @include setFont(var(--font-type-2), normal, 700, 12px, 17px, var(--text-medium));
-      }
-    }
-  }
-  .userAddressBox{
-    background-color: var(--card-dark);
-    border-radius: 8px;
-    line-height: 0;
-    .userAddressData {
-      @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
-      word-break: break-word;
-    }
-    .copyIcon {
-      padding: 4px 0 0 0;
-      cursor: pointer;
-    }
-  }
 
-    .walletMessage{
+    .userAddressBox {
+      background-color: var(--card-dark);
+      border-radius: 8px;
+      line-height: 0;
+
+      .userAddressData {
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+        word-break: break-word;
+      }
+
+      .copyIcon {
+        padding: 4px 0 0 0;
+        cursor: pointer;
+      }
+    }
+
+    .walletMessage {
       @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
       margin-bottom: 32px;
     }
-    .buttons{
-      line-height: 0px;
+
+    .bottomOption {
+      a {
+        width: 32px;
+        height: 0px;
+        line-height: 0px;
+      }
     }
-  .bottomOption{
-    a{
-      width: 32px;
-      height: 0px;
-      line-height:0px;
+
+    .menuList {
+      .menuItem {
+        height: 16px;
+        a {
+          height: 0px;
+          .profileMenuLabel{
+            @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--mantle-off-white));
+            text-transform: capitalize;
+          }
+        }
+      }
     }
   }
-  }
-  .nftLink{
-    div{
+
+  .nftLink {
+    div {
       line-height: 0px;
       @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--mantle-off-white));
       text-transform: capitalize;
     }
   }
-  .icon{
+
+  .icon {
     height: 20px;
     width: 20px;
     cursor: pointer;
   }
-  #openWalletMenu{
+
+  #openWalletMenu {
     cursor: pointer;
   }
-  .walletMenu{
+
+  .walletMenu {
     height: 460px;
     width: 254px;
     position: absolute;
@@ -185,25 +243,31 @@
     padding: 20px;
     line-height: 0px;
     transition: right 0.3s ease;
-    &.open{
+
+    &.open {
       right: 0px;
     }
-    .topMenu{
+
+    .topMenu {
       margin-top: 24px;
-      .menuItem{
+
+      .menuItem {
         @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
         cursor: pointer;
       }
     }
-    .bottomMenu{
+
+    .bottomMenu {
       padding-bottom: 20px;
-      .menuItem{
+
+      .menuItem {
         @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
         cursor: pointer;
       }
     }
   }
-  .addressBook{
+
+  .addressBook {
     height: 450px;
     width: 274px;
     position: absolute;
@@ -215,25 +279,29 @@
     padding: 20px;
     line-height: 0px;
     transition: right 0.3s ease;
-    &.open{
+
+    &.open {
       right: 0px;
     }
 
-    .walletAddressList{
-      height: 150px;
+    .walletAddressList {
+      height: 215px;
       overflow-y: auto;
       padding-right: 12px;
       margin-bottom: 24px;
-      .walletAddressItem{
+
+      .walletAddressItem {
         padding: 12px 0px;
         border-bottom: 2px solid var(--line);
-        .walletAddressLabel{
+
+        .walletAddressLabel {
           @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
           display: inline-block;
           cursor: pointer;
           transition: all 0.3s;
         }
-        input[type="radio"]{
+
+        input[type="radio"] {
           cursor: pointer;
           appearance: none;
           width: 20px;
@@ -244,7 +312,8 @@
           transform: translateY(-0.075em);
           display: grid;
           place-content: center;
-          &::before{
+
+          &::before {
             content: "";
             width: 12px;
             height: 12px;
@@ -253,23 +322,28 @@
             transition: 120ms transform ease-in-out;
             box-shadow: inset 1em 1em var(--default);
           }
-          &:checked{
+
+          &:checked {
             border-color: var(--default);
-            + label{
+
+            + label {
               @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--default));
             }
           }
-          &:checked::before{
+
+          &:checked::before {
             transform: scale(1);
           }
-          &:focus{
+
+          &:focus {
             outline: none;
           }
         }
       }
     }
-    .bottomMenu{
-      .primaryButton{
+
+    .bottomMenu {
+      .primaryButton {
         background-color: transparent;
         color: var(--default);
         border: none;
@@ -278,7 +352,8 @@
     }
   }
 }
-#walletBackDrop{
+
+#walletBackDrop {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -295,15 +370,16 @@
   transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
   z-index: 9998;
   cursor: auto;
-  &.active{
+
+  &.active {
     opacity: 1;
     visibility: visible;
   }
 }
 
 // User Profile Menu
-.right-menu .links li.userProfile{
-  .profileMenu{
+.right-menu .links li.userProfile {
+  .profileMenu {
     text-transform: none;
     background: var(--popup-bg);
     border: 2px solid var(--popup-stroke);
@@ -315,12 +391,13 @@
     top: 90px;
     transform: translateX(-73px);
     //z-index: -1;
-    z-index:99;
+    z-index: 99;
     padding: 20px;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
     cursor: auto;
+
     &::before {
       content: '';
       border-left: 9px solid transparent;
@@ -330,37 +407,47 @@
       top: -11px;
       right: 30px;
     }
-    .detailContainer{
+
+    .detailContainer {
       margin: 12px;
-      .userDetails{
+
+      .userDetails {
         margin-bottom: 32px;
-        .userName{
+
+        .userName {
           @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
         }
-        .userBalance{
+
+        .userBalance {
           @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--text-medium));
         }
       }
-      .profileMenuItem{
+
+      .profileMenuItem {
         padding: 16px 0px !important;
-        border-bottom: 2px solid #383838 ;
+        border-bottom: 2px solid #383838;
         cursor: pointer;
+
         .profileItemLink {
           gap: 12px;
+
           .profileMenuLabel {
             @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--mantle-off-white));
             text-transform: capitalize;
           }
         }
-        &:last-child{
+
+        &:last-child {
           padding-bottom: 0px !important;
-          border: none ;
+          border: none;
         }
       }
+
     }
   }
-  &:hover{
-    .profileMenu{
+
+  &:hover {
+    .profileMenu {
       top: 70px;
       opacity: 1;
       visibility: visible;
@@ -368,9 +455,9 @@
   }
 }
 
-#modal-content{
-  .walletPopupContainer{
-    border:none;
+#modal-content {
+  .walletPopupContainer {
+    border: none;
     margin: -32px;
     border-radius: 10px;
   }

@@ -9,41 +9,47 @@
             <div class="ms-2 d-flex flex-column justify-content-between">
                 <a href="@routes.ProfileController.viewProfile(loginState.username)" class="d-flex flex-row align-items-center p-0 profileItemLink">
                     <div class="userName">@loginState.username</div>
+                    <i class="bi bi-chevron-right align-self-end mt-1 iconDefault iconSmall"></i>
                 </a>
                 <div class="userBalance" id="walletBalance_@loginState.address"></div>
             </div>
         </div>
         <i id="openWalletMenu" class="bi bi-list iconDefault iconLarge" onclick="openCloseWalletScreen(this, 'addressBook')"></i>
     </div>
-
+    <div class="row p-2 mx-0 mt-3 justify-content-between align-items-center userAddressBox">
+        <div class="col-10 p-0 userAddressData username-data" data-value="@loginState.address">@loginState.address</div>
+        <div class="col-2 text-end copyIcon" onclick="copyToClipboard(this); callSnackBar('@Messages(constants.View.ADDRESS_COPIED)');">
+            <i id="openWalletMenu" class="bi bi-files iconDefault iconMedium"></i>
+        </div>
+    </div>
+    <div class="d-flex justify-content-around text-center mt-3 buttons">
+        <a href="https://app.osmosis.zone/?from=USDC&to=MNTL" target="_blank"><button class="secondaryButton">@Messages(constants.View.BUY_MORE)</button></a>
+        @commonFormButton(constants.Form.SEND_COIN, Symbol("parameters") -> s"'${loginState.address}'", Symbol("class") -> "primaryButton")
+    </div>
     <div class="separator"></div>
 
     <div class="detailContainer">
-        <div class="row p-2 mx-0 mt-4 justify-content-between align-items-center userAddressBox">
-            <div class="col-10 p-0 userAddressData username-data" data-value="@loginState.address">@loginState.address</div>
-            <div class="col-2 text-end copyIcon" onclick="copyToClipboard(this); callSnackBar('@Messages(constants.View.ADDRESS_COPIED)');">
-                <i id="openWalletMenu" class="bi bi-files iconDefault iconMedium"></i>
-            </div>
-        </div>
-        <div class="innerSeparator"></div>
-        <div id="walletBalance_@loginState.address"></div>
-        <div class="d-flex justify-content-around text-center buttons">
-            <a href="https://app.osmosis.zone/?from=USDC&to=MNTL" target="_blank"><button class="secondaryButton">@Messages(constants.View.BUY_MORE)</button></a>
-            @commonFormButton(constants.Form.SEND_COIN, Symbol("parameters") -> s"'${loginState.address}'", Symbol("class") -> "primaryButton")
-        </div>
-        <div class="innerSeparator"></div>
-        <div class="d-flex justify-content-between mt-4 bottomOption">
-            <div class="d-flex">
-                <a href="@routes.ProfileController.viewProfile(loginState.username)">
+        <div class="menuList">
+            <div class="menuItem">
+                <a href="@routes.ProfileController.viewProfile(loginState.username)" class="d-flex gap-3">
                     <i class="bi bi-wallet2 iconDefault icon"></i>
-                </a>
-                <a href="@routes.SettingController.viewSettings()">
-                    <i class="bi bi-gear iconDefault icon"></i>
+                    <div class="profileMenuLabel">@Messages(constants.View.PROFILE)</div>
                 </a>
             </div>
-            <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))">
-                <i class="bi bi-box-arrow-right iconDefault logout"></i>
-            </a>
+            <div class="innerSeparator"></div>
+            <div class="menuItem">
+                <a href="@routes.SettingController.viewSettings()" class="d-flex gap-3">
+                    <i class="bi bi-gear iconDefault icon"></i>
+                    <div class="profileMenuLabel">@Messages(constants.View.SETTINGS)</div>
+                </a>
+            </div>
+            <div class="innerSeparator"></div>
+            <div class="menuItem">
+                <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))" class="d-flex gap-3">
+                    <i class="bi bi-box-arrow-right iconDefault icon"></i>
+                    <div class="profileMenuLabel">@Messages(constants.View.SIGN_OUT)</div>
+                </a>
+            </div>
         </div>
     </div>
 
