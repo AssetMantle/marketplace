@@ -21,13 +21,3 @@
         </div>
     </div>
 }
-<script>
-        $("#formSubmitButton .buttonPrimary").addClass("disable");
-        $("#changeKeyAddress, #changeKeyName").keyup(function (){
-            if ($.trim(changeKeyAddress.value).length && $.trim(changeKeyName.value).length) {
-                $("#formSubmitButton .buttonPrimary").removeClass("disable");
-            } else {
-                $("#formSubmitButton .buttonPrimary").addClass("disable");
-            }
-        });
-</script>
