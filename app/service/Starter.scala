@@ -21,6 +21,7 @@ class Starter @Inject()(
                          masterCollections: master.Collections,
                          masterCollectionFiles: master.CollectionFiles,
                          masterNFTs: master.NFTs,
+                         masterWishLists: master.WishLists,
                          utilitiesOperations: utilities.Operations,
                        )(implicit exec: ExecutionContext, configuration: Configuration) {
 
@@ -167,9 +168,19 @@ class Starter @Inject()(
   } else Future()
 
 
-  def deleteCollections(): Future[Int] = {
+  def deleteCollections(): Future[Unit] = {
     val list = Seq("B1A4A6A989455917", "CBDE9E9300694D6C", "F88532DDCDDBEC96", "B04D4A86A96A87DD", "EB588A50A90A67E4", "988DDCCB136744F8")
-    masterCollections.Service.deleteById(list)
+    val deleteWishlist = masterWishLists.Service.deleteCollections(list)
+
+    def deleteNfts() = masterNFTs.Service.deleteCollections(list)
+
+    def deleteCollections() = masterCollections.Service.deleteById(list)
+
+    for {
+      _ <- deleteWishlist
+      _ <- deleteNfts()
+      _ <- deleteCollections()
+    } yield ()
   }
 
   def updateCollections(): Future[Unit] = {
