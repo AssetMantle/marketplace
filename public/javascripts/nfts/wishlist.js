@@ -29,7 +29,7 @@ function wishlistCounter(source, route) {
 
 updateWishlist();
 
-function wishlist(route, wishlistButton) {
+function wishlist(route, wishlistButton, snackBarMessage) {
     $.ajax({
         url: route.url,
         type: route.type,
@@ -38,8 +38,8 @@ function wishlist(route, wishlistButton) {
             200: function () {
                 let parent = $(wishlistButton).parent();
                 let counter = parent.find(".nft-likes");
+                callSnackBar(snackBarMessage);
                 setTimeout(() => {
-                    console.log($(counter).attr("data-id"));
                     wishlistCounter(counter, jsRoutes.controllers.NFTController.likesCounter($(counter).attr("data-id")));
                 }, 5000);
             },
@@ -53,13 +53,13 @@ function wishlist(route, wishlistButton) {
     });
 }
 
-function addRemoveWishlist(element, NFTId) {
+function addRemoveWishlist(element, NFTId, addMessage, removedMessage) {
     let wishlistIcon = $(element).children(".addToWishlist");
     if (!$(wishlistIcon).hasClass("clicked")) {
-        wishlist(jsRoutes.controllers.NFTController.addToWishList(`${NFTId}`), element);
+        wishlist(jsRoutes.controllers.NFTController.addToWishList(`${NFTId}`), element, addMessage);
         $(wishlistIcon).addClass("clicked");
     } else {
-        wishlist(jsRoutes.controllers.NFTController.deleteFromWishList(`${NFTId}`), element);
+        wishlist(jsRoutes.controllers.NFTController.deleteFromWishList(`${NFTId}`), element, removedMessage);
         $(wishlistIcon).removeClass("clicked");
     }
 }
