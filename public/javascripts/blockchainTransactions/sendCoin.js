@@ -29,3 +29,7 @@ function setOption(element, optionIndex) {
     $(element).addClass("active");
     $('#GAS_PRICE option:eq(' + optionIndex + ')').prop('selected', true);
 }
+// Set Available Balance
+function setAvailableBalance(targetFieldId, amount){
+    $("#"+targetFieldId).val(amount);
+}

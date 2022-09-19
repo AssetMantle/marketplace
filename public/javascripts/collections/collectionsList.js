@@ -25,3 +25,9 @@ function changeActive(section) {
     }
     changeSectionHighlight(currentSection);
 }
+
+function checkNumberOfCollections(){
+    if ($(".collectionsPerPage .singleCollection").length <= 5) {
+        $("#loadMoreBtnContainer").addClass("hide");
+    }
+}
