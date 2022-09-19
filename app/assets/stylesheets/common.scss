@@ -543,3 +543,82 @@
     }
   }
 }
+// Snackbar
+.snackbar {
+  position: fixed;
+  top: 85px;
+  right: 30px;
+  border-radius: 10px;
+  background: var(--popup-bg);
+  padding: 20px 20px 20px 28px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.75);
+  overflow: hidden;
+  transform: translateX(calc(100% + 30px));
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.35);
+  z-index: 9999;
+
+  &.active {
+    transform: translateX(0%);
+  }
+
+  .snackbarContent {
+    display: flex;
+    align-items: center;
+
+    .icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      min-width: 40px;
+      background-color: var(--card-dark);
+      font-size: 20px;
+      border-radius: 50%;
+    }
+
+    .snackbarMessage {
+      display: flex;
+      flex-direction: column;
+      margin: 0 8px;
+
+      .snackbarTitle {
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+      }
+
+      .snackbarDescription {
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
+      }
+    }
+  }
+
+  .snackbarProgress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background-color: var(--popup-bg);
+
+    &:before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0%;
+      height: 100%;
+      width: 100%;
+      background-color: var(--default);
+      display: none;
+    }
+
+    &.active:before {
+      animation: progress 3s linear forwards;
+      display: block;
+    }
+
+    @keyframes progress {
+      100% {
+        left: 100%;
+      }
+    }
+  }
+}
