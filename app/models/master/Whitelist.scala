@@ -113,5 +113,7 @@ class Whitelists @Inject()(
 
     def deleteById(id: String): Future[Int] = delete(id)
 
+    def hasWhitelist(accountId: String): Future[Boolean] = filter(_.ownerId === accountId).map(_.nonEmpty)
+
   }
 }
