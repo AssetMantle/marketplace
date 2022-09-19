@@ -23,6 +23,7 @@ class ProfileController @Inject()(
                                    withoutLoginAction: WithoutLoginAction,
                                    masterAccounts: master.Accounts,
                                    masterWhitelists: master.Whitelists,
+                                   masterCollections: master.Collections,
                                    masterWhitelistMembers: master.WhitelistMembers,
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -45,6 +46,16 @@ class ProfileController @Inject()(
 
   def profile(accountId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.profile.profile(accountId: String)))
+      val isCreator = if (loginState.isDefined && loginState.fold("")(_.username) == accountId) masterCollections.Service.isCreator(accountId) else Future(false)
+      val hasWhitelist = if (loginState.isDefined && loginState.fold("")(_.username) == accountId) masterWhitelists.Service.hasWhitelist(accountId) else Future(false)
+
+      (for {
+        isCreator <- isCreator
+        hasWhitelist <- hasWhitelist
+      } yield Ok(views.html.profile.profile(accountId: String, isCreator = isCreator, hasWhitelist = hasWhitelist))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+
   }
 }
