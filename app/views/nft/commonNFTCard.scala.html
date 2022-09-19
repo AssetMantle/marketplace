@@ -25,7 +25,7 @@
                 </div>
                 @if(loginState.nonEmpty) {
                     <div class="d-flex align-items-center gap-1 mt-3">
-                        <span onclick="addRemoveWishlist(this, '@nft.fileName')">
+                        <span onclick="addRemoveWishlist(this, '@nft.fileName', '@Messages(constants.View.ADDED_TO_WISHLIST)', '@Messages(constants.View.REMOVED_FROM_WISHLIST)')">
                         @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
                         </span>
                         <div class="nft-likes" data-id="@nft.fileName">00</div>
