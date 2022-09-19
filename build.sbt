@@ -1,12 +1,14 @@
 name := "MantlePlace"
 
+maintainer := "admin@assetmantle.one"
+
 libraryDependencies ++= Seq(
   guice,
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
 )
 scalaVersion := "2.13.8"
 
-version := "0.1.2"
+version := "0.1.4"
 
 lazy val GatlingTest = config("gatling") extend Test
 
