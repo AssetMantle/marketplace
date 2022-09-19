@@ -139,19 +139,30 @@ function switcher(id) {
 }
 
 // Snackbar
-function showSnackbar(){
-    const toast = document.querySelector(".snackbar");
-    const progress = document.querySelector(".snackbarProgress");
-    let timer1, timer2;
+// function showSnackbar(){
+//     const toast = document.querySelector(".snackbar");
+//     const progress = document.querySelector(".snackbarProgress");
+//     let timer1, timer2;
+//
+//     toast.classList.add("active");
+//     progress.classList.add("active");
+//
+//     timer1 = setTimeout(() => {
+//         toast.classList.remove("active");
+//     }, 3000);
+//
+//     timer2 = setTimeout(() => {
+//         progress.classList.remove("active");
+//     }, 3300);
+// }
 
-    toast.classList.add("active");
-    progress.classList.add("active");
+function showSnackbar(title, message, status) {
+    let configs = {
+        title:title,
+        message:message,
+        status: status,
+        timeout: 300000
+    }
 
-    timer1 = setTimeout(() => {
-        toast.classList.remove("active");
-    }, 3000);
-
-    timer2 = setTimeout(() => {
-        progress.classList.remove("active");
-    }, 3300);
+    Toast.create(configs);
 }

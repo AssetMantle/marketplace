@@ -544,10 +544,18 @@
   }
 }
 // Snackbar
-.snackbar {
+.snackbarList{
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
   position: fixed;
   top: 85px;
   right: 30px;
+}
+.snackbar {
+  //position: fixed;
+  //top: 85px;
+  //right: 30px;
   border-radius: 10px;
   background: var(--popup-bg);
   padding: 20px 20px 20px 28px;
@@ -618,6 +626,88 @@
     @keyframes progress {
       100% {
         left: 100%;
+      }
+    }
+  }
+}
+
+#toastContainer{
+  position: fixed !important;
+  top: 85px !important;
+  right: 15px !important;
+  margin: 0px !important;
+  .toast{
+    border-radius: 10px;
+    background: var(--popup-bg);
+    padding: 20px 20px 20px 28px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25) !important;
+    border:none;
+    overflow: hidden;
+    .toast-header{
+      background: var(--popup-bg);
+      padding: 0px;
+      border-bottom: none;
+      .status-icon{
+        &.text-success{
+          color: var(--connected) !important;
+        }
+        &.text-danger{
+          color: var(--error) !important;
+        }
+        &.text-warning{
+          color: var(--default) !important;
+        }
+        &.text-info{
+          color: var(--icon-white) !important;
+        }
+      }
+      .status-icon{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        min-width: 40px;
+        background-color: var(--card-dark);
+        font-size: 20px;
+        border-radius: 50%;
+      }
+      .toast-title{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+      }
+      .toast-body{
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
+        margin-top: 8px;
+        padding: 0px;
+      }
+      .snackbarProgress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 100%;
+        background-color: var(--popup-bg);
+
+        &:before {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0%;
+          height: 100%;
+          width: 100%;
+          background-color: var(--default);
+          display: none;
+        }
+
+        &.active:before {
+          animation: progress 3s linear forwards;
+          display: block;
+        }
+
+        @keyframes progress {
+          100% {
+            left: 100%;
+          }
+        }
       }
     }
   }
