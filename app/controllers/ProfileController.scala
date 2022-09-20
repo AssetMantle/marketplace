@@ -46,16 +46,7 @@ class ProfileController @Inject()(
 
   def profile(accountId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      val isCreator = if (loginState.isDefined && loginState.fold("")(_.username) == accountId) masterCollections.Service.isCreator(accountId) else Future(false)
-      val hasWhitelist = if (loginState.isDefined && loginState.fold("")(_.username) == accountId) masterWhitelists.Service.hasWhitelist(accountId) else Future(false)
-
-      (for {
-        isCreator <- isCreator
-        hasWhitelist <- hasWhitelist
-      } yield Ok(views.html.profile.profile(accountId: String, isCreator = isCreator, hasWhitelist = hasWhitelist))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
+      Future(Ok(views.html.profile.profile(accountId: String)))
 
   }
 }
