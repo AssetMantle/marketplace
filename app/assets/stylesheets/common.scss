@@ -505,6 +505,40 @@
 .gasFeesLabel{
   @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
 }
+#gasPriceToggleButton{
+  .toggleOption{
+    color: var(--mantle-off-white);
+    &:hover{
+      color: var(--card-color);
+      .gasPricePriority{
+        font-weight: bold;
+      }
+      .gasCharges,.gasChargesPrice{
+        color: var(--card-color);
+      }
+    }
+    &.active{
+      color: var(--card-color);
+      .gasPricePriority{
+        font-weight: bold;
+      }
+      .gasCharges,.gasChargesPrice{
+        color: var(--card-color);
+      }
+    }
+    .gasPricePriority{
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 22px;
+    }
+    .gasCharges,.gasChargesPrice{
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--gray);
+      line-height: 14px;
+    }
+  }
+}
 
 // Horizontal Switcher
 .nav{

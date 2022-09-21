@@ -137,3 +137,9 @@ function switcher(id) {
 
     firstTab.show()
 }
+
+// Truncate large string with ...
+function truncate(message, fieldId, length) {
+    let newMessage = (message.length > length) ? message.slice(0, length - 1) + '&hellip;' : message;
+    $("#"+fieldId).html(newMessage);
+};
