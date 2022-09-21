@@ -30,20 +30,6 @@ addresses.forEach(address => {
     $(address).text($(address).text().substr(0, 8) + "..." + $(address).text().substr($(address).length - 8));
 });
 
-// Copy to Clipboard
-function copyToClipboard(e) {
-    var element = $(e).next('.form-copy-message');
-    var copyText = $(e).prevAll('.username-data').attr("data-value");
-
-    if ($(window).width() > 1200) {
-        element.addClass("active");
-        element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function () {
-            element.removeClass('active');
-        });
-    }
-    navigator.clipboard.writeText(copyText);
-}
-
 // Open/Close wallet screens
 function openCloseWalletScreen(e, elementID) {
     $(e).parent().closest(".walletPopupContainer").find(`#${elementID}`).toggleClass("open");

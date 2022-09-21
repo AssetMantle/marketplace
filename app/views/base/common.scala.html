@@ -28,6 +28,9 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/explorer.css")"/>
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/walletPopUp.css")"/>
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/library/daterangepicker.min.css")"/>
+            <!-- Bootstrap Toaster -->
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/library/bootstrap-toaster.css")"/>
+        <script src="@routes.Assets.versioned("javascripts/library/bootstrap-toaster.js")" type="text/javascript"></script>
             <!-- JS -->
         <script src="@routes.Assets.versioned("javascripts/constants.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/firebase/firebase.js")" type="text/javascript"></script>
@@ -157,10 +160,10 @@
                 @optionalLoginState match {
                     case Some(loginState) => {
                         <ul class="d-flex flex-row gap-2 align-items-center mb-0 links">
-                            <li id="userWallet" class="user-wallet" onclick="showWallet()">
+                            <li id="userWallet" class="user-wallet" onclick="showWallet(); componentResource('walletPopup', jsRoutes.controllers.SettingController.walletPopup());">
                                     <!-- Wallet Start -->
                                 <div id="walletPopup" class="walletPopup"></div>
-                                <a class="desktop-link" target="_blank" onclick="componentResource('walletPopup', jsRoutes.controllers.SettingController.walletPopup())">
+                                <a class="desktop-link" target="_blank">
                                     <i class="bi bi-person iconWhite wallet"></i>
                                 </a>
                                     <!-- Wallet End -->
@@ -198,7 +201,6 @@
                 <div id="rightContent" class="col-12 col-md-3 col-lg-3 col-xl-2"></div>
             </div>
         </div>
-        <div id="commonSnackBar"></div>
     </body>
 </html>
 

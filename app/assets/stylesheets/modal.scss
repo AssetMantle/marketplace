@@ -28,7 +28,7 @@ body.modal-open::-webkit-scrollbar{
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
-    z-index: 9999;
+    z-index: 999;
   }
   .modal-overlay.active {
     opacity: 1;
@@ -297,4 +297,7 @@ body.modal-open::-webkit-scrollbar{
      }
    }
  }
+}
+.modal-backdrop{
+  z-index: 998;
 }

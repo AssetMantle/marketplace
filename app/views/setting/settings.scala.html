@@ -23,10 +23,9 @@
         <div class="d-flex flex-row align-items-center flex-wrap walletInfoField">
             <div class=" pe-2 fieldLabel">@Messages(constants.View.PROFILE_IDENTITY_ADDRESS)</div>
             <div class=" fieldValue username-data" data-value="@keys.find(_.active).fold(Messages(constants.View.ACTIVE_ADDRESS_NOT_FOUND))(_.address)">@keys.find(_.active).fold(Messages(constants.View.ACTIVE_ADDRESS_NOT_FOUND))(_.address)</div>
-            <div class="m-0 ms-2 mt-2 mt-xl-0 mt-md-2 iconContainer" onclick="copyToClipboard(this)">
+            <div class="m-0 ms-2 mt-2 mt-xl-0 mt-md-2 iconContainer" onclick="copyToClipboard(this); showSnackbar('', '@Messages(constants.View.ADDRESS_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
                 <i class="bi bi-files iconDefault iconMedium copyIcon"></i>
             </div>
-            <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
         </div>
     </div>
     <div class="walletInformation">
@@ -38,10 +37,9 @@
             <div class="pe-2 mb-2 fieldLabel"><label for="walletAddress1">@key.name.getOrElse("")</label></div>
             <div class="d-flex flex-row align-items-center flex-wrap">
                 <div class="fieldValue username-data" data-value="@key.address"><label for="walletAddress1">@key.address</label></div>
-                <div class="pe-2 m-0 ms-2 iconContainer" onclick="copyToClipboard(this)">
+                <div class="pe-2 m-0 ms-2 iconContainer" onclick="copyToClipboard(this); showSnackbar('', '@Messages(constants.View.ADDRESS_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
                     <i class="bi bi-files iconDefault iconMedium copyIcon"></i>
                 </div>
-                <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
                 <div class="ms-xl-auto ms-lg-3 ms-0 ms-sm-3 mt-2 mt-xl-0 mt-lg-2">
                     <div class="d-flex flex-row justify-content-between align-items-center walletAddressItem">
                         <div class="me-3 align-self-start fieldValue walletBalance">
