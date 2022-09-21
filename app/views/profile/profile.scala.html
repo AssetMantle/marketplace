@@ -7,35 +7,22 @@
 <div class="item item-center centerContainer">
     <div class="centerCard">
         <div class="contentContainer">
-            @optionalLoginState match {
-                case Some(loginState) => {
-                    @if(loginState.username == accountId) {
-                        @commonHorizontalSwitcher(
-                            ListMap(
-                                constants.View.WHITELIST -> routes.javascript.WhitelistController.whitelistSection,
-                                constants.View.WISHLIST -> routes.javascript.WishlistController.wishlistSection
-                            ),
-                            Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
-                        )
-                    } else {
-                        @commonHorizontalSwitcher(
-                            ListMap(
-                                constants.View.WISHLIST -> routes.javascript.WishlistController.wishlistSection
-                            ),
-                            Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
-                        )
-                    }
-                }
-                case _ => {
-                    @commonHorizontalSwitcher(
-                        ListMap(
-                            constants.View.WISHLIST -> routes.javascript.WishlistController.wishlistSection
-                        ),
-                        Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
-                    )
-                }
+            @if(optionalLoginState.isDefined && optionalLoginState.fold("")(_.username) == accountId) {
+                @commonHorizontalSwitcher(
+                    ListMap(
+                        constants.View.WHITELIST -> routes.javascript.WhitelistController.whitelistSection,
+                        constants.View.WISHLIST -> routes.javascript.WishlistController.wishlistSection
+                    ),
+                    Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
+                )
+            } else {
+                @commonHorizontalSwitcher(
+                    ListMap(
+                        constants.View.WISHLIST -> routes.javascript.WishlistController.wishlistSection
+                    ),
+                    Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
+                )
             }
-
         </div>
     </div>
 </div>

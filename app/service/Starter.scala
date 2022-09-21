@@ -21,6 +21,7 @@ class Starter @Inject()(
                          masterCollections: master.Collections,
                          masterCollectionFiles: master.CollectionFiles,
                          masterNFTs: master.NFTs,
+                         masterWishLists: master.WishLists,
                          utilitiesOperations: utilities.Operations,
                        )(implicit exec: ExecutionContext, configuration: Configuration) {
 
@@ -49,8 +50,8 @@ class Starter @Inject()(
   implicit val NumberPropertyReads: Reads[NumberProperty] = Json.reads[NumberProperty]
 
   def msgApply(`type`: String, value: JsObject): NftProperty = try {
-    `type` match {
-      case "String" => utilities.JSON.convertJsonStringToObject[StringProperty](value.toString).copy(`type` = constants.Collection.NFT.Data.STRING)
+    `type`.toLowerCase match {
+      case "string" => utilities.JSON.convertJsonStringToObject[StringProperty](value.toString).copy(`type` = constants.Collection.NFT.Data.STRING)
       case "number" => utilities.JSON.convertJsonStringToObject[NumberProperty](value.toString).toStringProperty
     }
   }
@@ -67,6 +68,10 @@ class Starter @Inject()(
   implicit val UploadCollectionReads: Reads[UploadCollection] = Json.reads[UploadCollection]
 
   implicit val NFTReads: Reads[NFT] = Json.reads[NFT]
+
+  case class UpdateAccountId(id: String, accountId: String)
+
+  implicit val UpdateAccountIdReads: Reads[UpdateAccountId] = Json.reads[UpdateAccountId]
 
   def getListOfFiles(dir: String): List[String] = {
     val file = new File(dir)
@@ -162,6 +167,35 @@ class Starter @Inject()(
     } yield ()
   } else Future()
 
+
+  def deleteCollections(): Future[Unit] = {
+    val list = Seq("B1A4A6A989455917", "CBDE9E9300694D6C", "F88532DDCDDBEC96", "B04D4A86A96A87DD", "EB588A50A90A67E4", "988DDCCB136744F8")
+    val deleteWishlist = masterWishLists.Service.deleteCollections(list)
+
+    def deleteNfts() = masterNFTs.Service.deleteCollections(list)
+
+    def deleteCollections() = masterCollections.Service.deleteById(list)
+
+    for {
+      _ <- deleteWishlist
+      _ <- deleteNfts()
+      _ <- deleteCollections()
+    } yield ()
+  }
+
+  def updateCollections(): Future[Unit] = {
+    val update = readFile[Seq[UpdateAccountId]](constants.CommonConfig.Files.CollectionPath + "/update.json")
+
+    def updates(data: Seq[UpdateAccountId]) = utilitiesOperations.traverse(data) { x =>
+      masterCollections.Service.updateAccountId(id = x.id, accountId = x.accountId)
+    }
+
+    for {
+      update <- update
+      _ <- updates(update)
+    } yield ()
+  }
+
   def start(): Future[Unit] = {
     val uploads = readFile[Seq[UploadCollection]](uploadCollectionFilePath)
 
@@ -174,9 +208,9 @@ class Starter @Inject()(
         val insta = if (uploadCollection.instagram != "") Option(SocialProfile(name = constants.Collection.SocialProfile.INSTAGRAM, url = uploadCollection.instagram)) else None
         val socialProfiles = Seq(twitter, insta).flatten
         if (collection.isEmpty) {
-          masterCollections.Service.add(name = uploadCollection.name, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles)
+          masterCollections.Service.add(name = uploadCollection.name, creatorId = "avkr003", description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles)
         } else if (uploadCollection.updateDetails) {
-          masterCollections.Service.insertOrUpdate(id = collection.get.id, name = uploadCollection.name, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles)
+          masterCollections.Service.insertOrUpdate(id = collection.get.id, creatorId = "avkr003", name = uploadCollection.name, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles)
         } else Future(collection.get.id)
       }
 
@@ -205,6 +239,8 @@ class Starter @Inject()(
     }
 
     (for {
+      _ <- deleteCollections()
+      _ <- updateCollections()
       uploads <- uploads
       _ <- processDir(uploads)
     } yield ()

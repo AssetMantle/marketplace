@@ -96,5 +96,7 @@ class WishLists @Inject()(
 
     def countLikes(nftId: String): Future[Int] = filter(_.nftId === nftId).map(_.length)
 
+    def deleteCollections(collectionIds: Seq[String]): Future[Int] = filterAndDelete(_.collectionId.inSet(collectionIds))
+
   }
 }

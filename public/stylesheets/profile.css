@@ -490,6 +490,16 @@ profileContainer .item-sticky .profile-card{
     height: auto;
     margin: auto;
 }
+@media (min-width: 1200px) {
+    .nft-list .card .card-img img{
+        height: 250px;
+    }
+}
+@media (max-width: 1200px) {
+    .nft-list .card .card-img img{
+        height: 200px;
+    }
+}
 .nft-list .card .nft-separator{
     height: 2px;
     width: calc(100% + 32px);

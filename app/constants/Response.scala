@@ -109,7 +109,7 @@ object Response {
   val INVALID_NUMBER_FORMAT = new Failure("INVALID_NUMBER_FORMAT")
   val ACCOUNT_TYPE_NOT_FOUND = new Failure("ACCOUNT_TYPE_NOT_FOUND")
   val BALANCE_FETCH_FAILED = new Failure("BALANCE_FETCH_FAILED")
-
+  val NO_COLLECTION_TO_CREATE_WHITELIST = new Failure("NO_COLLECTION_TO_CREATE_WHITELIST")
   val WHITELIST_MAX_MEMBERS_REACHED = new Failure("WHITELIST_MAX_MEMBERS_REACHED")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

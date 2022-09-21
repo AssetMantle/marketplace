@@ -23,6 +23,7 @@ class ProfileController @Inject()(
                                    withoutLoginAction: WithoutLoginAction,
                                    masterAccounts: master.Accounts,
                                    masterWhitelists: master.Whitelists,
+                                   masterCollections: master.Collections,
                                    masterWhitelistMembers: master.WhitelistMembers,
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -46,5 +47,6 @@ class ProfileController @Inject()(
   def profile(accountId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.profile.profile(accountId: String)))
+
   }
 }

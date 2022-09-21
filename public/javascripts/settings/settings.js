@@ -93,3 +93,24 @@ function fetchBalance(address) {
         }
     });
 }
+
+function updateKeyName(){
+    $('.walletInfoField').load(document.URL);
+}
+
+function showHideSeed() {
+    allSeeds = $('.mnemonicValue');
+    if (allSeeds[0].type === "password") {
+        allSeeds.each(function () {
+            $(this).attr("type", "text");
+        });
+        $(".closeEye").addClass("hidden");
+        $(".openEye").removeClass("hidden");
+    } else {
+        allSeeds.each(function () {
+            $(this).attr("type", "password");
+        });
+        $(".closeEye").removeClass("hidden");
+        $(".openEye").addClass("hidden");
+    }
+}

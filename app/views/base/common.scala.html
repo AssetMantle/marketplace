@@ -160,59 +160,13 @@
                 @optionalLoginState match {
                     case Some(loginState) => {
                         <ul class="d-flex flex-row gap-2 align-items-center mb-0 links">
-                            <li id="userProfile" class="userProfile">
-                                <a class="desktop-link" target="_blank">
-                                    <i class="bi bi-person iconWhite profile"></i>
-                                </a>
-
-                                    <!-- User Profile Menu Start -->
-                                <div id="profileMenu" class="profileMenu">
-                                    <div class="detailContainer">
-                                        <div class="d-flex flex-column flex-lg-row align-content-between gap-2 userDetails">
-                                            <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="40" height="40"/>
-                                            <div class="ml-3 d-flex align-items-center">
-                                                <div class="userName">@loginState.username</div>
-                                            </div>
-                                            @* <div class="ml-3 d-flex flex-column gap-1 align-content-between">*@
-                                            @* <div class="userName">@loginState.username</div>*@
-                                            @* <div class="userBalance">0.459930 $MNTL</div>*@
-                                            @* </div>*@
-                                        </div>
-                                        <div class="mb-0 innerSeparator"></div>
-                                        @* <div class="pt-0 profileMenuItem">*@
-                                        @* <a class="d-flex flex-row align-items-center p-0 profileItemLink">*@
-                                        @* <img class="icon" src="@routes.Assets.versioned("images/icon/createdYellow.png")"/>*@
-                                        @* <div class="profileMenuLabel">@Messages(constants.View.MENU_CREATED)</div>*@
-                                        @* </a>*@
-                                        @* </div>*@
-                                        <div class="profileMenuItem">
-                                            <a href="@routes.ProfileController.viewProfile(loginState.username)" class="d-flex flex-row align-items-center p-0 profileItemLink">
-                                                <i class="bi bi-person-lines-fill iconDefault"></i>
-                                                <div class="profileMenuLabel">@Messages(constants.View.PROFILE)</div>
-                                            </a>
-                                        </div>
-                                        <div class="profileMenuItem">
-                                            <a href="@routes.SettingController.viewSettings()" class="d-flex flex-row align-items-center p-0 profileItemLink">
-                                                <i class="bi bi-gear iconDefault"></i>
-                                                <div class="profileMenuLabel">@Messages(constants.View.MENU_SETTINGS)</div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                    <!-- User Profile Menu End -->
-                            </li>
                             <li id="userWallet" class="user-wallet" onclick="showWallet()">
                                     <!-- Wallet Start -->
                                 <div id="walletPopup" class="walletPopup"></div>
                                 <a class="desktop-link" target="_blank" onclick="componentResource('walletPopup', jsRoutes.controllers.SettingController.walletPopup())">
-                                    <i class="bi bi-wallet2 iconWhite wallet"></i>
+                                    <i class="bi bi-person iconWhite wallet"></i>
                                 </a>
                                     <!-- Wallet End -->
-                            </li>
-                            <li>
-                                <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))">
-                                    <i class="bi bi-box-arrow-right iconWhite logout"></i>
-                                </a>
                             </li>
                         </ul>
                         <div id="walletBackDrop" onclick="closeWallet()"></div>

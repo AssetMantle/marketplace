@@ -38,6 +38,12 @@ ALTER TABLE MASTER."WhitelistMember"
 ALTER TABLE MASTER."WhitelistMember"
     ADD CONSTRAINT WhitelistMember_Account_Id FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 
+
+ALTER TABLE MASTER."Collection"
+    ADD COLUMN IF NOT EXISTS "creatorId" VARCHAR NOT NULL default 'avkr003';
+ALTER TABLE MASTER."Collection"
+    ADD CONSTRAINT Collection_Account_Id FOREIGN KEY ("creatorId") REFERENCES MASTER."Account" ("id");
+
 CREATE TRIGGER WHITE_LIST_LOG
     BEFORE INSERT OR UPDATE
     ON MASTER."Whitelist"

@@ -6,7 +6,7 @@
 @whitelists.zipWithIndex.map { case (x, index) =>
 <tr>
     <td class="text-end tableFieldNo">@(lastIndex + index + 1)</td>
-    <td class="tableFieldName">@x.name</td>
+    <td class="tableFieldName" data-toggle="tooltip" data-placement="top" title="@x.name">@x.name</td>
     <td class="text-end tableFieldMaxMembers">@x.maxMembers</td>
     <td id="startEpoch_@x.id" class="text-end tableFieldStartEpoch epochValue">@x.startEpoch</td>
     <td  id="endEpoch_@x.id" class="text-end tableFieldEndEpoch epochValue">@x.endEpoch</td>
@@ -32,4 +32,3 @@
     epochToDateTime('endEpoch_@x.id');
 </script>
 }
-

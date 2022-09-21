@@ -28,6 +28,12 @@
         </span>
     </div>
     <div class="form-address-box-item">
+        <span class="address-box-label">@Messages(constants.View.WHITELIST_START_EPOCH)</span>
+        <span class="address-box-text">
+            <span class="username-data" id="startDate">@whitelist.startEpoch</span>
+        </span>
+    </div>
+    <div class="form-address-box-item">
         <span class="address-box-label">@Messages(constants.View.WHITELIST_END_EPOCH)</span>
         <span class="address-box-text">
             <span class="username-data" id="expiryDate">@whitelist.endEpoch</span>
@@ -35,10 +41,10 @@
     </div>
 </div>
 
-@if(maxReached) {
+@if(!maxReached) {
     <div class="d-flex justify-content-end horizontal-align">
         @commonSecondaryButton(constants.View.CLOSE_WHITELIST_INVITE, JavaScript(s"""closeModal()"""))
-        @commonPrimaryButton(constants.View.ACCEPT_WHITELIST_INVITE, JavaScript(s"""getForm(jsRoutes.controllers.WhitelistController.acceptInvite('${whitelist.id}'), '#commonModal', '#modal-content', resetCreatedWhitelistPage)"""))
+        @commonPrimaryButton(constants.View.ACCEPT_WHITELIST_INVITE, JavaScript(s"""getForm(jsRoutes.controllers.WhitelistController.acceptInvite('${whitelist.id}'))"""))
     </div>
 } else {
     <div class="d-flex gap-2 align-items-center justify-content-center mt-3 footerMessage">
@@ -46,4 +52,5 @@
         <div class="errorMessage">@Messages(constants.View.WHITELIST_MAXIMUM_MEMBERS_REACHED)</div>
     </div>
 }
+<script>epochToDateTime("startDate")</script>
 <script>epochToDateTime("expiryDate")</script>
