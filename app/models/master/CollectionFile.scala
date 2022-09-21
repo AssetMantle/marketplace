@@ -114,5 +114,7 @@ class CollectionFiles @Inject()(
 
     def deleteByCollectionId(id: String): Future[Int] = deleteMultipleById1(id)
 
+    def deleteCollections(collectionIds: Seq[String]): Future[Int] = filterAndDelete(_.id.inSet(collectionIds))
+
   }
 }

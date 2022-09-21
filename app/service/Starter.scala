@@ -172,6 +172,7 @@ class Starter @Inject()(
   def deleteCollections(): Future[Unit] = {
     val list = Seq("B1A4A6A989455917", "CBDE9E9300694D6C", "F88532DDCDDBEC96", "B04D4A86A96A87DD", "EB588A50A90A67E4", "988DDCCB136744F8")
     val deleteWishlist = masterWishLists.Service.deleteCollections(list)
+    val deleteCollectionFiles = masterCollectionFiles.Service.deleteCollections(list)
 
     def deleteNfts() = masterNFTs.Service.deleteCollections(list)
 
@@ -179,6 +180,7 @@ class Starter @Inject()(
 
     for {
       _ <- deleteWishlist
+      _ <- deleteCollectionFiles
       _ <- deleteNfts()
       _ <- deleteCollections()
     } yield ()
