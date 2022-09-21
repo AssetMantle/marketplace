@@ -85,12 +85,7 @@ addresses.forEach(address => {
 
 // Copy to Clipboard
 function copyToClipboard(e) {
-    var element = $(e).next('.form-copy-message');
     var copyText = $(e).prevAll('.username-data').attr("data-value");
-    element.addClass("active");
-    element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function () {
-        element.removeClass('active');
-    });
     navigator.clipboard.writeText(copyText);
 }
 
