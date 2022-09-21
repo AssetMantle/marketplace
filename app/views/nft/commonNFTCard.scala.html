@@ -1,4 +1,5 @@
 @import controllers.actions.LoginState
+@import views.html.base.commonStringValue
 
 @(collection: master.Collection, nft: master.NFT, liked: Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
@@ -13,7 +14,9 @@
                     <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="34" height="34"/>
                 </div>
                 <div class="d-flex flex-column justify-content-between">
-                    <span class="creator-name">@nft.name</span>
+                    <span class="creator-name">
+                        @commonStringValue(message = nft.name, id = utilities.IdGenerator.getRandomHexadecimal, length =  15)
+                    </span>
                     <span class="creator-collection-name">@collection.name</span>
                 </div>
             </div>
