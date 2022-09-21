@@ -38,7 +38,8 @@ ALTER TABLE MASTER."WhitelistMember"
 ALTER TABLE MASTER."WhitelistMember"
     ADD CONSTRAINT WhitelistMember_Account_Id FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 
-
+ALTER TABLE MASTER."CollectionFile"
+    ADD CONSTRAINT CollectionFile_Collection_Id FOREIGN KEY ("id") REFERENCES MASTER."Collection" ("id");
 ALTER TABLE MASTER."Collection"
     ADD COLUMN IF NOT EXISTS "creatorId" VARCHAR NOT NULL default 'avkr003';
 ALTER TABLE MASTER."Collection"
