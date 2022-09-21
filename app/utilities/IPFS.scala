@@ -70,15 +70,15 @@ object IPFS {
     }
   }
 
-  def pinFile(file: File, filename: String, metaData: Option[MetaData] = None): Success = {
+  def pinFile(file: File, filename: String, metaData: Option[MetaData] = None, pinataOptions: PinataOptions = PinataOptions(1, wrapWithDirectory = true)): Success = {
     val body = metaData.fold {
-      new MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart("file", filename, new InputStreamRequestBody(new FileInputStream(file), MediaType.parse("application/octet-stream")))
+      var builder = new MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart("file", filename, new InputStreamRequestBody(new FileInputStream(file), MediaType.parse("application/octet-stream")))
+      builder.addFormDataPart("pinataOptions", Json.toJson(pinataOptions).toString)
+      builder
     } { data =>
       var builder = new MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart("file", filename, new InputStreamRequestBody(new FileInputStream(file), MediaType.parse("application/octet-stream")))
+      builder.addFormDataPart("pinataOptions", Json.toJson(pinataOptions).toString)
       val options = new JSONObject(Json.toJsObject(PinataData(PinataMetaData(filename, data))).toString())
-      if (options.has("pinataOptions")) {
-        builder.addFormDataPart("pinataOptions", options.getJSONObject("pinataOptions").toString)
-      }
       if (options.has("pinataMetadata")) {
         builder.addFormDataPart("pinataMetadata", options.getJSONObject("pinataMetadata").toString)
       }
