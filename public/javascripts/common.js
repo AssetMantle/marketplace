@@ -136,3 +136,9 @@ function showSnackbar(title, message, status) {
     Toast.setPlacement(TOAST_PLACEMENT.BOTTOM_RIGHT);
     Toast.setMaxCount(6);
 }
+
+// Truncate large string with ...
+function truncate(message, fieldId, length) {
+    let newMessage = (message.length > length) ? message.slice(0, length - 1) + '&hellip;' : message;
+    $("#"+fieldId).html(newMessage);
+};
