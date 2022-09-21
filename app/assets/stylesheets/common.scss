@@ -440,51 +440,6 @@
   border-top-color: var(--line-2);
 }
 
-// Snackbar
-#commonSnackBar {
-  visibility: hidden;
-  min-width: 250px;
-  margin-left: -125px;
-  background-color: var(--card-dark);
-  text-align: center;
-  padding: 16px;
-  position: fixed;
-  z-index: 9999;
-  left: 50%;
-  bottom: 30px;
-  border-radius: 30px;
-  font-family: var(--font-type-2);
-  color: var(--default);
-  font-size: 14px;
-  border: 2px solid var(--popup-bg);
-}
-
-#commonSnackBar.show {
-  visibility: visible;
-  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-  animation: fadein 0.5s, fadeout 0.5s 2.5s;
-}
-
-@-webkit-keyframes fadein {
-  from {bottom: 0; opacity: 0;}
-  to {bottom: 30px; opacity: 1;}
-}
-
-@keyframes fadein {
-  from {bottom: 0; opacity: 0;}
-  to {bottom: 30px; opacity: 1;}
-}
-
-@-webkit-keyframes fadeout {
-  from {bottom: 30px; opacity: 1;}
-  to {bottom: 0; opacity: 0;}
-}
-
-@keyframes fadeout {
-  from {bottom: 30px; opacity: 1;}
-  to {bottom: 0; opacity: 0;}
-}
-
 // Common Error
 .commonError{
   @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--error));
@@ -544,109 +499,22 @@
   }
 }
 // Snackbar
-.snackbarList{
-  display: flex;
-  gap: 20px;
-  flex-direction: column;
-  position: fixed;
-  top: 85px;
-  right: 30px;
-}
-.snackbar {
-  //position: fixed;
-  //top: 85px;
-  //right: 30px;
-  border-radius: 10px;
-  background: var(--popup-bg);
-  padding: 20px 20px 20px 28px;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.75);
-  overflow: hidden;
-  transform: translateX(calc(100% + 30px));
-  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.35);
-  z-index: 9999;
-
-  &.active {
-    transform: translateX(0%);
-  }
-
-  .snackbarContent {
-    display: flex;
-    align-items: center;
-
-    .icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 40px;
-      min-width: 40px;
-      background-color: var(--card-dark);
-      font-size: 20px;
-      border-radius: 50%;
-    }
-
-    .snackbarMessage {
-      display: flex;
-      flex-direction: column;
-      margin: 0 8px;
-
-      .snackbarTitle {
-        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
-      }
-
-      .snackbarDescription {
-        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
-      }
-    }
-  }
-
-  .snackbarProgress {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    width: 100%;
-    background-color: var(--popup-bg);
-
-    &:before {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0%;
-      height: 100%;
-      width: 100%;
-      background-color: var(--default);
-      display: none;
-    }
-
-    &.active:before {
-      animation: progress 3s linear forwards;
-      display: block;
-    }
-
-    @keyframes progress {
-      100% {
-        left: 100%;
-      }
-    }
-  }
-}
-
 #toastContainer{
   position: fixed !important;
-  top: 85px !important;
+  bottom: 30px !important;
   right: 15px !important;
   margin: 0px !important;
   .toast{
     border-radius: 10px;
     background: var(--popup-bg);
-    padding: 20px 20px 20px 28px;
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25) !important;
     border:none;
     overflow: hidden;
     .toast-header{
       background: var(--popup-bg);
-      padding: 0px;
+      padding: 20px 20px 20px 28px;
       border-bottom: none;
+      position: relative;
       .status-icon{
         &.text-success{
           color: var(--connected) !important;
@@ -676,7 +544,6 @@
       }
       .toast-body{
         @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
-        margin-top: 8px;
         padding: 0px;
       }
       .snackbarProgress {
@@ -697,15 +564,17 @@
           background-color: var(--default);
           display: none;
         }
-
-        &.active:before {
+      }
+    }
+    &.show{
+      .snackbarProgress {
+        &:before {
           animation: progress 3s linear forwards;
           display: block;
-        }
-
-        @keyframes progress {
-          100% {
-            left: 100%;
+          @keyframes progress {
+            100% {
+              left: 100%;
+            }
           }
         }
       }

@@ -118,15 +118,6 @@ function epochToDateTime(elementId) {
     $("#" + elementId).text(dateTime.toLocaleDateString() + " " + dateTime.toLocaleTimeString());
 }
 
-function callSnackBar(message) {
-    let commonSnackBar = $("#commonSnackBar");
-    commonSnackBar.addClass("show");
-    commonSnackBar.html(message);
-    setTimeout(function () {
-        commonSnackBar.removeClass("show");
-    }, 3000);
-}
-
 function loadSwitcherContent(divID) {
     $('#' + divID).click();
 }
@@ -138,31 +129,15 @@ function switcher(id) {
     firstTab.show()
 }
 
-// Snackbar
-// function showSnackbar(){
-//     const toast = document.querySelector(".snackbar");
-//     const progress = document.querySelector(".snackbarProgress");
-//     let timer1, timer2;
-//
-//     toast.classList.add("active");
-//     progress.classList.add("active");
-//
-//     timer1 = setTimeout(() => {
-//         toast.classList.remove("active");
-//     }, 3000);
-//
-//     timer2 = setTimeout(() => {
-//         progress.classList.remove("active");
-//     }, 3300);
-// }
-
 function showSnackbar(title, message, status) {
-    let configs = {
+    let option = {
         title:title,
         message:message,
         status: status,
-        timeout: 300000
+        timeout: 3000
     }
 
-    Toast.create(configs);
+    Toast.create(option);
+    Toast.setPlacement(TOAST_PLACEMENT.BOTTOM_RIGHT);
+    Toast.setMaxCount(6);
 }
