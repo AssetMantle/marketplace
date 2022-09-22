@@ -659,8 +659,8 @@ nav .content .links
         color: #000000;
     }
 }
-#walletPopup.active + a i{
-        color: var(--default);
+.right-menu .links .menuItem.menuIcon{
+    color: var(--default);
 }
 .right-menu .links > li:hover i {
     color: var(--default);

@@ -63,6 +63,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SettingController.viewWishList,
         routes.javascript.SettingController.wishList,
         routes.javascript.SettingController.wishListNFTs,
+        routes.javascript.SettingController.notificationPopup,
 
         //        routes.javascript.ProfileController.viewOffers,
         //        routes.javascript.ProfileController.offers,

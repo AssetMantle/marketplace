@@ -62,6 +62,7 @@ GET         /nftFile                                              controllers.NF
 GET         /settings                                             controllers.SettingController.viewSettings()
 GET         /profileSettings                                      controllers.SettingController.settings()
 GET         /walletPopup                                          controllers.SettingController.walletPopup()
+GET         /notificationPopup                                    controllers.SettingController.notificationPopup()
 
 GET         /addNewKey                                            controllers.SettingController.addNewKey()
 

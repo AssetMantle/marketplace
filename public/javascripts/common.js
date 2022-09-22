@@ -17,6 +17,14 @@ function showWallet() {
     $("#walletPopup").addClass("active");
     $("#walletBackDrop").addClass("active");
     $("body").addClass("modal-open");
+    $("#userWallet").attr("onclick","");
+}
+
+// Show notification popup
+function showNotification() {
+    $("#notificationPopup").addClass("active");
+    $("#notificationPopup").addClass("active");
+    $("body").addClass("modal-open");
 }
 
 // Close wallet popup
@@ -28,6 +36,7 @@ function closeWallet() {
         $("#walletMenu").removeClass("open");
         $("#addressBook").removeClass("open");
     }, 200);
+    $("#userWallet").attr("onclick","showWallet(); componentResource('walletPopup', jsRoutes.controllers.SettingController.walletPopup());");
 }
 
 // Resize window for wallet popup

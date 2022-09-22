@@ -298,4 +298,11 @@ class SettingController @Inject()(
     }
   }
 
+  def notificationPopup(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.base.commonNotificationPopup())
+    }
+  }
+
 }
