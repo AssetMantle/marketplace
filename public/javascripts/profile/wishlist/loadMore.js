@@ -47,3 +47,15 @@ function loadMoreCollections(accountId) {
         $("#loadMoreBtnContainer").addClass("hide");
     }
 }
+
+timeout = 0;
+function loadWishlistCollectionOnScroll(accountId){
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+        if ($(window).scrollTop() >= ($(document).height() - $(window).height() - 100)) {
+            if ($(".noCollectionLeft").length === 0) {
+                loadMoreCollections(accountId);
+            }
+        }
+    }, 300);
+}

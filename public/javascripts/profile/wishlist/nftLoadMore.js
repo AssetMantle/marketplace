@@ -81,3 +81,15 @@ function loadFirstNFTBulk(source, route, loadingSpinnerID = 'commonSpinner', eve
         }
     });
 }
+
+timeout = 0;
+function loadWishlistNftOnScroll(accountId, collectionId){
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+        if ($(window).scrollTop() >= ($(document).height() - $(window).height() - 500)) {
+            if ($(".noNFT").length === 0) {
+                loadMoreNFTs(accountId,collectionId);
+            }
+        }
+    }, 300);
+}

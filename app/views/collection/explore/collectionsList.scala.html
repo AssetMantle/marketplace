@@ -25,11 +25,6 @@
                     <div class="ball"></div>
                 </div>
                     <!-- End -->
-
-                    <!-- Load more button -->
-                <div id="loadMoreBtnContainer" class="d-flex justify-content-center horizontal-align">
-                @views.html.base.buttons.commonPrimaryButton(constants.View.LOAD_MORE_BUTTON, JavaScript(s"loadMoreCollections()"), Symbol("id") -> "loadMoreCollectionButton")
-                </div>
             </div>
         </div>
     </div>
@@ -39,4 +34,5 @@
 <script>
         changeActive('@section');
         $('#art').addClass("active");
+        window.onscroll = function() { loadCollectionOnScroll(); }
 </script>

@@ -160,10 +160,10 @@
                 @optionalLoginState match {
                     case Some(loginState) => {
                         <ul class="d-flex flex-row gap-2 align-items-center mb-0 links">
-                            <li id="userWallet" class="user-wallet" onclick="showWallet(); componentResource('walletPopup', jsRoutes.controllers.SettingController.walletPopup());">
+                            <li id="userWallet" class="user-wallet" onclick="showWallet();">
                                     <!-- Wallet Start -->
                                 <div id="walletPopup" class="walletPopup"></div>
-                                <a class="desktop-link" target="_blank">
+                                <a class="desktop-link" target="_blank" onclick="componentResource('walletPopup', jsRoutes.controllers.SettingController.walletPopup());">
                                     <i class="bi bi-person iconWhite wallet"></i>
                                 </a>
                                     <!-- Wallet End -->

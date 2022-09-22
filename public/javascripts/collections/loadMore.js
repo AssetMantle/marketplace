@@ -58,3 +58,15 @@ $("#sectionMenu .menuItem").on('click', function () {
     $("#sectionMenu").find(".active").removeClass("active");
     $(this).addClass("active");
 });
+
+timeout = 0;
+function loadCollectionOnScroll(){
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+        if ($(window).scrollTop() >= ($(document).height() - $(window).height() - 100)) {
+            if ($(".noCollection").length === 0) {
+                loadMoreCollections();
+            }
+        }
+    }, 300);
+}

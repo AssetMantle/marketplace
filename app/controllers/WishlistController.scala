@@ -49,7 +49,7 @@ class WishlistController @Inject()(
         (for {
           collectionIds <- allCollectionIds
           collections <- allCollections(collectionIds)
-        } yield Ok(views.html.profile.wishlist.collectionPerPage(accountId, collections))
+        } yield Ok(views.html.profile.wishlist.collectionPerPage(accountId, collections, totalCollections = collectionIds.length))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
