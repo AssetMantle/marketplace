@@ -665,3 +665,6 @@ nav .content .links
 .right-menu .links > li:hover i {
     color: var(--default);
 }
+#userWallet .desktop-link{
+    padding: 27px 10px;
+}
