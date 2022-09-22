@@ -161,20 +161,16 @@
                     case Some(loginState) => {
                         <ul class="d-flex flex-row gap-2 align-items-center mb-0 links">
                             <li id="userNotification" class="menuItem menuIcon" onclick="showNotification();">
-                                    <!-- Wallet Start -->
                                 <div id="notificationPopup" class="notificationPopup popupContainer"></div>
                                 <a class="desktop-link" target="_blank" onclick="componentResource('notificationPopup', jsRoutes.controllers.SettingController.notificationPopup());">
                                     <i class="bi bi-bell iconWhite wallet"></i>
                                 </a>
-                                    <!-- Wallet End -->
                             </li>
                             <li id="userWallet" class="menuItem menuIcon" onclick="showWallet();">
-                                    <!-- Wallet Start -->
                                 <div id="walletPopup" class="walletPopup popupContainer"></div>
                                 <a class="desktop-link" target="_blank" onclick="componentResource('walletPopup', jsRoutes.controllers.SettingController.walletPopup());">
                                     <i class="bi bi-person iconWhite wallet"></i>
                                 </a>
-                                    <!-- Wallet End -->
                             </li>
                         </ul>
                         <div id="walletBackDrop" onclick="closeWallet()"></div>
