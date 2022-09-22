@@ -627,11 +627,11 @@
 // common Notification popup
 .right-menu .links li.menuItem .notificationPopup {
   text-transform: none;
-  width: 312px;
+  width: 396px;
   position: absolute;
-  left: -175px;
+  left: -260px;
   top: 90px;
-  transform: translateX(-73px);
+  transform: translateX(-71px);
   z-index: 9999;
   opacity: 0;
   visibility: hidden;
@@ -655,254 +655,108 @@
     //transition: all 0.3s ease;
   }
 
-  .walletPopupContainer {
+  .notificationPopupContainer {
     background: var(--popup-bg);
     border: 2px solid var(--popup-stroke);
     border-radius: 20px;
-    padding: 20px;
+    padding: 32px;
     position: relative;
     overflow: hidden;
 
+    .separator {
+      height: 2px;
+      width: 100%;
+      background-color: #383838;
+      margin: 16px 0px;
+    }
+
     .headerContainer {
-      .userDetails {
-        .userName {
-          @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--default));
-        }
-
-        .userBalance {
-          @include setFont(var(--font-type-2), normal, 600, 14px, 17px, var(--text-medium));
-
-          .start {
-            @include setFont(var(--font-type-2), normal, 700, 16px, 17px, var(--text-medium));
-          }
-
-          .end {
-            @include setFont(var(--font-type-2), normal, 700, 12px, 17px, var(--text-medium));
-          }
-        }
-      }
-    }
-
-    .userAddressBox {
-      background-color: var(--card-dark);
-      border-radius: 8px;
-      line-height: 0;
-
-      .userAddressData {
-        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
-        word-break: break-word;
-      }
-
-      .copyIcon {
-        padding: 4px 0 0 0;
-        cursor: pointer;
-      }
-    }
-
-    .buttons {
-      line-height: 0px;
-    }
-  }
-
-  .detailContainer {
-    margin: 24px 0px 12px 0px;
-
-    .userDetails {
-      .userName {
+      line-height: 22px;
+      .title{
         @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
       }
+      .titleLink{
+        @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
+        text-transform: capitalize;
+      }
+    }
 
-      .userBalance {
-        @include setFont(var(--font-type-2), normal, 600, 14px, 17px, var(--text-medium));
-
-        .start {
-          @include setFont(var(--font-type-2), normal, 700, 16px, 17px, var(--text-medium));
+    .emailContainer{
+      width: 100%;
+      line-height: 20px;
+      .emailInputField{
+        .emailNotificationLabel{
+          @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--gray));
+          text-transform: capitalize;
         }
-
-        .end {
-          @include setFont(var(--font-type-2), normal, 700, 12px, 17px, var(--text-medium));
-        }
-      }
-    }
-
-    .userAddressBox {
-      background-color: var(--card-dark);
-      border-radius: 8px;
-      line-height: 0;
-
-      .userAddressData {
-        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
-        word-break: break-word;
-      }
-
-      .copyIcon {
-        padding: 4px 0 0 0;
-        cursor: pointer;
-      }
-    }
-
-    .walletMessage {
-      @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
-      margin-bottom: 32px;
-    }
-
-    .bottomOption {
-      a {
-        width: 32px;
-        height: 0px;
-        line-height: 0px;
-      }
-    }
-
-    .menuList {
-      .menuItem {
-        height: 16px;
-        a {
-          height: 0px;
-          .profileMenuLabel{
-            @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--mantle-off-white));
-            text-transform: capitalize;
-          }
-        }
-      }
-    }
-  }
-
-  .nftLink {
-    div {
-      line-height: 0px;
-      @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--mantle-off-white));
-      text-transform: capitalize;
-    }
-  }
-
-  .icon {
-    height: 20px;
-    width: 20px;
-    cursor: pointer;
-  }
-
-  #openWalletMenu {
-    cursor: pointer;
-  }
-
-  .walletMenu {
-    height: 460px;
-    width: 254px;
-    position: absolute;
-    right: -255px;
-    top: 1px;
-    z-index: 999;
-    background: var(--card-dark);
-    border-radius: 10px 10px 0px 0px;
-    padding: 20px;
-    line-height: 0px;
-    transition: right 0.3s ease;
-
-    &.open {
-      right: 0px;
-    }
-
-    .topMenu {
-      margin-top: 24px;
-
-      .menuItem {
-        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
-        cursor: pointer;
-      }
-    }
-
-    .bottomMenu {
-      padding-bottom: 20px;
-
-      .menuItem {
-        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
-        cursor: pointer;
-      }
-    }
-  }
-
-  .addressBook {
-    height: 450px;
-    width: 274px;
-    position: absolute;
-    right: -275px;
-    top: 1px;
-    z-index: 1000;
-    background: var(--card-dark);
-    border-radius: 10px 10px 0px 0px;
-    padding: 20px;
-    line-height: 0px;
-    transition: right 0.3s ease;
-
-    &.open {
-      right: 0px;
-    }
-
-    .walletAddressList {
-      height: 215px;
-      overflow-y: auto;
-      padding-right: 12px;
-      margin-bottom: 24px;
-
-      .walletAddressItem {
-        padding: 12px 0px;
-        border-bottom: 2px solid var(--line);
-
-        .walletAddressLabel {
+        input[type="text"]{
           @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
-          display: inline-block;
-          cursor: pointer;
-          transition: all 0.3s;
-        }
-
-        input[type="radio"] {
-          cursor: pointer;
-          appearance: none;
-          width: 20px;
-          height: 20px;
-          box-shadow: 0.984848px 0.984848px 1.9697px rgba(0, 0, 0, 0.2), inset -0.984848px -0.984848px 1.9697px rgba(255, 255, 255, 0.2), inset 0.984848px 0.984848px 1.38889px rgba(168, 168, 168, 0.7);
-          border: 2px solid var(--icon-white);
-          border-radius: 50%;
-          transform: translateY(-0.075em);
-          display: grid;
-          place-content: center;
-
-          &::before {
-            content: "";
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            transform: scale(0);
-            transition: 120ms transform ease-in-out;
-            box-shadow: inset 1em 1em var(--default);
+          height: 36px;
+          box-sizing: border-box;
+          display: block;
+          width: 100%;
+          border: 1px solid var(--inactive-gray);
+          padding: calc(var(--size-bezel) * 2) 12px;
+          background: transparent;
+          border-radius: var(--size-radius);
+          letter-spacing: 1px;
+          outline: none;
+          margin-top: 12px;
+          &:focus{
+            border-color: var(--dark);
           }
+          &:not(:focus)
+          {
+            color: var(--inactive-gray);
+            border-color: var(--gray) !important;
+          }
+          &.errorField{
+            border: 1px solid var(--error) !important;
+          }
+        }
+        .emailNotificationButton{
+          @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
+          text-align: right;
+          text-transform: capitalize;
+          margin-top: 12px;
+        }
+      }
+    }
 
-          &:checked {
-            border-color: var(--default);
-
-            + label {
-              @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--default));
+    .notificationList{
+      .notificationListTitle{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--dark));
+        text-transform: capitalize;
+        margin-bottom: 12px;
+      }
+      .list{
+        .singleNotification{
+          .notificationIcon{
+            height: 40px;
+            width: 40px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background-color: var(--card-dark);
+          }
+          .notificationDetail{
+            .title{
+              @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+              text-transform: capitalize;
+            }
+            .description{
+              @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
+            }
+            .dateTime{
+              @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));
             }
           }
-
-          &:checked::before {
-            transform: scale(1);
-          }
-
-          &:focus {
-            outline: none;
-          }
         }
       }
-    }
-
-    .bottomMenu {
-      .primaryButton {
-        background-color: transparent;
-        color: var(--default);
-        border: none;
-        box-shadow: none;
+      .loadOlderNotificationButton{
+        @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
+        text-align: right;
+        text-transform: capitalize;
+        margin-top: 32px;
       }
     }
   }
