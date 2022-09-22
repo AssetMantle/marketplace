@@ -87,7 +87,7 @@ class Starter @Inject()(
     val fileName = jsonFileName + "." + uploadCollection.imageFormat
     val oldFilePath = constants.CommonConfig.Files.CollectionPath + "/" + uploadCollection.imagePath + "/" + fileName
     if (uploadCollection.downloadFromIPFS) {
-      utilities.IPFS.downloadFile(nftDetails.image.split("/").takeRight(2).mkString("/"), oldFilePath)
+      utilities.IPFS.downloadFile(nftDetails.image.split("/").drop(2).mkString("/"), oldFilePath)
     }
     val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
     val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(fileName)
@@ -107,7 +107,7 @@ class Starter @Inject()(
         val ipfsPath = if (uploadCollection.uploadToIPFS) {
           val file = new File(oldFilePath)
           utilities.IPFS.pinFile(file, newFileName).IpfsHash + "/" + newFileName
-        } else nftDetails.image.split("/").takeRight(2).mkString("/")
+        } else nftDetails.image.split("/").drop(2).mkString("/")
         val awsKey = uploadCollection.name + "/nfts/" + newFileName
         val newFilePath = constants.CommonConfig.Files.CollectionPath + "/" + awsKey
         utilities.AmazonS3.uploadFile(awsKey, oldFilePath)
