@@ -85,12 +85,7 @@ addresses.forEach(address => {
 
 // Copy to Clipboard
 function copyToClipboard(e) {
-    var element = $(e).next('.form-copy-message');
     var copyText = $(e).prevAll('.username-data').attr("data-value");
-    element.addClass("active");
-    element.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function () {
-        element.removeClass('active');
-    });
     navigator.clipboard.writeText(copyText);
 }
 
@@ -118,15 +113,6 @@ function epochToDateTime(elementId) {
     $("#" + elementId).text(dateTime.toLocaleDateString() + " " + dateTime.toLocaleTimeString());
 }
 
-function callSnackBar(message) {
-    let commonSnackBar = $("#commonSnackBar");
-    commonSnackBar.addClass("show");
-    commonSnackBar.html(message);
-    setTimeout(function () {
-        commonSnackBar.removeClass("show");
-    }, 3000);
-}
-
 function loadSwitcherContent(divID) {
     $('#' + divID).click();
 }
@@ -137,3 +123,22 @@ function switcher(id) {
 
     firstTab.show()
 }
+
+function showSnackbar(title, message, status) {
+    let option = {
+        title:title,
+        message:message,
+        status: status,
+        timeout: 3000
+    }
+
+    Toast.create(option);
+    Toast.setPlacement(TOAST_PLACEMENT.BOTTOM_RIGHT);
+    Toast.setMaxCount(6);
+}
+
+// Truncate large string with ...
+function truncate(message, fieldId, length) {
+    let newMessage = (message.length > length) ? message.slice(0, length - 1) + '&hellip;' : message;
+    $("#"+fieldId).html(newMessage);
+};

@@ -481,14 +481,17 @@ profileContainer .item-sticky .profile-card{
 }
 .nft-list .card .card-img{
     overflow: hidden;
+    width: 100%;
 }
 .nft-list .card .card-img img{
     display: block;
     max-width: 100%;
     max-height: 100%;
-    width: auto;
-    height: auto;
+    min-width: 100%;
+    min-height: 100%;
     margin: auto;
+    object-fit: contain;
+    aspect-ratio: 1/1;
 }
 @media (min-width: 1200px) {
     .nft-list .card .card-img img{

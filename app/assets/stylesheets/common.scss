@@ -440,51 +440,6 @@
   border-top-color: var(--line-2);
 }
 
-// Snackbar
-#commonSnackBar {
-  visibility: hidden;
-  min-width: 250px;
-  margin-left: -125px;
-  background-color: var(--card-dark);
-  text-align: center;
-  padding: 16px;
-  position: fixed;
-  z-index: 9999;
-  left: 50%;
-  bottom: 30px;
-  border-radius: 30px;
-  font-family: var(--font-type-2);
-  color: var(--default);
-  font-size: 14px;
-  border: 2px solid var(--popup-bg);
-}
-
-#commonSnackBar.show {
-  visibility: visible;
-  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-  animation: fadein 0.5s, fadeout 0.5s 2.5s;
-}
-
-@-webkit-keyframes fadein {
-  from {bottom: 0; opacity: 0;}
-  to {bottom: 30px; opacity: 1;}
-}
-
-@keyframes fadein {
-  from {bottom: 0; opacity: 0;}
-  to {bottom: 30px; opacity: 1;}
-}
-
-@-webkit-keyframes fadeout {
-  from {bottom: 30px; opacity: 1;}
-  to {bottom: 0; opacity: 0;}
-}
-
-@keyframes fadeout {
-  from {bottom: 30px; opacity: 1;}
-  to {bottom: 0; opacity: 0;}
-}
-
 // Common Error
 .commonError{
   @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--error));
@@ -504,6 +459,40 @@
 
 .gasFeesLabel{
   @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+}
+#gasPriceToggleButton{
+  .toggleOption{
+    color: var(--mantle-off-white);
+    &:hover{
+      color: var(--card-color);
+      .gasPricePriority{
+        font-weight: bold;
+      }
+      .gasCharges,.gasChargesPrice{
+        color: var(--card-color);
+      }
+    }
+    &.active{
+      color: var(--card-color);
+      .gasPricePriority{
+        font-weight: bold;
+      }
+      .gasCharges,.gasChargesPrice{
+        color: var(--card-color);
+      }
+    }
+    .gasPricePriority{
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 22px;
+    }
+    .gasCharges,.gasChargesPrice{
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--gray);
+      line-height: 14px;
+    }
+  }
 }
 
 // Horizontal Switcher
@@ -543,12 +532,94 @@
     }
   }
 }
+// Snackbar
+#toastContainer{
+  position: fixed !important;
+  bottom: 30px !important;
+  right: 15px !important;
+  margin: 0px !important;
+  .toast{
+    border-radius: 10px;
+    background: var(--popup-bg);
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25) !important;
+    border:none;
+    overflow: hidden;
+    .toast-header{
+      background: var(--popup-bg);
+      padding: 20px 20px 20px 28px;
+      border-bottom: none;
+      position: relative;
+      .status-icon{
+        &.text-success{
+          color: var(--connected) !important;
+        }
+        &.text-danger{
+          color: var(--error) !important;
+        }
+        &.text-warning{
+          color: var(--default) !important;
+        }
+        &.text-info{
+          color: var(--icon-white) !important;
+        }
+      }
+      .status-icon{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        min-width: 40px;
+        background-color: var(--card-dark);
+        font-size: 20px;
+        border-radius: 50%;
+      }
+      .toast-title{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+      }
+      .toast-body{
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
+        padding: 0px;
+      }
+      .snackbarProgress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 100%;
+        background-color: var(--popup-bg);
+
+        &:before {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0%;
+          height: 100%;
+          width: 100%;
+          background-color: var(--default);
+          display: none;
+        }
+      }
+    }
+    &.show{
+      .snackbarProgress {
+        &:before {
+          animation: progress 3s linear forwards;
+          display: block;
+          @keyframes progress {
+            100% {
+              left: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+}
 .sendCoinAmountField{
   position: relative;
   .availableBalance{
     position: absolute;
     right: 0;
     @include setFont(var(--font-type-1), normal, 500, 14px, 17px, var(--default));
-    cursor: pointer;
   }
 }

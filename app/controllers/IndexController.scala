@@ -5,7 +5,7 @@ import controllers.result.WithUsernameToken
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
-import play.api.mvc._
+import play.api.mvc.{Action, _}
 import service.Starter
 
 import javax.inject._
@@ -29,17 +29,16 @@ class IndexController @Inject()(
 
   implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections("art")
 
-  def index: EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit optionalLoginState =>
-      implicit request =>
-        optionalLoginState match {
-          case Some(loginState) =>
-            implicit val loginStateImplicit: LoginState = loginState
-            Future(Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)))
-          case None => Future(Ok(views.html.index()))
-        }
-    }
+  def index: Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
+    implicit request =>
+      optionalLoginState match {
+        case Some(loginState) =>
+          implicit val loginStateImplicit: LoginState = loginState
+          Future(Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)))
+        case None => Future(Ok(views.html.index()))
+      }
   }
+
 
   starter.start()
 }

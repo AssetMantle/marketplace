@@ -148,11 +148,11 @@ class Collections @Inject()(
 
     def isCreator(accountId: String): Future[Boolean] = filter(_.creatorId === accountId).map(_.nonEmpty)
 
-    def updateAccountId(id: String, accountId: String): Future[Unit] = {
+    def updateAccountId(id: String, description: String, website: String, socialProfiles: Seq[SocialProfile], accountId: String): Future[Unit] = {
       val collection = tryGet(id)
       for {
         collection <- collection
-        _ <- update(collection.copy(creatorId = accountId).serialize())
+        _ <- update(collection.copy(creatorId = accountId, description = description, website = website, socialProfiles = socialProfiles).serialize())
       } yield ()
     }
 

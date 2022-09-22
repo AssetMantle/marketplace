@@ -19,8 +19,8 @@
                 <i class="bi bi-pencil iconDefault iconMedium icon"></i>
             </div>
             <div>
-                <div class="p-0 userAddressData username-data hidden" data-value="@constants.CommonConfig.webAppUrl.concat(s"""/acceptWhitelistInvite/${x.id}""")"></div>
-                <div class="text-end copyIcon" onclick="copyToClipboard(this); callSnackBar('@Messages(constants.View.LINK_COPIED)');">
+                <div class="p-0 userAddressData username-data" data-value="@constants.CommonConfig.webAppUrl.concat(s"""/acceptWhitelistInvite/${x.id}""")"></div>
+                <div class="text-end copyIcon" onclick="copyToClipboard(this); showSnackbar('', '@Messages(constants.View.LINK_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
                     <i id="openWalletMenu" class="bi bi-share iconDefault iconMedium"></i>
                 </div>
             </div>
@@ -32,4 +32,3 @@
     epochToDateTime('endEpoch_@x.id');
 </script>
 }
-
