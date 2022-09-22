@@ -38,7 +38,7 @@ function wishlist(route, wishlistButton, snackBarMessage) {
             200: function () {
                 let parent = $(wishlistButton).parent();
                 let counter = parent.find(".nft-likes");
-                callSnackBar(snackBarMessage);
+                showSnackbar('', snackBarMessage, 'info');
                 setTimeout(() => {
                     wishlistCounter(counter, jsRoutes.controllers.NFTController.likesCounter($(counter).attr("data-id")));
                 }, 5000);
