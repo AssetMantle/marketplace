@@ -540,3 +540,6 @@ ADDRESS_COPIED=Address Copied!
 ADDED_TO_WISHLIST=NFT added to wishlist!
 REMOVED_FROM_WISHLIST=NFT removed from wishlist!
 
+#Collection detail
+COLLECTION_DETAIL_EXTERNAL_LINK=External Link
+COLLECTION_DETAIL_CREATOR_TITLE=Creator:
