@@ -51,6 +51,30 @@ class BlockchainTransactionController @Inject()(
   def sendCoinForm(fromAddress: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.blockchainTransaction.sendCoin(fromAddress = fromAddress))
   }
+  def delegateForm(delegationAmount: String): Action[AnyContent] = withoutLoginAction { implicit request => 
+  Ok(views.html.blockchainTransaction.delegate(delegationAmount = delegationAmount))}
+
+  def delegate(): Action[AnyContent] = withLoginActionAsync { implicit loginState => implicit request => Delegate.form.bindFromRequest().fold(
+    formWithErrors =>
+  )}
+
+  delegateData => {
+
+  }
+  def checkBalanceAndDelegate(balance: Option[models.blockchain.Balance], validatePassword: Boolean, key: master.Key) = if (balance.fold(MicroNumber.zero)(_.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount)) == MicroNumber.zero) {
+            constants.Response.INSUFFICIENT_BALANCE.throwFutureBaseException()
+          } else if (!validatePassword) constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+          else {
+            blockchainTransactionDelegate.Utility.transaction(
+              accountId = loginState.username,
+              validator = delegateData.validator
+              delegateAmount = Seq(Coin(denom = constants.Blockchain.StakingToken, delegateAmount = delegateData.delegateAmount)),
+              gasLimit = sendCoinData.gasAmount,
+              gasPrice = sendCoinData.gasPrice.toDouble,
+              ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, delegateData.password)),
+            )
+          }
+  
 
   def sendCoin(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
@@ -89,6 +113,10 @@ class BlockchainTransactionController @Inject()(
         }
       )
   }
+  
+  
+  
+
 
 
 }

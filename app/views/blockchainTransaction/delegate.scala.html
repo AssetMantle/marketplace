@@ -4,7 +4,7 @@
 
 @(sendCoin: Form[Delegate.Data] = Delegate.form, Validator: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.Delegate, delegate) {
-    @commonInputText(delegate, constants.FormField.Validator, Symbol("value") -> fromAddress, Symbol("readonly") -> "readonly")
+    @commonInputText(delegate, constants.FormField.Validator, Symbol("value") -> Validator, Symbol("readonly") -> "readonly")
     @commonInputMicornumber(delegate, constants.FormField.DELEGATE_AMOUNT)
     @commonInputInt(delegate, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultDelegateGasAmount, Symbol("class") -> "hidden")
     @commonSelectGas(delegate)
