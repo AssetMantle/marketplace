@@ -1,11 +1,31 @@
-@(collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(collection: master.Collection, collectionCoverFile: Option[String], collectionProfileFile: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <a onclick="viewCollection('@collection.id')">
     <div class="single-profile-card commonCollectionCard artCollection">
         <div class="profile-section">
-            <div id="collectionCoverImage_@collection.id"></div>
+            <div id="collectionCoverImage_@collection.id">
+                <div class="hero-img">
+                @if(collectionCoverFile.isDefined) {
+                    @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.id + "/others/" + collectionCoverFile.getOrElse("")) { uri =>
+                        <img src="@uri">
+                    }
+                } else {
+                    <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
+                }
+                </div>
+            </div>
             <div class="profile-detail">
-                <div id="collectionProfileImage_@collection.id"></div>
+                <div id="collectionProfileImage_@collection.id">
+                    <div class="profile-img">
+                @if(collectionProfileFile.isDefined) {
+                    @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.id + "/others/" + collectionProfileFile.getOrElse("")) { uri =>
+                        <img src="@uri">
+                    }
+                } else {
+                    <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
+                }
+                    </div>
+                </div>
                 <div id="content">
                     <h1>@collection.name</h1>
                     <p>@collection.description</p>
@@ -13,8 +33,4 @@
             </div>
         </div>
     </div>
-    <script>
-            componentResource('collectionCoverImage_@collection.id', jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.Collection.File.COVER', true));
-            componentResource('collectionProfileImage_@collection.id', jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.Collection.File.PROFILE', true));
-    </script>
 </a>

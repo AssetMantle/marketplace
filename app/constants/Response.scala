@@ -111,6 +111,9 @@ object Response {
   val BALANCE_FETCH_FAILED = new Failure("BALANCE_FETCH_FAILED")
   val NO_COLLECTION_TO_CREATE_WHITELIST = new Failure("NO_COLLECTION_TO_CREATE_WHITELIST")
   val WHITELIST_MAX_MEMBERS_REACHED = new Failure("WHITELIST_MAX_MEMBERS_REACHED")
+  val NO_SUCH_DOCUMENT_TYPE_EXCEPTION = new Failure("NO_SUCH_DOCUMENT_TYPE_EXCEPTION")
+  val NOT_COLLECTION_OWNER = new Failure("NOT_COLLECTION_OWNER")
+  val FILE_SIZE_EXCEED_LIMIT = new Failure("FILE_SIZE_EXCEED_LIMIT")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

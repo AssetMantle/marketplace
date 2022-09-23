@@ -45,8 +45,14 @@ GET         /collectionsList                                      controllers.Co
 GET         /collectionsPerPage                                   controllers.CollectionController.collectionsPerPage(pageNumber: Int)
 GET         /collectionNFTs                                       controllers.CollectionController.collectionNFTs(id: String)
 GET         /collectionNFTsPerPage                                controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
-GET         /collectionFile                                       controllers.CollectionController.collectionFile(id: String, documentType:String, compress: Boolean)
 GET         /collectionInfo                                       controllers.CollectionController.info(id: String)
+
+GET         /createCollection                                     controllers.CollectionController.createForm()
+POST        /createCollection                                     controllers.CollectionController.create()
+
+GET         /uploadCollectionFileForm                             controllers.CollectionController.uploadCollectionFileForm(id: String, documentType: String)
+POST        /storeCollectionFile                                  controllers.CollectionController.storeCollectionFile(id: String, documentType: String)
+GET         /uploadCollectionFile                                 controllers.CollectionController.uploadCollectionFile(id: String, documentType: String, name: String)
 
 GET         /wishlistSection                                      controllers.WishlistController.wishlistSection(accountId: String)
 GET         /wishListCollectionPerPage                            controllers.WishlistController.collectionPerPage(accountId: String, pageNumber: Int)

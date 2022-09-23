@@ -18,7 +18,7 @@ object SocialProfile {
   implicit val reads: Reads[SocialProfile] = Json.reads[SocialProfile]
 }
 
-case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, website: String, socialProfiles: Seq[SocialProfile], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, website: String, socialProfiles: Seq[SocialProfile], category: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
   def serialize(): Collections.CollectionSerialized = Collections.CollectionSerialized(
     id = this.id,
     creatorId = this.creatorId,
@@ -27,12 +27,15 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
     description = this.description,
     website = this.website,
     socialProfiles = Json.toJson(this.socialProfiles).toString(),
+    category = this.category,
     createdBy = this.createdBy,
     createdOn = this.createdOn,
     createdOnTimeZone = this.createdOnTimeZone,
     updatedBy = this.updatedBy,
     updatedOn = this.updatedOn,
     updatedOnTimeZone = this.updatedOnTimeZone)
+
+  def getWebsite: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.WEBSITE).map(_.url)
 
   def getTwitter: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.TWITTER).map(_.url)
 
@@ -45,13 +48,13 @@ object Collections {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class CollectionSerialized(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, website: String, socialProfiles: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
-    def deserialize: Collection = Collection(id = id, creatorId = creatorId, classificationId = classificationId, name = name, description = description, website = website, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class CollectionSerialized(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, website: String, socialProfiles: String, category: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
+    def deserialize: Collection = Collection(id = id, creatorId = creatorId, classificationId = classificationId, name = name, description = description, website = website, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), category = category, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   class CollectionTable(tag: Tag) extends Table[CollectionSerialized](tag, "Collection") with ModelTable[String] {
 
-    def * = (id, creatorId, classificationId.?, name, description, website, socialProfiles, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (CollectionSerialized.tupled, CollectionSerialized.unapply)
+    def * = (id, creatorId, classificationId.?, name, description, website, socialProfiles, category, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (CollectionSerialized.tupled, CollectionSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -66,6 +69,8 @@ object Collections {
     def website = column[String]("website")
 
     def socialProfiles = column[String]("socialProfiles")
+
+    def category = column[String]("category")
 
     def createdBy = column[String]("createdBy")
 
@@ -99,7 +104,7 @@ class Collections @Inject()(
 
   object Service {
 
-    def add(name: String, creatorId: String, description: String, website: String, socialProfiles: Seq[SocialProfile]): Future[String] = {
+    def add(name: String, creatorId: String, description: String, website: String, socialProfiles: Seq[SocialProfile], category: String): Future[String] = {
       val id = utilities.IdGenerator.getRandomHexadecimal
       val collection = Collection(
         id = id,
@@ -108,13 +113,14 @@ class Collections @Inject()(
         name = name,
         description = description,
         website = website,
-        socialProfiles = socialProfiles)
+        socialProfiles = socialProfiles,
+        category = category)
       for {
         _ <- create(collection.serialize())
       } yield id
     }
 
-    def insertOrUpdate(id: String, creatorId: String, name: String, description: String, website: String, socialProfiles: Seq[SocialProfile]): Future[String] = {
+    def insertOrUpdate(id: String, creatorId: String, name: String, description: String, website: String, socialProfiles: Seq[SocialProfile], category: String): Future[String] = {
       val collection = Collection(
         id = id,
         creatorId = creatorId,
@@ -122,11 +128,14 @@ class Collections @Inject()(
         name = name,
         description = description,
         website = website,
-        socialProfiles = socialProfiles)
+        socialProfiles = socialProfiles,
+        category = category)
       for {
         _ <- upsert(collection.serialize())
       } yield id
     }
+
+    def updateById(collection: Collection) = update(collection.serialize())
 
     def fetchAll(): Future[Seq[Collection]] = getAll.map(_.map(_.deserialize))
 
@@ -146,7 +155,7 @@ class Collections @Inject()(
 
     def getCollectionsByPage(collectionIds: Seq[String], pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.id.inSet(collectionIds))(_.createdOn).map(_.map(_.deserialize))
 
-    def isCreator(accountId: String): Future[Boolean] = filter(_.creatorId === accountId).map(_.nonEmpty)
+    def isCreator(accountId: String): Future[Boolean] = filterAndExists(_.creatorId === accountId)
 
     def updateAccountId(id: String, description: String, website: String, socialProfiles: Seq[SocialProfile], accountId: String): Future[Unit] = {
       val collection = tryGet(id)
@@ -155,6 +164,8 @@ class Collections @Inject()(
         _ <- update(collection.copy(creatorId = accountId, description = description, website = website, socialProfiles = socialProfiles).serialize())
       } yield ()
     }
+
+    def isOwner(id: String, accountId: String): Future[Boolean] = filterAndExists(x => x.id === id && x.creatorId === accountId)
 
   }
 }

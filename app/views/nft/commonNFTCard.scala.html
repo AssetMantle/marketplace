@@ -6,7 +6,9 @@
 <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3">
     <div class="card border-0" style="cursor: pointer;">
         <div class="card-img rounded-0" onclick="viewNFT('@nft.fileName')">
-            <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(nft.file)"/>
+            @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.id + "/nfts/" + nft.fileName) { uri =>
+                <img src="@uri"/>
+            }
         </div>
         <div class="nft-detail p-3">
             <div class="d-flex flex-row gap-2 nft-creator-detail">

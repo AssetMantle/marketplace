@@ -1,0 +1,31 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import helper._
+@import constants.File.FileUploadForm
+
+@(fileUploadForm: FileUploadForm, id: String, documentType: String, errorMessage: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div class="uploadForm">
+@CSRF.formField
+    <div class="modalInfoBlock">
+    <div id="uploadSelector_@documentType"  class="centerText uploadBox">
+        <span class="uploadIcon" cmuk-icon="cloud-upload"></span>
+        <div class="dropBox">
+            <p class="centerText"><small>@Messages(constants.View.DROP_FILE)</small></p>
+        </div>
+        <p class="centerText"><small>@Messages(constants.View.OR)</small></p>
+        <button type="button" class="cmuk-button cmuk-button-primary" id="browseUploadButton_@documentType">@Messages(constants.View.BROWSE)</button>
+    </div>
+    <div id="uploader_@documentType" class="centerText">
+        <a id="fileName_@documentType" class="fileName"></a>
+        <br>
+        <div id="uploadControls_@documentType">
+            <div class="progressContainer">
+                <div class="progressBar" id="fileUploadProgressBar_@documentType"></div>
+            </div>
+            <button type="button" class="cmuk-button cmuk-button-primary" id="uploadButton_@documentType" >@Messages(constants.View.UPLOAD)</button>
+        </div>
+    </div>
+    <div id="uploadCompletionMessage_@documentType" class=""></div>
+    </div>
+</div>
+<script>uploadFile(@utilities.JsRoutes.getJsRouteFunction(fileUploadForm.store), @utilities.JsRoutes.getJsRouteFunction(fileUploadForm.upload), '@id', '@documentType', '@fileUploadForm.fileTypes.mkString("_")', @fileUploadForm.maxFileSize)</script>

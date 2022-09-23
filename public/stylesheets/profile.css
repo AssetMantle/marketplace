@@ -329,6 +329,7 @@ profileContainer .item-sticky .profile-card{
     overflow: hidden;
 }
 .single-profile-card .hero-img img{
+    width: 100%;
     display: block;
     max-height: 150px;
     height: 100%;

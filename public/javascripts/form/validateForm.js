@@ -74,6 +74,16 @@ function validateForm(form) {
                         const ddInfoElement = $(this)[0];
                         const ddValidationInfo = ddInfoElement.innerHTML.split(": ");
                         switch (ddValidationInfo[0]) {
+                            case "URL":
+                                const urlRegex = new RegExp(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi)
+                                if (inputValue === "" || !inputValue.match(urlRegex)) {
+                                    formValidationBoolean = false;
+                                    fieldError = true;
+                                    $('#customFieldError_' + fieldName).removeClass("hidden");
+                                } else {
+                                    $('#customFieldError_' + fieldName).addClass("hidden");
+                                }
+                                break;
                             case "Numeric":
                                 if (inputValue === "" || isNaN(inputValue)) {
                                     formValidationBoolean = false;

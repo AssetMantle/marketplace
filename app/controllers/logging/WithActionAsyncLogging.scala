@@ -9,11 +9,11 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class WithActionAsyncLoggingFilter @Inject()(messagesControllerComponents: MessagesControllerComponents, messagesApi: MessagesApi)(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class WithActionAsyncLogging @Inject()(messagesControllerComponents: MessagesControllerComponents, messagesApi: MessagesApi)(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val lang: Lang = constants.CommonConfig.logLang
 
-  def next(f: => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = Action.async { implicit request =>
+  def apply(f: => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = Action.async { implicit request =>
     val startTime = System.currentTimeMillis()
     logger.info(messagesApi(constants.Log.Info.CONTROLLERS_REQUEST, request.method, request.uri, request.remoteAddress, request.session.get(constants.Session.USERNAME).getOrElse(constants.View.UNKNOWN)))
     val result = f(request)

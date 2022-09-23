@@ -31,10 +31,14 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.viewCollection,
         routes.javascript.CollectionController.collectionsList,
         routes.javascript.CollectionController.collectionsPerPage,
-        routes.javascript.CollectionController.collectionFile,
         routes.javascript.CollectionController.collectionNFTs,
         routes.javascript.CollectionController.collectionNFTsPerPage,
         routes.javascript.CollectionController.info,
+        routes.javascript.CollectionController.createForm,
+        routes.javascript.CollectionController.uploadCollectionFileForm,
+        routes.javascript.CollectionController.storeCollectionFile,
+        routes.javascript.CollectionController.uploadCollectionFile,
+
 
         routes.javascript.WishlistController.wishlistSection,
         routes.javascript.WishlistController.collectionPerPage,

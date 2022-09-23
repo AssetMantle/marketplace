@@ -84,31 +84,27 @@ class CollectionFiles @Inject()(
 
   object Service {
 
-    def add(id: String, documentType: String, fileName: String, file: Array[Byte]): Future[Unit] = {
-      val collectionFile = CollectionFile(
+    def add(id: String, documentType: String, fileName: String): Future[Unit] = {
+      create(CollectionFile(
         id = id,
         documentType = documentType,
         fileName = fileName,
-        file = file
-      )
-      for {
-        _ <- create(collectionFile.serialize())
-      } yield ()
+        file = Array()
+      ).serialize())
     }
 
     def insertOrUpdate(id: String, documentType: String, fileName: String, file: Array[Byte]): Future[Unit] = {
-      val collectionFile = CollectionFile(
+      upsert(CollectionFile(
         id = id,
         documentType = documentType,
         fileName = fileName,
         file = file
-      )
-      for {
-        _ <- upsert(collectionFile.serialize())
-      } yield ()
+      ).serialize())
     }
 
     def get(id: String, documentType: String): Future[Option[CollectionFile]] = getById(id1 = id, id2 = documentType).map(_.map(_.deserialize))
+
+    def get(ids: Seq[String]): Future[Seq[CollectionFile]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
 
     def fetchAll(): Future[Seq[CollectionFile]] = getAll.map(_.map(_.deserialize))
 

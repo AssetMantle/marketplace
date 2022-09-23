@@ -1,0 +1,7 @@
+@import views.html.base._
+@import views.collection.companion.Create
+
+@(id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = id, documentType = constants.Collection.File.PROFILE)
+@commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = id, documentType = constants.Collection.File.COVER)
