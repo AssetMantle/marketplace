@@ -17,6 +17,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.Assets.versioned,
 
         routes.javascript.IndexController.index,
+        routes.javascript.IndexController.pageNotFound,
 
         routes.javascript.AccountController.signUpForm,
         routes.javascript.AccountController.signInWithCallbackForm,
