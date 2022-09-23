@@ -2,7 +2,7 @@
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState] = None)
 @views.html.base.common(constants.View.HOME)
-<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/404.css")"/>
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/pageNotFound.css")"/>
 
 <div class="errorPageContainer">
     <div class="imageContainer">
