@@ -1,4 +1,5 @@
 @import views.html.base.commonStringValue
+@import views.html.collection.details.commonFilterSection
 
 @(collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="sticky-top item-sticky">
@@ -18,7 +19,7 @@
                 <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
             </div>
             <div class="creatorName">
-                @commonStringValue(message = Messages(constants.View.COLLECTION_DETAIL_CREATOR_TITLE), id = utilities.IdGenerator.getRandomHexadecimal, length =  5)
+            @commonStringValue(message = Messages(constants.View.COLLECTION_DETAIL_CREATOR_TITLE), id = utilities.IdGenerator.getRandomHexadecimal, length = 5)
             </div>
         </div>
         <div class="separator"></div>
@@ -49,53 +50,28 @@
         </div>
         <div class="separator"></div>
         <div class="filterOptions">
-            <div class="filterOption availability">
-                <div class="d-flex justify-content-between align-items-center optionTitle">
-                    <span>@Messages(constants.View.FILTER_TITLE_AVAILABILITY)</span>
-                    <i class="bi bi-chevron-down iconDefault iconMedium"></i>
-                </div>
-                <div class="d-flex flex-column gap-3 mt-3">
-                    <div class="d-flex gap-2 singleFilter">
-                        <input type="checkbox" class="cmuk-checkbox" id="filterAvailabilityOption1"/>
-                        <label for="filterAvailabilityOption1">@Messages(constants.View.FILTER_AVAILABILITY_OPTION_BUY_NOW)</label>
-                    </div>
-                    <div class="d-flex gap-2 singleFilter">
-                        <input type="checkbox" class="cmuk-checkbox" id="filterAvailabilityOption2"/>
-                        <label for="filterAvailabilityOption2">@Messages(constants.View.FILTER_AVAILABILITY_OPTION_SHOW_ALL)</label>
-                    </div>
-                </div>
-            </div>
+            @commonFilterSection(constants.View.FILTER_TITLE_NFT_STATUS, Seq(constants.View.FILTER_NFT_STATUS_MINTED, constants.View.FILTER_NFT_STATUS_LISTED, constants.View.FILTER_NFT_STATUS_UNMINTED, constants.View.FILTER_NFT_STATUS_UNLISTED))
             <div class="innerSeparator"></div>
-            <div class="filterOption fileType">
-                <div class="d-flex justify-content-between align-items-center optionTitle">
-                    <span>@Messages(constants.View.FILTER_TITLE_FILE_TYPE)</span>
-                    <i class="bi bi-chevron-down iconDefault iconMedium"></i>
-                </div>
-                <div class="d-flex flex-column gap-3 mt-3">
-                    <div class="d-flex gap-2 singleFilter">
-                        <input type="checkbox" class="cmuk-checkbox" id="filterFileTypeOption1"/>
-                        <label for="filterFileTypeOption1">@Messages(constants.View.FILTER_TITLE_FILE_TYPE_GIF)</label>
-                    </div>
-                    <div class="d-flex gap-2 singleFilter">
-                        <input type="checkbox" class="cmuk-checkbox" id="filterFileTypeOption2"/>
-                        <label for="filterFileTypeOption2">@Messages(constants.View.FILTER_TITLE_FILE_TYPE_JPEG)</label>
-                    </div>
-                </div>
-            </div>
+            @commonFilterSection(constants.View.FILTER_TITLE_AVAILABILITY, Seq(constants.View.FILTER_AVAILABILITY_OPTION_BUY_NOW, constants.View.FILTER_AVAILABILITY_OPTION_SHOW_ALL))
             <div class="innerSeparator"></div>
-            <div class="filterOption priceRange">
+            @commonFilterSection(constants.View.FILTER_TITLE_FILE_TYPE, Seq(constants.View.FILTER_TITLE_FILE_TYPE_GIF, constants.View.FILTER_TITLE_FILE_TYPE_JPEG))
+            <div class="innerSeparator"></div>
+            <div class="filterOption priceRange" id="@constants.View.FILTER_TITLE_PRICE_RANGE">
                 <div class="d-flex justify-content-between align-items-center optionTitle">
                     <span>@Messages(constants.View.FILTER_TITLE_PRICE_RANGE)</span>
-                    <i class="bi bi-chevron-down iconDefault iconMedium"></i>
+                    <i class="bi bi-chevron-down iconDefault iconMedium" onclick="showFilterOptions('@constants.View.FILTER_TITLE_PRICE_RANGE')"></i>
                 </div>
-                <div class="d-flex gap-3 flex-column justify-content-between align-items-center flex-wrap mt-3">
-                    <input type="number" placeholder="Min"/>
-                    <span class="label">@Messages(constants.View.TO)</span>
-                    <input type="number" placeholder="Max"/>
+                <div class="options">
+                    <div class="d-flex gap-3 flex-column justify-content-between align-items-center flex-wrap mt-3">
+                        <input type="number" placeholder="Min"/>
+                        <span class="label">@Messages(constants.View.TO)</span>
+                        <input type="number" placeholder="Max"/>
+                    </div>
+                    <div class="mt-3 text-end filterButton">@Messages(constants.View.FILTER_APPLY_BUTTON)</div>
                 </div>
-                <div class="mt-3 text-end filterButton">Apply</div>
             </div>
             <div class="mb-0 innerSeparator"></div>
         </div>
     </div>
 </div>
+<script src="@routes.Assets.versioned("javascripts/collections/filter.js")"></script>

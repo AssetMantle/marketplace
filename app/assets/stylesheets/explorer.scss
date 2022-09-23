@@ -15,6 +15,10 @@
   .title{
     @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
     text-transform: capitalize;
+    .titleLink{
+      cursor: pointer;
+      color: var(--default);
+    }
   }
   .description{
     @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
@@ -59,6 +63,65 @@
   .creatorName{
     @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--dark));
     text-transform: capitalize;
+  }
+  .filterOptions{
+    .filterOption{
+      .optionTitle{
+        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+        i{
+          transform: rotate(0deg);
+          transition: all 0.5s;
+          cursor: pointer;
+          &.active{
+            transform: rotate(180deg);
+          }
+        }
+      }
+      .options{
+        display: none;
+        .singleFilter{
+          input[type="checkbox"]{
+            &:checked{
+              + label{
+                color: var(--mantle-off-white);
+              }
+            }
+          }
+          label{
+            @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
+          }
+        }
+      }
+      &.priceRange{
+        input[type="number"]{
+          @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
+          text-align: center;
+          height: 36px;
+          width: 100%;
+          background: transparent;
+          border: 1px solid var(--inactive-gray);
+          border-radius: 8px;
+          outline: none;
+          &::-webkit-inner-spin-button,
+          &::-webkit-outer-spin-button{
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            margin: 0;
+          }
+          &:focus{
+            border-color: var(--dark);
+            color: var(--mantle-off-white);
+          }
+        }
+        .label{
+          @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
+        }
+      }
+      .filterButton{
+        @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--dark));
+      }
+    }
   }
 }
 .collectionContainer{
