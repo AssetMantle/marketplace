@@ -1,0 +1,12 @@
+@import views.blockchainTransaction.companion.Undelegate
+@import views.html.blockchainTransaction.commonSelectGas
+@import views.html.base.form._
+
+@(sendCoin: Form[Undelegate.Data] = Undelegate.form, Validator: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.Delegate, delegate) {
+    @commonInputText(undelegate, constants.FormField.Validator, Symbol("value") -> Validator, Symbol("readonly") -> "readonly")
+    @commonInputMicornumber(undelegate, constants.FormField.UNDELEGATE_AMOUNT)
+    @commonInputInt(undelegate, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultUndelegateGasAmount, Symbol("class") -> "hidden")
+    @commonSelectGas(undelegate)
+    @commonInputPassword(undelegate, constants.FormField.PASSWORD)
+}
