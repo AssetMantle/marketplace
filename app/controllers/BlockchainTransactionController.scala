@@ -57,6 +57,13 @@ class BlockchainTransactionController @Inject()(
       SendCoin.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.blockchainTransaction.sendCoin(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.FROM_ADDRESS.name, ""))))
+        formWithErrors => {
+          Future(BadRequest(views.html.blockchainTransaction.sendCoin(formWithErr
+          )
+          )
+          )
+        }
+
         },
         sendCoinData => {
           val balance = blockchainBalances.Service.get(sendCoinData.fromAddress)
@@ -89,6 +96,26 @@ class BlockchainTransactionController @Inject()(
         }
       )
   }
+    def undelegateForm(fromAddress: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.blockchainTransaction.undelegate(validator= validator))
+
+   def undelegate(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Undelegate.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.blockchainTransaction.undelegate(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.VALIDATOR.name, ""))))
+        formWithErrors => {
+          Future(BadRequest(views.html.blockchainTransaction.undelegate(formWithErr)))
+        },
+        sendCoinData => {
+
+        }
+
+  }
+      )
+   }
+   
+
 
 
 }
