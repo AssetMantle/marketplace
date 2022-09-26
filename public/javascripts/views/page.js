@@ -26,6 +26,7 @@ function viewSetting() {
 }
 
 function viewProfile(accountId) {
+    componentResource('leftContent', jsRoutes.controllers.ProfileController.profileInfoCard(accountId));
     componentResource('centerContent', jsRoutes.controllers.ProfileController.profile(accountId));
-    $('#leftContent').html('');
+    componentResource('rightContent', jsRoutes.controllers.ProfileController.profileActivityCard(accountId));
 }

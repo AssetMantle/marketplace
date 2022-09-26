@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base.buttons._
+@import views.html.base.commonAddressValue
 
 @(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="walletPopupContainer">
@@ -16,7 +17,9 @@
         <i id="openWalletMenu" class="bi bi-list iconDefault iconLarge" onclick="openCloseWalletScreen(this, 'addressBook')"></i>
     </div>
     <div class="row p-2 mx-0 mt-3 justify-content-between align-items-center userAddressBox">
-        <div class="col-10 p-0 userAddressData username-data" data-value="@loginState.address">@loginState.address</div>
+        <div class="col-10 p-0 userAddressData username-data" data-value="@loginState.address">
+        @commonAddressValue(message = loginState.address, id = utilities.IdGenerator.getRandomHexadecimal, length = 8)
+        </div>
         <div class="col-2 text-end copyIcon" onclick="copyToClipboard(this); showSnackbar('', '@Messages(constants.View.ADDRESS_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
             <i id="openWalletMenu" class="bi bi-files iconDefault iconMedium"></i>
         </div>

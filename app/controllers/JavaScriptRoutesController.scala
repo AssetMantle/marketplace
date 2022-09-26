@@ -72,6 +72,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ProfileController.viewProfile,
         routes.javascript.ProfileController.profile,
+        routes.javascript.ProfileController.profileInfoCard,
+        routes.javascript.ProfileController.profileActivityCard,
 
         routes.javascript.WhitelistController.whitelistSection,
         routes.javascript.WhitelistController.createdWhitelists,

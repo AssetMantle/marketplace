@@ -89,6 +89,8 @@ GET         /likesCounter                                         controllers.NF
 GET         /defaultProfile                                       controllers.ProfileController.viewDefaultProfile()
 GET         /profile/:accountId                                   controllers.ProfileController.viewProfile(accountId: String)
 GET         /profileSection                                       controllers.ProfileController.profile(accountId: String)
+GET         /profileInfoCard                                      controllers.ProfileController.profileInfoCard(accountId: String)
+GET         /profileActivityCard                                  controllers.ProfileController.profileActivityCard(accountId: String)
 
 GET         /whitelistSection                                     controllers.WhitelistController.whitelistSection()
 GET         /createdWhitelists                                    controllers.WhitelistController.createdWhitelists()

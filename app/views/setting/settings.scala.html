@@ -1,4 +1,5 @@
 @import controllers.actions.LoginState
+@import views.html.base.commonAddressValue
 
 @(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="profileSettingsContainer">
@@ -22,7 +23,9 @@
         </div>
         <div class="d-flex flex-row align-items-center flex-wrap walletInfoField">
             <div class=" pe-2 fieldLabel">@Messages(constants.View.PROFILE_IDENTITY_ADDRESS)</div>
-            <div class=" fieldValue username-data" data-value="@keys.find(_.active).fold(Messages(constants.View.ACTIVE_ADDRESS_NOT_FOUND))(_.address)">@keys.find(_.active).fold(Messages(constants.View.ACTIVE_ADDRESS_NOT_FOUND))(_.address)</div>
+            <div class=" fieldValue username-data" data-value="@keys.find(_.active).fold(Messages(constants.View.ACTIVE_ADDRESS_NOT_FOUND))(_.address)">
+                @commonAddressValue(message = keys.find(_.active).fold(Messages(constants.View.ACTIVE_ADDRESS_NOT_FOUND))(_.address), id = utilities.IdGenerator.getRandomHexadecimal, length = 8)
+            </div>
             <div class="m-0 ms-2 mt-2 mt-xl-0 mt-md-2 iconContainer" onclick="copyToClipboard(this); showSnackbar('', '@Messages(constants.View.ADDRESS_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
                 <i class="bi bi-files iconDefault iconMedium copyIcon"></i>
             </div>
@@ -36,7 +39,9 @@
         <div class="walletInfoField active">
             <div class="pe-2 mb-2 fieldLabel"><label for="walletAddress1">@key.name.getOrElse("")</label></div>
             <div class="d-flex flex-row align-items-center flex-wrap">
-                <div class="fieldValue username-data" data-value="@key.address"><label for="walletAddress1">@key.address</label></div>
+                <div class="fieldValue username-data" data-value="@key.address"><label for="walletAddress1">
+                    @commonAddressValue(message = key.address, id = utilities.IdGenerator.getRandomHexadecimal, length = 8)
+                </label></div>
                 <div class="pe-2 m-0 ms-2 iconContainer" onclick="copyToClipboard(this); showSnackbar('', '@Messages(constants.View.ADDRESS_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
                     <i class="bi bi-files iconDefault iconMedium copyIcon"></i>
                 </div>

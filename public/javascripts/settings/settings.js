@@ -24,12 +24,6 @@ $('.walletInformation input').on('change', function () {
     let parent = $(this).parents('.walletInfoField').last().addClass("active");
 });
 
-// Address Shorter
-var addresses = document.querySelectorAll('.username-data');
-addresses.forEach(address => {
-    $(address).text($(address).text().substr(0, 8) + "..." + $(address).text().substr($(address).length - 8));
-});
-
 // Open/Close wallet screens
 function openCloseWalletScreen(e, elementID) {
     $(e).parent().closest(".walletPopupContainer").find(`#${elementID}`).toggleClass("open");
