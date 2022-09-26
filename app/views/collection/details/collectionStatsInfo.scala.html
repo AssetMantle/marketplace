@@ -1,0 +1,42 @@
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="sticky-top item-sticky">
+    <div class="card rightInfoCard">
+        <div class="singleInfo">
+            <div class="infoTitle">@Messages(constants.View.STATS_INFO_TITLE_TOTAL_NFT)</div>
+            <div class="mt-1 infoValue">00</div>
+        </div>
+        <div class="separator"></div>
+        <div class="singleInfo">
+            <div class="infoTitle">@Messages(constants.View.STATS_INFO_TITLE_OWNER)</div>
+            <div class="mt-1 infoValue">00</div>
+        </div>
+        <div class="separator"></div>
+        <div class="singleInfo">
+            <div class="infoTitle">@Messages(constants.View.STATS_INFO_TITLE_FLOOR_PRICE)</div>
+            <div class="mt-1 d-flex gap-2 align-items-center infoValue">
+                <div class="tokenIcon">
+                    <img src="@routes.Assets.versioned("images/icon/mantlePlaceToken.png")"/>
+                </div>
+                <div class="mantleAmount">00.00</div>
+                <div class="dollarAmount">($00.00)</div>
+            </div>
+        </div>
+        <div class="separator"></div>
+        <div class="singleInfo">
+            <div class="infoTitle">@Messages(constants.View.STATS_INFO_TITLE_VOLUME_TRADED)</div>
+            <div class="mt-1 d-flex gap-2 align-items-center infoValue">
+                <div class="tokenIcon">
+                    <img src="@routes.Assets.versioned("images/icon/mantlePlaceToken.png")"/>
+                </div>
+                <div class="mantleAmount">00.00</div>
+                <div class="dollarAmount">($00.00)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card rightInfoCard">
+        <div class="zeroNftSelectedInfo">
+            @Messages(constants.View.STATS_INFO_ZERO_NFT_SELECTED_INFO)
+        </div>
+    </div>
+</div>

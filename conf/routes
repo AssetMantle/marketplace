@@ -47,6 +47,7 @@ GET         /collectionNFTs                                       controllers.Co
 GET         /collectionNFTsPerPage                                controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionFile                                       controllers.CollectionController.collectionFile(id: String, documentType:String, compress: Boolean)
 GET         /collectionInfo                                       controllers.CollectionController.info(id: String)
+GET         /collectionStatsInfo                                  controllers.CollectionController.statsInfo()
 
 GET         /wishlistSection                                      controllers.WishlistController.wishlistSection(accountId: String)
 GET         /wishListCollectionPerPage                            controllers.WishlistController.collectionPerPage(accountId: String, pageNumber: Int)

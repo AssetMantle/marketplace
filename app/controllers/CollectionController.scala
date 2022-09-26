@@ -150,4 +150,11 @@ class CollectionController @Inject()(
         }
     }
   }
+
+  def statsInfo(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.collection.details.collectionStatsInfo()))
+    }
+  }
 }

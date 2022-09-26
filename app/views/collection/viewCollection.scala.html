@@ -8,6 +8,7 @@
     <script>
         componentResource('leftContent', jsRoutes.controllers.CollectionController.info('@collection.id'));
         componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs('@collection.id'));
+        componentResource('rightContent', jsRoutes.controllers.CollectionController.statsInfo());
         checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection('@collection.id').url, '@collection.id', "viewCollection");
     </script>
 </div>

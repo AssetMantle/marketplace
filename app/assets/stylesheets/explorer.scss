@@ -7,7 +7,8 @@
   color: $color;
 }
 /* Left Info Card  */
-.leftInfoCard{
+.leftInfoCard,
+.rightInfoCard{
   height: fit-content;
   background-color: var(--card-color);
   border-radius: 20px;
@@ -65,20 +66,29 @@
     text-transform: capitalize;
   }
   .filterOptions{
-    .filterOption{
-      .optionTitle{
-        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
-        i{
-          transform: rotate(0deg);
-          transition: all 0.5s;
-          cursor: pointer;
-          &.active{
-            transform: rotate(180deg);
+    .accordion{
+      --bs-accordion-bg: var(--card-color);
+      .accordion-item{
+        border: none;
+        .accordion-header{
+          .accordion-button{
+            @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+            padding: 0px;
+            outline: none;
+            box-shadow: none;
+            &:not(.collapsed){
+              background-color: var(--card-color);
+            }
+            &::after{
+              background-image: url("../images/icon/downArrowYellow.png");
+            }
           }
+        }
+        .accordion-body{
+          padding: 0px;
         }
       }
       .options{
-        display: none;
         .singleFilter{
           input[type="checkbox"]{
             &:checked{
@@ -92,7 +102,7 @@
           }
         }
       }
-      &.priceRange{
+      .priceRange{
         input[type="number"]{
           @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
           text-align: center;
@@ -521,5 +531,24 @@
       border: 2px solid var(--line);
       @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--card-color));
     }
+  }
+}
+.rightInfoCard{
+  .singleInfo{
+    .infoTitle{
+      @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+    }
+    .infoValue{
+      @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+      .mantleAmount{
+        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--default));
+      }
+      .dollarAmount{
+        @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));
+      }
+    }
+  }
+  .zeroNftSelectedInfo{
+    @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--gray));
   }
 }
