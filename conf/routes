@@ -13,7 +13,6 @@ GET         /firebase-messaging-sw.js                             controllers.As
 
 # Home
 GET         /                                                     controllers.IndexController.index()
-GET         /pageNotFound                                         controllers.IndexController.pageNotFound()
 
 GET         /signUp                                               controllers.AccountController.signUpForm()
 POST        /signUp                                               controllers.AccountController.signUp()

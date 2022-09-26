@@ -39,15 +39,5 @@ class IndexController @Inject()(
       }
   }
 
-  def pageNotFound: Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
-    implicit request =>
-      optionalLoginState match {
-        case Some(loginState) =>
-          implicit val loginStateImplicit: LoginState = loginState
-          Future(Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)))
-        case None => Future(Ok(views.html.pageNotFound()))
-      }
-  }
-
   starter.start()
 }
