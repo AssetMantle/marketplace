@@ -87,6 +87,8 @@ object Response {
   val INVALID_PASSWORD_OR_SEEDS = new Failure("INVALID_PASSWORD_OR_SEEDS")
   val HD_PATH_NOT_FOUND = new Failure("HD_PATH_NOT_FOUND")
   val INVALID_WALLET_ADDRESS = new Failure("INVALID_WALLET_ADDRESS")
+  val START_TIME_GREATER_THAN_EQUAL_TO_END_TIME = new Failure("START_TIME_GREATER_THAN_EQUAL_TO_END_TIME")
+  val START_TIME_LESS_THAN_CURRENT_TIME = new Failure("START_TIME_LESS_THAN_CURRENT_TIME")
   val CANNOT_DELETE_ACTIVE_KEY = new Failure("CANNOT_DELETE_ACTIVE_KEY")
   val MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED = new Failure("MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED")
   val FROM_AND_TO_ADDRESS_SAME = new Failure("FROM_AND_TO_ADDRESS_SAME")
@@ -106,8 +108,11 @@ object Response {
   val TRANSACTION_ALREADY_IN_MEMPOOL = new Failure("TRANSACTION_ALREADY_IN_MEMPOOL")
   val INVALID_NUMBER_FORMAT = new Failure("INVALID_NUMBER_FORMAT")
   val ACCOUNT_TYPE_NOT_FOUND = new Failure("ACCOUNT_TYPE_NOT_FOUND")
+  val BALANCE_FETCH_FAILED = new Failure("BALANCE_FETCH_FAILED")
+  val NO_COLLECTION_TO_CREATE_WHITELIST = new Failure("NO_COLLECTION_TO_CREATE_WHITELIST")
+  val WHITELIST_MAX_MEMBERS_REACHED = new Failure("WHITELIST_MAX_MEMBERS_REACHED")
 
-  class Failure(response: String, private val actionController: JavaScriptReverseRoute = null) {
+  class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
     val action: String = utilities.JsRoutes.getJsRouteString(actionController)
     val logMessage: String = LOG_PREFIX + response

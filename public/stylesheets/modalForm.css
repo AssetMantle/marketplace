@@ -167,13 +167,13 @@
 }
 
 /* Form Button */
-.form-button{
+.horizontal-align{
     display: flex;
     justify-content: end;
     margin-top: 40px;
     gap: 30px;
 }
-.form-button button{
+.horizontal-align button{
     padding: 9px 0;
     width: 200px;
     font-family: var(--font-type-2);
@@ -188,17 +188,16 @@
     border-radius: 32px;
     cursor: pointer;
 }
-.form-button .form-primary-button{
+.horizontal-align .form-primary-button{
     color: var(--button-text);
     background-color: var(--default);
     overflow: hidden;
     position: relative;
     z-index: 950;
 }
-.form-button .form-primary-button:hover{
-    box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.5);
-}
-.form-button .form-primary-button.disable{
+.horizontal-align .form-primary-button.disable{
+    border: none !important;
+    box-shadow: none !important;
     background: var(--disable-yellow) !important;
     cursor: none;
     pointer-events: none;
@@ -208,20 +207,27 @@
     -ms-user-select: none;
     user-select: none;
 }
-.form-button .form-secondary-button{
-    background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
+.horizontal-align .form-secondary-button{
+    color: var(--dark);
     background-color: transparent;
     border: 1px solid var(--dark);
     overflow: hidden;
     position: relative;
     z-index: 950;
+    transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1);
 }
-.form-button .form-secondary-button:hover{
-    box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.3);
+.horizontal-align .form-primary-button.small,
+.horizontal-align .form-secondary-button.small{
+    width: 100px;
+    font-size: 14px;
+    padding: 6px 0;
+    line-height: 19px;
+    border: 1px solid var(--dark);
+}
+.horizontal-align .form-primary-button.small i,
+.horizontal-align .form-secondary-button.small i {
+    font-size: 14px;
+    line-height: 19px;
 }
 /* Error Modal */
 .wallet-error-message{
@@ -271,6 +277,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 350px;
+    white-space: nowrap;
 }
 @media (max-width: 650px){
     .form-address-box .address-box-text .username-data{
@@ -543,10 +550,17 @@
     line-height: 17px;
     color: var(--inactive-gray);
 }
+#formBody dd input[type=number]::-webkit-inner-spin-button,
+#formBody dd input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
 #formBody dd input[type=text],
 #formBody dd input[type=password],
 #formBody .commonTextarea{
-#formBody dd input[type=number]
+#formBody dd input[type=number],
+#formBody dd textarea
 {
     font-family: var(--font-type-2);
     height: 36px;
@@ -572,17 +586,29 @@
 #formBody dd input[type=text]:focus,
 #formBody dd input[type=password]:focus,
 #formBody .commonTextarea:focus
-#formBody dd input[type=number]:focus
+#formBody dd input[type=number]:focus,
+#formBody dd textarea:focus
 {
     border-color: var(--dark);
 }
 #formBody dd input[type=text]:not(:focus),
 #formBody dd input[type=password]:not(:focus),
 #formBody .commonTextarea:not(:focus)
-#formBody dd input[type=number]:not(:focus)
+#formBody dd input[type=number]:not(:focus),
+#formBody dd textarea:not(:focus)
 {
     color: var(--inactive-gray);
     border-color: var(--gray) !important;
+}
+#formBody dd textarea{
+    height: 120px;
+    padding: 10px 12px;
+}
+#formBody dd input[type=text].errorField,
+#formBody dd input[type=password].errorField,
+#formBody dd input[type=number].errorField,
+#formBody dd textarea.errorField{
+    border: 1px solid var(--error) !important;
 }
 #formBody dd input[type=number]::-webkit-inner-spin-button,
 #formBody dd input[type=number]::-webkit-outer-spin-button {
@@ -844,6 +870,21 @@ dl dd.error{
     align-items: baseline;
     gap: 10px;
 }
+#signUpUsername_field label{
+    display: none;
+}
+
+/* Character Count for Textarea */
+.remainingCharacterLabel{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--inactive-gray);
+}
+
+
 
 /* Character Count for Textarea */
 .remainingCharacterLabel{

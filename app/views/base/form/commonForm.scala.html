@@ -1,9 +1,11 @@
 @import helper._
 @import views.html.base.buttons._
 
-@(formTemplate: constants.Form, formData: Form[_], showBackButton: Boolean = false, closeButton: Boolean = true, showSubtitle: Boolean = true, showScreen: String = "", hideScreen: String = "", isModal: Boolean = false, submitDisable: Boolean = false, target: String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+@(formTemplate: constants.Form, formData: Form[_], showBackButton: Boolean = false, closeButton: Boolean = true, showSubtitle: Boolean = true, showScreen: String = "", hideScreen: String = "", refreshOverlay: Boolean = false, submitDisable: Boolean = true, target: String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
-@form(action = formTemplate.post, Symbol("onkeypress") -> s"submitFormOnEnter(event,'${isModal}',this, '${target}')") {
+@form(action = formTemplate.post,
+    Symbol("onkeypress") -> s"onKeyPress(event,'${refreshOverlay}',this, '${target}')",
+    if (submitDisable) Symbol("onkeyup") -> s"onKeyUp(this, '${formTemplate.submit.replace(".", "_")}')" else Symbol("onkeyup") -> "") {
     @if(showSubtitle) {
         @if(showBackButton) {
             <div class="modal-header mb-3">
@@ -81,9 +83,9 @@
                 @commonJavascriptButton(formTemplate.submit, customSubmit)
             } else {
                 @if(submitDisable) {
-                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace(".", "_"), Symbol("class") -> "disable")
+                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${refreshOverlay}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace(".", "_"), Symbol("class") -> "disable")
                 } else {
-                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${isModal}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace(".", "_"))
+                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${refreshOverlay}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace(".", "_"))
                 }
             }
             </div>

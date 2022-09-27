@@ -1,0 +1,8 @@
+@import play.api.routing.JavaScriptReverseRoute
+@(name: String, route : JavaScriptReverseRoute , arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<button type="@arguments.toMap.get(Symbol("type")).map(_.toString).getOrElse("button")"  class="@Seq("form-secondary-button", arguments.toMap.get(Symbol("class")).map(_.toString).getOrElse("")).mkString(" ")" id='@arguments.toMap.get(Symbol("id")).map(_.toString).getOrElse("")' onclick="getForm(@utilities.JsRoutes.getJsRouteString(route, arguments.toMap.get(Symbol("parameters")).map(_.toString).getOrElse("")))">@Messages(name)</button>
+
+@* Example Usage:
+@commonModalSecondaryButton("NAME", constants.FORM.form.get, Symbol("parameters") -> s"'${accountId}', 23"
+*@

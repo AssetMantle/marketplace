@@ -112,26 +112,6 @@ nav .content .links
     display: none;
 }
 
-.content .links > li.active::before,
-.content .links > li:hover::before,
-.right-menu .links > li.active::before,
-.right-menu .links > li:hover::before
-{
-    content: '';
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 7px;
-    height: 7px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    background-color: #FFC640;
-    border-radius: 50%;
-    animation: menuAnimation .3s ease-in forwards;
-}
-
 @keyframes menuAnimation {
     0% {
         bottom: 7px;
@@ -678,4 +658,13 @@ nav .content .links
         padding: 0;
         color: #000000;
     }
+}
+#walletPopup.active + a i{
+        color: var(--default);
+}
+.right-menu .links > li:hover i {
+    color: var(--default);
+}
+#userWallet .desktop-link{
+    padding: 27px 10px;
 }

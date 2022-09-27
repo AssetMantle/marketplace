@@ -1,4 +1,7 @@
-function getForm(route, modal = '#commonModal', modalContent = '#modal-content') {
+function emptyCallBack() {
+}
+
+function getForm(route, modal = '#commonModal', modalContent = '#modal-content', callback = emptyCallBack) {
     let myModal = new bootstrap.Modal($(modal), {});
     $.ajax({
         url: route.url,
@@ -9,9 +12,16 @@ function getForm(route, modal = '#commonModal', modalContent = '#modal-content')
                 $(modal).addClass('active');
                 $(modalContent).html(data);
                 myModal.show();
+                callback();
             },
             500: function (data) {
                 replaceDocument(data);
+            },
+            400: function (data) {
+                $(modal).addClass('active');
+                $(modalContent).html(data.responseText);
+                myModal.show();
+                callback();
             },
         }
     }).fail(function (XMLHttpRequest) {
@@ -26,5 +36,4 @@ function replaceDocument(data) {
     const newDocument = document.open("text/html", "replace");
     newDocument.write(data);
     newDocument.close();
-    // webSocket.close();
 }

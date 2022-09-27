@@ -1,0 +1,67 @@
+@import play.api.routing.JavaScriptReverseRoute
+@import scala.collection.immutable.ListMap
+
+@(items: ListMap[String, Any], arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<div>
+    <ul class="nav nav-tabs" id="commonHorizontalSwitcher_@items.keys.mkString("_")" role="tablist">
+    @for(((itemHeader, itemValue), index) <- items.zipWithIndex) {
+        @defining(index == 0) { firstIndex =>
+            @itemValue match {
+                case html: Html => {
+                    <li class="nav-item" role="presentation">
+                        <a class='@Seq("nav-link", if(firstIndex) "active" else "").mkString(" ")' id='@Seq(itemHeader, "-tab").mkString("")' data-bs-toggle="tab" data-bs-target="#switcherContent@itemHeader" role="tab" aria-controls="switcherContent@itemHeader" aria-selected="@firstIndex">@Messages(itemHeader)</a>
+                    </li>
+                }
+                case route: JavaScriptReverseRoute => {
+                    @defining(utilities.JsRoutes.getJsRouteString(route, arguments.toMap.get(Symbol(Seq(itemHeader, "PARAMETERS").mkString("_"))).map(_.toString).getOrElse(""))) { jsRoute =>
+                        <li class="nav-item" role="presentation">
+                            <a class='@Seq("nav-link", if(firstIndex) "active" else "").mkString(" ")' id='@Seq(itemHeader, "-tab").mkString("")' data-bs-toggle="tab" data-bs-target="#switcherContent@itemHeader" role="tab" aria-controls="switcherContent@itemHeader" aria-selected="@firstIndex" onclick="componentResource('switcherContent@itemHeader', @jsRoute)">@Messages(itemHeader)</a>
+                        </li>
+                    }
+                }
+                case _ => {
+                    <li class="nav-item" role="presentation">
+                        <a class='@Seq("nav-link", if(firstIndex) "active" else "").mkString(" ")' id='@Seq(itemHeader, "-tab").mkString("")' data-bs-toggle="tab" data-bs-target="#switcherContent@itemHeader" role="tab" aria-controls="switcherContent@itemHeader" aria-selected="@firstIndex">@Messages(itemHeader)</a>
+                    </li>
+                }
+            }
+        }
+    }
+    </ul>
+    <div class="tab-content">
+    @for(((itemHeader, itemValue), index) <- items.zipWithIndex) {
+        @defining(index == 0) { firstIndex =>
+            @itemValue match {
+                case html: Html => {
+                    <div class='@Seq("tab-pane", if(firstIndex) "fade show active" else "fade").mkString(" ")' id="switcherContent@itemHeader" role="tabpanel" aria-labelledby='@Seq(itemHeader, "-tab").mkString("")'>@itemValue</div>
+                }
+                case route: JavaScriptReverseRoute => {
+                    <div class='@Seq("tab-pane", if(firstIndex) "fade show active" else "fade").mkString(" ")' id="switcherContent@itemHeader" role="tabpanel" aria-labelledby='@Seq(itemHeader, "-tab").mkString("")'>
+                    @if(firstIndex) {
+                        <script>
+                                loadSwitcherContent('@Seq(itemHeader, "-tab").mkString("")');
+                        </script>
+                    }
+                    </div>
+                }
+                case _ => {
+                    <div class='@Seq("tab-pane", if(firstIndex) "fade show active" else "fade").mkString(" ")' id="switcherContent@itemHeader" role="tabpanel" aria-labelledby='@Seq(itemHeader, "-tab").mkString("")'>@itemValue.toString</div>
+                }
+            }
+        }
+    }
+    </div>
+    @* @commonSpinner(items.hashCode().toString)*@
+</div>
+<script>switcher('commonHorizontalSwitcher_@items.keys.mkString("_")')</script>
+@*Example Usage: @commonHorizontalSwitcher(
+ListMap(
+"HEADER_1" -> views.html.component.master.scalaTemplate("parameters"),
+"HEADER_2" -> routes.javascript.Controller.methodName,
+"HEADER_3" -> routes.javascript.Controller.methodNameRequiringParameters),
+'HEADER_3_PARAMETERS -> "'StringParameter', 123")
+
+If you don't want to use Html or jsRoutes, and rather fill the details like on certain event in javascript, give the Header key and leave its value to be empty string,
+use the id "switcherYour_header_value" to fill the content. But this is not preferable, always use scala template or jsRoutes.
+*@

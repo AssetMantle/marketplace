@@ -8,9 +8,11 @@ function viewCollection(collectionId) {
     componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs(collectionId));
 }
 
-function viewWishListCollection(collectionId) {
+function viewWishListCollection(lastPart) {
+    let accountId = lastPart.split("/")[0];
+    let collectionId = lastPart.split("/")[2];
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
-    componentResource('centerContent', jsRoutes.controllers.CollectionController.wishListCollectionNFTs(collectionId));
+    componentResource('centerContent', jsRoutes.controllers.WishlistController.collectionNFTs(accountId, collectionId));
 }
 
 function viewNFT(nftId) {
@@ -18,7 +20,12 @@ function viewNFT(nftId) {
     componentResource('centerContent', jsRoutes.controllers.NFTController.details(nftId));
 }
 
-function viewProfile() {
-    componentResource('centerContent', jsRoutes.controllers.ProfileController.settings());
+function viewSetting() {
+    componentResource('centerContent', jsRoutes.controllers.SettingController.settings());
+    $('#leftContent').html('');
+}
+
+function viewProfile(accountId) {
+    componentResource('centerContent', jsRoutes.controllers.ProfileController.profile(accountId));
     $('#leftContent').html('');
 }

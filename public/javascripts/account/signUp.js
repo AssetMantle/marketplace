@@ -27,8 +27,7 @@ function checkUsernameAvailable(source, usernameAvailableCheckBoxID) {
                             usernameAvailableCheckBox[0].checked = true;
                             $("#checkIcon").fadeIn();
                             $("#usernameAvailableError").hide(300);
-                            // $("#signUpUsername").css("border-color", "var(--dark)");
-                            $("#signUpUsername:focus").css("border-color","var(--dark)");
+                            $("#signUpUsername:focus").css("border-color", "var(--dark)");
                         },
                         204: function () {
                             usernameAvailableCheckBox[0].checked = false;
@@ -47,7 +46,6 @@ function checkUsernameAvailable(source, usernameAvailableCheckBoxID) {
 
 function showPassword() {
     let password = $('#signUpPassword')[0];
-    let matchPassword = $('#signUpConfirmPassword')[0];
     if (password.type === "password") {
         password.type = "text";
         $(".closeEye").addClass("hidden");
@@ -71,10 +69,10 @@ function checkPasswords() {
     }
 }
 
-function checkNewPassword(){
-    var flag1,flag2,flag3,flag4 = 0;
+function checkNewPassword() {
+    let flag1, flag2, flag3, flag4 = 0;
     let passwordValue = document.getElementById('signUpPassword').value;
-    if($.trim(passwordValue).length) {
+    if ($.trim(passwordValue).length) {
 
         let numberMatchPattern = passwordValue.match(/\d+/g);
         const isUpperCase = (x) => /[A-Z]/.test(x);
@@ -117,12 +115,8 @@ function checkNewPassword(){
 }
 
 function activeButton() {
-    let signUpUsername = document.getElementById("signUpUsername");
-    // let signUpPassword = document.getElementById("signUpPassword");
-    // let signUpConfirmPassword = document.getElementById("signUpConfirmPassword");
     let termsCondition = document.getElementById("termsCondition");
-    // if ($.trim(signUpUsername.value).length && $.trim(signUpPassword.value).length && $.trim(signUpConfirmPassword.value).length && termsCondition.checked === true){
-    if ($.trim(signUpUsername.value).length && termsCondition.checked === true){
+    if (termsCondition.checked === true) {
         $(".cmuk-button").removeClass("disable");
     } else {
         $(".cmuk-button").addClass("disable");
@@ -133,4 +127,8 @@ function changeFieldBorder() {
     $("#signUpUsername:focus").css("border-color", "var(--dark)");
     $("#signUpUsername:not(:focus)").css("border-color", "var(--inactive-gray)");
 }
+
+$(document).ready(function () {
+    $('#FORM_SIGN_UP_SUBMIT').addClass("disable");
+})
 

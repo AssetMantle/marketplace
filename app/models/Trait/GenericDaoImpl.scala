@@ -46,6 +46,8 @@ abstract class GenericDaoImpl[
 
   def filter[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Seq[E]] = db.run(tableQuery.filter(expr).result)
 
+  def filterAndCount[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Int] = db.run(tableQuery.filter(expr).size.result)
+
   def filterHead[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[E] = db.run(tableQuery.filter(expr).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -71,8 +73,8 @@ abstract class GenericDaoImpl[
     }
   }
 
-  def create(entity: E): Future[Unit] = db.run((tableQuery += entity).asTry).map {
-    case Success(result) => ()
+  def create(entity: E): Future[PK] = db.run((tableQuery returning tableQuery.map(_.id) += entity).asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_INSERT_FAILED"), psqlException)
     }

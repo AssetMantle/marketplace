@@ -8,22 +8,11 @@ document.onload = function () {
         window.scrollTo(0, 0);
     }
 }
-clicked = false;
 
-function loadMoreNFTs(collectionId, sectionName) {
+function loadMoreNFTs(collectionId) {
     const loading = document.querySelector('.loading');
     if ($(".noNFT").length === 0) {
-        let route = "";
-        switch (sectionName) {
-            case "art":
-                route = jsRoutes.controllers.CollectionController.collectionNFTsPerPage(collectionId, $(".nftPage").length + 1);
-                break;
-            case "wishlist":
-                route = jsRoutes.controllers.CollectionController.wishListCollectionNFTsPerPage(collectionId, $(".nftPage").length + 1);
-                break;
-            default:
-                break;
-        }
+        let route = jsRoutes.controllers.CollectionController.collectionNFTsPerPage(collectionId, $(".nftPage").length + 1);
         $.ajax({
             url: route.url,
             type: route.type,
@@ -50,29 +39,13 @@ function loadMoreNFTs(collectionId, sectionName) {
                     if ($(".noNFT").length !== 0) {
                         $("#loadMoreBtnContainer").addClass("hide");
                     }
-                    clicked = false;
                 }
             }
         });
     } else {
-        console.log("NO COLLECTION LEFT NFT")
         $(".nftPage:last").css("margin-top", "0px");
         $("#loadMoreBtnContainer").addClass("hide");
     }
-}
-
-nftPageTimeout = 0;
-collectionId = '';
-
-function loadCollections(section) {
-    if (!clicked) {
-        clicked = true;
-        loadMoreNFTs(collectionId, section);
-    }
-}
-
-function setCollectionId(id) {
-    collectionId = id;
 }
 
 function loadFirstNFTBulk(source, route, loadingSpinnerID = 'commonSpinner', event = '') {
@@ -104,8 +77,19 @@ function loadFirstNFTBulk(source, route, loadingSpinnerID = 'commonSpinner', eve
                 div.addClass("centerText componentError cmuk-card cmuk-card-default commonCard cmuk-animation-fade cmuk-card-body cmuk-height-medium cmuk-overflow-auto");
                 div.html(imageElement);
                 div.append("<p>" + data.responseText + "</p>")
-
             }
         }
     });
+}
+
+timeout = 0;
+function loadArtNftOnScroll(collectionId){
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+        if ($(window).scrollTop() >= ($(document).height() - $(window).height() - 500)) {
+            if ($(".noNFT").length === 0) {
+                loadMoreNFTs(collectionId);
+            }
+        }
+    }, 300);
 }

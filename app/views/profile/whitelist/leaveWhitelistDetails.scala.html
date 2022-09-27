@@ -1,0 +1,34 @@
+@import models.master.Whitelist
+@import views.html.base.buttons._
+
+@(whitelist: Whitelist)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="modal-header mb-0">
+    <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.WHITELIST_LEAVE_TITLE)</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                &times;
+    </button>
+</div>
+<div class="whitelistInfo form-address-box">
+    <div class="form-address-box-item">
+        <span class="address-box-label">@Messages(constants.View.WHITELIST_NAME)</span>
+        <span class="address-box-text">
+            <span class="username-data">@whitelist.name</span>
+        </span>
+    </div>
+    <div class="form-address-box-item">
+        <span class="address-box-label">@Messages(constants.View.WHITELIST_DESCRIPTION)</span>
+        <span class="address-box-text">
+            <span class="username-data">@whitelist.description</span>
+        </span>
+    </div>
+    <div class="form-address-box-item">
+        <span class="address-box-label">@Messages(constants.View.WHITELIST_MAX_MEMBERS)</span>
+        <span class="address-box-text">
+            <span class="username-data">@whitelist.maxMembers</span>
+        </span>
+    </div>
+</div>
+<div class="d-flex justify-content-end horizontal-align">
+    @commonSecondaryButton(constants.View.CLOSE_LEAVE_WHITELIST, JavaScript(s"""closeModal()"""))
+    @commonPrimaryButton(constants.View.LEAVE_WHITELIST, JavaScript(s"""getForm(jsRoutes.controllers.WhitelistController.leaveWhitelist('${whitelist.id}'), '#commonModal', '#modal-content', resetJoinedWhitelistPage)"""))
+</div>

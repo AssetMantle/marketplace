@@ -9,7 +9,7 @@ import models.master.WishList
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, EssentialAction, MessagesControllerComponents}
+import play.api.mvc.{AbstractController, Action, AnyContent, Call, EssentialAction, MessagesControllerComponents}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,6 +30,8 @@ class NFTController @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.NFT_CONTROLLER
+
+  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections("art")
 
   def viewNFT(nftId: String): EssentialAction = cached.apply(req => req.path + "/" + nftId, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>

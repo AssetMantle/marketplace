@@ -9,27 +9,12 @@ document.onload = function () {
     }
 }
 
-clicked = false;
-
 function loadMoreCollections() {
     const loading = document.querySelector('.loading');
     if ($(".noCollection").length === 0) {
         const activeSection = $.trim($("#sectionMenu").find(".menuItem.active").attr('id'));
-        let route = "";
-        let loadMore = "";
-        switch (activeSection) {
-            case "art":
-                route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
-                loadMore = $(".collectionsPerPage");
-                break;
-            case "wishListCollections":
-                route = jsRoutes.controllers.CollectionController.wishListCollectionPerPage($(".collectionPage").length + 1);
-                loadMore = $(".wishlistCollectionsPerPage");
-                break;
-            default:
-                break;
-        }
-
+        let route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
+        let loadMore = $(".collectionsPerPage");
         $.ajax({
             url: route.url,
             type: route.type,
@@ -48,9 +33,6 @@ function loadMoreCollections() {
                 if (activeSection === 'art' && $(".artCollection").length % 6 !== 0) {
                     $("#loadMoreBtnContainer").addClass("hide");
                 }
-                if (activeSection === 'wishListCollections' && $(".wishListCollection").length % 6 !== 0) {
-                    $("#loadMoreBtnContainer").addClass("hide");
-                }
             },
             statusCode: {
                 200: function (data) {
@@ -58,23 +40,12 @@ function loadMoreCollections() {
                     if ($(".noCollection").length !== 0) {
                         $("#loadMoreBtnContainer").addClass("hide");
                     }
-                    clicked = false;
                 }
             }
         });
     } else {
-        console.log("NO COLLECTION LEFT")
         $(".collectionPage:last").css("margin-top", "0px");
         $("#loadMoreBtnContainer").addClass("hide");
-    }
-}
-
-collectionPageTimeout = 0;
-
-function loadCollection() {
-    if (!clicked) {
-        clicked = true;
-        loadMoreCollections();
     }
 }
 
@@ -87,3 +58,15 @@ $("#sectionMenu .menuItem").on('click', function () {
     $("#sectionMenu").find(".active").removeClass("active");
     $(this).addClass("active");
 });
+
+timeout = 0;
+function loadCollectionOnScroll(){
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+        if ($(window).scrollTop() >= ($(document).height() - $(window).height() - 100)) {
+            if ($(".noCollection").length === 0) {
+                loadMoreCollections();
+            }
+        }
+    }, 300);
+}

@@ -1,0 +1,9 @@
+@(message:String, id:String, length:Int)
+
+<span id="@id" class="stringValue" data-toggle="tooltip" data-placement="top" title="@message">
+    @message
+</span>
+<script>
+    truncate('@message', '@id' ,@length);
+    $('[data-toggle="tooltip"]').tooltip();
+</script>

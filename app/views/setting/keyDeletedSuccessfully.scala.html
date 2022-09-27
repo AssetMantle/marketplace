@@ -1,0 +1,5 @@
+@import views.html.base.modal._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@successModal(heading = constants.View.KEY_DELETED_SUCCESSFULLY_TITLE, subHeading = constants.View.KEY_DELETED_SUCCESSFULLY_SUBTITLE)
+<script> updateKeyName(); </script>

@@ -15,11 +15,7 @@ function changeActive(section) {
         case 'art':
             componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.collectionsPerPage(1));
             checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections('art').url, 'art', "collections");
-            showLoadMoreButton();
-            break;
-        case 'wishListCollections':
-            componentResource('collectionsPerPage', jsRoutes.controllers.CollectionController.wishListCollectionPerPage(1));
-            checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections('wishListCollections').url, 'wishListCollections', "collections");
+            $(".loadMoreElement").addClass("show");
             showLoadMoreButton();
             break;
         default:
@@ -28,4 +24,10 @@ function changeActive(section) {
             break;
     }
     changeSectionHighlight(currentSection);
+}
+
+function checkNumberOfCollections(){
+    if ($(".collectionsPerPage .singleCollection").length <= 5) {
+        $("#loadMoreBtnContainer").addClass("hide");
+    }
 }

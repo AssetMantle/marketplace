@@ -1,4 +1,4 @@
-@mixin setFont($type, $style, $weight, $size, $lineHeight, $color){
+@mixin setFont($type, $style, $weight, $size, $lineHeight, $color) {
   font-family: $type;
   font-style: $style;
   font-weight: $weight;
@@ -12,7 +12,8 @@
   display: inline-block;
   width: 100%;
   z-index: 999;
-  .dropdownHead{
+
+  .dropdownHead {
     @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
     padding: 10px 12px;
     border: 1px solid var(--inactive-gray);
@@ -20,14 +21,16 @@
     cursor: pointer;
     position: relative;
     transition: all .5s;
-    &.active{
+
+    &.active {
       @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
       border-color: var(--dark);
       background: var(--card-color);
     }
-    &::after{
+
+    &::after {
       content: "";
       height: 20px;
       width: 20px;
@@ -40,21 +43,26 @@
       transform-origin: center center;
       transition: all .5s;
     }
-    &.active::after{
-      top:10px;
+
+    &.active::after {
+      top: 10px;
       transform: rotate(180deg);
     }
-    .currentSelected{
+
+    .currentSelected {
       line-height: 20px;
     }
-    &.active + .dropdownBody{
+
+    &.active + .dropdownBody {
       @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
     }
   }
-  .dropdownBody{
+
+  .dropdownBody {
     @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
     position: relative;
-    .dropdownBodyInner{
+
+    .dropdownBodyInner {
       position: absolute;
       left: 0;
       top: 0;
@@ -66,7 +74,8 @@
       border-bottom-left-radius: 8px;
       border-bottom-right-radius: 8px;
       overflow: hidden;
-      .dropdownItem{
+
+      .dropdownItem {
         padding: 10px 12px;
         cursor: pointer;
         transition: all .5s;
@@ -74,6 +83,7 @@
         line-height: 20px;
         position: relative;
         z-index: 89;
+
         &:nth-last-child(1) {
           padding-bottom: 10px;
         }
@@ -83,11 +93,12 @@
 }
 
 // Tooltip
-.form-copy-message.active{
+.form-copy-message.active {
   animation: msg-copied 2s ease-in-out forwards;
 }
-.form-copy-message{
-  margin-left:5px;
+
+.form-copy-message {
+  margin-left: 5px;
   font-size: 10px;
   padding: 5px 10px;
   border-radius: 5px;
@@ -97,40 +108,57 @@
   top: 10px;
   opacity: 0;
 }
+.form-copy-message{
+  &.top {
+    margin-left: 5px;
+    font-size: 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: var(--popup-bg);
+    color: var(--inactive-gray);
+    position: relative;
+    top: 10px;
+    left: -50%;
+    opacity: 1;
+  }
+}
+
 @media (max-width: 1200px) {
-  .form-copy-message{
+  .form-copy-message {
     display: none;
   }
-  .form-copy-message.active{
+  .form-copy-message.active {
     animation: msg-copied 2s ease-in-out forwards;
   }
 }
+
 @keyframes msg-copied {
-  0%{
-    top:10px;
+  0% {
+    top: 10px;
     opacity: 0;
   }
-  20%{
-    top:0px;
+  20% {
+    top: 0px;
     opacity: 1;
   }
-  80%{
-    top:0px;
+  80% {
+    top: 0px;
     opacity: 1;
   }
-  100%{
-    top:-10px;
+  100% {
+    top: -10px;
     opacity: 0;
   }
 }
 
 // Coming Soon Btn
-#comingSoonBtn{
+#comingSoonBtn {
   position: relative;
   overflow: hidden;
   outline: none;
   cursor: pointer;
 }
+
 #comingSoonBtn::before {
   display: flex;
   justify-content: center;
@@ -143,6 +171,7 @@
   content: 'Send';
   transition: all .3s;
 }
+
 #comingSoonBtn::after {
   display: flex;
   justify-content: center;
@@ -155,15 +184,17 @@
   content: 'Coming Soon';
   transition: all .3s;
 }
+
 #comingSoonBtn:hover::before {
   top: -60px;
 }
+
 #comingSoonBtn:hover::after {
   top: 0;
 }
 
 // New Components
-.mntlButton{
+.mntlButton {
   @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--button-text));
   text-transform: capitalize;
   width: 200px;
@@ -171,14 +202,17 @@
   border: none;
   outline: none;
   border-radius: 32px;
-  &.primaryButton{
-    &.active{
+
+  &.primaryButton {
+    &.active {
       background-color: var(--default);
-      &:hover{
+
+      &:hover {
         box-shadow: 0px 0px 10px rgba(255, 201, 66, 0.5);
       }
     }
-    &.disable{
+
+    &.disable {
       background-color: var(--disable-yellow);
       cursor: none;
       pointer-events: none;
@@ -190,6 +224,7 @@
     }
   }
 }
+
 .bi {
   font-size: 20px;
   line-height: 20px;
@@ -212,6 +247,10 @@
 
   &.iconError {
     color: var(--error);
+  }
+
+  &.iconGray {
+    color: var(--gray);
   }
 
   &.iconLarge {
@@ -238,26 +277,32 @@
     font-size: 24px;
   }
 }
+
 // Add To Wishlist Button
-.addToWishlist{
+.addToWishlist {
   border: none;
   background: none;
   transition: transform 0.4s ease;
-  &:hover{
+
+  &:hover {
     cursor: pointer;
   }
-  &:active{
+
+  &:active {
     transform: scale(1.3);
   }
+
   .heartIcon {
     width: 18px;
     height: 18px;
+
     path {
       fill: none;
       stroke-width: 2;
       stroke: var(--icon-white);
     }
   }
+
   &.clicked {
     .heartIcon {
       path {
@@ -269,35 +314,312 @@
 }
 
 // Toggle Button
-.toggleBtn{
+.toggleBtn {
   position: relative;
   right: 0;
-  span{
+
+  span {
     box-shadow: none !important;
     border: 2px solid var(--line);
     background: var(--popup-bg);
     @include setFont(var(--font-type-2), normal, 600, 14px, 17px, var(--text-medium));
-    &:first-child{
+
+    &:first-child {
       border-top-left-radius: 4px;
       border-bottom-left-radius: 4px;
     }
-    &:last-child{
+
+    &:last-child {
       border-top-right-radius: 4px;
       border-bottom-right-radius: 4px;
     }
-    &:hover{
+
+    &:hover {
       background: var(--dark);
       border: 2px solid var(--line);
     }
-    &.active{
+
+    &.active {
       background: var(--dark);
       border: 2px solid var(--line);
       @include setFont(var(--font-type-2), normal, 600, 14px, 17px, var(--card-color));
     }
   }
 }
-#gasPriceToggleButton{
+
+#gasPriceToggleButton {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-auto-flow: column;
+}
+
+// Menu on Hover
+.hoverMenu {
+  @include setFont(var(--font-type-1), normal, 500, 14px, 17px, var(--mantle-off-white));
+  text-transform: capitalize;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  .links {
+    .menuItem {
+      list-style: none;
+      position: relative;
+      a{
+        color: var(--mantle-off-white);
+        line-height: 30px;
+      }
+      .subMenu {
+        text-transform: none;
+        background: var(--card-dark);
+        border: 2px solid var(--line-2);
+        border-radius: 10px;
+        height: fit-content;
+        width: 180px;
+        position: absolute;
+        left: 0px;
+        top: 55px;
+        transform: translateX(-32px);
+        z-index: 99;
+        padding: 12px 24px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        cursor: auto;
+        &::before {
+          content: '';
+          border-left: 9px solid transparent;
+          border-right: 9px solid transparent;
+          border-bottom: 9px solid var(--card-dark);
+          position: absolute;
+          top: -11px;
+          left: 30px;
+        }
+        .subMenuList {
+          margin: 4px;
+          .subMenuItem {
+            padding: 12px 6px !important;
+            border-bottom: 2px solid #383838;
+            cursor: pointer;
+            .subMenuItemLink {
+              gap: 12px;
+              .subMenuItemLabel {
+                @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--mantle-off-white));
+                text-transform: capitalize;
+                @media (max-width: 992px) {
+                  font-size: 14px;
+                }
+              }
+            }
+            &:last-child {
+              border: none;
+            }
+          }
+        }
+        @media (max-width: 992px) {
+          width: 200px;
+          padding: 12px 12px;
+        }
+      }
+      &:hover {
+        .subMenu {
+          top: 35px;
+          opacity: 1;
+          visibility: visible;
+        }
+      }
+    }
+  }
+}
+
+// Tooltip
+.tooltip-inner {
+  background: var(--card-dark);
+  border:2px solid var(--line-2);
+}
+.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before, .bs-tooltip-top .tooltip-arrow::before{
+  border-top-color: var(--line-2);
+}
+
+// Common Error
+.commonError{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--error));
+  position: relative;
+}
+
+// Pagination Button
+.paginationButton{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--default));
+  cursor: pointer;
+  &.small{
+    i{
+      font-size: 14px;
+    }
+  }
+}
+
+.gasFeesLabel{
+  @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+}
+#gasPriceToggleButton{
+  .toggleOption{
+    color: var(--mantle-off-white);
+    &:hover{
+      color: var(--card-color);
+      .gasPricePriority{
+        font-weight: bold;
+      }
+      .gasCharges,.gasChargesPrice{
+        color: var(--card-color);
+      }
+    }
+    &.active{
+      color: var(--card-color);
+      .gasPricePriority{
+        font-weight: bold;
+      }
+      .gasCharges,.gasChargesPrice{
+        color: var(--card-color);
+      }
+    }
+    .gasPricePriority{
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 22px;
+    }
+    .gasCharges,.gasChargesPrice{
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--gray);
+      line-height: 14px;
+    }
+  }
+}
+
+// Horizontal Switcher
+.nav{
+  --bs-nav-link-padding-x: 1rem;
+  --bs-nav-link-padding-y: 0rem;
+  --bs-nav-link-color: var(--gray);
+  --bs-nav-link-hover-color: var(--gray);
+  --bs-nav-link-disabled-color: var(--disable);
+
+  &.nav-tabs{
+    --bs-nav-tabs-border-width: 0px;
+    --bs-nav-tabs-border-color: transparent;
+    --bs-nav-tabs-border-radius: 0rem;
+    --bs-nav-tabs-link-hover-border-color: transparent;
+    --bs-nav-tabs-link-active-color: var(--default);
+    --bs-nav-tabs-link-active-bg: transparent;
+    --bs-nav-tabs-link-active-border-color: transparent;
+    border-bottom: none;
+
+    .nav-link{
+      @include setFont(var(--font-type-1), normal, 500, 14px, 17px, var(--gray));
+      &.active{
+        @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--default));
+      }
+      &:first-child{
+        padding-left: 0px;
+      }
+    }
+  }
+}
+.tab-content{
+  .tab-pane{
+    &.fade{
+      transition-duration: 0.2s;
+      transition-timing-function: ease-in-out;
+    }
+  }
+}
+// Snackbar
+#toastContainer{
+  position: fixed !important;
+  bottom: 30px !important;
+  right: 15px !important;
+  margin: 0px !important;
+  .toast{
+    border-radius: 10px;
+    background: var(--popup-bg);
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25) !important;
+    border:none;
+    overflow: hidden;
+    .toast-header{
+      background: var(--popup-bg);
+      padding: 20px 20px 20px 28px;
+      border-bottom: none;
+      position: relative;
+      .status-icon{
+        &.text-success{
+          color: var(--connected) !important;
+        }
+        &.text-danger{
+          color: var(--error) !important;
+        }
+        &.text-warning{
+          color: var(--default) !important;
+        }
+        &.text-info{
+          color: var(--icon-white) !important;
+        }
+      }
+      .status-icon{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        min-width: 40px;
+        background-color: var(--card-dark);
+        font-size: 20px;
+        border-radius: 50%;
+      }
+      .toast-title{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+      }
+      .toast-body{
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
+        padding: 0px;
+      }
+      .snackbarProgress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 100%;
+        background-color: var(--popup-bg);
+
+        &:before {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0%;
+          height: 100%;
+          width: 100%;
+          background-color: var(--default);
+          display: none;
+        }
+      }
+    }
+    &.show{
+      .snackbarProgress {
+        &:before {
+          animation: progress 3s linear forwards;
+          display: block;
+          @keyframes progress {
+            100% {
+              left: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+.sendCoinAmountField{
+  position: relative;
+  .availableBalance{
+    position: absolute;
+    right: 0;
+    @include setFont(var(--font-type-1), normal, 500, 14px, 17px, var(--default));
+  }
 }

@@ -1,4 +1,5 @@
 @import controllers.actions.LoginState
+@import views.html.base.commonStringValue
 
 @(collection: master.Collection, nft: master.NFT, liked: Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
@@ -13,7 +14,9 @@
                     <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="34" height="34"/>
                 </div>
                 <div class="d-flex flex-column justify-content-between">
-                    <span class="creator-name">@nft.name</span>
+                    <span class="creator-name">
+                        @commonStringValue(message = nft.name, id = utilities.IdGenerator.getRandomHexadecimal, length =  15)
+                    </span>
                     <span class="creator-collection-name">@collection.name</span>
                 </div>
             </div>
@@ -25,15 +28,15 @@
                 </div>
                 @if(loginState.nonEmpty) {
                     <div class="d-flex align-items-center gap-1 mt-3">
-                        <span onclick="addRemoveWishlist(this, '@nft.fileName')">
-                            @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
+                        <span onclick="addRemoveWishlist(this, '@nft.fileName', '@Messages(constants.View.ADDED_TO_WISHLIST)', '@Messages(constants.View.REMOVED_FROM_WISHLIST)')">
+                        @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
                         </span>
                         <div class="nft-likes" data-id="@nft.fileName">00</div>
                     </div>
-                }else{
-                    <div class="d-flex align-items-center gap-1 mt-3" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN.get, ""))">
+                } else {
+                    <div class="d-flex align-items-center gap-1 mt-3" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN_WITH_CALLBACK.get, s"'/collection/${collection.id}'"))">
                         <span>
-                            @views.html.nft.commonCardWishlistButton(false)
+                        @views.html.nft.commonCardWishlistButton(false)
                         </span>
                         <div class="nft-likes" data-id="@nft.fileName">00</div>
                     </div>

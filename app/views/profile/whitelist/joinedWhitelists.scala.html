@@ -1,0 +1,41 @@
+@import controllers.actions.LoginState
+@import views.html.base.buttons._
+
+@(totalWhitelists: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@if(totalWhitelists > 0) {
+    <div class="contentBody">
+        <div class="container contentTableContainer" id="joinedWhitelist">
+            <div class="row">
+                <div class="col-sm-12 col-md-12">
+                    <div class="table-responsive">
+                        <table class="table contentTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-end tableFieldNo">@Messages(constants.View.WHITELIST_TABLE_TITLE_NO)</th>
+                                    <th class="tableFieldName">@Messages(constants.View.WHITELIST_TABLE_TITLE_NAME)</th>
+                                    <th class="tableFieldStartEpoch">@Messages(constants.View.WHITELIST_DURATION_TITLE)</th>
+                                    <th class="text-end tableFieldTotalMembers">@Messages(constants.View.WHITELIST_TABLE_TITLE_TOTAL_MEMBERS)</th>
+                                    <th class="text-end tableFieldMaxMembers">@Messages(constants.View.WHITELIST_TABLE_TITLE_MAX_MEMBERS)</th>
+                                    <th class="tableFieldAction"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="joinedWhitelistTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="joinedWhitelistPagination" class="mt-4 horizontal-align">
+        @commonPaginationButton(constants.View.BACK, JavaScript(s"joinedWhitelistPaginationOnBack()"), icon = "bi-chevron-left", size = "small", iconFirst = true, Symbol("id") -> "joinedWhitelistPaginationBack")
+        @commonPaginationButton(constants.View.NEXT, JavaScript(s"joinedWhitelistPaginationOnNext(${totalWhitelists}, ${constants.CommonConfig.Pagination.WhitelistPerPage})"), icon = "bi-chevron-right", size = "small", iconFirst = false, Symbol("id") -> "joinedWhitelistPaginationNext")
+    </div>
+    <script>joinedWhitelistPaginationOnNext(@totalWhitelists, @constants.CommonConfig.Pagination.WhitelistPerPage)</script>
+} else {
+    <div class="contentBody emptyBody">
+        <div class="h-100 d-flex flex-column justify-content-center align-items-center  emptyWhitelist">
+            <div class="message">@Messages(constants.View.EMPTY_WHITELIST_JOINED)</div>
+        </div>
+    </div>
+}

@@ -1,0 +1,7 @@
+@import controllers.actions.LoginState
+
+@(callbackUrl: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState] = None)
+
+    @views.html.index(failures, warnings, successes, infos)
+
+    <script>getForm(jsRoutes.controllers.AccountController.signInWithCallbackForm('@callbackUrl'))</script>

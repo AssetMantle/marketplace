@@ -1,4 +1,4 @@
-function submitForm(isModal, source, targetID) {
+function submitForm(refreshOverlay, source, targetID) {
     const target = '#' + targetID;
     const form = $(source).closest("form");
     if (validateForm(form)) {
@@ -12,30 +12,6 @@ function submitForm(isModal, source, targetID) {
             statusCode: {
                 400: function (data) {
                     result.html(data.responseText);
-
-                    function clearFormElements(target_id) {
-                        jQuery("#" + target_id).find(':input').each(function () {
-                            switch (this.type) {
-                                // case 'password':
-                                // case 'text':
-                                // case 'textarea':
-                                // case 'file':
-                                // case 'select-one':
-                                // case 'select-multiple':
-                                // case 'date':
-                                // case 'number':
-                                // case 'tel':
-                                // case 'email':
-                                //     jQuery(this).val('');
-                                //     break;
-                                case 'checkbox':
-                                case 'radio':
-                                    this.checked = false;
-                                    break;
-                            }
-                        });
-                    }
-
                     clearFormElements("formBody");
                     $(".error").closest("dd").prev().find('input').css({"border-color": "var(--error)"});
                 },
@@ -49,7 +25,7 @@ function submitForm(isModal, source, targetID) {
                     replaceDocument(data);
                 },
                 206: function (data) {
-                    if (isModal === "true") {
+                    if (refreshOverlay === "true") {
                         $(".modalContainer").removeClass('active');
                         // setTimeout(function(){
                         $(target).html(data);
@@ -61,6 +37,9 @@ function submitForm(isModal, source, targetID) {
                 },
                 404: function (data) {
                     result.html(data.responseText);
+                },
+                201: function (callbackUrl) {
+                    window.location = callbackUrl;
                 }
             }
         }).fail(function (XMLHttpRequest) {
@@ -73,9 +52,30 @@ function submitForm(isModal, source, targetID) {
     }
 }
 
-function submitFormOnEnter(event, isModal, source, targetID) {
+function onKeyPress(event, refreshOverlay, source, targetID) {
     if (event.keyCode === 13) {
         event.preventDefault();
-        submitForm(isModal, source, targetID);
+        submitForm(refreshOverlay, source, targetID);
     }
+}
+
+function onKeyUp(source, submitButtonId) {
+    const form = $(source).closest("form");
+    let allFiled = checkAllFieldsFilled(form);
+    if(allFiled){
+        $('#' + submitButtonId).removeClass("disable");
+    } else{
+        $('#' + submitButtonId).addClass("disable");
+    }
+}
+
+function clearFormElements(target_id) {
+    jQuery("#" + target_id).find(':input').each(function () {
+        switch (this.type) {
+            case 'checkbox':
+            case 'radio':
+                this.checked = false;
+                break;
+        }
+    });
 }

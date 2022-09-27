@@ -1,21 +1,26 @@
 @import views.account.companion.SignUp
 @import views.html.base.form._
-@import views.html.base.label._
 
 @(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div id="signUpForm">
-    @commonForm(constants.Form.SIGN_UP, signUpForm, isModal=true, submitDisable=true){
+    @commonForm(constants.Form.SIGN_UP, signUpForm, refreshOverlay = true, submitDisable = false) {
         <div class="modal-body">
             <div class="mb-3">
                 <div class="inputField">
                     <div class="inputFieldBody">
                         <div class="usernameAvailability">
-                            @commonLabelIcon(constants.FormField.USERNAME.name, Messages(constants.View.SIGN_UP_TOOLTIP))
+                            <div class="label-container">
+                                <label for="signUpUsername">@Messages(constants.FormField.USERNAME.name)</label>
+                                <i class="bi bi-info-circle iconDefault iconSmall toolTipReference"></i>
+                                <a class="toolTip">
+                                    <span class="toolTipText">@Messages(constants.View.SIGN_UP_TOOLTIP)</span>
+                                </a>
+                            </div>
                             <div id="checkIcon" class="fieldIcon checkIcon">
                                 <i class="bi bi-check-circle iconDefault iconMedium"></i>
                             </div>
-                            @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("class") -> "inputBox", Symbol("id") -> "signUpUsername", Symbol("autocomplete") -> "off", 'oninput -> """checkUsernameAvailable(this,'#USERNAME_AVAILABLE'); activeButton();""", Symbol("onblur") -> "changeFieldBorder()", Symbol("onfocus") -> "changeFieldBorder()")
-                            @commonFieldErrorMessage(id = "usernameAvailableError",message = Messages(constants.View.USERNAME_NOT_AVAILABLE))
+                            @commonInputText(signUpForm, constants.FormField.USERNAME, Symbol("class") -> "inputBox", Symbol("id") -> "signUpUsername", Symbol("autocomplete") -> "off", Symbol("oninput") -> """checkUsernameAvailable(this,'#USERNAME_AVAILABLE'); activeButton();""", Symbol("onblur") -> "changeFieldBorder()", Symbol("onfocus") -> "changeFieldBorder()")
+                            @commonFieldErrorMessage(id = "usernameAvailableError", message = Messages(constants.View.USERNAME_NOT_AVAILABLE))
                         </div>
                     </div>
                 </div>
@@ -24,7 +29,7 @@
             @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE, Symbol("class") -> "hidden")
 
             <div class="d-flex align-items-center mt-4">
-                @commonCheckbox(signUpForm, constants.FormField.SIGNUP_TERMS_CONDITIONS, 'id -> "termsCondition", 'oninput -> """activeButton()""")
+                @commonCheckbox(signUpForm, constants.FormField.SIGNUP_TERMS_CONDITIONS, Symbol("id") -> "termsCondition", Symbol("oninput") -> """activeButton()""")
                 <span class="termsConditionMessage">
                     <label for="termsCondition">
                     @Messages(constants.View.TERMS_CONDITION_MESSAGE)
@@ -36,7 +41,7 @@
             <div class="mt-3">
                 <div class="footerMessage">
                     <span>@Messages(constants.View.SIGN_UP_SIGN_IN_MESSAGE)</span>
-                    <a class="link" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN.get, ""))">@Messages(constants.View.SIGN_IN)</a>
+                    <a class="link" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN_WITH_CALLBACK.get, ""))">@Messages(constants.View.SIGN_IN)</a>
                 </div>
             </div>
         </div>

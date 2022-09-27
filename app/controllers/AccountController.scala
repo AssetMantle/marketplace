@@ -7,7 +7,7 @@ import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{AbstractController, Action, AnyContent, Call, MessagesControllerComponents, Result}
 import views.account.companion._
 
 import javax.inject.{Inject, Singleton}
@@ -31,6 +31,8 @@ class AccountController @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
+
+  implicit val callbackOnSessionTimeout: Call = routes.SettingController.viewSettings()
 
   def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.account.signUp())
@@ -106,15 +108,15 @@ class AccountController @Inject()(
       )
   }
 
-  def signInForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.account.signIn())
+  def signInWithCallbackForm(callbackUrl: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.account.signInWithCallback(callbackUrl = callbackUrl))
   }
 
-  def signIn: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def signInWithCallback: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      SignIn.form.bindFromRequest().fold(
+      SignInWithCallback.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.account.signIn(formWithErrors)))
+          Future(BadRequest(views.html.account.signInWithCallback(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CALLBACK_URL.name, routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION).url))))
         },
         signInData => {
           val masterAccount = masterAccounts.Service.tryGet(signInData.username)
@@ -174,10 +176,11 @@ class AccountController @Inject()(
                   implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = signInData.username, address = key.get.address))
                   implicit val loginState: LoginState = LoginState(username = signInData.username, address = key.get.address)
                   val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.upsert(id = loginState.username, token = signInData.pushNotificationToken)
-
+                  val result = if (signInData.callbackUrl != "/") withUsernameToken.InternalRedirectOnSubmitForm(signInData.callbackUrl)
+                  else withUsernameToken.Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION))
                   for {
                     _ <- pushNotificationTokenUpdate
-                    result <- withUsernameToken.Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION))
+                    result <- result
                   } yield result
                 }
               }
@@ -191,7 +194,7 @@ class AccountController @Inject()(
             result <- verifyUpdateAndGetResult(masterAccount, masterKey, masterWallet)
           } yield result
             ).recover {
-            case baseException: BaseException => NotFound(views.html.account.signIn(SignIn.form.withGlobalError(baseException.failure.message)))
+            case baseException: BaseException => NotFound(views.html.account.signInWithCallback(SignInWithCallback.form.withGlobalError(baseException.failure.message), signInData.callbackUrl))
           }
         }
       )
