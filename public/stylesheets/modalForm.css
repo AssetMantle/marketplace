@@ -559,6 +559,8 @@
 #formBody dd input[type=text],
 #formBody dd input[type=password],
 #formBody dd input[type=number],
+#formBody dd input[type=url],
+#formBody dd select,
 #formBody dd textarea
 {
     font-family: var(--font-type-2);
@@ -581,6 +583,8 @@
 #formBody dd input[type=text]:focus,
 #formBody dd input[type=password]:focus,
 #formBody dd input[type=number]:focus,
+#formBody dd input[type=url]:focus,
+#formBody dd select:focus,
 #formBody dd textarea:focus
 {
     border-color: var(--dark);
@@ -588,6 +592,8 @@
 #formBody dd input[type=text]:not(:focus),
 #formBody dd input[type=password]:not(:focus),
 #formBody dd input[type=number]:not(:focus),
+#formBody dd input[type=url]:not(:focus),
+#formBody dd select:not(:focus),
 #formBody dd textarea:not(:focus)
 {
     color: var(--inactive-gray);
@@ -600,6 +606,8 @@
 #formBody dd input[type=text].errorField,
 #formBody dd input[type=password].errorField,
 #formBody dd input[type=number].errorField,
+#formBody dd input[type=url].errorField,
+#formBody dd select.errorField,
 #formBody dd textarea.errorField{
     border: 1px solid var(--error) !important;
 }
@@ -608,6 +616,9 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+}
+#formBody dd select{
+    padding: 0px;
 }
 #formBody button{
     font-size: 16px;

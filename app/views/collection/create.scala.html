@@ -7,6 +7,7 @@
     @commonInputText(createForm, constants.FormField.COLLECTION_NAME)
     @commonDescriptionText(createForm, constants.FormField.COLLECTION_DESCRIPTION)
     @commonSelect(createForm, constants.FormField.COLLECTION_CATEGORY)
+    @views.html.base.form.commonDropDown(constants.View.ART, Seq(constants.View.ART, constants.View.PHOTOGRAPHY, constants.View.MISCELLANEOUS))
     @commonInputURL(createForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false)
     @commonInputURL(createForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false)
     @commonInputURL(createForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)
