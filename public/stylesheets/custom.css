@@ -49,6 +49,7 @@ body{
     background-attachment: fixed;
     background-position: center center;
     background-size: cover;
+    overflow: unset !important;
 }
 .body-container{
     max-width: 1440px;
