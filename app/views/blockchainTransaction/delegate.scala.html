@@ -2,7 +2,7 @@
 @import views.html.blockchainTransaction.commonSelectGas
 @import views.html.base.form._
 
-@(sendCoin: Form[Delegate.Data] = Delegate.form, Validator: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(Delegate: Form[Delegate.Data] = Delegate.form, Validator: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.Delegate, delegate) {
     @commonInputText(delegate, constants.FormField.Validator, Symbol("value") -> Validator, Symbol("readonly") -> "readonly")
     @commonInputMicornumber(delegate, constants.FormField.DELEGATE_AMOUNT)
