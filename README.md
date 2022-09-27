@@ -1,6 +1,5 @@
-## Mantleplace
+# Mantleplace
 
-![image](https://user-images.githubusercontent.com/69121168/187856359-0a8afc1a-acfe-40ac-966d-4593fff82426.png)
 
 
 ## Local development setup
