@@ -75,28 +75,22 @@ function validateForm(form) {
                         const ddValidationInfo = ddInfoElement.innerHTML.split(": ");
                         switch (ddValidationInfo[0]) {
                             case "Numeric":
+                                // No need to show minimum and maximum error since this is type check
                                 if (inputValue === "" || isNaN(inputValue)) {
                                     formValidationBoolean = false;
                                     fieldError = true;
-                                    $('#minimumFieldError_' + fieldName).removeClass("hidden");
-                                    $('#maximumFieldError_' + fieldName).removeClass("hidden");
                                     $('#customFieldError_' + fieldName).removeClass("hidden");
                                 } else {
-                                    $('#minimumFieldError_' + fieldName).addClass("hidden");
-                                    $('#maximumFieldError_' + fieldName).addClass("hidden");
                                     $('#customFieldError_' + fieldName).addClass("hidden");
                                 }
                                 break;
                             case "Real":
+                                // No need to show minimum and maximum error since this is type check
                                 if (inputValue === "" || isNaN(inputValue)) {
                                     formValidationBoolean = false;
                                     fieldError = true;
-                                    $('#minimumFieldError_' + fieldName).removeClass("hidden");
-                                    $('#maximumFieldError_' + fieldName).removeClass("hidden");
                                     $('#customFieldError_' + fieldName).removeClass("hidden");
                                 } else {
-                                    $('#minimumFieldError_' + fieldName).addClass("hidden");
-                                    $('#maximumFieldError_' + fieldName).addClass("hidden");
                                     $('#customFieldError_' + fieldName).addClass("hidden");
                                 }
                                 break;
