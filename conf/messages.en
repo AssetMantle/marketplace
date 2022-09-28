@@ -541,3 +541,7 @@ ADDRESS_COPIED=Address Copied!
 ADDED_TO_WISHLIST=NFT added to wishlist!
 REMOVED_FROM_WISHLIST=NFT removed from wishlist!
 
+#404 page
+ERROR_PAGE_TITLE=Page Not Found
+ERROR_PAGE_DESCRIPTION=The page you are trying to find has been moved or does not exist.
+ERROR_PAGE_GO_TO_EXPLORE_BUTTON=Go To Explore
