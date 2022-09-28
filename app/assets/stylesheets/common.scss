@@ -621,6 +621,7 @@
     position: absolute;
     right: 0;
     @include setFont(var(--font-type-1), normal, 500, 14px, 17px, var(--default));
+    cursor: pointer;
   }
 }
 

@@ -371,7 +371,6 @@ profileContainer .item-sticky .profile-card{
     margin: 0 auto;
 }
 .single-profile-card #content h1 {
-    margin: 8px 0 0 0;
     font-family: var(--font-type-2);
     font-style: normal;
     font-weight: 700;
@@ -379,9 +378,9 @@ profileContainer .item-sticky .profile-card{
     line-height: 17px;
     text-transform: capitalize;
     color: var(--default);
+    padding: 8px 0px;
 }
-.single-profile-card #content p {
-    margin: 8px 0 0px 0;
+.single-profile-card #content a p{
     font-family: var(--font-type-1);
     font-style: normal;
     font-weight: 500;

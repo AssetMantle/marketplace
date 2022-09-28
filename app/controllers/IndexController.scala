@@ -34,6 +34,5 @@ class IndexController @Inject()(
       Future(Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)))
   }
 
-
 //  starter.start()
 }

@@ -114,13 +114,19 @@
                             case Some(loginState) => {
                                 <div class="hiddenMenu">
                                     <li>
-                                        <a class="desktop-link">@Messages(constants.View.PROFILE)</a>
+                                        <a class="desktop-link">@loginState.username</a>
                                         <input type="checkbox" id="profileMenu">
                                         <label for="profileMenu" class="d-flex align-items-center gap-3">
-                                            <i class="bi bi-person iconWhite profile"></i>
-                                            <span>@Messages(constants.View.PROFILE)</span>
+                                            <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="35" height="35"/>
+                                            <span>@loginState.username</span>
                                         </label>
                                         <ul>
+                                            <li>
+                                                <a href="@routes.ProfileController.viewProfile(loginState.username)" class="d-flex flex-row align-items-center gap-3">
+                                                    <i class="bi bi-person iconWhite"></i>
+                                                    <div class="profileMenuLabel">@Messages(constants.View.PROFILE)</div>
+                                                </a>
+                                            </li>
                                             <li>
                                                 <a href="@routes.SettingController.viewSettings()" class="d-flex flex-row align-items-center gap-3">
                                                     <i class="bi bi-gear iconWhite"></i>
@@ -128,26 +134,14 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="@routes.ProfileController.viewProfile(loginState.username)" class="d-flex flex-row align-items-center gap-3">
-                                                    <i class="bi bi-person-lines-fill iconWhite"></i>
-                                                    <div class="profileMenuLabel">@Messages(constants.View.PROFILE)</div>
+                                                <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))" class="d-flex flex-row align-items-center gap-3">
+                                                    <i class="bi bi-box-arrow-right iconWhite logout"></i>
+                                                    <div class="profileMenuLabel">@Messages(constants.View.SIGN_OUT)</div>
                                                 </a>
                                             </li>
                                         </ul>
                                     </li>
-                                    <li id="userWalletMobile" class="user-wallet">
-                                        <a onclick="" class="d-flex align-items-center gap-3">
-                                            <i class="bi bi-wallet2 iconWhite wallet"></i>
-                                            <span>@Messages(constants.View.WALLET)</span>
-                                        </a>
-                                    </li>
                                 </div>
-                                <li class="d-flex hiddenMenu">
-                                    <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))" class="d-flex align-items-center gap-3">
-                                        <i class="bi bi-box-arrow-right iconWhite logout"></i>
-                                        <span>@Messages(constants.View.SIGN_OUT)</span>
-                                    </a>
-                                </li>
                             }
                             case _ => {
                                 <li class="hiddenMenu"><a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_UP.get, ""))">@Messages(constants.View.SIGN_UP)</a></li>
@@ -165,7 +159,7 @@
                                     <!-- Wallet Start -->
                                 <div id="walletPopup" class="walletPopup"></div>
                                 <a class="desktop-link" target="_blank" onclick="componentResource('walletPopup', jsRoutes.controllers.SettingController.walletPopup());">
-                                    <i class="bi bi-person iconWhite wallet"></i>
+                                    <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="35" height="35"/>
                                 </a>
                                     <!-- Wallet End -->
                             </li>
