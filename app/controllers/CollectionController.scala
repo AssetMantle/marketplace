@@ -127,6 +127,32 @@ class CollectionController @Inject()(
     }
   }
 
+  def createdSection(accountId: String): EssentialAction = cached.apply(req => req.path + accountId, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.created.createdSection(accountId)))
+    }
+  }
+
+  def createdCollectionPerPage(accountId: String, pageNumber: Int): EssentialAction = cached.apply(req => req.path + accountId + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collections = masterCollections.Service.getByCreatorAndPage(accountId, pageNumber)
+        val totalCreated = masterCollections.Service.totalCreated(accountId)
+
+        def allCollectionFiles(collectionIds: Seq[String]) = masterCollectionFiles.Service.get(collectionIds)
+
+        (for {
+          totalCreated <- totalCreated
+          collections <- collections
+          collectionFiles <- allCollectionFiles(collections.map(_.id))
+        } yield Ok(views.html.profile.created.collectionPerPage(collections, collectionFiles = collectionFiles, totalCollections = totalCreated))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
   def createForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.collection.create())
   }

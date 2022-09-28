@@ -36,17 +36,17 @@ libraryDependencies ++= Seq(
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "5.0.2",
   "com.typesafe.play" %% "play-slick-evolutions" % "5.0.2",
-  "org.postgresql" % "postgresql" % "42.3.6"
+  "org.postgresql" % "postgresql" % "42.5.0"
 )
 
 libraryDependencies ++= Seq(
-  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.3",
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.4",
   "org.json" % "json" % "20220320"
 )
 
 libraryDependencies ++= Seq(
-  "com.sksamuel.scrimage" % "scrimage-core" % "4.0.31",
-  "com.sksamuel.scrimage" %% "scrimage-scala" % "4.0.31"
+  "com.sksamuel.scrimage" % "scrimage-core" % "4.0.32",
+  "com.sksamuel.scrimage" %% "scrimage-scala" % "4.0.32"
 )
 
 libraryDependencies ++= Seq(
@@ -57,8 +57,8 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.amazonaws" % "aws-java-sdk-s3" % "1.12.272",
-  "com.amazonaws" % "aws-java-sdk" % "1.12.272"
+  "com.amazonaws" % "aws-java-sdk-s3" % "1.12.307",
+  "com.amazonaws" % "aws-java-sdk" % "1.12.307"
 )
 
-libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.21.5"
+libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.21.6"

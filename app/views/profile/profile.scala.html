@@ -10,16 +10,20 @@
             @if(optionalLoginState.isDefined && optionalLoginState.fold("")(_.username) == accountId) {
                 @commonHorizontalSwitcher(
                     ListMap(
+                        constants.View.CREATED -> routes.javascript.CollectionController.createdSection,
                         constants.View.WHITELIST -> routes.javascript.WhitelistController.whitelistSection,
                         constants.View.WISHLIST -> routes.javascript.WishlistController.wishlistSection
                     ),
+                    Symbol(constants.View.CREATED + "_PARAMETERS") -> s"'${accountId}'",
                     Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
                 )
             } else {
                 @commonHorizontalSwitcher(
                     ListMap(
+                        constants.View.CREATED -> routes.javascript.CollectionController.createdSection,
                         constants.View.WISHLIST -> routes.javascript.WishlistController.wishlistSection
                     ),
+                    Symbol(constants.View.CREATED + "_PARAMETERS") -> s"'${accountId}'",
                     Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
                 )
             }

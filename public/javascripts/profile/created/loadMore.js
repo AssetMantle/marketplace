@@ -1,19 +1,18 @@
 window.onbeforeunload = function () {
-    if ($("#wishlistCollectionsPerPage").length !== 0) {
+    if ($("#createdCollectionsPerPage").length !== 0) {
         window.scrollTo(0, 0);
     }
 }
 document.onload = function () {
-    if ($("#wishlistCollectionsPerPage").length !== 0) {
+    if ($("#createdCollectionsPerPage").length !== 0) {
         window.scrollTo(0, 0);
     }
 }
 
 function loadMoreCollections(accountId) {
     const loading = document.querySelector('.loading');
-    if ($("#noWishlistCollectionsPerPage").length === 0) {
-        let route = jsRoutes.controllers.WishlistController.collectionPerPage(accountId, ($(".wishlistCollectionsPerPage").length + 1));
-        console.log(route.url)
+    if ($("#noCreatedCollectionsPerPage").length === 0) {
+        let route = jsRoutes.controllers.CollectionController.createdCollectionPerPage(accountId, ($(".createdCollectionsPerPage").length + 1));
         $.ajax({
             url: route.url,
             type: route.type,
@@ -26,22 +25,22 @@ function loadMoreCollections(accountId) {
             },
             statusCode: {
                 200: function (data) {
-                    $("#wishlistCollectionsPerPage").append(data);
+                    $('#createdCollectionsPerPage').append(data);
                 }
             }
         });
     } else {
-        $(".collectionPage.wishlistCollectionsPerPage:last").css("margin-top", "0px");
+        $(".collectionPage.createdCollectionsPerPage:last").css("margin-top", "0px");
     }
 }
 
 timeout = 0;
 
-function loadWishlistCollectionOnScroll(accountId) {
+function loadCreatedCollectionOnScroll(accountId) {
     clearTimeout(timeout);
     timeout = setTimeout(function () {
         if ($(window).scrollTop() >= ($(document).height() - $(window).height() - 100)) {
-            if ($("#noWishlistCollectionsPerPage").length === 0) {
+            if ($("#noCreatedCollectionsPerPage").length === 0) {
                 loadMoreCollections(accountId);
             }
         }

@@ -4,6 +4,7 @@ import exceptions.BaseException
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick._
+import slick.jdbc.H2Profile.StreamingProfileAction
 import slick.jdbc.H2Profile.api._
 import slick.jdbc.JdbcProfile
 import slick.lifted.{CanBeQueryCondition, ColumnOrdered, Ordered}
@@ -30,44 +31,6 @@ abstract class GenericDaoImpl2[
 
   def count(): Future[Int] = db.run(tableQuery.length.result)
 
-  def getById(id1: PK1, id2: PK2): Future[Option[E]] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2).result.headOption)
-
-  def tryGetById(id1: PK1, id2: PK2): Future[E] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
-    }
-  }
-
-  def getAll: Future[Seq[E]] = db.run(tableQuery.result)
-
-  def filter[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Seq[E]] = db.run(tableQuery.filter(expr).result)
-
-  def filterAndCount[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Int] = db.run(tableQuery.filter(expr).size.result)
-
-  def filterHead[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[E] = db.run(tableQuery.filter(expr).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
-    }
-  }
-
-  def filterAndSortHead[C1 <: Rep[_], C2 <: Rep[_]](expr: T => C1)(sortExpr: T => C2)(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[E] = db.run(tableQuery.filter(expr).sortBy(sortExpr).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
-    }
-  }
-
-  def filterAndSortWithPagination[C1 <: Rep[_], C2 <: Rep[_]](offset: Int, limit: Int)(expr: T => C1)(sortExpr: T => C2)(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[Seq[E]] = db.run(tableQuery.filter(expr).sortBy(sortExpr).drop(offset).take(limit).result)
-
-  def filterAndSortWithOrderHead[C1 <: Rep[_], C2 <: Rep[_]](expr: T => C1)(sortExpr: T => ColumnOrdered[_])(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[E] = db.run(tableQuery.filter(expr).sortBy(sortExpr).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
-    }
-  }
-
   def create(entity: E): Future[Unit] = db.run((tableQuery += entity).asTry).map {
     case Success(result) => ()
     case Failure(exception) => exception match {
@@ -82,27 +45,7 @@ abstract class GenericDaoImpl2[
     }
   }
 
-  def upsert(entity: E): Future[Unit] = db.run(tableQuery.insertOrUpdate(entity).asTry).map {
-    case Success(result) => ()
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPSERT_FAILED"), psqlException)
-    }
-  }
-
-  def upsertMultiple(entities: Seq[E]): Future[Unit] = db.run(DBIO.sequence(entities.map(entity => tableQuery.insertOrUpdate(entity))).asTry).map {
-    case Success(result) => ()
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPSERT_FAILED"), psqlException)
-    }
-  }
-
-  def update(update: E): Future[Unit] = db.run(tableQuery.filter(x => x.id1 === update.id1 && x.id2 === update.id2).update(update).asTry).map {
-    case Success(result) => ()
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPDATE_FAILED"), psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_UPDATE_FAILED"), noSuchElementException)
-    }
-  }
+  def customQuery[C](query: StreamingProfileAction[C, _, _]) = db.run(query)
 
   def delete(id1: PK1, id2: PK2): Future[Int] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2).delete.asTry).map {
     case Success(result) => result
@@ -135,10 +78,75 @@ abstract class GenericDaoImpl2[
     }
   }
 
+  def exists(id1: PK1, id2: PK2): Future[Boolean] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2).exists.result)
+
+  def filter[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Seq[E]] = db.run(tableQuery.filter(expr).result)
+
+  def filterAndCount[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Int] = db.run(tableQuery.filter(expr).size.result)
+
   def filterAndDelete[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Int] = db.run(tableQuery.filter(expr).delete)
 
   def filterAndExists[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Boolean] = db.run(tableQuery.filter(expr).exists.result)
 
-  def exists(id1: PK1, id2: PK2): Future[Boolean] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2).exists.result)
+  def filterHead[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[E] = db.run(tableQuery.filter(expr).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
+    }
+  }
+
+  def filterAndSort[C1 <: Rep[_], C2 <: Rep[_]](expr: T => C1)(sortExpr: T => C2)(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[Seq[E]] = db.run(tableQuery.filter(expr).sortBy(sortExpr).result)
+
+  def filterAndSortHead[C1 <: Rep[_], C2 <: Rep[_]](expr: T => C1)(sortExpr: T => C2)(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[E] = db.run(tableQuery.filter(expr).sortBy(sortExpr).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
+    }
+  }
+
+  def filterAndSortWithPagination[C1 <: Rep[_], C2 <: Rep[_]](offset: Int, limit: Int)(expr: T => C1)(sortExpr: T => C2)(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[Seq[E]] = db.run(tableQuery.filter(expr).sortBy(sortExpr).drop(offset).take(limit).result)
+
+  def filterAndSortWithOrderHead[C1 <: Rep[_], C2 <: Rep[_]](expr: T => C1)(sortExpr: T => ColumnOrdered[_])(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[E] = db.run(tableQuery.filter(expr).sortBy(sortExpr).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
+    }
+  }
+
+  def getById(id1: PK1, id2: PK2): Future[Option[E]] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2).result.headOption)
+
+  def getAll: Future[Seq[E]] = db.run(tableQuery.result)
+
+  def getAllByPageNumber[C1 <: Rep[_]](offset: Int, limit: Int)(sortExpr: T => C1)(implicit ev: C1 => Ordered): Future[Seq[E]] = db.run(tableQuery.sortBy(sortExpr).drop(offset).take(limit).result)
+
+
+  def tryGetById(id1: PK1, id2: PK2): Future[E] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
+    }
+  }
+
+  def update(update: E): Future[Unit] = db.run(tableQuery.filter(x => x.id1 === update.id1 && x.id2 === update.id2).update(update).asTry).map {
+    case Success(result) => ()
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPDATE_FAILED"), psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_UPDATE_FAILED"), noSuchElementException)
+    }
+  }
+
+  def upsert(entity: E): Future[Unit] = db.run(tableQuery.insertOrUpdate(entity).asTry).map {
+    case Success(result) => ()
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPSERT_FAILED"), psqlException)
+    }
+  }
+
+  def upsertMultiple(entities: Seq[E]): Future[Unit] = db.run(DBIO.sequence(entities.map(entity => tableQuery.insertOrUpdate(entity))).asTry).map {
+    case Success(result) => ()
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPSERT_FAILED"), psqlException)
+    }
+  }
 
 }

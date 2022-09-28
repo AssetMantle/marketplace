@@ -46,6 +46,8 @@ GET         /collectionsPerPage                                   controllers.Co
 GET         /collectionNFTs                                       controllers.CollectionController.collectionNFTs(id: String)
 GET         /collectionNFTsPerPage                                controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionInfo                                       controllers.CollectionController.info(id: String)
+GET         /created                                              controllers.CollectionController.createdSection(accountId: String)
+GET         /createdCollectionPerPage                             controllers.CollectionController.createdCollectionPerPage(accountId: String, pageNumber: Int)
 
 GET         /createCollection                                     controllers.CollectionController.createForm()
 POST        /createCollection                                     controllers.CollectionController.create()
