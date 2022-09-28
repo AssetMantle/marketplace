@@ -168,40 +168,6 @@ class Starter @Inject()(
     } yield ()
   } else Future()
 
-
-  def deleteCollections(): Future[Unit] = {
-    val list = Seq("B1A4A6A989455917", "CBDE9E9300694D6C", "F88532DDCDDBEC96", "B04D4A86A96A87DD", "EB588A50A90A67E4", "988DDCCB136744F8")
-    val deleteWishlist = masterWishLists.Service.deleteCollections(list)
-    val deleteCollectionFiles = masterCollectionFiles.Service.deleteCollections(list)
-
-    def deleteNfts() = masterNFTs.Service.deleteCollections(list)
-
-    def deleteCollections() = masterCollections.Service.deleteById(list)
-
-    for {
-      _ <- deleteWishlist
-      _ <- deleteCollectionFiles
-      _ <- deleteNfts()
-      _ <- deleteCollections()
-    } yield ()
-  }
-
-  def updateCollections(): Future[Unit] = {
-    val update = readFile[Seq[UpdateAccountId]](constants.CommonConfig.Files.CollectionPath + "/update.json")
-
-    def updates(data: Seq[UpdateAccountId]) = utilitiesOperations.traverse(data) { x =>
-      val twitter = if (x.twitter != "") Option(SocialProfile(name = constants.Collection.SocialProfile.TWITTER, url = x.twitter)) else None
-      val insta = if (x.instagram != "") Option(SocialProfile(name = constants.Collection.SocialProfile.INSTAGRAM, url = x.instagram)) else None
-      val socialProfiles = Seq(twitter, insta).flatten
-      masterCollections.Service.updateAccountId(id = x.id, accountId = x.accountId, description = x.description, website = x.website, socialProfiles = socialProfiles)
-    }
-
-    for {
-      update <- update
-      _ <- updates(update)
-    } yield ()
-  }
-
   def start(): Future[Unit] = {
     val uploads = readFile[Seq[UploadCollection]](uploadCollectionFilePath)
 
@@ -249,8 +215,6 @@ class Starter @Inject()(
     }
 
     (for {
-      _ <- deleteCollections()
-      _ <- updateCollections()
       uploads <- uploads
       _ <- processDir(uploads)
     } yield ()

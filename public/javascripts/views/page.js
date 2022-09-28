@@ -15,6 +15,13 @@ function viewWishListCollection(lastPart) {
     componentResource('centerContent', jsRoutes.controllers.WishlistController.collectionNFTs(accountId, collectionId));
 }
 
+function viewCreatedCollection(lastPart) {
+    let accountId = lastPart.split("/")[0];
+    let collectionId = lastPart.split("/")[2];
+    componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
+    componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs(accountId, collectionId));
+}
+
 function viewNFT(nftId) {
     componentResource('leftContent', jsRoutes.controllers.NFTController.info(nftId));
     componentResource('centerContent', jsRoutes.controllers.NFTController.details(nftId));

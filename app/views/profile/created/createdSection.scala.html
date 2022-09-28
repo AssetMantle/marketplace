@@ -8,7 +8,7 @@
         <div class="profiles-container">
 
             <div class="profile-list" id="art">
-                <div id="wishlistCollectionsPerPage" class="w-100 list grid-view-filter collectionsPerPage"></div>
+                <div id="createdCollectionsPerPage" class="w-100 list grid-view-filter collectionsPerPage"></div>
             </div>
 
             <div class="loadMoreElement show">
@@ -24,6 +24,6 @@
     </div>
 </div>
 
-<script src="@routes.Assets.versioned("javascripts/profile/wishlist/loadMore.js")" type="text/javascript"></script>
-<script>componentResource("wishlistCollectionsPerPage", jsRoutes.controllers.WishlistController.collectionPerPage('@accountId', 1))</script>
-<script> window.onscroll = function() { loadWishlistCollectionOnScroll('@accountId'); } </script>
+<script src="@routes.Assets.versioned("javascripts/profile/created/loadMore.js")" type="text/javascript"></script>
+<script>componentResource("createdCollectionsPerPage", jsRoutes.controllers.CollectionController.createdCollectionPerPage('@accountId', 1))</script>
+<script> window.onscroll = function() { loadCreatedCollectionOnScroll('@accountId'); } </script>

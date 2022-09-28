@@ -150,4 +150,27 @@ class CollectionController @Inject()(
         }
     }
   }
+
+  def createdSection(accountId: String): EssentialAction = cached.apply(req => req.path + accountId, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.created.createdSection(accountId)))
+    }
+  }
+
+  def createdCollectionPerPage(accountId: String, pageNumber: Int): EssentialAction = cached.apply(req => req.path + accountId + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collections = masterCollections.Service.getByCreatorAndPage(accountId, pageNumber)
+        val totalCreated = masterCollections.Service.totalCreated(accountId)
+
+        (for {
+          totalCreated <- totalCreated
+          collections <- collections
+        } yield Ok(views.html.profile.created.collectionPerPage(collections, totalCollections = totalCreated))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
 }
