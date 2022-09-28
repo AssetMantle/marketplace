@@ -142,7 +142,7 @@ class CollectionController @Inject()(
 
           (for {
             collectionId <- collectionId
-          } yield PartialContent(views.html.base.commonUploadFile(constants.File.COLLECTION_FILE_FORM, id = collectionId, documentType = constants.Collection.File.COVER))
+          } yield PartialContent(views.html.collection.uploadFile(id = collectionId))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message)))
           }

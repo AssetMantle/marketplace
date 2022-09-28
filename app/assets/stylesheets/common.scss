@@ -623,3 +623,27 @@
     @include setFont(var(--font-type-1), normal, 500, 14px, 17px, var(--default));
   }
 }
+
+// Common Upload File
+.uploadBox{
+  border: 1px dashed var(--gray);
+  border-radius: 6px;
+  min-height: 200px;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  text-align: center;
+  .uploadIcon{
+    font-size: 40px;
+  }
+  .dropBox{
+    @include setFont(var(--font-type-2), normal, 600, 20px, 32px, var(--mantle-off-white));
+    display: block;
+    margin-bottom: 8px;
+  }
+  .centerText{
+    @include setFont(var(--font-type-2), normal, 500, 12px, 17px, var(--text-medium));
+    display: block;
+    margin-bottom: 8px;
+  }
+}

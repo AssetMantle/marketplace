@@ -19,8 +19,8 @@ object Collection {
 
   def getFilePath(documentType: String)(implicit module: String, logger: Logger): String = {
     documentType match {
-      case File.PROFILE => "/Users/abhinav/collection/"
-      case File.COVER => "/Users/abhinav/collection/"
+      case File.PROFILE => constants.CommonConfig.Files.CollectionPath + "/"
+      case File.COVER => constants.CommonConfig.Files.CollectionPath + "/"
       case _ => constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION.throwBaseException()
     }
   }

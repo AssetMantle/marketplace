@@ -8,12 +8,13 @@
 @CSRF.formField
     <div class="modalInfoBlock">
     <div id="uploadSelector_@documentType"  class="centerText uploadBox">
+        <i class="bi bi-cloud-upload iconDefault uploadIcon"></i>
         <span class="uploadIcon" cmuk-icon="cloud-upload"></span>
         <div class="dropBox">
-            <p class="centerText"><small>@Messages(constants.View.DROP_FILE)</small></p>
+            @Messages(constants.View.DROP_FILE)
         </div>
-        <p class="centerText"><small>@Messages(constants.View.OR)</small></p>
-        <button type="button" class="cmuk-button cmuk-button-primary" id="browseUploadButton_@documentType">@Messages(constants.View.BROWSE)</button>
+        <p class="centerText">@Messages(constants.View.OR)</p>
+        <button type="button" class="secondaryButton" id="browseUploadButton_@documentType">@Messages(constants.View.BROWSE)</button>
     </div>
     <div id="uploader_@documentType" class="centerText">
         <a id="fileName_@documentType" class="fileName"></a>
@@ -22,7 +23,9 @@
             <div class="progressContainer">
                 <div class="progressBar" id="fileUploadProgressBar_@documentType"></div>
             </div>
-            <button type="button" class="cmuk-button cmuk-button-primary" id="uploadButton_@documentType" >@Messages(constants.View.UPLOAD)</button>
+            <div class="mt-0 horizontal-align">
+                <button type="button" class="primaryButton" id="uploadButton_@documentType" >@Messages(constants.View.UPLOAD)</button>
+            </div>
         </div>
     </div>
     <div id="uploadCompletionMessage_@documentType" class=""></div>
