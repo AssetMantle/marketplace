@@ -148,13 +148,9 @@ class Collections @Inject()(
 
     def isCreator(accountId: String): Future[Boolean] = filter(_.creatorId === accountId).map(_.nonEmpty)
 
-    def updateAccountId(id: String, description: String, website: String, socialProfiles: Seq[SocialProfile], accountId: String): Future[Unit] = {
-      val collection = tryGet(id)
-      for {
-        collection <- collection
-        _ <- update(collection.copy(creatorId = accountId, description = description, website = website, socialProfiles = socialProfiles).serialize())
-      } yield ()
-    }
+    def totalCreated(creatorId: String): Future[Int] = filterAndCount(_.creatorId === creatorId)
+
+    def getByCreatorAndPage(creatorId: String, pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.creatorId === creatorId)(_.createdOn).map(_.map(_.deserialize))
 
   }
 }

@@ -540,4 +540,5 @@ SEND_COIN_AVAILABLE_BALANCE=Balance: {0} MNTL
 ADDRESS_COPIED=Address Copied!
 ADDED_TO_WISHLIST=NFT added to wishlist!
 REMOVED_FROM_WISHLIST=NFT removed from wishlist!
+NO_COLLECTION_FOUND=No Collection Found
 
