@@ -12,7 +12,8 @@ document.onload = function () {
 function loadMoreCollections(accountId) {
     const loading = document.querySelector('.loading');
     if ($("#noCreatedCollectionsPerPage").length === 0) {
-        let route = jsRoutes.controllers.CollectionController.createdCollectionPerPage(accountId, ($(".createdCollectionsPerPage").length + 1));
+        let nextPageNumber = Math.ceil(($('.singleCreatedCollection').length - 1) / 6 + 1);
+        let route = jsRoutes.controllers.CollectionController.createdCollectionPerPage(accountId, nextPageNumber);
         $.ajax({
             url: route.url,
             type: route.type,
@@ -25,7 +26,7 @@ function loadMoreCollections(accountId) {
             },
             statusCode: {
                 200: function (data) {
-                    $('#createdCollectionsPerPage').append(data);
+                    $('.createdCollectionsPerPage').append(data);
                 }
             }
         });

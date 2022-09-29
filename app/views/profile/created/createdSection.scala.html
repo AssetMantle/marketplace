@@ -8,7 +8,19 @@
         <div class="profiles-container">
 
             <div class="profile-list" id="art">
-                <div id="createdCollectionsPerPage" class="w-100 list grid-view-filter collectionsPerPage"></div>
+                <div id="createdCollectionsPerPage" class="w-100 list grid-view-filter collectionsPerPage">
+                    <div class="m-0 p-0 collectionPage createdCollectionsPerPage">
+                        <div class="mt-3 singleCollection singleCreatedCollection createCollectionContainer" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_COLLECTION.get, ""))">
+                            <div class="d-flex flex-column justify-content-end gap-3 h-100">
+                                <div class="text-center">
+                                    <img src="@routes.Assets.versioned("images/icon/createCollection.png")" />
+                                </div>
+                                <div class="createCollectionLabel">@Messages(constants.View.CREATE_COLLECTION_LABEL)</div>
+                                <div class="createCollectionButton">@Messages(constants.View.CREATE_COLLECTION_BUTTON)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="loadMoreElement show">
@@ -25,5 +37,5 @@
 </div>
 
 <script src="@routes.Assets.versioned("javascripts/profile/created/loadMore.js")" type="text/javascript"></script>
-<script>componentResource("createdCollectionsPerPage", jsRoutes.controllers.CollectionController.createdCollectionPerPage('@accountId', 1))</script>
+<script>loadMoreCollections('@accountId');</script>
 <script> window.onscroll = function() { loadCreatedCollectionOnScroll('@accountId'); } </script>
