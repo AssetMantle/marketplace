@@ -26,6 +26,13 @@ resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releas
 
 resolvers += "Maven Central Server" at "https://repo1.maven.org/maven2"
 
+resolvers ++= Seq(
+  Resolver.url(
+)
+
+libraryDependencies ++= Seq(
+  "com.edulify" %% "sitemap-module" % "2.1.0"
+
 libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
 libraryDependencies ++= Seq(
