@@ -25,6 +25,11 @@ object Collection {
     }
   }
 
+  object Category {
+    val ART = "ART"
+    val PHOTOGRAPHY = "PHOTOGRAPHY"
+    val MISCELLANEOUS = "MISCELLANEOUS"
+  }
 
   object NFT {
     object Data {

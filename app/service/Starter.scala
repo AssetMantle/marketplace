@@ -252,9 +252,9 @@ class Starter @Inject()(
         val insta = if (uploadCollection.instagram != "") Option(SocialProfile(name = constants.Collection.SocialProfile.INSTAGRAM, url = uploadCollection.instagram)) else None
         val socialProfiles = Seq(twitter, insta).flatten
         if (collection.isEmpty) {
-          masterCollections.Service.add(name = uploadCollection.name, creatorId = uploadCollection.accountId, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles, category = "ART")
+          masterCollections.Service.add(name = uploadCollection.name, creatorId = uploadCollection.accountId, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles, category = "ART", nsfw = false)
         } else if (uploadCollection.updateDetails) {
-          masterCollections.Service.insertOrUpdate(id = collection.get.id, creatorId = uploadCollection.accountId, name = uploadCollection.name, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles, category = "ART")
+          masterCollections.Service.insertOrUpdate(id = collection.get.id, creatorId = uploadCollection.accountId, name = uploadCollection.name, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles, category = "ART", nsfw = false)
         } else Future(collection.get.id)
       }
 

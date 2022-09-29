@@ -164,7 +164,7 @@ class CollectionController @Inject()(
           Future(BadRequest(views.html.collection.create(formWithErrors)))
         },
         createData => {
-          val collectionId = masterCollections.Service.add(name = createData.name, description = createData.description, website = "", socialProfiles = createData.getSocialProfiles, category = createData.category, creatorId = loginState.username)
+          val collectionId = masterCollections.Service.add(name = createData.name, description = createData.description, website = "", socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw)
 
           (for {
             collectionId <- collectionId

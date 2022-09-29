@@ -12,13 +12,13 @@ object Create {
     mapping(
       constants.FormField.COLLECTION_NAME.mapping,
       constants.FormField.COLLECTION_DESCRIPTION.mapping,
-      constants.FormField.COLLECTION_CATEGORY.mapping,
+      constants.FormField.NSFW_COLLECTION.mapping,
       constants.FormField.COLLECTION_WEBSITE.optionalMapping,
       constants.FormField.COLLECTION_TWITTER.optionalMapping,
       constants.FormField.COLLECTION_INSTAGRAM.optionalMapping,
     )(Data.apply)(Data.unapply))
 
-  case class Data(name: String, description: String, category: String, website: Option[URL], twitter: Option[URL], instagram: Option[URL]) {
+  case class Data(name: String, description: String, nsfw: Boolean, website: Option[URL], twitter: Option[URL], instagram: Option[URL]) {
     def getSocialProfiles: Seq[SocialProfile] = Seq(
       this.website.fold[Option[SocialProfile]](None)(x => Option(SocialProfile(name = constants.Collection.SocialProfile.WEBSITE, url = x.toString))),
       this.twitter.fold[Option[SocialProfile]](None)(x => Option(SocialProfile(name = constants.Collection.SocialProfile.TWITTER, url = x.toString))),
