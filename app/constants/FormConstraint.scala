@@ -4,7 +4,8 @@ import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import utilities.MicroNumber
 import views.account.companion._
 import views.setting.companion._
-import views.profile.whitelist.companion._
+import views.collection.{companion => collection}
+import views.profile.whitelist.{companion => whitelist}
 import views.blockchainTransaction.companion._
 
 object FormConstraint {
@@ -77,7 +78,7 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val createWhitelistInviteConstraint: Constraint[Create.Data] = Constraint("constraints.CreateWhitelist")({ createWhitelistData: Create.Data =>
+  val createWhitelistInviteConstraint: Constraint[whitelist.Create.Data] = Constraint("constraints.CreateWhitelist")({ createWhitelistData: whitelist.Create.Data =>
     val errors = Seq(
       if (createWhitelistData.startEpoch >= createWhitelistData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
       if (createWhitelistData.startEpoch < (System.currentTimeMillis / 1000 - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
@@ -85,9 +86,17 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val editWhitelistInviteConstraint: Constraint[Edit.Data] = Constraint("constraints.EditWhitelist")({ editWhitelistData: Edit.Data =>
+  val editWhitelistInviteConstraint: Constraint[whitelist.Edit.Data] = Constraint("constraints.EditWhitelist")({ editWhitelistData: whitelist.Edit.Data =>
     val errors = Seq(
       if (editWhitelistData.startEpoch >= editWhitelistData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val defineCollectionPropertiesConstraint: Constraint[collection.DefineProperties.Data] = Constraint("constraints.DefineCollectionPropertiesConstraint")({ definePropertiesData: collection.DefineProperties.Data =>
+    val errors = Seq(
+      if ((definePropertiesData.properties.flatten.length + constants.Collection.DefaultProperty.list.length) <= constants.Blockchain.MaximumProperties) Option(ValidationError(constants.Response.MAXIMUM_COLLECTION_PROPERTIES_EXCEEDED.message)) else None,
+      if (definePropertiesData.properties.flatten.map(_.name).intersect(constants.Collection.DefaultProperty.list).nonEmpty) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })

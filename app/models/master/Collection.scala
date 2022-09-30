@@ -168,5 +168,20 @@ class Collections @Inject()(
 
     def isOwner(id: String, accountId: String): Future[Boolean] = filterAndExists(x => x.id === id && x.creatorId === accountId)
 
+    def checkOwnerAndUpdate(id: String, ownerId: String, name: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean): Future[Unit] = {
+      val collection = tryGet(id)
+
+      def validateAndUpdate(collection: Collection) = if (collection.classificationId.isEmpty) {
+        if (collection.creatorId == ownerId) {
+          update(collection.copy(name = name, description = description, socialProfiles = socialProfiles, category = category, nsfw = nsfw).serialize())
+        } else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
+      } else constants.Response.CLASSIFICATION_ALREADY_DEFINED.throwFutureBaseException()
+
+      for {
+        collection <- collection
+        _ <- validateAndUpdate(collection)
+      } yield ()
+    }
+
   }
 }

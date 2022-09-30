@@ -37,10 +37,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.createdSection,
         routes.javascript.CollectionController.createdCollectionPerPage,
         routes.javascript.CollectionController.createForm,
+        routes.javascript.CollectionController.editForm,
         routes.javascript.CollectionController.uploadCollectionFileForm,
         routes.javascript.CollectionController.storeCollectionFile,
         routes.javascript.CollectionController.uploadCollectionFile,
-
+        routes.javascript.CollectionController.definePropertiesForm,
 
         routes.javascript.WishlistController.wishlistSection,
         routes.javascript.WishlistController.collectionPerPage,

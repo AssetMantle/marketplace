@@ -58,6 +58,9 @@ object FormField {
   val CHANGE_KEY_ADDRESS: StringFormField = StringFormField("CHANGE_KEY_ADDRESS", 3, 50, RegularExpression.MANTLE_ADDRESS)
   val COLLECTION_NAME: StringFormField = StringFormField("COLLECTION_NAME", 3, 30)
   val COLLECTION_DESCRIPTION: StringFormField = StringFormField("COLLECTION_DESCRIPTION", 3, 256)
+  val COLLECTION_ID: StringFormField = StringFormField("COLLECTION_ID", 16, 16)
+  val COLLECTION_PROPERTY_NAME: StringFormField = StringFormField("COLLECTION_PROPERTY_NAME", 1, 30)
+  val COLLECTION_PROPERTY_FIXED_VALUE: StringFormField = StringFormField("COLLECTION_PROPERTY_FIXED_VALUE", 1, 30)
 
   // UrlFormField
   val COLLECTION_WEBSITE: UrlFormField = UrlFormField("COLLECTION_WEBSITE")
@@ -76,18 +79,28 @@ object FormField {
   val SIGNUP_TERMS_CONDITIONS: BooleanFormField = BooleanFormField("SIGNUP_TERMS_CONDITIONS")
   val MANAGED_KEY_DISCLAIMER: BooleanFormField = BooleanFormField("MANAGED_KEY_DISCLAIMER")
   val NSFW_COLLECTION: BooleanFormField = BooleanFormField("NSFW_COLLECTION")
+  val COLLECTION_PROPERTY_REQUIRED: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_REQUIRED")
+  val COLLECTION_PROPERTY_MUTABLE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_MUTABLE")
+  val COLLECTION_PROPERTY_HIDE_VALUE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_HIDE_VALUE")
 
   // SelectFormField
   val GAS_PRICE: SelectFormField = SelectFormField("GAS_PRICE", Seq(constants.CommonConfig.Blockchain.LowGasPrice.toString, constants.CommonConfig.Blockchain.MediumGasPrice.toString, constants.CommonConfig.Blockchain.HighGasPrice.toString))
   val COLLECTION_CATEGORY: SelectFormField = SelectFormField("COLLECTION_CATEGORY", Seq(constants.Collection.Category.ART, constants.Collection.Category.PHOTOGRAPHY, constants.Collection.Category.MISCELLANEOUS))
+  val COLLECTION_PROPERTY_TYPE: SelectFormField = SelectFormField("COLLECTION_PROPERTY_TYPE", Seq(constants.Collection.NFT.Data.STRING, constants.Collection.NFT.Data.NUMBER, constants.Collection.NFT.Data.BOOLEAN))
 
   // MicroNumberFormField
   val SEND_COIN_AMOUNT: MicroNumberFormField = MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.zero, MicroNumber(Int.MaxValue), 6)
+
+  // NestedFormField
+  val COLLECTION_PROPERTY: NestedFormField = NestedFormField("COLLECTION_PROPERTY")
 
   case class StringFormField(name: String, minimumLength: Int, maximumLength: Int, regularExpression: RegularExpression = RegularExpression.ANY_STRING, errorMessage: String = "Regular expression validation failed!") {
     val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[String]) = name -> text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regex, name = regularExpression.regex.pattern.toString, error = errorMessage))
+
+    // TODO
+    //  def ignoredMapping: (String, Mapping[String]) = name -> ignored[String]("defaultValue")
 
     def optionalMapping: (String, Mapping[Option[String]]) = name -> optional(text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regex, name = regularExpression.regex.pattern.toString, error = errorMessage)))
 
@@ -99,7 +112,7 @@ object FormField {
   }
 
   case class SelectFormField(name: String, options: Seq[String], errorMessage: String = "Option not found") {
-    val placeHolder: String = PLACEHOLDER_PREFIX + name
+    val placeHolder: String = options.head
 
     def mapping: (String, Mapping[String]) = name -> text.verifying(constraint = field => options contains field, error = errorMessage)
 

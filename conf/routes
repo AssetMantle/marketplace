@@ -51,6 +51,10 @@ GET         /createdCollectionPerPage                             controllers.Co
 
 GET         /createCollection                                     controllers.CollectionController.createForm()
 POST        /createCollection                                     controllers.CollectionController.create()
+GET         /editCollection                                       controllers.CollectionController.editForm(id: String)
+POST        /editCollection                                       controllers.CollectionController.edit()
+GET         /defineProperties                                     controllers.CollectionController.definePropertiesForm(id: String)
+POST        /defineProperties                                     controllers.CollectionController.defineProperties()
 
 GET         /uploadCollectionFileForm                             controllers.CollectionController.uploadCollectionFileForm(id: String, documentType: String)
 POST        /storeCollectionFile                                  controllers.CollectionController.storeCollectionFile(id: String, documentType: String)

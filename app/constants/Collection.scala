@@ -1,5 +1,6 @@
 package constants
 
+import models.master.CollectionProperty
 import play.api.Logger
 
 import scala.concurrent.ExecutionContext
@@ -31,10 +32,22 @@ object Collection {
     val MISCELLANEOUS = "MISCELLANEOUS"
   }
 
+  object DefaultProperty {
+    val NAME = "name"
+    val DESCRIPTION = "description"
+    val CATEGORY = "category"
+    val NSFW = "nsfw"
+
+    val list: Seq[String] = Seq(NAME, DESCRIPTION, CATEGORY, NSFW)
+
+    def getDefaultProperties(id: String): Seq[CollectionProperty] = list.map(x => CollectionProperty(id = id, propertyName = x, propertyType = PropertyData.Type.STRING, required = true, mutable = false, fixedValue = None, hideValue = false))
+  }
+
   object NFT {
     object Data {
       val STRING = "STRING"
       val NUMBER = "NUMBER"
+      val BOOLEAN = "BOOLEAN"
     }
   }
 

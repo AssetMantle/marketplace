@@ -1,7 +1,8 @@
 @import views.html.base._
-@import views.collection.companion.Create
+@import views.html.base.buttons._
 
 @(id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = id, documentType = constants.Collection.File.PROFILE)
 @commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = id, documentType = constants.Collection.File.COVER)
+@commonModalPrimaryButton(constants.View.NEXT, constants.Form.DEFINE_COLLECTION_PROPERTIES.get, Symbol("parameters") -> s"'$id'")

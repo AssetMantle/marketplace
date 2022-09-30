@@ -10,6 +10,7 @@ object Blockchain {
   val ValidatorConsensusPublicPrefix: String = AccountPrefix + "valconspub"
   val CoinType = 118
   val MnemonicShown = 4
+  val MaximumProperties = 22
   val ChainId: String = CommonConfig.Blockchain.ChainId
   val StakingToken: String = CommonConfig.Blockchain.StakingToken
   val DefaultSendCoinGasAmount = 100000

@@ -8,7 +8,7 @@ import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import views.base.companion.UploadFile
-import views.collection.companion.Create
+import views.collection.companion._
 
 import java.nio.file.Files
 import javax.inject.{Inject, Singleton}
@@ -24,6 +24,7 @@ class CollectionController @Inject()(
                                       withLoginAction: WithLoginAction,
                                       masterAccounts: master.Accounts,
                                       masterCollections: master.Collections,
+                                      masterCollectionProperties: master.CollectionProperties,
                                       masterNFTs: master.NFTs,
                                       masterCollectionFiles: master.CollectionFiles,
                                       masterWishLists: master.WishLists,
@@ -166,9 +167,36 @@ class CollectionController @Inject()(
         createData => {
           val collectionId = masterCollections.Service.add(name = createData.name, description = createData.description, website = "", socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw)
 
+          def addDefaultProperties(id: String) = masterCollectionProperties.Service.addMultiple(constants.Collection.DefaultProperty.getDefaultProperties(id))
+
           (for {
             collectionId <- collectionId
+            _ <- addDefaultProperties(collectionId)
           } yield PartialContent(views.html.collection.uploadFile(id = collectionId))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message)))
+          }
+        }
+      )
+  }
+
+  def editForm(id: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.collection.edit(id = id))
+  }
+
+  def edit(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Edit.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.collection.edit(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))))
+        },
+        editData => {
+
+          val update = masterCollections.Service.checkOwnerAndUpdate(id = editData.collectionId, name = editData.name, description = editData.description, socialProfiles = editData.getSocialProfiles, category = constants.Collection.Category.ART, ownerId = loginState.username, nsfw = editData.nsfw)
+
+          (for {
+            _ <- update
+          } yield PartialContent(views.html.collection.uploadFile(id = editData.collectionId))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message)))
           }
@@ -216,9 +244,9 @@ class CollectionController @Inject()(
       val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
       val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(name)
       val awsKey = id + "/others/" + newFileName
-      val checkCollectionOwner = masterCollections.Service.isOwner(id = id, accountId = loginState.username)
+      val isOwner = masterCollections.Service.isOwner(id = id, accountId = loginState.username)
 
-      def uploadToAws(collectionOwner: Boolean) = if (collectionOwner) Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
+      def uploadToAws(isOwner: Boolean) = if (isOwner) Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
       else {
         utilities.FileOperations.deleteFile(oldFilePath)
         constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
@@ -227,8 +255,8 @@ class CollectionController @Inject()(
       def add = masterCollectionFiles.Service.add(id = id, documentType = documentType, fileName = newFileName)
 
       (for {
-        collectionOwner <- checkCollectionOwner
-        _ <- uploadToAws(collectionOwner)
+        isOwner <- isOwner
+        _ <- uploadToAws(isOwner)
         _ <- add
       } yield Ok
         ).recover {
@@ -236,5 +264,31 @@ class CollectionController @Inject()(
       }
   }
 
+  def definePropertiesForm(id: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.collection.defineProperties(id = id))
+  }
+
+  def defineProperties(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      DefineProperties.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.collection.defineProperties(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))))
+        },
+        definePropertiesData => {
+
+          val update = Future{
+            println(definePropertiesData)
+            println(definePropertiesData.properties.flatten)
+          }
+
+          (for {
+            _ <- update
+          } yield Ok
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message)))
+          }
+        }
+      )
+  }
 
 }

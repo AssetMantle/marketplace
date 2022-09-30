@@ -1,0 +1,21 @@
+@import views.html.base.form._
+@import views.collection.companion.DefineProperties
+@import views.html.helper.repeatWithIndex
+
+@(definePropertiesForm: Form[DefineProperties.Data] = DefineProperties.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm) {
+    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> id, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
+    @repeatWithIndex(definePropertiesForm(constants.FormField.COLLECTION_PROPERTY.name), min = constants.Blockchain.MaximumProperties - constants.Collection.DefaultProperty.list.length) { (propertyField, index) =>
+        @defining(Option(propertyField)) { implicit sequentialFormField =>
+            <div id='@Seq(constants.FormField.COLLECTION_PROPERTY.name, index).mkString("_")'>
+                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME)
+                @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources")
+                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_FIXED_VALUE, Symbol("required") -> false)
+                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_REQUIRED)
+                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
+                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE_VALUE)
+            </div>
+        }
+    }
+}
