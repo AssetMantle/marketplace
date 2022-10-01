@@ -1,6 +1,6 @@
 package app.assetmantle.sitemap;
 import com.redfin.sitemapgenerator.ChangeFreq;
-public @interface SitemapItem {
+ @interface SitemapItem {
 
   
   ChangeFreq changefreq() default ChangeFreq.DAILY;
