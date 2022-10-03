@@ -33,6 +33,7 @@ object Collection {
   }
 
   object DefaultProperty {
+    // Should be kept in lower case otherwise change in form constraints
     val NAME = "name"
     val DESCRIPTION = "description"
     val CATEGORY = "category"

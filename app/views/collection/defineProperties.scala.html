@@ -6,16 +6,18 @@
 
 @commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm, submitDisable = false) {
     @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> id, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
-    @repeatWithIndex(definePropertiesForm(constants.FormField.COLLECTION_PROPERTY.name), min = constants.Blockchain.MaximumProperties - constants.Collection.DefaultProperty.list.length) { (propertyField, index) =>
-        @defining(Option(propertyField)) { implicit sequentialFormField =>
-            <div id='@Seq(constants.FormField.COLLECTION_PROPERTY.name, index).mkString("_")'>
-                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME)
-                @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources")
-                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_FIXED_VALUE, Symbol("required") -> false)
-                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_REQUIRED)
-                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
-                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE_VALUE)
-            </div>
+    @defining(Option(constants.FormField.COLLECTION_PROPERTIES)) { implicit nestedFormField =>
+        @repeatWithIndex(definePropertiesForm(constants.FormField.COLLECTION_PROPERTIES.name), min = constants.Blockchain.MaximumProperties - constants.Collection.DefaultProperty.list.length) { (propertyField, index) =>
+            @defining(Option(propertyField)) { implicit sequentialFormField =>
+                <div id='@Seq(constants.View.COLLECTION_PROPERTY, index).mkString("_")'>
+                    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("required") -> false)
+                    @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources")
+                    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_FIXED_VALUE, Symbol("required") -> false)
+                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_REQUIRED)
+                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
+                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE_VALUE)
+                </div>
+            }
         }
     }
 }

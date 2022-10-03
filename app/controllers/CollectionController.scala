@@ -278,7 +278,7 @@ class CollectionController @Inject()(
 
           val update = Future{
             println(definePropertiesData)
-            println(definePropertiesData.properties.flatten)
+            println(definePropertiesData.properties)
           }
 
           (for {
