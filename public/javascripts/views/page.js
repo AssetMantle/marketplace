@@ -32,7 +32,9 @@ function viewSetting() {
     $('#leftContent').html('');
 }
 
-function viewProfile(accountId) {
-    componentResource('centerContent', jsRoutes.controllers.ProfileController.profile(accountId));
+function viewProfile(lastPart) {
+    let accountId = lastPart.split("/")[0];
+    let activeTab = lastPart.split("/")[1];
+    componentResource('centerContent', jsRoutes.controllers.ProfileController.profile(accountId, activeTab));
     $('#leftContent').html('');
 }
