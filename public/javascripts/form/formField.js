@@ -64,12 +64,10 @@ function copyFieldsValue(sourceField, destinationField) {
 }
 
 // Custom Select
-function customSelect(){
-    $(".custom-select").each(function() {
-        var classes = $(this).attr("class"),
-            id      = $(this).attr("id"),
-            name    = $(this).attr("name");
-        var template =  '<div class="' + classes + '">';
+function customSelect(containerID){
+    $("#"+containerID+" .custom-select").each(function() {
+        let classes = $(this).attr("class");
+        let template =  '<div class="' + classes + '">';
         template += '<span class="custom-select-trigger">' + $(this).attr("placeholder") + '</span>';
         template += '<div class="custom-options">';
         $(this).find("option").each(function() {
@@ -81,19 +79,22 @@ function customSelect(){
         $(this).hide();
         $(this).after(template);
     });
-    $(".custom-option:first-of-type").hover(function() {
-        $(this).parents(".custom-options").addClass("option-hover");
-    }, function() {
-        $(this).parents(".custom-options").removeClass("option-hover");
-    });
-    $(".custom-select-trigger").on("click", function() {
+    $("#"+containerID+" .custom-select-trigger").on("click", function() {
         $('html').one('click',function() {
             $(".custom-select").removeClass("opened");
         });
-        $(this).parents(".custom-select").toggleClass("opened");
+        $(".custom-select").each(function() {
+            $(this).removeClass("opened");
+        });
+        if($("#"+containerID+" .custom-select").hasClass("opened")){
+            $("#"+containerID+" .custom-select").removeClass("opened");
+        }else{
+            $("#"+containerID+" .custom-select").addClass("opened");
+        }
+        // $(this).parents(".custom-select").toggleClass("opened");
         event.stopPropagation();
     });
-    $(".custom-option").on("click", function() {
+    $("#"+containerID+" .custom-option").on("click", function() {
         $(this).parents(".custom-select-wrapper").find("select").val($(this).data("value"));
         $(this).parents(".custom-options").find(".custom-option").removeClass("selection");
         $(this).addClass("selection");
