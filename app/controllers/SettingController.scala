@@ -253,25 +253,6 @@ class SettingController @Inject()(
       )
   }
 
-  def viewWishList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        Future(Ok(views.html.setting.wishList.viewWishList()))
-    }
-  }
-
-  def wishList(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginAction { implicit request =>
-      Ok(views.html.setting.wishList.wishList())
-    }
-  }
-
-  def wishListNFTs(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginAction { implicit request =>
-      Ok(views.html.setting.wishList.wishListNFTs())
-    }
-  }
-
   def viewOffers(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>

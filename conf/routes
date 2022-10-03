@@ -129,8 +129,5 @@ GET         /gasTokenPrice                                        controllers.Bl
 GET         /sendCoin                                             controllers.BlockchainTransactionController.sendCoinForm(fromAddress: String)
 POST        /sendCoin                                             controllers.BlockchainTransactionController.sendCoin()
 
-GET         /viewWishList                                         controllers.SettingController.viewWishList()
-GET         /wishList                                             controllers.SettingController.wishList()
-GET         /wishListNFTs                                         controllers.SettingController.wishListNFTs()
 GET         /viewOffers                                           controllers.SettingController.viewOffers()
 GET         /offers                                               controllers.SettingController.offers()

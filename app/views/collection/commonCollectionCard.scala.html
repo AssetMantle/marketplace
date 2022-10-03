@@ -1,6 +1,6 @@
-@(collection: master.Collection, collectionCoverFile: Option[String], collectionProfileFile: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(collection: master.Collection, onClickFunction: JavaScript, collectionCoverFile: Option[String], collectionProfileFile: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<a onclick="viewCollection('@collection.id')">
+<a onclick="@onClickFunction">
     <div class="single-profile-card commonCollectionCard artCollection">
         <div class="profile-section">
             <div id="collectionCoverImage_@collection.id">
