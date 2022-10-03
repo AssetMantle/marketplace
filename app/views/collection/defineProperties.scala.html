@@ -1,23 +1,102 @@
 @import views.html.base.form._
 @import views.collection.companion.DefineProperties
 @import views.html.helper.repeatWithIndex
+@import views.html.base.buttons.commonTertiaryButton
 
 @(definePropertiesForm: Form[DefineProperties.Data] = DefineProperties.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm, submitDisable = false) {
     @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> id, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
     @defining(Option(constants.FormField.COLLECTION_PROPERTIES)) { implicit nestedFormField =>
+        <div class="propertyContainer">
         @repeatWithIndex(definePropertiesForm(constants.FormField.COLLECTION_PROPERTIES.name), min = constants.Blockchain.MaximumProperties - constants.Collection.DefaultProperty.list.length) { (propertyField, index) =>
             @defining(Option(propertyField)) { implicit sequentialFormField =>
-                <div id='@Seq(constants.View.COLLECTION_PROPERTY, index).mkString("_")'>
-                    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("required") -> false)
-                    @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources")
-                    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_FIXED_VALUE, Symbol("required") -> false)
-                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_REQUIRED)
-                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
-                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE_VALUE)
-                </div>
+                @if(index == 0) {
+                    <div id='@Seq(constants.View.COLLECTION_PROPERTY, index).mkString("_")' class="singlePropertyContainer active">
+                        @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("required") -> false)
+                        @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources")
+                        @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_FIXED_VALUE, Symbol("required") -> false)
+                        @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_REQUIRED)
+                        @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
+                        @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE_VALUE)
+                    </div>
+                }else{
+                    <div id='@Seq(constants.View.COLLECTION_PROPERTY, index).mkString("_")' class="singlePropertyContainer" style="display: none;">
+                        @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("required") -> false)
+                        @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources")
+                        @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_FIXED_VALUE, Symbol("required") -> false)
+                        @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_REQUIRED)
+                        @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
+                        @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE_VALUE)
+                        <button type="button" class="form-secondary-button" onclick="removeProperty(@index)">Delete</button>
+                    </div>
+                }
             }
         }
+        </div>
+    @commonTertiaryButton(name = constants.View.ADD_MORE_PROPERTIES, function = JavaScript(s"addProperty()"), icon = Option("bi-plus-circle"), iconFirst = Option(true), buttonId = Option("addMorePropertyButton"))
     }
 }
+<script>
+        let totalActiveContainer = 0;
+        function addProperty(){
+            totalActiveContainer = $(".singlePropertyContainer.active").length;
+            $("#COLLECTION_PROPERTY_"+totalActiveContainer).show();
+            $("#COLLECTION_PROPERTY_"+totalActiveContainer).addClass("active");
+
+            if(totalActiveContainer == 17){
+                $("#addMorePropertyButton").hide();
+            }else{
+                $("#addMorePropertyButton").show();
+            }
+        }
+
+        function removeProperty(containerId){
+            totalActiveContainer = $(".singlePropertyContainer.active").length;
+
+            $("#COLLECTION_PROPERTY_"+(totalActiveContainer-1)).hide();
+            $("#COLLECTION_PROPERTY_"+(totalActiveContainer-1)).removeClass("active");
+
+            if(totalActiveContainer == 16){
+                $("#addMorePropertyButton").hide();
+            }else{
+                $("#addMorePropertyButton").show();
+            }
+
+            $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_NAME").val("");
+            $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_TYPE").val("String");
+            $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text("String");
+            $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_FIXED_VALUE").val("");
+            $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_REQUIRED").prop("checked",false);
+            $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_MUTABLE").prop("checked",false);
+            $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_HIDE_VALUE").prop("checked",false);
+
+            for(let i=containerId; i < 17; i++){
+                let nextElementNameValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_NAME").val();
+                let nextElementTypeValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE").val();
+                let nextElementCustomSelectTypeValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text();
+                let nextElementFixedValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_FIXED_VALUE").val();
+                let nextElementRequiredValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_REQUIRED").is(':checked');
+                let nextElementMutableValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_MUTABLE").is(':checked');
+                let nextElementHideValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_HIDE_VALUE").is(':checked');
+
+                if(nextElementNameValue !== ""){
+                    $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_NAME").val(nextElementNameValue);
+                    $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_TYPE").val(nextElementTypeValue);
+                    $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text(nextElementCustomSelectTypeValue);
+                    $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_FIXED_VALUE").val(nextElementFixedValue);
+                    $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_REQUIRED").prop("checked", nextElementRequiredValue);
+                    $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_MUTABLE").prop("checked", nextElementMutableValue);
+                    $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_HIDE_VALUE").prop("checked", nextElementHideValue);
+
+                    $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_NAME").val("");
+                    $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE").val("String");
+                    $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text("String");
+                    $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_FIXED_VALUE").val("");
+                    $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_REQUIRED").prop("checked", false);
+                    $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_MUTABLE").prop("checked", false);
+                    $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_HIDE_VALUE").prop("checked", false);
+                }
+            }
+        }
+</script>
