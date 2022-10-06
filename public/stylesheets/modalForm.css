@@ -1029,7 +1029,7 @@ dl dd.error{
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    z-index: 99;
+    z-index: 999;
 }
 .custom-select.opened .custom-options {
     opacity: 1;

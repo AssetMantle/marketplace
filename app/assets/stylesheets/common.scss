@@ -648,3 +648,10 @@
     margin-bottom: 8px;
   }
 }
+
+// Common Tertiary Button
+.tertiaryButton{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
+  cursor: pointer;
+  display: inline-block;
+}
