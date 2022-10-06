@@ -11,8 +11,9 @@ GET         /assets/*file                                         controllers.As
 GET         /javascriptRoutes                                     controllers.JavaScriptRoutesController.javascriptRoutes
 GET         /firebase-messaging-sw.js                             controllers.Assets.at(path="/public/javascripts/firebase", file="firebase-messaging-sw.js")
 
-# Home
+# Index
 GET         /                                                     controllers.IndexController.index()
+GET         /sitemap.xml                                          controllers.IndexController.sitemap()
 
 GET         /signUp                                               controllers.AccountController.signUpForm()
 POST        /signUp                                               controllers.AccountController.signUp()
