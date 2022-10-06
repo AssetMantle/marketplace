@@ -28,6 +28,7 @@ function uploadFile(storeFileRoute, uploadRoute, id, documentType, filesSupporte
         $("#uploader_" + documentType).show();
         $("#uploadSelector_" + documentType).hide();
         $("#fileName_" + documentType).html(file.fileName);
+        $("#uploader_" + documentType).show();
     });
 
     rFile.on('fileProgress', function (file) {
