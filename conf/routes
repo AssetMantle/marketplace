@@ -39,10 +39,11 @@ POST        /migrateWalletToKey                               controllers.Accoun
 
 GET         /changeActiveKey                                  controllers.AccountController.changeActiveKey(address: String)
 
-GET         /collections/:section                             controllers.CollectionController.viewCollections(section: String)
+GET         /collections/:category                            controllers.CollectionController.viewCollections(category: String)
 GET         /collection/:id                                   controllers.CollectionController.viewCollection(id: String)
-GET         /collectionsList                                  controllers.CollectionController.collectionsList(section: String)
-GET         /collectionsPerPage                               controllers.CollectionController.collectionsPerPage(pageNumber: Int)
+GET         /collectionsSection                               controllers.CollectionController.collectionsSection(category: String)
+GET         /collectionList                                   controllers.CollectionController.collectionList(category: String)
+GET         /collectionsPerPage                               controllers.CollectionController.collectionsPerPage(category: String,pageNumber: Int)
 GET         /collectionNFTs                                   controllers.CollectionController.collectionNFTs(id: String)
 GET         /collectionNFTsPerPage                            controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionInfo                                   controllers.CollectionController.info(id: String)

@@ -152,7 +152,7 @@ class Collections @Inject()(
 
     def tryGetByName(name: String): Future[Collection] = filterHead(_.name === name).map(_.deserialize)
 
-    def getByPageNumber(pageNumber: Int): Future[Seq[Collection]] = getAllByPageNumber(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.createdOn).map(_.map(_.deserialize))
+    def getByPageNumber(category: String, pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.category === category)(_.createdOn).map(_.map(_.deserialize))
 
     def deleteById(id: String): Future[Int] = delete(id)
 
@@ -163,6 +163,8 @@ class Collections @Inject()(
     def isCreator(accountId: String): Future[Boolean] = filterAndExists(_.creatorId === accountId)
 
     def totalCreated(creatorId: String): Future[Int] = filterAndCount(_.creatorId === creatorId)
+
+    def total(category: String): Future[Int] = filterAndCount(_.category === category)
 
     def getByCreatorAndPage(creatorId: String, pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.creatorId === creatorId)(_.createdOn).map(_.map(_.deserialize))
 

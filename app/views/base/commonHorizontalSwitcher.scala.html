@@ -9,19 +9,19 @@
         @itemValue._1 match {
             case html: Html => {
                 <li class="nav-item" role="presentation">
-                    <a class='@Seq("nav-link", if(itemHeader == activeTab) "active" else "").mkString(" ")' id='@Seq(itemHeader, "-tab").mkString("")' data-bs-toggle="tab" data-bs-target="#switcherContent@itemHeader" role="tab" aria-controls="switcherContent@itemHeader" aria-selected="@(itemHeader == activeTab)" onclick="@itemValue._2">@Messages(itemHeader)</a>
+                    <a class='@Seq("nav-link", if(itemHeader == activeTab) "active" else "").mkString(" ")' id='@Seq(itemHeader, "-tab").mkString("")' data-bs-toggle="tab" data-bs-target="#switcherContent@itemHeader" role="tab" aria-controls="switcherContent@itemHeader" aria-selected="@(itemHeader == activeTab)" onclick="@itemValue._2;">@Messages(itemHeader)</a>
                 </li>
             }
             case route: JavaScriptReverseRoute => {
                 @defining(utilities.JsRoutes.getJsRouteString(route, arguments.toMap.get(Symbol(Seq(itemHeader, "PARAMETERS").mkString("_"))).map(_.toString).getOrElse(""))) { jsRoute =>
                     <li class="nav-item" role="presentation">
-                        <a class='@Seq("nav-link", if(itemHeader == activeTab) "active" else "").mkString(" ")' id='@Seq(itemHeader, "-tab").mkString("")' data-bs-toggle="tab" data-bs-target="#switcherContent@itemHeader" role="tab" aria-controls="switcherContent@itemHeader" aria-selected="@(itemHeader == activeTab)" onclick="@itemValue._2 componentResource('switcherContent@itemHeader', @jsRoute)">@Messages(itemHeader)</a>
+                        <a class='@Seq("nav-link", if(itemHeader == activeTab) "active" else "").mkString(" ")' id='@Seq(itemHeader, "-tab").mkString("")' data-bs-toggle="tab" data-bs-target="#switcherContent@itemHeader" role="tab" aria-controls="switcherContent@itemHeader" aria-selected="@(itemHeader == activeTab)" onclick="@itemValue._2; componentResource('switcherContent@itemHeader', @jsRoute)">@Messages(itemHeader)</a>
                     </li>
                 }
             }
             case _ => {
                 <li class="nav-item" role="presentation">
-                    <a class='@Seq("nav-link", if(itemHeader == activeTab) "active" else "").mkString(" ")' id='@Seq(itemHeader, "-tab").mkString("")' data-bs-toggle="tab" data-bs-target="#switcherContent@itemHeader" role="tab" aria-controls="switcherContent@itemHeader" aria-selected="@itemHeader == activeTab" onclick="@itemValue._2">@Messages(itemHeader)</a>
+                    <a class='@Seq("nav-link", if(itemHeader == activeTab) "active" else "").mkString(" ")' id='@Seq(itemHeader, "-tab").mkString("")' data-bs-toggle="tab" data-bs-target="#switcherContent@itemHeader" role="tab" aria-controls="switcherContent@itemHeader" aria-selected="@itemHeader == activeTab" onclick="@itemValue._2;">@Messages(itemHeader)</a>
                 </li>
             }
         }

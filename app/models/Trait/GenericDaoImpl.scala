@@ -119,7 +119,6 @@ abstract class GenericDaoImpl[
     }
   }
 
-
   def update(update: E): Future[Unit] = db.run(tableQuery.filter(_.id === update.id).update(update).asTry).map {
     case Success(result) => ()
     case Failure(exception) => exception match {
