@@ -83,15 +83,16 @@ function customSelect(containerID){
         $('html').one('click',function() {
             $(".custom-select").removeClass("opened");
         });
-        $(".custom-select").each(function() {
-            $(this).removeClass("opened");
+
+        $("div.custom-select").each(function() {
+            if($(this).closest('.commonSelect').find("div").attr("id") !== containerID){
+                $(this).removeClass("opened");
+            }
         });
-        if($("#"+containerID+" .custom-select").hasClass("opened")){
-            $("#"+containerID+" .custom-select").removeClass("opened");
-        }else{
-            $("#"+containerID+" .custom-select").addClass("opened");
-        }
-        // $(this).parents(".custom-select").toggleClass("opened");
+
+        let element = $("#"+containerID).find("div.custom-select.sources");
+        element.toggleClass("opened");
+
         event.stopPropagation();
     });
     $("#"+containerID+" .custom-option").on("click", function() {
