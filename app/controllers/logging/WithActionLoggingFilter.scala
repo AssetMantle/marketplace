@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class WithActionLoggingFilter @Inject()(messagesControllerComponents: MessagesControllerComponents, messagesApi: MessagesApi)(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val lang: Lang = constants.CommonConfig.logLang
+  private implicit val lang: Lang = constants.CommonConfig.LogLang
 
   def next(f: => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = Action { implicit request =>
     val startTime = System.currentTimeMillis()
