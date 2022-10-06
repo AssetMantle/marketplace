@@ -23,9 +23,7 @@ object Sitemap {
   )
 
 
-  def generate: Elem = {
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  def generate: Elem = <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
       {allElements.map(_.urlElement)}
     </urlset>
-  }
 }
