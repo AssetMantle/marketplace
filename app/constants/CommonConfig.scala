@@ -8,12 +8,12 @@ import scala.concurrent.duration.{Duration, DurationInt, FiniteDuration, MILLISE
 
 object CommonConfig {
   private val config: Configuration = Configuration(ConfigFactory.load())
-  val logLang: Lang = Lang(config.get[String]("play.log.lang"))
-  val webAppUrl: String = config.get[String]("webApp.url")
+  val LogLang: Lang = Lang(config.get[String]("play.log.lang"))
+  val WebAppUrl: String = config.get[String]("webApp.url")
   val WebAppCacheDuration: Duration = Duration(config.get[Int]("webApp.cacheDuration"), MILLISECONDS)
   val DefaultPublicFolder: String = config.get[String]("webApp.defaultPublicFolder")
 
-  val sessionTokenTimeout: Int = config.get[Int]("play.http.session.token.timeout")
+  val SessionTokenTimeout: Int = config.get[Int]("play.http.session.token.timeout")
 
   object Scheduler {
     val InitialDelay: FiniteDuration = config.get[Int]("scheduler.initialDelay").millis

@@ -35,7 +35,7 @@ class WithoutLoginActionAsync @Inject()(
           for {
             token <- token
             key <- key
-          } yield key.accountId == username && key.address == address && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.sessionTokenTimeout)
+          } yield key.accountId == username && key.address == address && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.SessionTokenTimeout)
         }
 
         def getResult(verify: Boolean, loginState: LoginState) = if (verify) f(Option(loginState))(request)
