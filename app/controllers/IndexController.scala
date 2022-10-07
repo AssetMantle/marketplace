@@ -29,14 +29,9 @@ class IndexController @Inject()(
 
   implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections("art")
 
-  def index: Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
+  def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      optionalLoginState match {
-        case Some(loginState) =>
-          implicit val loginStateImplicit: LoginState = loginState
-          Future(Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)))
-        case None => Future(Ok(views.html.index()))
-      }
+      Future(Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)))
   }
 
   def sitemap: EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {

@@ -77,6 +77,8 @@ abstract class GenericDaoImpl[
 
   def filterAndDelete[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Int] = db.run(tableQuery.filter(expr).delete)
 
+  def filterAndExists[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[Boolean] = db.run(tableQuery.filter(expr).exists.result)
+
   def filterHead[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[E] = db.run(tableQuery.filter(expr).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -117,7 +119,6 @@ abstract class GenericDaoImpl[
     }
   }
 
-
   def update(update: E): Future[Unit] = db.run(tableQuery.filter(_.id === update.id).update(update).asTry).map {
     case Success(result) => ()
     case Failure(exception) => exception match {
@@ -139,5 +140,4 @@ abstract class GenericDaoImpl[
       case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPSERT_FAILED"), psqlException)
     }
   }
-
 }

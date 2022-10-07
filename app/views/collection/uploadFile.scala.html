@@ -1,0 +1,20 @@
+@import views.html.base._
+@import views.html.base.buttons._
+
+@(id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="mb-4 modal-header">
+    <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.COLLECTION_PROFILE_COVER_TITLE)</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                &times;
+    </button>
+</div>
+
+<div class="d-flex gap-3 mb-4">
+    @commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = id, documentType = constants.Collection.File.PROFILE, label = constants.View.COLLECTION_PROFILE_IMAGE_TITLE)
+    @commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = id, documentType = constants.Collection.File.COVER, label = constants.View.COLLECTION_COVER_IMAGE_TITLE)
+</div>
+
+<div class="horizontal-align">
+    @commonModalPrimaryButton(constants.View.NEXT, constants.Form.DEFINE_COLLECTION_PROPERTIES.get, Symbol("parameters") -> s"'$id'")
+</div>

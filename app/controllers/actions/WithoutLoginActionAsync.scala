@@ -1,6 +1,6 @@
 package controllers.actions
 
-import controllers.logging.WithActionAsyncLoggingFilter
+import controllers.logging.WithActionAsyncLogging
 import exceptions.BaseException
 import models.{master, masterTransaction}
 import org.joda.time.{DateTime, DateTimeZone}
@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class WithoutLoginActionAsync @Inject()(
                                          messagesControllerComponents: MessagesControllerComponents,
-                                         withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter,
+                                         withActionAsyncLogging: WithActionAsyncLogging,
                                          masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                          masterKeys: master.Keys,
                                        )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -22,7 +22,7 @@ class WithoutLoginActionAsync @Inject()(
   private implicit val module: String = constants.Module.ASYNC_ACTIONS_WITHOUT_LOGIN
 
   def apply(f: => Option[LoginState] => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
-    withActionAsyncLoggingFilter.next { implicit request =>
+    withActionAsyncLogging { implicit request =>
       val username = request.session.get(constants.Session.USERNAME).getOrElse("")
       val sessionToken = request.session.get(constants.Session.TOKEN).getOrElse("")
       val address = request.session.get(constants.Session.ADDRESS).getOrElse("")
@@ -35,11 +35,11 @@ class WithoutLoginActionAsync @Inject()(
           for {
             token <- token
             key <- key
-          } yield (key.accountId == username && key.address == address && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.SessionTokenTimeout))
+          } yield key.accountId == username && key.address == address && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.SessionTokenTimeout)
         }
 
         def getResult(verify: Boolean, loginState: LoginState) = if (verify) f(Option(loginState))(request)
-        else Future(throw new BaseException(constants.Response.INVALID_SESSION))
+        else constants.Response.INVALID_SESSION.throwFutureBaseException()
 
         for {
           verify <- verify

@@ -329,6 +329,7 @@ profileContainer .item-sticky .profile-card{
     overflow: hidden;
 }
 .single-profile-card .hero-img img{
+    width: 100%;
     display: block;
     max-height: 150px;
     height: 100%;
@@ -650,4 +651,46 @@ profileContainer .item-sticky .profile-card{
     background: -o-linear-gradient(bottom, rgba(0,0,0,0) 0%,rgba(44, 44, 44, 0.70) 100%);
     background: -ms-linear-gradient(bottom, rgba(0,0,0,0) 0%,rgba(44, 44, 44, 0.70) 100%);
     background: linear-gradient(to bottom, rgba(0,0,0,0) 0%,rgba(44, 44, 44, 0.70) 100%);
+}
+
+/* Create New Collection Card */
+.createCollectionContainer{
+    height: 246px;
+    cursor: pointer;
+    position: relative;
+}
+.createCollectionBadge img{
+    width: 66px;
+    position: absolute;
+    top: 20px;
+    left: 0px;
+}
+.createCollectionContainer .createCollectionIcon{
+    width: 100px;
+}
+.createCollectionContainer .createCollectionLabel{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    text-transform: capitalize;
+    color: var(--gray);
+    margin-top: 16px;
+}
+.createCollectionContainer .createCollectionButton{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    text-transform: capitalize;
+    color: var(--default);
+    border-top: 2px solid var(--popup-bg);
+    padding: 15px 0px;
+}
+@media (max-width: 992px) {
+    .createCollectionContainer{
+        height: 216px;
+    }
 }

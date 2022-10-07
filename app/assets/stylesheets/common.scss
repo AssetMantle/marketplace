@@ -624,3 +624,52 @@
     cursor: pointer;
   }
 }
+
+// Common Upload File
+.uploadFileContainer{
+  width: 100%;
+  .uploadFileLabel{
+    @include setFont(var(--font-type-2), normal, 600, 18px, 34px, var(--inactive-gray));
+  }
+  .uploadForm{
+    border: 1px dashed var(--gray);
+    border-radius: 6px;
+    min-height: 246px;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 48px 48px 48px 48px;
+    .uploadBox{
+      .uploadIcon{
+        font-size: 40px;
+      }
+      .dropBox{
+        @include setFont(var(--font-type-2), normal, 600, 20px, 32px, var(--mantle-off-white));
+        display: block;
+        margin-bottom: 8px;
+      }
+      .centerText{
+        @include setFont(var(--font-type-2), normal, 500, 12px, 17px, var(--text-medium));
+        display: block;
+        margin-bottom: 8px;
+      }
+    }
+    .uploader{
+      display: none;
+      .fileName{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+      }
+    }
+  }
+  .modalInfoBlock{
+    height: 100%;
+  }
+}
+
+// Common Tertiary Button
+.tertiaryButton{
+  @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
+  cursor: pointer;
+  display: inline-block;
+}

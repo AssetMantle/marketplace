@@ -7,7 +7,7 @@
         <div class="d-flex flex-row align-content-between gap-2 userDetails">
             <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="40" height="40"/>
             <div class="ms-2 d-flex flex-column justify-content-between">
-                <a href="@routes.ProfileController.viewProfile(loginState.username)" class="d-flex flex-row align-items-center p-0 profileItemLink">
+                <a href="@routes.ProfileController.viewProfile(loginState.username, constants.View.CREATED)" class="d-flex flex-row align-items-center p-0 profileItemLink">
                     <div class="userName">@loginState.username</div>
                 </a>
                 <div class="userBalance" id="walletBalance_@loginState.address"></div>
@@ -30,7 +30,7 @@
     <div class="detailContainer">
         <div class="menuList">
             <div class="menuItem">
-                <a href="@routes.ProfileController.viewProfile(loginState.username)" class="d-flex gap-3">
+                <a href="@routes.ProfileController.viewProfile(loginState.username, constants.View.CREATED)" class="d-flex gap-3">
                     <i class="bi bi-person iconDefault icon"></i>
                     <div class="profileMenuLabel">@Messages(constants.View.PROFILE)</div>
                 </a>

@@ -195,6 +195,29 @@ object AmazonS3 {
     }
   }
 
+  def exists(objectKey: String, bucketName: String = bucketName): Boolean = {
+    try {
+      s3Client.doesObjectExist(bucketName, objectKey)
+    } catch {
+      case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
+        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+      case e: SdkClientException => logger.error(e.getLocalizedMessage)
+        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+    }
+  }
+
+  def renameObject(sourceKey: String, destinationKey: String, destinationBucketName: String = bucketName): Unit = {
+    try {
+      copyObject(sourceKey = sourceKey, destinationKey = destinationKey, destinationBucketName = destinationBucketName)
+      deleteObject(sourceKey)
+    } catch {
+      case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
+        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+      case e: SdkClientException => logger.error(e.getLocalizedMessage)
+        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+    }
+  }
+
   def getFullObject(objectKey: String, customFileName: String = ""): S3Object = {
     try {
       val request = new GetObjectRequest(bucketName, objectKey)
@@ -246,6 +269,21 @@ object AmazonS3 {
       if (bucketVersionStatus == BucketVersioningConfiguration.ENABLED) {
         s3Client.deleteVersion(new DeleteVersionRequest(bucketName, objectKey, versionID))
       } else throw new BaseException(constants.Response.AMAZON_S3_NON_VERSIONED_BUCKET)
+    } catch {
+      case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
+        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+      case e: SdkClientException => logger.error(e.getLocalizedMessage)
+        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+    }
+  }
+
+  def deleteObject(objectKey: String, versionID: Option[String] = None): Unit = {
+    try {
+      versionID.fold {
+        deleteObjectNonVersionedBucket(objectKey)
+      } { version =>
+        deleteObjectVersionedBucket(objectKey = objectKey, versionID = version)
+      }
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
         throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)

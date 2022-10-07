@@ -1,7 +1,7 @@
 package service
 
 import models.master
-import models.master.{Collection, Property, SocialProfile}
+import models.master.{Collection, CollectionFile, Property, SocialProfile}
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import play.api.{Configuration, Logger}
@@ -168,8 +168,79 @@ class Starter @Inject()(
     } yield ()
   } else Future()
 
+  private def updateCollectionSocialProfile() = {
+    val collections = masterCollections.Service.fetchAll()
+
+    def update(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
+      val checkAndUpdate = if (collection.website != "") masterCollections.Service.updateById(collection.copy(socialProfiles = collection.socialProfiles.+:(SocialProfile(constants.Collection.SocialProfile.WEBSITE, collection.website)), website = "")) else Future()
+
+      for {
+        _ <- checkAndUpdate
+      } yield ()
+    }
+
+    for {
+      collections <- collections
+      _ <- update(collections)
+    } yield ()
+
+  }
+
+  private def updateCollectionAwsFiles() = {
+    val collectionFiles = masterCollectionFiles.Service.fetchAll()
+    val collections = masterCollections.Service.fetchAll()
+
+    def update(collectionFiles: Seq[CollectionFile], collections: Seq[Collection]): Unit = collectionFiles.foreach { collectionFile =>
+      try {
+        val sourceKey = collections.find(_.id == collectionFile.id).fold("")(_.name) + "/others/" + collectionFile.fileName
+        val destinationKey = collectionFile.id + "/others/" + collectionFile.fileName
+        if (!utilities.AmazonS3.exists(destinationKey)) {
+          utilities.AmazonS3.copyObject(sourceKey = sourceKey, destinationKey = destinationKey)
+        }
+      } catch {
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
+      }
+    }
+
+    for {
+      collectionFiles <- collectionFiles
+      collections <- collections
+    } yield update(collectionFiles, collections)
+
+  }
+
+  private def updateCollectionNFTAwsFiles() = {
+    val collections = masterCollections.Service.fetchAll()
+
+    def update(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
+      val nfts = masterNFTs.Service.getAllForCollection(collection.id)
+
+      for {
+        nfts <- nfts
+      } yield {
+        nfts.foreach { nft =>
+          try {
+            val sourceKey = collections.find(_.id == nft.collectionId).fold("")(_.name) + "/nfts/" + nft.fileName
+            val destinationKey = nft.collectionId + "/nfts/" + nft.fileName
+            println(destinationKey)
+            if (!utilities.AmazonS3.exists(destinationKey)) {
+              utilities.AmazonS3.copyObject(sourceKey = sourceKey, destinationKey = destinationKey)
+            }
+          } catch {
+            case exception: Exception => logger.error(exception.getLocalizedMessage)
+          }
+        }
+      }
+    }
+
+    for {
+      collections <- collections
+    } yield update(collections)
+
+  }
+
   def start(): Future[Unit] = {
-    val uploads = readFile[Seq[UploadCollection]](uploadCollectionFilePath)
+    //    val uploads = readFile[Seq[UploadCollection]](uploadCollectionFilePath)
 
     def processDir(uploadCollections: Seq[UploadCollection]) = utilitiesOperations.traverse(uploadCollections) { uploadCollection =>
 
@@ -181,9 +252,9 @@ class Starter @Inject()(
         val insta = if (uploadCollection.instagram != "") Option(SocialProfile(name = constants.Collection.SocialProfile.INSTAGRAM, url = uploadCollection.instagram)) else None
         val socialProfiles = Seq(twitter, insta).flatten
         if (collection.isEmpty) {
-          masterCollections.Service.add(name = uploadCollection.name, creatorId = uploadCollection.accountId, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles)
+          masterCollections.Service.add(name = uploadCollection.name, creatorId = uploadCollection.accountId, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles, category = "ART", nsfw = false)
         } else if (uploadCollection.updateDetails) {
-          masterCollections.Service.insertOrUpdate(id = collection.get.id, creatorId = uploadCollection.accountId, name = uploadCollection.name, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles)
+          masterCollections.Service.insertOrUpdate(id = collection.get.id, creatorId = uploadCollection.accountId, name = uploadCollection.name, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles, category = "ART", nsfw = false)
         } else Future(collection.get.id)
       }
 
@@ -215,8 +286,9 @@ class Starter @Inject()(
     }
 
     (for {
-      uploads <- uploads
-      _ <- processDir(uploads)
+      _ <- updateCollectionSocialProfile()
+      _ <- updateCollectionAwsFiles()
+      _ <- updateCollectionNFTAwsFiles()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
