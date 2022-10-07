@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class WithMultipartFormActionAsyncLogging @Inject()(messagesControllerComponents: MessagesControllerComponents, messagesApi: MessagesApi)(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val lang: Lang = constants.CommonConfig.logLang
+  private implicit val lang: Lang = constants.CommonConfig.LogLang
 
   def apply(f: => Request[MultipartFormData[TemporaryFile]] => Future[Result])(implicit logger: Logger): Action[MultipartFormData[TemporaryFile]] = Action(parse.multipartFormData).async { implicit request =>
     val startTime = System.currentTimeMillis()
