@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
 (
     "id"                VARCHAR NOT NULL,
     "accountID"         VARCHAR,
-    "name"              VARCHAR NOT NULL,
+    "title"             VARCHAR NOT NULL,
     "messageParameters" VARCHAR NOT NULL,
     "jsRoute"           VARCHAR,
     "read"              BOOLEAN NOT NULL,
