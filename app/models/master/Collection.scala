@@ -140,7 +140,7 @@ class Collections @Inject()(
       } yield id
     }
 
-    def updateById(collection: Collection) = update(collection.serialize())
+    def updateById(collection: Collection): Future[Unit] = update(collection.serialize())
 
     def fetchAll(): Future[Seq[Collection]] = getAll.map(_.map(_.deserialize))
 

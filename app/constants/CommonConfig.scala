@@ -12,6 +12,8 @@ object CommonConfig {
   val WebAppUrl: String = config.get[String]("webApp.url")
   val WebAppCacheDuration: Duration = Duration(config.get[Int]("webApp.cacheDuration"), MILLISECONDS)
   val DefaultPublicFolder: String = config.get[String]("webApp.defaultPublicFolder")
+  val PushNotificationURL: String = config.get[String]("webApp.pushNotification.url")
+  val PushNotificationAuthorizationKey: String = config.get[String]("webApp.pushNotification.authorizationKey")
 
   val SessionTokenTimeout: Int = config.get[Int]("play.http.session.token.timeout")
 
@@ -38,6 +40,7 @@ object CommonConfig {
     val CollectionsPerPage: Int = config.get[Int]("webApp.collectionsPerPage")
     val NFTsPerPage: Int = config.get[Int]("webApp.nftsPerPage")
     val WhitelistPerPage: Int = config.get[Int]("webApp.whitelistPerPage")
+    val NotificationsPerPage: Int = config.get[Int]("webApp.notificationsPerPage")
   }
 
   object Files {
