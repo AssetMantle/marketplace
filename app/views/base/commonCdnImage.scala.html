@@ -2,11 +2,11 @@
 
 @defining(
     if(lowQuality.isDefined && blur.isEmpty) {
-        (s"""${constants.CommonConfig.webAppUrl}/cdn-cgi/image/q=${lowQuality.getOrElse(0)},f=${fileFormat}/assets/images/NFT/${fileName}""", s"""${constants.CommonConfig.webAppUrl}/cdn-cgi/image/q=${highQuality},f=${fileFormat}/assets/images/NFT/${fileName}""")
+        (s"""${constants.CommonConfig.WebAppUrl}/cdn-cgi/image/q=${lowQuality.getOrElse(0)},f=${fileFormat}/assets/images/NFT/${fileName}""", s"""${constants.CommonConfig.WebAppUrl}/cdn-cgi/image/q=${highQuality},f=${fileFormat}/assets/images/NFT/${fileName}""")
     } else if(lowQuality.isEmpty && blur.isDefined) {
-        (s"""${constants.CommonConfig.webAppUrl}/cdn-cgi/image/b=${blur.getOrElse(0)},f=${fileFormat}/assets/images/NFT/${fileName}""", s"""${constants.CommonConfig.webAppUrl}/cdn-cgi/image/q=${highQuality},f=${fileFormat}/assets/images/NFT/${fileName}""")
+        (s"""${constants.CommonConfig.WebAppUrl}/cdn-cgi/image/b=${blur.getOrElse(0)},f=${fileFormat}/assets/images/NFT/${fileName}""", s"""${constants.CommonConfig.WebAppUrl}/cdn-cgi/image/q=${highQuality},f=${fileFormat}/assets/images/NFT/${fileName}""")
     } else {
-        (s"""${constants.CommonConfig.webAppUrl}/cdn-cgi/image/q=${lowQuality.getOrElse(0)},b=${blur.getOrElse(0)},f=${fileFormat}/assets/images/NFT/${fileName}""", s"""${constants.CommonConfig.webAppUrl}/cdn-cgi/image/q=${highQuality},f=${fileFormat}/assets/images/NFT/${fileName}""")
+        (s"""${constants.CommonConfig.WebAppUrl}/cdn-cgi/image/q=${lowQuality.getOrElse(0)},b=${blur.getOrElse(0)},f=${fileFormat}/assets/images/NFT/${fileName}""", s"""${constants.CommonConfig.WebAppUrl}/cdn-cgi/image/q=${highQuality},f=${fileFormat}/assets/images/NFT/${fileName}""")
     }
 ) { imgSrc =>
         @if(height.isDefined && width.isDefined){

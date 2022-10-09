@@ -1,0 +1,29 @@
+@import controllers.actions.LoginState
+
+@(category: String, totalCollections: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+    @if(totalCollections > 0) {
+        <div class="item item-center collectionContainer">
+            <div class="profile-card">
+                <div class="profiles-container">
+
+                    <div class="profile-list">
+                        <div id="collectionsPerPage_@category" class="w-100 list grid-view-filter collectionsPerPage"></div>
+                    </div>
+
+                    <div class="loadMoreElement show">
+                            <!-- Loader -->
+                        <div class="loading">
+                            <div class="ball"></div>
+                            <div class="ball"></div>
+                            <div class="ball"></div>
+                        </div>
+                            <!-- End -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>loadMoreCollections();</script>
+    } else {
+        @Messages(constants.View.COMING_SOON)
+    }

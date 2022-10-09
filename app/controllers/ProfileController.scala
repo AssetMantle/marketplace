@@ -36,17 +36,17 @@ class ProfileController @Inject()(
   def viewDefaultProfile(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       implicit val optionalLoginState: Option[LoginState] = Option(loginState)
-      Future(Ok(views.html.profile.viewProfile(loginState.username)))
+      Future(Ok(views.html.profile.viewProfile(loginState.username, constants.View.CREATED)))
   }
 
-  def viewProfile(accountId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def viewProfile(accountId: String, activeTab: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.profile.viewProfile(accountId)))
+      Future(Ok(views.html.profile.viewProfile(accountId = accountId, activeTab = activeTab)))
   }
 
-  def profile(accountId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def profile(accountId: String, activeTab: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.profile.profile(accountId: String)))
+      Future(Ok(views.html.profile.profile(accountId = accountId, activeTab = activeTab)))
   }
 
   def profileInfoCard(accountId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>

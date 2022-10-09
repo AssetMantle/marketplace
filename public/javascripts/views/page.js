@@ -1,5 +1,5 @@
 function viewCollections(section) {
-    componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsList(section));
+    componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsSection(section));
     $('#leftContent').html('');
 }
 
@@ -15,6 +15,13 @@ function viewWishListCollection(lastPart) {
     componentResource('centerContent', jsRoutes.controllers.WishlistController.collectionNFTs(accountId, collectionId));
 }
 
+function viewCreatedCollection(lastPart) {
+    let accountId = lastPart.split("/")[0];
+    let collectionId = lastPart.split("/")[2];
+    componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
+    componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs(accountId, collectionId));
+}
+
 function viewNFT(nftId) {
     componentResource('leftContent', jsRoutes.controllers.NFTController.info(nftId));
     componentResource('centerContent', jsRoutes.controllers.NFTController.details(nftId));
@@ -25,8 +32,10 @@ function viewSetting() {
     $('#leftContent').html('');
 }
 
-function viewProfile(accountId) {
+function viewProfile(lastPart) {
+    let accountId = lastPart.split("/")[0];
+    let activeTab = lastPart.split("/")[1];
     componentResource('leftContent', jsRoutes.controllers.ProfileController.profileInfoCard(accountId));
-    componentResource('centerContent', jsRoutes.controllers.ProfileController.profile(accountId));
+    componentResource('centerContent', jsRoutes.controllers.ProfileController.profile(accountId, activeTab));
     componentResource('rightContent', jsRoutes.controllers.ProfileController.profileActivityCard(accountId));
 }

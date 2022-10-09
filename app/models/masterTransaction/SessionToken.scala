@@ -85,11 +85,11 @@ class SessionTokens @Inject()(
 
     def tryVerifyingSessionTokenTime(id: String): Future[Boolean] = {
       tryGetById(id).map { token =>
-        if (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.sessionTokenTimeout) true else false
+        if (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.SessionTokenTimeout) true else false
       }
     }
 
-    def getTimedOutIDs: Future[Seq[String]] = filter(_.sessionTokenTime < DateTime.now(DateTimeZone.UTC).getMillis - constants.CommonConfig.sessionTokenTimeout).map(_.map(_.accountId))
+    def getTimedOutIDs: Future[Seq[String]] = filter(_.sessionTokenTime < DateTime.now(DateTimeZone.UTC).getMillis - constants.CommonConfig.SessionTokenTimeout).map(_.map(_.accountId))
 
     def deleteById(id: String): Future[Int] = delete(id)
 
@@ -113,5 +113,5 @@ class SessionTokens @Inject()(
     }
   }
 
-  actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.CommonConfig.sessionTokenTimeout.milliseconds, delay = constants.CommonConfig.sessionTokenTimeout.milliseconds)(runnable)(schedulerExecutionContext)
+  actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.CommonConfig.SessionTokenTimeout.milliseconds, delay = constants.CommonConfig.SessionTokenTimeout.milliseconds)(runnable)(schedulerExecutionContext)
 }
