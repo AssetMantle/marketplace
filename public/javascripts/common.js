@@ -117,13 +117,6 @@ function loadSwitcherContent(divID) {
     $('#' + divID).click();
 }
 
-function switcher(id) {
-    let firstTabEl = document.querySelector('#' + id + ' li.active a')
-    let firstTab = new bootstrap.Tab(firstTabEl)
-
-    firstTab.show()
-}
-
 function showSnackbar(title, message, status) {
     let option = {
         title: title,

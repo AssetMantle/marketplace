@@ -14,6 +14,7 @@ case class PushNotificationToken(accountId: String, token: String, createdBy: Op
 }
 
 object PushNotificationTokens {
+
   implicit val module: String = constants.Module.MASTER_TRANSACTION_PUSH_NOTIFICATION_TOKEN
 
   implicit val logger: Logger = Logger(this.getClass)

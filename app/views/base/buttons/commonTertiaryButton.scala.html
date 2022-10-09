@@ -1,0 +1,15 @@
+@(name: String, function: JavaScript, icon: Option[String] = None, iconFirst: Option[Boolean] = None, buttonId: Option[String] = None)(implicit messagesProvider: MessagesProvider)
+
+<div class="tertiaryButton" onclick="@function" id='@buttonId'>
+    <div class="d-flex gap-2 align-items-center">
+    @if(icon.isDefined) {
+        @if(iconFirst) {
+            <i class="bi @icon iconDefault iconSmall"></i>
+            @Messages(name)
+        } else {
+            @Messages(name)
+            <i class="bi @icon iconDefault iconSmall"></i>
+        }
+    }
+    </div>
+</div>

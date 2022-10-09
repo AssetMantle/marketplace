@@ -10,57 +10,26 @@ document.onload = function () {
 }
 
 function loadMoreCollections() {
-    const loading = document.querySelector('.loading');
+    let activeTab = $('.active').attr('id').slice(0, -4);
     if ($(".noCollection").length === 0) {
-        const activeSection = $.trim($("#sectionMenu").find(".menuItem.active").attr('id'));
-        let route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
-        let loadMore = $(".collectionsPerPage");
+        let route = jsRoutes.controllers.CollectionController.collectionsPerPage(activeTab, $(".collectionPage").length + 1);
+        let loadMore = $("#collectionsPerPage_" + activeTab);
         $.ajax({
             url: route.url,
             type: route.type,
             async: true,
-            beforeSend: function () {
-                loading.classList.add('show');
-                if ($(".noCollection").length === 0) {
-                    $("#loadMoreBtnContainer").addClass("hide");
-                }
-            },
-            complete: function () {
-                loading.classList.remove('show');
-                if ($(".noCollection").length === 0) {
-                    $("#loadMoreBtnContainer").removeClass("hide");
-                }
-                if (activeSection === 'art' && $(".artCollection").length % 6 !== 0) {
-                    $("#loadMoreBtnContainer").addClass("hide");
-                }
-            },
             statusCode: {
                 200: function (data) {
                     loadMore.append(data);
-                    if ($(".noCollection").length !== 0) {
-                        $("#loadMoreBtnContainer").addClass("hide");
-                    }
                 }
             }
         });
-    } else {
-        $(".collectionPage:last").css("margin-top", "0px");
-        $("#loadMoreBtnContainer").addClass("hide");
     }
 }
 
-function showLoadMoreButton() {
-    $("#loadMoreBtnContainer").removeClass("hide");
-}
-
-$("#sectionMenu .menuItem").on('click', function () {
-    showLoadMoreButton();
-    $("#sectionMenu").find(".active").removeClass("active");
-    $(this).addClass("active");
-});
-
 timeout = 0;
-function loadCollectionOnScroll(){
+
+function loadCollectionOnScroll() {
     clearTimeout(timeout);
     timeout = setTimeout(function () {
         if ($(window).scrollTop() >= ($(document).height() - $(window).height() - 100)) {

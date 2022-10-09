@@ -10,9 +10,9 @@
             @if(optionalLoginState.isDefined && optionalLoginState.fold("")(_.username) == accountId) {
                 @commonHorizontalSwitcher(
                     ListMap(
-                        constants.View.CREATED -> (routes.javascript.CollectionController.createdSection, JavaScript(s"checkAndPushState(jsRoutes.controllers.ProfileController.viewProfile('$accountId', '${constants.View.CREATED}').url, ('$accountId'+ '/' + '${constants.View.CREATED}'), 'profile');")),
-                        constants.View.WHITELIST -> (routes.javascript.WhitelistController.whitelistSection, JavaScript(s"checkAndPushState(jsRoutes.controllers.ProfileController.viewProfile('$accountId', '${constants.View.WHITELIST}').url, ('$accountId'+ '/' + '${constants.View.WHITELIST}'), 'profile');")),
-                        constants.View.WISHLIST -> (routes.javascript.WishlistController.wishlistSection, JavaScript(s"checkAndPushState(jsRoutes.controllers.ProfileController.viewProfile('$accountId', '${constants.View.WISHLIST}').url, ('$accountId'+ '/' + '${constants.View.WISHLIST}'), 'profile');"))
+                        constants.View.CREATED -> (routes.javascript.CollectionController.createdSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.CREATED}')")),
+                        constants.View.WHITELIST -> (routes.javascript.WhitelistController.whitelistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WHITELIST}')")),
+                        constants.View.WISHLIST -> (routes.javascript.WishlistController.wishlistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WISHLIST}')")),
                     ),
                     activeTab,
                     Symbol(constants.View.CREATED + "_PARAMETERS") -> s"'${accountId}'",
@@ -21,8 +21,8 @@
             } else {
                 @commonHorizontalSwitcher(
                     ListMap(
-                        constants.View.CREATED -> (routes.javascript.CollectionController.createdSection, JavaScript(s"checkAndPushState(jsRoutes.controllers.ProfileController.viewProfile('$accountId', '${constants.View.CREATED}').url, ('$accountId'+ '/' + '${constants.View.CREATED}'), 'profile');")),
-                        constants.View.WISHLIST -> (routes.javascript.WishlistController.wishlistSection, JavaScript(s"checkAndPushState(jsRoutes.controllers.ProfileController.viewProfile('$accountId', '${constants.View.WISHLIST}').url, ('$accountId'+ '/' + '${constants.View.WISHLIST}'), 'profile');"))
+                        constants.View.CREATED -> (routes.javascript.CollectionController.createdSection,  JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WHITELIST}')")),
+                        constants.View.WISHLIST -> (routes.javascript.WishlistController.wishlistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WISHLIST}')")),
                     ),
                     activeTab,
                     Symbol(constants.View.CREATED + "_PARAMETERS") -> s"'${accountId}'",

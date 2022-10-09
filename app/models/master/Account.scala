@@ -126,7 +126,7 @@ class Accounts @Inject()(
 
     def get(username: String): Future[Option[Account]] = getById(username).map(_.map(_.deserialize))
 
-    def tryGetLanguage(id: String): Future[Lang] = tryGetById(id).map(_.deserialize.language)
+    def getLanguage(id: String): Future[Lang] = get(id).map(x => x.fold(Lang("en"))(_.language))
 
     def getAccountType(id: String): Future[String] = tryGetById(id).map(_.accountType)
 
