@@ -7,9 +7,9 @@
         <ul class="d-flex gap-3 leftOptions">
             <li class="active">@Messages(constants.View.OVERVIEW)</li>
         </ul>
-        @if(collection.website != "") {
+        @if(collection.getWebsite.isDefined) {
             <ul class="d-flex gap-3 rightOptions">
-                <li><a href="@collection.website" target="_blank">
+                <li><a href="@collection.getWebsite.get" target="_blank">
                     <i class="bi bi-globe2 iconDefault iconMedium icon"></i>
                 </a></li>
             </ul>

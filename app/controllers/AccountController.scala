@@ -26,6 +26,7 @@ class AccountController @Inject()(
                                    masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                                    withUsernameToken: WithUsernameToken,
                                    withLoginActionAsync: WithLoginActionAsync,
+                                   utilitiesNotification: utilities.Notification,
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -192,6 +193,7 @@ class AccountController @Inject()(
             masterWallet <- masterWallet
             masterKey <- masterKey
             result <- verifyUpdateAndGetResult(masterAccount, masterKey, masterWallet)
+            _ <- utilitiesNotification.send(accountID = signInData.username, notification = constants.Notification.LOGIN)()
           } yield result
             ).recover {
             case baseException: BaseException => NotFound(views.html.account.signInWithCallback(SignInWithCallback.form.withGlobalError(baseException.failure.message), signInData.callbackUrl))
@@ -259,6 +261,7 @@ class AccountController @Inject()(
           (for {
             _ <- pushNotificationTokenDelete
             _ <- deleteSessionToken
+            _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.LOG_OUT)()
           } yield Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

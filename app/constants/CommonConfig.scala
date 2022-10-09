@@ -8,12 +8,14 @@ import scala.concurrent.duration.{Duration, DurationInt, FiniteDuration, MILLISE
 
 object CommonConfig {
   private val config: Configuration = Configuration(ConfigFactory.load())
-  val logLang: Lang = Lang(config.get[String]("play.log.lang"))
-  val webAppUrl: String = config.get[String]("webApp.url")
+  val LogLang: Lang = Lang(config.get[String]("play.log.lang"))
+  val WebAppUrl: String = config.get[String]("webApp.url")
   val WebAppCacheDuration: Duration = Duration(config.get[Int]("webApp.cacheDuration"), MILLISECONDS)
   val DefaultPublicFolder: String = config.get[String]("webApp.defaultPublicFolder")
+  val PushNotificationURL: String = config.get[String]("webApp.pushNotification.url")
+  val PushNotificationAuthorizationKey: String = config.get[String]("webApp.pushNotification.authorizationKey")
 
-  val sessionTokenTimeout: Int = config.get[Int]("play.http.session.token.timeout")
+  val SessionTokenTimeout: Int = config.get[Int]("play.http.session.token.timeout")
 
   object Scheduler {
     val InitialDelay: FiniteDuration = config.get[Int]("scheduler.initialDelay").millis
@@ -38,6 +40,7 @@ object CommonConfig {
     val CollectionsPerPage: Int = config.get[Int]("webApp.collectionsPerPage")
     val NFTsPerPage: Int = config.get[Int]("webApp.nftsPerPage")
     val WhitelistPerPage: Int = config.get[Int]("webApp.whitelistPerPage")
+    val NotificationsPerPage: Int = config.get[Int]("webApp.notificationsPerPage")
   }
 
   object Files {

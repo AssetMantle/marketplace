@@ -1,0 +1,25 @@
+@import controllers.actions.LoginState
+@import views.html.base.commonHorizontalSwitcher
+@import scala.collection.immutable.ListMap
+
+@(category: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+<div class="item item-center centerContainer">
+    <div class="centerCard">
+        <div class="contentContainer">
+            @commonHorizontalSwitcher(
+                ListMap(
+                    constants.View.ART -> (routes.javascript.CollectionController.collectionList, JavaScript(s"changeExploreStateOnSwitcher('${constants.View.ART}')")),
+                    constants.View.MISCELLANEOUS -> (routes.javascript.CollectionController.collectionList, JavaScript(s"changeExploreStateOnSwitcher('${constants.View.MISCELLANEOUS}')")),
+                ),
+                category,
+                Symbol(constants.View.ART + "_PARAMETERS") -> s"'${constants.View.ART}', 1",
+                Symbol(constants.View.MISCELLANEOUS + "_PARAMETERS") -> s"'${constants.View.MISCELLANEOUS}', 1"
+            )
+        </div>
+    </div>
+</div>
+<script src="@routes.Assets.versioned("javascripts/collections/loadMore.js")" type="text/javascript"></script>
+<script>
+        window.onscroll = function() { loadCollectionOnScroll(); }
+</script>

@@ -5,7 +5,7 @@ import akka.util.ByteString
 import exceptions.BaseException
 import org.apache.commons.io.FileUtils
 import play.api.Logger
-import views.file.UploadInfo.UploadInfo
+import views.base.companion.UploadFile.UploadFile
 
 import java.io._
 import java.nio.file.InvalidPathException
@@ -18,14 +18,14 @@ object FileOperations {
 
   private implicit val module: String = constants.Module.UTILITIES_FILE_OPERATIONS
 
-  private val uploadedParts: ConcurrentMap[String, Set[UploadInfo]] = new ConcurrentHashMap(8, 0.9f, 1)
+  private val uploadedParts: ConcurrentMap[String, Set[UploadFile]] = new ConcurrentHashMap(8, 0.9f, 1)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def savePartialFile(filePart: Array[Byte], fileInfo: UploadInfo, uploadPath: String): Set[UploadInfo] = {
+  def savePartialFile(filePart: Array[Byte], fileInfo: UploadFile, uploadPath: String): Set[UploadFile] = {
     try {
       val fullFileName = uploadPath + fileInfo.resumableFilename
-      val partialFile = new RandomAccessFile(fullFileName, "rw")
+      val partialFile = new RandomAccessFile(new File(fullFileName), "rw")
       try {
         partialFile.seek((fileInfo.resumableChunkNumber - 1) * fileInfo.resumableChunkSize.toLong)
         partialFile.write(filePart, 0, filePart.length)

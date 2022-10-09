@@ -25,9 +25,11 @@
         </div>
         <div class="separator"></div>
         <div class="d-flex gap-3 gap-sm-4 gap-md-2 gap-lg-2 align-items-center w-100">
-            <a href="@collection.website" target="_blank">
-                <i class="bi bi-globe2 iconDefault icon"></i>
-            </a>
+            @if(collection.getWebsite.isDefined) {
+                <a href="@collection.getWebsite.get" target="_blank">
+                    <i class="bi bi-globe2 iconDefault icon"></i>
+                </a>
+            }
             @if(collection.getTwitter.isDefined) {
                 <a href="@collection.getTwitter.getOrElse("#")" target="_blank">
                     <i class="bi bi-twitter iconDefault icon"></i>

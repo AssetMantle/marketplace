@@ -29,24 +29,24 @@ resolvers += "Maven Central Server" at "https://repo1.maven.org/maven2"
 libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
 libraryDependencies ++= Seq(
-  "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.7.6" % "test",
-  "io.gatling" % "gatling-test-framework" % "3.7.6" % "test"
+  "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.8.4" % "test",
+  "io.gatling" % "gatling-test-framework" % "3.8.4" % "test"
 )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-slick" % "5.0.2",
-  "com.typesafe.play" %% "play-slick-evolutions" % "5.0.2",
-  "org.postgresql" % "postgresql" % "42.3.6"
+  "com.typesafe.play" %% "play-slick" % "5.1.0",
+  "com.typesafe.play" %% "play-slick-evolutions" % "5.1.0",
+  "org.postgresql" % "postgresql" % "42.5.0"
 )
 
 libraryDependencies ++= Seq(
-  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.3",
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.4",
   "org.json" % "json" % "20220320"
 )
 
 libraryDependencies ++= Seq(
-  "com.sksamuel.scrimage" % "scrimage-core" % "4.0.31",
-  "com.sksamuel.scrimage" %% "scrimage-scala" % "4.0.31"
+  "com.sksamuel.scrimage" % "scrimage-core" % "4.0.32",
+  "com.sksamuel.scrimage" %% "scrimage-scala" % "4.0.32"
 )
 
 libraryDependencies ++= Seq(
@@ -57,8 +57,8 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.amazonaws" % "aws-java-sdk-s3" % "1.12.272",
-  "com.amazonaws" % "aws-java-sdk" % "1.12.272"
+  "com.amazonaws" % "aws-java-sdk-s3" % "1.12.315",
+  "com.amazonaws" % "aws-java-sdk" % "1.12.315"
 )
 
-libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.21.5"
+libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.21.7"
