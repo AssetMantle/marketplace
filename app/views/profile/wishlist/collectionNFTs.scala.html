@@ -1,11 +1,19 @@
 @import views.html.base.buttons.commonPrimaryButton
 @import controllers.actions.LoginState
 
-@(accountId: String, collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(accountId: String, collection: master.Collection, collectionCoverFile: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 <div class="item item-center nftContainer">
     <div class="profileCover">
-        <div class="profileCoverContainer" id="collectionUncompressedCoverImage_@collection.id"></div>
+        <div class="profileCoverContainer" id="collectionUncompressedCoverImage_@collection.id">
+        @if(collectionCoverFile.isDefined) {
+            @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.id + "/others/" + collectionCoverFile.getOrElse("")) { uri =>
+                <img src="@uri">
+            }
+        } else {
+            <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
+        }
+        </div>
     </div>
     <div class="profile-card">
         <div class="profiles-container">
@@ -21,11 +29,6 @@
                     <div class="ball"></div>
                 </div>
                     <!-- End -->
-
-                    <!-- Load more button -->
-                <div id="loadMoreBtnContainer" class="d-flex justify-content-center horizontal-align">
-                    @commonPrimaryButton(constants.View.LOAD_MORE_BUTTON, JavaScript(s"loadMoreNFTs('${accountId}', '${collection.id}')"), Symbol("id") -> "loadMoreCollectionButton")
-                </div>
             </div>
         </div>
     </div>
@@ -33,6 +36,6 @@
 <script src="@routes.Assets.versioned("javascripts/profile/wishlist/nftLoadMore.js")" type="text/javascript"></script>
 <script>
      loadFirstNFTBulk('nftsPerPage', jsRoutes.controllers.WishlistController.collectionNFTsPerPage('@accountId', '@collection.id', 1));
-     checkAndPushState(jsRoutes.controllers.WishlistController.viewCollectionNFTs('@accountId', '@collection.id').url, ('@accountId' + '/wishListNFTs/' + '@collection.id'), "wishListCollection");
-     getImage(jsRoutes.controllers.CollectionController.collectionFile('@collection.id', '@constants.Collection.File.COVER', false), ('collectionUncompressedCoverImage_' + '@collection.id'));
+     checkAndPushState(jsRoutes.controllers.WishlistController.viewCollectionNFTs('@accountId', '@collection.id').url, ('@accountId' + '/WISHLIST/' + '@collection.id'), "wishListCollection");
+     window.onscroll = function() { loadWishlistNftOnScroll('@{accountId}', '@{collection.id}'); }
 </script>

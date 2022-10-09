@@ -124,17 +124,10 @@ function loadSwitcherContent(divID) {
     $('#' + divID).click();
 }
 
-function switcher(id) {
-    let firstTabEl = document.querySelector('#' + id + ' li:first-child a')
-    let firstTab = new bootstrap.Tab(firstTabEl)
-
-    firstTab.show()
-}
-
 function showSnackbar(title, message, status) {
     let option = {
-        title:title,
-        message:message,
+        title: title,
+        message: message,
         status: status,
         timeout: 3000
     }
@@ -147,5 +140,5 @@ function showSnackbar(title, message, status) {
 // Truncate large string with ...
 function truncate(message, fieldId, length) {
     let newMessage = (message.length > length) ? message.slice(0, length - 1) + '&hellip;' : message;
-    $("#"+fieldId).html(newMessage);
+    $("#" + fieldId).html(newMessage);
 };

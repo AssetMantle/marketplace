@@ -8,7 +8,7 @@
         <div class="profiles-container">
 
             <div class="profile-list" id="art">
-                <div id="collectionsPerPage" class="w-100 list grid-view-filter collectionsPerPage"></div>
+                <div id="wishlistCollectionsPerPage" class="w-100 list grid-view-filter collectionsPerPage"></div>
             </div>
 
             <div class="loadMoreElement show">
@@ -19,16 +19,11 @@
                     <div class="ball"></div>
                 </div>
                     <!-- End -->
-
-                    <!-- Load more button -->
-                <div id="loadMoreBtnContainer" class="d-flex justify-content-center horizontal-align">
-                @commonPrimaryButton(constants.View.LOAD_MORE_BUTTON, JavaScript(s"loadMoreCollections('${accountId}')"), Symbol("id") -> "loadMoreCollectionButton")
-                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script src="@routes.Assets.versioned("javascripts/profile/wishlist/loadMore.js")" type="text/javascript"></script>
-<script>componentResource("collectionsPerPage", jsRoutes.controllers.WishlistController.collectionPerPage('@accountId', 1))</script>
-
+<script>componentResource("wishlistCollectionsPerPage", jsRoutes.controllers.WishlistController.collectionPerPage('@accountId', 1))</script>
+<script> window.onscroll = function() { loadWishlistCollectionOnScroll('@accountId'); } </script>

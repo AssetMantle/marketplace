@@ -674,3 +674,6 @@ nav .content .links
 #userNotification .popupContainer.active + a i.bi-bell::before{
     content: "\f189";
 }
+#userWallet .desktop-link{
+    padding: 27px 10px;
+}

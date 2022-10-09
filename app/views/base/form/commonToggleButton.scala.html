@@ -1,0 +1,43 @@
+@import constants.FormField.{BooleanFormField, NestedFormField}
+@import helper._
+@import play.api.data.Field
+
+@(formData: Form[_], formField: BooleanFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialFormField: Option[Field] = None)
+
+<div id='@arguments.toMap.get(Symbol("containerDivID")).map(_.toString).getOrElse("")' class='@arguments.toMap.get(Symbol("containerDivClass")).map(_.toString).getOrElse("commonCheckBox")'>
+@defining(Seq(Symbol("_label") -> "", Symbol("class") -> "toggleButton")) { defaultArguments =>
+    @defining(
+        sequentialFormField match {
+            case Some(sequentialField: Field) => {
+                nestedFormField match {
+                    case Some(nestedField: NestedFormField) => {
+                        //This case handles sequential subForms under a nested field. See userAddOrUpdateUBOs for example.
+                        sequentialField.apply(formField.name)
+                    }
+                    case None => {
+                        //This case handles seq fields on basic data types. See negotiationDocumentList for example.
+                        sequentialField
+                    }
+                }
+            }
+            case None => {
+                nestedFormField match {
+                    case Some(field: NestedFormField) => {
+                        //This case handles nested fields. See AddOrganization for example.
+                        formData(Seq(field.name, formField.name).mkString("."))
+                    }
+                    case None => {
+                        //This case handles generic fields.
+                        formData(formField.name)
+                    }
+                }
+            }
+        }
+    ) { field =>
+        <div class="d-flex justify-content-between toggleButtonContainer">
+            <div class="toggleButtonLabel">@Messages(formField.name)</div>
+            <div>@checkbox(field, defaultArguments ++ arguments: _*)</div>
+        </div>
+    }
+}
+</div>
