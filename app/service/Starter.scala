@@ -222,7 +222,7 @@ class Starter @Inject()(
           try {
             val sourceKey = collections.find(_.id == nft.collectionId).fold("")(_.name) + "/nfts/" + nft.fileName
             val destinationKey = nft.collectionId + "/nfts/" + nft.fileName
-            println(destinationKey)
+//            println(destinationKey)
             if (!utilities.AmazonS3.exists(destinationKey)) {
               utilities.AmazonS3.copyObject(sourceKey = sourceKey, destinationKey = destinationKey)
             }
