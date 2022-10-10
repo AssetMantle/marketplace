@@ -442,3 +442,29 @@
     }
   }
 }
+
+// Center Container
+.centerContainer {
+  width: 100%;
+  height: fit-content;
+  background-color: var(--card-color);
+  border-radius: 20px;
+  margin-bottom: 100px;
+
+  .centerCard {
+    background-color: var(--card-color);
+    padding: 20px 20px 20px 20px;
+    border-radius: 20px;
+
+    .contentContainer {
+      .tab-content{
+        .collectionContainer{
+          border-radius: 0px;
+          .profile-card{
+            padding: 0px;
+          }
+        }
+      }
+    }
+  }
+}
