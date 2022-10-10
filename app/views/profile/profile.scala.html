@@ -2,7 +2,7 @@
 @import views.html.base.commonHorizontalSwitcher
 @import scala.collection.immutable.ListMap
 
-@(accountId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+@(accountId: String, activeTab: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
 
 <div class="item item-center centerContainer">
     <div class="centerCard">
@@ -10,16 +10,22 @@
             @if(optionalLoginState.isDefined && optionalLoginState.fold("")(_.username) == accountId) {
                 @commonHorizontalSwitcher(
                     ListMap(
-                        constants.View.WHITELIST -> routes.javascript.WhitelistController.whitelistSection,
-                        constants.View.WISHLIST -> routes.javascript.WishlistController.wishlistSection
+                        constants.View.CREATED -> (routes.javascript.CollectionController.createdSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.CREATED}')")),
+                        constants.View.WHITELIST -> (routes.javascript.WhitelistController.whitelistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WHITELIST}')")),
+                        constants.View.WISHLIST -> (routes.javascript.WishlistController.wishlistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WISHLIST}')")),
                     ),
+                    activeTab,
+                    Symbol(constants.View.CREATED + "_PARAMETERS") -> s"'${accountId}'",
                     Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
                 )
             } else {
                 @commonHorizontalSwitcher(
                     ListMap(
-                        constants.View.WISHLIST -> routes.javascript.WishlistController.wishlistSection
+                        constants.View.CREATED -> (routes.javascript.CollectionController.createdSection,  JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WHITELIST}')")),
+                        constants.View.WISHLIST -> (routes.javascript.WishlistController.wishlistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WISHLIST}')")),
                     ),
+                    activeTab,
+                    Symbol(constants.View.CREATED + "_PARAMETERS") -> s"'${accountId}'",
                     Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
                 )
             }
@@ -28,5 +34,5 @@
 </div>
 
 <script>
-        checkAndPushState(jsRoutes.controllers.ProfileController.viewProfile('@accountId').url, '@accountId', "profile");
+        checkAndPushState(jsRoutes.controllers.ProfileController.viewProfile('@accountId', '@activeTab').url, ('@accountId'+ '/' + '@activeTab'), "profile");
 </script>

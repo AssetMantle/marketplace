@@ -1,0 +1,15 @@
+@import views.html.base.form._
+@import views.collection.companion.Edit
+
+@(editForm: Form[Edit.Data] = Edit.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.EDIT_COLLECTION, editForm) {
+    @commonInputText(editForm, constants.FormField.COLLECTION_ID, Symbol("value") -> id, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
+    @commonInputText(editForm, constants.FormField.COLLECTION_NAME)
+    @commonDescriptionText(editForm, constants.FormField.COLLECTION_DESCRIPTION)
+    @commonToggleButton(editForm, constants.FormField.NSFW_COLLECTION)
+@*    @commonSelect(editForm, constants.FormField.COLLECTION_CATEGORY, Symbol("class") -> "custom-select sources", Symbol("placeholder") -> Messages(constants.View.ART))*@
+    @commonInputURL(editForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false)
+    @commonInputURL(editForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false)
+    @commonInputURL(editForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)
+}

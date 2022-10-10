@@ -1,6 +1,6 @@
 package controllers.actions
 
-import controllers.logging.WithActionLoggingFilter
+import controllers.logging.WithActionLogging
 import exceptions.BaseException
 import play.api.Logger
 import play.api.i18n.I18nSupport
@@ -11,11 +11,11 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class WithoutLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                   withActionLoggingFilter: WithActionLoggingFilter
+                                   withActionLogging: WithActionLogging
                                   )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def apply(f: => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
-    withActionLoggingFilter.next { implicit request =>
+    withActionLogging { implicit request =>
       try {
         f(request)
       } catch {

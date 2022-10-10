@@ -1,16 +1,16 @@
 package controllers
 
-import akka.stream.scaladsl.{Source, StreamConverters}
-import akka.util.ByteString
-import controllers.actions.{LoginState, WithLoginActionAsync, WithoutLoginAction, WithoutLoginActionAsync}
+import controllers.actions._
 import exceptions.BaseException
 import models.master
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import views.base.companion.UploadFile
+import views.collection.companion._
 
-import java.io.{File, FileInputStream}
+import java.nio.file.Files
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -21,8 +21,10 @@ class CollectionController @Inject()(
                                       withoutLoginAction: WithoutLoginAction,
                                       withoutLoginActionAsync: WithoutLoginActionAsync,
                                       withLoginActionAsync: WithLoginActionAsync,
+                                      withLoginAction: WithLoginAction,
                                       masterAccounts: master.Accounts,
                                       masterCollections: master.Collections,
+                                      masterCollectionProperties: master.CollectionProperties,
                                       masterNFTs: master.NFTs,
                                       masterCollectionFiles: master.CollectionFiles,
                                       masterWishLists: master.WishLists,
@@ -34,10 +36,10 @@ class CollectionController @Inject()(
 
   implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections("art")
 
-  def viewCollections(section: String): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollections(category: String): EssentialAction = cached.apply(req => req.path + "/" + category, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.collection.viewCollections(section)))
+        Future(Ok(views.html.collection.viewCollections(category)))
     }
   }
 
@@ -54,64 +56,55 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionsList(section: String): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+  def collectionsSection(category: String): EssentialAction = cached.apply(req => req.path + "/" + category, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.collection.explore.collectionsList(section)))
+        Future(Ok(views.html.collection.explore.collectionsSection(category)))
     }
   }
 
-  def collectionsPerPage(pageNumber: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val collections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
-      else masterCollections.Service.getByPageNumber(pageNumber)
-      (for {
-        collections <- collections
-      } yield Ok(views.html.collection.explore.collectionsPerPage(collections))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
+  def collectionList(category: String): EssentialAction = cached.apply(req => req.path + "/" + category, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val totalCollections = masterCollections.Service.total(category)
+
+        (for {
+          totalCollections <- totalCollections
+        } yield Ok(views.html.collection.explore.collectionList(category, totalCollections))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
   }
 
-  def collectionFile(id: String, documentType: String, compress: Boolean): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val collectionFile = masterCollectionFiles.Service.get(id = id, documentType = documentType)
-      val collection = masterCollections.Service.tryGet(id)
-      (for {
-        collectionFile <- collectionFile
-        collection <- collection
-      } yield {
-        if (compress) {
-          documentType match {
-            case constants.Collection.File.COVER => Ok(views.html.collection.collectionCardCoverImage(collectionFile))
-            case constants.Collection.File.PROFILE => Ok(views.html.collection.collectionCardProfileImage(collectionFile))
-            case _ => throw new BaseException(constants.Response.FILE_TYPE_NOT_FOUND)
-          }
-        } else {
-          collectionFile.fold {
-            documentType match {
-              case constants.Collection.File.COVER => Ok.chunked(StreamConverters.fromInputStream(() => new FileInputStream(new File(constants.CommonConfig.DefaultPublicFolder + "/images/defaultCollectionCover.png"))))
-              case constants.Collection.File.PROFILE => Ok.chunked(StreamConverters.fromInputStream(() => new FileInputStream(new File(constants.CommonConfig.DefaultPublicFolder + "/images/defaultProfileCover.png"))))
-              case _ => throw new BaseException(constants.Response.FILE_TYPE_NOT_FOUND)
-            }
-          }(x => {
-            val source: Source[ByteString, _] = StreamConverters.fromInputStream(() => utilities.AmazonS3.getFullObject(collection.name + "/others/" + x.fileName).getObjectContent.getDelegateStream)
-            Ok.chunked(source, inline = true, Option(x.fileName))
-          })
+  def collectionsPerPage(category: String, pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + category + "/" + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        else masterCollections.Service.getByPageNumber(category, pageNumber)
+
+        def allCollectionFiles(collectionIds: Seq[String]) = masterCollectionFiles.Service.get(collectionIds)
+
+        (for {
+          collections <- collections
+          collectionFiles <- allCollectionFiles(collections.map(_.id))
+        } yield Ok(views.html.collection.explore.collectionsPerPage(collections, collectionFiles))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
-      }
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
+    }
   }
 
   def collectionNFTs(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
+        val collectionCover = masterCollectionFiles.Service.get(id = id, documentType = constants.Collection.File.COVER)
+
         (for {
           collection <- collection
-        } yield Ok(views.html.collection.details.collectionNFTs(collection))
+          collectionCover <- collectionCover
+        } yield Ok(views.html.collection.details.collectionNFTs(collection, collectionCover.fold[Option[String]](None)(x => Option(x.fileName))))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -150,4 +143,168 @@ class CollectionController @Inject()(
         }
     }
   }
+
+  def createdSection(accountId: String): EssentialAction = cached.apply(req => req.path + accountId, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.created.createdSection(accountId)))
+    }
+  }
+
+  def createdCollectionPerPage(accountId: String, pageNumber: Int): EssentialAction = cached.apply(req => req.path + accountId + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collections = masterCollections.Service.getByCreatorAndPage(accountId, pageNumber)
+        val totalCreated = masterCollections.Service.totalCreated(accountId)
+
+        def allCollectionFiles(collectionIds: Seq[String]) = masterCollectionFiles.Service.get(collectionIds)
+
+        (for {
+          totalCreated <- totalCreated
+          collections <- collections
+          collectionFiles <- allCollectionFiles(collections.map(_.id))
+        } yield Ok(views.html.profile.created.collectionPerPage(collections, collectionFiles = collectionFiles, totalCollections = totalCreated))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def createForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.collection.create())
+  }
+
+  def create(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Create.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.collection.create(formWithErrors)))
+        },
+        createData => {
+          val collectionId = masterCollections.Service.add(name = createData.name, description = createData.description, website = "", socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw)
+
+          def addDefaultProperties(id: String) = masterCollectionProperties.Service.addMultiple(constants.Collection.DefaultProperty.getDefaultProperties(id))
+
+          (for {
+            collectionId <- collectionId
+            _ <- addDefaultProperties(collectionId)
+          } yield PartialContent(views.html.collection.uploadFile(id = collectionId))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message)))
+          }
+        }
+      )
+  }
+
+  def editForm(id: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.collection.edit(id = id))
+  }
+
+  def edit(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Edit.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.collection.edit(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))))
+        },
+        editData => {
+
+          val update = masterCollections.Service.checkOwnerAndUpdate(id = editData.collectionId, name = editData.name, description = editData.description, socialProfiles = editData.getSocialProfiles, category = constants.Collection.Category.ART, ownerId = loginState.username, nsfw = editData.nsfw)
+
+          (for {
+            _ <- update
+          } yield PartialContent(views.html.collection.uploadFile(id = editData.collectionId))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message)))
+          }
+        }
+      )
+  }
+
+  def uploadCollectionFileForm(id: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val checkCollectionOwner = masterCollections.Service.isOwner(id = id, accountId = loginState.username)
+      (for {
+        collectionOwner <- checkCollectionOwner
+      } yield if (collectionOwner) Ok(views.html.base.commonUploadFile(constants.File.COLLECTION_FILE_FORM, id = id, documentType = documentType))
+      else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def storeCollectionFile(id: String, documentType: String) = withLoginAction.applyMultipartFormData { implicit loginState =>
+    implicit request =>
+      UploadFile.form.bindFromRequest.fold(
+        formWithErrors => {
+          BadRequest(constants.View.BAD_REQUEST)
+        },
+        fileUploadInfo => {
+          try {
+            request.body.file(constants.File.KEY_FILE) match {
+              case None => BadRequest(constants.View.BAD_REQUEST)
+              case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.COLLECTION_FILE_FORM.maxFileSize) {
+                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, constants.Collection.getFilePath(documentType))
+                Ok
+              } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+            }
+          } catch {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        }
+      )
+  }
+
+  def uploadCollectionFile(id: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val oldFilePath = constants.Collection.getFilePath(documentType) + name
+      val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
+      val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(name)
+      val awsKey = id + "/others/" + newFileName
+      val isOwner = masterCollections.Service.isOwner(id = id, accountId = loginState.username)
+
+      def uploadToAws(isOwner: Boolean) = if (isOwner) Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
+      else {
+        utilities.FileOperations.deleteFile(oldFilePath)
+        constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
+      }
+
+      def add = masterCollectionFiles.Service.add(id = id, documentType = documentType, fileName = newFileName)
+
+      (for {
+        isOwner <- isOwner
+        _ <- uploadToAws(isOwner)
+        _ <- add
+      } yield Ok
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def definePropertiesForm(id: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.collection.defineProperties(id = id))
+  }
+
+  def defineProperties(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      DefineProperties.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.collection.defineProperties(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))))
+        },
+        definePropertiesData => {
+
+          val update = Future {
+            println(definePropertiesData)
+            println(definePropertiesData.properties)
+          }
+
+          (for {
+            _ <- update
+          } yield Ok
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message)))
+          }
+        }
+      )
+  }
+
 }

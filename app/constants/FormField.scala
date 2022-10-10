@@ -1,20 +1,24 @@
 package constants
 
 import play.api.data.Forms._
-import play.api.data.Mapping
+import play.api.data.{FormError, Mapping}
 import play.api.data.format.Formats.{bigDecimalFormat, doubleFormat}
 import play.api.data.validation.Constraints
 import play.api.i18n.{Messages, MessagesProvider}
 import utilities.MicroNumber
 import utilities.NumericOperation.checkPrecision
 
+import java.net.URL
 import java.util.Date
+import play.api.data.format.Formatter
+import play.api.data.format.Formats._
 
 object FormField {
 
   private val PLACEHOLDER_PREFIX = "PLACEHOLDER."
   private val SELECT_ERROR_PREFIX = "SELECT_ERROR_PREFIX."
   private val DATE_ERROR_PREFIX = "DATE_ERROR_PREFIX."
+  private val URL_ERROR_PREFIX = "URL_ERROR_PREFIX."
   private val NESTED_ERROR_PREFIX = "NESTED_ERROR_PREFIX."
   private val MINIMUM_LENGTH_ERROR = "MINIMUM_LENGTH_ERROR"
   private val MAXIMUM_LENGTH_ERROR = "MAXIMUM_LENGTH_ERROR"
@@ -52,7 +56,18 @@ object FormField {
   val UNMANAGED_KEY_ADDRESS: StringFormField = StringFormField("UNMANAGED_KEY_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val CHANGE_KEY_NAME: StringFormField = StringFormField("CHANGE_KEY_NAME", 3, 50)
   val CHANGE_KEY_ADDRESS: StringFormField = StringFormField("CHANGE_KEY_ADDRESS", 3, 50, RegularExpression.MANTLE_ADDRESS)
+  val COLLECTION_NAME: StringFormField = StringFormField("COLLECTION_NAME", 3, 30)
+  val COLLECTION_DESCRIPTION: StringFormField = StringFormField("COLLECTION_DESCRIPTION", 3, 256)
+  val COLLECTION_ID: StringFormField = StringFormField("COLLECTION_ID", 16, 16)
+  val COLLECTION_PROPERTY_NAME: StringFormField = StringFormField("COLLECTION_PROPERTY_NAME", 1, 30)
+  val COLLECTION_PROPERTY_FIXED_VALUE: StringFormField = StringFormField("COLLECTION_PROPERTY_FIXED_VALUE", 1, 30)
 
+  // UrlFormField
+  val COLLECTION_WEBSITE: UrlFormField = UrlFormField("COLLECTION_WEBSITE")
+  val COLLECTION_TWITTER: UrlFormField = UrlFormField("COLLECTION_TWITTER")
+  val COLLECTION_INSTAGRAM: UrlFormField = UrlFormField("COLLECTION_INSTAGRAM")
+
+  // IntFormField
   val GAS_AMOUNT: IntFormField = IntFormField("GAS_AMOUNT", 20000, 2000000)
   val WHITELIST_MAX_MEMBERS: IntFormField = IntFormField("WHITELIST_MAX_MEMBERS", 1, Int.MaxValue)
 
@@ -61,20 +76,36 @@ object FormField {
   val WHITELIST_INVITE_START_EPOCH: IntFormField = IntFormField("WHITELIST_INVITE_START_EPOCH", 1, Int.MaxValue)
   val WHITELIST_INVITE_END_EPOCH: IntFormField = IntFormField("WHITELIST_INVITE_END_EPOCH", 1, Int.MaxValue)
 
-  //BooleanFormField
+  // BooleanFormField
   val RECEIVE_NOTIFICATIONS: BooleanFormField = BooleanFormField("RECEIVE_NOTIFICATIONS")
   val USERNAME_AVAILABLE: BooleanFormField = BooleanFormField("USERNAME_AVAILABLE")
   val SIGNUP_TERMS_CONDITIONS: BooleanFormField = BooleanFormField("SIGNUP_TERMS_CONDITIONS")
   val MANAGED_KEY_DISCLAIMER: BooleanFormField = BooleanFormField("MANAGED_KEY_DISCLAIMER")
+  val NSFW_COLLECTION: BooleanFormField = BooleanFormField("NSFW_COLLECTION")
+  val COLLECTION_PROPERTY_REQUIRED: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_REQUIRED")
+  val COLLECTION_PROPERTY_MUTABLE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_MUTABLE")
+  val COLLECTION_PROPERTY_HIDE_VALUE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_HIDE_VALUE")
 
+  // SelectFormField
   val GAS_PRICE: SelectFormField = SelectFormField("GAS_PRICE", Seq(constants.CommonConfig.Blockchain.LowGasPrice.toString, constants.CommonConfig.Blockchain.MediumGasPrice.toString, constants.CommonConfig.Blockchain.HighGasPrice.toString))
+  val COLLECTION_CATEGORY: SelectFormField = SelectFormField("COLLECTION_CATEGORY", Seq(constants.Collection.Category.ART, constants.Collection.Category.PHOTOGRAPHY, constants.Collection.Category.MISCELLANEOUS))
+  val COLLECTION_PROPERTY_TYPE: SelectFormField = SelectFormField("COLLECTION_PROPERTY_TYPE", Seq(constants.Collection.NFT.Data.STRING, constants.Collection.NFT.Data.NUMBER, constants.Collection.NFT.Data.BOOLEAN))
 
+  // MicroNumberFormField
   val SEND_COIN_AMOUNT: MicroNumberFormField = MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.zero, MicroNumber(Int.MaxValue), 6)
+
+  // NestedFormField
+  val COLLECTION_PROPERTIES: NestedFormField = NestedFormField("COLLECTION_PROPERTIES")
 
   case class StringFormField(name: String, minimumLength: Int, maximumLength: Int, regularExpression: RegularExpression = RegularExpression.ANY_STRING, errorMessage: String = "Regular expression validation failed!") {
     val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[String]) = name -> text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regex, name = regularExpression.regex.pattern.toString, error = errorMessage))
+
+    // TODO
+    //  def ignoredMapping: (String, Mapping[String]) = name -> ignored[String]("defaultValue")
+
+    def optionalMapping: (String, Mapping[Option[String]]) = name -> optional(text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regex, name = regularExpression.regex.pattern.toString, error = errorMessage)))
 
     def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_LENGTH_ERROR, minimumLength)
 
@@ -84,9 +115,11 @@ object FormField {
   }
 
   case class SelectFormField(name: String, options: Seq[String], errorMessage: String = "Option not found") {
-    val placeHolder: String = PLACEHOLDER_PREFIX + name
+    val placeHolder: String = options.head
 
     def mapping: (String, Mapping[String]) = name -> text.verifying(constraint = field => options contains field, error = errorMessage)
+
+    def optionalMapping: (String, Mapping[Option[String]]) = name -> optional(text.verifying(constraint = field => options contains field, error = errorMessage))
 
     def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(SELECT_ERROR_PREFIX + name)
   }
@@ -96,6 +129,8 @@ object FormField {
 
     def mapping: (String, Mapping[String]) = name -> text
 
+    def optionalMapping: (String, Mapping[Option[String]]) = name -> optional(text)
+
     def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(SELECT_ERROR_PREFIX + name)
   }
 
@@ -103,6 +138,8 @@ object FormField {
     val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[Int]) = name -> number(min = minimumValue, max = maximumValue)
+
+    def optionalMapping: (String, Mapping[Option[Int]]) = name -> optional(number(min = minimumValue, max = maximumValue))
 
     def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_VALUE_ERROR, minimumValue)
 
@@ -117,6 +154,8 @@ object FormField {
 
     def mapping: (String, Mapping[Date]) = name -> date
 
+    def optionalMapping: (String, Mapping[Option[Date]]) = name -> optional(date)
+
     def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(DATE_ERROR_PREFIX + name)
   }
 
@@ -124,6 +163,8 @@ object FormField {
     val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[Double]) = name -> of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
+
+    def optionalMapping: (String, Mapping[Option[Double]]) = name -> optional(of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)))
 
     def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_VALUE_ERROR, minimumValue)
 
@@ -135,6 +176,8 @@ object FormField {
     val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[BigDecimal]) = name -> of(bigDecimalFormat).verifying(Constraints.max[BigDecimal](maximumValue), Constraints.min[BigDecimal](minimumValue))
+
+    def optionalMapping: (String, Mapping[Option[BigDecimal]]) = name -> optional(of(bigDecimalFormat).verifying(Constraints.max[BigDecimal](maximumValue), Constraints.min[BigDecimal](minimumValue)))
 
     def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_VALUE_ERROR, minimumValue)
 
@@ -148,10 +191,30 @@ object FormField {
     def mapping: (String, Mapping[Boolean]) = name -> boolean
   }
 
+  implicit object UrlFormatter extends Formatter[URL] {
+    override val format: Option[(String, Nil.type)] = Some(("URL", Nil))
+
+    override def bind(key: String, data: Map[String, String]) = parsing(new URL(_), "Invalid URL", Nil)(key, data)
+
+    override def unbind(key: String, value: URL): Map[String, String] = Map(key -> value.toString)
+  }
+
+  case class UrlFormField(name: String) {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
+
+    def mapping: (String, Mapping[URL]) = name -> of[URL]
+
+    def optionalMapping: (String, Mapping[Option[URL]]) = name -> optional(of[URL])
+
+    def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(URL_ERROR_PREFIX + name)
+  }
+
   case class MicroNumberFormField(name: String, minimumValue: MicroNumber, maximumValue: MicroNumber, precision: Int = 2) {
     val placeHolder: String = PLACEHOLDER_PREFIX + name
 
     def mapping: (String, Mapping[MicroNumber]) = name -> of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
+
+    def optionalMapping: (String, Mapping[Option[MicroNumber]]) = name -> optional(of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble))
 
     def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_VALUE_ERROR, minimumValue)
 

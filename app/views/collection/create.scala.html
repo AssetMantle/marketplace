@@ -1,0 +1,14 @@
+@import views.html.base.form._
+@import views.collection.companion.Create
+
+@(createForm: Form[Create.Data] = Create.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.CREATE_COLLECTION, createForm) {
+    @commonInputText(createForm, constants.FormField.COLLECTION_NAME)
+    @commonDescriptionText(createForm, constants.FormField.COLLECTION_DESCRIPTION)
+    @commonToggleButton(createForm, constants.FormField.NSFW_COLLECTION)
+@*    @commonSelect(createForm, constants.FormField.COLLECTION_CATEGORY, Symbol("class") -> "custom-select sources", Symbol("placeholder") -> Messages(constants.View.ART))*@
+    @commonInputURL(createForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false)
+    @commonInputURL(createForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false)
+    @commonInputURL(createForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)
+}
