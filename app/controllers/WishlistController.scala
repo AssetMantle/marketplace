@@ -7,6 +7,7 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import views.profile.wishlist.companion.AddOrRemove
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -102,4 +103,40 @@ class WishlistController @Inject()(
         }
     }
   }
+
+  def add(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      AddOrRemove.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(formWithErrors.errors.map(_.message).mkString(" ")))
+        },
+        addData => {
+          (for {
+            nft <- masterNFTs.Service.tryGet(addData.nftId)
+            _ <- masterWishLists.Service.add(accountId = loginState.username, nftId = addData.nftId, collectionId = nft.collectionId)
+          } yield Ok
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        }
+      )
+  }
+
+  def delete(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      AddOrRemove.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(formWithErrors.errors.map(_.message).mkString(" ")))
+        },
+        deleteData => {
+          (for {
+            _ <- masterWishLists.Service.deleteWishItem(accountId = loginState.username, nftId = deleteData.nftId)
+          } yield Ok
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        }
+      )
+  }
+
 }

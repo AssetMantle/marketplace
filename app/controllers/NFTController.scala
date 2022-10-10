@@ -99,27 +99,6 @@ class NFTController @Inject()(
       }
   }
 
-  def addToWishList(nftId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      (for {
-        nft <- masterNFTs.Service.tryGet(nftId)
-        _ <- masterWishLists.Service.add(accountId = loginState.username, nftId = nftId, collectionId = nft.collectionId)
-      } yield Ok
-        ).recover {
-        case baseException: BaseException => BadRequest(baseException.failure.message)
-      }
-  }
-
-  def deleteFromWishList(nftId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      (for {
-        _ <- masterWishLists.Service.deleteWishItem(accountId = loginState.username, nftId = nftId)
-      } yield Ok
-        ).recover {
-        case baseException: BaseException => BadRequest(baseException.failure.message)
-      }
-  }
-
   def likesCounter(nftId: String): EssentialAction = cached.apply(req => req.path + "/" + nftId, constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>

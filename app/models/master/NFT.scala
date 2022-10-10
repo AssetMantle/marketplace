@@ -20,6 +20,8 @@ object Property {
 
 case class NFT(fileName: String, file: Array[Byte], collectionId: String, name: String, description: String, properties: Seq[Property], ipfsLink: String, edition: Option[Int], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
 
+  def getFileHash: String = utilities.FileOperations.getFileNameWithoutExtension(fileName)
+
   def serialize(): NFTs.NFTSerialized = NFTs.NFTSerialized(
     fileName = this.fileName,
     file = this.file,

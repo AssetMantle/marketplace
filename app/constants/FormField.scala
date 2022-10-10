@@ -61,6 +61,7 @@ object FormField {
   val COLLECTION_ID: StringFormField = StringFormField("COLLECTION_ID", 16, 16)
   val COLLECTION_PROPERTY_NAME: StringFormField = StringFormField("COLLECTION_PROPERTY_NAME", 1, 30)
   val COLLECTION_PROPERTY_FIXED_VALUE: StringFormField = StringFormField("COLLECTION_PROPERTY_FIXED_VALUE", 1, 30)
+  val NFT_ID: StringFormField = StringFormField("NFT_ID", 1, 100)
 
   // UrlFormField
   val COLLECTION_WEBSITE: UrlFormField = UrlFormField("COLLECTION_WEBSITE")

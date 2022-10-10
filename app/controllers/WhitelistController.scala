@@ -85,7 +85,8 @@ class WhitelistController @Inject()(
         },
         createData => {
           val isCreator = masterCollections.Service.isCreator(loginState.username)
-          def create(isCreator: Boolean) = if(isCreator) masterWhitelists.Service.addWhitelist(ownerId = loginState.username, name = createData.name, description = createData.description, maxMembers = createData.maxMembers, startEpoch = createData.startEpoch, endEpoch = createData.endEpoch)
+
+          def create(isCreator: Boolean) = if (isCreator) masterWhitelists.Service.addWhitelist(ownerId = loginState.username, name = createData.name, description = createData.description, maxMembers = createData.maxMembers, startEpoch = createData.startEpoch, endEpoch = createData.endEpoch)
           else constants.Response.NO_COLLECTION_TO_CREATE_WHITELIST.throwFutureBaseException()
 
           (for {
@@ -190,19 +191,27 @@ class WhitelistController @Inject()(
     }
   }
 
-  def acceptInvite(whitelistId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def acceptInvite(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val whitelist = masterWhitelists.Service.tryGet(whitelistId)
+      AcceptOrLeave.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(formWithErrors.errors.map(_.message).mkString(" ")))
+        },
+        acceptData => {
+          val whitelist = masterWhitelists.Service.tryGet(acceptData.whitelistId)
 
-      def checkAndAdd(whitelist: Whitelist) = masterWhitelistMembers.Service.checkAndAdd(whitelist = whitelist, accountId = loginState.username)
+          def checkAndAdd(whitelist: Whitelist) = masterWhitelistMembers.Service.checkAndAdd(whitelist = whitelist, accountId = loginState.username)
 
-      (for {
-        whitelist <- whitelist
-        _ <- checkAndAdd(whitelist)
-      } yield Ok(views.html.profile.whitelist.acceptInviteSuccessful(whitelist))
-        ).recover {
-        case baseException: BaseException => BadRequest(views.html.base.modal.errorModal(heading = constants.View.JOIN_WHITELIST_FAILED, subHeading = baseException.failure.message))
-      }
+          (for {
+            whitelist <- whitelist
+            _ <- checkAndAdd(whitelist)
+          } yield PartialContent(views.html.profile.whitelist.acceptInviteSuccessful(whitelist))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.base.modal.errorModal(heading = constants.View.JOIN_WHITELIST_FAILED, subHeading = baseException.failure.message))
+          }
+        }
+      )
+
   }
 
   def leaveWhitelistDetails(whitelistId: String): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
@@ -219,18 +228,25 @@ class WhitelistController @Inject()(
     }
   }
 
-  def leaveWhitelist(whitelistId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def leaveWhitelist(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val whitelist = masterWhitelists.Service.tryGet(whitelistId)
-      val deleteMember = masterWhitelistMembers.Service.deleteMember(whitelistId = whitelistId, accountId = loginState.username)
+      AcceptOrLeave.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(formWithErrors.errors.map(_.message).mkString(" ")))
+        },
+        leaveData => {
+          val whitelist = masterWhitelists.Service.tryGet(leaveData.whitelistId)
+          val deleteMember = masterWhitelistMembers.Service.deleteMember(whitelistId = leaveData.whitelistId, accountId = loginState.username)
 
-      (for {
-        whitelist <- whitelist
-        _ <- deleteMember
-      } yield Ok(views.html.profile.whitelist.leaveWhitelistSuccessful(whitelist))
-        ).recover {
-        case baseException: BaseException => BadRequest(views.html.base.modal.errorModal(heading = constants.View.LEAVE_WHITELIST_FAILED, subHeading = baseException.failure.message))
-      }
+          (for {
+            whitelist <- whitelist
+            _ <- deleteMember
+          } yield PartialContent(views.html.profile.whitelist.leaveWhitelistSuccessful(whitelist))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.base.modal.errorModal(heading = constants.View.LEAVE_WHITELIST_FAILED, subHeading = baseException.failure.message))
+          }
+        }
+      )
   }
 
 }

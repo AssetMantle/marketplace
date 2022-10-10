@@ -5,6 +5,6 @@
     @views.html.base.common(constants.View.PROFILE)(requestHeader, messagesProvider, Option(loginState))
     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
     <script>
-        componentResource('centerContent', jsRoutes.controllers.ProfileController.profile('@loginState.username'));
+        componentResource('centerContent', jsRoutes.controllers.ProfileController.profile('@loginState.username', '@constants.View.WHITELIST'));
         getForm(jsRoutes.controllers.WhitelistController.acceptInviteDetails('@whitelistId'));
     </script>

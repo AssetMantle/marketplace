@@ -1,5 +1,8 @@
 @import controllers.actions.LoginState
 @import views.html.base.commonStringValue
+@import helper._
+@import views.html.base.form._
+@import views.profile.wishlist.companion.AddOrRemove
 
 @(collection: master.Collection, nft: master.NFT, liked: Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
@@ -30,7 +33,19 @@
                 </div>
                 @if(loginState.nonEmpty) {
                     <div class="d-flex align-items-center gap-1 mt-3">
-                        <span onclick="addRemoveWishlist(this, '@nft.fileName', '@Messages(constants.View.ADDED_TO_WISHLIST)', '@Messages(constants.View.REMOVED_FROM_WISHLIST)')">
+                        <div id="addToWishlist_@nft.getFileHash" class="hidden">
+                        @form(routes.WishlistController.add()) {
+                            @CSRF.formField
+                            @commonInputText(AddOrRemove.form, constants.FormField.NFT_ID, Symbol("value") -> nft.fileName, Symbol("readonly") -> true, Symbol("containerDivClass") -> "hidden")
+                        }
+                        </div>
+                        <div id="deleteFromWishlist_@nft.getFileHash" class="hidden">
+                        @form(routes.WishlistController.delete()) {
+                            @CSRF.formField
+                            @commonInputText(AddOrRemove.form, constants.FormField.NFT_ID, Symbol("value") -> nft.fileName, Symbol("readonly") -> true, Symbol("containerDivClass") -> "hidden")
+                        }
+                        </div>
+                        <span onclick="addRemoveWishlist(this, '@nft.getFileHash', '@Messages(constants.View.ADDED_TO_WISHLIST)', '@Messages(constants.View.REMOVED_FROM_WISHLIST)')">
                         @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
                         </span>
                         <div class="nft-likes" data-id="@nft.fileName">00</div>
@@ -45,14 +60,5 @@
                 }
             </div>
         </div>
-        <!--<div class="m-0 nft-separator"></div>
-        <div class="d-flex flex-row align-items-center justify-content-between nft-bottom">
-            <div class="setting">
-                <div class="dots">
-                    <div class="dot"></div>
-                </div>
-            </div>
-            @* <div class="buy-now-btn">@Messages(constants.View.BUYNOW)</div> *@
-        </div>-->
     </div>
 </div>
