@@ -468,3 +468,15 @@
     }
   }
 }
+
+// Empty Collection
+.emptyList{
+  background-color: var(--card-dark);
+  width: 100%;
+  border-radius: 10px;
+  height: 500px;
+  min-height: 500px;
+  .message{
+    @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+  }
+}
