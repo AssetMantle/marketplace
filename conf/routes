@@ -13,7 +13,7 @@ GET         /firebase-messaging-sw.js                         controllers.Assets
 
 # Index
 GET         /                                                 controllers.IndexController.index()
-GET         /sitemap.xml                                          controllers.IndexController.sitemap()
+GET         /sitemap.xml                                      controllers.IndexController.sitemap()
 
 GET         /signUp                                           controllers.AccountController.signUpForm()
 POST        /signUp                                           controllers.AccountController.signUp()
@@ -70,6 +70,9 @@ GET         /wishListCollectionNFTs                           controllers.Wishli
 GET         /profile/:accountId/WISHLIST/:collectionId        controllers.WishlistController.viewCollectionNFTs(accountId: String, collectionId: String)
 GET         /wishListNFTsPerPage                              controllers.WishlistController.collectionNFTsPerPage(accountId: String, collectionId: String, pageNumber: Int)
 
+POST        /addToWishList                                    controllers.WishlistController.add()
+POST        /deleteFromWishList                               controllers.WishlistController.delete()
+
 GET         /nft/:nftId                                       controllers.NFTController.viewNFT( nftId: String)
 GET         /nftDetails                                       controllers.NFTController.details( nftId: String)
 GET         /nftInfo                                          controllers.NFTController.info( nftId: String)
@@ -98,8 +101,6 @@ POST        /deleteKey                                        controllers.Settin
 
 GET         /walletBalance                                    controllers.SettingController.walletBalance(address: String)
 
-GET         /addToWishList                                    controllers.NFTController.addToWishList(nftId: String)
-GET         /deleteFromWishList                               controllers.NFTController.deleteFromWishList(nftId: String)
 GET         /likesCounter                                     controllers.NFTController.likesCounter(nftId: String)
 
 GET         /defaultProfile                                   controllers.ProfileController.viewDefaultProfile()
@@ -123,9 +124,9 @@ POST        /editWhitelist                                    controllers.Whitel
 # Should be not changed it will be public
 GET         /acceptWhitelistInvite/:whitelistId               controllers.WhitelistController.viewAcceptInviteDetails(whitelistId: String)
 GET         /whitelistInviteDetails                           controllers.WhitelistController.acceptInviteDetails(whitelistId: String)
-GET         /acceptWhitelistInvite                            controllers.WhitelistController.acceptInvite(whitelistId: String)
+POST        /acceptWhitelistInvite                            controllers.WhitelistController.acceptInvite()
 GET         /leaveWhitelistDetails                            controllers.WhitelistController.leaveWhitelistDetails(whitelistId: String)
-GET         /leaveWhitelist                                   controllers.WhitelistController.leaveWhitelist(whitelistId: String)
+POST        /leaveWhitelist                                   controllers.WhitelistController.leaveWhitelist()
 
 #GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()

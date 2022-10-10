@@ -1,7 +1,9 @@
 @import models.master.Whitelist
 @import views.html.base.buttons._
+@import views.html.base.form._
+@import views.profile.whitelist.companion.AcceptOrLeave
 
-@(whitelist: Whitelist, maxReached: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(whitelist: Whitelist, maxReached: Boolean, acceptForm: Form[AcceptOrLeave.Data] = AcceptOrLeave.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="modal-header mb-0">
     <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.WHITELIST_JOIN_TITLE)</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
@@ -43,8 +45,9 @@
 
 @if(!maxReached) {
     <div class="d-flex justify-content-end horizontal-align">
-        @commonSecondaryButton(constants.View.CLOSE_WHITELIST_INVITE, JavaScript(s"""closeModal()"""))
-        @commonPrimaryButton(constants.View.ACCEPT_WHITELIST_INVITE, JavaScript(s"""getForm(jsRoutes.controllers.WhitelistController.acceptInvite('${whitelist.id}'))"""))
+        @commonForm(constants.Form.ACCEPT_WHITELIST_INVITE, acceptForm, submitDisable = false, showCancel = true, closeButton = false, showSubtitle = false) {
+            @commonInputText(acceptForm, constants.FormField.WHITELIST_ID, Symbol("value") -> whitelist.id, Symbol("readonly") -> true, Symbol("containerDivClass") -> "hidden")
+        }
     </div>
 } else {
     <div class="d-flex gap-2 align-items-center justify-content-center mt-3 footerMessage">

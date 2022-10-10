@@ -1,0 +1,15 @@
+package views.profile.wishlist.companion
+
+import play.api.data.Form
+import play.api.data.Forms.mapping
+
+object AddOrRemove {
+
+  val form: Form[Data] = Form(
+    mapping(
+      constants.FormField.NFT_ID.mapping,
+    )(Data.apply)(Data.unapply))
+
+  case class Data(nftId: String)
+
+}

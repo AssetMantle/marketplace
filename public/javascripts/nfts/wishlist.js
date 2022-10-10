@@ -29,10 +29,12 @@ function wishlistCounter(source, route) {
 
 updateWishlist();
 
-function wishlist(route, wishlistButton, snackBarMessage) {
+function wishlist(form, route, wishlistButton, snackBarMessage) {
     $.ajax({
-        url: route.url,
-        type: route.type,
+        type: 'POST',
+        contentType: 'application/x-www-form-urlencoded',
+        url: form.attr('action'),
+        data: form.serialize(),
         async: true,
         statusCode: {
             200: function () {
@@ -54,12 +56,16 @@ function wishlist(route, wishlistButton, snackBarMessage) {
 }
 
 function addRemoveWishlist(element, NFTId, addMessage, removedMessage) {
+    console.log(NFTId)
     let wishlistIcon = $(element).children(".addToWishlist");
     if (!$(wishlistIcon).hasClass("clicked")) {
-        wishlist(jsRoutes.controllers.NFTController.addToWishList(`${NFTId}`), element, addMessage);
+        const form = $("#addToWishlist_" + NFTId + " form")
+        console.log(form);
+        wishlist(form, jsRoutes.controllers.WishlistController.add(), element, addMessage);
         $(wishlistIcon).addClass("clicked");
     } else {
-        wishlist(jsRoutes.controllers.NFTController.deleteFromWishList(`${NFTId}`), element, removedMessage);
+        const form = $("#deleteFromWishlist_" + NFTId + " form")
+        wishlist(form, jsRoutes.controllers.WishlistController.delete(), element, removedMessage);
         $(wishlistIcon).removeClass("clicked");
     }
 }
