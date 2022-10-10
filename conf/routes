@@ -62,6 +62,8 @@ GET         /uploadCollectionFileForm                         controllers.Collec
 POST        /storeCollectionFile                              controllers.CollectionController.storeCollectionFile(id: String, documentType: String)
 GET         /uploadCollectionFile                             controllers.CollectionController.uploadCollectionFile(id: String, documentType: String, name: String)
 
+GET         /notificationPopup                                controllers.SettingController.notificationPopup()
+
 GET         /wishlistSection                                  controllers.WishlistController.wishlistSection(accountId: String)
 GET         /wishListCollectionPerPage                        controllers.WishlistController.collectionPerPage(accountId: String, pageNumber: Int)
 GET         /wishListCollectionNFTs                           controllers.WishlistController.collectionNFTs(accountId: String, collectionId: String)

@@ -659,11 +659,20 @@ nav .content .links
         color: #000000;
     }
 }
-#walletPopup.active + a i{
-        color: var(--default);
-}
-.right-menu .links > li:hover i {
+.popupContainer.active + a i{
     color: var(--default);
+}
+.right-menu .links .menuItem.menuIcon{
+    color: var(--default);
+}
+.right-menu .links > li:hover a > i {
+    color: var(--default);
+}
+.right-menu .menuItem.menuIcon .desktop-link{
+    padding: 27px 10px;
+}
+#userNotification .popupContainer.active + a i.bi-bell::before{
+    content: "\f189";
 }
 #userWallet .desktop-link{
     padding: 27px 10px;

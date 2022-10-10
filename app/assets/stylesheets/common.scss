@@ -625,6 +625,143 @@
   }
 }
 
+// common Notification popup
+.right-menu .links li.menuItem .notificationPopup {
+  text-transform: none;
+  width: 396px;
+  position: absolute;
+  left: -260px;
+  top: 90px;
+  transform: translateX(-71px);
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  cursor: auto;
+
+  &::before {
+    content: '';
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid var(--popup-bg);
+    position: absolute;
+    top: -9px;
+    right: 35px;
+  }
+
+  &.active {
+    top: 70px;
+    opacity: 1;
+    visibility: visible;
+    //transition: all 0.3s ease;
+  }
+
+  .notificationPopupContainer {
+    background: var(--popup-bg);
+    border: 2px solid var(--popup-stroke);
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+
+    .separator {
+      height: 2px;
+      width: 100%;
+      background-color: #383838;
+      margin: 16px 0px;
+    }
+
+    .headerContainer {
+      line-height: 22px;
+      .title{
+        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+      }
+      .titleLink{
+        @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
+        text-transform: capitalize;
+      }
+    }
+
+    .emailContainer{
+      width: 100%;
+      line-height: 20px;
+      .emailInputField{
+        .emailNotificationLabel{
+          @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--gray));
+          text-transform: capitalize;
+        }
+        input[type="text"]{
+          @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+          height: 36px;
+          box-sizing: border-box;
+          display: block;
+          width: 100%;
+          border: 1px solid var(--inactive-gray);
+          padding: calc(var(--size-bezel) * 2) 12px;
+          background: transparent;
+          border-radius: var(--size-radius);
+          letter-spacing: 1px;
+          outline: none;
+          margin-top: 12px;
+          &:focus{
+            border-color: var(--dark);
+          }
+          &:not(:focus)
+          {
+            color: var(--inactive-gray);
+            border-color: var(--gray) !important;
+          }
+          &.errorField{
+            border: 1px solid var(--error) !important;
+          }
+        }
+        .emailNotificationButton{
+          @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
+          text-align: right;
+          text-transform: capitalize;
+          margin-top: 12px;
+        }
+      }
+    }
+
+    .notificationList{
+      .notificationListTitle{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--dark));
+        text-transform: capitalize;
+        margin-bottom: 12px;
+      }
+      .list{
+        .singleNotification{
+          .notificationIcon{
+            height: 40px;
+            width: 40px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background-color: var(--card-dark);
+          }
+          .notificationDetail{
+            .title{
+              @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+              text-transform: capitalize;
+            }
+            .description{
+              @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
+            }
+            .dateTime{
+              @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));
+            }
+          }
+        }
+      }
+      .loadOlderNotificationButton{
+        @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
+        text-align: right;
+        text-transform: capitalize;
+        margin-top: 32px;
+      }
+    }
+  }
+}
 // Common Upload File
 .uploadFileContainer{
   width: 100%;

@@ -156,13 +156,24 @@
                 @optionalLoginState match {
                     case Some(loginState) => {
                         <ul class="d-flex flex-row gap-2 align-items-center mb-0 links">
+                            <li id="userNotification" class="menuItem menuIcon" onclick="showNotification();">
+                                <div id="notificationPopup" class="notificationPopup popupContainer"></div>
+                                <a class="desktop-link" target="_blank" onclick="componentResource('notificationPopup', jsRoutes.controllers.SettingController.notificationPopup());">
+                                    <i class="bi bi-bell iconWhite wallet"></i>
+                                </a>
+                            </li>
+                            <li id="userWallet" class="menuItem menuIcon" onclick="showWallet();">
+                                <div id="walletPopup" class="walletPopup popupContainer"></div>
+                                <a class="desktop-link" target="_blank" onclick="componentResource('walletPopup', jsRoutes.controllers.SettingController.walletPopup());">
+                                    <i class="bi bi-person iconWhite wallet"></i>
+                                </a>
+                            </li>
                             <li id="userWallet" class="user-wallet" onclick="showWallet();">
                                     <!-- Wallet Start -->
                                 <div id="walletPopup" class="walletPopup"></div>
                                 <a class="desktop-link" target="_blank" onclick="componentResource('walletPopup', jsRoutes.controllers.SettingController.walletPopup());">
                                     <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="35" height="35"/>
                                 </a>
-                                    <!-- Wallet End -->
                             </li>
                         </ul>
                         <div id="walletBackDrop" onclick="closeWallet()"></div>

@@ -19,9 +19,16 @@ function showWallet() {
     $("body").addClass("modal-open");
 }
 
+// Show notification popup
+function showNotification() {
+    $("#notificationPopup").addClass("active");
+    $("#walletBackDrop").addClass("active");
+    $("body").addClass("modal-open");
+}
+
 // Close wallet popup
 function closeWallet() {
-    $("#walletPopup").removeClass("active");
+    $("#walletPopup, #notificationPopup").removeClass("active");
     $("#walletBackDrop").removeClass("active");
     $("body").removeClass("modal-open");
     setTimeout(() => {

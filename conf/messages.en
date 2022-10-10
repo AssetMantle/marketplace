@@ -565,6 +565,15 @@ OR=Or
 BROWSE=Browse
 UPLOAD=Upload
 
+#Notification popup
+NOTIFICATION_POPUP_TITLE=Notifications
+NOTIFICATION_POPUP_TITLE_LINK=Mark all as read
+NOTIFICATION_POPUP_TITLE_NEW=New
+NOTIFICATION_POPUP_TITLE_OLD=Old
+NOTIFICATION_POPUP_EMAIL_LABEL=Add your email to get all the notifications
+NOTIFICATION_POPUP_EMAIL_SUBMIT=Get Notified
+NOTIFICATION_POPUP_LOAD_OLDER=Load older
+
 #404 page
 ERROR_PAGE_TITLE=Page Not Found
 ERROR_PAGE_DESCRIPTION=The page you are trying to find has been moved or does not exist.
