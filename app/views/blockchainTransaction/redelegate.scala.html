@@ -1,0 +1,12 @@
+@import views.blockchainTransaction.companion.Redelegate
+@import views.html.blockchainTransaction.commonSelectGas
+@import views.html.base.form._
+
+@(Redelegate: Form[Redelegate.Data] = Redelegate.form, Validator: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.Redelegate, redelegate) {
+    @commonInputText(redelegate, constants.FormField.Validator, Symbol("value") -> Validator, Symbol("readonly") -> "readonly")
+    @commonInputMicornumber(redelegate, constants.FormField.REDELEGATE_AMOUNT)
+    @commonInputInt(redelegate, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultRedelegateGasAmount, Symbol("class") -> "hidden")
+    @commonSelectGas(redelegate)
+    @commonInputPassword(redelegate, constants.FormField.PASSWORD)
+}

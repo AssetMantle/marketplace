@@ -98,6 +98,20 @@ class BlockchainTransactionController @Inject()(
         }
       )
   }
+       def redelegateForm(redelegationAmount: String): Action[AnyContent] = withoutLoginAction { implicit request => 
+     Ok(views.html.blockchainTransaction.redelegate(redelegationAmount = redelegationAmount))}
+
+
+
+    redelegateData => {
+
+  }
+  def checkBalanceAndRedelegate(balance: Option[models.blockchain.Balance], validatePassword: Boolean, key: master.Key) = if (balance.fold(MicroNumber.zero)(_.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount)) == MicroNumber.zero) {
+            constants.Response.INSUFFICIENT_BALANCE.throwFutureBaseException()
+          } else if (!validatePassword) constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+  }
+
+  
 
 
 }
