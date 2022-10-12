@@ -16,7 +16,7 @@ class WithMultipartFormActionLogging @Inject()(messagesControllerComponents: Mes
 
   def apply(f: => Request[MultipartFormData[TemporaryFile]] => Result)(implicit logger: Logger): Action[MultipartFormData[TemporaryFile]] = Action(parse.multipartFormData) { implicit request =>
     val startTime = System.currentTimeMillis()
-    val remoteIp = request.headers.get(constants.Session.FORWARDED_IP_ADDRESS_HEADER).getOrElse("0.0.0.0")
+    val remoteIp = request.headers.get(constants.Session.FORWARDED_IP_ADDRESS_HEADER).getOrElse(request.remoteAddress)
     try {
       logger.info(messagesApi(constants.Log.Info.CONTROLLERS_REQUEST, request.method, request.uri, remoteIp, request.session.get(constants.Session.USERNAME).getOrElse(constants.View.UNKNOWN)))
       val result = f(request)

@@ -15,7 +15,7 @@ class WithActionAsyncLogging @Inject()(messagesControllerComponents: MessagesCon
 
   def apply(f: => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = Action.async { implicit request =>
     val startTime = System.currentTimeMillis()
-    val remoteIp = request.headers.get(constants.Session.FORWARDED_IP_ADDRESS_HEADER).getOrElse("0.0.0.0")
+    val remoteIp = request.headers.get(constants.Session.FORWARDED_IP_ADDRESS_HEADER).getOrElse(request.remoteAddress)
     logger.info(messagesApi(constants.Log.Info.CONTROLLERS_REQUEST, request.method, request.uri, remoteIp, request.session.get(constants.Session.USERNAME).getOrElse(constants.View.UNKNOWN)))
     val result = f(request)
     (for {
