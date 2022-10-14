@@ -1,0 +1,40 @@
+@import constants.FormField.{RadioFormField, NestedFormField}
+@import helper._
+@import play.api.data.Field
+
+@(formData: Form[_], formField: RadioFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialFormField: Option[Field] = None)
+
+<div id='@arguments.toMap.get(Symbol("containerDivID")).map(_.toString).getOrElse("")' class='@arguments.toMap.get(Symbol("containerDivClass")).map(_.toString).getOrElse("commonRadioGroup")'>
+@defining(Seq(Symbol("_label") -> Messages(formField.name), Symbol("class") -> "am-radio")) { defaultArguments =>
+    @defining(
+        sequentialFormField match {
+            case Some(sequentialField: Field) => {
+                nestedFormField match {
+                    case Some(nestedField: NestedFormField) => {
+                        //This case handles sequential subForms under a nested field. See userAddOrUpdateUBOs for example.
+                        sequentialField.apply(formField.name)
+                    }
+                    case None => {
+                        //This case handles seq fields on basic data types. See negotiationDocumentList for example.
+                        sequentialField
+                    }
+                }
+            }
+            case None => {
+                nestedFormField match {
+                    case Some(field: NestedFormField) => {
+                        //This case handles nested fields. See AddOrganization for example.
+                        formData(Seq(field.name, formField.name).mkString("."))
+                    }
+                    case None => {
+                        //This case handles generic fields.
+                        formData(formField.name)
+                    }
+                }
+            }
+        }
+    ) { field =>
+        @inputRadioGroup(field.copy(value = Option(formField.options.head._1)), options = formField.options.map(x => (x._1, Messages(x._2))), defaultArguments ++ arguments: _*)
+    }
+}
+</div>

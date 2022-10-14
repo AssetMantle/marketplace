@@ -17,6 +17,7 @@ object FormField {
 
   private val PLACEHOLDER_PREFIX = "PLACEHOLDER."
   private val SELECT_ERROR_PREFIX = "SELECT_ERROR_PREFIX."
+  private val RADIO_BUTTON_ERROR_PREFIX = "RADIO_BUTTON_ERROR_PREFIX."
   private val DATE_ERROR_PREFIX = "DATE_ERROR_PREFIX."
   private val URL_ERROR_PREFIX = "URL_ERROR_PREFIX."
   private val NESTED_ERROR_PREFIX = "NESTED_ERROR_PREFIX."
@@ -80,9 +81,6 @@ object FormField {
   val SIGNUP_TERMS_CONDITIONS: BooleanFormField = BooleanFormField("SIGNUP_TERMS_CONDITIONS")
   val MANAGED_KEY_DISCLAIMER: BooleanFormField = BooleanFormField("MANAGED_KEY_DISCLAIMER")
   val NSFW_COLLECTION: BooleanFormField = BooleanFormField("NSFW_COLLECTION")
-  val COLLECTION_PROPERTY_REQUIRED: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_REQUIRED")
-  val COLLECTION_PROPERTY_MUTABLE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_MUTABLE")
-  val COLLECTION_PROPERTY_HIDE_VALUE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_HIDE_VALUE")
 
   // SelectFormField
   val GAS_PRICE: SelectFormField = SelectFormField("GAS_PRICE", Seq(constants.CommonConfig.Blockchain.LowGasPrice.toString, constants.CommonConfig.Blockchain.MediumGasPrice.toString, constants.CommonConfig.Blockchain.HighGasPrice.toString))
@@ -94,6 +92,11 @@ object FormField {
 
   // NestedFormField
   val COLLECTION_PROPERTIES: NestedFormField = NestedFormField("COLLECTION_PROPERTIES")
+
+  // RadioFormField
+  val COLLECTION_PROPERTY_MUTABLE: RadioFormField = RadioFormField("COLLECTION_PROPERTY_MUTABLE", Seq(("IMMUTABLE", "Immutable"), ("MUTABLE", "Mutable")))
+  val COLLECTION_PROPERTY_REQUIRED: RadioFormField = RadioFormField("COLLECTION_PROPERTY_REQUIRED", Seq(("REQUIRED", "Required"), ("NOT_REQUIRED", "Optional")))
+  val COLLECTION_PROPERTY_META: RadioFormField = RadioFormField("COLLECTION_PROPERTY_META", Seq(("NON_META", "Non-meta"), ("META", "Meta")))
 
   case class StringFormField(name: String, minimumLength: Int, maximumLength: Int, regularExpression: RegularExpression = RegularExpression.ANY_STRING, errorMessage: String = "Regular expression validation failed!") {
     val placeHolder: String = PLACEHOLDER_PREFIX + name
@@ -110,6 +113,16 @@ object FormField {
     def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_LENGTH_ERROR, maximumLength)
 
     def getRegexErrorMessage()(implicit messagesProvider: MessagesProvider): String = regularExpression.getRegExErrorMessage()
+  }
+
+  case class RadioFormField(name: String, options: Seq[(String, String)], errorMessage: String = "Option not found") {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
+
+    def mapping: (String, Mapping[String]) = name -> text.verifying(constraint = field => options.map(_._1) contains field, error = errorMessage)
+
+    def optionalMapping: (String, Mapping[Option[String]]) = name -> optional(text.verifying(constraint = field => options.map(_._1) contains field, error = errorMessage))
+
+    def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(RADIO_BUTTON_ERROR_PREFIX + name)
   }
 
   case class SelectFormField(name: String, options: Seq[String], errorMessage: String = "Option not found") {
