@@ -1,14 +1,18 @@
-@import views.html.base.form._
 @import views.collection.companion.Create
+@import views.html.base.form._
 
-@(createForm: Form[Create.Data] = Create.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(createForm: Form[Create.Data] = Create.form, totalDrafts: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonForm(constants.Form.CREATE_COLLECTION, createForm) {
-    @commonInputText(createForm, constants.FormField.COLLECTION_NAME)
-    @commonDescriptionText(createForm, constants.FormField.COLLECTION_DESCRIPTION)
-    @commonToggleButton(createForm, constants.FormField.NSFW_COLLECTION)
-@*    @commonSelect(createForm, constants.FormField.COLLECTION_CATEGORY, Symbol("class") -> "custom-select sources", Symbol("placeholder") -> Messages(constants.View.ART))*@
-    @commonInputURL(createForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false)
-    @commonInputURL(createForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false)
-    @commonInputURL(createForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)
-}
+    @if(totalDrafts < constants.CommonConfig.MaxCollectionDrafts) {
+        @commonForm(constants.Form.CREATE_COLLECTION, createForm) {
+            @commonInputText(createForm, constants.FormField.COLLECTION_NAME)
+            @commonDescriptionText(createForm, constants.FormField.COLLECTION_DESCRIPTION)
+            @commonToggleButton(createForm, constants.FormField.NSFW_COLLECTION)
+            @* @commonSelect(createForm, constants.FormField.COLLECTION_CATEGORY, Symbol("class") -> "custom-select sources", Symbol("placeholder") -> Messages(constants.View.ART))*@
+            @commonInputURL(createForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false)
+            @commonInputURL(createForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false)
+            @commonInputURL(createForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)
+        }
+    } else {
+        @Messages(constants.View.MAX_DRAFT_COLLECTIONS_REACHED)
+    }

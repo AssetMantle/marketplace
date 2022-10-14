@@ -43,6 +43,8 @@ object CommonConfig {
     val NotificationsPerPage: Int = config.get[Int]("webApp.notificationsPerPage")
   }
 
+  val MaxCollectionDrafts: Int = config.get[Int]("webApp.maxCollectionDrafts")
+
   object Files {
     val RootFilePath: String = config.get[String]("upload.rootFilePath")
     val CollectionPath: String = config.get[String]("upload.collectionPath")

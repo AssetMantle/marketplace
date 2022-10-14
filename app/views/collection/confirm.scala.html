@@ -1,0 +1,9 @@
+@import views.html.base.form._
+@import views.collection.companion.Confirm
+@import models.masterTransaction.CollectionDraft
+
+@(confirmForm: Form[Confirm.Data] = Confirm.form, draft: CollectionDraft)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.CONFIRM_COLLECTION, confirmForm) {
+    @commonInputText(confirmForm, constants.FormField.COLLECTION_ID, Symbol("value") -> draft.id, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
+}

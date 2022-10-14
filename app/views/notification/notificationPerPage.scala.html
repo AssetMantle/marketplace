@@ -1,0 +1,46 @@
+@import controllers.actions.LoginState
+@import models.masterTransaction.Notification
+
+@(notifications: Seq[Notification])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@notifications.map { notification =>
+    @if(notification.read) {
+        <div class="separator"></div>
+        <div class="notificationList">
+            <div class="notificationListTitle">@Messages(constants.View.NOTIFICATION_POPUP_TITLE_NEW)</div>
+            <div class="list">
+                <div class="mb-4 singleNotification">
+                    <div class="d-flex gap-2">
+                        <div class="d-flex justify-content-center align-items-center notificationIcon">
+                            <i class="bi bi-tag iconWhite"></i>
+                        </div>
+                        <div class="notificationDetail">
+                            <div class="mb-2 title">@Messages(notification.title)</div>
+                            <div class="mb-2 description">@Messages(notification.message, notification.messageParameters)</div>
+                            <div class="dateTime">@notification.createdOnMillisEpoch</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    } else {
+        <div class="separator"></div>
+        <div class="notificationList">
+            <div class="notificationListTitle">@Messages(constants.View.NOTIFICATION_POPUP_TITLE_OLD)</div>
+            <div class="list">
+                <div class="mb-4 singleNotification">
+                    <div class="d-flex gap-2">
+                        <div class="d-flex justify-content-center align-items-center notificationIcon">
+                            <i class="bi bi-tag iconWhite"></i>
+                        </div>
+                        <div class="notificationDetail">
+                            <div class="mb-2 title">@Messages(notification.title)</div>
+                            <div class="mb-2 description">@Messages(notification.message, notification.messageParameters)</div>
+                            <div class="dateTime">@notification.createdOnMillisEpoch</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

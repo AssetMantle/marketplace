@@ -1,6 +1,6 @@
 package views.collection.companion
 
-import models.master.SocialProfile
+import models.common.Collection._
 import play.api.data.Form
 import play.api.data.Forms.mapping
 

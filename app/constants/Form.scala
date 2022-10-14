@@ -27,6 +27,7 @@ object Form {
   val CREATE_COLLECTION: Form = Form("CREATE_COLLECTION", routes.javascript.CollectionController.createForm, routes.CollectionController.create())
   val EDIT_COLLECTION: Form = Form("EDIT_COLLECTION", routes.javascript.CollectionController.editForm, routes.CollectionController.edit())
   val DEFINE_COLLECTION_PROPERTIES: Form = Form("DEFINE_COLLECTION_PROPERTIES", routes.javascript.CollectionController.definePropertiesForm, routes.CollectionController.defineProperties())
+  val CONFIRM_COLLECTION: Form = Form("CONFIRM_COLLECTION", routes.javascript.CollectionController.confirmForm, routes.CollectionController.confirm())
 
   val ADD_MANAGED_KEY: Form = Form("ADD_MANAGED_KEY", routes.javascript.SettingController.addManagedKeyForm, routes.SettingController.addManagedKey())
   val ADD_UNMANAGED_KEY: Form = Form("ADD_UNMANAGED_KEY", routes.javascript.SettingController.addUnmanagedKeyForm, routes.SettingController.addUnmanagedKey())
@@ -39,5 +40,9 @@ object Form {
   val EDIT_WHITELIST: Form = Form("EDIT_WHITELIST", routes.javascript.WhitelistController.editWhitelistForm, routes.WhitelistController.editWhitelist())
   val ACCEPT_WHITELIST_INVITE: Form = Form("ACCEPT_WHITELIST_INVITE", JavaScriptReverseRoute("", ""), routes.WhitelistController.acceptInvite())
   val LEAVE_WHITELIST: Form = Form("LEAVE_WHITELIST", JavaScriptReverseRoute("", ""), routes.WhitelistController.leaveWhitelist())
+
+  val NFT_BASIC_DETAIL: Form = Form("NFT_BASIC_DETAIL", routes.javascript.NFTController.basicDetailsForm, routes.NFTController.basicDetails())
+  val NFT_ADD_PROPERTIES: Form = Form("NFT_ADD_PROPERTIES", routes.javascript.NFTController.addPropertiesForm, routes.NFTController.addProperties())
+  val NFT_TAGS: Form = Form("NFT_TAGS", routes.javascript.NFTController.tagsForm, routes.NFTController.tags())
 
 }

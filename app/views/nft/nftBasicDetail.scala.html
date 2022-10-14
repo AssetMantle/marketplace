@@ -1,0 +1,14 @@
+@import views.html.base.form._
+@import views.nft.companion.NFTBasicDetail
+@import views.html.base.commonUploadFile
+
+@(nftBasicDetailForm: Form[NFTBasicDetail.Data] = NFTBasicDetail.form, collectionId: String, fileName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.NFT_BASIC_DETAIL, nftBasicDetailForm) {
+    @commonInputText(nftBasicDetailForm, constants.FormField.NFT_NAME)
+    @commonDescriptionText(nftBasicDetailForm, constants.FormField.NFT_DESCRIPTION)
+    @commonInputText(nftBasicDetailForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionId, Symbol("containerDivClass") -> "hidden")
+    @commonInputText(nftBasicDetailForm, constants.FormField.NFT_FILE_NAME, Symbol("value") -> fileName, Symbol("containerDivClass") -> "hidden")
+}
+
+@commonUploadFile(constants.File.NFT_FILE_FORM, id = collectionId, documentType = constants.View.NFT)

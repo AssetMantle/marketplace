@@ -61,7 +61,12 @@ object FormField {
   val COLLECTION_ID: StringFormField = StringFormField("COLLECTION_ID", 16, 16)
   val COLLECTION_PROPERTY_NAME: StringFormField = StringFormField("COLLECTION_PROPERTY_NAME", 1, 30)
   val COLLECTION_PROPERTY_FIXED_VALUE: StringFormField = StringFormField("COLLECTION_PROPERTY_FIXED_VALUE", 1, 30)
-  val NFT_ID: StringFormField = StringFormField("NFT_ID", 1, 100)
+  val NFT_NAME: StringFormField = StringFormField("NFT_NAME", 3, 50)
+  val NFT_DESCRIPTION: StringFormField = StringFormField("NFT_DESCRIPTION", 0, 256)
+  val NFT_FILE_NAME: StringFormField = StringFormField("NFT_FILE_NAME", 64, 255)
+  val NFT_TAGS: StringFormField = StringFormField("NFT_TAGS", 2, 255)
+  val NFT_PROPERTY_NAME: StringFormField = StringFormField("NFT_PROPERTY_NAME", 1, 30)
+  val NFT_PROPERTY_VALUE: StringFormField = StringFormField("NFT_PROPERTY_VALUE", 1, 30)
 
   // UrlFormField
   val COLLECTION_WEBSITE: UrlFormField = UrlFormField("COLLECTION_WEBSITE")
@@ -82,7 +87,7 @@ object FormField {
   val NSFW_COLLECTION: BooleanFormField = BooleanFormField("NSFW_COLLECTION")
   val COLLECTION_PROPERTY_REQUIRED: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_REQUIRED")
   val COLLECTION_PROPERTY_MUTABLE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_MUTABLE")
-  val COLLECTION_PROPERTY_HIDE_VALUE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_HIDE_VALUE")
+  val COLLECTION_PROPERTY_META: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_META")
 
   // SelectFormField
   val GAS_PRICE: SelectFormField = SelectFormField("GAS_PRICE", Seq(constants.CommonConfig.Blockchain.LowGasPrice.toString, constants.CommonConfig.Blockchain.MediumGasPrice.toString, constants.CommonConfig.Blockchain.HighGasPrice.toString))
@@ -94,6 +99,7 @@ object FormField {
 
   // NestedFormField
   val COLLECTION_PROPERTIES: NestedFormField = NestedFormField("COLLECTION_PROPERTIES")
+  val NFT_PROPERTIES: NestedFormField = NestedFormField("NFT_PROPERTIES")
 
   case class StringFormField(name: String, minimumLength: Int, maximumLength: Int, regularExpression: RegularExpression = RegularExpression.ANY_STRING, errorMessage: String = "Regular expression validation failed!") {
     val placeHolder: String = PLACEHOLDER_PREFIX + name

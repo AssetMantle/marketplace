@@ -20,7 +20,7 @@
                             </div>
                             @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_REQUIRED)
                             @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
-                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE_VALUE)
+                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_META)
                         </div>
                     } else {
                         <div id='@Seq(constants.View.COLLECTION_PROPERTY, index).mkString("_")' class="singlePropertyContainer" style="display: none;">
@@ -31,7 +31,7 @@
                             </div>
                             @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_REQUIRED)
                             @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
-                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE_VALUE)
+                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_META)
                             <button type="button" class="form-secondary-button" onclick="removeProperty(@index)">Delete</button>
                         </div>
                     }

@@ -35,5 +35,6 @@ object File {
   case class FileUploadForm(name: String, get: JavaScriptReverseRoute, store: JavaScriptReverseRoute, upload: JavaScriptReverseRoute, fileTypes: Seq[String], maxFileSize: Long = 10485760)
 
   val COLLECTION_FILE_FORM: FileUploadForm = FileUploadForm("COLLECTION_FILE_FORM", get = routes.javascript.CollectionController.uploadCollectionFileForm, store = routes.javascript.CollectionController.storeCollectionFile, upload = routes.javascript.CollectionController.uploadCollectionFile, fileTypes = ALL_IMAGES_WITH_GIF)
+  val NFT_FILE_FORM: FileUploadForm = FileUploadForm("NFT_FILE_FORM", get = routes.javascript.NFTController.uploadNFTFileForm, store = routes.javascript.NFTController.storeNFTFile, upload = routes.javascript.NFTController.uploadNFTFile, fileTypes = ALL_IMAGES_WITH_GIF)
 
 }

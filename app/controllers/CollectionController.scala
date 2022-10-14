@@ -2,7 +2,8 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
-import models.master
+import models.masterTransaction.CollectionDraft
+import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -24,7 +25,7 @@ class CollectionController @Inject()(
                                       withLoginAction: WithLoginAction,
                                       masterAccounts: master.Accounts,
                                       masterCollections: master.Collections,
-                                      masterCollectionProperties: master.CollectionProperties,
+                                      masterTransactionCollectionDrafts: masterTransaction.CollectionDrafts,
                                       masterNFTs: master.NFTs,
                                       masterCollectionFiles: master.CollectionFiles,
                                       masterWishLists: master.WishLists,
@@ -144,53 +145,55 @@ class CollectionController @Inject()(
     }
   }
 
-  def createdSection(accountId: String): EssentialAction = cached.apply(req => req.path + accountId, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        Future(Ok(views.html.profile.created.createdSection(accountId)))
-    }
+  // createdSection: Do not do caching here as it will then show draft collections to non-owners
+  def createdSection(accountId: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    implicit val optionalLoginState: Option[LoginState] = None
+    Ok(views.html.profile.created.createdSection(accountId))
   }
 
-  def createdCollectionPerPage(accountId: String, pageNumber: Int): EssentialAction = cached.apply(req => req.path + accountId + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val collections = masterCollections.Service.getByCreatorAndPage(accountId, pageNumber)
-        val totalCreated = masterCollections.Service.totalCreated(accountId)
+  // createdCollectionPerPage: Do not do caching here as it will then show draft collections to non-owners
+  def createdCollectionPerPage(accountId: String, pageNumber: Int): Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
+    implicit request =>
+      val collections = masterCollections.Service.getByCreatorAndPage(accountId, pageNumber)
+      val totalCreated = masterCollections.Service.totalCreated(accountId)
+      val drafts = if (pageNumber == 1 && optionalLoginState.fold("")(_.username) == accountId) masterTransactionCollectionDrafts.Service.getByCreatorAndPage(accountId, pageNumber)
+      else Future(Seq())
 
-        def allCollectionFiles(collectionIds: Seq[String]) = masterCollectionFiles.Service.get(collectionIds)
+      def allCollectionFiles(collectionIds: Seq[String]) = masterCollectionFiles.Service.get(collectionIds)
 
-        (for {
-          totalCreated <- totalCreated
-          collections <- collections
-          collectionFiles <- allCollectionFiles(collections.map(_.id))
-        } yield Ok(views.html.profile.created.collectionPerPage(collections, collectionFiles = collectionFiles, totalCollections = totalCreated))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
+      (for {
+        totalCreated <- totalCreated
+        collections <- collections
+        drafts <- drafts
+        collectionFiles <- allCollectionFiles(collections.map(_.id))
+      } yield Ok(views.html.profile.created.collectionPerPage(collections, collectionFiles = collectionFiles, drafts = drafts, totalCollections = totalCreated))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
-  def createForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.collection.create())
+  def createForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val totalDrafts = masterTransactionCollectionDrafts.Service.totalDrafts(loginState.username)
+      for {
+        totalDrafts <- totalDrafts
+      } yield Ok(views.html.collection.create(totalDrafts = totalDrafts))
   }
 
   def create(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Create.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.collection.create(formWithErrors)))
+          Future(BadRequest(views.html.collection.create(formWithErrors, 0)))
         },
         createData => {
-          val collectionId = masterCollections.Service.add(name = createData.name, description = createData.description, website = "", socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw)
-
-          def addDefaultProperties(id: String) = masterCollectionProperties.Service.addMultiple(constants.Collection.DefaultProperty.getDefaultProperties(id))
+          val collectionId = masterTransactionCollectionDrafts.Service.add(name = createData.name, description = createData.description, socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw)
 
           (for {
             collectionId <- collectionId
-            _ <- addDefaultProperties(collectionId)
           } yield PartialContent(views.html.collection.uploadFile(id = collectionId))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message)))
+            case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message), 0))
           }
         }
       )
@@ -207,14 +210,13 @@ class CollectionController @Inject()(
           Future(BadRequest(views.html.collection.edit(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))))
         },
         editData => {
-
-          val update = masterCollections.Service.checkOwnerAndUpdate(id = editData.collectionId, name = editData.name, description = editData.description, socialProfiles = editData.getSocialProfiles, category = constants.Collection.Category.ART, ownerId = loginState.username, nsfw = editData.nsfw)
+          val update = masterTransactionCollectionDrafts.Service.checkOwnerAndUpdate(id = editData.collectionId, name = editData.name, description = editData.description, socialProfiles = editData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = editData.nsfw)
 
           (for {
             _ <- update
           } yield PartialContent(views.html.collection.uploadFile(id = editData.collectionId))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message)))
+            case baseException: BaseException => BadRequest(views.html.collection.edit(Edit.form.withGlobalError(baseException.failure.message), editData.collectionId))
           }
         }
       )
@@ -222,7 +224,7 @@ class CollectionController @Inject()(
 
   def uploadCollectionFileForm(id: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val checkCollectionOwner = masterCollections.Service.isOwner(id = id, accountId = loginState.username)
+      val checkCollectionOwner = masterTransactionCollectionDrafts.Service.isOwner(id = id, accountId = loginState.username)
       (for {
         collectionOwner <- checkCollectionOwner
       } yield if (collectionOwner) Ok(views.html.base.commonUploadFile(constants.File.COLLECTION_FILE_FORM, id = id, documentType = documentType))
@@ -243,7 +245,7 @@ class CollectionController @Inject()(
             request.body.file(constants.File.KEY_FILE) match {
               case None => BadRequest(constants.View.BAD_REQUEST)
               case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.COLLECTION_FILE_FORM.maxFileSize) {
-                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, constants.Collection.getFilePath(documentType))
+                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, constants.Collection.getFilePath(id = id, documentType = documentType))
                 Ok
               } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
             }
@@ -256,11 +258,11 @@ class CollectionController @Inject()(
 
   def uploadCollectionFile(id: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val oldFilePath = constants.Collection.getFilePath(documentType) + name
+      val oldFilePath = constants.Collection.getFilePath(id = id, documentType = documentType) + name
       val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
       val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(name)
       val awsKey = id + "/others/" + newFileName
-      val isOwner = masterCollections.Service.isOwner(id = id, accountId = loginState.username)
+      val isOwner = masterTransactionCollectionDrafts.Service.isOwner(id = id, accountId = loginState.username)
 
       def uploadToAws(isOwner: Boolean) = if (isOwner) Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
       else {
@@ -268,11 +270,18 @@ class CollectionController @Inject()(
         constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
       }
 
-      def add = masterCollectionFiles.Service.add(id = id, documentType = documentType, fileName = newFileName)
+      def deleteLocalFile() = Future(utilities.FileOperations.deleteFile(oldFilePath))
+
+      def add = documentType match {
+        case constants.Collection.File.PROFILE => masterTransactionCollectionDrafts.Service.updateProfile(id = id, fileName = newFileName)
+        case constants.Collection.File.COVER => masterTransactionCollectionDrafts.Service.updateCover(id = id, fileName = newFileName)
+        case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwFutureBaseException()
+      }
 
       (for {
         isOwner <- isOwner
         _ <- uploadToAws(isOwner)
+        _ <- deleteLocalFile()
         _ <- add
       } yield Ok
         ).recover {
@@ -292,19 +301,55 @@ class CollectionController @Inject()(
         },
         definePropertiesData => {
 
-          val update = Future {
-            println(definePropertiesData)
-            println(definePropertiesData.properties)
-          }
+          val update = masterTransactionCollectionDrafts.Service.updateProperties(definePropertiesData.collectionId, definePropertiesData.getSerializableProperties)
 
           (for {
             _ <- update
           } yield Ok
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message)))
+            case baseException: BaseException => BadRequest(views.html.collection.defineProperties(DefineProperties.form.withGlobalError(baseException.failure.message), definePropertiesData.collectionId))
           }
         }
       )
   }
+
+  def confirmForm(id: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val draft = masterTransactionCollectionDrafts.Service.tryGet(id)
+      (for {
+        draft <- draft
+      } yield Ok(views.html.collection.confirm(draft = draft))).recover {
+        case baseException: BaseException => BadRequest
+      }
+  }
+
+  def confirm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Confirm.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest)
+        },
+        confirmData => {
+          val draft = masterTransactionCollectionDrafts.Service.tryGet(confirmData.collectionId)
+
+          def add(draft: CollectionDraft) = masterCollections.Service.add(draft.toCollection)
+
+          def addFiles(draft: CollectionDraft) = {
+            val files = Seq(draft.getCollectionCoverFile, draft.getCollectionProfileFile).flatten
+            if (files.nonEmpty) masterCollectionFiles.Service.insertOrUpdate(files) else Future()
+          }
+
+          (for {
+            draft <- draft
+            _ <- add(draft)
+            _ <- addFiles(draft)
+          } yield PartialContent(views.html.collection.createSuccessful(draft))
+            ).recover {
+            case baseException: BaseException => BadRequest
+          }
+        }
+      )
+  }
+
 
 }

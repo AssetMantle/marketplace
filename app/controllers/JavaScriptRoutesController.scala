@@ -57,6 +57,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.details,
         routes.javascript.NFTController.file,
         routes.javascript.NFTController.likesCounter,
+        routes.javascript.NFTController.selectCollection,
+        routes.javascript.NFTController.uploadNFTFileForm,
+        routes.javascript.NFTController.storeNFTFile,
+        routes.javascript.NFTController.uploadNFTFile,
+        routes.javascript.NFTController.basicDetailsForm,
+        routes.javascript.NFTController.addPropertiesForm,
 
         routes.javascript.SettingController.viewSettings,
         routes.javascript.SettingController.settings,
@@ -68,7 +74,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SettingController.viewMnemonicsForm,
         routes.javascript.SettingController.deleteKeyForm,
         routes.javascript.SettingController.walletBalance,
-        routes.javascript.SettingController.notificationPopup,
 
 
         //        routes.javascript.ProfileController.viewOffers,
@@ -79,6 +84,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ProfileController.viewProfile,
         routes.javascript.ProfileController.profile,
+        routes.javascript.ProfileController.notificationPopup,
+        routes.javascript.ProfileController.notificationPopupPerPage,
 
         routes.javascript.WhitelistController.whitelistSection,
         routes.javascript.WhitelistController.createdWhitelists,

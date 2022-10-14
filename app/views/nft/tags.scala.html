@@ -1,0 +1,11 @@
+@import views.html.base.form._
+@import views.nft.companion.NFTTags
+@import views.html.base.commonUploadFile
+
+@(nftTagsForm: Form[NFTTags.Data] = NFTTags.form, collectionId: String, fileName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.NFT_TAGS, nftTagsForm) {
+    @commonInputText(nftTagsForm, constants.FormField.NFT_TAGS)
+    @commonInputText(nftTagsForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionId, Symbol("containerDivClass") -> "hidden")
+    @commonInputText(nftTagsForm, constants.FormField.NFT_FILE_NAME, Symbol("value") -> fileName, Symbol("containerDivClass") -> "hidden")
+}

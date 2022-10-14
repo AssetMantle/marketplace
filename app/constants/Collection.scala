@@ -1,9 +1,6 @@
 package constants
 
-import models.master.CollectionProperty
 import play.api.Logger
-
-import scala.concurrent.ExecutionContext
 
 object Collection {
 
@@ -18,13 +15,15 @@ object Collection {
     val INSTAGRAM = "INSTAGRAM"
   }
 
-  def getFilePath(documentType: String)(implicit module: String, logger: Logger): String = {
+  def getFilePath(id: String, documentType: String)(implicit module: String, logger: Logger): String = {
     documentType match {
-      case File.PROFILE => constants.CommonConfig.Files.CollectionPath + "/"
-      case File.COVER => constants.CommonConfig.Files.CollectionPath + "/"
+      case File.PROFILE => constants.CommonConfig.Files.CollectionPath + "/" + id + "/" + File.PROFILE + "/"
+      case File.COVER => constants.CommonConfig.Files.CollectionPath + "/" + id + "/" + File.COVER + "/"
       case _ => constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION.throwBaseException()
     }
   }
+
+  def getNFTFilePath(collectionId: String)(implicit module: String, logger: Logger): String = constants.CommonConfig.Files.CollectionPath + "/" + collectionId + "/nfts/"
 
   object Category {
     val ART = "ART"
@@ -40,8 +39,6 @@ object Collection {
     val NSFW = "nsfw"
 
     val list: Seq[String] = Seq(NAME, DESCRIPTION, CATEGORY, NSFW)
-
-    def getDefaultProperties(id: String): Seq[CollectionProperty] = list.map(x => CollectionProperty(id = id, propertyName = x, propertyType = PropertyData.Type.STRING, required = true, mutable = false, fixedValue = None, hideValue = false))
   }
 
   object NFT {
