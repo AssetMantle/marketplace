@@ -13,6 +13,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class CollectionDraft(id: String, creatorId: String, name: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, properties: Option[Seq[Property]], profileFileName: Option[String], coverFileName: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
+  def getWebsite: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.WEBSITE).map(_.url)
+
+  def getTwitter: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.TWITTER).map(_.url)
+
+  def getInstagram: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.INSTAGRAM).map(_.url)
+
   def toCollection: Collection = Collection(id = id, creatorId = creatorId, classificationId = None, name = name, description = description, website = "", socialProfiles = socialProfiles, category = category, nsfw = nsfw, properties = this.properties)
 
   def getCollectionProfileFile: Option[CollectionFile] = this.profileFileName.map(x => CollectionFile(id = id, documentType = constants.Collection.File.PROFILE, fileName = x, file = Array.emptyByteArray))

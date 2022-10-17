@@ -3,11 +3,12 @@
 @import views.html.helper.repeatWithIndex
 @import views.html.base.buttons.commonTertiaryButton
 @import views.html.collection.commonPropertyBox
+@import models.masterTransaction.CollectionDraft
 
-@(definePropertiesForm: Form[DefineProperties.Data] = DefineProperties.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(definePropertiesForm: Form[DefineProperties.Data] = DefineProperties.form, collectionDraft: Option[CollectionDraft])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm, submitDisable = false) {
-    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> id, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
+    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionDraft.fold("")(_.id), Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
     <div id="basicInfoContainer" class="propertyInfoContainer">
         <div class="singleProperty">
             <div class="d-flex justify-content-between align-content-center propertyHeaderContainer">
@@ -20,8 +21,8 @@
                 </div>
             </div>
             <div class="propertyDetail">
-                @commonPropertyBox(index = 1, label = constants.View.PROPERTY_TITLE_COLLECTION_NAME, value = constants.View.PROPERTY_TITLE_COLLECTION_NAME, visibility = true, requirement = true)
-                @commonPropertyBox(index = 2, label = constants.View.PROPERTY_TITLE_DESCRIPTION, value = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", visibility = true, requirement = true)
+                @commonPropertyBox(index = 1, label = constants.View.PROPERTY_TITLE_COLLECTION_NAME, value = collectionDraft.fold("")(_.name), visibility = true, requirement = true)
+                @commonPropertyBox(index = 2, label = constants.View.PROPERTY_TITLE_DESCRIPTION, value = collectionDraft.fold("")(_.description), visibility = true, requirement = true)
             </div>
             <div class="separator"></div>
         </div>

@@ -199,15 +199,28 @@ class CollectionController @Inject()(
       )
   }
 
-  def editForm(id: String): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.collection.edit(id = id))
+  def editForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id)
+      (for {
+        collectionDraft <- collectionDraft
+      } yield if (collectionDraft.creatorId == loginState.username) Ok(views.html.collection.edit(collectionDraft = Option(collectionDraft))) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
   }
 
   def edit(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Edit.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.collection.edit(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))))
+          val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))
+          (for {
+            collectionDraft <- collectionDraft
+          } yield if (collectionDraft.creatorId == loginState.username) BadRequest(views.html.collection.edit(formWithErrors, Option(collectionDraft))) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
         },
         editData => {
           val update = masterTransactionCollectionDrafts.Service.checkOwnerAndUpdate(id = editData.collectionId, name = editData.name, description = editData.description, socialProfiles = editData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = editData.nsfw)
@@ -216,7 +229,7 @@ class CollectionController @Inject()(
             _ <- update
           } yield PartialContent(views.html.collection.uploadFile(id = editData.collectionId))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.collection.edit(Edit.form.withGlobalError(baseException.failure.message), editData.collectionId))
+            case baseException: BaseException => BadRequest(views.html.collection.edit(Edit.form.withGlobalError(baseException.failure.message), None))
           }
         }
       )
@@ -289,15 +302,28 @@ class CollectionController @Inject()(
       }
   }
 
-  def definePropertiesForm(id: String): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.collection.defineProperties(id = id))
+  def definePropertiesForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id)
+      (for {
+        collectionDraft <- collectionDraft
+      } yield if (collectionDraft.creatorId == loginState.username) Ok(views.html.collection.defineProperties(collectionDraft = Option(collectionDraft))) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
   }
 
   def defineProperties(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       DefineProperties.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.collection.defineProperties(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))))
+          val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))
+          (for {
+            collectionDraft <- collectionDraft
+          } yield if (collectionDraft.creatorId == loginState.username) BadRequest(views.html.collection.defineProperties(formWithErrors, Option(collectionDraft))) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
         },
         definePropertiesData => {
 
@@ -307,7 +333,7 @@ class CollectionController @Inject()(
             _ <- update
           } yield Ok
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.collection.defineProperties(DefineProperties.form.withGlobalError(baseException.failure.message), definePropertiesData.collectionId))
+            case baseException: BaseException => BadRequest(views.html.collection.defineProperties(DefineProperties.form.withGlobalError(baseException.failure.message), None))
           }
         }
       )
