@@ -8,7 +8,11 @@
     @commonInputText(editForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionDraft.fold("")(_.id), Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
     @commonInputText(editForm, constants.FormField.COLLECTION_NAME, Symbol("value") -> collectionDraft.fold("")(_.name))
     @commonDescriptionText(editForm, constants.FormField.COLLECTION_DESCRIPTION, Symbol("value") -> collectionDraft.fold("")(_.description))
-    @commonToggleButton(editForm, constants.FormField.NSFW_COLLECTION, Symbol("value") -> collectionDraft.fold("")(_.nsfw.toString))
+    @if(collectionDraft.fold("")(_.nsfw.toString) == "true"){
+        @commonToggleButton(editForm, constants.FormField.NSFW_COLLECTION, Symbol("value") -> collectionDraft.fold("")(_.nsfw.toString), Symbol("checked") -> "checked")
+    }else{
+        @commonToggleButton(editForm, constants.FormField.NSFW_COLLECTION, Symbol("value") -> collectionDraft.fold("")(_.nsfw.toString))
+    }
 @*    @commonSelect(editForm, constants.FormField.COLLECTION_CATEGORY, Symbol("class") -> "custom-select sources", Symbol("placeholder") -> Messages(constants.View.ART))*@
     @commonInputURL(editForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false, Symbol("value") -> collectionDraft.fold("")(_.getWebsite.getOrElse(""))))
     @commonInputURL(editForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false, Symbol("value") -> collectionDraft.fold("")(_.getTwitter.getOrElse(""))))
