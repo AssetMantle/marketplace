@@ -49,7 +49,7 @@
                             @if(key.active) {
                                 <input type="radio" name="walletAddress" id='@key.address' checked/>
                             } else {
-                                <input type="radio" name="walletAddress" id='@key.address' onclick="changeActive('@key.address', '@keys.find(_.active).getOrElse("")')"/>
+                                <input type="radio" name="walletAddress" id='@key.address' onclick="changeActive('@key.address', '@keys.find(_.active).fold("")(_.address)')"/>
                             }
                         } else{
                             <input type="radio" name="walletAddress" style="visibility: hidden;"/>
