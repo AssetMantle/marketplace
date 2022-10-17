@@ -14,5 +14,8 @@
             @commonInputURL(createForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)
         }
     } else {
-        @Messages(constants.View.MAX_DRAFT_COLLECTIONS_REACHED)
+        <div class="d-flex gap-3 align-items-center maxDraftLimitInfo">
+            <i class="bi bi-info-circle iconDefault iconLarge"></i>
+            @Messages(constants.View.MAX_DRAFT_COLLECTIONS_REACHED)
+        </div>
     }
