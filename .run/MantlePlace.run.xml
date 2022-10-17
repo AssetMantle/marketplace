@@ -20,10 +20,10 @@
         <entry key="IPFS_DOWNLOAD_END_POINT" value="https://demo-assetmantle.mypinata.cloud/ipfs" />
         <entry key="IPFS_JWT" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIwMjYwZmRmYi1lZmRjLTRmZTktOGYwYi1jZjg4OTExOGFmMjkiLCJlbWFpbCI6InB1bmVldEBwZXJzaXN0ZW5jZS5vbmUiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJpZCI6IkZSQTEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlfSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiYTAyMWI1MWMzZWVlOGQ2NWU0MjciLCJzY29wZWRLZXlTZWNyZXQiOiJiNzQyMmQ5ZDNhNGQyNzViYmI0M2VhMDU1OTlmNzA2ODgzZTUxNjMyNzcxMjRiYjZlOWM5Yjg2YjBkZDBhNGUyIiwiaWF0IjoxNjM0NjQ5MTg4fQ.i514LU4xYYu95OvuZJ6vhWKgUqmXxnkhMMmDw-GmpCg" />
         <entry key="IPFS_UPLOAD_END_POINT" value="https://api.pinata.cloud/pinning/pinFileToIPFS" />
-        <entry key="POSTGRES_DB" value="mantlePlaceProd" />
-        <entry key="POSTGRES_PASSWORD" value="postgres" />
+        <entry key="POSTGRES_DB" value="mantlePlace" />
+        <entry key="POSTGRES_PASSWORD" value="mantlePlace" />
         <entry key="POSTGRES_URL" value="localhost:5432" />
-        <entry key="POSTGRES_USER" value="postgres" />
+        <entry key="POSTGRES_USER" value="mantlePlace" />
         <entry key="EXPLORER_POSTGRES_DB" value="assetMantle" />
         <entry key="EXPLORER_POSTGRES_PASSWORD" value="assetMantle" />
         <entry key="EXPLORER_POSTGRES_URL" value="localhost:5432" />
