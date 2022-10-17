@@ -1,8 +1,9 @@
 package constants
 
 import play.api.data.Forms._
-import play.api.data.{FormError, Mapping}
-import play.api.data.format.Formats.{bigDecimalFormat, doubleFormat}
+import play.api.data.Mapping
+import play.api.data.format.Formats._
+import play.api.data.format.Formatter
 import play.api.data.validation.Constraints
 import play.api.i18n.{Messages, MessagesProvider}
 import utilities.MicroNumber
@@ -10,8 +11,6 @@ import utilities.NumericOperation.checkPrecision
 
 import java.net.URL
 import java.util.Date
-import play.api.data.format.Formatter
-import play.api.data.format.Formats._
 
 object FormField {
 
@@ -100,9 +99,9 @@ object FormField {
   val NFT_PROPERTIES: NestedFormField = NestedFormField("NFT_PROPERTIES")
 
   // RadioFormField
-  val COLLECTION_PROPERTY_MUTABLE: RadioFormField = RadioFormField("COLLECTION_PROPERTY_MUTABLE", Seq(("IMMUTABLE", "Immutable"), ("MUTABLE", "Mutable")))
-  val COLLECTION_PROPERTY_REQUIRED: RadioFormField = RadioFormField("COLLECTION_PROPERTY_REQUIRED", Seq(("REQUIRED", "Required"), ("NOT_REQUIRED", "Optional")))
-  val COLLECTION_PROPERTY_META: RadioFormField = RadioFormField("COLLECTION_PROPERTY_META", Seq(("NON_META", "Non-meta"), ("META", "Meta")))
+  val COLLECTION_PROPERTY_MUTABLE: RadioFormField = RadioFormField("COLLECTION_PROPERTY_MUTABLE", Seq((constants.Collection.DefaultProperty.IMMUTABLE, constants.Collection.DefaultProperty.IMMUTABLE), (constants.Collection.DefaultProperty.MUTABLE, constants.Collection.DefaultProperty.MUTABLE)))
+  val COLLECTION_PROPERTY_REQUIRED: RadioFormField = RadioFormField("COLLECTION_PROPERTY_REQUIRED", Seq((constants.Collection.DefaultProperty.REQUIRED, constants.Collection.DefaultProperty.REQUIRED), (constants.Collection.DefaultProperty.NOT_REQUIRED, constants.Collection.DefaultProperty.NOT_REQUIRED)))
+  val COLLECTION_PROPERTY_META: RadioFormField = RadioFormField("COLLECTION_PROPERTY_META", Seq((constants.Collection.DefaultProperty.NON_META, constants.Collection.DefaultProperty.NON_META), (constants.Collection.DefaultProperty.META, constants.Collection.DefaultProperty.META)))
 
   case class StringFormField(name: String, minimumLength: Int, maximumLength: Int, regularExpression: RegularExpression = RegularExpression.ANY_STRING, errorMessage: String = "Regular expression validation failed!") {
     val placeHolder: String = PLACEHOLDER_PREFIX + name

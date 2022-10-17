@@ -38,6 +38,13 @@ object Collection {
     val CATEGORY = "category"
     val NSFW = "nsfw"
 
+    val IMMUTABLE = "IMMUTABLE"
+    val MUTABLE = "MUTABLE"
+    val REQUIRED = "REQUIRED"
+    val NOT_REQUIRED = "NOT_REQUIRED"
+    val NON_META = "NON_META"
+    val META = "META"
+
     val list: Seq[String] = Seq(NAME, DESCRIPTION, CATEGORY, NSFW)
   }
 
