@@ -117,9 +117,9 @@ function checkNewPassword() {
 function activeButton() {
     let termsCondition = document.getElementById("termsCondition");
     if (termsCondition.checked === true) {
-        $(".cmuk-button").removeClass("disable");
+        $("#FORM_SIGN_UP_SUBMIT").removeClass("disable");
     } else {
-        $(".cmuk-button").addClass("disable");
+        $("#FORM_SIGN_UP_SUBMIT").addClass("disable");
     }
 }
 

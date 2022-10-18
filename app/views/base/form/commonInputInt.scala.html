@@ -5,7 +5,7 @@
 @(formData: Form[_], formField: IntFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialFormField: Option[Field] = None)
 
 <div id='@arguments.toMap.get(Symbol("containerDivID")).map(_.toString).getOrElse("")' class='@arguments.toMap.get(Symbol("containerDivClass")).map(_.toString).getOrElse("commonInputInt")'>
-@defining(Seq(Symbol("type") -> "number", Symbol("_label") -> Messages(formField.name), Symbol("placeholder") -> Messages(formField.placeHolder), Symbol("min") -> formField.minimumValue, Symbol("max") -> formField.maximumValue, Symbol("class") -> "cmuk-input")) { defaultArguments =>
+@defining(Seq(Symbol("type") -> "number", Symbol("_label") -> Messages(formField.name), Symbol("placeholder") -> Messages(formField.placeHolder), Symbol("min") -> formField.minimumValue, Symbol("max") -> formField.maximumValue, Symbol("class") -> "am-input")) { defaultArguments =>
     @defining(
         sequentialFormField match {
             case Some(sequentialField: Field) => {
