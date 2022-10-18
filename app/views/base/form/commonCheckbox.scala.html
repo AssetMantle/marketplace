@@ -5,7 +5,7 @@
 @(formData: Form[_], formField: BooleanFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialFormField: Option[Field] = None)
 
 <div id='@arguments.toMap.get(Symbol("containerDivID")).map(_.toString).getOrElse("")' class='@arguments.toMap.get(Symbol("containerDivClass")).map(_.toString).getOrElse("commonCheckBox")'>
-@defining(Seq(Symbol("_label") -> Messages(formField.name), Symbol("class") -> "cmuk-checkbox")) { defaultArguments =>
+@defining(Seq(Symbol("_label") -> Messages(formField.name), Symbol("class") -> "am-checkbox")) { defaultArguments =>
     @defining(
         sequentialFormField match {
             case Some(sequentialField: Field) => {
