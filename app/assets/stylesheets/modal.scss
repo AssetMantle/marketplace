@@ -438,6 +438,9 @@ body.modal-open::-webkit-scrollbar {
         @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--inactive-gray));
         text-transform: capitalize;
       }
+      .propertyEdit{
+        cursor: pointer;
+      }
     }
 
     .propertyDetail {
