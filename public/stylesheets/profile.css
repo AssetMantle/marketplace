@@ -694,3 +694,35 @@ profileContainer .item-sticky .profile-card{
         height: 216px;
     }
 }
+.createNFTCard .createNFTBadge img{
+    width: 66px;
+    position: absolute;
+    top: 20px;
+    left: 0px;
+}
+.createNFTCard .card-img{
+    overflow: unset !important;
+}
+.createNFTCard .card-img img{
+    width: 94px !important;
+    height: 68px !important;
+    margin-right: -12px !important;
+}
+.createNFTCard .card-img .label{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    text-transform: capitalize;
+    color: var(--gray);
+}
+.createNFTCard .createNFTCardDetail .label{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    text-transform: capitalize;
+    color: var(--default);
+}
