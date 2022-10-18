@@ -1,5 +1,6 @@
 package constants
 
+import models.common.Collection.Property
 import play.api.Logger
 
 object Collection {
@@ -15,13 +16,7 @@ object Collection {
     val INSTAGRAM = "INSTAGRAM"
   }
 
-  def getFilePath(id: String, documentType: String)(implicit module: String, logger: Logger): String = {
-    documentType match {
-      case File.PROFILE => constants.CommonConfig.Files.CollectionPath + "/" + id + "/" + File.PROFILE + "/"
-      case File.COVER => constants.CommonConfig.Files.CollectionPath + "/" + id + "/" + File.COVER + "/"
-      case _ => constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION.throwBaseException()
-    }
-  }
+  def getFilePath: String = constants.CommonConfig.Files.CollectionPath + "/"
 
   def getNFTFilePath(collectionId: String)(implicit module: String, logger: Logger): String = constants.CommonConfig.Files.CollectionPath + "/" + collectionId + "/nfts/"
 
@@ -33,10 +28,12 @@ object Collection {
 
   object DefaultProperty {
     // Should be kept in lower case otherwise change in form constraints
-    val NAME = "name"
-    val DESCRIPTION = "description"
+    val NAME = "collectionName"
+    val DESCRIPTION = "collectionDescription"
     val CATEGORY = "category"
     val NSFW = "nsfw"
+    val NFT_NAME = "nftName"
+    val NFT_DESCRIPTION = "nftDescription"
 
     val IMMUTABLE = "IMMUTABLE"
     val MUTABLE = "MUTABLE"
@@ -45,15 +42,11 @@ object Collection {
     val NON_META = "NON_META"
     val META = "META"
 
-    val list: Seq[String] = Seq(NAME, DESCRIPTION, CATEGORY, NSFW)
-  }
+    val list: Seq[String] = Seq(NAME, DESCRIPTION, CATEGORY, NSFW, NFT_NAME, NFT_DESCRIPTION)
 
-  object NFT {
-    object Data {
-      val STRING = "STRING"
-      val NUMBER = "NUMBER"
-      val BOOLEAN = "BOOLEAN"
+    val defaultProperties: Seq[Property] = list.map { propertyName =>
+      if (propertyName != NSFW) Property(name = propertyName, `type` = constants.NFT.Data.STRING, `value` = "", required = true, meta = true, mutable = false)
+      else Property(name = propertyName, `type` = constants.NFT.Data.BOOLEAN, `value` = "", required = true, meta = true, mutable = false)
     }
   }
-
 }

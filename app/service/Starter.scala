@@ -43,14 +43,14 @@ class Starter @Inject()(
   implicit val StringPropertyReads: Reads[StringProperty] = Json.reads[StringProperty]
 
   case class NumberProperty(name: String, `type`: String, `value`: Int) extends NftProperty {
-    def toStringProperty: StringProperty = StringProperty(name = name, `type` = constants.Collection.NFT.Data.NUMBER, `value` = `value`.toString)
+    def toStringProperty: StringProperty = StringProperty(name = name, `type` = constants.NFT.Data.NUMBER, `value` = `value`.toString)
   }
 
   implicit val NumberPropertyReads: Reads[NumberProperty] = Json.reads[NumberProperty]
 
   def msgApply(`type`: String, value: JsObject): NftProperty = try {
     `type`.toLowerCase match {
-      case "string" => utilities.JSON.convertJsonStringToObject[StringProperty](value.toString).copy(`type` = constants.Collection.NFT.Data.STRING)
+      case "string" => utilities.JSON.convertJsonStringToObject[StringProperty](value.toString).copy(`type` = constants.NFT.Data.STRING)
       case "number" => utilities.JSON.convertJsonStringToObject[NumberProperty](value.toString).toStringProperty
     }
   }

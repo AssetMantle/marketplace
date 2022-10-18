@@ -1,27 +1,27 @@
-@(index:Number, label:String, value:String, mutability:Boolean=false, visibility:Boolean=false, requirement:Boolean=false)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(index: Number, label: String, value: String, mutability: Boolean = false, visibility: Boolean = false, requirement: Boolean = false)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="propertyBox">
-    <div class="propertyTitle">@Messages(constants.View.PROPERTY_NUMBER,index)</div>
+    <div class="propertyTitle">@Messages(constants.View.PROPERTY_NUMBER, index)</div>
     <div class="mt-3 propertyBoxItem">
         <span class="align-self-start propertyBoxItemLabel">@Messages(label)</span>
         <span class="align-self-start propertyBoxValue">
             <span class="username-data">@Messages(value)</span>
         </span>
         <span class="d-flex gap-2 justify-content-end align-self-end">
-            @if(mutability){
+            @if(mutability) {
                 <img src="@routes.Assets.versioned("images/icon/mutableDisable.png")" class="propertyIcon"/>
-            }else{
+            } else {
                 <img src="@routes.Assets.versioned("images/icon/immutableDisable.png")" class="propertyIcon"/>
             }
 
-            @if(visibility){
+            @if(visibility) {
                 <img src="@routes.Assets.versioned("images/icon/nonMetaDisable.png")" class="propertyIcon"/>
-            }else{
+            } else {
                 <img src="@routes.Assets.versioned("images/icon/metaDisable.png")" class="propertyIcon"/>
             }
 
-            @if(requirement){
+            @if(requirement) {
                 <img src="@routes.Assets.versioned("images/icon/requiredDisable.png")" class="propertyIcon"/>
-            }else{
+            } else {
                 <img src="@routes.Assets.versioned("images/icon/optionalDisable.png")" class="propertyIcon"/>
             }
 

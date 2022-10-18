@@ -1,156 +1,164 @@
-@import views.html.base.form._
-@import views.collection.companion.DefineProperties
-@import views.html.helper.repeatWithIndex
-@import views.html.base.buttons.commonTertiaryButton
-@import views.html.collection.commonPropertyBox
 @import models.masterTransaction.CollectionDraft
+@import views.collection.companion.DefineProperties
+@import views.html.base.buttons.commonTertiaryButton
+@import views.html.base.form._
+@import views.html.collection.commonPropertyBox
+@import views.html.helper.repeatWithIndex
 
 @(definePropertiesForm: Form[DefineProperties.Data] = DefineProperties.form, collectionDraft: Option[CollectionDraft])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm, submitDisable = false) {
-    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionDraft.fold("")(_.id), Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
-    <div id="basicInfoContainer" class="propertyInfoContainer">
-        <div class="singleProperty">
-            <div class="d-flex justify-content-between align-content-center propertyHeaderContainer">
-                <div class="d-flex gap-3 align-content-center">
-                    <div class="propertyHeading">@Messages(constants.View.CREATE_COLLECTION_TITLE_BASIC_INFORMATION)</div>
-                    <i class="bi bi-chevron-down iconDefault dropdownIcon" onclick="openPropertyDetail(this)"></i>
+    @commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm, submitDisable = false) {
+        @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionDraft.fold("")(_.id), Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
+        @commonCheckbox(definePropertiesForm, constants.FormField.SAVE_COLLECTION_DRAFT)
+        <div id="basicInfoContainer" class="propertyInfoContainer">
+            <div class="singleProperty">
+                <div class="d-flex justify-content-between align-content-center propertyHeaderContainer">
+                    <div class="d-flex gap-3 align-content-center">
+                        <div class="propertyHeading">@Messages(constants.View.CREATE_COLLECTION_TITLE_BASIC_INFORMATION)</div>
+                        <i class="bi bi-chevron-down iconDefault dropdownIcon" onclick="openPropertyDetail(this)"></i>
+                    </div>
+                    <div class="propertyEdit">
+                        <i class="bi bi-pencil iconDefault"></i>
+                    </div>
                 </div>
-                <div class="propertyEdit">
-                    <i class="bi bi-pencil iconDefault" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.EDIT_COLLECTION.get, s"'${collectionDraft.fold("")(_.id)}'"))"></i>
+                <div class="propertyDetail">
+                    @commonPropertyBox(index = 1, label = constants.View.PROPERTY_TITLE_COLLECTION_NAME, value = collectionDraft.fold("")(_.name), visibility = true, requirement = true)
+                    @commonPropertyBox(index = 2, label = constants.View.PROPERTY_TITLE_DESCRIPTION, value = collectionDraft.fold("")(_.description), visibility = true, requirement = true)
                 </div>
+                <div class="separator"></div>
             </div>
-            <div class="propertyDetail">
-                @commonPropertyBox(index = 1, label = constants.View.PROPERTY_TITLE_COLLECTION_NAME, value = collectionDraft.fold("")(_.name), visibility = true, requirement = true)
-                @commonPropertyBox(index = 2, label = constants.View.PROPERTY_TITLE_DESCRIPTION, value = collectionDraft.fold("")(_.description), visibility = true, requirement = true)
-            </div>
-            <div class="separator"></div>
-        </div>
 
-        <div class="singleProperty">
-            <div class="d-flex justify-content-between align-content-center propertyHeaderContainer">
-                <div class="d-flex gap-3 align-content-center">
-                    <div class="propertyHeading">@Messages(constants.View.CREATE_COLLECTION_TITLE_ADVANCED_INFORMATION)</div>
-                    <i class="bi bi-chevron-down iconDefault dropdownIcon" onclick="openPropertyDetail(this)"></i>
+            <div class="singleProperty">
+                <div class="d-flex justify-content-between align-content-center propertyHeaderContainer">
+                    <div class="d-flex gap-3 align-content-center">
+                        <div class="propertyHeading">@Messages(constants.View.CREATE_COLLECTION_TITLE_ADVANCED_INFORMATION)</div>
+                        <i class="bi bi-chevron-down iconDefault dropdownIcon" onclick="openPropertyDetail(this)"></i>
+                    </div>
+                    <div class="propertyEdit">
+                        <i class="bi bi-pencil iconDefault"></i>
+                    </div>
                 </div>
-                <div class="propertyEdit">
-                    <i class="bi bi-pencil iconDefault"></i>
+                <div class="propertyDetail">
+                    @commonPropertyBox(index = 3, label = constants.FormField.NFT_NAME.name, value = "", visibility = true, requirement = true)
+                    @commonPropertyBox(index = 4, label = constants.FormField.NFT_DESCRIPTION.name, value = "", visibility = true, requirement = true)
+                    @commonPropertyBox(index = 5, label = constants.FormField.NSFW_COLLECTION.name, value = collectionDraft.fold("")(_.nsfw.toString), visibility = true, requirement = true)
+                    @commonPropertyBox(index = 6, label = constants.FormField.COLLECTION_CATEGORY.name, value = collectionDraft.fold("")(_.category), visibility = true, requirement = true)
                 </div>
+                <div class="separator"></div>
             </div>
-            <div class="propertyDetail">
-                @commonPropertyBox(index = 3, label = constants.View.PROPERTY_TITLE_THUMBNAIL, value = constants.View.PROPERTY_TITLE_THUMBNAIL, visibility = true, requirement = true)
-                @commonPropertyBox(index = 4, label = constants.View.PROPERTY_TITLE_BANNER, value = constants.View.PROPERTY_TITLE_BANNER, visibility = true, requirement = true)
-            </div>
-            <div class="separator"></div>
-        </div>
 
-        @defining(Option(constants.FormField.COLLECTION_PROPERTIES)) { implicit nestedFormField =>
-            @repeatWithIndex(definePropertiesForm(constants.FormField.COLLECTION_PROPERTIES.name), min = constants.Blockchain.MaximumProperties - constants.Collection.DefaultProperty.list.length) { (propertyField, index) =>
-                @defining(Option(propertyField)) { implicit sequentialFormField =>
-                    <div id='@Seq(constants.View.COLLECTION_PROPERTY, index).mkString("_")' class="singlePropertyContainer" style="display: none;">
-                        <div class="propertyFormView active">
-                            <div class="d-flex justify-content-between align-items-center mb-4 addPropertyHeader">
-                                <span class="title">@Messages(constants.View.PROPERTY_NUMBER, (constants.Collection.DefaultProperty.list.length + 1 + index))</span>
-                                <i class="bi bi-trash iconDefault" onclick="removeProperty(@index)"></i>
-                            </div>
-                            <div class="d-flex gap-4">
-                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("required") -> false)
-                                @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources")
-                            </div>
-                            <div class="propertyAdvancedDetail">
-                                <div class="d-flex gap-2 align-content-center mt-3">
-                                    <div class="propertyHeading">@Messages(constants.View.PROPERTY_ADVANCED_OPTIONS)</div>
-                                    <i class="bi bi-chevron-down iconDefault iconSmall dropdownIcon" onclick="openPropertyAdvancedOption(this)"></i>
+            @defining(Option(constants.FormField.COLLECTION_PROPERTIES)) { implicit nestedFormField =>
+                @repeatWithIndex(definePropertiesForm(constants.FormField.COLLECTION_PROPERTIES.name), min = constants.Blockchain.MaximumProperties - constants.Collection.DefaultProperty.list.length) { (propertyField, index) =>
+                    @defining(Option(propertyField)) { implicit sequentialFormField =>
+                        <div id='@Seq(constants.View.COLLECTION_PROPERTY, index).mkString("_")' class="singlePropertyContainer" style="display: none;">
+                            <div class="propertyFormView active">
+                                <div class="d-flex justify-content-between align-items-center mb-4 addPropertyHeader">
+                                    <span class="title">@Messages(constants.View.PROPERTY_NUMBER, constants.Collection.DefaultProperty.list.length + 1 + index)</span>
+                                    <i class="bi bi-trash iconDefault" onclick="removeProperty(@index)"></i>
                                 </div>
-                                <div class="advancedDetailOption">
-                                    <div class="d-flex justify-content-between align-items-center singleOption">
-                                        <div class="d-flex gap-2 optionTitle">
-                                            <i class="bi bi-pencil iconDefault iconSmall me-1" style="transform: rotate(-90deg)"></i>
-                                            <span>@Messages(constants.View.ADVANCED_PROPERTY_MUTABILITY)</span>
-                                            <i class="bi bi-info-circle iconDefault iconSmall"></i>
-                                        </div>
-                                        <div class="options">
-                                        @commonRadio(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
-                                        </div>
+                                <div class="d-flex gap-4">
+                                @if(collectionDraft.isDefined && collectionDraft.get.properties.length > constants.Collection.DefaultProperty.list.length) {
+                                    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collectionDraft.get.properties(constants.Collection.DefaultProperty.list.length + index).name, Symbol("required") -> false)
+                                    @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("value") -> collectionDraft.get.properties(constants.Collection.DefaultProperty.list.length + index).`type`, Symbol("class") -> "custom-select sources")
+                                } else {
+                                    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("required") -> false)
+                                    @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources")
+                                }
+                                </div>
+                                <div class="propertyAdvancedDetail">
+                                    <div class="d-flex gap-2 align-content-center mt-3">
+                                        <div class="propertyHeading">@Messages(constants.View.PROPERTY_ADVANCED_OPTIONS)</div>
+                                        <i class="bi bi-chevron-down iconDefault iconSmall dropdownIcon" onclick="openPropertyAdvancedOption(this)"></i>
                                     </div>
-                                    <div class="d-flex justify-content-between align-items-center singleOption">
-                                        <div class="d-flex gap-2 optionTitle">
-                                            <i class="bi bi-eye iconDefault iconSmall me-1"></i>
-                                            <span>@Messages(constants.View.ADVANCED_PROPERTY_VISIBILITY)</span>
-                                            <i class="bi bi-info-circle iconDefault iconSmall"></i>
-                                        </div>
-                                        <div class="options">
-                                        @commonRadio(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_META)
-                                        </div>
-                                    </div>
-                                    <div class="requirementOption">
+                                    <div class="advancedDetailOption">
                                         <div class="d-flex justify-content-between align-items-center singleOption">
                                             <div class="d-flex gap-2 optionTitle">
-                                                <i class="bi bi-asterisk iconDefault iconSmall me-1"></i>
-                                                <span>@Messages(constants.View.ADVANCED_PROPERTY_REQUIREMENT)</span>
+                                                <i class="bi bi-pencil iconDefault iconSmall me-1" style="transform: rotate(-90deg)"></i>
+                                                <span>@Messages(constants.View.ADVANCED_PROPERTY_MUTABILITY)</span>
                                                 <i class="bi bi-info-circle iconDefault iconSmall"></i>
                                             </div>
                                             <div class="options">
-                                            @commonRadio(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_REQUIRED)
+                                            @commonRadio(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
                                             </div>
                                         </div>
-                                        <div class="optionInputField" style="display: none;">
-                                        @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_FIXED_VALUE, Symbol("required") -> false)
+                                        <div class="d-flex justify-content-between align-items-center singleOption">
+                                            <div class="d-flex gap-2 optionTitle">
+                                                <i class="bi bi-eye iconDefault iconSmall me-1"></i>
+                                                <span>@Messages(constants.View.ADVANCED_PROPERTY_VISIBILITY)</span>
+                                                <i class="bi bi-info-circle iconDefault iconSmall"></i>
+                                            </div>
+                                            <div class="options">
+                                            @commonRadio(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_META)
+                                            </div>
+                                        </div>
+                                        <div class="requirementOption">
+                                            <div class="d-flex justify-content-between align-items-center singleOption">
+                                                <div class="d-flex gap-2 optionTitle">
+                                                    <i class="bi bi-asterisk iconDefault iconSmall me-1"></i>
+                                                    <span>@Messages(constants.View.ADVANCED_PROPERTY_REQUIREMENT)</span>
+                                                    <i class="bi bi-info-circle iconDefault iconSmall"></i>
+                                                </div>
+                                                <div class="options">
+                                                @commonRadio(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_REQUIRED)
+                                                </div>
+                                            </div>
+                                            <div class="optionInputField" style="display: none;">
+                                            @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_FIXED_VALUE, Symbol("required") -> false)
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="separator"></div>
                             </div>
-                            <div class="separator"></div>
-                        </div>
-                        <div class="propertyCardView" style="display: none;">
-                            <div class="singleProperty">
-                                <div class="propertyDetail">
-                                    <div class="propertyBox">
-                                        <div class="d-flex justify-content-between">
-                                            <div class="propertyTitle">@Messages(constants.View.PROPERTY_NUMBER, (constants.Collection.DefaultProperty.list.length + 1 + index))</div>
-                                            <div class="d-flex gap-3">
-                                                <i class="bi bi-pencil iconDefault" onclick="updateProperty(@index)"></i>
-                                                <i class="bi bi-trash iconDefault" onclick="removeProperty(@index)"></i>
+                            <div class="propertyCardView" style="display: none;">
+                                <div class="singleProperty">
+                                    <div class="propertyDetail">
+                                        <div class="propertyBox">
+                                            <div class="d-flex justify-content-between">
+                                                <div class="propertyTitle">@Messages(constants.View.PROPERTY_NUMBER, (constants.Collection.DefaultProperty.list.length + 1 + index))</div>
+                                                <div class="d-flex gap-3">
+                                                    <i class="bi bi-pencil iconDefault" onclick="updateProperty(@index)"></i>
+                                                    <i class="bi bi-trash iconDefault" onclick="removeProperty(@index)"></i>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div class="mt-3 propertyBoxItem">
-                                            <span class="align-self-start propertyBoxItemLabel">@Messages(constants.View.PROPERTY_CARD_LABEL_NAME)</span>
-                                            <span class="align-self-start propertyBoxValue">
-                                                <span class="propertyCardName"></span>
-                                            </span>
-                                        </div>
+                                            <div class="mt-3 propertyBoxItem">
+                                                <span class="align-self-start propertyBoxItemLabel">@Messages(constants.View.PROPERTY_CARD_LABEL_NAME)</span>
+                                                <span class="align-self-start propertyBoxValue">
+                                                    <span class="propertyCardName"></span>
+                                                </span>
+                                            </div>
 
-                                        <div class="mt-3 propertyBoxItem">
-                                            <span class="align-self-start propertyBoxItemLabel">@Messages(constants.View.PROPERTY_CARD_LABEL_TYPE)</span>
-                                            <span class="align-self-start propertyBoxValue">
-                                                <span class="propertyCardType"></span>
-                                            </span>
-                                        </div>
+                                            <div class="mt-3 propertyBoxItem">
+                                                <span class="align-self-start propertyBoxItemLabel">@Messages(constants.View.PROPERTY_CARD_LABEL_TYPE)</span>
+                                                <span class="align-self-start propertyBoxValue">
+                                                    <span class="propertyCardType"></span>
+                                                </span>
+                                            </div>
 
-                                        <div class="mt-3 propertyBoxItem">
-                                            <span class="align-self-start propertyBoxItemLabel">@Messages(constants.View.PROPERTY_CARD_LABEL_VALUE)</span>
-                                            <span class="align-self-start propertyBoxValue">
-                                                <span class="propertyCardValue"></span>
-                                            </span>
-                                            <span class="d-flex gap-2 justify-content-end align-self-end">
-                                                <div class="propertyIcon propertyIconMutability active"></div>
-                                                <div class="propertyIcon propertyIconVisibility active"></div>
-                                                <div class="propertyIcon propertyIconRequirement active"></div>
-                                            </span>
+                                            <div class="mt-3 propertyBoxItem">
+                                                <span class="align-self-start propertyBoxItemLabel">@Messages(constants.View.PROPERTY_CARD_LABEL_VALUE)</span>
+                                                <span class="align-self-start propertyBoxValue">
+                                                    <span class="propertyCardValue"></span>
+                                                </span>
+                                                <span class="d-flex gap-2 justify-content-end align-self-end">
+                                                    <div class="propertyIcon propertyIconMutability active"></div>
+                                                    <div class="propertyIcon propertyIconVisibility active"></div>
+                                                    <div class="propertyIcon propertyIconRequirement active"></div>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="separator"></div>
                             </div>
-                            <div class="separator"></div>
                         </div>
-                    </div>
+                    }
                 }
             }
-        }
-        <div class="text-center">
-        @commonTertiaryButton(name = constants.View.ADD_MORE_PROPERTIES, function = JavaScript(s"addProperty()"), icon = Option("bi-plus-circle"), iconFirst = Option(true), buttonId = Option("addMorePropertyButton"))
+            <div class="text-center">
+            @commonTertiaryButton(name = constants.View.ADD_MORE_PROPERTIES, function = JavaScript(s"addProperty()"), icon = Option("bi-plus-circle"), iconFirst = Option(true), buttonId = Option("addMorePropertyButton"))
+            </div>
         </div>
-    </div>
-}
-<script src="@routes.Assets.versioned("javascripts/collections/createCollection.js")"></script>
+    }
+    <script src="@routes.Assets.versioned("javascripts/collections/createCollection.js")"></script>
