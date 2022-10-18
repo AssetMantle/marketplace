@@ -112,8 +112,8 @@ class WishlistController @Inject()(
         },
         addData => {
           (for {
-            nft <- masterNFTs.Service.tryGet(addData.nftId)
-            _ <- masterWishLists.Service.add(accountId = loginState.username, nftId = addData.nftId, collectionId = nft.collectionId)
+            nft <- masterNFTs.Service.tryGet(addData.nftFileName)
+            _ <- masterWishLists.Service.add(accountId = loginState.username, nftId = addData.nftFileName, collectionId = nft.collectionId)
           } yield Ok
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
@@ -130,7 +130,7 @@ class WishlistController @Inject()(
         },
         deleteData => {
           (for {
-            _ <- masterWishLists.Service.deleteWishItem(accountId = loginState.username, nftId = deleteData.nftId)
+            _ <- masterWishLists.Service.deleteWishItem(accountId = loginState.username, nftId = deleteData.nftFileName)
           } yield Ok
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)

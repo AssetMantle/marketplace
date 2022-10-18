@@ -38,7 +38,7 @@ POST        /changePassword                                   controllers.Accoun
 GET         /migrateWalletToKey                               controllers.AccountController.migrateWalletToKeyForm()
 POST        /migrateWalletToKey                               controllers.AccountController.migrateWalletToKey()
 
-GET         /changeActiveKey                                  controllers.AccountController.changeActiveKey(address: String)
+POST        /changeActiveKey                                  controllers.AccountController.changeActiveKey()
 
 GET         /collections/:category                            controllers.CollectionController.viewCollections(category: String)
 GET         /collection/:id                                   controllers.CollectionController.viewCollection(id: String)
@@ -62,8 +62,6 @@ GET         /uploadCollectionFileForm                         controllers.Collec
 POST        /storeCollectionFile                              controllers.CollectionController.storeCollectionFile(id: String, documentType: String)
 GET         /uploadCollectionFile                             controllers.CollectionController.uploadCollectionFile(id: String, documentType: String, name: String)
 
-GET         /notificationPopup                                controllers.SettingController.notificationPopup()
-
 GET         /wishlistSection                                  controllers.WishlistController.wishlistSection(accountId: String)
 GET         /wishListCollectionPerPage                        controllers.WishlistController.collectionPerPage(accountId: String, pageNumber: Int)
 GET         /wishListCollectionNFTs                           controllers.WishlistController.collectionNFTs(accountId: String, collectionId: String)
@@ -77,6 +75,19 @@ GET         /nft/:nftId                                       controllers.NFTCon
 GET         /nftDetails                                       controllers.NFTController.details( nftId: String)
 GET         /nftInfo                                          controllers.NFTController.info( nftId: String)
 GET         /nftFile                                          controllers.NFTController.file( nftId: String)
+GET         /likesCounter                                     controllers.NFTController.likesCounter(nftId: String)
+
+# Create NFT
+GET         /selectCollection                                 controllers.NFTController.selectCollection()
+GET         /uploadNFTFileForm                                controllers.NFTController.uploadNFTFileForm(collectionId: String)
+POST        /storeNFTFile                                     controllers.NFTController.storeNFTFile(collectionId: String, documentType: String)
+GET         /uploadNFTFile                                    controllers.NFTController.uploadNFTFile(collectionId: String, documentType: String, name: String)
+GET         /basicDetails                                     controllers.NFTController.basicDetailsForm(collectionId: String, fileName: String)
+POST        /basicDetails                                     controllers.NFTController.basicDetails()
+GET         /nftTags                                          controllers.NFTController.tagsForm(collectionId: String, fileName: String)
+POST        /nftTags                                          controllers.NFTController.tags()
+GET         /addNFTProperties                                 controllers.NFTController.addPropertiesForm(collectionId: String, fileName: String)
+POST        /addNFTProperties                                 controllers.NFTController.addProperties()
 
 GET         /settings                                         controllers.SettingController.viewSettings()
 GET         /profileSettings                                  controllers.SettingController.settings()
@@ -101,12 +112,12 @@ POST        /deleteKey                                        controllers.Settin
 
 GET         /walletBalance                                    controllers.SettingController.walletBalance(address: String)
 
-GET         /likesCounter                                     controllers.NFTController.likesCounter(nftId: String)
-
 GET         /defaultProfile                                   controllers.ProfileController.viewDefaultProfile()
 GET         /profile/:accountId/:activeTab                    controllers.ProfileController.viewProfile(accountId: String, activeTab: String)
 GET         /profile/:accountId                               controllers.ProfileController.viewProfile(accountId: String, activeTab: String ?= "CREATED")
 GET         /profileSection                                   controllers.ProfileController.profile(accountId: String, activeTab: String)
+GET         /notificationPopup                                controllers.ProfileController.notificationPopup()
+GET         /notificationPopupPerPage                         controllers.ProfileController.notificationPopupPerPage(pageNumber: Int)
 
 GET         /whitelistSection                                 controllers.WhitelistController.whitelistSection()
 GET         /createdWhitelists                                controllers.WhitelistController.createdWhitelists()

@@ -1,9 +1,7 @@
 package constants
 
-import models.master.CollectionProperty
+import models.common.Collection.Property
 import play.api.Logger
-
-import scala.concurrent.ExecutionContext
 
 object Collection {
 
@@ -18,13 +16,9 @@ object Collection {
     val INSTAGRAM = "INSTAGRAM"
   }
 
-  def getFilePath(documentType: String)(implicit module: String, logger: Logger): String = {
-    documentType match {
-      case File.PROFILE => constants.CommonConfig.Files.CollectionPath + "/"
-      case File.COVER => constants.CommonConfig.Files.CollectionPath + "/"
-      case _ => constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION.throwBaseException()
-    }
-  }
+  def getFilePath: String = constants.CommonConfig.Files.CollectionPath + "/"
+
+  def getNFTFilePath(collectionId: String)(implicit module: String, logger: Logger): String = constants.CommonConfig.Files.CollectionPath + "/" + collectionId + "/nfts/"
 
   object Category {
     val ART = "ART"
@@ -34,22 +28,25 @@ object Collection {
 
   object DefaultProperty {
     // Should be kept in lower case otherwise change in form constraints
-    val NAME = "name"
-    val DESCRIPTION = "description"
+    val NAME = "collectionName"
+    val DESCRIPTION = "collectionDescription"
     val CATEGORY = "category"
     val NSFW = "nsfw"
+    val NFT_NAME = "nftName"
+    val NFT_DESCRIPTION = "nftDescription"
 
-    val list: Seq[String] = Seq(NAME, DESCRIPTION, CATEGORY, NSFW)
+    val IMMUTABLE = "IMMUTABLE"
+    val MUTABLE = "MUTABLE"
+    val REQUIRED = "REQUIRED"
+    val NOT_REQUIRED = "NOT_REQUIRED"
+    val NON_META = "NON_META"
+    val META = "META"
 
-    def getDefaultProperties(id: String): Seq[CollectionProperty] = list.map(x => CollectionProperty(id = id, propertyName = x, propertyType = PropertyData.Type.STRING, required = true, mutable = false, fixedValue = None, hideValue = false))
-  }
+    val list: Seq[String] = Seq(NAME, DESCRIPTION, CATEGORY, NSFW, NFT_NAME, NFT_DESCRIPTION)
 
-  object NFT {
-    object Data {
-      val STRING = "STRING"
-      val NUMBER = "NUMBER"
-      val BOOLEAN = "BOOLEAN"
+    val defaultProperties: Seq[Property] = list.map { propertyName =>
+      if (propertyName != NSFW) Property(name = propertyName, `type` = constants.NFT.Data.STRING, `value` = "", required = true, meta = true, mutable = false)
+      else Property(name = propertyName, `type` = constants.NFT.Data.BOOLEAN, `value` = "", required = true, meta = true, mutable = false)
     }
   }
-
 }

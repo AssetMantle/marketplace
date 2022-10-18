@@ -1,17 +1,14 @@
 package controllers
 
 import controllers.actions._
-import exceptions.BaseException
-import models.master
+import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, _}
-import play.api.mvc.{AbstractController, MessagesControllerComponents}
+import play.api.mvc._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import views.profile.whitelist.companion._
 
 @Singleton
 class ProfileController @Inject()(
@@ -25,6 +22,7 @@ class ProfileController @Inject()(
                                    masterWhitelists: master.Whitelists,
                                    masterCollections: master.Collections,
                                    masterWhitelistMembers: master.WhitelistMembers,
+                                   masterTransactionNotifications: masterTransaction.Notifications,
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -47,6 +45,26 @@ class ProfileController @Inject()(
   def profile(accountId: String, activeTab: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.profile.profile(accountId = accountId, activeTab = activeTab)))
+  }
 
+  def notificationPopup(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val unread = masterTransactionNotifications.Service.getNumberOfUnread(loginState.username)
+        for {
+          unread <- unread
+        } yield Ok(views.html.notification.commonNotificationPopup(unread))
+    }
+  }
+
+  def notificationPopupPerPage(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse("") + "/" + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val notifications = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwFutureBaseException()
+        else masterTransactionNotifications.Service.get(loginState.username, pageNumber)
+        for {
+          notifications <- notifications
+        } yield Ok(views.html.notification.notificationPerPage(notifications))
+    }
   }
 }

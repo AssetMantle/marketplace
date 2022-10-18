@@ -1,8 +1,9 @@
 package constants
 
 import play.api.data.Forms._
-import play.api.data.{FormError, Mapping}
-import play.api.data.format.Formats.{bigDecimalFormat, doubleFormat}
+import play.api.data.Mapping
+import play.api.data.format.Formats._
+import play.api.data.format.Formatter
 import play.api.data.validation.Constraints
 import play.api.i18n.{Messages, MessagesProvider}
 import utilities.MicroNumber
@@ -10,8 +11,6 @@ import utilities.NumericOperation.checkPrecision
 
 import java.net.URL
 import java.util.Date
-import play.api.data.format.Formatter
-import play.api.data.format.Formats._
 
 object FormField {
 
@@ -62,7 +61,12 @@ object FormField {
   val COLLECTION_ID: StringFormField = StringFormField("COLLECTION_ID", 16, 16)
   val COLLECTION_PROPERTY_NAME: StringFormField = StringFormField("COLLECTION_PROPERTY_NAME", 1, 30)
   val COLLECTION_PROPERTY_FIXED_VALUE: StringFormField = StringFormField("COLLECTION_PROPERTY_FIXED_VALUE", 1, 30)
-  val NFT_ID: StringFormField = StringFormField("NFT_ID", 1, 100)
+  val NFT_NAME: StringFormField = StringFormField("NFT_NAME", 3, 50)
+  val NFT_DESCRIPTION: StringFormField = StringFormField("NFT_DESCRIPTION", 0, 256)
+  val NFT_FILE_NAME: StringFormField = StringFormField("NFT_FILE_NAME", 64, 255)
+  val NFT_TAGS: StringFormField = StringFormField("NFT_TAGS", 2, 255)
+  val NFT_PROPERTY_NAME: StringFormField = StringFormField("NFT_PROPERTY_NAME", 1, 30)
+  val NFT_PROPERTY_VALUE: StringFormField = StringFormField("NFT_PROPERTY_VALUE", 1, 30)
 
   // UrlFormField
   val COLLECTION_WEBSITE: UrlFormField = UrlFormField("COLLECTION_WEBSITE")
@@ -81,22 +85,24 @@ object FormField {
   val SIGNUP_TERMS_CONDITIONS: BooleanFormField = BooleanFormField("SIGNUP_TERMS_CONDITIONS")
   val MANAGED_KEY_DISCLAIMER: BooleanFormField = BooleanFormField("MANAGED_KEY_DISCLAIMER")
   val NSFW_COLLECTION: BooleanFormField = BooleanFormField("NSFW_COLLECTION")
+  val SAVE_COLLECTION_DRAFT: BooleanFormField = BooleanFormField("SAVE_COLLECTION_DRAFT")
 
   // SelectFormField
   val GAS_PRICE: SelectFormField = SelectFormField("GAS_PRICE", Seq(constants.CommonConfig.Blockchain.LowGasPrice.toString, constants.CommonConfig.Blockchain.MediumGasPrice.toString, constants.CommonConfig.Blockchain.HighGasPrice.toString))
   val COLLECTION_CATEGORY: SelectFormField = SelectFormField("COLLECTION_CATEGORY", Seq(constants.Collection.Category.ART, constants.Collection.Category.PHOTOGRAPHY, constants.Collection.Category.MISCELLANEOUS))
-  val COLLECTION_PROPERTY_TYPE: SelectFormField = SelectFormField("COLLECTION_PROPERTY_TYPE", Seq(constants.Collection.NFT.Data.STRING, constants.Collection.NFT.Data.NUMBER, constants.Collection.NFT.Data.BOOLEAN))
+  val COLLECTION_PROPERTY_TYPE: SelectFormField = SelectFormField("COLLECTION_PROPERTY_TYPE", Seq(constants.NFT.Data.STRING, constants.NFT.Data.NUMBER, constants.NFT.Data.BOOLEAN))
 
   // MicroNumberFormField
   val SEND_COIN_AMOUNT: MicroNumberFormField = MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.zero, MicroNumber(Int.MaxValue), 6)
 
   // NestedFormField
   val COLLECTION_PROPERTIES: NestedFormField = NestedFormField("COLLECTION_PROPERTIES")
+  val NFT_PROPERTIES: NestedFormField = NestedFormField("NFT_PROPERTIES")
 
   // RadioFormField
-  val COLLECTION_PROPERTY_MUTABLE: RadioFormField = RadioFormField("COLLECTION_PROPERTY_MUTABLE", Seq(("IMMUTABLE", "Immutable"), ("MUTABLE", "Mutable")))
-  val COLLECTION_PROPERTY_REQUIRED: RadioFormField = RadioFormField("COLLECTION_PROPERTY_REQUIRED", Seq(("REQUIRED", "Required"), ("NOT_REQUIRED", "Optional")))
-  val COLLECTION_PROPERTY_META: RadioFormField = RadioFormField("COLLECTION_PROPERTY_META", Seq(("NON_META", "Non-meta"), ("META", "Meta")))
+  val COLLECTION_PROPERTY_MUTABLE: RadioFormField = RadioFormField("COLLECTION_PROPERTY_MUTABLE", Seq((constants.Collection.DefaultProperty.IMMUTABLE, constants.Collection.DefaultProperty.IMMUTABLE), (constants.Collection.DefaultProperty.MUTABLE, constants.Collection.DefaultProperty.MUTABLE)))
+  val COLLECTION_PROPERTY_REQUIRED: RadioFormField = RadioFormField("COLLECTION_PROPERTY_REQUIRED", Seq((constants.Collection.DefaultProperty.REQUIRED, constants.Collection.DefaultProperty.REQUIRED), (constants.Collection.DefaultProperty.NOT_REQUIRED, constants.Collection.DefaultProperty.NOT_REQUIRED)))
+  val COLLECTION_PROPERTY_META: RadioFormField = RadioFormField("COLLECTION_PROPERTY_META", Seq((constants.Collection.DefaultProperty.NON_META, constants.Collection.DefaultProperty.NON_META), (constants.Collection.DefaultProperty.META, constants.Collection.DefaultProperty.META)))
 
   case class StringFormField(name: String, minimumLength: Int, maximumLength: Int, regularExpression: RegularExpression = RegularExpression.ANY_STRING, errorMessage: String = "Regular expression validation failed!") {
     val placeHolder: String = PLACEHOLDER_PREFIX + name

@@ -954,3 +954,21 @@
     @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
   }
 }
+
+.draftCollection{
+  position: relative;
+  &:before{
+    content: '';
+    width: 66px;
+    height: 26px;
+    position: absolute;
+    background-image: url("../images/icon/draftBadge.png");
+    background-size: cover;
+    left: 0;
+    top: 20px;
+    z-index: 99;
+  }
+}
+.maxDraftLimitInfo{
+  @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+}

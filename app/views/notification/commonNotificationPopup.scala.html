@@ -1,0 +1,23 @@
+@import controllers.actions.LoginState
+
+@(unread: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+<div class="notificationPopupContainer">
+    <div class="d-flex justify-content-between align-items-center headerContainer">
+        <div class="title">@Messages(constants.View.NOTIFICATION_POPUP_TITLE)</div>
+        <div class="titleLink">@Messages(constants.View.NOTIFICATION_POPUP_TITLE_LINK)</div>
+    </div>
+    <div class="separator"></div>
+@*    <div class="emailContainer">*@
+@*        <div class="text-end closeEmailContainer">*@
+@*            <i class="bi bi-x iconDefault iconLarge"></i>*@
+@*        </div>*@
+@*        <div class="emailInputField">*@
+@*            <span class="emailNotificationLabel">@Messages(constants.View.NOTIFICATION_POPUP_EMAIL_LABEL)</span>*@
+@*            <input type="text" placeholder="email@@email.com"/>*@
+@*            <div class="emailNotificationButton">@Messages(constants.View.NOTIFICATION_POPUP_EMAIL_SUBMIT)</div>*@
+@*        </div>*@
+@*    </div>*@
+@*    <div class="separator"></div>*@
+    <div id="notificationList"></div>
+    <div class="loadOlderNotificationButton">@Messages(constants.View.NOTIFICATION_POPUP_LOAD_OLDER)</div>
+</div>

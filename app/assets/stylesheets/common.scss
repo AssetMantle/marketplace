@@ -772,6 +772,7 @@
     border: 1px dashed var(--gray);
     border-radius: 6px;
     min-height: 246px;
+    max-height: 400px;
     height: 100%;
     align-items: center;
     justify-content: center;
@@ -797,6 +798,10 @@
       .fileName{
         @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
       }
+    }
+    .uploadCompletionMessage{
+      @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+      word-break: break-word;
     }
   }
   .modalInfoBlock{

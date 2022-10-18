@@ -7,10 +7,9 @@ import models.{blockchain, master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import views.setting.companion._
 import play.api.mvc._
 import utilities.MicroNumber
+import views.setting.companion._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -263,13 +262,6 @@ class SettingController @Inject()(
           ).recover {
           case _: BaseException => BadRequest(views.html.base.info.commonMicroNumber(MicroNumber.zero, constants.View.STAKING_TOKEN_UNITS))
         }
-    }
-  }
-
-  def notificationPopup(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
-    withLoginAction { implicit loginState =>
-      implicit request =>
-        Ok(views.html.base.commonNotificationPopup())
     }
   }
 

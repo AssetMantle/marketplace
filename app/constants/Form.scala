@@ -40,4 +40,8 @@ object Form {
   val ACCEPT_WHITELIST_INVITE: Form = Form("ACCEPT_WHITELIST_INVITE", JavaScriptReverseRoute("", ""), routes.WhitelistController.acceptInvite())
   val LEAVE_WHITELIST: Form = Form("LEAVE_WHITELIST", JavaScriptReverseRoute("", ""), routes.WhitelistController.leaveWhitelist())
 
+  val NFT_BASIC_DETAIL: Form = Form("NFT_BASIC_DETAIL", routes.javascript.NFTController.basicDetailsForm, routes.NFTController.basicDetails())
+  val NFT_ADD_PROPERTIES: Form = Form("NFT_ADD_PROPERTIES", routes.javascript.NFTController.addPropertiesForm, routes.NFTController.addProperties())
+  val NFT_TAGS: Form = Form("NFT_TAGS", routes.javascript.NFTController.tagsForm, routes.NFTController.tags())
+
 }

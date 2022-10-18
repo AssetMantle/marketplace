@@ -1,12 +1,12 @@
 package constants
 
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
-import utilities.MicroNumber
 import views.account.companion._
-import views.setting.companion._
-import views.collection.{companion => collection}
-import views.profile.whitelist.{companion => whitelist}
 import views.blockchainTransaction.companion._
+import views.collection.{companion => collection}
+import views.nft.companion._
+import views.profile.whitelist.{companion => whitelist}
+import views.setting.companion._
 
 object FormConstraint {
   val passwordSymbols = "!@#$%^&*._-"
@@ -93,12 +93,28 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
+  val collectionPropertiesConstraint: Constraint[collection.DefineProperties.Property] = Constraint("constraints.DefinePropertiesProperty")({ propertyData: collection.DefineProperties.Property =>
+    val errors = Seq(
+      if (propertyData.propertyType == constants.NFT.Data.BOOLEAN && propertyData.optionalValue.isDefined && (propertyData.optionalValue.getOrElse("") != constants.NFT.Data.TRUE || propertyData.optionalValue.getOrElse("") != constants.NFT.Data.FALSE)) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
+      if (propertyData.propertyType == constants.NFT.Data.NUMBER && propertyData.optionalValue.isDefined && propertyData.optionalValue.getOrElse("0").toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
   val defineCollectionPropertiesConstraint: Constraint[collection.DefineProperties.Data] = Constraint("constraints.DefineCollectionPropertiesConstraint")({ definePropertiesData: collection.DefineProperties.Data =>
     val definedPropertiesNames = definePropertiesData.properties.filter(_.name.isDefined).map(_.name.get.toLowerCase())
     val errors = Seq(
       if ((definedPropertiesNames.length + constants.Collection.DefaultProperty.list.length) > constants.Blockchain.MaximumProperties) Option(ValidationError(constants.Response.MAXIMUM_COLLECTION_PROPERTIES_EXCEEDED.message)) else None,
       if (definedPropertiesNames.intersect(constants.Collection.DefaultProperty.list).nonEmpty) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES.message)) else None,
       if (definedPropertiesNames.distinct.length != definedPropertiesNames.length) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DUPLICATE_PROPERTIES.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val nftTagsConstraint: Constraint[NFTTags.Data] = Constraint("constraints.NFTTagsConstraint")({ nftTagsData: NFTTags.Data =>
+    val tags = nftTagsData.tags.split(",")
+    val errors = Seq(
+      if (tags.exists(x => x.length == 1 || x.charAt(0) != '#')) Option(ValidationError(constants.Response.INVALID_NFT_TAGS.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })

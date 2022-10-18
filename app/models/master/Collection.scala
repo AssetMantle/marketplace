@@ -1,24 +1,17 @@
 package models.master
 
 import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
+import models.common.Collection._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.Json
 import slick.jdbc.H2Profile.api._
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class SocialProfile(name: String, url: String)
-
-object SocialProfile {
-  implicit val writes: Writes[SocialProfile] = Json.writes[SocialProfile]
-
-  implicit val reads: Reads[SocialProfile] = Json.reads[SocialProfile]
-}
-
-case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, website: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, website: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, properties: Option[Seq[Property]], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
   def serialize(): Collections.CollectionSerialized = Collections.CollectionSerialized(
     id = this.id,
     creatorId = this.creatorId,
@@ -29,6 +22,7 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
     socialProfiles = Json.toJson(this.socialProfiles).toString(),
     category = this.category,
     nsfw = this.nsfw,
+    properties = this.properties.map(Json.toJson(_).toString()),
     createdBy = this.createdBy,
     createdOn = this.createdOn,
     createdOnTimeZone = this.createdOnTimeZone,
@@ -49,13 +43,13 @@ object Collections {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class CollectionSerialized(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, website: String, socialProfiles: String, category: String, nsfw: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
-    def deserialize: Collection = Collection(id = id, creatorId = creatorId, classificationId = classificationId, name = name, description = description, website = website, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), category = category, nsfw = nsfw, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class CollectionSerialized(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, website: String, socialProfiles: String, category: String, nsfw: Boolean, properties: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
+    def deserialize: Collection = Collection(id = id, creatorId = creatorId, classificationId = classificationId, name = name, description = description, website = website, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), category = category, nsfw = nsfw, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[Property]](_)), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   class CollectionTable(tag: Tag) extends Table[CollectionSerialized](tag, "Collection") with ModelTable[String] {
 
-    def * = (id, creatorId, classificationId.?, name, description, website, socialProfiles, category, nsfw, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (CollectionSerialized.tupled, CollectionSerialized.unapply)
+    def * = (id, creatorId, classificationId.?, name, description, website, socialProfiles, category, nsfw, properties.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (CollectionSerialized.tupled, CollectionSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -74,6 +68,8 @@ object Collections {
     def category = column[String]("category")
 
     def nsfw = column[Boolean]("nsfw")
+
+    def properties = column[String]("properties")
 
     def createdBy = column[String]("createdBy")
 
@@ -107,7 +103,7 @@ class Collections @Inject()(
 
   object Service {
 
-    def add(name: String, creatorId: String, description: String, website: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean): Future[String] = {
+    def add(name: String, creatorId: String, description: String, website: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, properties: Option[Seq[Property]]): Future[String] = {
       val id = utilities.IdGenerator.getRandomHexadecimal
       val collection = Collection(
         id = id,
@@ -118,13 +114,16 @@ class Collections @Inject()(
         website = website,
         socialProfiles = socialProfiles,
         category = category,
-        nsfw = nsfw)
+        nsfw = nsfw,
+        properties = properties)
       for {
         _ <- create(collection.serialize())
       } yield id
     }
 
-    def insertOrUpdate(id: String, creatorId: String, name: String, description: String, website: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean): Future[String] = {
+    def add(collection: Collection): Future[String] = create(collection.serialize())
+
+    def insertOrUpdate(id: String, creatorId: String, name: String, description: String, website: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, properties: Option[Seq[Property]]): Future[String] = {
       val collection = Collection(
         id = id,
         creatorId = creatorId,
@@ -134,7 +133,8 @@ class Collections @Inject()(
         website = website,
         socialProfiles = socialProfiles,
         category = category,
-        nsfw = nsfw)
+        nsfw = nsfw,
+        properties = properties)
       for {
         _ <- upsert(collection.serialize())
       } yield id
@@ -168,22 +168,10 @@ class Collections @Inject()(
 
     def getByCreatorAndPage(creatorId: String, pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.creatorId === creatorId)(_.createdOn).map(_.map(_.deserialize))
 
+    def getByCreator(creatorId: String): Future[Seq[(String, String)]] = filterAndSort(_.creatorId === creatorId)(_.name).map(_.map(x => x.id -> x.name))
+
     def isOwner(id: String, accountId: String): Future[Boolean] = filterAndExists(x => x.id === id && x.creatorId === accountId)
 
-    def checkOwnerAndUpdate(id: String, ownerId: String, name: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean): Future[Unit] = {
-      val collection = tryGet(id)
-
-      def validateAndUpdate(collection: Collection) = if (collection.classificationId.isEmpty) {
-        if (collection.creatorId == ownerId) {
-          update(collection.copy(name = name, description = description, socialProfiles = socialProfiles, category = category, nsfw = nsfw).serialize())
-        } else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
-      } else constants.Response.CLASSIFICATION_ALREADY_DEFINED.throwFutureBaseException()
-
-      for {
-        collection <- collection
-        _ <- validateAndUpdate(collection)
-      } yield ()
-    }
 
   }
 }

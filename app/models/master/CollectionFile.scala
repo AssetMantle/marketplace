@@ -102,6 +102,10 @@ class CollectionFiles @Inject()(
       ).serialize())
     }
 
+    def insertOrUpdate(collectionFile: CollectionFile): Future[Unit] = upsert(collectionFile.serialize())
+
+    def insertOrUpdate(collectionFiles: Seq[CollectionFile]): Future[Unit] = upsertMultiple(collectionFiles.map(_.serialize()))
+
     def get(id: String, documentType: String): Future[Option[CollectionFile]] = getById(id1 = id, id2 = documentType).map(_.map(_.deserialize))
 
     def get(ids: Seq[String]): Future[Seq[CollectionFile]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))

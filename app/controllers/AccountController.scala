@@ -7,7 +7,7 @@ import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, Call, MessagesControllerComponents, Result}
+import play.api.mvc._
 import views.account.companion._
 
 import javax.inject.{Inject, Singleton}
@@ -328,22 +328,29 @@ class AccountController @Inject()(
       )
   }
 
-  def changeActiveKey(address: String): Action[AnyContent] = withLoginActionAsync { oldLoginState =>
+  def changeActiveKey(): Action[AnyContent] = withLoginActionAsync { oldLoginState =>
     implicit request =>
-      val changeActive = masterKeys.Service.changeActive(accountId = oldLoginState.username, oldAddress = oldLoginState.address, newAddress = address)
+      ChangeActiveKey.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest)
+        },
+        changeKeyData => {
+          val changeActive = masterKeys.Service.changeActive(accountId = oldLoginState.username, oldAddress = oldLoginState.address, newAddress = changeKeyData.address)
 
-      def getResult = {
-        implicit val loginState: LoginState = LoginState(username = oldLoginState.username, address = address)
-        withUsernameToken.Ok()
-      }
+          def getResult = {
+            implicit val loginState: LoginState = LoginState(username = oldLoginState.username, address = changeKeyData.address)
+            withUsernameToken.Ok()
+          }
 
-      (for {
-        _ <- changeActive
-        result <- getResult
-      } yield result
-        ).recover {
-        case _: BaseException => NoContent
-      }
+          (for {
+            _ <- changeActive
+            result <- getResult
+          } yield result
+            ).recover {
+            case _: BaseException => NoContent
+          }
+        }
+      )
   }
 
 }

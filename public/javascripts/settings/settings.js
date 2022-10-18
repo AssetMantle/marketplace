@@ -36,10 +36,12 @@ function openCloseWalletScreen(e, elementID) {
 }
 
 function changeActive(setAddress, oldAddress) {
-    let route = jsRoutes.controllers.AccountController.changeActiveKey(setAddress);
+    let form = $('#changeActiveKeyForm');
+    $('#WALLET_ADDRESS').val(setAddress);
     $.ajax({
-        url: route.url,
-        type: route.type,
+        url: form.attr('action'),
+        type: 'POST',
+        data: form.serialize(),
         async: true,
         statusCode: {
             200: function (data) {
@@ -80,7 +82,7 @@ function fetchBalance(address) {
     });
 }
 
-function updateKeyName(){
+function updateKeyName() {
     $('.walletInfoField').load(document.URL);
 }
 

@@ -1,7 +1,9 @@
 package service
 
+import models.common.Collection.SocialProfile
+import models.common.NFT._
 import models.master
-import models.master.{Collection, CollectionFile, Property, SocialProfile}
+import models.master.{Collection, CollectionFile}
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import play.api.{Configuration, Logger}
@@ -41,14 +43,14 @@ class Starter @Inject()(
   implicit val StringPropertyReads: Reads[StringProperty] = Json.reads[StringProperty]
 
   case class NumberProperty(name: String, `type`: String, `value`: Int) extends NftProperty {
-    def toStringProperty: StringProperty = StringProperty(name = name, `type` = constants.Collection.NFT.Data.NUMBER, `value` = `value`.toString)
+    def toStringProperty: StringProperty = StringProperty(name = name, `type` = constants.NFT.Data.NUMBER, `value` = `value`.toString)
   }
 
   implicit val NumberPropertyReads: Reads[NumberProperty] = Json.reads[NumberProperty]
 
   def msgApply(`type`: String, value: JsObject): NftProperty = try {
     `type`.toLowerCase match {
-      case "string" => utilities.JSON.convertJsonStringToObject[StringProperty](value.toString).copy(`type` = constants.Collection.NFT.Data.STRING)
+      case "string" => utilities.JSON.convertJsonStringToObject[StringProperty](value.toString).copy(`type` = constants.NFT.Data.STRING)
       case "number" => utilities.JSON.convertJsonStringToObject[NumberProperty](value.toString).toStringProperty
     }
   }
@@ -114,7 +116,7 @@ class Starter @Inject()(
         utilities.FileOperations.copyFile(oldFilePath, newFilePath)
         masterNFTs.Service.add(
           fileName = newFileName,
-          file = utilities.ImageProcess.convertToThumbnailWithHeight(newFilePath, 400),
+          //          file = utilities.ImageProcess.convertToThumbnailWithHeight(newFilePath, 400),
           collectionId = collectionID,
           name = nftDetails.name,
           description = nftDetails.description,
@@ -222,7 +224,7 @@ class Starter @Inject()(
           try {
             val sourceKey = collections.find(_.id == nft.collectionId).fold("")(_.name) + "/nfts/" + nft.fileName
             val destinationKey = nft.collectionId + "/nfts/" + nft.fileName
-            println(destinationKey)
+            //            println(destinationKey)
             if (!utilities.AmazonS3.exists(destinationKey)) {
               utilities.AmazonS3.copyObject(sourceKey = sourceKey, destinationKey = destinationKey)
             }
@@ -252,9 +254,9 @@ class Starter @Inject()(
         val insta = if (uploadCollection.instagram != "") Option(SocialProfile(name = constants.Collection.SocialProfile.INSTAGRAM, url = uploadCollection.instagram)) else None
         val socialProfiles = Seq(twitter, insta).flatten
         if (collection.isEmpty) {
-          masterCollections.Service.add(name = uploadCollection.name, creatorId = uploadCollection.accountId, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles, category = "ART", nsfw = false)
+          masterCollections.Service.add(name = uploadCollection.name, creatorId = uploadCollection.accountId, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles, category = "ART", nsfw = false, properties = None)
         } else if (uploadCollection.updateDetails) {
-          masterCollections.Service.insertOrUpdate(id = collection.get.id, creatorId = uploadCollection.accountId, name = uploadCollection.name, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles, category = "ART", nsfw = false)
+          masterCollections.Service.insertOrUpdate(id = collection.get.id, creatorId = uploadCollection.accountId, name = uploadCollection.name, description = uploadCollection.description, website = uploadCollection.website, socialProfiles = socialProfiles, category = "ART", nsfw = false, properties = None)
         } else Future(collection.get.id)
       }
 

@@ -1,0 +1,9 @@
+@import controllers.actions.LoginState
+@import views.html.base.buttons._
+
+@(collectionList: Seq[(String, String)])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@collectionList.map(_._1)
+@collectionList.map(_._2)
+
+@commonPrimaryButton(constants.View.NEXT, JavaScript("getForm(jsRoutes.controllers.NFTController.signInWithCallbackForm('@callbackUrl'))"))

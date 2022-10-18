@@ -7,9 +7,9 @@ object AddOrRemove {
 
   val form: Form[Data] = Form(
     mapping(
-      constants.FormField.NFT_ID.mapping,
+      constants.FormField.NFT_FILE_NAME.mapping,
     )(Data.apply)(Data.unapply))
 
-  case class Data(nftId: String)
+  case class Data(nftFileName: String)
 
 }
