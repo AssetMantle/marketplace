@@ -9,7 +9,7 @@
 
     @commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm, submitDisable = false) {
         @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionDraft.fold("")(_.id), Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
-        @commonCheckbox(definePropertiesForm, constants.FormField.SAVE_COLLECTION_DRAFT)
+        @commonCheckbox(definePropertiesForm, constants.FormField.SAVE_COLLECTION_DRAFT, Symbol("containerDivClass") -> "hidden")
         <div id="basicInfoContainer" class="propertyInfoContainer">
             <div class="singleProperty">
                 <div class="d-flex justify-content-between align-content-center propertyHeaderContainer">
