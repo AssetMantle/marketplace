@@ -3,6 +3,23 @@
 
 @(collection: master.Collection, nfts: Seq[master.NFT], likedNFTIds: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <div class="row m-0 nftPage">
+
+    <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 createNFTCard" onclick="">
+        <div class="card border-0 h-100 d-flex justify-content-between" style="cursor: pointer;">
+            <div class="createNFTBadge">
+                <img src="@routes.Assets.versioned("images/icon/createBadge.png")"/>
+            </div>
+            <div class="mt-3 card-img">
+                <img src="@routes.Assets.versioned("images/icon/createCollection.png")"/>
+                <div class="text-center mt-2 label">@Messages(constants.View.CREATE_NFT_LABEL)</div>
+            </div>
+            <div class="p-3 createNFTCardDetail">
+                <div class="separator"></div>
+                <div class="text-center label">@Messages(constants.View.CREATE_NFT_BUTTON)</div>
+            </div>
+        </div>
+    </div>
+
     @if(nfts.nonEmpty) {
         @nfts.map { nft =>
             @if(loginState.isEmpty) {

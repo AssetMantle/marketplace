@@ -166,11 +166,16 @@ function hideRadioGroupLabel(){
     $(".commonRadioGroup dl dt").text("");
 }
 
+function saveToDraft(){
+    $("#SAVE_COLLECTION_DRAFT").attr("checked","checked");
+    $("#FORM_DEFINE_COLLECTION_PROPERTIES_SUBMIT").click();
+}
+
 $("#formSubmitButton").prepend(`
                                 <div class="d-flex gap-3 align-items-center me-3 propertyModalButton">
                                     <div class="tertiaryButton" onclick="">
                                         Skip
                                     </div>
-                                    <button class="form-secondary-button">Save Draft</button>
+                                    <button class="form-secondary-button active" type="button" onclick="saveToDraft()">Save Draft</button>
                                 </div>
                                 `);

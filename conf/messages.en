@@ -636,3 +636,7 @@ IMMUTABLE=Immutable
 MUTABLE=Mutable
 NON_META=Hide
 META=Show
+
+#Create NFT
+CREATE_NFT_LABEL=Create a new NFT!
+CREATE_NFT_BUTTON=Get Started!
