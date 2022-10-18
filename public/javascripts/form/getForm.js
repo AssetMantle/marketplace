@@ -1,4 +1,5 @@
 function emptyCallBack() {
+    console.log("emptyCallBack");
 }
 
 function getForm(route, modal = '#commonModal', modalContent = '#modal-content', callback = emptyCallBack) {

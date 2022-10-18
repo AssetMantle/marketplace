@@ -1,0 +1,12 @@
+@import controllers.actions.LoginState
+@import views.html.base.buttons._
+
+@(collectionId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@Messages(constants.View.UPLOAD_NFT)
+
+<div class="hidden" id="nftFileHashName"></div>
+
+@views.html.base.commonUploadFile(constants.File.NFT_FILE_FORM, id = collectionId, documentType = constants.View.NFT, onSuccessCallback = JavaScript("onSuccessfulUpload"))
+
+@commonPrimaryButton(constants.View.NEXT, JavaScript(s"getForm(jsRoutes.controllers.NFTController.basicDetailsForm('${collectionId}', '${"newFileName"}'))"))

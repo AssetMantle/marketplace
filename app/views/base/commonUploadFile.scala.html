@@ -3,7 +3,7 @@
 @import helper._
 @import constants.File.FileUploadForm
 
-@(fileUploadForm: FileUploadForm, id: String, documentType: String, errorMessage: String = "", label: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(fileUploadForm: FileUploadForm, id: String, documentType: String, errorMessage: String = "", label: String = "", onSuccessCallback: JavaScript = JavaScript("emptyCallBack"))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="uploadFileContainer">
     <div class="mb-2 uploadFileLabel">@Messages(label)</div>
     <div class="uploadForm">
@@ -49,4 +49,4 @@
         </div>
     </div>
 </div>
-<script>uploadFile(@utilities.JsRoutes.getJsRouteFunction(fileUploadForm.store), @utilities.JsRoutes.getJsRouteFunction(fileUploadForm.upload), '@id', '@documentType', '@fileUploadForm.fileTypes.mkString("_")', @fileUploadForm.maxFileSize)</script>
+<script>uploadFile(@utilities.JsRoutes.getJsRouteFunction(fileUploadForm.store), @utilities.JsRoutes.getJsRouteFunction(fileUploadForm.upload), '@id', '@documentType', '@fileUploadForm.fileTypes.mkString("_")', @fileUploadForm.maxFileSize, @onSuccessCallback)</script>

@@ -6,4 +6,4 @@
 @collectionList.map(_._1)
 @collectionList.map(_._2)
 
-@commonPrimaryButton(constants.View.NEXT, JavaScript("getForm(jsRoutes.controllers.NFTController.signInWithCallbackForm('@callbackUrl'))"))
+@commonPrimaryButton(constants.View.NEXT, JavaScript(s"getForm(jsRoutes.controllers.NFTController.uploadNFTFileForm('${collectionList.head._1}'))"))
