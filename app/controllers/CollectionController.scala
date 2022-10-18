@@ -258,7 +258,7 @@ class CollectionController @Inject()(
             request.body.file(constants.File.KEY_FILE) match {
               case None => BadRequest(constants.View.BAD_REQUEST)
               case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.COLLECTION_FILE_FORM.maxFileSize) {
-                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, constants.Collection.getFilePath(id = id, documentType = documentType))
+                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, constants.Collection.getFilePath)
                 Ok
               } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
             }
@@ -271,7 +271,7 @@ class CollectionController @Inject()(
 
   def uploadCollectionFile(id: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val oldFilePath = constants.Collection.getFilePath(id = id, documentType = documentType) + name
+      val oldFilePath = constants.Collection.getFilePath + name
       val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
       val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(name)
       val awsKey = id + "/others/" + newFileName
@@ -326,56 +326,34 @@ class CollectionController @Inject()(
           }
         },
         definePropertiesData => {
-
           val update = masterTransactionCollectionDrafts.Service.updateProperties(definePropertiesData.collectionId, definePropertiesData.getSerializableProperties)
 
+          def publishCollection(collectionDraft: CollectionDraft) = if (!definePropertiesData.saveAsDraft) {
+            val add = masterCollections.Service.add(collectionDraft.toCollection)
+
+            def addCover() = if (collectionDraft.coverFileName.isDefined) masterCollectionFiles.Service.add(id = collectionDraft.id, documentType = constants.Collection.File.COVER, fileName = collectionDraft.coverFileName.get) else Future()
+
+            def addProfile() = if (collectionDraft.profileFileName.isDefined) masterCollectionFiles.Service.add(id = collectionDraft.id, documentType = constants.Collection.File.PROFILE, fileName = collectionDraft.profileFileName.get) else Future()
+
+            def deleteDraft() = masterTransactionCollectionDrafts.Service.deleteById(collectionDraft.id)
+
+            for {
+              _ <- add
+              _ <- addCover()
+              _ <- addProfile()
+              _ <- deleteDraft()
+            } yield ()
+          } else Future("")
+
           (for {
-            _ <- update
-          } yield Ok
+            collectionDraft <- update
+            _ <- publishCollection(collectionDraft)
+          } yield PartialContent(views.html.collection.createSuccessful(collectionDraft))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.collection.defineProperties(DefineProperties.form.withGlobalError(baseException.failure.message), None))
           }
         }
       )
   }
-
-  def confirmForm(id: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val draft = masterTransactionCollectionDrafts.Service.tryGet(id)
-      (for {
-        draft <- draft
-      } yield Ok(views.html.collection.confirm(draft = draft))).recover {
-        case baseException: BaseException => BadRequest
-      }
-  }
-
-  def confirm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      Confirm.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest)
-        },
-        confirmData => {
-          val draft = masterTransactionCollectionDrafts.Service.tryGet(confirmData.collectionId)
-
-          def add(draft: CollectionDraft) = masterCollections.Service.add(draft.toCollection)
-
-          def addFiles(draft: CollectionDraft) = {
-            val files = Seq(draft.getCollectionCoverFile, draft.getCollectionProfileFile).flatten
-            if (files.nonEmpty) masterCollectionFiles.Service.insertOrUpdate(files) else Future()
-          }
-
-          (for {
-            draft <- draft
-            _ <- add(draft)
-            _ <- addFiles(draft)
-          } yield PartialContent(views.html.collection.createSuccessful(draft))
-            ).recover {
-            case baseException: BaseException => BadRequest
-          }
-        }
-      )
-  }
-
 
 }

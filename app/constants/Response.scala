@@ -121,6 +121,7 @@ object Response {
   val CLASSIFICATION_ALREADY_DEFINED = new Failure("CLASSIFICATION_ALREADY_DEFINED")
   val FILE_SIZE_EXCEED_LIMIT = new Failure("FILE_SIZE_EXCEED_LIMIT")
   val INVALID_DOCUMENT_TYPE = new Failure("INVALID_DOCUMENT_TYPE")
+  val INVALID_OPTIONAL_VALUE =  new Failure("INVALID_OPTIONAL_VALUE")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

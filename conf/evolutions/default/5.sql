@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."CollectionDraft"
     "socialProfiles"       VARCHAR NOT NULL,
     "category"             VARCHAR NOT NULL,
     "nsfw"                 BOOLEAN NOT NULL,
-    "properties"           VARCHAR,
+    "properties"           VARCHAR NOT NULL,
     "profileFileName"      VARCHAR,
     "coverFileName"        VARCHAR,
     "createdBy"            VARCHAR,

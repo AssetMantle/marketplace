@@ -11,7 +11,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class CollectionDraft(id: String, creatorId: String, name: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, properties: Option[Seq[Property]], profileFileName: Option[String], coverFileName: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class CollectionDraft(id: String, creatorId: String, name: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, properties: Seq[Property], profileFileName: Option[String], coverFileName: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def getWebsite: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.WEBSITE).map(_.url)
 
@@ -19,7 +19,7 @@ case class CollectionDraft(id: String, creatorId: String, name: String, descript
 
   def getInstagram: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.INSTAGRAM).map(_.url)
 
-  def toCollection: Collection = Collection(id = id, creatorId = creatorId, classificationId = None, name = name, description = description, website = "", socialProfiles = socialProfiles, category = category, nsfw = nsfw, properties = this.properties)
+  def toCollection: Collection = Collection(id = id, creatorId = creatorId, classificationId = None, name = name, description = description, website = "", socialProfiles = socialProfiles, category = category, nsfw = nsfw, properties = Option(this.properties))
 
   def getCollectionProfileFile: Option[CollectionFile] = this.profileFileName.map(x => CollectionFile(id = id, documentType = constants.Collection.File.PROFILE, fileName = x, file = Array.emptyByteArray))
 
@@ -33,7 +33,7 @@ case class CollectionDraft(id: String, creatorId: String, name: String, descript
     socialProfiles = Json.toJson(this.socialProfiles).toString(),
     category = this.category,
     nsfw = this.nsfw,
-    properties = this.properties.map(Json.toJson(_).toString()),
+    properties = Json.toJson(this.properties).toString(),
     profileFileName = this.profileFileName,
     coverFileName = this.coverFileName,
     createdBy = this.createdBy,
@@ -48,13 +48,13 @@ object CollectionDrafts {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class CollectionDraftSerialized(id: String, creatorId: String, name: String, description: String, socialProfiles: String, category: String, nsfw: Boolean, properties: Option[String], profileFileName: Option[String], coverFileName: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize: CollectionDraft = CollectionDraft(id = id, creatorId = creatorId, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), category = category, nsfw = nsfw, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[Property]](_)), profileFileName = profileFileName, coverFileName = coverFileName, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class CollectionDraftSerialized(id: String, creatorId: String, name: String, description: String, socialProfiles: String, category: String, nsfw: Boolean, properties: String, profileFileName: Option[String], coverFileName: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
+    def deserialize: CollectionDraft = CollectionDraft(id = id, creatorId = creatorId, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), category = category, nsfw = nsfw, properties = utilities.JSON.convertJsonStringToObject[Seq[Property]](properties), profileFileName = profileFileName, coverFileName = coverFileName, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
   class CollectionDraftTable(tag: Tag) extends Table[CollectionDraftSerialized](tag, "CollectionDraft") with ModelTable[String] {
 
-    def * = (id, creatorId, name, description, socialProfiles, category, nsfw, properties.?, profileFileName.?, coverFileName.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionDraftSerialized.tupled, CollectionDraftSerialized.unapply)
+    def * = (id, creatorId, name, description, socialProfiles, category, nsfw, properties, profileFileName.?, coverFileName.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionDraftSerialized.tupled, CollectionDraftSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -113,7 +113,7 @@ class CollectionDrafts @Inject()(
         socialProfiles = socialProfiles,
         category = category,
         nsfw = nsfw,
-        properties = None,
+        properties = constants.Collection.DefaultProperty.defaultProperties,
         profileFileName = None,
         coverFileName = None)
       for {
@@ -154,17 +154,19 @@ class CollectionDrafts @Inject()(
       } yield ()
     }
 
-    def updateProperties(id: String, properties: Seq[Property]): Future[Unit] = {
+    def updateProperties(id: String, properties: Seq[Property]): Future[CollectionDraft] = {
       val collectionDraft = tryGet(id)
       for {
         collectionDraft <- collectionDraft
-        _ <- update(collectionDraft.copy(properties = Option(properties)).serialize())
-      } yield ()
+        _ <- update(collectionDraft.copy(properties = properties).serialize())
+      } yield collectionDraft.copy(properties = properties)
     }
 
     def totalDrafts(creatorId: String): Future[Int] = filterAndCount(_.creatorId === creatorId)
 
     def getByCreatorAndPage(creatorId: String, pageNumber: Int): Future[Seq[CollectionDraft]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.creatorId === creatorId)(_.createdOnMillisEpoch).map(_.map(_.deserialize))
+
+    def deleteById(id: String): Future[Int] = delete(id)
 
   }
 }
