@@ -9,6 +9,7 @@ object SetProperties {
     mapping(
       constants.FormField.COLLECTION_ID.mapping,
       constants.FormField.NFT_FILE_NAME.mapping,
+      constants.FormField.SAVE_NFT_DRAFT.mapping,
       constants.FormField.NFT_PROPERTIES.name -> seq(
         mapping(
           constants.FormField.NFT_PROPERTY_NAME.mapping,
@@ -19,7 +20,7 @@ object SetProperties {
 
   case class Property(name: String, `value`: String)
 
-  case class Data(collectionId: String, fileName: String, properties: Seq[Property])
+  case class Data(collectionId: String, fileName: String, saveNFTDraft: Boolean, properties: Seq[Property])
 
 
 }

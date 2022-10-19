@@ -8,6 +8,7 @@
 @commonForm(constants.Form.NFT_SET_PROPERTIES, setPropertiesForm) {
     @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collection.id, Symbol("containerDivClass") -> "hidden")
     @commonInputText(setPropertiesForm, constants.FormField.NFT_FILE_NAME, Symbol("value") -> fileName, Symbol("containerDivClass") -> "hidden")
+    @commonCheckbox(setPropertiesForm, constants.FormField.SAVE_NFT_DRAFT, Symbol("containerDivClass") -> "hidden")
     @defining(Option(constants.FormField.COLLECTION_PROPERTIES)) { implicit nestedFormField =>
         @repeatWithIndex(setPropertiesForm(constants.FormField.NFT_PROPERTIES.name), min = collection.properties.fold(0)(_.length)) { (propertyField, index) =>
             @defining(Option(propertyField)) { implicit sequentialFormField =>
