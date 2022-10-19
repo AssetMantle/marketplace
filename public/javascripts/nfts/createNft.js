@@ -1,9 +1,9 @@
-const ul = document.querySelector("#hashtagList");
-const input = document.querySelector("#hashtagField");
-const tagNum = document.querySelector(".details span");
+var ul = document.querySelector("#hashtagList");
+var input = document.querySelector("#hashtagField");
+var tagNum = document.querySelector(".details span");
 
-let maxTags = 5;
-let tags = [];
+var maxTags = 5;
+var tags = [];
 
 countHashtags();
 createHashtag();
@@ -27,6 +27,7 @@ function remove(element, tag){
     tags = [...tags.slice(0, index), ...tags.slice(index + 1)];
     element.parentElement.remove();
     countHashtags();
+    $("#NFT_TAGS").val(tags.join(","));
 }
 
 function addHashtag(e){
@@ -44,6 +45,15 @@ function addHashtag(e){
         }
         e.target.value = "";
     }
+    $("#NFT_TAGS").val(tags.join(","));
 }
 
 input.addEventListener("keyup", addHashtag);
+
+// Select Collection
+function setCollectionId(selectedItem){
+    let selectedElement = $(selectedItem)[0];
+    let selectedElementValue = selectedElement.getAttribute("value");
+    $("#modalNextButtonContainer .form-primary-button").removeClass("disable");
+    $("#modalNextButtonContainer .form-primary-button").attr("onclick",`getForm(jsRoutes.controllers.NFTController.uploadNFTFileForm('${selectedElementValue}'))`);
+}

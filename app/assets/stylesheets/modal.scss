@@ -735,6 +735,7 @@ body.modal-open::-webkit-scrollbar {
         border: none;
         outline: none;
         padding: calc(var(--size-bezel) * 1.5) 12px;
+        flex: 1;
       }
     }
   }

@@ -11,13 +11,22 @@
     </button>
 </div>
 
-@* @collectionList.map(_._1) *@
-@* @collectionList.map(_._2) *@
-
 <div class="createNft">
     <span class="createNftSelectCollection">@Messages(constants.View.CREATE_NFT_FIELD_SELECT_COLLECTION_LABEL)</span>
     <div class="mt-1">
-        @commonDropDown(constants.View.CREATE_NFT_FIELD_SELECT_COLLECTION, collectionList.map(_._2))
+        <div class="dropdown" id="collectionIdList">
+            <input type="hidden" class="dp-input" value=""/>
+            <div class="dropdownHead" onclick="showOptions(this)">
+                <div class="currentSelected">@Messages(constants.View.CREATE_NFT_FIELD_SELECT_COLLECTION)</div>
+            </div>
+            <div class="dropdownBody">
+                <div class="dropdownBodyInner">
+                @collectionList.zipWithIndex.map {case(option, index) =>
+                    <div class="dropdownItem" value="@option._1" onclick="setOption(this); setCollectionId(this);">@option._2</div>
+                }
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="mt-3">
@@ -27,8 +36,8 @@
         </div>
     </div>
 
-    <div class="horizontal-align">
-@*//        @commonPrimaryButton(constants.View.NEXT, JavaScript(s"getForm(jsRoutes.controllers.NFTController.uploadNFTFileForm('${collectionList.head._1}'))"))*@
-        @commonPrimaryButton(constants.View.NEXT, JavaScript(s"getForm(jsRoutes.controllers.NFTController.tagsForm('${collectionList.head._1}','test.png'))"))
+    <div class="horizontal-align" id="modalNextButtonContainer">
+        @commonPrimaryButton(constants.View.NEXT, JavaScript(s""), Symbol("class") -> "disable")
     </div>
 </div>
+<script src="@routes.Assets.versioned("javascripts/nfts/createNft.js")"></script>
