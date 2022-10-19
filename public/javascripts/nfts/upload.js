@@ -1,3 +1,4 @@
 function onSuccessfulUpload(fileHash) {
-    $('#nftFileHashName').val(fileHash);
+    $('#nftFileHashName').text(fileHash);
+    setFileName(fileHash);
 }

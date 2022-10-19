@@ -480,3 +480,8 @@
     @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
   }
 }
+
+// Max Limit for Collection
+.maxDraftLimitInfo{
+  @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+}
