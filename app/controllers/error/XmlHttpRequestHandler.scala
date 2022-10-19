@@ -1,7 +1,11 @@
 package controllers.error
 
+
 import play.api._
 import play.api.http.DefaultHttpErrorHandler
+import play.api.i18n.MessagesApi
+import play.api.i18n.{Lang, Langs, MessagesImpl, MessagesProvider}
+import play.api.mvc.Results.{BadRequest, Status}
 import play.api.mvc._
 import play.api.routing.Router
 
@@ -13,13 +17,24 @@ class XmlHttpRequestHandler @Inject()(
                                        environment: Environment,
                                        configuration: Configuration,
                                        sourceMapper: OptionalSourceMapper,
-                                       router: Provider[Router]
+                                       router: Provider[Router],
+                                       langs: Langs,
+                                       messagesApi: MessagesApi
                                      ) extends DefaultHttpErrorHandler(environment, configuration, sourceMapper, router) {
 
-  override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
+  override def onClientError( request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
+
+
+    implicit val messagesProvider: MessagesProvider = {
+      MessagesImpl(request.transientLang().getOrElse(Lang("en")), messagesApi)
+    }
+
+
     Future.successful(
-      utilities.XMLRestResponse.REQUEST_NOT_WELL_FORMED.result
+      BadRequest(views.html.pageNotFound()(request, messagesProvider))
     )
+
+
   }
 
 }
