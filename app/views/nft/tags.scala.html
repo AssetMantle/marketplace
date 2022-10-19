@@ -8,4 +8,17 @@
     @commonInputText(nftTagsForm, constants.FormField.NFT_TAGS)
     @commonInputText(nftTagsForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionId, Symbol("containerDivClass") -> "hidden")
     @commonInputText(nftTagsForm, constants.FormField.NFT_FILE_NAME, Symbol("value") -> fileName, Symbol("containerDivClass") -> "hidden")
+
+    <div class="hashtagWrapper">
+        <div class="content">
+            <label for="hashtagField">@Messages(constants.View.CREATE_NFT_TAG_LABEL)</label>
+            <ul id="hashtagList" class="mt-1">
+                <input type="text" id="hashtagField">
+            </ul>
+        </div>
+        <div class="mt-1 details">
+            <p><span>5</span> @Messages(constants.View.CREATE_NFT_TAG_REMAINING_LABEL)</p>
+        </div>
+    </div>
 }
+<script src="@routes.Assets.versioned("javascripts/nfts/createNft.js")"></script>

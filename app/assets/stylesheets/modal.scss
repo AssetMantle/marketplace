@@ -690,3 +690,55 @@ body.modal-open::-webkit-scrollbar {
     }
   }
 }
+
+// Create NFT
+.createNft{
+  .createNftSelectCollection{
+    @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+    margin-bottom: 4px;
+  }
+}
+.hashtagWrapper{
+  &:where(.title, li, li i, .details){
+    display: flex;
+    align-items: center;
+  }
+  .content{
+    label{
+      @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+    }
+    ul{
+      display: flex;
+      flex-wrap: wrap;
+      padding: calc(var(--size-bezel) * 2) 12px;
+      border-radius: 8px;
+      border: 1px solid var(--inactive-gray);
+      li{
+        @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--dark));
+        margin: 6px 6px;
+        list-style: none;
+        border-radius: 24px;
+        background: rgba(242, 175, 19, 0.1);
+        padding: 5px 12px 5px 12px;
+        border: 1px solid var(--dark);
+        i{
+          height: 20px;
+          width: 20px;
+          margin-left: 8px;
+          cursor: pointer;
+          justify-content: center;
+        }
+      }
+      input{
+        background-color: transparent;
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+        border: none;
+        outline: none;
+        padding: calc(var(--size-bezel) * 1.5) 12px;
+      }
+    }
+  }
+  .details{
+    @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+  }
+}

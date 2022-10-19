@@ -970,6 +970,3 @@
     z-index: 99;
   }
 }
-.maxDraftLimitInfo{
-  @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
-}
