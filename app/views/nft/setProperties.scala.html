@@ -14,14 +14,19 @@
             @defining(Option(propertyField)) { implicit sequentialFormField =>
                 @if(collection.properties.fold(0)(_.length) > 0) {
                     @if(collection.properties.get(index).required) {
-                        @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
-                        @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).`value`)
+                        <div class="d-flex gap-3">
+                            @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
+                            @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).`value`)
+                        </div>
                     } else {
-                        @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
-                        @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).`value`, Symbol("required") -> false)
+                        <div class="d-flex gap-3">
+                            @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
+                            @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).`value`, Symbol("required") -> false)
+                        </div>
                     }
                 }
             }
         }
     }
 }
+<script src="@routes.Assets.versioned("javascripts/nfts/setProperties.js")"></script>
