@@ -2,6 +2,7 @@ package models.masterTransaction
 
 import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import models.common.NFT._
+import models.master.NFT
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -11,6 +12,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 case class NFTDraft(fileName: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[Seq[Property]], hashTags: Option[Seq[String]], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+
+  def toNFT: NFT = NFT(fileName = fileName, collectionId = collectionId, name = name.orNull, description = description.orNull, properties = properties.getOrElse(Seq()), ipfsLink = "", edition = None)
 
   def getFileHash: String = utilities.FileOperations.getFileNameWithoutExtension(fileName)
 
@@ -116,12 +119,12 @@ class NFTDrafts @Inject()(
       } yield ()
     }
 
-    def updateProperties(fileName: String, properties: Seq[Property]): Future[Unit] = {
+    def updateProperties(fileName: String, properties: Seq[Property]): Future[NFTDraft] = {
       val draft = tryGet(fileName)
       for {
-        draft <- draft
-        _ <- update(draft.copy(properties = Option(properties)).serialize())
-      } yield ()
+        nftDraft <- draft
+        _ <- update(nftDraft.copy(properties = Option(properties)).serialize())
+      } yield nftDraft.copy(properties = Option(properties))
     }
 
     def updateHashTags(fileName: String, hashTags: Seq[String]): Future[Unit] = {

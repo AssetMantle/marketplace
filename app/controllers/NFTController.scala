@@ -4,7 +4,7 @@ import akka.stream.scaladsl.{Source, StreamConverters}
 import akka.util.ByteString
 import controllers.actions._
 import exceptions.BaseException
-import models.master.Collection
+import models.master.{Collection, NFT}
 import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
@@ -290,12 +290,26 @@ class NFTController @Inject()(
           }
         },
         setPropertiesData => {
-          val isOwner = masterCollections.Service.isOwner(id = setPropertiesData.collectionId, accountId = loginState.username)
+          val collection = masterCollections.Service.tryGet(id = setPropertiesData.collectionId)
+
+          def update(collection: Collection) = if (collection.creatorId == loginState.username) {
+            val updateDraft = masterTransactionNFTDrafts.Service.updateProperties(setPropertiesData.fileName, setPropertiesData.getNFTProperties(collection.properties.getOrElse(Seq())))
+
+            def addToNFT(nft: NFT) = if (!setPropertiesData.saveNFTDraft) {
+              masterNFTs.Service.add(nft)
+            } else Future("")
+
+            for {
+              draft <- updateDraft
+              _ <- addToNFT(draft.toNFT)
+            } yield draft.toNFT
+          } else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
 
 
           (for {
-            isOwner <- isOwner
-          } yield Ok
+            collection <- collection
+            nft <- update(collection)
+          } yield PartialContent(views.html.nft.createSuccessful(nft))
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
           }

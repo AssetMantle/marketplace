@@ -107,6 +107,8 @@ class NFTs @Inject()(
       create(nft.serialize())
     }
 
+    def add(nft: NFT): Future[String] = create(nft.serialize())
+
     def fetchAll(): Future[Seq[NFT]] = getAll.map(_.map(_.deserialize))
 
     def tryGet(nftId: String): Future[NFT] = tryGetById(nftId).map(_.deserialize)
