@@ -36,7 +36,6 @@ class AccountController @Inject()(
   implicit val callbackOnSessionTimeout: Call = routes.SettingController.viewSettings()
 
   def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    request.lang
     Ok(views.html.account.signUp())
   }
 

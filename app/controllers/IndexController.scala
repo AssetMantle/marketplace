@@ -40,10 +40,6 @@ class IndexController @Inject()(
     }
   }
 
-  def PageNotFound: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      Future(Ok(views.html.pageNotFound()))
-  }
 
   starter.start()
 }
