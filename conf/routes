@@ -86,8 +86,8 @@ GET         /basicDetails                                     controllers.NFTCon
 POST        /basicDetails                                     controllers.NFTController.basicDetails()
 GET         /nftTags                                          controllers.NFTController.tagsForm(collectionId: String, fileName: String)
 POST        /nftTags                                          controllers.NFTController.tags()
-GET         /addNFTProperties                                 controllers.NFTController.addPropertiesForm(collectionId: String, fileName: String)
-POST        /addNFTProperties                                 controllers.NFTController.addProperties()
+GET         /setProperties                                    controllers.NFTController.setPropertiesForm(collectionId: String, fileName: String)
+POST        /setProperties                                    controllers.NFTController.setProperties()
 
 GET         /settings                                         controllers.SettingController.viewSettings()
 GET         /profileSettings                                  controllers.SettingController.settings()
