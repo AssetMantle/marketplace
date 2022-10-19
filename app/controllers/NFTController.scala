@@ -11,7 +11,7 @@ import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import views.base.companion.UploadFile
-import views.nft.companion.{NFTBasicDetail, NFTTags}
+import views.nft.companion.{NFTBasicDetail, NFTTags, SetProperties}
 
 import java.nio.file.Files
 import javax.inject.{Inject, Singleton}
@@ -229,41 +229,6 @@ class NFTController @Inject()(
       )
   }
 
-  def addPropertiesForm(collectionId: String, fileName: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val collection = masterCollections.Service.tryGet(id = collectionId)
-      (for {
-        collection <- collection
-      } yield if (collection.creatorId == loginState.username) Ok(views.html.nft.addProperties(collectionId = collectionId, fileName = fileName, collectionProperties = collection.properties.getOrElse(Seq())))
-      else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
-        ).recover {
-        case baseException: BaseException => BadRequest(baseException.failure.message)
-      }
-  }
-
-  def addProperties(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      NFTTags.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(views.html.nft.tags(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.NFT_FILE_NAME.name, ""))))
-        },
-        tagsData => {
-          val isOwner = masterCollections.Service.isOwner(id = tagsData.collectionId, accountId = loginState.username)
-
-          def update(isOwner: Boolean) = if (isOwner) masterTransactionNFTDrafts.Service.updateHashTags(fileName = tagsData.fileName, hashTags = tagsData.getTags)
-          else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
-
-          (for {
-            isOwner <- isOwner
-            _ <- update(isOwner)
-          } yield Ok
-            ).recover {
-            case baseException: BaseException => BadRequest(views.html.nft.tags(NFTTags.form.withGlobalError(baseException.failure.message), collectionId = tagsData.collectionId, fileName = tagsData.fileName))
-          }
-        }
-      )
-  }
-
   def tagsForm(collectionId: String, fileName: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val isOwner = masterCollections.Service.isOwner(id = collectionId, accountId = loginState.username)
@@ -298,5 +263,45 @@ class NFTController @Inject()(
         }
       )
   }
+
+  def setPropertiesForm(collectionId: String, fileName: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val collection = masterCollections.Service.tryGet(id = collectionId)
+      (for {
+        collection <- collection
+      } yield if (collection.creatorId == loginState.username) Ok(views.html.nft.setProperties(collection = collection, fileName = fileName))
+      else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def setProperties(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      SetProperties.form.bindFromRequest().fold(
+        formWithErrors => {
+          val collection = masterCollections.Service.tryGet(id = formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))
+          (for {
+            collection <- collection
+          } yield if (collection.creatorId == loginState.username) BadRequest(views.html.nft.setProperties(formWithErrors, collection, formWithErrors.data.getOrElse(constants.FormField.NFT_FILE_NAME.name, "")))
+          else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        },
+        setPropertiesData => {
+          val isOwner = masterCollections.Service.isOwner(id = setPropertiesData.collectionId, accountId = loginState.username)
+
+
+          (for {
+            isOwner <- isOwner
+          } yield Ok
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        }
+      )
+  }
+
 
 }
