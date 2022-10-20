@@ -309,7 +309,7 @@ class NFTController @Inject()(
           (for {
             collection <- collection
             nft <- update(collection)
-          } yield PartialContent(views.html.nft.createSuccessful(nft))
+          } yield PartialContent(views.html.nft.createSuccessful(nft, setPropertiesData.saveNFTDraft))
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
           }

@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
 @import views.html.base.modal._
 
-@(nft: master.NFT)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(nft: master.NFT, savedAsDraft: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 @successModal(heading = constants.View.CREATE_NFT_SUCCESS_TITLE, subHeading = constants.View.CREATE_NFT_SUCCESS_SUBTITLE)
