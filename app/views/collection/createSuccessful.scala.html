@@ -1,5 +1,23 @@
 @import models.masterTransaction.CollectionDraft
+@import views.html.base.modal._
+@import views.html.base.buttons._
 
 @(draft: CollectionDraft, savedAsDraft: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@draft.name
+@if(savedAsDraft){
+    @successModal(heading = constants.View.CREATE_COLLECTION_DRAFT_SUCCESS_TITLE, subHeading = constants.View.CREATE_COLLECTION_DRAFT_SUCCESS_SUBTITLE)
+}else{
+    @successModal(heading = constants.View.CREATE_COLLECTION_SUCCESS_TITLE, subHeading = constants.View.CREATE_COLLECTION_SUCCESS_SUBTITLE)
+    <div class="form-address-box">
+        <div class="form-address-box-item">
+            <span class="address-box-label">@Messages(constants.View.CREATE_COLLECTION_SUCCESS_LABEL_NAME)</span>
+            <span class="address-box-text">
+                <span class="username-data" data-value="@draft.name">@draft.name</span>
+                <span class="form-copy-icon" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copy.png")"/></span>
+            </span>
+        </div>
+    </div>
+    <div class="horizontal-align">
+        @commonPrimaryButton(constants.View.NEXT, JavaScript(s"getForm(jsRoutes.controllers.NFTController.selectCollection())"))
+    </div>
+}
