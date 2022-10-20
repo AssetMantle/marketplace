@@ -636,6 +636,11 @@ IMMUTABLE=Immutable
 MUTABLE=Mutable
 NON_META=Hide
 META=Show
+CREATE_COLLECTION_DRAFT_SUCCESS_TITLE=Draft Saved Successfully
+CREATE_COLLECTION_DRAFT_SUCCESS_SUBTITLE=Your draft has been saved successfully. You will find it in my collections section of profile.
+CREATE_COLLECTION_SUCCESS_TITLE=Collection Created Successfully
+CREATE_COLLECTION_SUCCESS_SUBTITLE=Click "Next" to create NFTs.
+CREATE_COLLECTION_SUCCESS_LABEL_NAME=Collection Name:
 
 #Create NFT
 CREATE_NFT_LABEL=Create a new NFT!
@@ -666,3 +671,6 @@ CREATE_NFT_SUCCESS_SUBTITLE=NFT created and added to the collection successfully
 NFT_PROPERTY_NAME=Name
 NFT_PROPERTY_VALUE=Value
 NFT_PROPERTY_BOOLEAN_FIELD_LABEL=Select Value
+NFT_DRAFT_SUCCESS_TITLE=Draft Saved Successfully
+NFT_DRAFT_SUCCESS_SUBTITLE=Your draft has been saved successfully.
+CREATE_NFT_SUCCESS_LABEL_NAME=NFT Name:
