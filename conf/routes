@@ -145,3 +145,5 @@ POST        /leaveWhitelist                                   controllers.Whitel
 GET         /gasTokenPrice                                    controllers.BlockchainTransactionController.gasTokenPrice()
 GET         /sendCoin                                         controllers.BlockchainTransactionController.sendCoinForm(fromAddress: String)
 POST        /sendCoin                                         controllers.BlockchainTransactionController.sendCoin()
+
+

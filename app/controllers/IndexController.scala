@@ -40,5 +40,6 @@ class IndexController @Inject()(
     }
   }
 
+
   starter.start()
 }
