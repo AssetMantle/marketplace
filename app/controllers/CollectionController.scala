@@ -348,7 +348,7 @@ class CollectionController @Inject()(
           (for {
             collectionDraft <- update
             _ <- publishCollection(collectionDraft)
-          } yield PartialContent(views.html.collection.createSuccessful(collectionDraft))
+          } yield PartialContent(views.html.collection.createSuccessful(collectionDraft, definePropertiesData.saveAsDraft))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.collection.defineProperties(DefineProperties.form.withGlobalError(baseException.failure.message), None))
           }
