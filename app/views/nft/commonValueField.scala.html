@@ -1,0 +1,43 @@
+@(propertyType: String, propertyValue: String, index: Number)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@if(propertyType == "BOOLEAN") {
+    <div class="mb-0 commonInputInt w-100">
+        <dl>
+            <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+            <dd class="mt-2">
+                <div class="dropdown" id="booleanOptionList">
+                    <input type="hidden" class="dp-input" value=""/>
+                    <div class="dropdownHead" onclick="showOptions(this)">
+                        <div class="currentSelected">@Messages(constants.View.NFT_PROPERTY_BOOLEAN_FIELD_LABEL)</div>
+                    </div>
+                    <div class="dropdownBody">
+                        <div class="dropdownBodyInner">
+                            <div class="dropdownItem" value="true" onclick="setOption(this); setBooleanValue(@index, 'true');">True</div>
+                            <div class="dropdownItem" value="false" onclick="setOption(this); setBooleanValue(@index, 'false');">False</div>
+                        </div>
+                    </div>
+                </div>
+            </dd>
+        </dl>
+    </div>
+}
+@if(propertyType == "NUMBER") {
+    <div class="mb-0 commonInputInt w-100">
+        <dl>
+            <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+            <dd>
+                <input type="number" id="fieldValue_@index" name="fieldValue_@index" value="@propertyValue" class="am-input" onkeyup="setNonBooleanValue(@index, event)"/>
+            </dd>
+        </dl>
+    </div>
+}
+@if(propertyType == "STRING") {
+    <div class="mb-0 commonInputInt w-100">
+        <dl>
+            <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+            <dd>
+                <input type="text" id="fieldValue_@index" name="fieldValue_@index" value="@propertyValue" class="am-input" onkeyup="setNonBooleanValue(@index, event)"/>
+            </dd>
+        </dl>
+    </div>
+}

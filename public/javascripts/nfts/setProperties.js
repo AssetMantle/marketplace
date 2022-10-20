@@ -8,3 +8,12 @@ $("#FORM_NFT_SET_PROPERTIES_SUBMIT").parent().prepend(`
                                     <button class="form-secondary-button active" type="button" onclick="saveToDraft()">Save Draft</button>
                                 </div>
                                 `);
+
+function setBooleanValue(valueFieldIndex, fieldValue){
+    $(`#NFT_PROPERTIES_${valueFieldIndex}_COLLECTION_PROPERTY_NAME`).attr("value",fieldValue);
+}
+
+function setNonBooleanValue(valueFieldIndex, e){
+    let fieldValue = e.target.value;
+    $(`#NFT_PROPERTIES_${valueFieldIndex}_COLLECTION_PROPERTY_NAME`).attr("value",fieldValue);
+}
