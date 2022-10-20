@@ -12,7 +12,7 @@ function getFileTypes(documentType) {
     return fileTypes
 }
 
-function uploadFile(storeFileRoute, uploadRoute, id, documentType, filesSupported, maxFileSize) {
+function uploadFile(storeFileRoute, uploadRoute, id, documentType, filesSupported, maxFileSize, onSuccessCallback) {
     const rFile = new Resumable({
         target: storeFileRoute(id, documentType).url,
         fileType: filesSupported.split("_"),
@@ -55,6 +55,7 @@ function uploadFile(storeFileRoute, uploadRoute, id, documentType, filesSupporte
                 200: function (data) {
                     $("#uploadCompletionMessage_" + documentType).show();
                     uploadCompletionMessage.textContent = data;
+                    onSuccessCallback(data);
                 },
                 206: function (data) {
                     $("#commonModalContent").html(data);

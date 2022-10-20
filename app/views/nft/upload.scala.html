@@ -1,0 +1,29 @@
+@import controllers.actions.LoginState
+@import views.html.base.buttons._
+
+@(collectionId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+<script src="@routes.Assets.versioned("javascripts/nfts/upload.js")"></script>
+
+<div class="mb-4 modal-header">
+    <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.UPLOAD)</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                &times;
+    </button>
+</div>
+
+<div class="hidden" id="nftFileHashName"></div>
+
+<div class="d-flex gap-3 mb-4">
+    @views.html.base.commonUploadFile(constants.File.NFT_FILE_FORM, id = collectionId, documentType = constants.View.NFT, label = constants.View.UPLOAD_NFT_LABEL, onSuccessCallback = JavaScript("onSuccessfulUpload"))
+</div>
+
+<div class="horizontal-align">
+    @commonPrimaryButton(constants.View.NEXT, JavaScript(s""), Symbol("id") -> "uploadNftNextButton", Symbol("class") -> "disable")
+</div>
+
+<script>
+    function setFileName(fileHash){
+        $("#uploadNftNextButton").removeClass("disable");
+        $("#uploadNftNextButton").attr("onclick",`getForm(jsRoutes.controllers.NFTController.basicDetailsForm("@collectionId","${fileHash}"))`);
+    }
+</script>

@@ -18,7 +18,7 @@ object Collection {
 
   def getFilePath: String = constants.CommonConfig.Files.CollectionPath + "/"
 
-  def getNFTFilePath(collectionId: String)(implicit module: String, logger: Logger): String = constants.CommonConfig.Files.CollectionPath + "/" + collectionId + "/nfts/"
+  def getNFTFilePath: String = constants.CommonConfig.Files.CollectionPath  + "/nfts/"
 
   object Category {
     val ART = "ART"

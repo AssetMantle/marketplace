@@ -1,7 +1,8 @@
 @import views.html.base._
 @import views.html.base.buttons._
+@import controllers.actions.LoginState
 
-@(id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div class="mb-4 modal-header">
     <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.COLLECTION_PROFILE_COVER_TITLE)</h5>

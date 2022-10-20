@@ -122,6 +122,9 @@ object Response {
   val FILE_SIZE_EXCEED_LIMIT = new Failure("FILE_SIZE_EXCEED_LIMIT")
   val INVALID_DOCUMENT_TYPE = new Failure("INVALID_DOCUMENT_TYPE")
   val INVALID_OPTIONAL_VALUE =  new Failure("INVALID_OPTIONAL_VALUE")
+  val NFT_PROPERTY_NOT_FOUND =  new Failure("NFT_PROPERTY_NOT_FOUND")
+  val NFT_PROPERTY_NAME_NOT_FOUND =  new Failure("NFT_PROPERTY_NAME_NOT_FOUND")
+  val NFT_PROPERTY_DESCRIPTION_NOT_FOUND =  new Failure("NFT_PROPERTY_DESCRIPTION_NOT_FOUND")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

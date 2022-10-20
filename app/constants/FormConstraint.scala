@@ -2,6 +2,7 @@ package constants
 
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import views.account.companion._
+import models.common.{Collection => commonCollection}
 import views.blockchainTransaction.companion._
 import views.collection.{companion => collection}
 import views.nft.companion._

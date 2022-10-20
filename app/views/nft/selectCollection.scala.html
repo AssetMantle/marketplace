@@ -1,9 +1,43 @@
 @import controllers.actions.LoginState
 @import views.html.base.buttons._
+@import views.html.base.form._
 
 @(collectionList: Seq[(String, String)])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@collectionList.map(_._1)
-@collectionList.map(_._2)
+<div class="mb-4 modal-header">
+    <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.CREATE_NFT_TITLE)</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                &times;
+    </button>
+</div>
 
-@commonPrimaryButton(constants.View.NEXT, JavaScript("getForm(jsRoutes.controllers.NFTController.signInWithCallbackForm('@callbackUrl'))"))
+<div class="createNft">
+    <span class="createNftSelectCollection">@Messages(constants.View.CREATE_NFT_FIELD_SELECT_COLLECTION_LABEL)</span>
+    <div class="mt-1">
+        <div class="dropdown" id="collectionIdList">
+            <input type="hidden" class="dp-input" value=""/>
+            <div class="dropdownHead" onclick="showOptions(this)">
+                <div class="currentSelected">@Messages(constants.View.CREATE_NFT_FIELD_SELECT_COLLECTION)</div>
+            </div>
+            <div class="dropdownBody">
+                <div class="dropdownBodyInner">
+                @collectionList.zipWithIndex.map {case(option, index) =>
+                    <div class="dropdownItem" value="@option._1" onclick="setOption(this); setCollectionId(this);">@option._2</div>
+                }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <div class="footerMessage">
+            <span>@Messages(constants.View.CREATE_NFT_NEW_COLLECTION_LABEL)</span>
+            <a class="link" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_COLLECTION.get, ""))">@Messages(constants.View.CREATE_NFT_NEW_COLLECTION_LINK)</a>
+        </div>
+    </div>
+
+    <div class="horizontal-align" id="modalNextButtonContainer">
+        @commonPrimaryButton(constants.View.NEXT, JavaScript(s""), Symbol("class") -> "disable")
+    </div>
+</div>
+<script src="@routes.Assets.versioned("javascripts/nfts/createNft.js")"></script>

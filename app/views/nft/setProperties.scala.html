@@ -1,0 +1,39 @@
+@import views.html.base.form._
+@import views.nft.companion.SetProperties
+@import views.html.helper.repeatWithIndex
+@import models.master.Collection
+@import views.html.nft.commonValueField
+
+@(setPropertiesForm: Form[SetProperties.Data] = SetProperties.form, collection: Collection, fileName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.NFT_SET_PROPERTIES, setPropertiesForm) {
+    @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collection.id, Symbol("containerDivClass") -> "hidden")
+    @commonInputText(setPropertiesForm, constants.FormField.NFT_FILE_NAME, Symbol("value") -> fileName, Symbol("containerDivClass") -> "hidden")
+    @commonCheckbox(setPropertiesForm, constants.FormField.SAVE_NFT_DRAFT, Symbol("containerDivClass") -> "hidden")
+    @defining(Option(constants.FormField.COLLECTION_PROPERTIES)) { implicit nestedFormField =>
+        @repeatWithIndex(setPropertiesForm(constants.FormField.NFT_PROPERTIES.name), min = collection.properties.fold(0)(_.length)) { (propertyField, index) =>
+            @defining(Option(propertyField)) { implicit sequentialFormField =>
+                @if(collection.properties.fold(0)(_.length) > 0) {
+                    @if(collection.properties.get(index).required) {
+                        <div class="d-flex gap-3">
+                            @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
+                            <div class="hidden">
+                                @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).`value`)
+                            </div>
+                            @commonValueField(collection.properties.get(index).`type`, collection.properties.get(index).`value`, index)
+                        </div>
+                    } else {
+                        <div class="d-flex gap-3">
+                            @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
+                            <div class="hidden">
+                                @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).`value`, Symbol("required") -> false)
+                            </div>
+                            @commonValueField(collection.properties.get(index).`type`, collection.properties.get(index).`value`, index)
+                        </div>
+                    }
+                }
+            }
+        }
+    }
+}
+<script src="@routes.Assets.versioned("javascripts/nfts/setProperties.js")"></script>
