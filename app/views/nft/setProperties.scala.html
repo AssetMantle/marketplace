@@ -2,6 +2,7 @@
 @import views.nft.companion.SetProperties
 @import views.html.helper.repeatWithIndex
 @import models.master.Collection
+@import views.html.nft.commonValueField
 
 @(setPropertiesForm: Form[SetProperties.Data] = SetProperties.form, collection: Collection, fileName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -16,12 +17,18 @@
                     @if(collection.properties.get(index).required) {
                         <div class="d-flex gap-3">
                             @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
-                            @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).`value`)
+                            <div class="hidden">
+                                @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).`value`)
+                            </div>
+                            @commonValueField(collection.properties.get(index).`type`, collection.properties.get(index).`value`, index)
                         </div>
                     } else {
                         <div class="d-flex gap-3">
                             @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
-                            @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).`value`, Symbol("required") -> false)
+                            <div class="hidden">
+                                @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).`value`, Symbol("required") -> false)
+                            </div>
+                            @commonValueField(collection.properties.get(index).`type`, collection.properties.get(index).`value`, index)
                         </div>
                     }
                 }
