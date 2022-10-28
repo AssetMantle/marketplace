@@ -21,14 +21,19 @@ object SetProperties {
     )(Data.apply)(Data.unapply))
 
 
-  case class Property(name: String, `value`: String)
+  case class Property(name: String, value: String)
 
   case class Data(collectionId: String, fileName: String, saveNFTDraft: Boolean, properties: Seq[Property]) {
 
-    def getNFTProperties(collectionProperties: Seq[collectionProperty])(implicit logger: Logger, module: String): Seq[BaseNFTProperty] = this.properties.map { x =>
-      val collectionProperty = collectionProperties.find(_.name == x.name).getOrElse(constants.Response.NFT_PROPERTY_NOT_FOUND.throwBaseException())
-      nftProperty(name = x.name, `type` = collectionProperty.`type`, `value` = x.`value`, meta = collectionProperty.meta, mutable = collectionProperty.mutable).toBaseNFTProperty
+    def validate(collectionProperties: Seq[collectionProperty])(implicit logger: Logger, module: String): Boolean = {
+      val collectionNameTypeMap = collectionProperties.map(x => x.name -> x.`type`).toMap
+      this.properties.map(_.name).toSet.equals(collectionProperties.map(_.name).toSet) && this.properties.forall(x => collectionNameTypeMap.get(x.name).fold(false)(y => constants.NFT.Data.isCastable(`type` = y, value = x.value)))
     }
+
+    def getNFTProperties(collectionProperties: Seq[collectionProperty])(implicit logger: Logger, module: String): Seq[BaseNFTProperty] = if (this.validate(collectionProperties)) this.properties.map { x =>
+      val collectionProperty = collectionProperties.find(_.name == x.name).getOrElse(constants.Response.NFT_PROPERTY_NOT_FOUND.throwBaseException())
+      nftProperty(name = x.name, `type` = collectionProperty.`type`, `value` = x.value, meta = collectionProperty.meta, mutable = collectionProperty.mutable).toBaseNFTProperty
+    } else constants.Response.INVALID_NFT_PROPERTY.throwBaseException()
 
   }
 
