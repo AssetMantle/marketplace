@@ -95,14 +95,15 @@ object FormConstraint {
 
   val collectionPropertiesConstraint: Constraint[collection.DefineProperties.Property] = Constraint("constraints.DefinePropertiesProperty")({ propertyData: collection.DefineProperties.Property =>
     val errors = Seq(
-      if (propertyData.propertyType == constants.NFT.Data.BOOLEAN && propertyData.optionalValue.isDefined && (propertyData.optionalValue.getOrElse("") != constants.NFT.Data.TRUE || propertyData.optionalValue.getOrElse("") != constants.NFT.Data.SMALL_TRUE || propertyData.optionalValue.getOrElse("") != constants.NFT.Data.FALSE || propertyData.optionalValue.getOrElse("") != constants.NFT.Data.SMALL_FALSE)) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
+      if (!constants.NFT.Data.TypesList.contains(propertyData.propertyType)) Option(ValidationError(constants.Response.NFT_PROPERTY_TYPE_NOT_FOUND.message)) else None,
+      if (propertyData.propertyType == constants.NFT.Data.BOOLEAN && propertyData.optionalValue.isDefined && (propertyData.optionalValue.getOrElse("") != constants.NFT.Data.TRUE || propertyData.optionalValue.getOrElse("") != constants.NFT.Data.FALSE)) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
       if (propertyData.propertyType == constants.NFT.Data.DECIMAL && propertyData.optionalValue.isDefined && propertyData.optionalValue.getOrElse("0").toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
   val defineCollectionPropertiesConstraint: Constraint[collection.DefineProperties.Data] = Constraint("constraints.DefineCollectionPropertiesConstraint")({ definePropertiesData: collection.DefineProperties.Data =>
-    val definedPropertiesNames = definePropertiesData.properties.filter(_.name.isDefined).map(_.name.get.toLowerCase())
+    val definedPropertiesNames = definePropertiesData.properties.flatMap(_.name)
     val errors = Seq(
       if ((definedPropertiesNames.length + constants.Collection.DefaultProperty.list.length) > constants.Blockchain.MaximumProperties) Option(ValidationError(constants.Response.MAXIMUM_COLLECTION_PROPERTIES_EXCEEDED.message)) else None,
       if (definedPropertiesNames.intersect(constants.Collection.DefaultProperty.list).nonEmpty) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES.message)) else None,
@@ -115,6 +116,7 @@ object FormConstraint {
     val tags = nftTagsData.tags.split(",")
     val errors = Seq(
       if (tags.exists(x => x.length == 1 || x.charAt(0) != '#')) Option(ValidationError(constants.Response.INVALID_NFT_TAGS.message)) else None,
+      if (tags.distinct.length != tags.length) Option(ValidationError(constants.Response.REPEATED_NFT_TAGS.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })

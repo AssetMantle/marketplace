@@ -109,6 +109,8 @@ class NFTDrafts @Inject()(
 
     def deleteByCollectionId(id: String): Future[Int] = filterAndDelete(_.collectionId === id)
 
+    def deleteNFT(fileName: String): Future[Int] = filterAndDelete(_.fileName === fileName)
+
     def getByIds(ids: Seq[String]): Future[Seq[NFTDraft]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
 
     def updateNameDescription(fileName: String, name: String, description: String): Future[Unit] = {
