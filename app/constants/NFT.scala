@@ -6,10 +6,19 @@ object NFT {
 
   object Data {
     val STRING = "STRING"
-    val NUMBER = "NUMBER"
+    val DECIMAL = "DECIMAL"
     val BOOLEAN = "BOOLEAN"
 
+    @deprecated
+    val NUMBER = "NUMBER"
+    @deprecated
+    val SMALL_STRING = "string"
+    @deprecated
+    val SMALL_NUMBER = "number"
+
     val TRUE = "TRUE"
+    val SMALL_TRUE = "true"
     val FALSE = "FALSE"
+    val SMALL_FALSE = "false"
   }
 }

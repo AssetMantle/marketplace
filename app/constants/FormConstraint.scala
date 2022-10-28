@@ -2,7 +2,6 @@ package constants
 
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import views.account.companion._
-import models.common.{Collection => commonCollection}
 import views.blockchainTransaction.companion._
 import views.collection.{companion => collection}
 import views.nft.companion._
@@ -96,8 +95,8 @@ object FormConstraint {
 
   val collectionPropertiesConstraint: Constraint[collection.DefineProperties.Property] = Constraint("constraints.DefinePropertiesProperty")({ propertyData: collection.DefineProperties.Property =>
     val errors = Seq(
-      if (propertyData.propertyType == constants.NFT.Data.BOOLEAN && propertyData.optionalValue.isDefined && (propertyData.optionalValue.getOrElse("") != constants.NFT.Data.TRUE || propertyData.optionalValue.getOrElse("") != constants.NFT.Data.FALSE)) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
-      if (propertyData.propertyType == constants.NFT.Data.NUMBER && propertyData.optionalValue.isDefined && propertyData.optionalValue.getOrElse("0").toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
+      if (propertyData.propertyType == constants.NFT.Data.BOOLEAN && propertyData.optionalValue.isDefined && (propertyData.optionalValue.getOrElse("") != constants.NFT.Data.TRUE || propertyData.optionalValue.getOrElse("") != constants.NFT.Data.SMALL_TRUE || propertyData.optionalValue.getOrElse("") != constants.NFT.Data.FALSE || propertyData.optionalValue.getOrElse("") != constants.NFT.Data.SMALL_FALSE)) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
+      if (propertyData.propertyType == constants.NFT.Data.DECIMAL && propertyData.optionalValue.isDefined && propertyData.optionalValue.getOrElse("0").toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })
