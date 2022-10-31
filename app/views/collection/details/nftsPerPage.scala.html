@@ -1,7 +1,8 @@
 @import views.html.nft._
 @import controllers.actions.LoginState
+@import models.masterTransaction.NFTDraft
 
-@(collection: master.Collection, nfts: Seq[master.NFT], likedNFTIds: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(collection: master.Collection, nfts: Seq[master.NFT], likedNFTIds: Seq[String], nftDrafts: Seq[NFTDraft])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <div class="row m-0 nftPage">
 
     @if(loginState.fold("")(_.username) == collection.creatorId) {
@@ -20,14 +21,17 @@
                 </div>
             </div>
         </div>
+        @nftDrafts.map{nftDraft =>
+            @commonNFTCard(collection, nftDraft.toNFT, None, JavaScript(s"getForm(jsRoutes.controllers.NFTController.basicDetailsForm('${nftDraft.collectionId}','${nftDraft.fileName}'))"))
+        }
     }
 
     @if(nfts.nonEmpty) {
         @nfts.map { nft =>
             @if(loginState.isEmpty) {
-                @commonNFTCard(collection, nft, None)
+                @commonNFTCard(collection, nft, None, JavaScript(s"viewNFT('${nft.fileName}')"))
             } else {
-                @commonNFTCard(collection, nft, Option(likedNFTIds.contains(nft.fileName)))
+                @commonNFTCard(collection, nft, Option(likedNFTIds.contains(nft.fileName)), JavaScript(s"viewNFT('${nft.fileName}')"))
             }
         }
     } else {

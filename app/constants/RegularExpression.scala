@@ -26,4 +26,6 @@ object RegularExpression {
   val SWIFT_CODE: RegularExpression = RegularExpression("SWIFT_CODE", """^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$""".r)
   val SPLIT: RegularExpression = RegularExpression("SPLIT", """^[0-9]+(\\.[0-9]+)?$""".r)
   val TRANSACTION_HASH: RegularExpression = RegularExpression("TRANSACTION_HASH", """[A-F0-9]{64}""".r)
+  val TWITTER_USERNAME: RegularExpression = RegularExpression("TWITTER_USERNAME", """^[A-Za-z0-9_]*$""".r)
+  val INSTAGRAM_USERNAME: RegularExpression = RegularExpression("INSTAGRAM_USERNAME", """^[A-Za-z0-9._]*$""".r)
 }

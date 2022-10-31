@@ -2,6 +2,7 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
+import models.master.Collection
 import models.masterTransaction.CollectionDraft
 import models.{master, masterTransaction}
 import play.api.Logger
@@ -27,6 +28,7 @@ class CollectionController @Inject()(
                                       masterCollections: master.Collections,
                                       masterTransactionCollectionDrafts: masterTransaction.CollectionDrafts,
                                       masterNFTs: master.NFTs,
+                                      masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                       masterCollectionFiles: master.CollectionFiles,
                                       masterWishLists: master.WishLists,
                                     )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -44,7 +46,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def viewCollection(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollection(id: String): EssentialAction = cached.apply(req => req.path + "/" + id + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
@@ -96,7 +98,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionNFTs(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
+  def collectionNFTs(id: String): EssentialAction = cached.apply(req => req.path + "/" + id + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
@@ -112,7 +114,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionNFTsPerPage(id: String, pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + id + "/" + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
+  def collectionNFTsPerPage(id: String, pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + id + "/" + pageNumber.toString + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
@@ -121,11 +123,14 @@ class CollectionController @Inject()(
 
         val likedNFTs = loginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollection(accountId = x.username, collectionId = id))
 
+        def nftDrafts(collection: Collection) = if(loginState.fold("")(_.username) == collection.creatorId) masterTransactionNFTDrafts.Service.getAllForCollection(id) else Future(Seq())
+
         (for {
           collection <- collection
           nfts <- nfts
+          nftDrafts <- nftDrafts(collection)
           likedNFTs <- likedNFTs
-        } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts, likedNFTs))
+        } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts, likedNFTs, nftDrafts))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -187,11 +192,11 @@ class CollectionController @Inject()(
           Future(BadRequest(views.html.collection.create(formWithErrors, 0)))
         },
         createData => {
-          val collectionId = masterTransactionCollectionDrafts.Service.add(name = createData.name, description = createData.description, socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw)
+          val collectionDraft = masterTransactionCollectionDrafts.Service.add(name = createData.name, description = createData.description, socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw)
 
           (for {
-            collectionId <- collectionId
-          } yield PartialContent(views.html.collection.uploadFile(id = collectionId))
+            collectionDraft <- collectionDraft
+          } yield PartialContent(views.html.collection.uploadFile(collectionDraft = collectionDraft))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message), 0))
           }
@@ -226,8 +231,8 @@ class CollectionController @Inject()(
           val update = masterTransactionCollectionDrafts.Service.checkOwnerAndUpdate(id = editData.collectionId, name = editData.name, description = editData.description, socialProfiles = editData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = editData.nsfw)
 
           (for {
-            _ <- update
-          } yield PartialContent(views.html.collection.uploadFile(id = editData.collectionId))
+            collectionDraft <- update
+          } yield PartialContent(views.html.collection.uploadFile(collectionDraft = collectionDraft))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.collection.edit(Edit.form.withGlobalError(baseException.failure.message), None))
           }
@@ -296,7 +301,7 @@ class CollectionController @Inject()(
         _ <- uploadToAws(isOwner)
         _ <- deleteLocalFile()
         _ <- add
-      } yield Ok
+      } yield Ok(constants.CommonConfig.AmazonS3.s3BucketURL + awsKey)
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }

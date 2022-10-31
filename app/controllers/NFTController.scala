@@ -118,25 +118,25 @@ class NFTController @Inject()(
     }
   }
 
-  def selectCollection(): EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
-    withLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val collections = masterCollections.Service.getByCreator(loginState.username)
-        (for {
-          collections <- collections
-        } yield Ok(views.html.nft.selectCollection(collections))
-          ).recover {
-          case baseException: BaseException => BadRequest(baseException.failure.message)
-        }
-    }
+  def selectCollection(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val collections = masterCollections.Service.getByCreator(loginState.username)
+      (for {
+        collections <- collections
+      } yield Ok(views.html.nft.selectCollection(collections))
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
   }
 
   def uploadNFTFileForm(collectionId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val checkCollectionOwner = masterCollections.Service.isOwner(id = collectionId, accountId = loginState.username)
+      val totalNftDrafts = masterTransactionNFTDrafts.Service.countAllForCollection(collectionId)
       (for {
         collectionOwner <- checkCollectionOwner
-      } yield if (collectionOwner) Ok(views.html.nft.upload(collectionId))
+        totalNftDrafts <- totalNftDrafts
+      } yield if (collectionOwner) Ok(views.html.nft.upload(collectionId, totalNftDrafts))
       else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
@@ -197,10 +197,14 @@ class NFTController @Inject()(
   def basicDetailsForm(collectionId: String, fileName: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val isOwner = masterCollections.Service.isOwner(id = collectionId, accountId = loginState.username)
+
+      def optionalNFTDraft(isOwner: Boolean) = if (isOwner) masterTransactionNFTDrafts.Service.get(fileName)
+      else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
+
       (for {
         isOwner <- isOwner
-      } yield if (isOwner) Ok(views.html.nft.nftBasicDetail(collectionId = collectionId, fileName = fileName))
-      else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+        optionalNFTDraft <- optionalNFTDraft(isOwner)
+      } yield Ok(views.html.nft.nftBasicDetail(collectionId = collectionId, fileName = fileName, optionalNFTDraft = optionalNFTDraft))
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
@@ -210,7 +214,16 @@ class NFTController @Inject()(
     implicit request =>
       NFTBasicDetail.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.nft.nftBasicDetail(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.NFT_FILE_NAME.name, ""))))
+          val fileName = formWithErrors.data.getOrElse(constants.FormField.NFT_FILE_NAME.name, "")
+          val optionalNFTDraft = masterTransactionNFTDrafts.Service.get(fileName)
+
+          (for {
+            optionalNFTDraft <- optionalNFTDraft
+          } yield BadRequest(views.html.nft.nftBasicDetail(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""), fileName, optionalNFTDraft))
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+
         },
         basicDetailsData => {
           val isOwner = masterCollections.Service.isOwner(id = basicDetailsData.collectionId, accountId = loginState.username)
@@ -220,10 +233,10 @@ class NFTController @Inject()(
 
           (for {
             isOwner <- isOwner
-            _ <- update(isOwner)
+            nftDraft <- update(isOwner)
           } yield Ok
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.nft.nftBasicDetail(NFTBasicDetail.form.withGlobalError(baseException.failure.message), collectionId = basicDetailsData.collectionId, fileName = basicDetailsData.fileName))
+            case baseException: BaseException => BadRequest(views.html.nft.nftBasicDetail(NFTBasicDetail.form.withGlobalError(baseException.failure.message), collectionId = basicDetailsData.collectionId, fileName = basicDetailsData.fileName, None))
           }
         }
       )

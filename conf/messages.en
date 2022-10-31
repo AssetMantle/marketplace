@@ -512,6 +512,8 @@ COLLECTION_OFFERS_LINK=Go to Collection Offers
 
 REGEX_ERROR.ANY_STRING=All characters allowed
 REGEX_ERROR.MANTLE_ADDRESS=Only mantle address allowed (mantle1...)
+REGEX_ERROR.TWITTER_USERNAME=Invalid twitter username
+REGEX_ERROR.INSTAGRAM_USERNAME=Invalid Instagram username
 REGEX_ERROR.ALL_SMALL_LETTERS=Only small letters are allowed
 REGEX_ERROR.ALL_SMALL_LETTERS_WITH_SPACE=Only small letters and space are allowed
 REGEX_ERROR.PASSWORD=Must contain 1 small letter, 1 capital letter, 1 number and any special character from !@#$%^&*._-
@@ -552,8 +554,8 @@ COLLECTION_WEBSITE=Website
 COLLECTION_TWITTER=Twitter
 COLLECTION_INSTAGRAM=Instagram
 PLACEHOLDER.COLLECTION_WEBSITE=https://yourWebsite.com
-PLACEHOLDER.COLLECTION_TWITTER=https://twitter.com/username
-PLACEHOLDER.COLLECTION_INSTAGRAM=https://www.instagram.com/username
+PLACEHOLDER.COLLECTION_TWITTER=Twitter
+PLACEHOLDER.COLLECTION_INSTAGRAM=Instagram
 FORM.CREATE_COLLECTION.SUBMIT=Next
 PHOTOGRAPHY=Photography
 MISCELLANEOUS=Misc
@@ -564,6 +566,7 @@ DROP_FILE=Drop file here
 OR=Or
 BROWSE=Browse
 UPLOAD=Upload
+DECIMAL=Number
 
 #Notification popup
 NOTIFICATION_POPUP_TITLE=Notifications
@@ -610,6 +613,7 @@ FORM.ACCEPT_WHITELIST_INVITE.SUBMIT=Accept
 FORM.LEAVE_WHITELIST.TITLE=
 FORM.LEAVE_WHITELIST.SUBMIT=Leave
 MAX_DRAFT_COLLECTIONS_REACHED=Maximum number of allowed draft collections reached. Please confirm or delete other drafts before making new one.
+MAX_DRAFT_NFTS_REACHED=Maximum number of allowed draft NFts reached. Please confirm or delete other drafts before making new one.
 
 CREATE_COLLECTION_TITLE_BASIC_INFORMATION=Basic Information NFT Schema
 PROPERTY_NUMBER=Property {0} of 22

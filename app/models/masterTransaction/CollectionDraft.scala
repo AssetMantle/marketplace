@@ -103,7 +103,7 @@ class CollectionDrafts @Inject()(
 
   object Service {
 
-    def add(name: String, creatorId: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean): Future[String] = {
+    def add(name: String, creatorId: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean): Future[CollectionDraft] = {
       val id = utilities.IdGenerator.getRandomHexadecimal
       val collection = CollectionDraft(
         id = id,
@@ -118,12 +118,12 @@ class CollectionDrafts @Inject()(
         coverFileName = None)
       for {
         _ <- create(collection.serialize())
-      } yield id
+      } yield collection
     }
 
     def tryGet(id: String): Future[CollectionDraft] = tryGetById(id).map(_.deserialize)
 
-    def checkOwnerAndUpdate(id: String, creatorId: String, name: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean): Future[Unit] = {
+    def checkOwnerAndUpdate(id: String, creatorId: String, name: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean): Future[CollectionDraft] = {
       val collectionDraft = tryGet(id)
 
       def validateAndUpdate(collectionDraft: CollectionDraft) = if (collectionDraft.creatorId == creatorId) {
@@ -133,7 +133,7 @@ class CollectionDrafts @Inject()(
       for {
         collectionDraft <- collectionDraft
         _ <- validateAndUpdate(collectionDraft)
-      } yield ()
+      } yield collectionDraft.copy(name = name, description = description, socialProfiles = socialProfiles, category = category, nsfw = nsfw)
     }
 
     def isOwner(id: String, accountId: String): Future[Boolean] = filterAndExists(x => x.id === id && x.creatorId === accountId)

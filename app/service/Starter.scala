@@ -162,12 +162,26 @@ class Starter @Inject()(
     } yield ()
   }
 
+  private def updateSocialURLs() = {
+    val collections = masterCollections.Service.fetchAll()
+
+    def update(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
+      masterCollections.Service.updateById(collection.copy(socialProfiles = collection.socialProfiles.map(x => x.copy(url = x.url.split("/").last))))
+    }
+
+    for {
+      collections <- collections
+      _ <- update(collections)
+    } yield ()
+  }
+
   def start(): Future[Unit] = {
 
     (for {
       _ <- updateNFTProperties()
       _ <- updateCollectionAwsFiles()
       _ <- updateCollectionNFTAwsFiles()
+      _ <- updateSocialURLs()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)

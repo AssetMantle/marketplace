@@ -10,8 +10,8 @@
             @commonToggleButton(createForm, constants.FormField.NSFW_COLLECTION)
             @* @commonSelect(createForm, constants.FormField.COLLECTION_CATEGORY, Symbol("class") -> "custom-select sources", Symbol("placeholder") -> Messages(constants.View.ART))*@
             @commonInputURL(createForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false)
-            @commonInputURL(createForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false)
-            @commonInputURL(createForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)
+            @commonInputText(createForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false)
+            @commonInputText(createForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)
         }
     } else {
         <div class="d-flex gap-3 align-items-center maxDraftLimitInfo">
