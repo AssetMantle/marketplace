@@ -55,6 +55,7 @@ function uploadFile(storeFileRoute, uploadRoute, id, documentType, filesSupporte
                 200: function (data) {
                     $("#uploadCompletionMessage_" + documentType).show();
                     uploadCompletionMessage.textContent = data;
+                    console.log(data);
                     onSuccessCallback(data);
                 },
                 206: function (data) {

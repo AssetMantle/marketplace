@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class NFTDraft(fileName: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[Seq[BaseNFTProperty]], hashTags: Option[Seq[String]], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def toNFT: NFT = NFT(fileName = fileName, collectionId = collectionId, name = name.orNull, description = description.orNull, properties = Seq(), ipfsLink = "", edition = None, baseProperties = properties.getOrElse(Seq()))
+  def toNFT: NFT = NFT(fileName = fileName, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), properties = Seq(), ipfsLink = "", edition = None, baseProperties = properties.getOrElse(Seq()))
 
   def getFileHash: String = utilities.FileOperations.getFileNameWithoutExtension(fileName)
 
@@ -105,6 +105,10 @@ class NFTDrafts @Inject()(
 
     def getAllForCollection(collectionId: String): Future[Seq[NFTDraft]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize))
 
+    def get(nftId: String): Future[Option[NFTDraft]] = getById(nftId).map(_.map(_.deserialize))
+
+    def countAllForCollection(collectionId: String): Future[Int] = filterAndCount(_.collectionId === collectionId)
+
     def checkExists(id: String): Future[Boolean] = exists(id)
 
     def deleteByCollectionId(id: String): Future[Int] = filterAndDelete(_.collectionId === id)
@@ -113,12 +117,12 @@ class NFTDrafts @Inject()(
 
     def getByIds(ids: Seq[String]): Future[Seq[NFTDraft]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
 
-    def updateNameDescription(fileName: String, name: String, description: String): Future[Unit] = {
+    def updateNameDescription(fileName: String, name: String, description: String): Future[NFTDraft] = {
       val draft = tryGet(fileName)
       for {
         draft <- draft
         _ <- update(draft.copy(name = Option(name), description = Option(description)).serialize())
-      } yield ()
+      } yield draft.copy(name = Option(name), description = Option(description))
     }
 
     def updateProperties(fileName: String, properties: Seq[BaseNFTProperty]): Future[NFTDraft] = {

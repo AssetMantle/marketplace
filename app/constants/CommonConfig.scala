@@ -44,6 +44,7 @@ object CommonConfig {
   }
 
   val MaxCollectionDrafts: Int = config.get[Int]("webApp.maxCollectionDrafts")
+  val MaxNFTDrafts: Int = config.get[Int]("webApp.maxNFTDrafts")
 
   object Files {
     val RootFilePath: String = config.get[String]("upload.rootFilePath")

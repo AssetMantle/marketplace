@@ -15,6 +15,6 @@
     }
 @*    @commonSelect(editForm, constants.FormField.COLLECTION_CATEGORY, Symbol("class") -> "custom-select sources", Symbol("placeholder") -> Messages(constants.View.ART))*@
     @commonInputURL(editForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false, Symbol("value") -> collectionDraft.fold("")(_.getWebsite.getOrElse(""))))
-    @commonInputURL(editForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false, Symbol("value") -> collectionDraft.fold("")(_.getTwitter.getOrElse(""))))
-    @commonInputURL(editForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false, Symbol("value") -> collectionDraft.fold("")(_.getInstagram.getOrElse(""))))
+    @commonInputText(editForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false, Symbol("value") -> collectionDraft.fold("")(_.getTwitter.getOrElse(""))))
+    @commonInputText(editForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false, Symbol("value") -> collectionDraft.fold("")(_.getInstagram.getOrElse(""))))
 }

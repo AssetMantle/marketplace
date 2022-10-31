@@ -67,11 +67,11 @@ object FormField {
   val NFT_TAGS: StringFormField = StringFormField("NFT_TAGS", 2, 255)
   val NFT_PROPERTY_NAME: StringFormField = StringFormField("NFT_PROPERTY_NAME", 1, 30)
   val NFT_PROPERTY_VALUE: StringFormField = StringFormField("NFT_PROPERTY_VALUE", 1, 30)
+  val COLLECTION_TWITTER: StringFormField = StringFormField("COLLECTION_TWITTER", 1, 15, RegularExpression.TWITTER_USERNAME)
+  val COLLECTION_INSTAGRAM: StringFormField = StringFormField("COLLECTION_INSTAGRAM", 1, 30, RegularExpression.INSTAGRAM_USERNAME)
 
   // UrlFormField
   val COLLECTION_WEBSITE: UrlFormField = UrlFormField("COLLECTION_WEBSITE")
-  val COLLECTION_TWITTER: UrlFormField = UrlFormField("COLLECTION_TWITTER")
-  val COLLECTION_INSTAGRAM: UrlFormField = UrlFormField("COLLECTION_INSTAGRAM")
 
   // IntFormField
   val GAS_AMOUNT: IntFormField = IntFormField("GAS_AMOUNT", 20000, 2000000)
