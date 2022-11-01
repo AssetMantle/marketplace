@@ -1,0 +1,11 @@
+@import helper._
+@import views.account.companion.ChangeActiveKey
+@import views.html.base.form._
+@import controllers.actions.LoginState
+
+@(changeActiveKeyForm: Form[ChangeActiveKey.Data] = ChangeActiveKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+<form id="changeActiveKeyForm" action="@routes.AccountController.changeActiveKey()">
+    @CSRF.formField
+    @commonInputText(changeActiveKeyForm, constants.FormField.WALLET_ADDRESS)
+</form>

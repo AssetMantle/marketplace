@@ -1,0 +1,13 @@
+@import helper._
+@import views.html.base.form._
+@import views.profile.wishlist.companion.AddOrRemove
+@import controllers.actions.LoginState
+
+@(nft: master.NFT)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+<div id="addToWishlist_@nft.getFileHash" class="hidden">
+@form(routes.WishlistController.add()) {
+    @CSRF.formField
+    @commonInputText(AddOrRemove.form, constants.FormField.NFT_FILE_NAME, Symbol("value") -> nft.fileName, Symbol("readonly") -> true, Symbol("containerDivClass") -> "hidden")
+}
+</div>

@@ -339,7 +339,7 @@ class AccountController @Inject()(
 
           def getResult = {
             implicit val loginState: LoginState = LoginState(username = oldLoginState.username, address = changeKeyData.address)
-            withUsernameToken.Ok()
+            withUsernameToken.Ok(views.html.setting.changeActiveKey())
           }
 
           (for {
