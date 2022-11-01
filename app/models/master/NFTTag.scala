@@ -9,7 +9,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 
-case class NFTHashTag(hashTag: String, fileName: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
+case class NFTTag(hashTag: String, fileName: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
 
   def getFileHash: String = utilities.FileOperations.getFileNameWithoutExtension(fileName)
 
@@ -18,15 +18,15 @@ case class NFTHashTag(hashTag: String, fileName: String, createdBy: Option[Strin
   def id2: String = fileName
 }
 
-object NFTHashTags {
+object NFTTags {
 
   implicit val module: String = constants.Module.MASTER_NFT_TAG
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  class NFTHashTagTable(tag: Tag) extends Table[NFTHashTag](tag, "NFTHashTag") with ModelTable2[String, String] {
+  class NFTTagTable(tag: Tag) extends Table[NFTTag](tag, "NFTTag") with ModelTable2[String, String] {
 
-    def * = (hashTag, fileName, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTHashTag.tupled, NFTHashTag.unapply)
+    def * = (hashTag, fileName, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTTag.tupled, NFTTag.unapply)
 
     def hashTag = column[String]("hashTag", O.PrimaryKey)
 
@@ -45,24 +45,24 @@ object NFTHashTags {
     def id2 = fileName
   }
 
-  val TableQuery = new TableQuery(tag => new NFTHashTagTable(tag))
+  val TableQuery = new TableQuery(tag => new NFTTagTable(tag))
 }
 
 @Singleton
-class NFTHashTags @Inject()(
+class NFTTags @Inject()(
                              protected val databaseConfigProvider: DatabaseConfigProvider
                            )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl2[NFTHashTags.NFTHashTagTable, NFTHashTag, String, String](
+  extends GenericDaoImpl2[NFTTags.NFTTagTable, NFTTag, String, String](
     databaseConfigProvider,
-    NFTHashTags.TableQuery,
+    NFTTags.TableQuery,
     executionContext,
-    NFTHashTags.module,
-    NFTHashTags.logger
+    NFTTags.module,
+    NFTTags.logger
   ) {
 
   object Service {
 
-    def add(hashTag: String, fileName: String): Future[Unit] = create(NFTHashTag(hashTag = hashTag, fileName = fileName))
+    def add(hashTag: String, fileName: String): Future[Unit] = create(NFTTag(hashTag = hashTag, fileName = fileName))
 
     def getByHashTag(hashTag: String): Future[Seq[String]] = filter(_.hashTag === hashTag).map(_.map(_.fileName))
 
