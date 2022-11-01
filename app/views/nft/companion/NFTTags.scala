@@ -14,7 +14,7 @@ object NFTTags {
 
   case class Data(tags: String, collectionId: String, fileName: String) {
 
-    def getTags: Seq[String] = tags.split(constants.NFT.TagsSeparator)
+    def getTags: Seq[String] = tags.split(constants.NFT.Tags.Separator)
   }
 
 }

@@ -5,12 +5,12 @@ import controllers.result.WithUsernameToken
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, _}
+import play.api.mvc._
 import service.Starter
 
 import javax.inject._
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration.{DAYS, Duration}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class IndexController @Inject()(
@@ -27,19 +27,18 @@ class IndexController @Inject()(
 
   private implicit val module: String = constants.Module.INDEX_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections("art")
+  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)
 
   def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)))
+      Future(Ok(views.html.collection.viewCollections()))
   }
 
-  def sitemap: EssentialAction = cached.apply(req => req.path, constants.CommonConfig.WebAppCacheDuration) {
+  def sitemap: EssentialAction = cached.apply(req => req.path, Duration(7, DAYS)) {
     withoutLoginAction { implicit request =>
       Ok(utilities.Sitemap.generate).as("application/xml; charset=utf-8")
     }
   }
 
-
-  starter.start()
+//    starter.start()
 }

@@ -178,7 +178,7 @@ class AccountController @Inject()(
                   implicit val loginState: LoginState = LoginState(username = signInData.username, address = key.get.address)
                   val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.upsert(id = loginState.username, token = signInData.pushNotificationToken)
                   val result = if (signInData.callbackUrl != "/") withUsernameToken.InternalRedirectOnSubmitForm(signInData.callbackUrl)
-                  else withUsernameToken.Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION))
+                  else withUsernameToken.Ok(views.html.collection.viewCollections())
                   for {
                     _ <- pushNotificationTokenUpdate
                     result <- result
@@ -223,7 +223,7 @@ class AccountController @Inject()(
             def getResult(username: String, address: String) = {
               implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = username, address = address))
               implicit val loginState: LoginState = LoginState(username = username, address = address)
-              withUsernameToken.Ok(views.html.collection.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION))
+              withUsernameToken.Ok(views.html.collection.viewCollections())
             }
 
             for {

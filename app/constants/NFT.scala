@@ -4,7 +4,12 @@ import scala.util.Try
 
 object NFT {
 
-  val TagsSeparator = ","
+  object Tags {
+    val MinimumLength = 2
+    val MaximumLength = 15
+    val Separator = ","
+    val MaximumAllowed = 5
+  }
 
   object Data {
     val STRING = "STRING"
