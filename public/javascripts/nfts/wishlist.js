@@ -29,7 +29,7 @@ function wishlistCounter(source, route) {
 
 updateWishlist();
 
-function wishlist(form, route, wishlistButton, snackBarMessage) {
+function wishlist(form, route, wishlistButton, snackBarMessage, NFTId, add) {
     $.ajax({
         type: 'POST',
         contentType: 'application/x-www-form-urlencoded',
@@ -37,10 +37,15 @@ function wishlist(form, route, wishlistButton, snackBarMessage) {
         data: form.serialize(),
         async: true,
         statusCode: {
-            200: function () {
+            200: function (data) {
                 let parent = $(wishlistButton).parent();
                 let counter = parent.find(".nft-likes");
                 showSnackbar('', snackBarMessage, 'info');
+                if (add) {
+                    $('#addToWishlistContainer_' + NFTId).html(data);
+                } else {
+                    $('#deleteFromWishlistContainer_' + NFTId).html(data);
+                }
                 setTimeout(() => {
                     wishlistCounter(counter, jsRoutes.controllers.NFTController.likesCounter($(counter).attr("data-id")));
                 }, 5000);
@@ -56,16 +61,14 @@ function wishlist(form, route, wishlistButton, snackBarMessage) {
 }
 
 function addRemoveWishlist(element, NFTId, addMessage, removedMessage) {
-    console.log(NFTId)
     let wishlistIcon = $(element).children(".addToWishlist");
     if (!$(wishlistIcon).hasClass("clicked")) {
         const form = $("#addToWishlist_" + NFTId + " form")
-        console.log(form);
-        wishlist(form, jsRoutes.controllers.WishlistController.add(), element, addMessage);
+        wishlist(form, jsRoutes.controllers.WishlistController.add(), element, addMessage, NFTId, true);
         $(wishlistIcon).addClass("clicked");
     } else {
         const form = $("#deleteFromWishlist_" + NFTId + " form")
-        wishlist(form, jsRoutes.controllers.WishlistController.delete(), element, removedMessage);
+        wishlist(form, jsRoutes.controllers.WishlistController.delete(), element, removedMessage, NFTId, false);
         $(wishlistIcon).removeClass("clicked");
     }
 }
