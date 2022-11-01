@@ -2,7 +2,7 @@
 @import views.account.companion.ChangeActiveKey
 @import views.html.base.buttons._
 
-@(keys: Seq[master.Key], changeActiveKeyForm: Form[ChangeActiveKey.Data] = ChangeActiveKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="walletPopupContainer">
     <div class="d-flex flex-row justify-content-between headerContainer">
         <div class="d-flex flex-row align-content-between gap-2 userDetails">
