@@ -32,7 +32,7 @@ object NFT {
 
     def isBooleanType(value: String): Boolean = value == TRUE || value == SMALL_TRUE || value == FALSE || value == SMALL_FALSE
 
-    def isCastable( `type`: String, value: String): Boolean = `type`match {
+    def isCastable( `type`: String, value: String) = `type`match {
       case constants.NFT.Data.STRING => true
       case constants.NFT.Data.DECIMAL => Try(BigDecimal(value)).isSuccess
       case constants.NFT.Data.BOOLEAN => constants.NFT.Data.isBooleanType(value)
