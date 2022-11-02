@@ -20,3 +20,4 @@ server.pid
 /dist/
 .cache
 .metals/*
+.vscode/*
