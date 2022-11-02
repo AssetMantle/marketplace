@@ -1,10 +1,8 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.account.companion.ChangeActiveKey
 @import views.html.base.buttons._
-@import views.html.base.form._
 
-@(keys: Seq[master.Key], changeActiveKeyForm: Form[ChangeActiveKey.Data] = ChangeActiveKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="walletPopupContainer">
     <div class="d-flex flex-row justify-content-between headerContainer">
         <div class="d-flex flex-row align-content-between gap-2 userDetails">
@@ -20,7 +18,8 @@
     </div>
     <div class="row p-2 mx-0 mt-3 justify-content-between align-items-center userAddressBox">
         <div class="col-10 p-0 userAddressData username-data" data-value="@loginState.address">@loginState.address</div>
-        <div class="col-2 text-end copyIcon" onclick="copyToClipboard(this);showSnackbar('', '@Messages(constants.View.ADDRESS_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
+        <div class="col-2 text-end copyIcon" onclick="copyToClipboard(this);
+        showSnackbar('', '@Messages(constants.View.ADDRESS_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
             <i id="openWalletMenu" class="bi bi-files iconDefault iconMedium"></i>
         </div>
     </div>
@@ -63,22 +62,23 @@
         </div>
         <div class="d-flex flex-column justify-content-between">
             <div class="mt-2 walletAddressList">
-                <form id="changeActiveKeyForm" class="hidden" action="@routes.AccountController.changeActiveKey()">
-                    @CSRF.formField
-                    @commonInputText(changeActiveKeyForm, constants.FormField.WALLET_ADDRESS, Symbol("containerDivClass") -> "hidden")
-                </form>
-                @keys.sortBy(!_.encryptedPrivateKey.nonEmpty).map { key =>
+                <div id="changeActiveKeyFormContainer" class="hidden">
+                @views.html.setting.changeActiveKey()
+                </div>
+                @keys.filter(_.encryptedPrivateKey.nonEmpty).sortBy(_.name).map { key =>
                     <div class="d-flex flex-row-reverse justify-content-between walletAddressItem">
-                        @if(key.encryptedPrivateKey.nonEmpty) {
-                            @if(key.active) {
-                                <input type="radio" name="address" id='@key.address' checked/>
-                            } else {
-                                <input type="radio" name="address" id='@key.address' onclick="changeActive('@key.address', '@keys.find(_.active).fold("")(_.address)')"/>
-                            }
+                        @if(key.active) {
+                            <input type="radio" name="address" class='activeKey' id='@key.address' checked onclick="changeActive('@key.address')"/>
                         } else {
-                            <input type="radio" class="invisible"/>
+                            <input type="radio" name="address" id='@key.address' onclick="changeActive('@key.address')"/>
                         }
                     <label for="radio1" class="walletAddressLabel">@key.name</label>
+                    </div>
+                }
+                @keys.filter(_.encryptedPrivateKey.isEmpty).sortBy(_.name).map { key =>
+                    <div class="d-flex flex-row-reverse justify-content-between walletAddressItem">
+                        <input type="radio" class="invisible"/>
+                        <label for="radio1" class="walletAddressLabel">@key.name</label>
                     </div>
                 }
             </div>

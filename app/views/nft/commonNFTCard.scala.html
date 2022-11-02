@@ -1,8 +1,5 @@
 @import controllers.actions.LoginState
 @import views.html.base.commonStringValue
-@import helper._
-@import views.html.base.form._
-@import views.profile.wishlist.companion.AddOrRemove
 
 @(collection: master.Collection, nft: master.NFT, liked: Option[Boolean], onClickFunction: JavaScript, draft: Boolean = false)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <link href="@routes.Assets.versioned("stylesheets/explorer.css")"/>
@@ -13,9 +10,9 @@
 }
     <div class="card border-0" style="cursor: pointer;">
         <div class="card-img rounded-0" onclick="@onClickFunction">
-            @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.id + "/nfts/" + nft.fileName) { uri =>
-                <img src="@uri"/>
-            }
+        @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.id + "/nfts/" + nft.fileName) { uri =>
+            <img src="@uri"/>
+        }
         </div>
         <div class="nft-detail p-3">
             <div class="d-flex flex-row gap-2 nft-creator-detail">
@@ -24,7 +21,7 @@
                 </div>
                 <div class="d-flex flex-column justify-content-between">
                     <span class="creator-name">
-                        @commonStringValue(message = nft.name, id = utilities.IdGenerator.getRandomHexadecimal, length =  15)
+                    @commonStringValue(message = nft.name, id = utilities.IdGenerator.getRandomHexadecimal, length = 15)
                     </span>
                     <span class="creator-collection-name">@collection.name</span>
                 </div>
@@ -37,17 +34,11 @@
                 </div>
                 @if(loginState.nonEmpty) {
                     <div class="d-flex align-items-center gap-1 mt-3">
-                        <div id="addToWishlist_@nft.getFileHash" class="hidden">
-                        @form(routes.WishlistController.add()) {
-                            @CSRF.formField
-                            @commonInputText(AddOrRemove.form, constants.FormField.NFT_FILE_NAME, Symbol("value") -> nft.fileName, Symbol("readonly") -> true, Symbol("containerDivClass") -> "hidden")
-                        }
+                        <div id="addToWishlistContainer_@nft.getFileHash" class="hidden">
+                        @views.html.nft.addToWishlist(nft)
                         </div>
-                        <div id="deleteFromWishlist_@nft.getFileHash" class="hidden">
-                        @form(routes.WishlistController.delete()) {
-                            @CSRF.formField
-                            @commonInputText(AddOrRemove.form, constants.FormField.NFT_FILE_NAME, Symbol("value") -> nft.fileName, Symbol("readonly") -> true, Symbol("containerDivClass") -> "hidden")
-                        }
+                        <div id="deleteFromWishlistContainer_@nft.getFileHash" class="hidden">
+                        @views.html.nft.deleteFromWishlist(nft)
                         </div>
                         <span onclick="addRemoveWishlist(this, '@nft.getFileHash', '@Messages(constants.View.ADDED_TO_WISHLIST)', '@Messages(constants.View.REMOVED_FROM_WISHLIST)')">
                         @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
@@ -57,7 +48,7 @@
                 } else {
                     <div class="d-flex align-items-center gap-1 mt-3" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN_WITH_CALLBACK.get, s"'/collection/${collection.id}'"))">
                         <span>
-                        @views.html.nft.commonCardWishlistButton(false)
+                        @views.html.nft.commonCardWishlistButton()
                         </span>
                         <div class="nft-likes" data-id="@nft.fileName">00</div>
                     </div>

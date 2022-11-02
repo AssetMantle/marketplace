@@ -49,7 +49,7 @@ class SettingController @Inject()(
         val keys = masterKeys.Service.getAll(loginState.username)
         (for {
           keys <- keys
-        } yield Ok(views.html.setting.settings(keys))
+        } yield Ok(views.html.setting.settings(keys.filter(_.encryptedPrivateKey.nonEmpty).sortBy(_.name) ++ keys.filter(_.encryptedPrivateKey.isEmpty).sortBy(_.name)))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

@@ -35,26 +35,32 @@ function openCloseWalletScreen(e, elementID) {
     $(e).parent().closest(".walletPopupContainer").find(`#${elementID}`).toggleClass("open");
 }
 
-function changeActive(setAddress, oldAddress) {
-    let form = $('#changeActiveKeyForm');
-    $('#WALLET_ADDRESS').val(setAddress);
-    $.ajax({
-        url: form.attr('action'),
-        type: 'POST',
-        data: form.serialize(),
-        async: true,
-        statusCode: {
-            200: function (data) {
-                $(setAddress).prop("checked", true);
-                $(oldAddress).prop("checked", false);
-            },
-            400: function (data) {
-            },
-            204: function (data) {
+function changeActive(setAddress) {
+    let oldAddress = $('.activeKey').attr("id");
+    if (oldAddress !== setAddress) {
+        let form = $('#changeActiveKeyForm');
+        $('#WALLET_ADDRESS').val(setAddress);
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: form.serialize(),
+            async: true,
+            statusCode: {
+                200: function (data) {
+                    $('#' + oldAddress).removeClass("activeKey");
+                    $('#' + setAddress).addClass("activeKey");
+                    $('#changeActiveKeyForm').html(data);
+                },
+                400: function (data) {
+                },
+                204: function (data) {
 
-            },
-        }
-    });
+                },
+            }
+        });
+    } else {
+        console.log("setting to same address");
+    }
 }
 
 function fetchBalances(walletAddresses) {

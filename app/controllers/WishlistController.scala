@@ -111,10 +111,11 @@ class WishlistController @Inject()(
           Future(BadRequest(formWithErrors.errors.map(_.message).mkString(" ")))
         },
         addData => {
+          implicit val optionalLoginState: Option[LoginState] = Option(loginState)
           (for {
             nft <- masterNFTs.Service.tryGet(addData.nftFileName)
             _ <- masterWishLists.Service.add(accountId = loginState.username, nftId = addData.nftFileName, collectionId = nft.collectionId)
-          } yield Ok
+          } yield Ok(views.html.nft.addToWishlist(nft))
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
           }
@@ -129,9 +130,11 @@ class WishlistController @Inject()(
           Future(BadRequest(formWithErrors.errors.map(_.message).mkString(" ")))
         },
         deleteData => {
+          implicit val optionalLoginState: Option[LoginState] = Option(loginState)
           (for {
+            nft <- masterNFTs.Service.tryGet(deleteData.nftFileName)
             _ <- masterWishLists.Service.deleteWishItem(accountId = loginState.username, nftId = deleteData.nftFileName)
-          } yield Ok
+          } yield Ok(views.html.nft.deleteFromWishlist(nft))
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
           }

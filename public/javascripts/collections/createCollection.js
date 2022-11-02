@@ -1,4 +1,4 @@
-let totalActiveContainer = 0;
+totalActiveContainer = 0;
 
 function addProperty() {
     totalActiveContainer = $(".singlePropertyContainer.active").length;
