@@ -39,6 +39,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.createdCollectionPerPage,
         routes.javascript.CollectionController.createForm,
         routes.javascript.CollectionController.editForm,
+        routes.javascript.CollectionController.uploadCollectionFilesForm,
         routes.javascript.CollectionController.uploadCollectionFileForm,
         routes.javascript.CollectionController.storeCollectionFile,
         routes.javascript.CollectionController.uploadCollectionFile,
