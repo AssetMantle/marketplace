@@ -103,7 +103,52 @@
                                                 </div>
                                             </div>
                                             <div class="optionInputField" style="display: none;">
-                                            @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_FIXED_VALUE, Symbol("required") -> false)
+                                                <div class="hidden">
+                                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_FIXED_VALUE, Symbol("required") -> false, Symbol("class") -> "fixedValueField")
+                                                </div>
+                                                <div class="propertyTypeOption">
+                                                    <div class="propertyType string active">
+                                                        <div class="mb-0 commonInputInt w-100">
+                                                            <dl>
+                                                                <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+                                                                <dd>
+                                                                    <input type="text" id="fieldValue_@index" name="fieldValue_@index" class="propertyTypeField am-input" onkeyup="setNonBooleanValue(@index, event)"/>
+                                                                </dd>
+                                                            </dl>
+                                                        </div>
+                                                    </div>
+                                                    <div class="propertyType number">
+                                                        <div class="mb-0 commonInputInt w-100">
+                                                            <dl>
+                                                                <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+                                                                <dd>
+                                                                    <input type="number" id="fieldValue_@index" name="fieldValue_@index" class="propertyTypeField am-input" onkeyup="setNonBooleanValue(@index, event)"/>
+                                                                </dd>
+                                                            </dl>
+                                                        </div>
+                                                    </div>
+                                                    <div class="propertyType boolean">
+                                                        <div class="mb-0 commonInputInt w-100">
+                                                            <dl>
+                                                                <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+                                                                <dd class="mt-2">
+                                                                    <div class="dropdown" id="fieldValue_@index">
+                                                                        <input type="hidden" class="dp-input" value=""/>
+                                                                        <div class="dropdownHead" onclick="showOptions(this)">
+                                                                            <div class="currentSelected">@Messages(constants.View.NFT_PROPERTY_BOOLEAN_FIELD_LABEL)</div>
+                                                                        </div>
+                                                                        <div class="dropdownBody">
+                                                                            <div class="dropdownBodyInner">
+                                                                                <div class="propertyTypeField dropdownItem" value="true" onclick="setOption(this); setBooleanValue(@index, 'true');">True</div>
+                                                                                <div class="propertyTypeField dropdownItem" value="false" onclick="setOption(this); setBooleanValue(@index, 'false');">False</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </dd>
+                                                            </dl>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

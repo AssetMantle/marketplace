@@ -11,20 +11,20 @@ function addProperty() {
         $("#addMorePropertyButton").show();
     }
 
-    if (totalActiveContainer >= 0) {
+    if(totalActiveContainer >= 0){
         $(".propertyModalButton .form-secondary-button").addClass("active");
-    } else {
+    }else{
         $(".propertyModalButton .form-secondary-button").removeClass("active");
     }
 
-    for (let i = 0; i < totalActiveContainer; i++) {
+    for(let i=0; i<totalActiveContainer; i++){
         let elementNameValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_NAME").val();
         let elementTypeValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text();
         let elementFixedValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_FIXED_VALUE").val();
 
-        let elementMutabilityValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_MUTABLE input[name='COLLECTION_PROPERTIES[" + i + "].COLLECTION_PROPERTY_MUTABLE']:checked").val();
-        let elementVisibilityValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_META input[name='COLLECTION_PROPERTIES[" + i + "].COLLECTION_PROPERTY_META']:checked").val();
-        let elementRequirementValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_REQUIRED input[name='COLLECTION_PROPERTIES[" + i + "].COLLECTION_PROPERTY_REQUIRED']:checked").val();
+        let elementMutabilityValue = $("#COLLECTION_PROPERTIES_"+ i +"_COLLECTION_PROPERTY_MUTABLE input[name='COLLECTION_PROPERTIES["+ i +"].COLLECTION_PROPERTY_MUTABLE']:checked").val();
+        let elementVisibilityValue = $("#COLLECTION_PROPERTIES_"+ i +"_COLLECTION_PROPERTY_META input[name='COLLECTION_PROPERTIES["+ i +"].COLLECTION_PROPERTY_META']:checked").val();
+        let elementRequirementValue = $("#COLLECTION_PROPERTIES_"+ i +"_COLLECTION_PROPERTY_REQUIRED input[name='COLLECTION_PROPERTIES["+ i +"].COLLECTION_PROPERTY_REQUIRED']:checked").val();
 
         $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyCardName").text(elementNameValue);
         $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyCardType").text(elementTypeValue);
@@ -45,9 +45,9 @@ function addProperty() {
 function removeProperty(containerId) {
     totalActiveContainer = $(".singlePropertyContainer.active").length;
 
-    if (totalActiveContainer > 1) {
+    if(totalActiveContainer > 1){
         $(".propertyModalButton .form-secondary-button").addClass("active");
-    } else {
+    }else{
         $(".propertyModalButton .form-secondary-button").removeClass("active");
     }
 
@@ -68,37 +68,54 @@ function removeProperty(containerId) {
     }
 
 
+
     // Clear deleted property field
     $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_NAME").val("");
     $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_TYPE").val("String");
     $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text("String");
     $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_FIXED_VALUE").val("");
-    $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_MUTABLE input:radio[name='COLLECTION_PROPERTIES[" + containerId + "].COLLECTION_PROPERTY_MUTABLE']:first").prop('checked', true);
-    $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_META input:radio[name='COLLECTION_PROPERTIES[" + containerId + "].COLLECTION_PROPERTY_META']:first").prop('checked', true);
-    $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_REQUIRED input:radio[name='COLLECTION_PROPERTIES[" + containerId + "].COLLECTION_PROPERTY_REQUIRED']:first").prop('checked', true);
+    $("#COLLECTION_PROPERTIES_"+ containerId +"_COLLECTION_PROPERTY_MUTABLE input:radio[name='COLLECTION_PROPERTIES["+ containerId +"].COLLECTION_PROPERTY_MUTABLE']:first").prop('checked', true);
+    $("#COLLECTION_PROPERTIES_"+ containerId +"_COLLECTION_PROPERTY_META input:radio[name='COLLECTION_PROPERTIES["+ containerId +"].COLLECTION_PROPERTY_META']:first").prop('checked', true);
+    $("#COLLECTION_PROPERTIES_"+ containerId +"_COLLECTION_PROPERTY_REQUIRED input:radio[name='COLLECTION_PROPERTIES["+ containerId +"].COLLECTION_PROPERTY_REQUIRED']:first").prop('checked', true);
+    $("#COLLECTION_PROPERTY_"+ containerId + " .propertyTypeField").val("");
+    $("#COLLECTION_PROPERTY_"+ containerId + " .propertyType").removeClass("active");
+    $("#COLLECTION_PROPERTY_"+ containerId + " .propertyType.string").addClass("active");
 
     for (let i = containerId; i < 17; i++) {
         let nextElementNameValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_NAME").val();
         let nextElementTypeValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE").val();
         let nextElementCustomSelectTypeValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text();
         let nextElementFixedValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_FIXED_VALUE").val();
-        let nextElementMutabilityValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_MUTABLE input[name='COLLECTION_PROPERTIES[" + (i + 1) + "].COLLECTION_PROPERTY_MUTABLE']:checked").val();
-        let nextElementVisibilityValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_META input[name='COLLECTION_PROPERTIES[" + (i + 1) + "].COLLECTION_PROPERTY_META']:checked").val();
-        let nextElementRequirementValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_REQUIRED input[name='COLLECTION_PROPERTIES[" + (i + 1) + "].COLLECTION_PROPERTY_REQUIRED']:checked").val();
+        let nextElementMutabilityValue = $("#COLLECTION_PROPERTIES_"+ (i + 1) +"_COLLECTION_PROPERTY_MUTABLE input[name='COLLECTION_PROPERTIES["+ (i + 1) +"].COLLECTION_PROPERTY_MUTABLE']:checked").val();
+        let nextElementVisibilityValue = $("#COLLECTION_PROPERTIES_"+ (i + 1) +"_COLLECTION_PROPERTY_META input[name='COLLECTION_PROPERTIES["+ (i + 1) +"].COLLECTION_PROPERTY_META']:checked").val();
+        let nextElementRequirementValue = $("#COLLECTION_PROPERTIES_"+ (i + 1) +"_COLLECTION_PROPERTY_REQUIRED input[name='COLLECTION_PROPERTIES["+ (i + 1) +"].COLLECTION_PROPERTY_REQUIRED']:checked").val();
 
         if (nextElementNameValue !== "") {
             $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_NAME").val(nextElementNameValue);
             $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_TYPE").val(nextElementTypeValue);
             $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text(nextElementCustomSelectTypeValue);
             $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_FIXED_VALUE").val(nextElementFixedValue);
-            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_MUTABLE input:radio[name='COLLECTION_PROPERTIES[" + i + "].COLLECTION_PROPERTY_MUTABLE'][value=" + nextElementMutabilityValue + "]").prop('checked', true);
-            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_META input:radio[name='COLLECTION_PROPERTIES[" + i + "].COLLECTION_PROPERTY_META'][value=" + nextElementVisibilityValue + "]").prop('checked', true);
-            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_REQUIRED input:radio[name='COLLECTION_PROPERTIES[" + i + "].COLLECTION_PROPERTY_REQUIRED'][value=" + nextElementRequirementValue + "]").prop('checked', true);
+            $("#COLLECTION_PROPERTIES_"+ i +"_COLLECTION_PROPERTY_MUTABLE input:radio[name='COLLECTION_PROPERTIES["+ i +"].COLLECTION_PROPERTY_MUTABLE'][value=" + nextElementMutabilityValue + "]").prop('checked', true);
+            $("#COLLECTION_PROPERTIES_"+ i +"_COLLECTION_PROPERTY_META input:radio[name='COLLECTION_PROPERTIES["+ i +"].COLLECTION_PROPERTY_META'][value=" + nextElementVisibilityValue + "]").prop('checked', true);
+            $("#COLLECTION_PROPERTIES_"+ i +"_COLLECTION_PROPERTY_REQUIRED input:radio[name='COLLECTION_PROPERTIES["+ i +"].COLLECTION_PROPERTY_REQUIRED'][value=" + nextElementRequirementValue + "]").prop('checked', true);
 
             $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyCardName").text(nextElementNameValue);
             $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyCardType").text(nextElementCustomSelectTypeValue);
             $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyCardValue").text(nextElementFixedValue);
 
+            if(nextElementTypeValue === "BOOLEAN"){
+                $("#COLLECTION_PROPERTY_"+ i + " .propertyType").removeClass("active");
+                $("#COLLECTION_PROPERTY_"+ i + " .propertyType.boolean").addClass("active");
+                $("#COLLECTION_PROPERTY_"+ i + " .dropdown .currentSelected").text(nextElementFixedValue.slice(0,1).toUpperCase()+nextElementFixedValue.slice(1));
+            }else if(nextElementTypeValue === "DECIMAL"){
+                $("#COLLECTION_PROPERTY_"+ i + " .propertyType").removeClass("active");
+                $("#COLLECTION_PROPERTY_"+ i + " .propertyType.number").addClass("active");
+                $("#COLLECTION_PROPERTY_"+ i + " .propertyTypeField").val(nextElementFixedValue);
+            }else{
+                $("#COLLECTION_PROPERTY_"+ i + " .propertyType").removeClass("active");
+                $("#COLLECTION_PROPERTY_"+ i + " .propertyType.string").addClass("active");
+                $("#COLLECTION_PROPERTY_"+ i + " .propertyTypeField").val(nextElementFixedValue);
+            }
 
         }
         $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_NAME").val("");
@@ -106,26 +123,30 @@ function removeProperty(containerId) {
         $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text("String");
         $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_FIXED_VALUE").val("");
         $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_FIXED_VALUE").closest(".optionInputField").show();
-        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_MUTABLE input:radio[name='COLLECTION_PROPERTIES[" + (i + 1) + "].COLLECTION_PROPERTY_MUTABLE']:first").prop('checked', true);
-        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_META input:radio[name='COLLECTION_PROPERTIES[" + (i + 1) + "].COLLECTION_PROPERTY_META']:first").prop('checked', true);
-        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_REQUIRED input:radio[name='COLLECTION_PROPERTIES[" + (i + 1) + "].COLLECTION_PROPERTY_REQUIRED']:first").prop('checked', true);
+        $("#COLLECTION_PROPERTIES_"+ (i + 1) +"_COLLECTION_PROPERTY_MUTABLE input:radio[name='COLLECTION_PROPERTIES["+ (i + 1) +"].COLLECTION_PROPERTY_MUTABLE']:first").prop('checked', true);
+        $("#COLLECTION_PROPERTIES_"+ (i + 1) +"_COLLECTION_PROPERTY_META input:radio[name='COLLECTION_PROPERTIES["+ (i + 1) +"].COLLECTION_PROPERTY_META']:first").prop('checked', true);
+        $("#COLLECTION_PROPERTIES_"+ (i + 1) +"_COLLECTION_PROPERTY_REQUIRED input:radio[name='COLLECTION_PROPERTIES["+ (i + 1) +"].COLLECTION_PROPERTY_REQUIRED']:first").prop('checked', true);
 
-        if (totalActiveContainer === 1) {
+        $("#COLLECTION_PROPERTY_"+ (i + 1) + " .propertyType").removeClass("active");
+        $("#COLLECTION_PROPERTY_"+ (i + 1) + " .propertyType.string").addClass("active");
+        $("#COLLECTION_PROPERTY_"+ (i + 1) + " .propertyTypeField").val("");
+
+        if(totalActiveContainer === 1){
             $("#COLLECTION_PROPERTY_" + i + " .propertyFormView .propertyAdvancedDetail .advancedDetailOption").hide();
             $("#COLLECTION_PROPERTY_" + i + " .propertyFormView .propertyAdvancedDetail .dropdownIcon").removeClass("active");
-        } else {
+        }else{
             $("#COLLECTION_PROPERTY_" + (i + 1) + " .propertyFormView .propertyAdvancedDetail .advancedDetailOption").hide();
             $("#COLLECTION_PROPERTY_" + (i + 1) + " .propertyFormView .propertyAdvancedDetail .dropdownIcon").removeClass("active");
         }
 
-        if (nextElementRequirementValue === "REQUIRED") {
+        if(nextElementRequirementValue === "REQUIRED"){
             $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_FIXED_VALUE").closest(".optionInputField").hide();
-        } else {
+        }else{
             $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_FIXED_VALUE").closest(".optionInputField").show();
         }
 
     }
-    for (let j = 0; j < totalActiveContainer - 2; j++) {
+    for(let j=0; j<totalActiveContainer-2; j++){
         $("#COLLECTION_PROPERTY_" + j + " .propertyFormView").hide();
         $("#COLLECTION_PROPERTY_" + j + " .propertyFormView").removeClass("active");
         $("#COLLECTION_PROPERTY_" + j + " .propertyCardView").show();
@@ -175,6 +196,33 @@ function submitButton() {
     $("#FORM_DEFINE_COLLECTION_PROPERTIES_SUBMIT").click();
 }
 
-function hideSubmitButton(){
+function hideSubmitButton() {
     $("#formSubmitButton").hide();
 }
+
+function setBooleanValue(valueFieldIndex, fieldValue) {
+    $(`#COLLECTION_PROPERTIES_${valueFieldIndex}_COLLECTION_PROPERTY_FIXED_VALUE`).val(fieldValue);
+}
+
+function setNonBooleanValue(valueFieldIndex, e) {
+    let fieldValue = e.target.value;
+    $(`#COLLECTION_PROPERTIES_${valueFieldIndex}_COLLECTION_PROPERTY_FIXED_VALUE`).val(fieldValue);
+}
+
+$(".custom-select .custom-options .custom-option").on("click", function () {
+    let selectedType = $(this).text();
+    let parentContainer = $(this).closest(".singlePropertyContainer.active");
+
+    parentContainer.find('.fixedValueField').val("");
+
+    if (selectedType == "String") {
+        parentContainer.find(".propertyType").removeClass("active");
+        parentContainer.find(".propertyType.string").addClass("active");
+    } else if (selectedType == "Number") {
+        parentContainer.find(".propertyType").removeClass("active");
+        parentContainer.find(".propertyType.number").addClass("active");
+    } else if (selectedType == "Boolean") {
+        parentContainer.find(".propertyType").removeClass("active");
+        parentContainer.find(".propertyType.boolean").addClass("active");
+    }
+});

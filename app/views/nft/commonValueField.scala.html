@@ -1,6 +1,6 @@
 @(propertyType: String, propertyValue: String, index: Number)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@if(propertyType == "BOOLEAN") {
+@if(propertyType == constants.NFT.Data.BOOLEAN) {
     <div class="mb-0 commonInputInt w-100">
         <dl>
             <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
@@ -21,7 +21,7 @@
         </dl>
     </div>
 }
-@if(propertyType == "DECIMAL") {
+@if(propertyType == constants.NFT.Data.NUMBER) {
     <div class="mb-0 commonInputInt w-100">
         <dl>
             <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
@@ -31,7 +31,7 @@
         </dl>
     </div>
 }
-@if(propertyType == "STRING") {
+@if(propertyType == constants.NFT.Data.STRING) {
     <div class="mb-0 commonInputInt w-100">
         <dl>
             <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>

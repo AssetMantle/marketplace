@@ -747,3 +747,11 @@ body.modal-open::-webkit-scrollbar {
   cursor: pointer;
   margin-right: 16px;
 }
+.propertyTypeOption{
+  .propertyType{
+    display: none;
+    &.active{
+      display: block;
+    }
+  }
+}
