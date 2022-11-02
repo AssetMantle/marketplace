@@ -171,11 +171,10 @@ function saveToDraft() {
     $("#FORM_DEFINE_COLLECTION_PROPERTIES_SUBMIT").click();
 }
 
-$("#formSubmitButton").prepend(`
-                                <div class="d-flex gap-3 align-items-center me-3 propertyModalButton">
-                                    <div class="tertiaryButton" onclick="">
-                                        Skip
-                                    </div>
-                                    <button class="form-secondary-button active" type="button" onclick="saveToDraft()">Save Draft</button>
-                                </div>
-                                `);
+function submitButton() {
+    $("#FORM_DEFINE_COLLECTION_PROPERTIES_SUBMIT").click();
+}
+
+function hideSubmitButton(){
+    $("#formSubmitButton").hide();
+}

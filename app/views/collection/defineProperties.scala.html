@@ -7,7 +7,7 @@
 
 @(definePropertiesForm: Form[DefineProperties.Data] = DefineProperties.form, collectionDraft: Option[CollectionDraft])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-    @commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm, submitDisable = false) {
+    @commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm, submitDisable = false, showBackButton = true) {
         @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionDraft.fold("")(_.id), Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
         @commonCheckbox(definePropertiesForm, constants.FormField.SAVE_COLLECTION_DRAFT, Symbol("containerDivClass") -> "hidden")
         <div id="basicInfoContainer" class="propertyInfoContainer">
@@ -156,9 +156,21 @@
                     }
                 }
             }
-            <div class="text-center">S
+            <div class="text-center">
             @commonTertiaryButton(name = constants.View.ADD_MORE_PROPERTIES, function = JavaScript(s"addProperty()"), icon = Option("bi-plus-circle"), iconFirst = Option(true), buttonId = Option("addMorePropertyButton"))
             </div>
         </div>
+
+    <div class="horizontal-align">
+        <div class="d-flex gap-3 align-items-center me-3 propertyModalButton">
+            <div class="tertiaryButton" onclick="">@Messages(constants.View.CREATE_COLLECTION_SKIP_BUTTON)</div>
+            <button class="form-secondary-button active" type="button" onclick="saveToDraft()">@Messages(constants.View.CREATE_COLLECTION_SAVE_DRAFT_BUTTON)</button>
+            <button class="form-primary-button active" type="button" onclick="submitButton();">@Messages(constants.View.CREATE_COLLECTION_NEXT_BUTTON)</button>
+        </div>
+    </div>
     }
-    <script src="@routes.Assets.versioned("javascripts/collections/createCollection.js")"></script>
+<script src="@routes.Assets.versioned("javascripts/collections/createCollection.js")"></script>
+<script>
+        hideSubmitButton();
+        $("#modalBackButton").attr("onclick","");
+</script>

@@ -6,7 +6,10 @@
 @if(totalNftDrafts < constants.CommonConfig.MaxNFTDrafts) {
     <script src="@routes.Assets.versioned("javascripts/nfts/upload.js")"></script>
 
-    <div class="mb-4 modal-header">
+    <div class="modal-header mb-3">
+        <div class="title-icon back-button-icon" id="modalBackButton" onclick="">
+            <i class="bi bi-chevron-left iconDefault"></i>
+        </div>
         <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.UPLOAD)</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
                     &times;
@@ -15,7 +18,7 @@
 
     <div class="hidden" id="nftFileHashName"></div>
 
-    <div class="d-flex gap-3 mb-4">
+    <div class="d-flex gap-3">
     @views.html.base.commonUploadFile(constants.File.NFT_FILE_FORM, id = collectionId, documentType = constants.View.NFT, label = constants.View.UPLOAD_NFT_LABEL, onSuccessCallback = JavaScript("onSuccessfulUpload"))
     </div>
 

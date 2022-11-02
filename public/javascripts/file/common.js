@@ -38,7 +38,7 @@ function uploadFile(storeFileRoute, uploadRoute, id, documentType, filesSupporte
     let uploadCompletionMessage = document.getElementById('uploadCompletionMessage_' + documentType);
 
     rFile.on('fileSuccess', function (file) {
-        $("#uploadControls_" + documentType).delay(1000).fadeOut(1000);
+        $("#uploadControls_" + documentType).fadeOut(500);
         let storeDbRoute = uploadRoute(id, documentType, file.fileName);
         // let loadingSpinner = $('#commonSpinner');
         $.ajax({
@@ -53,8 +53,9 @@ function uploadFile(storeFileRoute, uploadRoute, id, documentType, filesSupporte
             // },
             statusCode: {
                 200: function (data) {
-                    $("#uploadCompletionMessage_" + documentType).show();
-                    uploadCompletionMessage.textContent = data;
+                    $("#uploadCompletionMessage_" + documentType).delay(500).show();
+                    $("#uploadCompletionMessage_" + documentType + " .previewImageContainer").delay(2000).show();
+                    $("#uploadCompletionMessage_" + documentType + " .previewImage").attr("src",data);
                     console.log(data);
                     onSuccessCallback(data);
                 },
