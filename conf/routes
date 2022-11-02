@@ -55,6 +55,7 @@ GET         /createCollection                                 controllers.Collec
 POST        /createCollection                                 controllers.CollectionController.create()
 GET         /editCollection                                   controllers.CollectionController.editForm(id: String)
 POST        /editCollection                                   controllers.CollectionController.edit()
+GET         /uploadCollectionFilesForm                        controllers.CollectionController.uploadCollectionFilesForm(id: String)
 GET         /defineProperties                                 controllers.CollectionController.definePropertiesForm(id: String)
 POST        /defineProperties                                 controllers.CollectionController.defineProperties()
 

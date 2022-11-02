@@ -123,7 +123,7 @@ class CollectionController @Inject()(
 
         val likedNFTs = loginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollection(accountId = x.username, collectionId = id))
 
-        def nftDrafts(collection: Collection) = if(loginState.fold("")(_.username) == collection.creatorId) masterTransactionNFTDrafts.Service.getAllForCollection(id) else Future(Seq())
+        def nftDrafts(collection: Collection) = if (loginState.fold("")(_.username) == collection.creatorId) masterTransactionNFTDrafts.Service.getAllForCollection(id) else Future(Seq())
 
         (for {
           collection <- collection
@@ -238,6 +238,17 @@ class CollectionController @Inject()(
           }
         }
       )
+  }
+
+  def uploadCollectionFilesForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id)
+      (for {
+        collectionDraft <- collectionDraft
+      } yield if (collectionDraft.creatorId == loginState.username) Ok(views.html.collection.uploadFile(collectionDraft = collectionDraft)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
   }
 
   def uploadCollectionFileForm(id: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
