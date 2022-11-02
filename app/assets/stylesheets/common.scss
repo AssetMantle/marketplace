@@ -765,14 +765,15 @@
 // Common Upload File
 .uploadFileContainer{
   width: 100%;
+  height: 100%;
   .uploadFileLabel{
     @include setFont(var(--font-type-2), normal, 600, 18px, 34px, var(--inactive-gray));
   }
   .uploadForm{
     border: 1px dashed var(--gray);
     border-radius: 6px;
-    min-height: 246px;
-    max-height: 400px;
+    min-height: 288px;
+    max-height: 288px;
     height: 100%;
     align-items: center;
     justify-content: center;
@@ -802,10 +803,26 @@
     .uploadCompletionMessage{
       @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
       word-break: break-word;
+      display: flex;
+      justify-content: center;
     }
   }
   .modalInfoBlock{
     height: 100%;
+  }
+  .previewImageContainer{
+    height: 200px;
+    width: 150px;
+    img{
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      min-width: 100%;
+      min-height: 100%;
+      margin: auto;
+      object-fit: contain;
+      aspect-ratio: 1/1;
+    }
   }
 }
 

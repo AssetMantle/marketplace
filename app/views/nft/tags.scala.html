@@ -21,7 +21,5 @@
             <p><span>5</span> @Messages(constants.View.CREATE_NFT_TAG_REMAINING_LABEL)</p>
         </div>
     </div>
-
-    @commonPrimaryButton(constants.View.NEXT, JavaScript(s"getForm(jsRoutes.controllers.NFTController.setPropertiesForm('${collectionId}','${fileName}'))"))
 }
 <script src="@routes.Assets.versioned("javascripts/nfts/createNft.js")"></script>

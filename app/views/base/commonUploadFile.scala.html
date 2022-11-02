@@ -25,7 +25,13 @@
         </div>
 
         <div id="uploader_@documentType" class="centerText uploader h-100">
-            <div class="d-flex flex-column gap-3 justify-content-between h-100">
+            <div class="d-flex flex-column gap-1 h-100">
+                <div id="uploadCompletionMessage_@documentType" class="uploadCompletionMessage">
+                    <div class="previewImageContainer" style="display: none;">
+                        <img src="" class="previewImage"/>
+                    </div>
+                </div>
+
                 <div class="text-center">
                     <div id="fileName_@documentType" class="fileName"></div>
                     <br>
@@ -39,8 +45,6 @@
                         <button type="button" class="secondaryButton" id="uploadButton_@documentType">@Messages(constants.View.UPLOAD)</button>
                     </div>
                 </div>
-
-                <div id="uploadCompletionMessage_@documentType" class="mt-3 uploadCompletionMessage"></div>
             </div>
         </div>
     </div>

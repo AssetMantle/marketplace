@@ -1,9 +1,13 @@
 @import controllers.actions.LoginState
 @import views.html.base.commonStringValue
 
-@(collection: master.Collection, nft: master.NFT, liked: Option[Boolean], onClickFunction: JavaScript)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
-
+@(collection: master.Collection, nft: master.NFT, liked: Option[Boolean], onClickFunction: JavaScript, draft: Boolean = false)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+<link href="@routes.Assets.versioned("stylesheets/explorer.css")"/>
+@if(draft){
+<div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 draftNft">
+}else{
 <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3">
+}
     <div class="card border-0" style="cursor: pointer;">
         <div class="card-img rounded-0" onclick="@onClickFunction">
         @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.id + "/nfts/" + nft.fileName) { uri =>

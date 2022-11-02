@@ -743,3 +743,15 @@ body.modal-open::-webkit-scrollbar {
     @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
   }
 }
+#modalBackButton{
+  cursor: pointer;
+  margin-right: 16px;
+}
+.propertyTypeOption{
+  .propertyType{
+    display: none;
+    &.active{
+      display: block;
+    }
+  }
+}
