@@ -27,7 +27,7 @@ case class Delegate(accountId: String, txHash: String, txRawHex: String, delegat
 
 }
 
-object SendCoins {
+object Delegate {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -85,7 +85,7 @@ object SendCoins {
 }
 
 @Singleton
-class SendCoins @Inject()(
+class Delegate @Inject()(
                            protected val databaseConfigProvider: DatabaseConfigProvider,
                            blockchainAccounts: models.blockchain.Accounts,
                            blockchainTransactions: models.blockchain.Transactions,
