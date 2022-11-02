@@ -13,13 +13,11 @@ object NFT {
 
   object Data {
     val STRING = "STRING"
-    val DECIMAL = "DECIMAL"
     val BOOLEAN = "BOOLEAN"
-
-    val TypesList: Seq[String] = Seq(STRING, DECIMAL, BOOLEAN)
-
-    @deprecated
     val NUMBER = "NUMBER"
+
+    val TypesList: Seq[String] = Seq(STRING, NUMBER, BOOLEAN)
+
     @deprecated
     val SMALL_STRING = "string"
     @deprecated
@@ -34,7 +32,7 @@ object NFT {
 
     def isCastable( `type`: String, value: String) = `type`match {
       case constants.NFT.Data.STRING => true
-      case constants.NFT.Data.DECIMAL => Try(BigDecimal(value)).isSuccess
+      case constants.NFT.Data.NUMBER => Try(BigDecimal(value)).isSuccess
       case constants.NFT.Data.BOOLEAN => constants.NFT.Data.isBooleanType(value)
       case _ => false
     }

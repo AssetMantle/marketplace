@@ -97,7 +97,7 @@ object FormConstraint {
     val errors = Seq(
       if (!constants.NFT.Data.TypesList.contains(propertyData.propertyType)) Option(ValidationError(constants.Response.NFT_PROPERTY_TYPE_NOT_FOUND.message)) else None,
       if (propertyData.propertyType == constants.NFT.Data.BOOLEAN && propertyData.optionalValue.isDefined && (propertyData.optionalValue.getOrElse("") != constants.NFT.Data.TRUE || propertyData.optionalValue.getOrElse("") != constants.NFT.Data.FALSE)) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
-      if (propertyData.propertyType == constants.NFT.Data.DECIMAL && propertyData.optionalValue.isDefined && propertyData.optionalValue.getOrElse("0").toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
+      if (propertyData.propertyType == constants.NFT.Data.NUMBER && propertyData.optionalValue.isDefined && propertyData.optionalValue.getOrElse("0").toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })
@@ -113,13 +113,15 @@ object FormConstraint {
   })
 
   val nftTagsConstraint: Constraint[NFTTags.Data] = Constraint("constraints.NFTTagsConstraint")({ nftTagsData: NFTTags.Data =>
-    val tags = nftTagsData.tags.split(constants.NFT.Tags.Separator)
-    val errors = Seq(
-      if (tags.length > constants.NFT.Tags.MaximumAllowed) Option(ValidationError(constants.Response.MAXIMUM_NFT_TAGS_EXCEEDED.message)) else None,
-      if (tags.exists(x => x.length < constants.NFT.Tags.MinimumLength || x.length > constants.NFT.Tags.MaximumLength)) Option(ValidationError(constants.Response.INVALID_NFT_TAGS_LENGTH.message)) else None,
-      if (tags.distinct.length != tags.length) Option(ValidationError(constants.Response.REPEATED_NFT_TAGS.message)) else None,
-      if (tags.distinct.length != tags.length) Option(ValidationError(constants.Response.REPEATED_NFT_TAGS.message)) else None,
-    ).flatten
-    if (errors.isEmpty) Valid else Invalid(errors)
+    if (nftTagsData.tags != "") {
+      val tags = nftTagsData.tags.split(constants.NFT.Tags.Separator)
+      val errors = Seq(
+        if (tags.length > constants.NFT.Tags.MaximumAllowed) Option(ValidationError(constants.Response.MAXIMUM_NFT_TAGS_EXCEEDED.message)) else None,
+        if (tags.exists(x => x.length < constants.NFT.Tags.MinimumLength || x.length > constants.NFT.Tags.MaximumLength)) Option(ValidationError(constants.Response.INVALID_NFT_TAGS_LENGTH.message)) else None,
+        if (tags.distinct.length != tags.length) Option(ValidationError(constants.Response.REPEATED_NFT_TAGS.message)) else None,
+        if (tags.distinct.length != tags.length) Option(ValidationError(constants.Response.REPEATED_NFT_TAGS.message)) else None,
+      ).flatten
+      if (errors.isEmpty) Valid else Invalid(errors)
+    } else Valid
   })
 }

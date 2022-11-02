@@ -190,7 +190,7 @@ class NFTController @Inject()(
         _ <- add()
       } yield Ok(constants.CommonConfig.AmazonS3.s3BucketURL + awsKey)
         ).recover {
-        case baseException: BaseException => BadRequest(baseException.failure.message)
+        case baseException: BaseException => BadRequest(messagesApi(baseException.failure.message)(request.lang))
       }
   }
 
@@ -234,7 +234,7 @@ class NFTController @Inject()(
           (for {
             isOwner <- isOwner
             nftDraft <- update(isOwner)
-          } yield PartialContent(views.html.nft.tags(collectionId = basicDetailsData.collectionId, fileName = nftDraft.fileName))
+          } yield PartialContent(views.html.nft.tags(collectionId = basicDetailsData.collectionId, fileName = nftDraft.fileName, tags = Seq()))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.nft.nftBasicDetail(NFTBasicDetail.form.withGlobalError(baseException.failure.message), collectionId = basicDetailsData.collectionId, fileName = basicDetailsData.fileName, None))
           }
@@ -245,9 +245,11 @@ class NFTController @Inject()(
   def tagsForm(collectionId: String, fileName: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val isOwner = masterCollections.Service.isOwner(id = collectionId, accountId = loginState.username)
+      val nftDraft = masterTransactionNFTDrafts.Service.get(fileName)
       (for {
         isOwner <- isOwner
-      } yield if (isOwner) Ok(views.html.nft.tags(collectionId = collectionId, fileName = fileName))
+        nftDraft <- nftDraft
+      } yield if (isOwner) Ok(views.html.nft.tags(collectionId = collectionId, fileName = fileName, tags = nftDraft.fold[Seq[String]](Seq())(_.hashTags.getOrElse(Seq.empty[String]))))
       else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
@@ -258,7 +260,7 @@ class NFTController @Inject()(
     implicit request =>
       NFTTags.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.nft.tags(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.NFT_FILE_NAME.name, ""))))
+          Future(BadRequest(views.html.nft.tags(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.NFT_FILE_NAME.name, ""), formWithErrors.data.getOrElse(constants.FormField.NFT_TAGS.name, "").split(","))))
         },
         tagsData => {
           val collection = masterCollections.Service.tryGet(id = tagsData.collectionId)
@@ -271,7 +273,7 @@ class NFTController @Inject()(
             _ <- update(collection)
           } yield PartialContent(views.html.nft.setProperties(collection = collection, fileName = tagsData.fileName))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.nft.tags(NFTTags.form.withGlobalError(baseException.failure.message), collectionId = tagsData.collectionId, fileName = tagsData.fileName))
+            case baseException: BaseException => BadRequest(views.html.nft.tags(NFTTags.form.withGlobalError(baseException.failure.message), collectionId = tagsData.collectionId, fileName = tagsData.fileName, tags = tagsData.getTags))
           }
         }
       )
