@@ -299,7 +299,7 @@ class CollectionController @Inject()(
         def deleteOldAws() = Future(documentType match {
           case constants.Collection.File.PROFILE => collectionDraft.profileFileName.map(x => utilities.AmazonS3.deleteObject(id + "/others/" + x))
           case constants.Collection.File.COVER => collectionDraft.coverFileName.map(x => utilities.AmazonS3.deleteObject(id + "/others/" + x))
-          case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwFutureBaseException()
+          case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwBaseException()
         })
 
         for {
