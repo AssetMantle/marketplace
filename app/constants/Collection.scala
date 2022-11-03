@@ -1,7 +1,6 @@
 package constants
 
 import models.common.Collection.Property
-import play.api.Logger
 
 object Collection {
 
@@ -18,7 +17,7 @@ object Collection {
 
   def getFilePath: String = constants.CommonConfig.Files.CollectionPath + "/"
 
-  def getNFTFilePath: String = constants.CommonConfig.Files.CollectionPath  + "/nfts/"
+  def getNFTFilePath: String = constants.CommonConfig.Files.CollectionPath + "/nfts/"
 
   object Category {
     val ART = "ART"
@@ -34,6 +33,7 @@ object Collection {
     val NSFW = "nsfw"
     val NFT_NAME = "nftName"
     val NFT_DESCRIPTION = "nftDescription"
+    val FILE_HASH = "fileHash"
 
     val IMMUTABLE = "IMMUTABLE"
     val MUTABLE = "MUTABLE"
@@ -42,7 +42,7 @@ object Collection {
     val NON_META = "NON_META"
     val META = "META"
 
-    val list: Seq[String] = Seq(NAME, DESCRIPTION, CATEGORY, NSFW, NFT_NAME, NFT_DESCRIPTION)
+    val list: Seq[String] = Seq(NAME, DESCRIPTION, CATEGORY, NSFW, NFT_NAME, NFT_DESCRIPTION, FILE_HASH)
 
     val defaultProperties: Seq[Property] = list.map { propertyName =>
       if (propertyName != NSFW) Property(name = propertyName, `type` = constants.NFT.Data.STRING, `value` = "", required = true, meta = true, mutable = false)

@@ -115,10 +115,9 @@ function goToStep(stepNumber) {
 }
 
 // Show and hide modal screen
-function showHideModalScreen(showScreen="", hideScreen="") {
+function showHideModalScreen(showScreen = "", hideScreen = "") {
     $(".modalContainer").removeClass('active');
-        $(hideScreen).hide()
-        $(showScreen).show();
-        $(".modalContainer").addClass('active');
-
+    $(hideScreen).hide()
+    $(showScreen).show();
+    $(".modalContainer").addClass('active');
 }
