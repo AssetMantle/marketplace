@@ -2,7 +2,7 @@ package models.masterTransaction
 
 import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import models.common.Collection._
-import models.master.{Collection, CollectionFile}
+import models.master.Collection
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -19,7 +19,7 @@ case class CollectionDraft(id: String, creatorId: String, name: String, descript
 
   def getInstagram: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.INSTAGRAM).map(_.url)
 
-  def toCollection: Collection = Collection(id = id, creatorId = creatorId, classificationId = None, name = name, description = description, website = "", socialProfiles = socialProfiles, category = category, nsfw = nsfw, properties = Option(this.properties))
+  def toCollection(public: Boolean = false): Collection = Collection(id = id, creatorId = creatorId, classificationId = None, name = name, description = description, website = "", socialProfiles = socialProfiles, category = category, nsfw = nsfw, properties = Option(this.properties), profileFileName = this.profileFileName, coverFileName = this.coverFileName, public = public)
 
   def getProfileFileURL: Option[String] = this.profileFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + this.id + "/others/" + x)
 

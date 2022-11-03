@@ -1,18 +1,17 @@
 @import controllers.actions.LoginState
-@import views.html.base.buttons.commonPrimaryCallButton
 @import views.html.collection.commonCollectionCard
 
-@(collections: Seq[master.Collection], collectionFiles: Seq[master.CollectionFile], drafts: Seq[masterTransaction.CollectionDraft], totalCollections: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(collections: Seq[master.Collection], drafts: Seq[masterTransaction.CollectionDraft], totalCollections: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 @if(collections.nonEmpty || drafts.nonEmpty) {
     @drafts.map { draft =>
         <div class="mt-3 singleCollection singleCreatedCollection draftCollection">
-            @commonCollectionCard(draft.toCollection, JavaScript(s"getForm(jsRoutes.controllers.CollectionController.editForm('${draft.id}'))"), collectionCoverFile = draft.coverFileName, collectionProfileFile = draft.profileFileName)
+            @commonCollectionCard(draft.toCollection(), JavaScript(s"getForm(jsRoutes.controllers.CollectionController.editForm('${draft.id}'))"), collectionCoverFile = draft.coverFileName, collectionProfileFile = draft.profileFileName)
         </div>
     }
     @collections.map { collection =>
         <div class="mt-3 singleCollection singleCreatedCollection">
-            @commonCollectionCard(collection, JavaScript(s"viewCollection('${collection.id}')"), collectionCoverFile = collectionFiles.find(x => x.id == collection.id && x.documentType == constants.Collection.File.COVER).map(_.fileName), collectionProfileFile = collectionFiles.find(x => x.id == collection.id && x.documentType == constants.Collection.File.PROFILE).map(_.fileName))
+            @commonCollectionCard(collection, JavaScript(s"viewCollection('${collection.id}')"), collectionCoverFile = collection.coverFileName, collectionProfileFile = collection.profileFileName)
         </div>
     }
 } else {
