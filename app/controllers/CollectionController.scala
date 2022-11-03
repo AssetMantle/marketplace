@@ -287,14 +287,26 @@ class CollectionController @Inject()(
 
   def uploadCollectionFile(id: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
+      val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id = id)
       val oldFilePath = constants.Collection.getFilePath + name
       val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
       val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(name)
       val awsKey = id + "/others/" + newFileName
-      val isOwner = masterTransactionCollectionDrafts.Service.isOwner(id = id, accountId = loginState.username)
 
-      def uploadToAws(isOwner: Boolean) = if (isOwner) Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
-      else {
+      def uploadToAws(collectionDraft: CollectionDraft) = if (collectionDraft.creatorId == loginState.username) {
+        val uploadLatest = Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
+
+        def deleteOldAws() = Future(documentType match {
+          case constants.Collection.File.PROFILE => collectionDraft.profileFileName.map(x => utilities.AmazonS3.deleteObject(id + "/others/" + x))
+          case constants.Collection.File.COVER => collectionDraft.coverFileName.map(x => utilities.AmazonS3.deleteObject(id + "/others/" + x))
+          case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwFutureBaseException()
+        })
+
+        for {
+          _ <- uploadLatest
+          _ <- deleteOldAws()
+        } yield ()
+      } else {
         utilities.FileOperations.deleteFile(oldFilePath)
         constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
       }
@@ -308,8 +320,8 @@ class CollectionController @Inject()(
       }
 
       (for {
-        isOwner <- isOwner
-        _ <- uploadToAws(isOwner)
+        collectionDraft <- collectionDraft
+        _ <- uploadToAws(collectionDraft)
         _ <- deleteLocalFile()
         _ <- add
       } yield Ok(constants.CommonConfig.AmazonS3.s3BucketURL + awsKey)
