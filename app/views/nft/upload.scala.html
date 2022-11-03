@@ -7,7 +7,7 @@
     <script src="@routes.Assets.versioned("javascripts/nfts/upload.js")"></script>
 
     <div class="modal-header mb-3">
-        <div class="title-icon back-button-icon" id="modalBackButton" onclick="">
+        <div class="title-icon back-button-icon" id="modalBackButton" onclick="getForm(jsRoutes.controllers.NFTController.selectCollection())">
             <i class="bi bi-chevron-left iconDefault"></i>
         </div>
         <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.UPLOAD)</h5>
@@ -27,10 +27,7 @@
     </div>
 
     <script>
-            function setFileName(fileHash){
-                $("#uploadNftNextButton").removeClass("disable");
-                $("#uploadNftNextButton").attr("onclick",`getForm(jsRoutes.controllers.NFTController.basicDetailsForm("@collectionId","${fileHash}"))`);
-            }
+            passCollectionId("@collectionId");
     </script>
 } else {
     <div class="d-flex gap-3 align-items-center maxDraftLimitInfo">

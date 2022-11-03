@@ -18,7 +18,7 @@
                         <div class="d-flex gap-3">
                             @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
                             <div class="hidden">
-                                @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).`value`)
+                            @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_VALUE, Symbol("value") -> collection.properties.get(index).`value`)
                             </div>
                             @commonValueField(collection.properties.get(index).`type`, collection.properties.get(index).`value`, index)
                         </div>
@@ -26,7 +26,7 @@
                         <div class="d-flex gap-3">
                             @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
                             <div class="hidden">
-                                @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).`value`, Symbol("required") -> false)
+                            @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_VALUE, Symbol("value") -> collection.properties.get(index).`value`, Symbol("required") -> false)
                             </div>
                             @commonValueField(collection.properties.get(index).`type`, collection.properties.get(index).`value`, index)
                         </div>
@@ -35,5 +35,14 @@
             }
         }
     }
+    <div class="horizontal-align">
+        <div class="d-flex gap-3 align-items-center me-3 propertyModalButton">
+            <button class="form-secondary-button active" type="button" onclick="saveToDraftNft()">@Messages(constants.View.CREATE_COLLECTION_SAVE_DRAFT_BUTTON)</button>
+            <button class="form-primary-button active" type="button" onclick="submitButtonNft();">@Messages(constants.View.CREATE_COLLECTION_NEXT_BUTTON)</button>
+        </div>
+    </div>
 }
 <script src="@routes.Assets.versioned("javascripts/nfts/setProperties.js")"></script>
+<script>
+        hideSubmitButton();
+</script>
