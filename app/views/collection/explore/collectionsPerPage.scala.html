@@ -5,7 +5,7 @@
     @if(collections.nonEmpty) {
         @collections.map { collection =>
             <div class="mt-3 singleCollection">
-                @commonCollectionCard(collection, JavaScript(s"viewCollection('${collection.id}')"), collectionCoverFile = collection.coverFileName, collectionProfileFile = collection.profileFileName)
+                @commonCollectionCard(collection, JavaScript(s"viewCollection('${collection.id}')"))
             </div>
         }
     } else {
