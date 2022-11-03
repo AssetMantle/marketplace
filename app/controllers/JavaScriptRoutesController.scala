@@ -44,6 +44,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.storeCollectionFile,
         routes.javascript.CollectionController.uploadCollectionFile,
         routes.javascript.CollectionController.definePropertiesForm,
+        routes.javascript.CollectionController.deleteDraft,
 
         routes.javascript.WishlistController.wishlistSection,
         routes.javascript.WishlistController.collectionPerPage,
@@ -65,6 +66,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.basicDetailsForm,
         routes.javascript.NFTController.setPropertiesForm,
         routes.javascript.NFTController.tagsForm,
+        routes.javascript.NFTController.deleteDraft,
 
         routes.javascript.SettingController.viewSettings,
         routes.javascript.SettingController.settings,
@@ -101,6 +103,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WhitelistController.acceptInvite,
         routes.javascript.WhitelistController.leaveWhitelistDetails,
         routes.javascript.WhitelistController.leaveWhitelist,
+        routes.javascript.WhitelistController.listMembers,
+        routes.javascript.WhitelistController.deleteMember,
 
       )
     ).as("text/javascript")

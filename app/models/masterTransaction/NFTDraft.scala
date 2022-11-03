@@ -141,5 +141,6 @@ class NFTDrafts @Inject()(
       } yield ()
     }
 
+    def deleteById(fileName: String): Future[Int] = delete(fileName)
   }
 }

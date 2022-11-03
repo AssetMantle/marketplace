@@ -168,5 +168,14 @@ class CollectionDrafts @Inject()(
 
     def deleteById(id: String): Future[Int] = delete(id)
 
+    def checkOwnerAndDelete(id: String, accountId: String): Future[Unit] = {
+      val draft = tryGet(id)
+
+      for {
+        draft <- draft
+        _ <- if (draft.creatorId == accountId) delete(id) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+      } yield ()
+    }
+
   }
 }

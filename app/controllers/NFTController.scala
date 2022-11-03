@@ -11,7 +11,7 @@ import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import views.base.companion.UploadFile
-import views.nft.companion.{NFTBasicDetail, NFTTags, SetProperties}
+import views.nft.companion._
 
 import java.nio.file.Files
 import javax.inject.{Inject, Singleton}
@@ -331,6 +331,31 @@ class NFTController @Inject()(
             collection <- collection
             nft <- update(collection)
           } yield PartialContent(views.html.nft.createSuccessful(nft, setPropertiesData.saveNFTDraft))
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        }
+      )
+  }
+
+  def deleteDraft(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      DeleteDraft.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest)
+        },
+        deleteDraftData => {
+          val nftDraft = masterTransactionNFTDrafts.Service.tryGet(deleteDraftData.nftFileName)
+
+          def collection(collectionId: String) = masterCollections.Service.tryGet(id = collectionId)
+
+          def delete(isOwner: Boolean) = masterTransactionNFTDrafts.Service.deleteById(deleteDraftData.nftFileName)
+
+          (for {
+            nftDraft <- nftDraft
+            collection <- collection(nftDraft.collectionId)
+            _ <- delete(collection.creatorId == loginState.username)
+          } yield Ok
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
           }
