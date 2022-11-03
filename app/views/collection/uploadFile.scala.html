@@ -6,7 +6,7 @@
 @(collectionDraft: CollectionDraft)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div class="modal-header mb-3">
-    <div class="title-icon back-button-icon" id="modalBackButton" onclick="">
+    <div class="title-icon back-button-icon" id="modalBackButton" onclick="getForm(jsRoutes.controllers.CollectionController.editForm('@collectionDraft.id'))">
         <i class="bi bi-chevron-left iconDefault"></i>
     </div>
     <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.COLLECTION_PROFILE_COVER_TITLE)</h5>
@@ -16,11 +16,10 @@
 </div>
 
 <div class="d-flex gap-3">
-    @commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = collectionDraft.id, documentType = constants.Collection.File.PROFILE, label = constants.View.COLLECTION_PROFILE_IMAGE_TITLE)
-    @commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = collectionDraft.id, documentType = constants.Collection.File.COVER, label = constants.View.COLLECTION_COVER_IMAGE_TITLE)
+    @commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = collectionDraft.id, documentType = constants.Collection.File.PROFILE, label = constants.View.COLLECTION_PROFILE_IMAGE_TITLE, fileUrl = collectionDraft.getProfileFileURL)
+    @commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = collectionDraft.id, documentType = constants.Collection.File.COVER, label = constants.View.COLLECTION_COVER_IMAGE_TITLE, fileUrl = collectionDraft.getCoverFileURL)
 </div>
 
 <div class="horizontal-align">
-    @commonModalSecondaryButton(constants.View.BACK, constants.Form.EDIT_COLLECTION.get, Symbol("parameters") -> s"'${collectionDraft.id}'")
     @commonModalPrimaryButton(constants.View.NEXT, constants.Form.DEFINE_COLLECTION_PROPERTIES.get, Symbol("parameters") -> s"'${collectionDraft.id}'")
 </div>

@@ -21,9 +21,9 @@ case class CollectionDraft(id: String, creatorId: String, name: String, descript
 
   def toCollection: Collection = Collection(id = id, creatorId = creatorId, classificationId = None, name = name, description = description, website = "", socialProfiles = socialProfiles, category = category, nsfw = nsfw, properties = Option(this.properties))
 
-  def getCollectionProfileFile: Option[CollectionFile] = this.profileFileName.map(x => CollectionFile(id = id, documentType = constants.Collection.File.PROFILE, fileName = x, file = Array.emptyByteArray))
+  def getProfileFileURL: Option[String] = this.profileFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + this.id + "/others/" + x)
 
-  def getCollectionCoverFile: Option[CollectionFile] = this.coverFileName.map(x => CollectionFile(id = id, documentType = constants.Collection.File.COVER, fileName = x, file = Array.emptyByteArray))
+  def getCoverFileURL: Option[String] = this.coverFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + this.id + "/others/" + x)
 
   def serialize(): CollectionDrafts.CollectionDraftSerialized = CollectionDrafts.CollectionDraftSerialized(
     id = this.id,
