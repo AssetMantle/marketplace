@@ -370,4 +370,23 @@ class CollectionController @Inject()(
       )
   }
 
+  def deleteDraft(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      DeleteDraft.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest)
+        },
+        deleteDraftData => {
+          val delete = masterTransactionCollectionDrafts.Service.checkOwnerAndDelete(id = deleteDraftData.collectionId, accountId = loginState.username)
+
+          (for {
+            _ <- delete
+          } yield Ok
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        }
+      )
+  }
+
 }

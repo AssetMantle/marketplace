@@ -249,4 +249,44 @@ class WhitelistController @Inject()(
       )
   }
 
+  def listMembers(whitelistId: String): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val whitelist = masterWhitelists.Service.tryGet(whitelistId)
+        val members = masterWhitelistMembers.Service.getAllForWhitelist(whitelistId)
+
+        (for {
+          whitelist <- whitelist
+          members <- members
+        } yield if (whitelist.ownerId == loginState.username) Ok(views.html.profile.whitelist.listMembers(whitelist = whitelist, members = members))
+        else constants.Response.NOT_WHITELIST_CREATOR.throwBaseException()
+          ).recover {
+          case baseException: BaseException => BadRequest(views.html.base.modal.errorModal(heading = constants.View.LEAVE_WHITELIST_FAILED, subHeading = baseException.failure.message))
+        }
+    }
+  }
+
+  def deleteMember(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      RemoveMember.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest)
+        },
+        deleteMemberData => {
+          val whitelist = masterWhitelists.Service.tryGet(deleteMemberData.whitelistId)
+
+          def deleteMember(whitelist: Whitelist) = if (whitelist.ownerId == loginState.username) masterWhitelistMembers.Service.deleteMember(whitelistId = deleteMemberData.whitelistId, accountId = deleteMemberData.username)
+          else constants.Response.NOT_WHITELIST_CREATOR.throwFutureBaseException()
+
+          (for {
+            whitelist <- whitelist
+            _ <- deleteMember(whitelist)
+          } yield Ok
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        }
+      )
+  }
 }
+

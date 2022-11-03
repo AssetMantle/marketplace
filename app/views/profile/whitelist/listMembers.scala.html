@@ -1,0 +1,19 @@
+@import controllers.actions.LoginState
+@import models.master.Whitelist
+@import views.html.base.form._
+@import helper.{form, _}
+
+@(whitelist: Whitelist, members: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@members.map { username =>
+    <div>@username</div>
+    <div class="hidden">
+    @defining(views.profile.whitelist.companion.RemoveMember.form) { removeMemberForm =>
+        @form(routes.WhitelistController.deleteMember()) {
+            @CSRF.formField
+            @commonInputText(removeMemberForm, constants.FormField.WHITELIST_ID, Symbol("value") -> whitelist.id, Symbol("readonly") -> "readonly")
+            @commonInputText(removeMemberForm, constants.FormField.USERNAME, Symbol("value") -> username, Symbol("readonly") -> "readonly")
+        }
+    }
+    </div>
+}
