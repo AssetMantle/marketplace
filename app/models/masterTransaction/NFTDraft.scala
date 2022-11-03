@@ -2,7 +2,7 @@ package models.masterTransaction
 
 import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import models.common.NFT._
-import models.master.NFT
+import models.master.{NFT, NFTProperty}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -13,7 +13,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class NFTDraft(fileName: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[Seq[BaseNFTProperty]], hashTags: Option[Seq[String]], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def toNFT: NFT = NFT(fileName = fileName, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), properties = Seq(), ipfsLink = "", edition = None, baseProperties = properties.getOrElse(Seq()))
+  def toNFT: NFT = NFT(fileName = fileName, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), properties = Seq(), ipfsLink = "", edition = None)
+
+  def getNFTProperties: Seq[NFTProperty] = this.properties.fold[Seq[NFTProperty]](Seq())(x => x.map(_.toNFTProperty(this.fileName)))
 
   def getFileHash: String = utilities.FileOperations.getFileNameWithoutExtension(fileName)
 
