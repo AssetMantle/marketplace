@@ -2,52 +2,87 @@
 @import controllers.actions.LoginState
 @import helper._
 
-@(fileUploadForm: FileUploadForm, id: String, documentType: String, errorMessage: String = "", label: String = "", onSuccessCallback: JavaScript = JavaScript("emptyCallBack"))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(fileUploadForm: FileUploadForm, id: String, documentType: String, errorMessage: String = "", label: String = "", onSuccessCallback: JavaScript = JavaScript("emptyCallBack"), fileUrl: Object = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="uploadFileContainer">
     <div class="mb-2 uploadFileLabel">@Messages(label)</div>
     <div class="uploadForm">
         @CSRF.formField
-    <div class="modalInfoBlock">
-        <div id="uploadSelector_@documentType" class="h-100 centerText uploadBox">
-            <div class="d-flex flex-column justify-content-between h-100">
-                <div class="text-center">
-                    <i class="bi bi-cloud-upload iconDefault uploadIcon"></i>
-                    <span class="uploadIcon"></span>
-                    <div class="dropBox">
-                    @Messages(constants.View.DROP_FILE)
+        <div class="modalInfoBlock">
+        @if(fileUrl != None){
+                <div id="uploader_@documentType" class="centerText uploader h-100" style="display: block">
+                    <div class="d-flex flex-column gap-1 h-100">
+                        <div id="uploadCompletionMessage_@documentType" class="uploadCompletionMessage">
+                            <div class="previewImageContainer">
+                                <img src="@fileUrl" class="previewImage"/>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <div id="fileName_@documentType" class="fileName"></div>
+                            <br>
+                            <div class="progressContainer">
+                                <div class="progressBar" id="fileUploadProgressBar_@documentType"></div>
+                            </div>
+                        </div>
                     </div>
-                    <p class="centerText">@Messages(constants.View.OR)</p>
                 </div>
-                <div class="text-center">
-                    <button type="button" class="secondaryButton" id="browseUploadButton_@documentType">@Messages(constants.View.BROWSE)</button>
+
+                <div class="d-flex justify-content-center">
+                    <div id="uploadSelector_@documentType" class="h-100 centerText uploadBox">
+                        <div class="d-flex flex-column justify-content-between h-100">
+                            <div class="text-center">
+                                <button type="button" class="secondaryButton" id="browseUploadButton_@documentType">@Messages(constants.View.BROWSE)</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="uploadControls_@documentType" style="display: none;">
+                        <div class="mt-0">
+                            <button type="button" class="secondaryButton" id="uploadButton_@documentType">@Messages(constants.View.UPLOAD)</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            }else{
+                <div id="uploader_@documentType" class="centerText uploader h-100">
+                    <div class="d-flex flex-column gap-1 h-100">
+                        <div id="uploadCompletionMessage_@documentType" class="uploadCompletionMessage">
+                            <div class="previewImageContainer" style="display: none;">
+                                <img src="@fileUrl" class="previewImage"/>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <div id="fileName_@documentType" class="fileName"></div>
+                            <br>
+                            <div class="progressContainer">
+                                <div class="progressBar" id="fileUploadProgressBar_@documentType"></div>
+                            </div>
+                        </div>
+
+                        <div id="uploadControls_@documentType">
+                            <div class="mt-0">
+                                <button type="button" class="secondaryButton" id="uploadButton_@documentType">@Messages(constants.View.UPLOAD)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="uploadSelector_@documentType" class="h-100 centerText uploadBox">
+                    <div class="d-flex flex-column justify-content-between h-100">
+                        <div class="text-center">
+                            <i class="bi bi-cloud-upload iconDefault uploadIcon"></i>
+                            <span class="uploadIcon"></span>
+                            <div class="dropBox">
+                            @Messages(constants.View.DROP_FILE)
+                            </div>
+                            <p class="centerText">@Messages(constants.View.OR)</p>
+                        </div>
+                        <div class="text-center">
+                            <button type="button" class="secondaryButton" id="browseUploadButton_@documentType">@Messages(constants.View.BROWSE)</button>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
-
-        <div id="uploader_@documentType" class="centerText uploader h-100">
-            <div class="d-flex flex-column gap-1 h-100">
-                <div id="uploadCompletionMessage_@documentType" class="uploadCompletionMessage">
-                    <div class="previewImageContainer" style="display: none;">
-                        <img src="" class="previewImage"/>
-                    </div>
-                </div>
-
-                <div class="text-center">
-                    <div id="fileName_@documentType" class="fileName"></div>
-                    <br>
-                    <div class="progressContainer">
-                        <div class="progressBar" id="fileUploadProgressBar_@documentType"></div>
-                    </div>
-                </div>
-
-                <div id="uploadControls_@documentType">
-                    <div class="mt-0">
-                        <button type="button" class="secondaryButton" id="uploadButton_@documentType">@Messages(constants.View.UPLOAD)</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     </div>
 </div>
 <script>uploadFile(@utilities.JsRoutes.getJsRouteFunction(fileUploadForm.store), @utilities.JsRoutes.getJsRouteFunction(fileUploadForm.upload), '@id', '@documentType', '@fileUploadForm.fileTypes.mkString("_")', @fileUploadForm.maxFileSize, @onSuccessCallback)</script>

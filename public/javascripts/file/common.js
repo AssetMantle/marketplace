@@ -29,6 +29,7 @@ function uploadFile(storeFileRoute, uploadRoute, id, documentType, filesSupporte
         $("#uploadSelector_" + documentType).hide();
         $("#fileName_" + documentType).html(file.fileName);
         $("#uploader_" + documentType).show();
+        $("#uploadControls_" + documentType).show();
     });
 
     rFile.on('fileProgress', function (file) {
@@ -53,6 +54,7 @@ function uploadFile(storeFileRoute, uploadRoute, id, documentType, filesSupporte
             // },
             statusCode: {
                 200: function (data) {
+                    $("#uploadControls_" + documentType).fadeOut(500);
                     $("#uploadCompletionMessage_" + documentType).delay(500).show();
                     $("#uploadCompletionMessage_" + documentType + " .previewImageContainer").delay(2000).show();
                     $("#uploadCompletionMessage_" + documentType + " .previewImage").attr("src",data);

@@ -772,13 +772,15 @@
   .uploadForm{
     border: 1px dashed var(--gray);
     border-radius: 6px;
-    min-height: 288px;
-    max-height: 288px;
+    min-height: 357px;
+    max-height: 400px;
     height: 100%;
     align-items: center;
     justify-content: center;
     text-align: center;
     padding: 48px 48px 48px 48px;
+    display: flex;
+    align-items: center;
     .uploadBox{
       .uploadIcon{
         font-size: 40px;

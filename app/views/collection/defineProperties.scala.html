@@ -218,5 +218,5 @@
 <script src="@routes.Assets.versioned("javascripts/collections/createCollection.js")"></script>
 <script>
         hideSubmitButton();
-        $("#modalBackButton").attr("onclick", "");
+        $("#modalBackButton").attr("onclick", "getForm(jsRoutes.controllers.CollectionController.uploadCollectionFilesForm('@collectionDraft.fold("")(_.id)'))");
 </script>
