@@ -83,33 +83,6 @@ class CollectionFiles @Inject()(
 
 
   object Service {
-
-    def add(id: String, documentType: String, fileName: String): Future[Unit] = {
-      create(CollectionFile(
-        id = id,
-        documentType = documentType,
-        fileName = fileName,
-        file = Array()
-      ).serialize())
-    }
-
-    def insertOrUpdate(id: String, documentType: String, fileName: String, file: Array[Byte]): Future[Unit] = {
-      upsert(CollectionFile(
-        id = id,
-        documentType = documentType,
-        fileName = fileName,
-        file = file
-      ).serialize())
-    }
-
-    def insertOrUpdate(collectionFile: CollectionFile): Future[Unit] = upsert(collectionFile.serialize())
-
-    def insertOrUpdate(collectionFiles: Seq[CollectionFile]): Future[Unit] = upsertMultiple(collectionFiles.map(_.serialize()))
-
-    def get(id: String, documentType: String): Future[Option[CollectionFile]] = getById(id1 = id, id2 = documentType).map(_.map(_.deserialize))
-
-    def get(ids: Seq[String]): Future[Seq[CollectionFile]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
-
     def fetchAll(): Future[Seq[CollectionFile]] = getAll.map(_.map(_.deserialize))
 
     def deleteByCollectionId(id: String): Future[Int] = deleteMultipleById1(id)

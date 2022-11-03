@@ -24,7 +24,6 @@ class WishlistController @Inject()(
                                     masterWishLists: master.WishLists,
                                     masterCollections: master.Collections,
                                     masterNFTs: master.NFTs,
-                                    masterCollectionFiles: master.CollectionFiles,
                                   )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -48,13 +47,10 @@ class WishlistController @Inject()(
         def allCollections(collectionIds: Seq[String]) = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
         else masterCollections.Service.getCollectionsByPage(collectionIds, pageNumber)
 
-        def allCollectionFiles(collectionIds: Seq[String]) = masterCollectionFiles.Service.get(collectionIds)
-
         (for {
           collectionIds <- allCollectionIds
           collections <- allCollections(collectionIds)
-          collectionFiles <- allCollectionFiles(collectionIds)
-        } yield Ok(views.html.profile.wishlist.collectionPerPage(accountId, collections, collectionFiles, totalCollections = collectionIds.length))
+        } yield Ok(views.html.profile.wishlist.collectionPerPage(accountId, collections, totalCollections = collectionIds.length))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -72,12 +68,10 @@ class WishlistController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(collectionId)
-        val collectionCover = masterCollectionFiles.Service.get(id = collectionId, documentType = constants.Collection.File.COVER)
 
         (for {
           collection <- collection
-          collectionCover <- collectionCover
-        } yield Ok(views.html.profile.wishlist.collectionNFTs(accountId, collection, collectionCover.fold[Option[String]](None)(x => Option(x.fileName))))
+        } yield Ok(views.html.profile.wishlist.collectionNFTs(accountId, collection, collection.coverFileName))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

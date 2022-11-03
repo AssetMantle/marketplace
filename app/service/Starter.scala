@@ -1,5 +1,6 @@
 package service
 
+import models.common.Collection.SocialProfile
 import models.common.NFT._
 import models.master
 import models.master.{Collection, CollectionFile}
@@ -145,8 +146,12 @@ class Starter @Inject()(
       val nfts = masterNFTs.Service.getAllForCollection(collection.id)
 
       def updateNFTs(nfts: Seq[master.NFT]) = {
-        println(nfts.length)
-        utilitiesOperations.traverse(nfts)(nft => masterNFTs.Service.updateBaseNFTProperty(nft))
+        val updateCollectionProperties = masterCollections.Service.updateById(collection.copy(properties = Option(nfts.head.properties.map(x => models.common.Collection.Property(name = x.name, `type` = x.`type`, `value` = "")))))
+        val nftsUpdate = utilitiesOperations.traverse(nfts)(nft => masterNFTs.Service.updateBaseNFTProperty(nft))
+        for {
+          _ <- updateCollectionProperties
+          _ <- nftsUpdate
+        } yield ()
       }
 
       for {
@@ -162,16 +167,23 @@ class Starter @Inject()(
     } yield ()
   }
 
-  private def updateSocialURLs() = {
+  private def updateSocialURLsAndCollectionFiles() = {
     val collections = masterCollections.Service.fetchAll()
+    val collectionFiles = masterCollectionFiles.Service.fetchAll()
 
-    def update(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
-      masterCollections.Service.updateById(collection.copy(socialProfiles = collection.socialProfiles.map(x => x.copy(url = x.url.split("/").last))))
+    def update(collections: Seq[Collection], collectionFiles: Seq[CollectionFile]) = utilitiesOperations.traverse(collections) { collection =>
+      masterCollections.Service.updateById(collection.copy(
+        socialProfiles = if (collection.website == "") collection.socialProfiles.map(x => x.copy(url = x.url.split("/").last)) else SocialProfile(name = constants.Collection.SocialProfile.WEBSITE, url = collection.website) +: collection.socialProfiles.map(x => x.copy(url = x.url.split("/").last)),
+        profileFileName = collectionFiles.find(x => x.id == collection.id && x.documentType == constants.Collection.File.PROFILE).map(_.fileName),
+        coverFileName = collectionFiles.find(x => x.id == collection.id && x.documentType == constants.Collection.File.COVER).map(_.fileName),
+        website = "",
+      ))
     }
 
     for {
       collections <- collections
-      _ <- update(collections)
+      collectionFiles <- collectionFiles
+      _ <- update(collections, collectionFiles)
     } yield ()
   }
 
@@ -181,7 +193,7 @@ class Starter @Inject()(
       _ <- updateNFTProperties()
       _ <- updateCollectionAwsFiles()
       _ <- updateCollectionNFTAwsFiles()
-      _ <- updateSocialURLs()
+      _ <- updateSocialURLsAndCollectionFiles()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)

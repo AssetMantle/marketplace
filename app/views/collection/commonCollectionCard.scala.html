@@ -1,29 +1,25 @@
-@(collection: master.Collection, onClickFunction: JavaScript, collectionCoverFile: Option[String], collectionProfileFile: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(collection: master.Collection, onClickFunction: JavaScript)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <a onclick="@onClickFunction">
     <div class="single-profile-card commonCollectionCard artCollection">
         <div class="profile-section">
             <div id="collectionCoverImage_@collection.id">
                 <div class="hero-img">
-                @if(collectionCoverFile.isDefined) {
-                    @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.id + "/others/" + collectionCoverFile.getOrElse("")) { uri =>
-                        <img src="@uri">
-                    }
-                } else {
+                @collection.getCoverFileURL.fold {
                     <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
+                } { uri =>
+                    <img src="@uri">
                 }
                 </div>
             </div>
             <div class="profile-detail">
                 <div id="collectionProfileImage_@collection.id">
                     <div class="profile-img">
-                @if(collectionProfileFile.isDefined) {
-                    @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.id + "/others/" + collectionProfileFile.getOrElse("")) { uri =>
+                    @collection.getProfileFileURL.fold {
+                        <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
+                    } { uri =>
                         <img src="@uri">
                     }
-                } else {
-                    <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
-                }
                     </div>
                 </div>
                 <div id="content">

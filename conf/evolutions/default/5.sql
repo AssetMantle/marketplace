@@ -63,6 +63,12 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
 ALTER TABLE MASTER."Collection"
     ADD COLUMN IF NOT EXISTS "properties" VARCHAR default null;
 ALTER TABLE MASTER."Collection"
+    ADD COLUMN IF NOT EXISTS "profileFileName" VARCHAR default null;
+ALTER TABLE MASTER."Collection"
+    ADD COLUMN IF NOT EXISTS "coverFileName" VARCHAR default null;
+ALTER TABLE MASTER."Collection"
+    ADD COLUMN IF NOT EXISTS "public" BOOLEAN NOT NULL default true;
+ALTER TABLE MASTER."Collection"
     ADD COLUMN IF NOT EXISTS "category" VARCHAR NOT NULL default 'ART';
 ALTER TABLE MASTER."Collection"
     ADD COLUMN IF NOT EXISTS "nsfw" BOOLEAN NOT NULL default false;
@@ -72,6 +78,8 @@ ALTER TABLE MASTER."NFT"
     ADD COLUMN IF NOT EXISTS "baseProperties" VARCHAR NOT NULL default '[]';
 ALTER TABLE MASTER."Collection"
     DROP CONSTRAINT IF EXISTS "Collection_name_key";
+ALTER TABLE MASTER."Collection"
+    ADD CONSTRAINT uniqueClassificationId UNIQUE ("classificationId");
 
 ALTER TABLE MASTER."NFTTag"
     ADD CONSTRAINT NFTTag_fileName FOREIGN KEY ("fileName") REFERENCES MASTER."NFT" ("fileName");

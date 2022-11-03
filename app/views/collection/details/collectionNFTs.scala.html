@@ -1,13 +1,13 @@
 @import views.html.nft._
 @import views.html.base.buttons.commonPrimaryButton
 
-@(collection: master.Collection, collectionCoverFile: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="item item-center nftContainer">
     <div class="profileCover">
         <div class="profileCoverContainer" id="collectionUncompressedCoverImage_@collection.id">
-        @if(collectionCoverFile.isDefined) {
-            @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.id + "/others/" + collectionCoverFile.getOrElse("")) { uri =>
+        @if(collection.coverFileName.isDefined) {
+            @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.id + "/others/" + collection.coverFileName.getOrElse("")) { uri =>
                 <img src="@uri">
             }
         } else {

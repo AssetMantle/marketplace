@@ -11,7 +11,7 @@ import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, website: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, properties: Option[Seq[Property]], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, website: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, properties: Option[Seq[Property]], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
   def serialize(): Collections.CollectionSerialized = Collections.CollectionSerialized(
     id = this.id,
     creatorId = this.creatorId,
@@ -23,6 +23,9 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
     category = this.category,
     nsfw = this.nsfw,
     properties = this.properties.map(Json.toJson(_).toString()),
+    profileFileName = this.profileFileName,
+    coverFileName = this.coverFileName,
+    public = this.public,
     createdBy = this.createdBy,
     createdOn = this.createdOn,
     createdOnTimeZone = this.createdOnTimeZone,
@@ -35,6 +38,11 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
   def getTwitter: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.TWITTER).map("https://www.twitter.com/" + _.url)
 
   def getInstagram: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.INSTAGRAM).map("https://www.instagram.com/" + _.url)
+
+  def getProfileFileURL: Option[String] = this.profileFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + this.id + "/others/" + x)
+
+  def getCoverFileURL: Option[String] = this.coverFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + this.id + "/others/" + x)
+
 }
 
 object Collections {
@@ -43,13 +51,13 @@ object Collections {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class CollectionSerialized(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, website: String, socialProfiles: String, category: String, nsfw: Boolean, properties: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
-    def deserialize: Collection = Collection(id = id, creatorId = creatorId, classificationId = classificationId, name = name, description = description, website = website, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), category = category, nsfw = nsfw, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[Property]](_)), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class CollectionSerialized(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, website: String, socialProfiles: String, category: String, nsfw: Boolean, properties: Option[String], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
+    def deserialize: Collection = Collection(id = id, creatorId = creatorId, classificationId = classificationId, name = name, description = description, website = website, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), category = category, nsfw = nsfw, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[Property]](_)), profileFileName = profileFileName, coverFileName = coverFileName, public = public, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   class CollectionTable(tag: Tag) extends Table[CollectionSerialized](tag, "Collection") with ModelTable[String] {
 
-    def * = (id, creatorId, classificationId.?, name, description, website, socialProfiles, category, nsfw, properties.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (CollectionSerialized.tupled, CollectionSerialized.unapply)
+    def * = (id, creatorId, classificationId.?, name, description, website, socialProfiles, category, nsfw, properties.?, profileFileName.?, coverFileName.?, public, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (CollectionSerialized.tupled, CollectionSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -70,6 +78,12 @@ object Collections {
     def nsfw = column[Boolean]("nsfw")
 
     def properties = column[String]("properties")
+
+    def profileFileName = column[String]("profileFileName")
+
+    def coverFileName = column[String]("coverFileName")
+
+    def public = column[Boolean]("public")
 
     def createdBy = column[String]("createdBy")
 
@@ -103,42 +117,7 @@ class Collections @Inject()(
 
   object Service {
 
-    def add(name: String, creatorId: String, description: String, website: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, properties: Option[Seq[Property]]): Future[String] = {
-      val id = utilities.IdGenerator.getRandomHexadecimal
-      val collection = Collection(
-        id = id,
-        creatorId = creatorId,
-        classificationId = None,
-        name = name,
-        description = description,
-        website = website,
-        socialProfiles = socialProfiles,
-        category = category,
-        nsfw = nsfw,
-        properties = properties)
-      for {
-        _ <- create(collection.serialize())
-      } yield id
-    }
-
     def add(collection: Collection): Future[String] = create(collection.serialize())
-
-    def insertOrUpdate(id: String, creatorId: String, name: String, description: String, website: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, properties: Option[Seq[Property]]): Future[String] = {
-      val collection = Collection(
-        id = id,
-        creatorId = creatorId,
-        classificationId = None,
-        name = name,
-        description = description,
-        website = website,
-        socialProfiles = socialProfiles,
-        category = category,
-        nsfw = nsfw,
-        properties = properties)
-      for {
-        _ <- upsert(collection.serialize())
-      } yield id
-    }
 
     def updateById(collection: Collection): Future[Unit] = update(collection.serialize())
 
@@ -152,7 +131,7 @@ class Collections @Inject()(
 
     def tryGetByName(name: String): Future[Collection] = filterHead(_.name === name).map(_.deserialize)
 
-    def getByPageNumber(category: String, pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.category === category)(_.createdOn).map(_.map(_.deserialize))
+    def getByPageNumber(category: String, pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(x => x.category === category && x.public)(_.createdOn).map(_.map(_.deserialize))
 
     def deleteById(id: String): Future[Int] = delete(id)
 

@@ -86,12 +86,9 @@ class CollectionController @Inject()(
         val collections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
         else masterCollections.Service.getByPageNumber(category, pageNumber)
 
-        def allCollectionFiles(collectionIds: Seq[String]) = masterCollectionFiles.Service.get(collectionIds)
-
         (for {
           collections <- collections
-          collectionFiles <- allCollectionFiles(collections.map(_.id))
-        } yield Ok(views.html.collection.explore.collectionsPerPage(collections, collectionFiles))
+        } yield Ok(views.html.collection.explore.collectionsPerPage(collections))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -102,12 +99,10 @@ class CollectionController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
-        val collectionCover = masterCollectionFiles.Service.get(id = id, documentType = constants.Collection.File.COVER)
 
         (for {
           collection <- collection
-          collectionCover <- collectionCover
-        } yield Ok(views.html.collection.details.collectionNFTs(collection, collectionCover.fold[Option[String]](None)(x => Option(x.fileName))))
+        } yield Ok(views.html.collection.details.collectionNFTs(collection))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -164,14 +159,11 @@ class CollectionController @Inject()(
       val drafts = if (pageNumber == 1 && optionalLoginState.fold("")(_.username) == accountId) masterTransactionCollectionDrafts.Service.getByCreatorAndPage(accountId, pageNumber)
       else Future(Seq())
 
-      def allCollectionFiles(collectionIds: Seq[String]) = masterCollectionFiles.Service.get(collectionIds)
-
       (for {
         totalCreated <- totalCreated
         collections <- collections
         drafts <- drafts
-        collectionFiles <- allCollectionFiles(collections.map(_.id))
-      } yield Ok(views.html.profile.created.collectionPerPage(collections, collectionFiles = collectionFiles, drafts = drafts, totalCollections = totalCreated))
+      } yield Ok(views.html.profile.created.collectionPerPage(collections, drafts = drafts, totalCollections = totalCreated))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -356,26 +348,20 @@ class CollectionController @Inject()(
         definePropertiesData => {
           val update = masterTransactionCollectionDrafts.Service.updateProperties(definePropertiesData.collectionId, definePropertiesData.getSerializableProperties)
 
-          def publishCollection(collectionDraft: CollectionDraft) = if (!definePropertiesData.saveAsDraft) {
-            val add = masterCollections.Service.add(collectionDraft.toCollection)
-
-            def addCover() = if (collectionDraft.coverFileName.isDefined) masterCollectionFiles.Service.add(id = collectionDraft.id, documentType = constants.Collection.File.COVER, fileName = collectionDraft.coverFileName.get) else Future()
-
-            def addProfile() = if (collectionDraft.profileFileName.isDefined) masterCollectionFiles.Service.add(id = collectionDraft.id, documentType = constants.Collection.File.PROFILE, fileName = collectionDraft.profileFileName.get) else Future()
+          def saveCollection(collectionDraft: CollectionDraft) = if (!definePropertiesData.saveAsDraft) {
+            val add = masterCollections.Service.add(collectionDraft.toCollection())
 
             def deleteDraft() = masterTransactionCollectionDrafts.Service.deleteById(collectionDraft.id)
 
             for {
               _ <- add
-              _ <- addCover()
-              _ <- addProfile()
               _ <- deleteDraft()
             } yield ()
           } else Future("")
 
           (for {
             collectionDraft <- update
-            _ <- publishCollection(collectionDraft)
+            _ <- saveCollection(collectionDraft)
           } yield PartialContent(views.html.collection.createSuccessful(collectionDraft, definePropertiesData.saveAsDraft))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.collection.defineProperties(DefineProperties.form.withGlobalError(baseException.failure.message), None))
