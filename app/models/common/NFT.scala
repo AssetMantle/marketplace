@@ -1,5 +1,6 @@
 package models.common
 
+import models.master.NFTProperty
 import play.api.Logger
 import play.api.libs.functional.syntax.toAlternativeOps
 import play.api.libs.json._
@@ -27,6 +28,8 @@ object NFT {
     def `type`: String
 
     def valueAsString: String
+
+    def toNFTProperty(fileName: String): NFTProperty = NFTProperty(fileName = fileName, name = this.name, `type` = this.`type`, `value` = this.valueAsString, meta = this.meta, mutable = this.mutable)
   }
 
   implicit val baseNFTPropertyWrites: Writes[BaseNFTProperty] = {

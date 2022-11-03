@@ -4,7 +4,8 @@ import akka.stream.scaladsl.{Source, StreamConverters}
 import akka.util.ByteString
 import controllers.actions._
 import exceptions.BaseException
-import models.master.{Collection, NFT}
+import models.master.Collection
+import models.masterTransaction.NFTDraft
 import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
@@ -28,6 +29,7 @@ class NFTController @Inject()(
                                masterAccounts: master.Accounts,
                                masterCollections: master.Collections,
                                masterNFTs: master.NFTs,
+                               masterNFTProperties: master.NFTProperties,
                                masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                masterWishLists: master.WishLists,
                                masterCollectionFiles: master.CollectionFiles,
@@ -56,15 +58,17 @@ class NFTController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val nft = masterNFTs.Service.tryGet(nftId)
+        val nftProperties = masterNFTProperties.Service.getForNFT(nftId)
         val liked = loginState.fold[Future[Option[Boolean]]](Future(None))(x => masterWishLists.Service.checkExists(accountId = x.username, nftId = nftId).map(Option(_)))
 
         def getCollection(collectionID: String) = masterCollections.Service.tryGet(collectionID)
 
         (for {
           nft <- nft
+          nftProperties <- nftProperties
           liked <- liked
           collection <- getCollection(nft.collectionId)
-        } yield Ok(views.html.nft.details(collection, nft, liked))
+        } yield Ok(views.html.nft.details(collection, nft, nftProperties, liked))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -310,20 +314,23 @@ class NFTController @Inject()(
           def update(collection: Collection) = if (collection.creatorId == loginState.username) {
             val updateDraft = masterTransactionNFTDrafts.Service.updateProperties(setPropertiesData.fileName, setPropertiesData.getNFTProperties(collection.properties.getOrElse(Seq())))
 
-            def addToNFT(nft: NFT) = if (!setPropertiesData.saveNFTDraft) {
-              val add = masterNFTs.Service.add(nft)
+            def addToNFT(nftDraft: NFTDraft) = if (!setPropertiesData.saveNFTDraft) {
+              val add = masterNFTs.Service.add(nftDraft.toNFT)
 
-              def delete = masterTransactionNFTDrafts.Service.deleteNFT(nft.fileName)
+              def addProperties = masterNFTProperties.Service.addMultiple(nftDraft.getNFTProperties)
+
+              def delete = masterTransactionNFTDrafts.Service.deleteNFT(nftDraft.fileName)
 
               for {
                 _ <- add
+                _ <- addProperties
                 _ <- delete
               } yield ()
             } else Future()
 
             for {
               draft <- updateDraft
-              _ <- addToNFT(draft.toNFT)
+              _ <- addToNFT(draft)
             } yield draft.toNFT
           } else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
 

@@ -17,6 +17,7 @@ class Starter @Inject()(
                          masterCollections: master.Collections,
                          masterCollectionFiles: master.CollectionFiles,
                          masterNFTs: master.NFTs,
+                         masterNFTProperties: master.NFTProperties,
                          masterWishLists: master.WishLists,
                          utilitiesOperations: utilities.Operations,
                        )(implicit exec: ExecutionContext, configuration: Configuration) {
@@ -103,7 +104,7 @@ class Starter @Inject()(
 
       def updateNFTs(nfts: Seq[master.NFT]) = {
         val updateCollectionProperties = masterCollections.Service.updateById(collection.copy(properties = Option(nfts.head.properties.map(_.toBaseNFTProperty).map(x => models.common.Collection.Property(name = x.name, `type` = x.`type`, `value` = "")))))
-        val nftsUpdate = utilitiesOperations.traverse(nfts)(nft => masterNFTs.Service.updateBaseNFTProperty(nft))
+        val nftsUpdate = utilitiesOperations.traverse(nfts)(nft => masterNFTProperties.Service.addMultiple(nft.properties.map(_.toBaseNFTProperty.toNFTProperty(nft.fileName))))
         for {
           _ <- updateCollectionProperties
           _ <- nftsUpdate
