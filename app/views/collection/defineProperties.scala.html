@@ -34,9 +34,6 @@
                     <div class="propertyHeading">@Messages(constants.View.CREATE_COLLECTION_TITLE_ADVANCED_INFORMATION)</div>
                     <i class="bi bi-chevron-down iconDefault dropdownIcon" onclick="openPropertyDetail(this)"></i>
                 </div>
-                <div class="propertyEdit">
-                    <i class="bi bi-pencil iconDefault"></i>
-                </div>
             </div>
             <div class="propertyDetail">
                 @commonPropertyBox(index = 3, label = constants.FormField.NFT_NAME.name, value = "", visibility = true, requirement = true)
@@ -209,7 +206,6 @@
 
     <div class="horizontal-align">
         <div class="d-flex gap-3 align-items-center me-3 propertyModalButton">
-            <div class="tertiaryButton" onclick="">@Messages(constants.View.CREATE_COLLECTION_SKIP_BUTTON)</div>
             <button class="form-secondary-button active" type="button" onclick="saveToDraft()">@Messages(constants.View.CREATE_COLLECTION_SAVE_DRAFT_BUTTON)</button>
             <button class="form-primary-button active" type="button" onclick="submitButton();">@Messages(constants.View.CREATE_COLLECTION_NEXT_BUTTON)</button>
         </div>
