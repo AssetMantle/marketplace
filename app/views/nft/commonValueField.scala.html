@@ -2,7 +2,7 @@
 
 @if(propertyType == constants.NFT.Data.BOOLEAN) {
     <div class="mb-0 commonInputInt w-100">
-        <dl>
+        <div class="fieldContainer">
             <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
             <dd class="mt-2">
                 <div class="dropdown" id="booleanOptionList">
@@ -18,26 +18,26 @@
                     </div>
                 </div>
             </dd>
-        </dl>
+        </div>
     </div>
 }
 @if(propertyType == constants.NFT.Data.NUMBER) {
     <div class="mb-0 commonInputInt w-100">
-        <dl>
+        <div class="fieldContainer">
             <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
             <dd>
                 <input type="number" id="fieldValue_@index" name="fieldValue_@index" value="@propertyValue" class="am-input" onkeyup="setNonBooleanValue(@index, event)"/>
             </dd>
-        </dl>
+        </div>
     </div>
 }
 @if(propertyType == constants.NFT.Data.STRING) {
     <div class="mb-0 commonInputInt w-100">
-        <dl>
+        <div class="fieldContainer">
             <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
             <dd>
                 <input type="text" id="fieldValue_@index" name="fieldValue_@index" value="@propertyValue" class="am-input" onkeyup="setNonBooleanValue(@index, event)"/>
             </dd>
-        </dl>
+        </div>
     </div>
 }

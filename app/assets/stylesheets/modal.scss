@@ -753,10 +753,10 @@ body.modal-open::-webkit-scrollbar {
     &.active{
       display: block;
     }
-    .fieldContainer{
-      label{
-        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
-      }
-    }
+  }
+}
+.fieldContainer{
+  label{
+    @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
   }
 }
