@@ -6,13 +6,11 @@
 <div class="item item-center nftContainer">
     <div class="profileCover">
         <div class="profileCoverContainer" id="collectionUncompressedCoverImage_@collection.id">
-        @if(collection.coverFileName.isDefined) {
-            @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.id + "/others/" + collection.coverFileName.getOrElse("")) { uri =>
+            @collection.getCoverFileURL.fold{
+                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
+            }{uri =>
                 <img src="@uri">
             }
-        } else {
-            <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
-        }
         </div>
     </div>
     <div class="profile-card">
