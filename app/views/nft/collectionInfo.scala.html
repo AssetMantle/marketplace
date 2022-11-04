@@ -1,0 +1,8 @@
+@import controllers.actions.LoginState
+@import models.master.Collection
+@import views.html.base.buttons._
+
+@(nft: master.NFT, collection: Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+@commonPrimaryButton(collection.name, JavaScript(s"viewCollection('${collection.id}')"))
+@commonPrimaryButton(collection.creatorId, JavaScript(s"viewProfile('${collection.creatorId}/${constants.View.CREATED}')"))
