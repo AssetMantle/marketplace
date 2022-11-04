@@ -22,8 +22,8 @@
                 </div>
             </div>
             <div class="propertyDetail">
-                @commonPropertyBox(index = 1, label = constants.View.PROPERTY_TITLE_COLLECTION_NAME, value = collectionDraft.fold("")(_.name), visibility = true, requirement = true)
-                @commonPropertyBox(index = 2, label = constants.View.PROPERTY_TITLE_DESCRIPTION, value = collectionDraft.fold("")(_.description), visibility = true, requirement = true)
+                @commonPropertyBox(index = 1, label = constants.FormField.NFT_NAME.name, value = collectionDraft.fold("")(_.name), visibility = true, requirement = true)
+                @commonPropertyBox(index = 2, label = constants.FormField.NFT_DESCRIPTION.name, value = collectionDraft.fold("")(_.description), visibility = true, requirement = true)
             </div>
             <div class="separator"></div>
         </div>
@@ -36,11 +36,7 @@
                 </div>
             </div>
             <div class="propertyDetail">
-                @commonPropertyBox(index = 3, label = constants.FormField.NFT_NAME.name, value = "", visibility = true, requirement = true)
-                @commonPropertyBox(index = 4, label = constants.FormField.NFT_DESCRIPTION.name, value = "", visibility = true, requirement = true)
-                @commonPropertyBox(index = 5, label = constants.FormField.NSFW_COLLECTION.name, value = collectionDraft.fold("")(_.nsfw.toString), visibility = true, requirement = true)
-                @commonPropertyBox(index = 6, label = constants.FormField.COLLECTION_CATEGORY.name, value = collectionDraft.fold("")(_.category), visibility = true, requirement = true)
-                @commonPropertyBox(index = 7, label = constants.View.NFT_FILE_HASH, value = "", visibility = true, requirement = true)
+                @commonPropertyBox(index = 3, label = constants.View.NFT_FILE_HASH, value = "", visibility = true, requirement = true)
             </div>
             <div class="separator"></div>
         </div>

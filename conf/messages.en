@@ -685,3 +685,4 @@ NFT_DRAFT_SUCCESS_SUBTITLE=Your draft has been saved successfully.
 CREATE_NFT_SUCCESS_LABEL_NAME=NFT Name:
 RESPONSE.FAILURE.MASTER_TRANSACTION_NFT_DRAFT_INSERT_FAILED=NFT already exists! Cannot create duplicate NFTs.
 RESPONSE.FAILURE.INVALID_NFT_TAGS_LENGTH=Tags should be minimum 2 characters and maximum 15 characters long.
+RESPONSE.FAILURE.NOT_GENESIS_CREATOR=Account is not a genesis creator.
