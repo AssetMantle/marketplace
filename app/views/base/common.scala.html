@@ -95,9 +95,18 @@
                             <a class="desktop-link">@Messages(constants.View.CREATE)</a>
                             <input type="checkbox" id="show-features2">
                             <label for="show-features2">@Messages(constants.View.CREATE)</label>
-                            <ul>
-                                <li>
-                                    <div class="disable">@Messages(constants.View.COMING_SOON)</div>
+                            <ul class="submenu">
+                                <li onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_COLLECTION.get, ""))">
+                                    <a class="d-flex flex-row align-items-center gap-3">
+                                        <i class="bi bi-folder-plus iconDefault"></i>
+                                        <div class="profileMenuLabel">@Messages(constants.View.CREATE_NEW_COLLECTION_MENU)</div>
+                                    </a>
+                                </li>
+                                <li onclick="getForm(jsRoutes.controllers.NFTController.selectCollection())">
+                                    <a class="d-flex flex-row align-items-center gap-3">
+                                        <img src="@routes.Assets.versioned("images/icon/createNFT.svg")"/>
+                                        <div class="profileMenuLabel">@Messages(constants.View.CREATE_NEW_NFT_MENU)</div>
+                                    </a>
                                 </li>
                             </ul>
                         </li>

@@ -64,6 +64,8 @@ FOOTER_FAQ_LINK_4=Docs
 FOOTER_FAQ_5=Want MantleChain inside?
 FOOTER_FAQ_LINK_5=Explorer
 COPYRIGHT=MantlePlace © 2022 - All Rights Reserved
+CREATE_NEW_COLLECTION_MENU=Create new collection
+CREATE_NEW_NFT_MENU=Create new NFT
 
 #//Sign Up
 FORM.SIGN_UP.TITLE=Sign Up
