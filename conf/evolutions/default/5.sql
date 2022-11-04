@@ -42,7 +42,8 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."CollectionDraft"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("id"),
+    UNIQUE ("creatorId", "name")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NFTDraft"
@@ -57,7 +58,8 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NFTDraft"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("fileName")
+    PRIMARY KEY ("fileName"),
+    UNIQUE ("name", "collectionId")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
@@ -94,6 +96,10 @@ ALTER TABLE MASTER."Collection"
 ALTER TABLE MASTER."Collection"
     ADD CONSTRAINT uniqueClassificationId UNIQUE ("classificationId");
 
+ALTER TABLE MASTER."Collection"
+    ADD CONSTRAINT "uniqueCreatorIdCollectionName" UNIQUE ("creatorId", "name");
+ALTER TABLE MASTER."NFT"
+    ADD CONSTRAINT "uniqueNameCollectionId" UNIQUE ("collectionId", "name");
 ALTER TABLE MASTER."NFTProperty"
     ADD CONSTRAINT NFTProperty_fileName FOREIGN KEY ("fileName") REFERENCES MASTER."NFT" ("fileName");
 ALTER TABLE MASTER."NFTTag"

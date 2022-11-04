@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base.buttons.commonPrimaryButton
 
-@(accountId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(accountId: String, allowCreateCollection: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 <div class="mt-2 mb-0 item item-center collectionContainer">
     <div class="p-0 profile-card">

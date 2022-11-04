@@ -144,9 +144,23 @@ class Starter @Inject()(
     } yield ()
   }
 
+  private def updateAccountType() = {
+    val collections = masterCollections.Service.fetchAll()
+
+    def update(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
+      masterAccounts.Service.updateAccountType(accountId = collection.creatorId, accountType = constants.Account.Type.GENESIS_CREATOR)
+    }
+
+    for {
+      collections <- collections
+      _ <- update(collections)
+    } yield ()
+  }
+
   def start(): Future[Unit] = {
 
     (for {
+      _ <- updateAccountType()
       _ <- updateNFTProperties()
       _ <- updateCollectionAwsFiles()
       _ <- updateCollectionNFTAwsFiles()

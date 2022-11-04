@@ -1,6 +1,5 @@
 package models.master
 
-import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -119,6 +118,14 @@ class Accounts @Inject()(
     //        account <- account
     //      } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = account.passwordHash, salt = account.salt, iterations = account.iterations), account.deserialize)
     //    }
+
+    def updateAccountType(accountId: String, accountType: String): Future[Unit] = {
+      val account = tryGetById(accountId)
+      for {
+        account <- account
+        _ <- update(account.copy(accountType = accountType))
+      } yield ()
+    }
 
     def checkUsernameAvailable(username: String): Future[Boolean] = exists(username).map(!_)
 
