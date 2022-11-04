@@ -1,11 +1,27 @@
 @import controllers.actions.LoginState
 @import views.html.collection.commonCollectionCard
+@import views.html.base.form._
+@import helper.{form, _}
 
 @(collections: Seq[master.Collection], drafts: Seq[masterTransaction.CollectionDraft], totalCollections: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 @if(collections.nonEmpty || drafts.nonEmpty) {
     @drafts.map { draft =>
         <div class="mt-3 singleCollection singleCreatedCollection draftCollection">
+            <div class="d-flex justify-content-end draftOption">
+                <div class="d-flex gap-2">
+                    <i class="bi bi-pencil iconDefault" onclick=""></i>
+                    <i class="bi bi-trash iconDefault" onclick="getForm(jsRoutes.controllers.CollectionController.deleteDraftForm('@draft.id'))"></i>
+                    <div id="deleteCollectionDraft_@draft.id" class="hidden">
+                        @defining(views.collection.companion.DeleteDraft.form) { deleteDraftForm =>
+                            @form(routes.WhitelistController.deleteMember()) {
+                                @CSRF.formField
+                                @commonInputText(deleteDraftForm, constants.FormField.COLLECTION_ID, Symbol("value") -> draft.id, Symbol("readonly") -> "readonly")
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
             @commonCollectionCard(draft.toCollection(), JavaScript(s"getForm(jsRoutes.controllers.CollectionController.editForm('${draft.id}'))"))
         </div>
     }

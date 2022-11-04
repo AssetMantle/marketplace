@@ -44,6 +44,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.storeCollectionFile,
         routes.javascript.CollectionController.uploadCollectionFile,
         routes.javascript.CollectionController.definePropertiesForm,
+        routes.javascript.CollectionController.deleteDraftForm,
         routes.javascript.CollectionController.deleteDraft,
 
         routes.javascript.WishlistController.wishlistSection,
