@@ -1,12 +1,12 @@
 @(collectionId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="modal-header mb-3">
-    <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.WHITELIST_DRAFT_REMOVE_TITLE)</h5>
+    <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.COLLECTION_DRAFT_REMOVE_TITLE)</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal();">
                 &times;
     </button>
 </div>
-<p class="sub-heading" id="modalSubtitle">@Messages(constants.View.WHITELIST_DRAFT_REMOVE_SUBTITLE)</p>
+<p class="sub-heading" id="modalSubtitle">@Messages(constants.View.COLLECTION_DRAFT_REMOVE_SUBTITLE)</p>
 
 <div class="form-body">
     <div class="horizontal-align">
@@ -14,3 +14,4 @@
         <button class="form-primary-button" onclick="removeCollectionDraft('@collectionId', '@Messages(constants.View.REMOVE_FROM_DRAFT)')">@Messages(constants.View.CONFIRM_BUTTON)</button>
     </div>
 </div>
+<script src="@routes.Assets.versioned("javascripts/profile/created/draft.js")"></script>

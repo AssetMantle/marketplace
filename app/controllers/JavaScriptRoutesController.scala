@@ -67,6 +67,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.basicDetailsForm,
         routes.javascript.NFTController.setPropertiesForm,
         routes.javascript.NFTController.tagsForm,
+        routes.javascript.NFTController.deleteDraftForm,
         routes.javascript.NFTController.deleteDraft,
 
         routes.javascript.SettingController.viewSettings,

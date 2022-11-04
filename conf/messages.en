@@ -495,8 +495,6 @@ WHITELIST_MEMBER_SUBTITLE=You can review and modify your Whitelist members here.
 REMOVE_FROM_WHITELIST=Removed from whitelist
 WHITELIST_MEMBER_LIST_TITLE_NO=No.
 WHITELIST_MEMBER_LIST_TITLE_NAME=Member Name
-WHITELIST_DRAFT_REMOVE_TITLE=Delete Draft
-WHITELIST_DRAFT_REMOVE_SUBTITLE=Are you sure you want to delete draft?
 
 LINK_COPIED=Link Copied!
 
@@ -658,6 +656,8 @@ CREATE_COLLECTION_NEXT_BUTTON=Next
 COLLECTION_LINK=Collection Link:
 REMOVE_FROM_DRAFT=Removed from draft
 CREATE_COLLECTION_SUCCESS_TERTIARY_BUTTON=Goto Collection
+COLLECTION_DRAFT_REMOVE_TITLE=Delete Draft
+COLLECTION_DRAFT_REMOVE_SUBTITLE=Are you sure you want to delete draft?
 
 #Create NFT
 CREATE_NFT_LABEL=Create a new NFT!
@@ -694,3 +694,5 @@ NFT_DRAFT_SUCCESS_SUBTITLE=Your draft has been saved successfully.
 CREATE_NFT_SUCCESS_LABEL_NAME=NFT Name:
 RESPONSE.FAILURE.MASTER_TRANSACTION_NFT_DRAFT_INSERT_FAILED=NFT already exists! Cannot create duplicate NFTs.
 RESPONSE.FAILURE.INVALID_NFT_TAGS_LENGTH=Tags should be minimum 2 characters and maximum 15 characters long.
+NFT_DRAFT_REMOVE_TITLE=Delete Draft
+NFT_DRAFT_REMOVE_SUBTITLE=Are you sure you want to delete draft?

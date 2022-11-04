@@ -14,7 +14,7 @@
                     <i class="bi bi-trash iconDefault" onclick="getForm(jsRoutes.controllers.CollectionController.deleteDraftForm('@draft.id'))"></i>
                     <div id="deleteCollectionDraft_@draft.id" class="hidden">
                         @defining(views.collection.companion.DeleteDraft.form) { deleteDraftForm =>
-                            @form(routes.WhitelistController.deleteMember()) {
+                            @form(routes.CollectionController.deleteDraft()) {
                                 @CSRF.formField
                                 @commonInputText(deleteDraftForm, constants.FormField.COLLECTION_ID, Symbol("value") -> draft.id, Symbol("readonly") -> "readonly")
                             }
