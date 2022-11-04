@@ -10,9 +10,7 @@
 }
     <div class="card border-0" style="cursor: pointer;">
         <div class="card-img rounded-0" onclick="@onClickFunction">
-        @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.id + "/nfts/" + nft.fileName) { uri =>
-            <img src="@uri"/>
-        }
+            <img src="@nft.getS3Url"/>
         </div>
         <div class="nft-detail p-3">
             <div class="d-flex flex-row gap-2 nft-creator-detail">

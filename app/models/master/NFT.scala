@@ -15,6 +15,8 @@ case class NFT(fileName: String, collectionId: String, name: String, description
 
   def getFileHash: String = utilities.FileOperations.getFileNameWithoutExtension(fileName)
 
+  def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + this.collectionId + "/nfts/" + this.fileName
+
   def serialize(): NFTs.NFTSerialized = NFTs.NFTSerialized(
     fileName = this.fileName,
     collectionId = collectionId,
