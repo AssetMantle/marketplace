@@ -21,7 +21,7 @@
             } else {
                 @commonHorizontalSwitcher(
                     ListMap(
-                        constants.View.CREATED -> (routes.javascript.CollectionController.createdSection,  JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WHITELIST}')")),
+                        constants.View.CREATED -> (routes.javascript.CollectionController.createdSection,  JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.CREATED}')")),
                         constants.View.WISHLIST -> (routes.javascript.WishlistController.wishlistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WISHLIST}')")),
                     ),
                     activeTab,

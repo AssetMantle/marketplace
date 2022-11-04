@@ -91,6 +91,23 @@ class NFTController @Inject()(
     }
   }
 
+  def collectionInfo(nftId: String): EssentialAction = cached.apply(req => req.path + "/" + nftId, constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val nft = masterNFTs.Service.tryGet(nftId)
+
+        def collection(collectionId: String) = masterCollections.Service.tryGet(collectionId)
+
+        (for {
+          nft <- nft
+          collection <- collection(nft.collectionId)
+        } yield Ok(views.html.nft.collectionInfo(nft, collection))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
   def file(nftId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val nft = masterNFTs.Service.tryGet(nftId)
