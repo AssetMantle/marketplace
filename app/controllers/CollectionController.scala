@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
-import models.master.Collection
+import models.master.{Account, Collection}
 import models.masterTransaction.CollectionDraft
 import models.{master, masterTransaction}
 import play.api.Logger
@@ -146,9 +146,15 @@ class CollectionController @Inject()(
   }
 
   // createdSection: Do not do caching here as it will then show draft collections to non-owners
-  def createdSection(accountId: String): Action[AnyContent] = withoutLoginAction { implicit request =>
-    implicit val optionalLoginState: Option[LoginState] = None
-    Ok(views.html.profile.created.createdSection(accountId))
+  def createdSection(accountId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      if (loginState.isDefined && loginState.get.username == accountId) {
+        val account = masterAccounts.Service.tryGet(loginState.get.username)
+        for {
+          account <- account
+        } yield Ok(views.html.profile.created.createdSection(accountId, account.accountType == constants.Account.Type.CREATOR))
+      } else Future(Ok(views.html.profile.created.createdSection(accountId, false)))
+
   }
 
   // createdCollectionPerPage: Do not do caching here as it will then show draft collections to non-owners
@@ -184,10 +190,14 @@ class CollectionController @Inject()(
           Future(BadRequest(views.html.collection.create(formWithErrors, 0)))
         },
         createData => {
-          val collectionDraft = masterTransactionCollectionDrafts.Service.add(name = createData.name, description = createData.description, socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw)
+          val account = masterAccounts.Service.tryGet(loginState.username)
+
+          def collectionDraft(account: Account) = if (account.accountType == constants.Account.Type.GENESIS_CREATOR) masterTransactionCollectionDrafts.Service.add(name = createData.name, description = createData.description, socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw)
+          else constants.Response.NOT_GENESIS_CREATOR.throwFutureBaseException()
 
           (for {
-            collectionDraft <- collectionDraft
+            account <- account
+            collectionDraft <- collectionDraft(account)
           } yield PartialContent(views.html.collection.uploadFile(collectionDraft = collectionDraft))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message), 0))

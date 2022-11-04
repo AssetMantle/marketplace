@@ -1,5 +1,20 @@
 # --- !Ups
 
+CREATE TABLE IF NOT EXISTS MASTER."NFTProperty"
+(
+    "fileName"             VARCHAR NOT NULL,
+    "name"                 VARCHAR NOT NULL,
+    "type"                 VARCHAR NOT NULL,
+    "value"                VARCHAR NOT NULL,
+    "meta"                 BOOLEAN NOT NULL,
+    "mutable"              BOOLEAN NOT NULL,
+    "createdBy"            VARCHAR,
+    "createdOnMillisEpoch" BIGINT,
+    "updatedBy"            VARCHAR,
+    "updatedOnMillisEpoch" BIGINT,
+    PRIMARY KEY ("fileName", "name", "type")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER."NFTTag"
 (
     "hashTag"              VARCHAR NOT NULL,
@@ -27,7 +42,8 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."CollectionDraft"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("id"),
+    UNIQUE ("creatorId", "name")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NFTDraft"
@@ -42,7 +58,8 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NFTDraft"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("fileName")
+    PRIMARY KEY ("fileName"),
+    UNIQUE ("name", "collectionId")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
@@ -74,13 +91,17 @@ ALTER TABLE MASTER."Collection"
     ADD COLUMN IF NOT EXISTS "nsfw" BOOLEAN NOT NULL default false;
 ALTER TABLE MASTER."NFT"
     DROP COLUMN IF EXISTS "file";
-ALTER TABLE MASTER."NFT"
-    ADD COLUMN IF NOT EXISTS "baseProperties" VARCHAR NOT NULL default '[]';
 ALTER TABLE MASTER."Collection"
     DROP CONSTRAINT IF EXISTS "Collection_name_key";
 ALTER TABLE MASTER."Collection"
     ADD CONSTRAINT uniqueClassificationId UNIQUE ("classificationId");
 
+ALTER TABLE MASTER."Collection"
+    ADD CONSTRAINT "uniqueCreatorIdCollectionName" UNIQUE ("creatorId", "name");
+ALTER TABLE MASTER."NFT"
+    ADD CONSTRAINT "uniqueNameCollectionId" UNIQUE ("collectionId", "name");
+ALTER TABLE MASTER."NFTProperty"
+    ADD CONSTRAINT NFTProperty_fileName FOREIGN KEY ("fileName") REFERENCES MASTER."NFT" ("fileName");
 ALTER TABLE MASTER."NFTTag"
     ADD CONSTRAINT NFTTag_fileName FOREIGN KEY ("fileName") REFERENCES MASTER."NFT" ("fileName");
 
@@ -108,6 +129,11 @@ BEGIN
 END;;
 $$ LANGUAGE PLPGSQL;
 
+CREATE TRIGGER NFT_PROPERTY_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."NFTProperty"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 CREATE TRIGGER NFT_TAG_LOG
     BEFORE INSERT OR UPDATE
     ON MASTER."NFTTag"
@@ -131,12 +157,14 @@ CREATE TRIGGER NFT_DRAFT_LOG
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 
 # --- !Downs
+DROP TRIGGER IF EXISTS NFT_PROPERTY_LOG ON MASTER."NFTProperty" CASCADE;
 DROP TRIGGER IF EXISTS NFT_TAG_LOG ON MASTER."NFTTag" CASCADE;
 
 DROP TRIGGER IF EXISTS COLLECTION_DRAFT_LOG ON MASTER_TRANSACTION."CollectionDraft" CASCADE;
 DROP TRIGGER IF EXISTS NOTIFICATION_LOG ON MASTER_TRANSACTION."Notification" CASCADE;
 DROP TRIGGER IF EXISTS NFT_DRAFT_LOG ON MASTER_TRANSACTION."NFTDraft" CASCADE;
 
+DROP TABLE IF EXISTS MASTER."NFTProperty" CASCADE;
 DROP TABLE IF EXISTS MASTER."NFTTag" CASCADE;
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."CollectionDraft" CASCADE;

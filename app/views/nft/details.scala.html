@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
+@import models.master.NFTProperty
 
-@(collection: master.Collection, nft: master.NFT, liked: Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(collection: master.Collection, nft: master.NFT, nftProperties: Seq[NFTProperty], liked: Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 <div class="item item-center nftPreviewContainer">
     <div class="d-flex justify-content-between">
@@ -18,9 +19,7 @@
     <div class="mt-2 nftImagePreview">
         <a href="https://ipfs.io/ipfs/@nft.ipfsLink" target="_blank">
             <div id="nftImage_@utilities.FileOperations.getFileNameWithoutExtension(nft.fileName)">
-                @defining(constants.CommonConfig.AmazonS3.s3BucketURL + collection.name.replaceAll(" ", "+") + "/nfts/" + nft.fileName) {uri =>
-                    <img src="@uri">
-                }
+                <img src="@nft.getS3Url">
             </div>
         </a>
     </div>
@@ -31,16 +30,16 @@
             </ul>
         </div>
         <div class="d-flex flex-row flex-wrap gap-3 propertyList">
-            @nft.baseProperties.map { property =>
+        @nftProperties.map { property =>
             <div class="singleProperty">
                 <div class="propertyName">@property.name</div>
                 <div class="mt-2 propertyValue">
-                @defining(property.valueAsString) { propertyValue =>
+                @defining(property.`value`) { propertyValue =>
                     @propertyValue
                 }
                 </div>
             </div>
-            }
+        }
         </div>
     </div>
 </div>

@@ -27,10 +27,6 @@ object Collection {
 
   object DefaultProperty {
     // Should be kept in lower case otherwise change in form constraints
-    val NAME = "collectionName"
-    val DESCRIPTION = "collectionDescription"
-    val CATEGORY = "category"
-    val NSFW = "nsfw"
     val NFT_NAME = "nftName"
     val NFT_DESCRIPTION = "nftDescription"
     val FILE_HASH = "fileHash"
@@ -42,11 +38,9 @@ object Collection {
     val NON_META = "NON_META"
     val META = "META"
 
-    val list: Seq[String] = Seq(NAME, DESCRIPTION, CATEGORY, NSFW, NFT_NAME, NFT_DESCRIPTION, FILE_HASH)
+    val list: Seq[String] = Seq(NFT_NAME, NFT_DESCRIPTION, FILE_HASH)
 
-    val defaultProperties: Seq[Property] = list.map { propertyName =>
-      if (propertyName != NSFW) Property(name = propertyName, `type` = constants.NFT.Data.STRING, `value` = "", required = true, meta = true, mutable = false)
-      else Property(name = propertyName, `type` = constants.NFT.Data.BOOLEAN, `value` = "", required = true, meta = true, mutable = false)
+    val defaultProperties: Seq[Property] = list.map { propertyName => Property(name = propertyName, `type` = constants.NFT.Data.STRING, `value` = "", required = true, meta = true, mutable = false)
     }
   }
 }

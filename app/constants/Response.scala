@@ -130,6 +130,7 @@ object Response {
   val NFT_PROPERTY_DESCRIPTION_NOT_FOUND = new Failure("NFT_PROPERTY_DESCRIPTION_NOT_FOUND")
   val NFT_PROPERTY_TYPE_NOT_FOUND = new Failure("NFT_PROPERTY_TYPE_NOT_FOUND")
   val INVALID_NFT_PROPERTY = new Failure("INVALID_NFT_PROPERTY")
+  val NOT_GENESIS_CREATOR = new Failure("NOT_GENESIS_CREATOR")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

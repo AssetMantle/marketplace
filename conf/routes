@@ -91,6 +91,7 @@ GET         /nftTags                                          controllers.NFTCon
 POST        /nftTags                                          controllers.NFTController.tags()
 GET         /setProperties                                    controllers.NFTController.setPropertiesForm(collectionId: String, fileName: String)
 POST        /setProperties                                    controllers.NFTController.setProperties()
+GET         /nftCollectionInfo                                controllers.NFTController.collectionInfo(nftId: String)
 GET         /deleteNftDraft                                   controllers.NFTController.deleteDraftForm(fileName: String, fileHash: String)
 POST        /deleteNftDraft                                   controllers.NFTController.deleteDraft()
 
