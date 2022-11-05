@@ -7,7 +7,8 @@
   color: $color;
 }
 /* Left Info Card  */
-.leftInfoCard{
+.leftInfoCard,
+.rightInfoCard{
   height: fit-content;
   background-color: var(--card-color);
   border-radius: 20px;
@@ -42,6 +43,20 @@
       }
     }
   }
+  .badgeImageText{
+    margin-top: 12px;
+    cursor: pointer;
+    img{
+      height: 32px;
+      width: 32px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+    }
+    .badgeText{
+      @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--dark));
+      text-transform: capitalize;
+    }
+  }
 }
 .collectionContainer{
   width: 100%;
@@ -58,7 +73,6 @@
   background-color: var(--card-color);
   border-radius: 20px;
   overflow: hidden;
-  margin-bottom: 100px;
   padding: 20px;
   .leftOptions{
     li{

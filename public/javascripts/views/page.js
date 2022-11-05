@@ -6,6 +6,7 @@ function viewCollections(section) {
 function viewCollection(collectionId) {
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs(collectionId));
+    $('#rightContent').html('');
 }
 
 function viewWishListCollection(lastPart) {
@@ -38,4 +39,5 @@ function viewProfile(lastPart) {
     let activeTab = lastPart.split("/")[1];
     componentResource('centerContent', jsRoutes.controllers.ProfileController.profile(accountId, activeTab));
     $('#leftContent').html('');
+    $('#rightContent').html('');
 }
