@@ -742,9 +742,11 @@
             .title{
               @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--default));
               text-transform: capitalize;
+              word-break: break-word;
             }
             .description{
               @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
+              word-break: break-word;
             }
             .dateTime{
               @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));

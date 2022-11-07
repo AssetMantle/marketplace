@@ -34,8 +34,12 @@
             <div class="singleProperty">
                 <div class="propertyName">@property.name</div>
                 <div class="mt-2 propertyValue">
-                @defining(property.`value`) { propertyValue =>
-                    @propertyValue
+                @if(property.meta){
+                    @defining(property.`value`) { propertyValue =>
+                        @propertyValue
+                    }
+                } else {
+                    *****
                 }
                 </div>
             </div>
