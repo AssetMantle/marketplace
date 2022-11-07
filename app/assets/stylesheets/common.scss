@@ -773,7 +773,7 @@
   .uploadForm{
     border: 1px dashed var(--gray);
     border-radius: 6px;
-    min-height: 357px;
+    min-height: 374px;
     max-height: 400px;
     height: 100%;
     align-items: center;
@@ -801,6 +801,7 @@
       display: none;
       .fileName{
         @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+        word-break: break-word;
       }
     }
     .uploadCompletionMessage{
@@ -842,6 +843,17 @@
 }
 
 #notificationList{
-  height: 200px;
+  height: 215px;
   overflow-y: auto;
+}
+
+// New Feature Icon
+.newFeatureIcon{
+  position: absolute;
+  right: 0;
+  top: 10px;
+  @include setFont(var(--font-type-2), normal, 400, 10px, 14px, var(--header-bg));
+  padding: 2px 4px;
+  background-color: var(--default);
+  border-radius: 5px;
 }

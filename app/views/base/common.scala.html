@@ -93,7 +93,10 @@
                     <ul class="links">
                         <li><a href="@routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)">@Messages(constants.View.EXPLORE)</a></li>
                         <li>
-                            <a class="desktop-link">@Messages(constants.View.CREATE)</a>
+                            <a class="desktop-link">
+                                <span class="newFeatureIcon">@Messages(constants.View.NEW_LABEL)</span>
+                                @Messages(constants.View.CREATE)
+                            </a>
                             <input type="checkbox" id="show-features2">
                             <label for="show-features2">@Messages(constants.View.CREATE)</label>
                             <ul class="submenu">

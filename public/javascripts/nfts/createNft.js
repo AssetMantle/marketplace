@@ -57,3 +57,9 @@ function setCollectionId(selectedItem){
     $("#modalNextButtonContainer .form-primary-button").removeClass("disable");
     $("#modalNextButtonContainer .form-primary-button").attr("onclick",`getForm(jsRoutes.controllers.NFTController.uploadNFTFileForm('${selectedElementValue}'))`);
 }
+
+function addProperty(property){
+    tags.push(property);
+    countHashtags();
+    createHashtag();
+}

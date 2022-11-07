@@ -6,14 +6,14 @@
 <div class="notificationsPerPage">
     @notifications.map { notification =>
         @if(notification.read) {
-            <div class="separator"></div>
+
             <div class="notificationList">
 @*                <div class="notificationListTitle">@Messages(constants.View.NOTIFICATION_POPUP_TITLE_NEW)</div>*@
                 <div class="list">
                     <div class="mb-4 singleNotification">
                         <div class="d-flex gap-2">
                             <div class="d-flex justify-content-center align-items-center notificationIcon">
-                                <i class="bi bi-tag iconWhite"></i>
+                                <i class="bi bi-info-circle iconWhite"></i>
                             </div>
                             <div class="notificationDetail">
                                 <div class="mb-2 title">@Messages(notification.title)</div>
@@ -24,15 +24,16 @@
                     </div>
                 </div>
             </div>
-        } else {
             <div class="separator"></div>
+        } else {
+
             <div class="notificationList">
 @*                <div class="notificationListTitle">@Messages(constants.View.NOTIFICATION_POPUP_TITLE_OLD)</div>*@
                 <div class="list">
                     <div class="mb-4 singleNotification">
                         <div class="d-flex gap-2">
                             <div class="d-flex justify-content-center align-items-center notificationIcon">
-                                <i class="bi bi-tag iconWhite"></i>
+                                <i class="bi bi-info-circle iconWhite"></i>
                             </div>
                             <div id="@notification.id" class="notificationDetail">
                                 <div class="mb-2 title">@Messages(notification.title)</div>
@@ -43,6 +44,7 @@
                     </div>
                 </div>
             </div>
+            <div class="separator"></div>
         }
 
       <script>convertMillisEpochToLocal('notificationDateTime_@notification.id')</script>
