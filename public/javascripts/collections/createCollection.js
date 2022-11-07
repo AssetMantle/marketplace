@@ -5,7 +5,7 @@ function addProperty() {
     $("#COLLECTION_PROPERTY_" + totalActiveContainer).show();
     $("#COLLECTION_PROPERTY_" + totalActiveContainer).addClass("active");
 
-    if (totalActiveContainer == 17) {
+    if (totalActiveContainer == 18) {
         $("#addMorePropertyButton").hide();
     } else {
         $("#addMorePropertyButton").show();
@@ -61,7 +61,7 @@ function removeProperty(containerId) {
     $("#COLLECTION_PROPERTY_" + (totalActiveContainer - 1)).hide();
     $("#COLLECTION_PROPERTY_" + (totalActiveContainer - 1)).removeClass("active");
 
-    if (totalActiveContainer == 16) {
+    if (totalActiveContainer == 17) {
         $("#addMorePropertyButton").hide();
     } else {
         $("#addMorePropertyButton").show();
