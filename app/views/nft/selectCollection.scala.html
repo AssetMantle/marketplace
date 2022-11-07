@@ -1,6 +1,5 @@
 @import controllers.actions.LoginState
 @import views.html.base.buttons._
-@import views.html.base.form._
 
 @(collectionList: Seq[(String, String)])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
@@ -10,6 +9,7 @@
                 &times;
     </button>
 </div>
+<p class="sub-heading" id="modalSubtitle">@Messages(constants.View.NOT_GENESIS_CREATOR)</p>
 
 <div class="createNft">
     <span class="createNftSelectCollection">@Messages(constants.View.CREATE_NFT_FIELD_SELECT_COLLECTION_LABEL)</span>
@@ -21,8 +21,10 @@
             </div>
             <div class="dropdownBody">
                 <div class="dropdownBodyInner">
-                @collectionList.zipWithIndex.map {case(option, index) =>
-                    <div class="dropdownItem" value="@option._1" onclick="setOption(this); setCollectionId(this);">@option._2</div>
+                @collectionList.zipWithIndex.map { case (option, index) =>
+                <div class="dropdownItem" value="@option._1" onclick="setOption(this);
+                setCollectionId(this);">@option._2
+                </div>
                 }
                 </div>
             </div>
@@ -37,7 +39,7 @@
     </div>
 
     <div class="horizontal-align" id="modalNextButtonContainer">
-        @commonPrimaryButton(constants.View.NEXT, JavaScript(""), Symbol("class") -> "disable")
+    @commonPrimaryButton(constants.View.NEXT, JavaScript(""), Symbol("class") -> "disable")
     </div>
 </div>
 <script src="@routes.Assets.versioned("javascripts/nfts/createNft.js")"></script>

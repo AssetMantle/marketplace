@@ -31,6 +31,7 @@ class CollectionController @Inject()(
                                       masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                       masterCollectionFiles: master.CollectionFiles,
                                       masterWishLists: master.WishLists,
+                                      utilitiesNotification: utilities.Notification,
                                     )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -366,6 +367,7 @@ class CollectionController @Inject()(
             for {
               _ <- add
               _ <- deleteDraft()
+              _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.COLLECTION_CREATED, collectionDraft.name)(collectionDraft.id)
             } yield ()
           } else Future("")
 

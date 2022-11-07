@@ -92,7 +92,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.viewProfile,
         routes.javascript.ProfileController.profile,
         routes.javascript.ProfileController.notificationPopup,
-        routes.javascript.ProfileController.notificationPopupPerPage,
+        routes.javascript.ProfileController.loadMoreNotifications,
 
         routes.javascript.WhitelistController.whitelistSection,
         routes.javascript.WhitelistController.createdWhitelists,

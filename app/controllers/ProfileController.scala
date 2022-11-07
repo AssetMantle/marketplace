@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions._
+import exceptions.BaseException
 import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
@@ -51,20 +52,28 @@ class ProfileController @Inject()(
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val unread = masterTransactionNotifications.Service.getNumberOfUnread(loginState.username)
-        for {
+        val notifications = masterTransactionNotifications.Service.get(loginState.username, 1)
+        (for {
           unread <- unread
-        } yield Ok(views.html.notification.commonNotificationPopup(unread))
+          notifications <- notifications
+        } yield Ok(views.html.notification.commonNotificationPopup(unread, notifications))
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
     }
   }
 
-  def notificationPopupPerPage(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse("") + "/" + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
+  def loadMoreNotifications(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse("") + "/" + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val notifications = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwFutureBaseException()
         else masterTransactionNotifications.Service.get(loginState.username, pageNumber)
-        for {
+        (for {
           notifications <- notifications
-        } yield Ok(views.html.notification.notificationPerPage(notifications))
+        } yield Ok(views.html.notification.notificationPerPage(notifications, pageNumber))
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
     }
   }
 }
