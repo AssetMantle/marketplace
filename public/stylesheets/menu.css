@@ -101,7 +101,8 @@ nav .content .links
     color:var(--mantle-off-white);
 }
 .submenu{
-    width: 180px !important;
+    width: 300px !important;
+    padding: 15px 30px !important;
 }
 .submenu .disable{
     color:var(--mantle-off-white);
@@ -237,11 +238,10 @@ nav .content .links
     position: absolute;
     background: var(--popup-bg);
     border: 2px solid var(--popup-stroke);
-    border-radius: 20px;
+    border-radius: 10px;
     top: 90px;
     z-index: -1;
-    left: 50%;
-    transform: translateX(-73px);
+    right: 0;
     padding: 15px 30px;
     opacity: 0;
     visibility: hidden;

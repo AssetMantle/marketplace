@@ -362,6 +362,10 @@ class NFTController @Inject()(
       )
   }
 
+  def deleteDraftForm(fileName: String, fileHash: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.nft.deleteDraft(fileName, fileHash))
+  }
+
   def deleteDraft(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       DeleteDraft.form.bindFromRequest().fold(

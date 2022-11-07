@@ -7,7 +7,7 @@
 @if(savedAsDraft){
     @successModal(heading = constants.View.CREATE_COLLECTION_DRAFT_SUCCESS_TITLE, subHeading = constants.View.CREATE_COLLECTION_DRAFT_SUCCESS_SUBTITLE)
 }else{
-    @successModal(heading = constants.View.CREATE_COLLECTION_SUCCESS_TITLE, subHeading = constants.View.CREATE_COLLECTION_SUCCESS_SUBTITLE)
+    @successModal(heading = constants.View.CREATE_COLLECTION_SUCCESS_TITLE)
     <div class="form-address-box">
         <div class="form-address-box-item">
             <span class="address-box-label">@Messages(constants.View.COLLECTION_LINK)</span>
@@ -19,7 +19,7 @@
     </div>
     <div class="horizontal-align">
         <a href="@constants.CommonConfig.WebAppUrl.concat(s"""/collection/${draft.id}""")">
-            <button class="tertiaryButton">@Messages(constants.View.CREATE_COLLECTION_NEXT_BUTTON)</button>
+            <button class="tertiaryButton">@Messages(constants.View.CREATE_COLLECTION_SUCCESS_TERTIARY_BUTTON)</button>
         </a>
     </div>
 }

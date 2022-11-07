@@ -95,3 +95,45 @@ function joinedWhitelistPaginationOnBack() {
 $(function () {
     $('[data-toggle="tooltip"]').tooltip();
 })
+
+function whitelistMember(form, route, snackBarMessage) {
+    $.ajax({
+        url: route.url,
+        type: 'POST',
+        contentType: 'application/x-www-form-urlencoded',
+        data: form.serialize(),
+        async: true,
+        statusCode: {
+            200: function () {
+                showSnackbar('', snackBarMessage, 'info');
+            },
+            401: function () {
+                console.log("400 response");
+            },
+            500: function () {
+                console.log("500 response");
+            }
+        }
+    });
+}
+
+function removeWhitelistMember(username, removedMessage){
+    const form = $("#removeWhitelistMember_" + username + " form");
+    whitelistMember(form, jsRoutes.controllers.WhitelistController.deleteMember(), removedMessage);
+}
+
+function searchMember() {
+    let searchField = document.getElementById('searchMemberField');
+    let filter = searchField.value.toUpperCase();
+    let members = document.getElementById("memberList");
+    let memberList = members.getElementsByTagName('li');
+
+    for (let i = 0; i < memberList.length; i++) {
+        let memberName = memberList[i].querySelector(".username").textContent;
+        if (memberName.toUpperCase().indexOf(filter) > -1) {
+            memberList[i].style.display = "";
+        } else {
+            memberList[i].style.display = "none";
+        }
+    }
+}

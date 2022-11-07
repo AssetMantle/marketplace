@@ -58,6 +58,7 @@ POST        /editCollection                                   controllers.Collec
 GET         /uploadCollectionFilesForm                        controllers.CollectionController.uploadCollectionFilesForm(id: String)
 GET         /defineProperties                                 controllers.CollectionController.definePropertiesForm(id: String)
 POST        /defineProperties                                 controllers.CollectionController.defineProperties()
+GET         /deleteCollectionDraft                            controllers.CollectionController.deleteDraftForm(collectionId: String)
 POST        /deleteCollectionDraft                            controllers.CollectionController.deleteDraft()
 
 GET         /uploadCollectionFileForm                         controllers.CollectionController.uploadCollectionFileForm(id: String, documentType: String)
@@ -90,8 +91,9 @@ GET         /nftTags                                          controllers.NFTCon
 POST        /nftTags                                          controllers.NFTController.tags()
 GET         /setProperties                                    controllers.NFTController.setPropertiesForm(collectionId: String, fileName: String)
 POST        /setProperties                                    controllers.NFTController.setProperties()
-POST        /deleteNFTDraft                                   controllers.NFTController.deleteDraft()
 GET         /nftCollectionInfo                                controllers.NFTController.collectionInfo(nftId: String)
+GET         /deleteNftDraft                                   controllers.NFTController.deleteDraftForm(fileName: String, fileHash: String)
+POST        /deleteNftDraft                                   controllers.NFTController.deleteDraft()
 
 GET         /settings                                         controllers.SettingController.viewSettings()
 GET         /profileSettings                                  controllers.SettingController.settings()
@@ -144,6 +146,7 @@ GET         /leaveWhitelistDetails                            controllers.Whitel
 POST        /leaveWhitelist                                   controllers.WhitelistController.leaveWhitelist()
 GET         /leaveWhitelist                                   controllers.WhitelistController.listMembers(whitelistId: String)
 POST        /deleteMember                                     controllers.WhitelistController.deleteMember()
+GET         /listMembers                                      controllers.WhitelistController.listMembers(whitelistId: String)
 
 #GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()

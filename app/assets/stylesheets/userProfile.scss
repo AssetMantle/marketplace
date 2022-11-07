@@ -710,9 +710,9 @@
           .tableFieldDescription{ min-width: 150px;}
           .tableFieldStatus{min-width: 90px;}
           .tableFieldTotalMembers{min-width: 120px;}
-          .tableFieldMaxMembers{min-width: 110px;}
-          .tableFieldStartEpoch{min-width: 170px;}
-          .tableFieldEndEpoch{min-width: 170px;}
+          .tableFieldMaxMembers{min-width: 90px;}
+          .tableFieldStartEpoch{min-width: 155px;}
+          .tableFieldEndEpoch{min-width: 155px;}
           .tableFieldSale{min-width: 140px;}
           .tableFieldAction{min-width: 105px;width:105px; i{cursor: pointer;}}
         }
@@ -968,5 +968,12 @@
     left: 0;
     top: 20px;
     z-index: 99;
+  }
+  .draftOption{
+    position: absolute;
+    z-index: 99;
+    bottom: 12px;
+    right: 12px;
+    cursor: pointer;
   }
 }

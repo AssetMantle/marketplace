@@ -380,6 +380,10 @@ class CollectionController @Inject()(
       )
   }
 
+  def deleteDraftForm(collectionId: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.collection.deleteDraft(collectionId))
+  }
+
   def deleteDraft(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       DeleteDraft.form.bindFromRequest().fold(
