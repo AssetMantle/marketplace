@@ -48,7 +48,7 @@ class ProfileController @Inject()(
       Future(Ok(views.html.profile.profile(accountId = accountId, activeTab = activeTab)))
   }
 
-  def notificationPopup(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+  def notificationPopup(): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val unread = masterTransactionNotifications.Service.getNumberOfUnread(loginState.username)
@@ -63,7 +63,7 @@ class ProfileController @Inject()(
     }
   }
 
-  def loadMoreNotifications(pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse("") + "/" + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
+  def loadMoreNotifications(pageNumber: Int): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val notifications = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwFutureBaseException()

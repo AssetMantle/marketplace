@@ -17,7 +17,7 @@
                             </div>
                             <div class="notificationDetail">
                                 <div class="mb-2 title">@Messages(notification.title)</div>
-                                <div class="mb-2 description">@Messages(notification.message, notification.messageParameters)</div>
+                                <div class="mb-2 description">@Messages(notification.message, notification.messageParameters: _*)</div>
                                 <div id="notificationDateTime_@notification.id" class="dateTime">@notification.createdOnMillisEpoch</div>
                             </div>
                         </div>
@@ -36,7 +36,7 @@
                             </div>
                             <div id="@notification.id" class="notificationDetail">
                                 <div class="mb-2 title">@Messages(notification.title)</div>
-                                <div class="mb-2 description">@Messages(notification.message, notification.messageParameters)</div>
+                                <div class="mb-2 description">@Messages(notification.message, notification.messageParameters: _*)</div>
                                 <div id="notificationDateTime_@notification.id" class="dateTime">@notification.createdOnMillisEpoch</div>
                             </div>
                         </div>

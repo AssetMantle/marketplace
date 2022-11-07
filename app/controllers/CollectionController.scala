@@ -38,16 +38,16 @@ class CollectionController @Inject()(
 
   private implicit val module: String = constants.Module.COLLECTION_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections("art")
+  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)
 
-  def viewCollections(category: String): EssentialAction = cached.apply(req => req.path + "/" + category, constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollections(category: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         Future(Ok(views.html.collection.viewCollections(category)))
     }
   }
 
-  def viewCollection(id: String): EssentialAction = cached.apply(req => req.path + "/" + id + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollection(id: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
@@ -60,14 +60,14 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionsSection(category: String): EssentialAction = cached.apply(req => req.path + "/" + category, constants.CommonConfig.WebAppCacheDuration) {
+  def collectionsSection(category: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         Future(Ok(views.html.collection.explore.collectionsSection(category)))
     }
   }
 
-  def collectionList(category: String): EssentialAction = cached.apply(req => req.path + "/" + category, constants.CommonConfig.WebAppCacheDuration) {
+  def collectionList(category: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val totalCollections = masterCollections.Service.total(category)
@@ -81,7 +81,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionsPerPage(category: String, pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + category + "/" + pageNumber.toString, constants.CommonConfig.WebAppCacheDuration) {
+  def collectionsPerPage(category: String, pageNumber: Int): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
@@ -96,7 +96,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionNFTs(id: String): EssentialAction = cached.apply(req => req.path + "/" + id + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionNFTs(id: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
@@ -110,7 +110,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionNFTsPerPage(id: String, pageNumber: Int): EssentialAction = cached.apply(req => req.path + "/" + id + "/" + pageNumber.toString + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionNFTsPerPage(id: String, pageNumber: Int): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
@@ -133,7 +133,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def info(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.CommonConfig.WebAppCacheDuration) {
+  def info(id: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
@@ -153,7 +153,7 @@ class CollectionController @Inject()(
         val account = masterAccounts.Service.tryGet(loginState.get.username)
         for {
           account <- account
-        } yield Ok(views.html.profile.created.createdSection(accountId, account.accountType == constants.Account.Type.CREATOR))
+        } yield Ok(views.html.profile.created.createdSection(accountId, account.accountType == constants.Account.Type.GENESIS_CREATOR))
       } else Future(Ok(views.html.profile.created.createdSection(accountId, false)))
 
   }

@@ -18,6 +18,9 @@ function getForm(route, modal = '#commonModal', modalContent = '#modal-content',
             500: function (data) {
                 replaceDocument(data);
             },
+            401: function (data) {
+                replaceDocument(data.responseText);
+            },
             400: function (data) {
                 $(modal).addClass('active');
                 $(modalContent).html(data.responseText);

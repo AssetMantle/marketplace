@@ -11,7 +11,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class NFTDraft(fileName: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[Seq[BaseNFTProperty]], hashTags: Option[Seq[String]], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class NFTDraft(fileName: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[Seq[BaseNFTProperty]], tagNames: Option[Seq[String]], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def toNFT: NFT = NFT(fileName = fileName, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), properties = Seq(), ipfsLink = "", edition = None)
 
@@ -25,7 +25,7 @@ case class NFTDraft(fileName: String, collectionId: String, name: Option[String]
     name = this.name,
     description = this.description,
     properties = this.properties.map(Json.toJson(_).toString()),
-    hashTags = this.hashTags.map(Json.toJson(_).toString()),
+    tagNames = this.tagNames.map(Json.toJson(_).toString()),
     createdBy = this.createdBy,
     createdOnMillisEpoch = this.createdOnMillisEpoch,
     updatedBy = this.updatedBy,
@@ -38,15 +38,15 @@ object NFTDrafts {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class NFTDraftSerialized(fileName: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[String], hashTags: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize: NFTDraft = NFTDraft(fileName = fileName, collectionId = collectionId, name = name, description = description, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[BaseNFTProperty]](_)), hashTags = hashTags.map(utilities.JSON.convertJsonStringToObject[Seq[String]](_)), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class NFTDraftSerialized(fileName: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[String], tagNames: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
+    def deserialize: NFTDraft = NFTDraft(fileName = fileName, collectionId = collectionId, name = name, description = description, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[BaseNFTProperty]](_)), tagNames = tagNames.map(utilities.JSON.convertJsonStringToObject[Seq[String]](_)), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
     def id: String = fileName
   }
 
   class NFTDraftTable(tag: Tag) extends Table[NFTDraftSerialized](tag, "NFTDraft") with ModelTable[String] {
 
-    def * = (fileName, collectionId, name.?, description.?, properties.?, hashTags.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTDraftSerialized.tupled, NFTDraftSerialized.unapply)
+    def * = (fileName, collectionId, name.?, description.?, properties.?, tagNames.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTDraftSerialized.tupled, NFTDraftSerialized.unapply)
 
     def fileName = column[String]("fileName", O.PrimaryKey)
 
@@ -58,7 +58,7 @@ object NFTDrafts {
 
     def properties = column[String]("properties")
 
-    def hashTags = column[String]("hashTags")
+    def tagNames = column[String]("tagNames")
 
     def createdBy = column[String]("createdBy")
 
@@ -96,7 +96,7 @@ class NFTDrafts @Inject()(
         name = None,
         description = None,
         properties = None,
-        hashTags = None,
+        tagNames = None,
       )
       create(nft.serialize())
     }
@@ -135,11 +135,11 @@ class NFTDrafts @Inject()(
       } yield nftDraft.copy(properties = Option(properties))
     }
 
-    def updateHashTags(fileName: String, hashTags: Seq[String]): Future[Unit] = {
+    def updateTagNames(fileName: String, tagNames: Seq[String]): Future[Unit] = {
       val draft = tryGet(fileName)
       for {
         draft <- draft
-        _ <- update(draft.copy(hashTags = Option(hashTags)).serialize())
+        _ <- update(draft.copy(tagNames = Option(tagNames)).serialize())
       } yield ()
     }
 
