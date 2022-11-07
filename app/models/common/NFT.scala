@@ -29,7 +29,7 @@ object NFT {
 
     def valueAsString: String
 
-    def toNFTProperty(fileName: String): NFTProperty = NFTProperty(fileName = fileName, name = this.name, `type` = this.`type`, `value` = this.valueAsString, meta = this.meta, mutable = this.mutable)
+    def toNFTProperty(fileName: String): NFTProperty = NFTProperty(fileName = fileName, name = this.name, `type` = this.`type`, `value` = if (this.valueAsString == "") "None" else this.valueAsString, meta = this.meta, mutable = this.mutable)
   }
 
   implicit val baseNFTPropertyWrites: Writes[BaseNFTProperty] = {
