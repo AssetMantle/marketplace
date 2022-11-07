@@ -2,10 +2,10 @@
 @import controllers.actions.LoginState
 @import models.masterTransaction.NFTDraft
 
-@(collection: master.Collection, nfts: Seq[master.NFT], likedNFTIds: Seq[String], nftDrafts: Seq[NFTDraft])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(collection: master.Collection, nfts: Seq[master.NFT], likedNFTIds: Seq[String], nftDrafts: Seq[NFTDraft], pageNumber: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <div class="row m-0 nftPage">
 
-    @if(loginState.fold("")(_.username) == collection.creatorId) {
+    @if(loginState.fold("")(_.username) == collection.creatorId && pageNumber == 1) {
         <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 createNFTCard" onclick="getForm(jsRoutes.controllers.NFTController.uploadNFTFileForm('@collection.id'))">
             <div class="card border-0 h-100 d-flex justify-content-between" style="cursor: pointer;">
                 <div class="createNFTBadge">

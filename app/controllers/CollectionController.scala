@@ -125,7 +125,7 @@ class CollectionController @Inject()(
           nfts <- nfts
           nftDrafts <- nftDrafts(collection)
           likedNFTs <- likedNFTs
-        } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts, likedNFTs, nftDrafts))
+        } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts, likedNFTs, nftDrafts, pageNumber))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
