@@ -21,3 +21,12 @@
     </div>
 }
 <script src="@routes.Assets.versioned("javascripts/nfts/createNft.js")"></script>
+@if(tags.nonEmpty) {
+    @tags.map { tag =>
+        <script>
+            tags.push('@tag');
+            countHashtags();
+            createHashtag();
+        </script>
+    }
+}
