@@ -256,7 +256,7 @@ class NFTController @Inject()(
           (for {
             isOwner <- isOwner
             nftDraft <- update(isOwner)
-          } yield PartialContent(views.html.nft.tags(collectionId = basicDetailsData.collectionId, fileName = nftDraft.fileName, tags = nftDraft.hashTags.getOrElse(Seq.empty[String])))
+          } yield PartialContent(views.html.nft.tags(collectionId = basicDetailsData.collectionId, fileName = nftDraft.fileName, tags = nftDraft.tagNames.getOrElse(Seq.empty[String])))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.nft.nftBasicDetail(NFTBasicDetail.form.withGlobalError(baseException.failure.message), collectionId = basicDetailsData.collectionId, fileName = basicDetailsData.fileName, None))
           }
