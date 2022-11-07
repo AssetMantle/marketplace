@@ -36,14 +36,14 @@ class SettingController @Inject()(
 
   implicit val callbackOnSessionTimeout: Call = routes.SettingController.viewSettings()
 
-  def viewSettings(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+  def viewSettings(): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.setting.viewSettings())
     }
   }
 
-  def settings(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+  def settings(): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val keys = masterKeys.Service.getAll(loginState.username)
@@ -56,7 +56,7 @@ class SettingController @Inject()(
     }
   }
 
-  def walletPopup(): EssentialAction = cached.apply(req => req.path + "/" + req.session.get(constants.Session.USERNAME).getOrElse("") + "/" + req.session.get(constants.Session.TOKEN).getOrElse(""), constants.CommonConfig.WebAppCacheDuration) {
+  def walletPopup(): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val keys = masterKeys.Service.getAll(loginState.username)
@@ -252,7 +252,7 @@ class SettingController @Inject()(
       )
   }
 
-  def walletBalance(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.CommonConfig.WebAppCacheDuration) {
+  def walletBalance(address: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val balance = blockchainBalances.Service.tryGet(address)

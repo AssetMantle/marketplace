@@ -9,11 +9,11 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 
-case class NFTTag(hashTag: String, fileName: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
+case class NFTTag(tagName: String, fileName: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
 
   def getFileHash: String = utilities.FileOperations.getFileNameWithoutExtension(fileName)
 
-  def id1: String = hashTag
+  def id1: String = tagName
 
   def id2: String = fileName
 }
@@ -26,9 +26,9 @@ object NFTTags {
 
   class NFTTagTable(tag: Tag) extends Table[NFTTag](tag, "NFTTag") with ModelTable2[String, String] {
 
-    def * = (hashTag, fileName, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTTag.tupled, NFTTag.unapply)
+    def * = (tagName, fileName, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTTag.tupled, NFTTag.unapply)
 
-    def hashTag = column[String]("hashTag", O.PrimaryKey)
+    def tagName = column[String]("tagName", O.PrimaryKey)
 
     def fileName = column[String]("fileName", O.PrimaryKey)
 
@@ -40,7 +40,7 @@ object NFTTags {
 
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def id1 = hashTag
+    def id1 = tagName
 
     def id2 = fileName
   }
@@ -62,15 +62,15 @@ class NFTTags @Inject()(
 
   object Service {
 
-    def add(hashTag: String, fileName: String): Future[Unit] = create(NFTTag(hashTag = hashTag, fileName = fileName))
+    def add(tagName: String, fileName: String): Future[Unit] = create(NFTTag(tagName = tagName, fileName = fileName))
 
-    def getByHashTag(hashTag: String): Future[Seq[String]] = filter(_.hashTag === hashTag).map(_.map(_.fileName))
+    def getByTagName(tagName: String): Future[Seq[String]] = filter(_.tagName === tagName).map(_.map(_.fileName))
 
-    def getByHashTags(hashTags: Seq[String]): Future[Seq[String]] = filter(_.hashTag.inSet(hashTags)).map(_.map(_.fileName))
+    def getByTagNames(tagNames: Seq[String]): Future[Seq[String]] = filter(_.tagName.inSet(tagNames)).map(_.map(_.fileName))
 
-    def getHashTagsForNFT(fileName: String): Future[Seq[String]] = filter(_.hashTag === fileName).map(_.map(_.hashTag))
+    def getTagNamesForNFT(fileName: String): Future[Seq[String]] = filter(_.tagName === fileName).map(_.map(_.tagName))
 
-    def deleteHashTag(hashTag: String, fileName: String): Future[Int] = delete(id1 = hashTag, id2 = fileName)
+    def deleteTagName(tagName: String, fileName: String): Future[Int] = delete(id1 = tagName, id2 = fileName)
 
   }
 }

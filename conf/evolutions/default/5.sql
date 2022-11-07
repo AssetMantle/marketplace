@@ -17,13 +17,13 @@ CREATE TABLE IF NOT EXISTS MASTER."NFTProperty"
 
 CREATE TABLE IF NOT EXISTS MASTER."NFTTag"
 (
-    "hashTag"              VARCHAR NOT NULL,
+    "tagName"              VARCHAR NOT NULL,
     "fileName"             VARCHAR NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("hashTag", "fileName")
+    PRIMARY KEY ("tagName", "fileName")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."CollectionDraft"
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NFTDraft"
     "name"                 VARCHAR,
     "description"          VARCHAR,
     "properties"           VARCHAR,
-    "hashTags"             VARCHAR,
+    "tagNames"             VARCHAR,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,

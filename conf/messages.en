@@ -707,3 +707,7 @@ NOTIFICATION.LOGIN.MESSAGE=You logged in.
 LOG_OUT=Signed Out
 NOTIFICATION.LOG_OUT.MESSAGE=You logged out.
 NOT_GENESIS_CREATOR=Only genesis creators are allowed to mint!
+COLLECTION_CREATED=Collection Created
+NOTIFICATION.COLLECTION_CREATED.MESSAGE= New collection {0} created.
+CREATE_NFT_FAILED=Create NFT Failed
+RESPONSE.FAILURE.MASTER_NFT_INSERT_FAILED=Exactly similar NFT already exists.
