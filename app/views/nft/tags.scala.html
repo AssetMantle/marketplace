@@ -24,9 +24,7 @@
 @if(tags.nonEmpty) {
     @tags.map { tag =>
         <script>
-            tags.push('@tag');
-            countHashtags();
-            createHashtag();
+            addProperty('@tag');
         </script>
     }
 }
