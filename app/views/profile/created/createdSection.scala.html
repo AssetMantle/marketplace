@@ -22,7 +22,8 @@
                                     <div class="createCollectionButton">@Messages(constants.View.CREATE_COLLECTION_BUTTON)</div>
                                 </div>
                             </div>
-                        } else {
+                        }
+                        @if(loginState.isDefined && loginState.get.username == accountId && !allowCreateCollection) {
                             <div class="contentBody emptyBody">
                                 <div class="h-100 d-flex flex-column justify-content-center align-items-center  emptyWhitelist">
                                     <div class="message">@Messages(constants.View.NOT_GENESIS_CREATOR)</div>

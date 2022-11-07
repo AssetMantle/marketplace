@@ -30,6 +30,7 @@ object Collection {
     val NFT_NAME = "nftName"
     val NFT_DESCRIPTION = "nftDescription"
     val FILE_HASH = "fileHash"
+    val CLASSIFICATION_ID = "classificationId"
 
     val IMMUTABLE = "IMMUTABLE"
     val MUTABLE = "MUTABLE"
@@ -38,7 +39,7 @@ object Collection {
     val NON_META = "NON_META"
     val META = "META"
 
-    val list: Seq[String] = Seq(NFT_NAME, NFT_DESCRIPTION, FILE_HASH)
+    val list: Seq[String] = Seq(NFT_NAME, NFT_DESCRIPTION, FILE_HASH, CLASSIFICATION_ID)
 
     val defaultProperties: Seq[Property] = list.map { propertyName => Property(name = propertyName, `type` = constants.NFT.Data.STRING, `value` = "", required = true, meta = true, mutable = false)
     }
