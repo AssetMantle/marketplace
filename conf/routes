@@ -123,7 +123,7 @@ GET         /profile/:accountId/:activeTab                    controllers.Profil
 GET         /profile/:accountId                               controllers.ProfileController.viewProfile(accountId: String, activeTab: String ?= "CREATED")
 GET         /profileSection                                   controllers.ProfileController.profile(accountId: String, activeTab: String)
 GET         /notificationPopup                                controllers.ProfileController.notificationPopup()
-GET         /notificationPopupPerPage                         controllers.ProfileController.notificationPopupPerPage(pageNumber: Int)
+GET         /loadMoreNotifications                            controllers.ProfileController.loadMoreNotifications(pageNumber: Int)
 
 GET         /whitelistSection                                 controllers.WhitelistController.whitelistSection()
 GET         /createdWhitelists                                controllers.WhitelistController.createdWhitelists()

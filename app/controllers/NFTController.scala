@@ -33,6 +33,7 @@ class NFTController @Inject()(
                                masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                masterWishLists: master.WishLists,
                                masterCollectionFiles: master.CollectionFiles,
+                               utilitiesNotification: utilities.Notification,
                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -334,14 +335,15 @@ class NFTController @Inject()(
             def addToNFT(nftDraft: NFTDraft) = if (!setPropertiesData.saveNFTDraft) {
               val add = masterNFTs.Service.add(nftDraft.toNFT)
 
-              def addProperties = masterNFTProperties.Service.addMultiple(nftDraft.getNFTProperties)
+              def addProperties() = masterNFTProperties.Service.addMultiple(nftDraft.getNFTProperties)
 
               def delete = masterTransactionNFTDrafts.Service.deleteNFT(nftDraft.fileName)
 
               for {
                 _ <- add
-                _ <- addProperties
+                _ <- addProperties()
                 _ <- delete
+                _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.NFT_CREATED, nftDraft.name.getOrElse(""))(nftDraft.fileName)
               } yield ()
             } else Future()
 

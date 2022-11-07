@@ -1,12 +1,14 @@
 @import controllers.actions.LoginState
+@import views.html.base.buttons._
+@import models.masterTransaction.Notification
 
-@(unread: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(unread: Int, notifications: Seq[Notification])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="notificationPopupContainer">
     <div class="d-flex justify-content-between align-items-center headerContainer">
         <div class="title">@Messages(constants.View.NOTIFICATION_POPUP_TITLE)</div>
-        <div class="titleLink">@Messages(constants.View.NOTIFICATION_POPUP_TITLE_LINK)</div>
+@*        <div class="titleLink">@Messages(constants.View.NOTIFICATION_POPUP_MARK_ALL_AS_READ)</div>*@
     </div>
-    <div class="separator"></div>
+@*    <div class="separator"></div>*@
 @*    <div class="emailContainer">*@
 @*        <div class="text-end closeEmailContainer">*@
 @*            <i class="bi bi-x iconDefault iconLarge"></i>*@
@@ -18,6 +20,8 @@
 @*        </div>*@
 @*    </div>*@
 @*    <div class="separator"></div>*@
-    <div id="notificationList"></div>
-    <div class="loadOlderNotificationButton">@Messages(constants.View.NOTIFICATION_POPUP_LOAD_OLDER)</div>
+    <div id="notificationList">
+        @views.html.notification.notificationPerPage(notifications, 1)
+    </div>
+    <div class="loadOlderNotificationButton" onclick="loadMoreNotifications()">@Messages(constants.View.NOTIFICATION_POPUP_LOAD_MORE)</div>
 </div>

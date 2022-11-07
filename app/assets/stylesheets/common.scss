@@ -723,7 +723,6 @@
         }
       }
     }
-
     .notificationList{
       .notificationListTitle{
         @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--dark));
@@ -741,7 +740,7 @@
           }
           .notificationDetail{
             .title{
-              @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+              @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--default));
               text-transform: capitalize;
             }
             .description{
@@ -753,12 +752,14 @@
           }
         }
       }
-      .loadOlderNotificationButton{
-        @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
-        text-align: right;
-        text-transform: capitalize;
-        margin-top: 32px;
-      }
+
+    }
+    .loadOlderNotificationButton{
+      @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
+      text-align: right;
+      text-transform: capitalize;
+      margin-top: 32px;
+      cursor: pointer;
     }
   }
 }
@@ -838,4 +839,9 @@
   text-fill-color: transparent;
   cursor: pointer;
   display: inline-block;
+}
+
+#notificationList{
+  height: 200px;
+  overflow-y: auto;
 }
