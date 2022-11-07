@@ -842,6 +842,17 @@
 }
 
 #notificationList{
-  height: 200px;
+  height: 215px;
   overflow-y: auto;
+}
+
+// New Feature Icon
+.newFeatureIcon{
+  position: absolute;
+  right: 0;
+  top: 10px;
+  @include setFont(var(--font-type-2), normal, 400, 10px, 14px, var(--header-bg));
+  padding: 2px 4px;
+  background-color: var(--default);
+  border-radius: 5px;
 }
