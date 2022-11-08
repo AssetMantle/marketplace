@@ -10,7 +10,7 @@
         <div class="mt-3 singleCollection singleCreatedCollection draftCollection">
             <div class="d-flex justify-content-end draftOption">
                 <div class="d-flex gap-2">
-                    <i class="bi bi-pencil iconDefault" onclick=""></i>
+                    <i class="bi bi-pencil iconDefault" onclick="getForm(jsRoutes.controllers.CollectionController.editForm('@draft.id'))"></i>
                     <i class="bi bi-trash iconDefault" onclick="getForm(jsRoutes.controllers.CollectionController.deleteDraftForm('@draft.id'))"></i>
                     <div id="deleteCollectionDraft_@draft.id" class="hidden">
                         @defining(views.collection.companion.DeleteDraft.form) { deleteDraftForm =>
