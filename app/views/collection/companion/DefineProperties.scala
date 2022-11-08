@@ -21,11 +21,11 @@ object DefineProperties {
       )
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.defineCollectionPropertiesConstraint))
 
-  case class Property(name: Option[String], propertyType: String, defaultValue: Option[String], mutable: Boolean, meta: Boolean)
+  case class Property(name: Option[String], propertyType: String, defaultValue: Option[String], mutable: Boolean, hide: Boolean)
 
   case class Data(collectionId: String, saveAsDraft: Boolean, properties: Seq[Property]) {
 
-    def getSerializableProperties: Seq[commonCollection.Property] = this.properties.filter(_.name.isDefined).map(property => commonCollection.Property(name = property.name.get, `type` = property.propertyType, defaultValue = property.defaultValue.getOrElse(""), mutable = property.mutable, meta = property.meta))
+    def getSerializableProperties: Seq[commonCollection.Property] = this.properties.filter(_.name.isDefined).map(property => commonCollection.Property(name = property.name.get, `type` = property.propertyType, defaultValue = property.defaultValue.getOrElse(""), mutable = property.mutable, meta = !property.hide))
 
   }
 
