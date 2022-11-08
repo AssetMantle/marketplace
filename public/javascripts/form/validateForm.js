@@ -55,7 +55,7 @@ function validateForm(form) {
             } else if (dlElement.find(("select"))[0] !== undefined) {
                 let selectElement = dlElement.find(("select"))[0];
                 fieldName = selectElement.getAttribute("name");
-                if (!selectElement.disabled && selectElement.value === "") {
+                if (!selectElement.disabled && selectElement.getAttribute("value") === "") {
                     formValidationBoolean = false;
                     fieldError = true;
                     $('#fieldError_' + fieldName).removeClass("hidden");
@@ -192,7 +192,7 @@ function checkAllFieldsFilled(form) {
                 const inputElement = dlElement.find("textarea")[0];
                 const inputValue = inputElement.value;
                 if ((inputElement.getAttribute("required") === "false" && inputValue === "") || inputElement.disabled) {
-                    $(this).parent().find('label').css("color","var(--inactive-gray)");
+                    $(this).parent().find('label').css("color", "var(--inactive-gray)");
                     return;
                 }
                 let hasZeroLength = false;
@@ -209,26 +209,26 @@ function checkAllFieldsFilled(form) {
 
                 if (inputValue === "" && !hasZeroLength) {
                     allFilled = false;
-                    $(this).parent().find('label').css("color","var(--inactive-gray)");
-                }else{
-                    $(this).parent().find('label').css("color","var(--gray)");
-                    $(this).find("textarea").css("color","var(--mantle-off-white)");
+                    $(this).parent().find('label').css("color", "var(--inactive-gray)");
+                } else {
+                    $(this).parent().find('label').css("color", "var(--gray)");
+                    $(this).find("textarea").css("color", "var(--mantle-off-white)");
                 }
             } else if (dlElement.find(("select"))[0] !== undefined) {
                 let selectElement = dlElement.find(("select"))[0];
                 if (selectElement.value === "") {
                     allFilled = false;
-                    $(this).parent().find('label').css("color","var(--inactive-gray)");
-                }else{
-                    $(this).parent().find('label').css("color","var(--gray)");
-                    $(this).find("select").css("color","var(--mantle-off-white)");
+                    $(this).parent().find('label').css("color", "var(--inactive-gray)");
+                } else {
+                    $(this).parent().find('label').css("color", "var(--gray)");
+                    $(this).find("select").css("color", "var(--mantle-off-white)");
                 }
             } else {
                 const inputElement = dlElement.find("input")[0];
                 const inputValue = inputElement.value;
 
                 if ((inputElement.getAttribute("required") === "false" && inputValue === "") || inputElement.disabled || inputElement.classList.contains("hidden")) {
-                    $(this).parent().find('label').css("color","var(--inactive-gray)");
+                    $(this).parent().find('label').css("color", "var(--inactive-gray)");
                     return;
                 }
 
@@ -236,10 +236,10 @@ function checkAllFieldsFilled(form) {
                     case "number":
                         if (inputValue === "" || isNaN(inputValue)) {
                             allFilled = false;
-                            $(this).parent().find('label').css("color","var(--inactive-gray)");
-                        }else{
-                            $(this).parent().find('label').css("color","var(--gray)");
-                            $(this).find("input").css("color","var(--mantle-off-white)");
+                            $(this).parent().find('label').css("color", "var(--inactive-gray)");
+                        } else {
+                            $(this).parent().find('label').css("color", "var(--gray)");
+                            $(this).find("input").css("color", "var(--mantle-off-white)");
                         }
                         break;
                     case "text":
@@ -258,28 +258,28 @@ function checkAllFieldsFilled(form) {
 
                         if (inputValue === "" && !hasZeroLength) {
                             allFilled = false;
-                            $(this).parent().find('label').css("color","var(--inactive-gray)");
-                        }else{
-                            $(this).parent().find('label').css("color","var(--gray)");
-                            $(this).find("input").css("color","var(--mantle-off-white)");
+                            $(this).parent().find('label').css("color", "var(--inactive-gray)");
+                        } else {
+                            $(this).parent().find('label').css("color", "var(--gray)");
+                            $(this).find("input").css("color", "var(--mantle-off-white)");
                         }
                         break;
                     case "date":
                         if (inputValue === "") {
                             allFilled = false;
-                            $(this).parent().find('label').css("color","var(--inactive-gray)");
-                        }else{
-                            $(this).parent().find('label').css("color","var(--gray)");
-                            $(this).find("input").css("color","var(--mantle-off-white)");
+                            $(this).parent().find('label').css("color", "var(--inactive-gray)");
+                        } else {
+                            $(this).parent().find('label').css("color", "var(--gray)");
+                            $(this).find("input").css("color", "var(--mantle-off-white)");
                         }
                         break;
 
                     case "url":
                         if (inputValue === "") {
-                            $(this).parent().find('label').css("color","var(--inactive-gray)");
-                        }else{
-                            $(this).parent().find('label').css("color","var(--gray)");
-                            $(this).find("input").css("color","var(--mantle-off-white)");
+                            $(this).parent().find('label').css("color", "var(--inactive-gray)");
+                        } else {
+                            $(this).parent().find('label').css("color", "var(--gray)");
+                            $(this).find("input").css("color", "var(--mantle-off-white)");
                         }
                         break;
                 }

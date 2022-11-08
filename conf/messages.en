@@ -716,6 +716,7 @@ RESPONSE.FAILURE.FROM_AND_TO_ADDRESS_SAME=From & to address cannot be same.
 BLOCKCHAIN_TRANSACTION_SUCCESS_SUBTITLE=Please wait sometime for transaction to get commit.
 TRUE=True
 FALSE=False
+RESPONSE.FAILURE.INVALID_DEFAULT_VALUE=Invalid default value of a property
 NFT_CREATED=NFT Created
 NOTIFICATION.NFT_CREATED.MESSAGE=New NFT {0} created.
 RESPONSE.FAILURE.REPEATED_NFT_TAGS=Cannot repeat NFT tags.
