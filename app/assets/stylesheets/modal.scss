@@ -510,6 +510,7 @@ body.modal-open::-webkit-scrollbar {
       .advancedDetailOption{
         display: none;
         .singleOption{
+          height: 30px;
           .optionTitle{
             @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
             text-transform: capitalize;
