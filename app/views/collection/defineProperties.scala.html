@@ -54,12 +54,12 @@
                                     <i class="bi bi-trash iconDefault" onclick="removeProperty(@index)"></i>
                                 </div>
                                 <div class="d-flex gap-4">
-                                @if(collectionDraft.isDefined && collectionDraft.get.properties.length > constants.Collection.DefaultProperty.list.length) {
-                                    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collectionDraft.get.properties(constants.Collection.DefaultProperty.list.length + index).name, Symbol("required") -> false)
-                                    @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("value") -> collectionDraft.get.properties(constants.Collection.DefaultProperty.list.length + index).`type`, Symbol("class") -> "custom-select sources")
+                                @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length) {
+                                    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collectionDraft.get.properties(index).name, Symbol("required") -> false)
+                                    @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("value") -> collectionDraft.get.properties(index).`type`, Symbol("class") -> "custom-select sources")
                                 } else {
                                     @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("required") -> false)
-                                    @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources")
+                                    @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources", Symbol("value") -> constants.FormField.COLLECTION_PROPERTY_TYPE.options.head)
                                 }
                                 </div>
                                 <div class="propertyAdvancedDetail">
@@ -137,9 +137,9 @@
                                                                         <div class="dropdownBody">
                                                                             <div class="dropdownBodyInner">
                                                                                 <div class="propertyTypeField dropdownItem" value="true" onclick="setOption(this);
-                                                                                setBooleanValue(@index, '@Messages(constants.View.TRUE)');">@Messages(constants.View.TRUE)</div>
+                                                                                setBooleanValue(@index, '@constants.NFT.Data.TRUE');">@Messages(constants.View.TRUE)</div>
                                                                                 <div class="propertyTypeField dropdownItem" value="false" onclick="setOption(this);
-                                                                                setBooleanValue(@index, '@Messages(constants.View.FALSE)');">@Messages(constants.View.FALSE)</div>
+                                                                                setBooleanValue(@index, '@constants.NFT.Data.FALSE');">@Messages(constants.View.FALSE)</div>
                                                                             </div>
                                                                         </div>
                                                                     </div>

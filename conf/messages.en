@@ -716,3 +716,4 @@ RESPONSE.FAILURE.FROM_AND_TO_ADDRESS_SAME=From & to address cannot be same.
 BLOCKCHAIN_TRANSACTION_SUCCESS_SUBTITLE=Please wait sometime for transaction to get commit.
 TRUE=True
 FALSE=False
+RESPONSE.FAILURE.INVALID_DEFAULT_VALUE=Invalid default value of a property

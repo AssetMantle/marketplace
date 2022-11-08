@@ -70,7 +70,7 @@ function removeProperty(containerId) {
 
     // Clear deleted property field
     $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_NAME").val("");
-    $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_TYPE").val("String");
+    $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_TYPE option(1)").prop("selected",true);
     $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text("String");
     $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_DEFAULT_VALUE").val("");
     $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_MUTABLE").prop('checked', false);
@@ -118,7 +118,7 @@ function removeProperty(containerId) {
 
         }
         $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_NAME").val("");
-        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE").val("String");
+        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE option(1)").prop("selected",true);
         $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text("String");
         $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_DEFAULT_VALUE").val("");
         $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_DEFAULT_VALUE").closest(".optionInputField").show();
@@ -214,13 +214,13 @@ $(".custom-select .custom-options .custom-option").on("click", function () {
 
     parentContainer.find('.fixedValueField').val("");
 
-    if (selectedType == "String") {
+    if (selectedType === "String") {
         parentContainer.find(".propertyType").removeClass("active");
         parentContainer.find(".propertyType.string").addClass("active");
-    } else if (selectedType == "Number") {
+    } else if (selectedType === "Number") {
         parentContainer.find(".propertyType").removeClass("active");
         parentContainer.find(".propertyType.number").addClass("active");
-    } else if (selectedType == "Boolean") {
+    } else if (selectedType === "Boolean") {
         parentContainer.find(".propertyType").removeClass("active");
         parentContainer.find(".propertyType.boolean").addClass("active");
     }
