@@ -96,8 +96,8 @@ object FormConstraint {
   val collectionPropertiesConstraint: Constraint[collection.DefineProperties.Property] = Constraint("constraints.DefinePropertiesProperty")({ propertyData: collection.DefineProperties.Property =>
     val errors = Seq(
       if (!constants.NFT.Data.TypesList.contains(propertyData.propertyType)) Option(ValidationError(constants.Response.NFT_PROPERTY_TYPE_NOT_FOUND.message)) else None,
-      if (propertyData.propertyType == constants.NFT.Data.BOOLEAN && propertyData.optionalValue.isDefined && (propertyData.optionalValue.getOrElse("") != constants.NFT.Data.TRUE || propertyData.optionalValue.getOrElse("") != constants.NFT.Data.FALSE)) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
-      if (propertyData.propertyType == constants.NFT.Data.DECIMAL && propertyData.optionalValue.isDefined && propertyData.optionalValue.getOrElse("0").toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
+      if (propertyData.propertyType == constants.NFT.Data.BOOLEAN && propertyData.defaultValue.isDefined && (propertyData.defaultValue.getOrElse("") != constants.NFT.Data.TRUE || propertyData.defaultValue.getOrElse("") != constants.NFT.Data.FALSE)) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
+      if (propertyData.propertyType == constants.NFT.Data.DECIMAL && propertyData.defaultValue.isDefined && propertyData.defaultValue.getOrElse("0").toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_OPTIONAL_VALUE.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })

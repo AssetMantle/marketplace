@@ -32,7 +32,6 @@ object Collection {
 
     val IMMUTABLE = "IMMUTABLE"
     val MUTABLE = "MUTABLE"
-    val REQUIRED = "REQUIRED"
     val NOT_REQUIRED = "NOT_REQUIRED"
     val NON_META = "NON_META"
     val META = "META"
