@@ -714,3 +714,5 @@ RESPONSE.FAILURE.MASTER_NFT_INSERT_FAILED=Exactly similar NFT already exists.
 RESPONSE.FAILURE.MASTER_TRANSACTION_COLLECTION_DRAFT_INSERT_FAILED=Cannot create draft. Collection with same name already exists.
 RESPONSE.FAILURE.FROM_AND_TO_ADDRESS_SAME=From & to address cannot be same.
 BLOCKCHAIN_TRANSACTION_SUCCESS_SUBTITLE=Please wait sometime for transaction to get commit.
+NFT_CREATED=NFT Created
+NOTIFICATION.NFT_CREATED.MESSAGE=New NFT {0} created.
