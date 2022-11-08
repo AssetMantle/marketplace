@@ -75,7 +75,7 @@
                                                 <i class="bi bi-info-circle iconDefault iconSmall"></i>
                                             </div>
                                             <div class="options">
-                                            @commonRadio(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
+                                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
                                             </div>
                                         </div>
                                         <div class="d-flex justify-content-between align-items-center singleOption">
@@ -85,7 +85,7 @@
                                                 <i class="bi bi-info-circle iconDefault iconSmall"></i>
                                             </div>
                                             <div class="options">
-                                            @commonRadio(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_META)
+                                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE)
                                             </div>
                                         </div>
                                         <div class="requirementOption">
@@ -96,12 +96,12 @@
                                                     <i class="bi bi-info-circle iconDefault iconSmall"></i>
                                                 </div>
                                                 <div class="options">
-                                                @commonRadio(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_REQUIRED)
+                                                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_SET_DEFAULT_VALUE)
                                                 </div>
                                             </div>
                                             <div class="optionInputField" style="display: none;">
                                                 <div class="hidden">
-                                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_FIXED_VALUE, Symbol("required") -> false, Symbol("class") -> "fixedValueField")
+                                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_DEFAULT_VALUE, Symbol("required") -> false, Symbol("class") -> "fixedValueField")
                                                 </div>
                                                 <div class="propertyTypeOption">
                                                     <div class="propertyType string active">
