@@ -362,7 +362,7 @@ class CollectionController @Inject()(
           def saveCollection(collectionDraft: CollectionDraft) = if (!definePropertiesData.saveAsDraft) {
             val add = masterCollections.Service.add(collectionDraft.toCollection())
 
-            def deleteDraft() = masterTransactionCollectionDrafts.Service.deleteById(collectionDraft.id)
+            def deleteDraft() = masterTransactionCollectionDrafts.Service.delete(collectionDraft.id)
 
             for {
               _ <- add

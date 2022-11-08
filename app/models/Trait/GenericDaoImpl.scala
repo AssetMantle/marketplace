@@ -46,7 +46,7 @@ abstract class GenericDaoImpl[
 
   def customQuery[C](query: StreamingProfileAction[C, _, _]) = db.run(query)
 
-  def delete(id: PK): Future[Int] = db.run(tableQuery.filter(_.id === id).delete.asTry).map {
+  def deleteById(id: PK): Future[Int] = db.run(tableQuery.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_DELETE_FAILED"), psqlException)
@@ -54,7 +54,7 @@ abstract class GenericDaoImpl[
     }
   }
 
-  def deleteMultiple(ids: Seq[PK]): Future[Unit] = db.run(tableQuery.filter(_.id.inSet(ids)).delete.asTry).map {
+  def deleteByIds(ids: Seq[PK]): Future[Unit] = db.run(tableQuery.filter(_.id.inSet(ids)).delete.asTry).map {
     case Success(result) => ()
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_DELETE_FAILED"), psqlException)

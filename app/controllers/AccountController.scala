@@ -255,8 +255,8 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.account.signOut(formWithErrors)))
         },
         signOutData => {
-          val pushNotificationTokenDelete = if (!signOutData.receiveNotifications) masterTransactionPushNotificationTokens.Service.deleteByID(loginState.username) else Future()
-          val deleteSessionToken = masterTransactionSessionTokens.Service.deleteById(loginState.username)
+          val pushNotificationTokenDelete = if (!signOutData.receiveNotifications) masterTransactionPushNotificationTokens.Service.delete(loginState.username) else Future()
+          val deleteSessionToken = masterTransactionSessionTokens.Service.delete(loginState.username)
 
           (for {
             _ <- pushNotificationTokenDelete
@@ -315,7 +315,7 @@ class AccountController @Inject()(
         changePasswordData => {
           val changePassword = masterKeys.Service.changePassword(accountId = loginState.username, address = loginState.address, oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword)
 
-          def signOut = masterTransactionSessionTokens.Service.deleteById(loginState.username)
+          def signOut = masterTransactionSessionTokens.Service.delete(loginState.username)
 
           (for {
             _ <- changePassword

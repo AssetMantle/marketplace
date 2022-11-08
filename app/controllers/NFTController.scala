@@ -379,7 +379,7 @@ class NFTController @Inject()(
 
           def collection(collectionId: String) = masterCollections.Service.tryGet(id = collectionId)
 
-          def delete(isOwner: Boolean) = masterTransactionNFTDrafts.Service.deleteById(deleteDraftData.nftFileName)
+          def delete(isOwner: Boolean) = masterTransactionNFTDrafts.Service.delete(deleteDraftData.nftFileName)
 
           (for {
             nftDraft <- nftDraft

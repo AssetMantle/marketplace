@@ -111,8 +111,6 @@ class Whitelists @Inject()(
 
     def getByIds(whitelistIds: Seq[String]): Future[Seq[Whitelist]] = filter(_.id.inSet(whitelistIds)).map(_.map(_.deserialize))
 
-    def deleteById(id: String): Future[Int] = delete(id)
-
     def hasWhitelist(accountId: String): Future[Boolean] = filter(_.ownerId === accountId).map(_.nonEmpty)
 
   }

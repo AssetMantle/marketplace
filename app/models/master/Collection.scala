@@ -133,10 +133,6 @@ class Collections @Inject()(
 
     def getByPageNumber(category: String, pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(x => x.category === category && x.public)(_.createdOn).map(_.map(_.deserialize))
 
-    def deleteById(id: String): Future[Int] = delete(id)
-
-    def deleteById(ids: Seq[String]): Future[Int] = filterAndDelete(_.id.inSet(ids))
-
     def getCollectionsByPage(collectionIds: Seq[String], pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.id.inSet(collectionIds))(_.createdOn).map(_.map(_.deserialize))
 
     def isCreator(accountId: String): Future[Boolean] = filterAndExists(_.creatorId === accountId)

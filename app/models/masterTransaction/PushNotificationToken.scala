@@ -61,14 +61,14 @@ class PushNotificationTokens @Inject()(
 
     def upsert(id: String, token: String): Future[Unit] = {
       for {
-        _ <- delete(id)
+        _ <- deleteById(id)
         _ <- create(PushNotificationToken(id, token))
       } yield ()
     }
 
     def getPushNotificationToken(id: String): Future[Option[String]] = getById(id).map(_.map(_.token))
 
-    def deleteByID(id: String): Future[Int] = delete(id)
+    def delete(id: String): Future[Int] = deleteById(id)
 
   }
 

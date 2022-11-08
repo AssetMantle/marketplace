@@ -101,10 +101,6 @@ class Wallets @Inject()(
 
     def tryGetByAccountID(accountId: String): Future[Wallet] = filterAndSortHead(_.accountId === accountId)(_.preference).map(_.deserialize)
 
-    def deleteWallets(address: Seq[String]): Future[Unit] = deleteMultiple(address)
-
-    def deleteWallet(address: String): Future[Int] = delete(address)
-
     def walletExists(address: String): Future[Boolean] = exists(address)
   }
 

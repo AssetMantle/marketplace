@@ -166,7 +166,7 @@ class CollectionDrafts @Inject()(
 
     def getByCreatorAndPage(creatorId: String, pageNumber: Int): Future[Seq[CollectionDraft]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.creatorId === creatorId)(_.createdOnMillisEpoch).map(_.map(_.deserialize))
 
-    def deleteById(id: String): Future[Int] = delete(id)
+    def delete(id: String): Future[Int] = deleteById(id)
 
     def checkOwnerAndDelete(id: String, accountId: String): Future[Unit] = {
       val draft = tryGet(id)
