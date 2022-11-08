@@ -27,8 +27,8 @@ object Collection {
 
   object DefaultProperty {
     // Should be kept in lower case otherwise change in form constraints
-    val NFT_NAME = "nftName"
-    val NFT_DESCRIPTION = "nftDescription"
+    val NFT_NAME = "name"
+    val NFT_DESCRIPTION = "description"
     val FILE_HASH = "fileHash"
     val CLASSIFICATION_ID = "classificationId"
 
