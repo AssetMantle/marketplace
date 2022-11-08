@@ -579,7 +579,11 @@ body.modal-open::-webkit-scrollbar {
                 }
               }
             }
-
+            .toggleButtonContainer{
+              .toggleButtonLabel{
+                display: none;
+              }
+            }
           }
         }
       }
@@ -650,17 +654,17 @@ body.modal-open::-webkit-scrollbar {
             }
           }
           &.propertyIconVisibility{
-            background-image: url("../images/icon/nonMetaDisable.png");
+            background-image: url("../images/icon/metaDisable.png");
             background-size: cover;
             &.active{
-              background-image: url("../images/icon/metaDisable.png");
+              background-image: url("../images/icon/nonMetaDisable.png");
             }
           }
           &.propertyIconRequirement{
-            background-image: url("../images/icon/requiredDisable.png");
+            background-image: url("../images/icon/optionalDisable.png");
             background-size: cover;
             &.active{
-              background-image: url("../images/icon/optionalDisable.png");
+              background-image: url("../images/icon/requiredDisable.png");
             }
           }
         }
