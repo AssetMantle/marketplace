@@ -30,7 +30,7 @@
             </div>
             @if(draft){
                 <div class="d-flex gap-2 justify-content-end pt-4">
-                    <i class="bi bi-pencil iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.basicDetailsForm('@nft.collectionId','@nftDraft.fileName'))"></i>
+                    <i class="bi bi-pencil iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.basicDetailsForm('@nft.collectionId','@nft.fileName'))"></i>
                     <i class="bi bi-trash iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.deleteDraftForm('@nft.fileName','@nft.getFileHash'))"></i>
                     <div id="deleteNftDraft_@nft.getFileHash" class="hidden">
                     @defining(views.nft.companion.DeleteDraft.form) { deleteDraftForm =>
