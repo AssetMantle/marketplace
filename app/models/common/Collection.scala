@@ -4,7 +4,7 @@ import play.api.libs.json.{Json, OFormat, Reads, Writes}
 
 object Collection {
 
-  case class Property(name: String, `type`: String, `value`: String, required: Boolean = true, meta: Boolean = true, mutable: Boolean = false)
+  case class Property(name: String, `type`: String, defaultValue: String, meta: Boolean = true, mutable: Boolean = false)
 
   object Property {
 

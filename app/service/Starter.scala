@@ -103,7 +103,7 @@ class Starter @Inject()(
       val nfts = masterNFTs.Service.getAllForCollection(collection.id)
 
       def updateNFTs(nfts: Seq[master.NFT]) = {
-        val updateCollectionProperties = masterCollections.Service.updateById(collection.copy(properties = Option(nfts.head.properties.map(_.toBaseNFTProperty).map(x => models.common.Collection.Property(name = x.name, `type` = x.`type`, `value` = "")))))
+        val updateCollectionProperties = masterCollections.Service.updateById(collection.copy(properties = Option(nfts.head.properties.map(_.toBaseNFTProperty).map(x => models.common.Collection.Property(name = x.name, `type` = x.`type`, defaultValue = "")))))
         val nftsUpdate = utilitiesOperations.traverse(nfts)(nft => masterNFTProperties.Service.addMultiple(nft.properties.map(_.toBaseNFTProperty.toNFTProperty(nft.fileName))))
         for {
           _ <- updateCollectionProperties

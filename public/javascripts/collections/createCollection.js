@@ -6,7 +6,7 @@ function addProperty() {
     $("#COLLECTION_PROPERTY_" + totalActiveContainer).show();
     $("#COLLECTION_PROPERTY_" + totalActiveContainer).addClass("active");
 
-    if (totalActiveContainer === (totalNumberOfProperties-1)) {
+    if (totalActiveContainer === (totalNumberOfProperties - 1)) {
         $("#addMorePropertyButton").hide();
     } else {
         $("#addMorePropertyButton").show();
@@ -21,18 +21,18 @@ function addProperty() {
     for (let i = 0; i < totalActiveContainer; i++) {
         let elementNameValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_NAME").val();
         let elementTypeValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text();
-        let elementFixedValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_FIXED_VALUE").val();
+        let elementFixedValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_DEFAULT_VALUE").val();
 
-        let elementMutabilityValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_MUTABLE input[name='COLLECTION_PROPERTIES[" + i + "].COLLECTION_PROPERTY_MUTABLE']:checked").val();
-        let elementVisibilityValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_META input[name='COLLECTION_PROPERTIES[" + i + "].COLLECTION_PROPERTY_META']:checked").val();
-        let elementRequirementValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_REQUIRED input[name='COLLECTION_PROPERTIES[" + i + "].COLLECTION_PROPERTY_REQUIRED']:checked").val();
+        let elementMutabilityValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_MUTABLE").is(":checked");
+        let elementVisibilityValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_HIDE").is(":checked");
+        let elementRequirementValue = $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_SET_DEFAULT_VALUE").is(":checked");
 
         $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyCardName").text(elementNameValue);
         $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyCardType").text(elementTypeValue);
         $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyCardValue").text(elementFixedValue);
-        (elementMutabilityValue === "MUTABLE") ? $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyIconMutability").addClass("active") : $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyIconMutability").removeClass("active");
-        (elementVisibilityValue === "META") ? $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyIconVisibility").addClass("active") : $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyIconVisibility").removeClass("active");
-        (elementRequirementValue === "REQUIRED") ? $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyIconRequirement").addClass("active") : $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyIconRequirement").removeClass("active");
+        (elementMutabilityValue) ? $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyIconMutability").addClass("active") : $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyIconMutability").removeClass("active");
+        (elementVisibilityValue) ? $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyIconVisibility").addClass("active") : $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyIconVisibility").removeClass("active");
+        (elementRequirementValue) ? $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyIconRequirement").addClass("active") : $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyIconRequirement").removeClass("active");
 
         $("#COLLECTION_PROPERTY_" + i + " .propertyFormView").hide();
         $("#COLLECTION_PROPERTY_" + i + " .propertyFormView").removeClass("active");
@@ -72,31 +72,31 @@ function removeProperty(containerId) {
     $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_NAME").val("");
     $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_TYPE").val("String");
     $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text("String");
-    $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_FIXED_VALUE").val("");
-    $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_MUTABLE input:radio[name='COLLECTION_PROPERTIES[" + containerId + "].COLLECTION_PROPERTY_MUTABLE']:first").prop('checked', true);
-    $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_META input:radio[name='COLLECTION_PROPERTIES[" + containerId + "].COLLECTION_PROPERTY_META']:first").prop('checked', true);
-    $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_REQUIRED input:radio[name='COLLECTION_PROPERTIES[" + containerId + "].COLLECTION_PROPERTY_REQUIRED']:first").prop('checked', true);
+    $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_DEFAULT_VALUE").val("");
+    $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_MUTABLE").prop('checked', false);
+    $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_HIDE").prop('checked', false);
+    $("#COLLECTION_PROPERTIES_" + containerId + "_COLLECTION_PROPERTY_SET_DEFAULT_VALUE").prop('checked', false);
     $("#COLLECTION_PROPERTY_" + containerId + " .propertyTypeField").val("");
     $("#COLLECTION_PROPERTY_" + containerId + " .propertyType").removeClass("active");
     $("#COLLECTION_PROPERTY_" + containerId + " .propertyType.string").addClass("active");
 
-    for (let i = containerId; i < totalNumberOfProperties; i++) {
+    for (let i = containerId; i < totalNumberOfProperties-1; i++) {
         let nextElementNameValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_NAME").val();
         let nextElementTypeValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE").val();
         let nextElementCustomSelectTypeValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text();
-        let nextElementFixedValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_FIXED_VALUE").val();
-        let nextElementMutabilityValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_MUTABLE input[name='COLLECTION_PROPERTIES[" + (i + 1) + "].COLLECTION_PROPERTY_MUTABLE']:checked").val();
-        let nextElementVisibilityValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_META input[name='COLLECTION_PROPERTIES[" + (i + 1) + "].COLLECTION_PROPERTY_META']:checked").val();
-        let nextElementRequirementValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_REQUIRED input[name='COLLECTION_PROPERTIES[" + (i + 1) + "].COLLECTION_PROPERTY_REQUIRED']:checked").val();
+        let nextElementFixedValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_DEFAULT_VALUE").val();
+        let nextElementMutabilityValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_MUTABLE").is(":checked");
+        let nextElementVisibilityValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_HIDE").is(":checked");
+        let nextElementRequirementValue = $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_SET_DEFAULT_VALUE").is(":checked");
 
         if (nextElementNameValue !== "") {
             $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_NAME").val(nextElementNameValue);
             $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_TYPE").val(nextElementTypeValue);
             $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text(nextElementCustomSelectTypeValue);
-            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_FIXED_VALUE").val(nextElementFixedValue);
-            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_MUTABLE input:radio[name='COLLECTION_PROPERTIES[" + i + "].COLLECTION_PROPERTY_MUTABLE'][value=" + nextElementMutabilityValue + "]").prop('checked', true);
-            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_META input:radio[name='COLLECTION_PROPERTIES[" + i + "].COLLECTION_PROPERTY_META'][value=" + nextElementVisibilityValue + "]").prop('checked', true);
-            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_REQUIRED input:radio[name='COLLECTION_PROPERTIES[" + i + "].COLLECTION_PROPERTY_REQUIRED'][value=" + nextElementRequirementValue + "]").prop('checked', true);
+            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_DEFAULT_VALUE").val(nextElementFixedValue);
+            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_MUTABLE").prop('checked', nextElementMutabilityValue);
+            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_HIDE").prop('checked', nextElementVisibilityValue);
+            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_SET_DEFAULT_VALUE").prop('checked', nextElementRequirementValue);
 
             $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyCardName").text(nextElementNameValue);
             $("#COLLECTION_PROPERTY_" + i + " .propertyCardView .propertyCardType").text(nextElementCustomSelectTypeValue);
@@ -120,11 +120,11 @@ function removeProperty(containerId) {
         $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_NAME").val("");
         $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE").val("String");
         $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text("String");
-        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_FIXED_VALUE").val("");
-        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_FIXED_VALUE").closest(".optionInputField").show();
-        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_MUTABLE input:radio[name='COLLECTION_PROPERTIES[" + (i + 1) + "].COLLECTION_PROPERTY_MUTABLE']:first").prop('checked', true);
-        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_META input:radio[name='COLLECTION_PROPERTIES[" + (i + 1) + "].COLLECTION_PROPERTY_META']:first").prop('checked', true);
-        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_REQUIRED input:radio[name='COLLECTION_PROPERTIES[" + (i + 1) + "].COLLECTION_PROPERTY_REQUIRED']:first").prop('checked', true);
+        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_DEFAULT_VALUE").val("");
+        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_DEFAULT_VALUE").closest(".optionInputField").show();
+        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_MUTABLE").prop('checked', false);
+        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_HIDE").prop('checked', false);
+        $("#COLLECTION_PROPERTIES_" + (i + 1) + "_COLLECTION_PROPERTY_SET_DEFAULT_VALUE").prop('checked', false);
 
         $("#COLLECTION_PROPERTY_" + (i + 1) + " .propertyType").removeClass("active");
         $("#COLLECTION_PROPERTY_" + (i + 1) + " .propertyType.string").addClass("active");
@@ -138,10 +138,10 @@ function removeProperty(containerId) {
             $("#COLLECTION_PROPERTY_" + (i + 1) + " .propertyFormView .propertyAdvancedDetail .dropdownIcon").removeClass("active");
         }
 
-        if (nextElementRequirementValue === "REQUIRED") {
-            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_FIXED_VALUE").closest(".optionInputField").hide();
+        if (nextElementRequirementValue) {
+            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_DEFAULT_VALUE").closest(".optionInputField").show();
         } else {
-            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_FIXED_VALUE").closest(".optionInputField").show();
+            $("#COLLECTION_PROPERTIES_" + i + "_COLLECTION_PROPERTY_DEFAULT_VALUE").closest(".optionInputField").hide();
         }
 
     }
@@ -160,13 +160,13 @@ function updateProperty(containerId) {
     $("#COLLECTION_PROPERTY_" + containerId + " .propertyCardView").removeClass("active");
 }
 
-$(".requirementOption input[type='radio']").change(function () {
+$(".requirementOption .options input[type='checkbox']").change(function () {
     let parentElement = $(this).closest(".requirementOption");
-    if (this.value === "REQUIRED") {
+    if ($(this).is(":checked")) {
+        $(parentElement).find(".optionInputField").show();
+    } else {
         $(parentElement).find(".optionInputField").hide();
         $(parentElement).find(".optionInputField input").val("");
-    } else {
-        $(parentElement).find(".optionInputField").show();
     }
 });
 
@@ -200,12 +200,12 @@ function hideSubmitButton() {
 }
 
 function setBooleanValue(valueFieldIndex, fieldValue) {
-    $(`#COLLECTION_PROPERTIES_${valueFieldIndex}_COLLECTION_PROPERTY_FIXED_VALUE`).val(fieldValue);
+    $(`#COLLECTION_PROPERTIES_${valueFieldIndex}_COLLECTION_PROPERTY_DEFAULT_VALUE`).val(fieldValue);
 }
 
 function setNonBooleanValue(valueFieldIndex, e) {
     let fieldValue = e.target.value;
-    $(`#COLLECTION_PROPERTIES_${valueFieldIndex}_COLLECTION_PROPERTY_FIXED_VALUE`).val(fieldValue);
+    $(`#COLLECTION_PROPERTIES_${valueFieldIndex}_COLLECTION_PROPERTY_DEFAULT_VALUE`).val(fieldValue);
 }
 
 $(".custom-select .custom-options .custom-option").on("click", function () {

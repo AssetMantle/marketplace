@@ -14,23 +14,13 @@
         @repeatWithIndex(setPropertiesForm(constants.FormField.NFT_PROPERTIES.name), min = collection.properties.fold(0)(_.length)) { (propertyField, index) =>
             @defining(Option(propertyField)) { implicit sequentialFormField =>
                 @if(collection.properties.fold(0)(_.length) > 0) {
-                    @if(collection.properties.get(index).required) {
-                        <div class="d-flex gap-3">
-                            @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
-                            <div class="hidden">
-                            @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_VALUE, Symbol("value") -> collection.properties.get(index).`value`)
-                            </div>
-                            @commonValueField(collection.properties.get(index).`type`, collection.properties.get(index).`value`, index)
+                    <div class="d-flex gap-3">
+                        @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
+                        <div class="hidden">
+                        @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_VALUE, Symbol("value") -> collection.properties.get(index).defaultValue)
                         </div>
-                    } else {
-                        <div class="d-flex gap-3">
-                            @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
-                            <div class="hidden">
-                            @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_VALUE, Symbol("value") -> collection.properties.get(index).`value`, Symbol("required") -> false)
-                            </div>
-                            @commonValueField(collection.properties.get(index).`type`, collection.properties.get(index).`value`, index)
-                        </div>
-                    }
+                        @commonValueField(collection.properties.get(index).`type`, collection.properties.get(index).defaultValue, index)
+                    </div>
                 }
             }
         }
