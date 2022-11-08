@@ -113,7 +113,7 @@ class CollectionDrafts @Inject()(
         socialProfiles = socialProfiles,
         category = category,
         nsfw = nsfw,
-        properties = constants.Collection.DefaultProperty.defaultProperties,
+        properties = Seq(),
         profileFileName = None,
         coverFileName = None)
       for {

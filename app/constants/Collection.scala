@@ -1,7 +1,5 @@
 package constants
 
-import models.common.Collection.Property
-
 object Collection {
 
   object File {
@@ -41,7 +39,5 @@ object Collection {
 
     val list: Seq[String] = Seq(NFT_NAME, NFT_DESCRIPTION, FILE_HASH, CLASSIFICATION_ID)
 
-    val defaultProperties: Seq[Property] = list.map { propertyName => Property(name = propertyName, `type` = constants.NFT.Data.STRING, `value` = "", required = true, meta = true, mutable = false)
-    }
   }
 }
