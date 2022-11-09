@@ -225,3 +225,9 @@ $(".custom-select .custom-options .custom-option").on("click", function () {
         parentContainer.find(".propertyType.boolean").addClass("active");
     }
 });
+
+$("select.filledSelect").each((index,element)=>{
+    let selectFieldValue = $(element).val().substr(0,1).toUpperCase()+$(element).val().substr(1).toLowerCase();
+    let selectFieldIndex = $(element).attr("data-index");
+    $("#COLLECTION_PROPERTIES_" + selectFieldIndex + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text(selectFieldValue);
+})
