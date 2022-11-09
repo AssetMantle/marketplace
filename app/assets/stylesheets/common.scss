@@ -11,7 +11,7 @@
 .dropdown {
   display: inline-block;
   width: 100%;
-  z-index: 999;
+  //z-index: 999;
 
   .dropdownHead {
     @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
@@ -82,7 +82,7 @@
         background: var(--card-color);
         line-height: 20px;
         position: relative;
-        z-index: 89;
+        z-index: 999;
 
         &:nth-last-child(1) {
           padding-bottom: 10px;

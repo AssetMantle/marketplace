@@ -56,7 +56,7 @@
                                 <div class="d-flex gap-4">
                                 @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length) {
                                     @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collectionDraft.get.properties(index).name, Symbol("required") -> false)
-                                    @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("value") -> collectionDraft.get.properties(index).`type`, Symbol("class") -> "custom-select sources")
+                                    @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("value") -> collectionDraft.get.properties(index).`type`, Symbol("data-index") -> index, Symbol("class") -> "custom-select sources filledSelect")
                                 } else {
                                     @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("required") -> false)
                                     @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources", Symbol("value") -> constants.FormField.COLLECTION_PROPERTY_TYPE.options.head)
@@ -74,7 +74,11 @@
                                                 <span>@Messages(constants.View.ADVANCED_PROPERTY_MUTABILITY)</span>
                                             </div>
                                             <div class="options">
-                                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
+                                                @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length && collectionDraft.get.properties(index).mutable) {
+                                                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE, Symbol("checked") -> "checked")
+                                                } else {
+                                                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
+                                                }
                                             </div>
                                         </div>
                                         <div class="d-flex justify-content-between align-items-center singleOption">
@@ -83,7 +87,11 @@
                                                 <span>@Messages(constants.View.ADVANCED_PROPERTY_HIDE)</span>
                                             </div>
                                             <div class="options">
-                                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE)
+                                                @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length && !collectionDraft.get.properties(index).meta) {
+                                                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE, Symbol("checked") -> "checked")
+                                                } else{
+                                                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE)
+                                                }
                                             </div>
                                         </div>
                                         <div class="requirementOption">
