@@ -461,6 +461,9 @@ nav .content .links
         padding: 0 20px 0 50px;
     }
 
+    .submenu{
+        padding: 0px !important;
+    }
 }
 
 @media screen and (max-width: 400px) {

@@ -137,19 +137,19 @@
                                         <ul>
                                             <li>
                                                 <a href="@routes.ProfileController.viewProfile(loginState.username, constants.View.CREATED)" class="d-flex flex-row align-items-center gap-3">
-                                                    <i class="bi bi-person iconWhite"></i>
+                                                    <i class="bi bi-person iconDefault"></i>
                                                     <div class="profileMenuLabel">@Messages(constants.View.PROFILE)</div>
                                                 </a>
                                             </li>
                                             <li>
                                                 <a href="@routes.SettingController.viewSettings()" class="d-flex flex-row align-items-center gap-3">
-                                                    <i class="bi bi-gear iconWhite"></i>
+                                                    <i class="bi bi-gear iconDefault"></i>
                                                     <div class="profileMenuLabel">@Messages(constants.View.MENU_SETTINGS)</div>
                                                 </a>
                                             </li>
                                             <li>
                                                 <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))" class="d-flex flex-row align-items-center gap-3">
-                                                    <i class="bi bi-box-arrow-right iconWhite logout"></i>
+                                                    <i class="bi bi-box-arrow-right iconDefault logout"></i>
                                                     <div class="profileMenuLabel">@Messages(constants.View.SIGN_OUT)</div>
                                                 </a>
                                             </li>
