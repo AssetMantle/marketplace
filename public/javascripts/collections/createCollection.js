@@ -227,7 +227,17 @@ $(".custom-select .custom-options .custom-option").on("click", function () {
 });
 
 $("select.filledSelect").each((index,element)=>{
-    let selectFieldValue = $(element).val().substr(0,1).toUpperCase()+$(element).val().substr(1).toLowerCase();
+    let selectedFieldValue = $(element).val();
+    if (selectedFieldValue === "DECIMAL"){
+        selectedFieldValue = "NUMBER";
+    }
+    let valueToShow = selectedFieldValue.substr(0,1).toUpperCase()+selectedFieldValue.substr(1).toLowerCase();
     let selectFieldIndex = $(element).attr("data-index");
-    $("#COLLECTION_PROPERTIES_" + selectFieldIndex + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text(selectFieldValue);
-})
+    $("#COLLECTION_PROPERTIES_" + selectFieldIndex + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text(valueToShow);
+});
+
+$(".selectedBooleanType").each((index,element)=>{
+    let selectedFieldValue = $(element).text();
+    let valueToShow = selectedFieldValue.substr(0,1).toUpperCase()+selectedFieldValue.substr(1).toLowerCase();
+    $(element).text(valueToShow);
+});
