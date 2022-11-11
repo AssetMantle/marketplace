@@ -26,7 +26,7 @@
         </div>
         <ul id="memberList">
             @members.zipWithIndex.map { case (username, index) =>
-                <li>
+                <li id="whitelistUser_@index">
                     <div class="d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center gap-4">
                             <div class="memberIndex">@(index + 1)</div>
@@ -38,7 +38,7 @@
                             </div>
                         </div>
                         <div class="deleteIcon">
-                            <i class="bi bi-x iconDefault" onclick="removeWhitelistMember('@username', '@Messages(constants.View.REMOVE_FROM_WHITELIST)')"></i>
+                            <i class="bi bi-x iconDefault" onclick="removeWhitelistMember('@username', '@Messages(constants.View.REMOVE_FROM_WHITELIST)',@index)"></i>
                         </div>
                         <div id="removeWhitelistMember_@username" class="hidden">
                             @defining(views.profile.whitelist.companion.RemoveMember.form) { removeMemberForm =>
