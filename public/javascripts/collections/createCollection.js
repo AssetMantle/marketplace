@@ -241,3 +241,7 @@ $(".selectedBooleanType").each((index,element)=>{
     let valueToShow = selectedFieldValue.substr(0,1).toUpperCase()+selectedFieldValue.substr(1).toLowerCase();
     $(element).text(valueToShow);
 });
+
+function setDefinePropertyBackButton(collectionId){
+    $("#modalBackButton").attr("onclick", `getForm(jsRoutes.controllers.CollectionController.uploadCollectionFilesForm('${collectionId}'))`);
+}
