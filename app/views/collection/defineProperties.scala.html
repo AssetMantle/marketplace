@@ -166,74 +166,6 @@
                                                     }
                                                 </div>
                                             </div>
-                                            }
-                                            @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length && collectionDraft.get.properties(index).defaultValue.isEmpty){
-                                                <div class="optionInputField">
-                                                    <div class="hidden">
-                                                    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_DEFAULT_VALUE, Symbol("required") -> false, Symbol("class") -> "fixedValueField")
-                                                    </div>
-                                                    <div class="propertyTypeOption">
-                                                        @if(collectionDraft.get.properties(index).`type` == constants.NFT.Data.STRING){
-                                                        <div class="propertyType string active">
-                                                        }else{
-                                                        <div class="propertyType string">
-                                                        }
-                                                            <div class="mb-0 commonInputInt w-100">
-                                                                <div class="fieldContainer">
-                                                                    <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
-                                                                    <dd>
-                                                                        <input type="text" id="fieldValue_@index" name="fieldValue_@index" class="propertyTypeField am-input" onkeyup="setNonBooleanValue(@index, event)"/>
-                                                                    </dd>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        @if(collectionDraft.get.properties(index).`type` == constants.NFT.Data.DECIMAL){
-                                                        <div class="propertyType number active">
-                                                        }else{
-                                                        <div class="propertyType number">
-                                                        }
-                                                            <div class="mb-0 commonInputInt w-100">
-                                                                <div class="fieldContainer">
-                                                                    <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
-                                                                    <dd>
-                                                                    @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length && collectionDraft.get.properties(index).defaultValue.nonEmpty) {
-                                                                        <input type="number" id="fieldValue_@index" name="fieldValue_@index" class="propertyTypeField am-input" onkeyup="setNonBooleanValue(@index, event)" value="@collectionDraft.get.properties(index).defaultValue"/>
-                                                                    }else{
-                                                                        <input type="number" id="fieldValue_@index" name="fieldValue_@index" class="propertyTypeField am-input" onkeyup="setNonBooleanValue(@index, event)"/>
-                                                                    }
-                                                                    </dd>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        @if(collectionDraft.get.properties(index).`type` == constants.NFT.Data.BOOLEAN){
-                                                        <div class="propertyType boolean active">
-                                                        }else{
-                                                        <div class="propertyType boolean">
-                                                        }
-                                                            <div class="mb-0 commonInputInt w-100">
-                                                                <div class="fieldContainer">
-                                                                    <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
-                                                                    <dd class="mt-2">
-                                                                        <div class="dropdown" id="fieldValue_@index">
-                                                                            <input type="hidden" class="dp-input" value=""/>
-                                                                            <div class="dropdownHead" onclick="showOptions(this)">
-                                                                                <div class="currentSelected">@Messages(constants.View.NFT_PROPERTY_BOOLEAN_FIELD_LABEL)</div>
-                                                                            </div>
-                                                                            <div class="dropdownBody">
-                                                                                <div class="dropdownBodyInner">
-                                                                                    <div class="propertyTypeField dropdownItem" value="true" onclick="setOption(this);
-                                                                                    setBooleanValue(@index, '@constants.NFT.Data.TRUE');">@Messages(constants.View.TRUE)</div>
-                                                                                    <div class="propertyTypeField dropdownItem" value="false" onclick="setOption(this);
-                                                                                    setBooleanValue(@index, '@constants.NFT.Data.FALSE');">@Messages(constants.View.FALSE)</div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </dd>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             }else{
                                                 <div class="optionInputField" style="display: none;">
                                                     <div class="hidden">
@@ -290,7 +222,6 @@
                                                     </div>
                                                 </div>
                                             }
-
 
                                         </div>
                                     </div>
