@@ -19,3 +19,7 @@ function setNonBooleanValue(valueFieldIndex, e){
     let fieldValue = e.target.value;
     $(`#NFT_PROPERTIES_${valueFieldIndex}_NFT_PROPERTY_VALUE`).val(fieldValue);
 }
+
+function setPropertyBackButton(collectionId, fileName){
+    $("#modalBackButton").attr("onclick", `getForm(jsRoutes.controllers.NFTController.tagsForm('${collectionId}', '${fileName}'))`);
+}

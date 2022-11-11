@@ -3,7 +3,7 @@
 
 @(nftTagsForm: Form[NFTTags.Data] = NFTTags.form, collectionId: String, fileName: String, tags: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonForm(constants.Form.NFT_TAGS, nftTagsForm, submitDisable = false) {
+@commonForm(constants.Form.NFT_TAGS, nftTagsForm, submitDisable = false, showBackButton = true) {
     @commonInputText(nftTagsForm, constants.FormField.NFT_TAGS, Symbol("class") -> "hidden", Symbol("value") -> tags.mkString(","))
     @commonInputText(nftTagsForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionId, Symbol("containerDivClass") -> "hidden")
     @commonInputText(nftTagsForm, constants.FormField.NFT_FILE_NAME, Symbol("value") -> fileName, Symbol("containerDivClass") -> "hidden")
@@ -28,3 +28,6 @@
         </script>
     }
 }
+<script>
+    setTagBackButton('@collectionId','@fileName');
+</script>

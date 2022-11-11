@@ -338,7 +338,7 @@ class CollectionController @Inject()(
       val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id)
       (for {
         collectionDraft <- collectionDraft
-      } yield if (collectionDraft.creatorId == loginState.username) Ok(views.html.collection.defineProperties(collectionDraft = Option(collectionDraft))) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+      } yield if (collectionDraft.creatorId == loginState.username) Ok(views.html.collection.defineProperties(collectionDraftId = id, collectionDraft = Option(collectionDraft))) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
@@ -348,10 +348,11 @@ class CollectionController @Inject()(
     implicit request =>
       DefineProperties.form.bindFromRequest().fold(
         formWithErrors => {
-          val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))
+          val collectionDraftId = formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, "")
+          val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(collectionDraftId)
           (for {
             collectionDraft <- collectionDraft
-          } yield if (collectionDraft.creatorId == loginState.username) BadRequest(views.html.collection.defineProperties(formWithErrors, Option(collectionDraft))) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+          } yield if (collectionDraft.creatorId == loginState.username) BadRequest(views.html.collection.defineProperties(formWithErrors, collectionDraftId, Option(collectionDraft))) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
           }
@@ -376,7 +377,7 @@ class CollectionController @Inject()(
             _ <- saveCollection(collectionDraft)
           } yield PartialContent(views.html.collection.createSuccessful(collectionDraft, definePropertiesData.saveAsDraft))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.collection.defineProperties(DefineProperties.form.withGlobalError(baseException.failure.message), None))
+            case baseException: BaseException => BadRequest(views.html.collection.defineProperties(DefineProperties.form.withGlobalError(baseException.failure.message), definePropertiesData.collectionId, None))
           }
         }
       )
