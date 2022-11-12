@@ -28,7 +28,7 @@ abstract class GenericDaoImpl[
 
   import databaseConfig.profile.api._
 
-  def count(): Future[Int] = db.run(tableQuery.length.result)
+  def countTotal(): Future[Int] = db.run(tableQuery.length.result)
 
   def create(entity: E): Future[PK] = db.run((tableQuery returning tableQuery.map(_.id) += entity).asTry).map {
     case Success(result) => result

@@ -61,9 +61,6 @@
                     @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
                     </span>
                     <div class="nft-likes" data-id="@nft.fileName">00</div>
-                    @if(loginState.get.username == nft.ownerId.getOrElse(collection.creatorId)) {
-                        @commonTertiaryButton(constants.Form.NFT_WHITELIST_SALE.button, JavaScript(s"getForm(${utilities.JsRoutes.getJsRouteString(constants.Form.NFT_WHITELIST_SALE.get, s"'${nft.fileName}'")})"))
-                    }
                 </div>
             } else {
                 <div class="d-flex align-items-center gap-1 mt-3" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN_WITH_CALLBACK.get, s"'/collection/${collection.id}'"))">

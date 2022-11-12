@@ -2,6 +2,8 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
+import models.analytics.{CollectionAnalysis, CollectionsAnalysis}
+import models.master.Collection
 import models.{blockchain, master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
@@ -22,6 +24,7 @@ class SaleController @Inject()(
                                 withLoginAction: WithLoginAction,
                                 withLoginActionAsync: WithLoginActionAsync,
                                 withoutLoginAction: WithoutLoginAction,
+                                collectionsAnalysis: CollectionsAnalysis,
                                 blockchainBalances: blockchain.Balances,
                                 masterAccounts: master.Accounts,
                                 masterKeys: master.Keys,
@@ -55,10 +58,13 @@ class SaleController @Inject()(
       val whitelists = masterWhitelists.Service.getAll(loginState.username)
       val collections = masterCollections.Service.getByCreator(loginState.username)
 
+      def totalNFTs(ids: Seq[String]) = collectionsAnalysis.Service.getForCollections(ids)
+
       for {
         whitelists <- whitelists
         collections <- collections
-      } yield Ok(views.html.sale.createWhitelistSale(collections = collections.toMap, whitelistId = whitelistId, whitelists = whitelists))
+        totalNFTs <- totalNFTs(collections.map(_._1))
+      } yield Ok(views.html.sale.createWhitelistSale(collections = collections.map(x => x._1 -> s"${x._2} (${totalNFTs.find(_.id == x._1).fold("0")(_.totalNFTs.toString)})").toMap, whitelistId = whitelistId, whitelists = whitelists))
   }
 
   def createWhitelistSale(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -68,50 +74,34 @@ class SaleController @Inject()(
           val collections = masterCollections.Service.getByCreator(loginState.username)
           val whitelists = masterWhitelists.Service.getAll(loginState.username)
 
+          def totalNFTs(ids: Seq[String]) = collectionsAnalysis.Service.getForCollections(ids)
+
           for {
             whitelists <- whitelists
             collections <- collections
-          } yield BadRequest(views.html.sale.createWhitelistSale(formWithErrors, whitelists = whitelists, whitelistId = formWithErrors.data.get(constants.FormField.SELECT_WHITELIST_ID.name), collections = collections.toMap))
+            totalNFTs <- totalNFTs(collections.map(_._1))
+          } yield BadRequest(views.html.sale.createWhitelistSale(formWithErrors, whitelists = whitelists, whitelistId = formWithErrors.data.get(constants.FormField.SELECT_WHITELIST_ID.name), collections = collections.map(x => x._1 -> s"${x._2} (${totalNFTs.find(_.id == x._1).fold("0")(_.totalNFTs.toString)})").toMap))
         },
         createData => {
-          val isCollectionOwner = masterCollections.Service.isOwner(id = createData.collectionId, accountId = loginState.username)
-          val verifyNFTsCollection = if (createData.nftFileNames.isDefined && createData.nftFileNames.get.split(",").nonEmpty) masterNFTs.Service.verifyNFTsCollection(fileNames = createData.nftFileNames.get.split(","), collectionId = createData.collectionId) else Future(true)
+          val collection = masterCollections.Service.tryGet(id = createData.collectionId)
+          val collectionAnalysis = collectionsAnalysis.Service.tryGet(createData.collectionId)
 
-          def addToSale(isCollectionOwner: Boolean, verifyNFTsCollection: Boolean) = if (isCollectionOwner && verifyNFTsCollection) {
-            if (createData.nftFileNames.isDefined && createData.nftFileNames.get.split(",").nonEmpty) masterNFTWhitelistSales.Service.add(createData.toNFTWhitelistSales(quantity = 1, fileNames = createData.nftFileNames.get.split(","), denom = constants.Blockchain.StakingToken))
-            else {
-              val nftIds = masterNFTs.Service.getIdsAllForCollection(createData.collectionId)
-              for {
-                nftIds <- nftIds
-                _ <- masterNFTWhitelistSales.Service.add(createData.toNFTWhitelistSales(quantity = 1, fileNames = nftIds, denom = constants.Blockchain.StakingToken))
-              } yield ()
-            }
-          }
-          else constants.Response.NOT_NFT_OWNER.throwFutureBaseException()
+          def addToSale(collection: Collection, collectionAnalysis: CollectionAnalysis) = if (collection.creatorId == loginState.username && collection.public && verifyNFTsCollection) {
+            if (createData.nftForSale >= collectionAnalysis.totalNFTs) {
+              masterNFTWhitelistSales.Utility.addRandomNFTsForSale(whitelistId = createData.whitelistId, collectionId = createData.collectionId, numberOfNFTs = createData.nftForSale, price = createData.price, denom = constants.CommonConfig.Blockchain.StakingToken, creatorFee = createData.creatorFee, startTimeEpoch = createData.startEpoch, endTimeEpoch = createData.endEpoch)
+            } else constants.Response.INVALID_NUMBER_OF_NFTS.throwFutureBaseException()
+          } else constants.Response.NOT_COLLECTION_OWNER_OR_COLLECTION_NOT_PUBLIC.throwFutureBaseException()
 
           (for {
-            isCollectionOwner <- isCollectionOwner
-            verifyNFTsCollection <- verifyNFTsCollection
-            _ <- addToSale(isCollectionOwner = isCollectionOwner, verifyNFTsCollection = verifyNFTsCollection)
+            collection <- collection
+            collectionAnalysis <- collectionAnalysis
+            _ <- addToSale(collection = collection, collectionAnalysis = collectionAnalysis)
           } yield PartialContent(views.html.sale.createSuccessful())
             ).recover {
             case baseException: BaseException => BadRequest(views.html.sale.createWhitelistSale(CreateWhitelistSale.form.withGlobalError(baseException.failure.message), Map(), whitelistId = Option(createData.whitelistId), Map()))
           }
         }
       )
-  }
-
-  def selectCollectionNFTs(pageNumber: Int, collectionId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val nfts = masterNFTs.Service.getByPageNumber(collectionId, pageNumber)
-        (for {
-          nfts <- nfts
-        } yield Ok(views.html.sale.selectCollectionNFTs(pageNumber, nfts))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
   }
 
   def acceptWhitelistSaleOfferForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>

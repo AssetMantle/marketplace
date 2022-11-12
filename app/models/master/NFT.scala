@@ -152,5 +152,9 @@ class NFTs @Inject()(
     def getCollectionIds(nfts: Seq[String]): Future[Seq[String]] = filter(_.id.inSet(nfts)).map(_.map(_.collectionId))
 
     def verifyNFTsCollection(fileNames: Seq[String], collectionId: String): Future[Boolean] = filter(x => x.fileName.inSet(fileNames) && x.collectionId === collectionId).map(_.length == fileNames.length)
+
+    def countNFTs(collectionId: String): Future[Int] = filterAndCount(_.collectionId === collectionId)
+
+    def getRandomNFTs(collectionId: String, n: Int): Future[Seq[String]] = filter(_.collectionId === collectionId).map(x => util.Random.shuffle(x.map(_.fileName)).take(n))
   }
 }
