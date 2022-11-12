@@ -519,6 +519,7 @@ REQUEST_STATUS_PENDING=Pending
 REQUEST_STATUS_DECLINED=Declined
 OFFER_HISTORY=Offer History
 COLLECTION_OFFERS_LINK=Go to Collection Offers
+NO_NFT_OFFERS=No offers found!
 
 REGEX_ERROR.ANY_STRING=All characters allowed
 REGEX_ERROR.MANTLE_ADDRESS=Only mantle address allowed (mantle1...)
