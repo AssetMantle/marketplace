@@ -86,7 +86,7 @@ class SaleController @Inject()(
           val collection = masterCollections.Service.tryGet(id = createData.collectionId)
           val collectionAnalysis = collectionsAnalysis.Service.tryGet(createData.collectionId)
 
-          def addToSale(collection: Collection, collectionAnalysis: CollectionAnalysis) = if (collection.creatorId == loginState.username && collection.public && verifyNFTsCollection) {
+          def addToSale(collection: Collection, collectionAnalysis: CollectionAnalysis) = if (collection.creatorId == loginState.username && collection.public) {
             if (createData.nftForSale >= collectionAnalysis.totalNFTs) {
               masterNFTWhitelistSales.Utility.addRandomNFTsForSale(whitelistId = createData.whitelistId, collectionId = createData.collectionId, numberOfNFTs = createData.nftForSale, price = createData.price, denom = constants.CommonConfig.Blockchain.StakingToken, creatorFee = createData.creatorFee, startTimeEpoch = createData.startEpoch, endTimeEpoch = createData.endEpoch)
             } else constants.Response.INVALID_NUMBER_OF_NFTS.throwFutureBaseException()
