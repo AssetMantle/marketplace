@@ -90,10 +90,12 @@ class WishLists @Inject()(
 
     def getCollections(accountId: String): Future[Seq[String]] = filter(_.accountId === accountId).map(_.map(_.collectionId).distinct)
 
+    def get(accountId: String, nftIds: Seq[String]): Future[Seq[WishList]] = filter(x => x.accountId === accountId && x.nftId.inSet(nftIds)).map(_.map(_.deserialize))
+
     // TODO
     //    def getCollections(accountId: String): Future[Seq[String]] = customQuery[Seq[String]](WishLists.TableQuery.filter(_.accountId === accountId).map(_.collectionId).distinct.result)
 
-    def deleteWishItem(accountId: String, nftId: String): Future[Int] = delete(id1 = accountId, id2 = nftId)
+    def delete(accountId: String, nftId: String): Future[Int] = deleteById1AndId2(id1 = accountId, id2 = nftId)
 
     def checkExists(accountId: String, nftId: String): Future[Boolean] = exists(id1 = accountId, id2 = nftId)
 

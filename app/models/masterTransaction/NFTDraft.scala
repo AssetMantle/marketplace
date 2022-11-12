@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class NFTDraft(fileName: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[Seq[BaseNFTProperty]], tagNames: Option[Seq[String]], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def toNFT: NFT = NFT(fileName = fileName, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), properties = Seq(), ipfsLink = "", edition = None)
+  def toNFT(ownerId: String, supply: Int = 1): NFT = NFT(fileName = fileName, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), ownerId = Option(ownerId), supply = supply, ipfsLink = "", edition = None)
 
   def getNFTProperties: Seq[NFTProperty] = this.properties.fold[Seq[NFTProperty]](Seq())(x => x.map(_.toNFTProperty(this.fileName)))
 
@@ -123,7 +123,7 @@ class NFTDrafts @Inject()(
       val draft = tryGet(fileName)
       for {
         draft <- draft
-        _ <- update(draft.copy(name = Option(name), description = Option(description)).serialize())
+        _ <- updateById(draft.copy(name = Option(name), description = Option(description)).serialize())
       } yield draft.copy(name = Option(name), description = Option(description))
     }
 
@@ -131,7 +131,7 @@ class NFTDrafts @Inject()(
       val draft = tryGet(fileName)
       for {
         nftDraft <- draft
-        _ <- update(nftDraft.copy(properties = Option(properties)).serialize())
+        _ <- updateById(nftDraft.copy(properties = Option(properties)).serialize())
       } yield nftDraft.copy(properties = Option(properties))
     }
 
@@ -139,7 +139,7 @@ class NFTDrafts @Inject()(
       val draft = tryGet(fileName)
       for {
         draft <- draft
-        _ <- update(draft.copy(tagNames = Option(tagNames)).serialize())
+        _ <- updateById(draft.copy(tagNames = Option(tagNames)).serialize())
       } yield ()
     }
 

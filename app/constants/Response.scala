@@ -121,6 +121,7 @@ object Response {
   val NOT_WHITELIST_CREATOR = new Failure("NOT_WHITELIST_CREATOR")
   val NO_SUCH_DOCUMENT_TYPE_EXCEPTION = new Failure("NO_SUCH_DOCUMENT_TYPE_EXCEPTION")
   val NOT_COLLECTION_OWNER = new Failure("NOT_COLLECTION_OWNER")
+  val NOT_NFT_OWNER = new Failure("NOT_NFT_OWNER")
   val CLASSIFICATION_ALREADY_DEFINED = new Failure("CLASSIFICATION_ALREADY_DEFINED")
   val FILE_SIZE_EXCEED_LIMIT = new Failure("FILE_SIZE_EXCEED_LIMIT")
   val INVALID_DOCUMENT_TYPE = new Failure("INVALID_DOCUMENT_TYPE")
@@ -131,6 +132,7 @@ object Response {
   val NFT_PROPERTY_TYPE_NOT_FOUND = new Failure("NFT_PROPERTY_TYPE_NOT_FOUND")
   val INVALID_NFT_PROPERTY = new Failure("INVALID_NFT_PROPERTY")
   val NOT_GENESIS_CREATOR = new Failure("NOT_GENESIS_CREATOR")
+  val COLLECTION_NOT_FOUND = new Failure("COLLECTION_NOT_FOUND")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

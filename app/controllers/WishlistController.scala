@@ -32,14 +32,14 @@ class WishlistController @Inject()(
 
   implicit val callbackOnSessionTimeout: Call = routes.ProfileController.viewDefaultProfile()
 
-  def wishlistSection(accountId: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def wishlistSection(accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         Future(Ok(views.html.profile.wishlist.wishlistSection(accountId)))
     }
   }
 
-  def collectionPerPage(accountId: String, pageNumber: Int): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionPerPage(accountId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val allCollectionIds = masterWishLists.Service.getCollections(accountId)
@@ -57,14 +57,14 @@ class WishlistController @Inject()(
     }
   }
 
-  def viewCollectionNFTs(accountId: String, collectionId: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollectionNFTs(accountId: String, collectionId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         Future(Ok(views.html.profile.wishlist.viewCollectionNFTs(accountId, collectionId)))
     }
   }
 
-  def collectionNFTs(accountId: String, collectionId: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionNFTs(accountId: String, collectionId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(collectionId)
@@ -78,7 +78,7 @@ class WishlistController @Inject()(
     }
   }
 
-  def collectionNFTsPerPage(accountId: String, collectionId: String, pageNumber: Int): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionNFTsPerPage(accountId: String, collectionId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
@@ -127,7 +127,7 @@ class WishlistController @Inject()(
           implicit val optionalLoginState: Option[LoginState] = Option(loginState)
           (for {
             nft <- masterNFTs.Service.tryGet(deleteData.nftFileName)
-            _ <- masterWishLists.Service.deleteWishItem(accountId = loginState.username, nftId = deleteData.nftFileName)
+            _ <- masterWishLists.Service.delete(accountId = loginState.username, nftId = deleteData.nftFileName)
           } yield Ok(views.html.nft.deleteFromWishlist(nft))
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)

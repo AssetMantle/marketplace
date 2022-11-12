@@ -140,7 +140,7 @@ class AccountController @Inject()(
                 backupUsed = false,
                 verified = wallet.get.verified)
 
-              def updateMasterAccount() = if (account.passwordHash.nonEmpty) masterAccounts.Service.updateAccount(account.copy(passwordHash = Array[Byte](), salt = Array[Byte](), iterations = 0)) else Future()
+              def updateMasterAccount() = if (account.passwordHash.nonEmpty) masterAccounts.Service.update(account.copy(passwordHash = Array[Byte](), salt = Array[Byte](), iterations = 0)) else Future()
 
               for {
                 _ <- addKey
@@ -167,7 +167,7 @@ class AccountController @Inject()(
                     backupUsed = false,
                     verified = None)
 
-                  def deleteUnverifiedKey() = masterKeys.Service.deleteKey(accountId = key.get.accountId, address = key.get.address)
+                  def deleteUnverifiedKey() = masterKeys.Service.delete(accountId = key.get.accountId, address = key.get.address)
 
                   for {
                     _ <- addKey

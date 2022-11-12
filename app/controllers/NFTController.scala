@@ -32,7 +32,10 @@ class NFTController @Inject()(
                                masterNFTProperties: master.NFTProperties,
                                masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                masterWishLists: master.WishLists,
+                               masterWhitelists: master.Whitelists,
+                               masterWhitelistMembers: master.WhitelistMembers,
                                masterCollectionFiles: master.CollectionFiles,
+                               masterNFTWhitelistSales: master.NFTWhitelistSales,
                                utilitiesNotification: utilities.Notification,
                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -42,7 +45,7 @@ class NFTController @Inject()(
 
   implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)
 
-  def viewNFT(nftId: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def viewNFT(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val nft = masterNFTs.Service.tryGet(nftId)
@@ -55,7 +58,7 @@ class NFTController @Inject()(
     }
   }
 
-  def details(nftId: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def details(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val nft = masterNFTs.Service.tryGet(nftId)
@@ -76,7 +79,7 @@ class NFTController @Inject()(
     }
   }
 
-  def info(nftId: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def info(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val nft = masterNFTs.Service.tryGet(nftId)
@@ -92,7 +95,7 @@ class NFTController @Inject()(
     }
   }
 
-  def collectionInfo(nftId: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionInfo(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val nft = masterNFTs.Service.tryGet(nftId)
@@ -127,7 +130,7 @@ class NFTController @Inject()(
       }
   }
 
-  def likesCounter(nftId: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def likesCounter(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val countLikes = masterWishLists.Service.countLikes(nftId)
@@ -333,7 +336,7 @@ class NFTController @Inject()(
             val updateDraft = masterTransactionNFTDrafts.Service.updateProperties(setPropertiesData.fileName, setPropertiesData.getNFTProperties(collection.properties.getOrElse(Seq())))
 
             def addToNFT(nftDraft: NFTDraft) = if (!setPropertiesData.saveNFTDraft) {
-              val add = masterNFTs.Service.add(nftDraft.toNFT)
+              val add = masterNFTs.Service.add(nftDraft.toNFT(loginState.username))
 
               def addProperties() = masterNFTProperties.Service.addMultiple(nftDraft.getNFTProperties)
 
@@ -350,7 +353,7 @@ class NFTController @Inject()(
             for {
               draft <- updateDraft
               _ <- addToNFT(draft)
-            } yield draft.toNFT
+            } yield draft.toNFT(loginState.username)
           } else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
 
           (for {
@@ -393,5 +396,62 @@ class NFTController @Inject()(
       )
   }
 
+
+  def ownedSection(accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit optionalLoginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.owned.ownedSection(accountId)))
+    }
+  }
+
+  def ownedNFTsPerPage(accountId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit optionalLoginState =>
+      implicit request =>
+        val nfts = masterNFTs.Service.getByOwnerIdAndPageNumber(accountId, pageNumber)
+
+        def collections(collectionIds: Seq[String]) = masterCollections.Service.getCollections(collectionIds)
+
+        def wishLists(nftIds: Seq[String]) = masterWishLists.Service.get(accountId = accountId, nftIds = nftIds)
+
+        (for {
+          nfts <- nfts
+          collections <- collections(nfts.map(_.collectionId))
+          wishLists <- wishLists(nfts.map(_.fileName))
+        } yield Ok(views.html.profile.owned.ownedNFTsPerPage(nfts, collections, wishLists))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def offerSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.offer.offerSection()))
+    }
+  }
+
+  def offeredNFTsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val whitelistIds = masterWhitelistMembers.Service.getAllForMember(loginState.username)
+
+        def nftWhitelistSales(whitelistIds: Seq[String]) = masterNFTWhitelistSales.Service.getByPageNumber(whitelistIds, pageNumber)
+
+        def nfts(fileNames: Seq[String]) = masterNFTs.Service.getByIds(fileNames)
+
+        def collections(collectionIds: Seq[String]) = masterCollections.Service.getCollections(collectionIds)
+
+        (for {
+          whitelistIds <- whitelistIds
+          nftWhitelistSales <- nftWhitelistSales(whitelistIds)
+          nfts <- nfts(nftWhitelistSales.map(_.fileName))
+          collections <- collections(nfts.map(_.collectionId))
+        } yield Ok(views.html.profile.offer.offeredNFTsPerPage(pageNumber, nfts, nftWhitelistSales, collections))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
 
 }

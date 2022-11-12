@@ -87,11 +87,13 @@ class WhitelistMembers @Inject()(
 
     def getAllForMember(accountId: String, pageNumber: Int, perPage: Int): Future[Seq[String]] = filterAndSortWithPagination((pageNumber - 1) * perPage, limit = perPage)(_.accountId === accountId)(_.createdOn).map(_.map(_.whitelistId))
 
+    def getAllForMember(accountId: String): Future[Seq[String]] = filter(_.accountId === accountId).map(_.map(_.whitelistId))
+
     def totalJoined(accountId: String): Future[Int] = filterAndCount(_.accountId === accountId)
 
     def deleteAllMembers(whitelistId: String): Future[Int] = filterAndDelete(_.whitelistId === whitelistId)
 
-    def deleteMember(whitelistId: String, accountId: String): Future[Int] = delete(id1 = whitelistId, id2 = accountId)
+    def delete(whitelistId: String, accountId: String): Future[Int] = deleteById1AndId2(id1 = whitelistId, id2 = accountId)
 
     def getWhitelistsMemberCount(whitelistId: String): Future[Int] = filterAndCount(_.whitelistId === whitelistId)
 

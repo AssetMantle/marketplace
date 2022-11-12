@@ -94,6 +94,10 @@ POST        /setProperties                                    controllers.NFTCon
 GET         /nftCollectionInfo                                controllers.NFTController.collectionInfo(nftId: String)
 GET         /deleteNftDraft                                   controllers.NFTController.deleteDraftForm(fileName: String, fileHash: String)
 POST        /deleteNftDraft                                   controllers.NFTController.deleteDraft()
+GET         /ownedSection                                     controllers.NFTController.ownedSection(accountId: String)
+GET         /ownedNFTsPerPage                                 controllers.NFTController.ownedNFTsPerPage(accountId: String, pageNumber: Int)
+GET         /offerSection                                     controllers.NFTController.offerSection()
+GET         /offeredNFTsPerPage                               controllers.NFTController.offeredNFTsPerPage(pageNumber: Int)
 
 GET         /settings                                         controllers.SettingController.viewSettings()
 GET         /profileSettings                                  controllers.SettingController.settings()
@@ -137,6 +141,9 @@ POST        /createWhitelist                                  controllers.Whitel
 
 GET         /editWhitelist                                    controllers.WhitelistController.editWhitelistForm(whitelistId: String)
 POST        /editWhitelist                                    controllers.WhitelistController.editWhitelist()
+
+GET         /createSale                                       controllers.SaleController.createWhitelistSaleForm(whitelistId: Option[String])
+POST        /createSale                                       controllers.SaleController.createWhitelistSale()
 
 # Should be not changed it will be public
 GET         /acceptWhitelistInvite/:whitelistId               controllers.WhitelistController.viewAcceptInviteDetails(whitelistId: String)

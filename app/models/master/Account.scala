@@ -110,7 +110,7 @@ class Accounts @Inject()(
       } yield ()
     }
 
-    def updateAccount(account: Account): Future[Unit] = update(account.serialize())
+    def update(account: Account): Future[Unit] = updateById(account.serialize())
 
     //    def validateUsernamePasswordAndGetAccount(username: String, password: String): Future[(Boolean, Account)] = {
     //      val account = tryGetById(username)
@@ -123,7 +123,7 @@ class Accounts @Inject()(
       val account = tryGetById(accountId)
       for {
         account <- account
-        _ <- update(account.copy(accountType = accountType))
+        _ <- updateById(account.copy(accountType = accountType))
       } yield ()
     }
 

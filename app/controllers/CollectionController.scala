@@ -40,14 +40,14 @@ class CollectionController @Inject()(
 
   implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)
 
-  def viewCollections(category: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollections(category: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         Future(Ok(views.html.collection.viewCollections(category)))
     }
   }
 
-  def viewCollection(id: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollection(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
@@ -60,14 +60,14 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionsSection(category: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionsSection(category: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         Future(Ok(views.html.collection.explore.collectionsSection(category)))
     }
   }
 
-  def collectionList(category: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionList(category: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val totalCollections = masterCollections.Service.total(category)
@@ -81,7 +81,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionsPerPage(category: String, pageNumber: Int): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionsPerPage(category: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
@@ -96,7 +96,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionNFTs(id: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionNFTs(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
@@ -110,7 +110,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionNFTsPerPage(id: String, pageNumber: Int): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionNFTsPerPage(id: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
@@ -133,7 +133,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def info(id: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def info(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
@@ -146,34 +146,36 @@ class CollectionController @Inject()(
     }
   }
 
-  // createdSection: Do not do caching here as it will then show draft collections to non-owners
-  def createdSection(accountId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      if (loginState.isDefined && loginState.get.username == accountId) {
-        val account = masterAccounts.Service.tryGet(loginState.get.username)
-        for {
-          account <- account
-        } yield Ok(views.html.profile.created.createdSection(accountId, account.accountType == constants.Account.Type.GENESIS_CREATOR))
-      } else Future(Ok(views.html.profile.created.createdSection(accountId, false)))
+  def createdSection(accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        if (loginState.isDefined && loginState.get.username == accountId) {
+          val account = masterAccounts.Service.tryGet(loginState.get.username)
+          for {
+            account <- account
+          } yield Ok(views.html.profile.created.createdSection(accountId, account.accountType == constants.Account.Type.GENESIS_CREATOR))
+        } else Future(Ok(views.html.profile.created.createdSection(accountId, allowCreateCollection = false)))
 
+    }
   }
 
-  // createdCollectionPerPage: Do not do caching here as it will then show draft collections to non-owners
-  def createdCollectionPerPage(accountId: String, pageNumber: Int): Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
-    implicit request =>
-      val collections = masterCollections.Service.getByCreatorAndPage(accountId, pageNumber)
-      val totalCreated = masterCollections.Service.totalCreated(accountId)
-      val drafts = if (pageNumber == 1 && optionalLoginState.fold("")(_.username) == accountId) masterTransactionCollectionDrafts.Service.getByCreatorAndPage(accountId, pageNumber)
-      else Future(Seq())
+  def createdCollectionPerPage(accountId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit optionalLoginState =>
+      implicit request =>
+        val collections = masterCollections.Service.getByCreatorAndPage(accountId, pageNumber)
+        val totalCreated = masterCollections.Service.totalCreated(accountId)
+        val drafts = if (pageNumber == 1 && optionalLoginState.fold("")(_.username) == accountId) masterTransactionCollectionDrafts.Service.getByCreatorAndPage(accountId, pageNumber)
+        else Future(Seq())
 
-      (for {
-        totalCreated <- totalCreated
-        collections <- collections
-        drafts <- drafts
-      } yield Ok(views.html.profile.created.collectionPerPage(collections, drafts = drafts, totalCollections = totalCreated))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
+        (for {
+          totalCreated <- totalCreated
+          collections <- collections
+          drafts <- drafts
+        } yield Ok(views.html.profile.created.collectionPerPage(collections, drafts = drafts, totalCollections = totalCreated))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
   }
 
   def createForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>

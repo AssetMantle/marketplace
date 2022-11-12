@@ -1,0 +1,18 @@
+@import views.html.base.form._
+@import views.sale.companion.CreateWhitelistSale
+
+@(createSaleForm: Form[CreateWhitelistSale.Data] = CreateWhitelistSale.form, collections: Map[String, String], whitelistId: Option[String], whitelists: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+    @commonForm(constants.Form.NFT_WHITELIST_SALE, createSaleForm) {
+        @commonCustomSelect(createSaleForm, constants.FormField.SELECT_COLLECTION_ID, collections)
+        @if(whitelistId.getOrElse("") != "") {
+            @commonCustomSelect(createSaleForm, constants.FormField.SELECT_WHITELIST_ID, whitelists, Symbol("value") -> whitelistId.get)
+        } else {
+            @commonCustomSelect(createSaleForm, constants.FormField.SELECT_WHITELIST_ID, whitelists)
+        }
+        @commonInputText(createSaleForm, constants.FormField.WHITELIST_SALE_NFT_FILE_NAMES)
+        @commonInputMicornumber(createSaleForm, constants.FormField.NFT_SALE_RATE)
+        @commonInputBigDecimal(createSaleForm, constants.FormField.NFT_SALE_CREATOR_FEE)
+        @commonInputEpochTIme(createSaleForm, constants.FormField.NFT_SALE_START_EPOCH, setCurrentTime = true)
+        @commonInputEpochTIme(createSaleForm, constants.FormField.NFT_SALE_END_EPOCH, setCurrentTime = false)
+    }

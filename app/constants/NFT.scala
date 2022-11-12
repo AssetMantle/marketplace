@@ -32,4 +32,9 @@ object NFT {
       case _ => false
     }
   }
+
+  object Sale {
+    val MaxSaleAmount: BigDecimal = BigDecimal("1000000000")
+    val MaxCreatorFee: BigDecimal = BigDecimal("40")
+  }
 }

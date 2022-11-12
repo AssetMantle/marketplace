@@ -99,7 +99,7 @@ class Whitelists @Inject()(
       val whitelist = tryGet(id)
       for {
         whitelist <- whitelist
-        _ <- update(whitelist.copy(name = name, description = description, maxMembers = maxMembers, startEpoch = startEpoch, endEpoch = endEpoch).serialize())
+        _ <- updateById(whitelist.copy(name = name, description = description, maxMembers = maxMembers, startEpoch = startEpoch, endEpoch = endEpoch).serialize())
       } yield ()
     }
 
@@ -112,6 +112,8 @@ class Whitelists @Inject()(
     def getByIds(whitelistIds: Seq[String]): Future[Seq[Whitelist]] = filter(_.id.inSet(whitelistIds)).map(_.map(_.deserialize))
 
     def hasWhitelist(accountId: String): Future[Boolean] = filter(_.ownerId === accountId).map(_.nonEmpty)
+
+    def getAll(ownerId: String) = filter(_.ownerId=== ownerId).map(_.map(x => x.id -> x.ownerId).toMap)
 
   }
 }

@@ -70,7 +70,5 @@ class NFTTags @Inject()(
 
     def getTagNamesForNFT(fileName: String): Future[Seq[String]] = filter(_.tagName === fileName).map(_.map(_.tagName))
 
-    def deleteTagName(tagName: String, fileName: String): Future[Int] = delete(id1 = tagName, id2 = fileName)
-
   }
 }

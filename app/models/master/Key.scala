@@ -240,7 +240,7 @@ class Keys @Inject()(
 
     def getActiveByAccountId(accountId: String): Future[Option[Key]] = filter(x => x.id1 === accountId && x.active).map(_.map(_.deserialize).headOption)
 
-    def deleteKey(accountId: String, address: String): Future[Int] = delete(accountId, address)
+    def delete(accountId: String, address: String): Future[Int] = deleteById1AndId2(accountId, address)
 
     def tryGet(accountId: String, address: String): Future[Key] = tryGetById(id1 = accountId, id2 = address).map(_.deserialize)
 

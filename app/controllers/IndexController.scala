@@ -34,7 +34,7 @@ class IndexController @Inject()(
       Future(Ok(views.html.collection.viewCollections()))
   }
 
-  def sitemap: EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), Duration(7, DAYS)) {
+  def sitemap: EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), Duration(7, DAYS)) {
     withoutLoginAction { implicit request =>
       Ok(utilities.Sitemap.generate).as("application/xml; charset=utf-8")
     }

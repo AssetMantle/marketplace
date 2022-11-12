@@ -36,14 +36,14 @@ class SettingController @Inject()(
 
   implicit val callbackOnSessionTimeout: Call = routes.SettingController.viewSettings()
 
-  def viewSettings(): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def viewSettings(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.setting.viewSettings())
     }
   }
 
-  def settings(): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def settings(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val keys = masterKeys.Service.getAll(loginState.username)
@@ -56,7 +56,7 @@ class SettingController @Inject()(
     }
   }
 
-  def walletPopup(): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def walletPopup(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val keys = masterKeys.Service.getAll(loginState.username)
@@ -214,7 +214,7 @@ class SettingController @Inject()(
           val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = deleteKeyData.address, password = deleteKeyData.password)
 
           def delete(validated: Boolean, key: master.Key) = if (!key.active) {
-            if (validated) masterKeys.Service.deleteKey(accountId = key.accountId, address = key.address) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+            if (validated) masterKeys.Service.delete(accountId = key.accountId, address = key.address) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
           } else constants.Response.CANNOT_DELETE_ACTIVE_KEY.throwFutureBaseException()
 
           (for {
@@ -252,7 +252,7 @@ class SettingController @Inject()(
       )
   }
 
-  def walletBalance(address: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def walletBalance(address: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val balance = blockchainBalances.Service.tryGet(address)

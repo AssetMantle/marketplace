@@ -47,7 +47,7 @@ abstract class GenericDaoImpl2[
 
   def customQuery[C](query: StreamingProfileAction[C, _, _]) = db.run(query)
 
-  def delete(id1: PK1, id2: PK2): Future[Int] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2).delete.asTry).map {
+  def deleteById1AndId2(id1: PK1, id2: PK2): Future[Int] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_DELETE_FAILED"), psqlException)

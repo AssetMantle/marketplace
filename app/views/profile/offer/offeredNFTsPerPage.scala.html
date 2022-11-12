@@ -1,0 +1,19 @@
+@import controllers.actions.LoginState
+@import models.master._
+
+@(pageNumber: Int, nfts: Seq[NFT], nftWhitelistSales: Seq[NFTWhitelistSale], collections: Seq[Collection])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@if(nftWhitelistSales.nonEmpty) {
+    @nftWhitelistSales.map { nftWhitelistSale =>
+        @defining(nfts.find(_.fileName == nftWhitelistSale.fileName)) { nft =>
+            @if(nft.isDefined) {
+                <div>@nft.get.name</div>
+                <div>@collections.find(_.id == nft.get.collectionId).map(_.name).getOrElse("")</div>
+                <div>@nftWhitelistSale.startTimeEpoch</div>
+                <div>@nftWhitelistSale.endTimeEpoch</div>
+            }
+        }
+    }
+} else {
+
+}

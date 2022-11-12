@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import models.master._
+@import views.html.nft.commonNFTCard
+
+@(nfts: Seq[NFT], collections: Seq[Collection], likedNFTs: Seq[WishList])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+<div class="row m-0 ownedNFTPage">
+    @if(nfts.nonEmpty) {
+        @nfts.map { nft =>
+            @commonNFTCard(collection = collections.find(_.id == nft.collectionId).get, nft = nft, liked = Option(likedNFTs.exists(_.nftId == nft.fileName)), onClickFunction = JavaScript(s"viewNFT('${nft.fileName}')"))
+        }
+    } else {
+        <div id="noOwnedNFTsPerPage" class="noNFT"></div>
+    }
+</div>

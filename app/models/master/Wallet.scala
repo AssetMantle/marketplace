@@ -93,7 +93,7 @@ class Wallets @Inject()(
 
     def get(address: String): Future[Option[Wallet]] = getById(address).map(_.map(_.deserialize))
 
-    def updateWallet(wallet: Wallet): Future[Unit] = update(wallet.serialize())
+    def update(wallet: Wallet): Future[Unit] = updateById(wallet.serialize())
 
     def getAllByAccountId(username: String): Future[Seq[Wallet]] = filter(_.accountId === username).map(_.map(_.deserialize))
 
