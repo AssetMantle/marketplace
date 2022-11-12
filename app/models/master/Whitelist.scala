@@ -113,7 +113,7 @@ class Whitelists @Inject()(
 
     def hasWhitelist(accountId: String): Future[Boolean] = filter(_.ownerId === accountId).map(_.nonEmpty)
 
-    def getAll(ownerId: String) = filter(_.ownerId=== ownerId).map(_.map(x => x.id -> x.ownerId).toMap)
+    def getAll(ownerId: String): Future[Map[String, String]] = filter(_.ownerId === ownerId).map(_.map(x => x.id -> x.name).toMap)
 
   }
 }

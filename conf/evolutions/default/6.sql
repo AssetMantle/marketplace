@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS MASTER."NFTWhitelistSale"
     "fileName"             VARCHAR NOT NULL,
     "whitelistId"          VARCHAR NOT NULL,
     "quantity"             BIGINT  NOT NULL,
-    "rate"                 NUMERIC NOT NULL,
+    "price"                NUMERIC NOT NULL,
     "denom"                VARCHAR NOT NULL,
     "creatorFee"           NUMERIC NOT NULL,
     "startTimeEpoch"       BIGINT  NOT NULL,
@@ -20,9 +20,9 @@ CREATE TABLE IF NOT EXISTS MASTER."NFTWhitelistSale"
 );
 
 ALTER TABLE MASTER."Collection"
-    DROP COLUMN "website";
+    DROP COLUMN IF EXISTS "website";
 ALTER TABLE MASTER."NFT"
-    DROP COLUMN "properties";
+    DROP COLUMN IF EXISTS "properties";
 ALTER TABLE MASTER."NFT"
     ADD COLUMN IF NOT EXISTS "ownerId" VARCHAR default null;
 ALTER TABLE MASTER."NFT"

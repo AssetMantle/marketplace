@@ -9,14 +9,14 @@ import utilities.MicroNumber
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class NFTWhitelistSale(id: String, fileName: String, whitelistId: String, quantity: Long, rate: MicroNumber, denom: String, creatorFee: BigDecimal, startTimeEpoch: Long, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class NFTWhitelistSale(id: String, fileName: String, whitelistId: String, quantity: Long, price: MicroNumber, denom: String, creatorFee: BigDecimal, startTimeEpoch: Long, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def serialize(): NFTWhitelistSales.NFTWhitelistSaleSerialized = NFTWhitelistSales.NFTWhitelistSaleSerialized(
     id = this.id,
     fileName = this.fileName,
     whitelistId = this.whitelistId,
     quantity = this.quantity,
-    rate = this.rate.toString,
+    price = this.price.toBigDecimal,
     denom = this.denom,
     startTimeEpoch = this.startTimeEpoch,
     endTimeEpoch = this.endTimeEpoch,
@@ -33,15 +33,15 @@ object NFTWhitelistSales {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class NFTWhitelistSaleSerialized(id: String, fileName: String, whitelistId: String, quantity: Long, rate: String, denom: String, creatorFee: BigDecimal, startTimeEpoch: Long, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
+  case class NFTWhitelistSaleSerialized(id: String, fileName: String, whitelistId: String, quantity: Long, price: BigDecimal, denom: String, creatorFee: BigDecimal, startTimeEpoch: Long, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
-    def deserialize: NFTWhitelistSale = NFTWhitelistSale(id = id, fileName = fileName, whitelistId = whitelistId, quantity = quantity, rate = rate, denom = denom, creatorFee = creatorFee, startTimeEpoch = startTimeEpoch, endTimeEpoch = endTimeEpoch, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+    def deserialize: NFTWhitelistSale = NFTWhitelistSale(id = id, fileName = fileName, whitelistId = whitelistId, quantity = quantity, price = MicroNumber(price), denom = denom, creatorFee = creatorFee, startTimeEpoch = startTimeEpoch, endTimeEpoch = endTimeEpoch, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
   }
 
   class NFTWhitelistSaleTable(tag: Tag) extends Table[NFTWhitelistSaleSerialized](tag, "NFTWhitelistSale") with ModelTable[String] {
 
-    def * = (id, fileName, whitelistId, quantity, rate, denom, creatorFee, startTimeEpoch, endTimeEpoch, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTWhitelistSaleSerialized.tupled, NFTWhitelistSaleSerialized.unapply)
+    def * = (id, fileName, whitelistId, quantity, price, denom, creatorFee, startTimeEpoch, endTimeEpoch, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTWhitelistSaleSerialized.tupled, NFTWhitelistSaleSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -51,7 +51,7 @@ object NFTWhitelistSales {
 
     def quantity = column[Long]("quantity")
 
-    def rate = column[String]("rate")
+    def price = column[BigDecimal]("price")
 
     def denom = column[String]("denom")
 
@@ -94,6 +94,8 @@ class NFTWhitelistSales @Inject()(
 
     def tryGet(fileName: String, whitelistId: String): Future[NFTWhitelistSale] = filterHead(x => x.fileName === fileName && x.whitelistId === whitelistId).map(_.deserialize)
 
-    def getByPageNumber(whitelistIds: Seq[String], pageNumber: Int) = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.whitelistId.inSet(whitelistIds))(_.endTimeEpoch).map(_.map(_.deserialize))
+    def tryGet(id: String): Future[NFTWhitelistSale] = filterHead(_.id === id).map(_.deserialize)
+
+    def getByPageNumber(whitelistIds: Seq[String], pageNumber: Int): Future[Seq[NFTWhitelistSale]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.whitelistId.inSet(whitelistIds))(_.endTimeEpoch).map(_.map(_.deserialize))
   }
 }
