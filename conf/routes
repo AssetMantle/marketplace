@@ -144,6 +144,9 @@ POST        /editWhitelist                                    controllers.Whitel
 
 GET         /createSale                                       controllers.SaleController.createWhitelistSaleForm(whitelistId: Option[String])
 POST        /createSale                                       controllers.SaleController.createWhitelistSale()
+GET         /selectCollectionNFTs                             controllers.SaleController.selectCollectionNFTs(pageNumber: Int, collectionid: String)
+GET         /acceptWhitelistSaleOffer                         controllers.SaleController.acceptWhitelistSaleOfferForm(id: String)
+POST        /acceptWhitelistSaleOffer                         controllers.SaleController.acceptWhitelistSaleOffer()
 
 # Should be not changed it will be public
 GET         /acceptWhitelistInvite/:whitelistId               controllers.WhitelistController.viewAcceptInviteDetails(whitelistId: String)
