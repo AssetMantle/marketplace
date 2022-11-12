@@ -2,15 +2,17 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
-import models.{master, masterTransaction}
+import models.{blockchain, master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import utilities.MicroNumber
 import views.sale.companion._
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class SaleController @Inject()(
@@ -20,7 +22,9 @@ class SaleController @Inject()(
                                 withLoginAction: WithLoginAction,
                                 withLoginActionAsync: WithLoginActionAsync,
                                 withoutLoginAction: WithoutLoginAction,
+                                blockchainBalances: blockchain.Balances,
                                 masterAccounts: master.Accounts,
+                                masterKeys: master.Keys,
                                 masterWhitelists: master.Whitelists,
                                 masterCollections: master.Collections,
                                 masterNFTs: master.NFTs,
@@ -97,18 +101,71 @@ class SaleController @Inject()(
       )
   }
 
-//  def acceptWhitelistSaleOfferForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-//    implicit request =>
-//      val whitelistSale = masterNFTWhitelistSales.Service.tryGet(id)
-//      def nft(fileName: String) = masterNFTs.Service.tryGet(fileName)
-//      def collection(id: String) = masterCollections.Service.tryGet(id)
-//
-//      for {
-//        whitelistSale <- whitelistSale
-//        nft <- nft(whitelistSale.fileName)
-//        collection <- collection(nft.collectionId)
-//      } yield Ok(views.html.sale.acceptWhitelistSaleOffer(collections = collections.toMap, whitelistId = whitelistId, whitelists = whitelists))
-//  }
+  def selectCollectionNFTs(pageNumber: Int, collectionId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val nfts = masterNFTs.Service.getByPageNumber(collectionId, pageNumber)
+        (for {
+          nfts <- nfts
+        } yield Ok(views.html.sale.selectCollectionNFTs(pageNumber, nfts))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def acceptWhitelistSaleOfferForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val whitelistSale = masterNFTWhitelistSales.Service.tryGet(id)
+
+      for {
+        whitelistSale <- whitelistSale
+      } yield Ok(views.html.sale.acceptWhitelistSaleOffer(saleId = id, whitelistSale = whitelistSale))
+  }
+
+  def acceptWhitelistSaleOffer(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      AcceptWhitelistSaleOffer.form.bindFromRequest().fold(
+        formWithErrors => {
+          val saleId = formWithErrors.data.getOrElse(constants.FormField.WHITELIST_SALE_ID.name, "")
+          val whitelistSale = masterNFTWhitelistSales.Service.tryGet(saleId)
+
+          for {
+            whitelistSale <- whitelistSale
+          } yield BadRequest(views.html.sale.acceptWhitelistSaleOffer(formWithErrors, saleId = saleId, whitelistSale = whitelistSale))
+        },
+        acceptWhitelistSaleOfferData => {
+          val keyValidPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = acceptWhitelistSaleOfferData.password)
+          val whitelistSale = masterNFTWhitelistSales.Service.tryGet(acceptWhitelistSaleOfferData.saleId)
+          val balance = blockchainBalances.Service.tryGet(loginState.address)
+
+          def validateAndTransfer(validPassword: Boolean, key: master.Key, whitelistSale: master.NFTWhitelistSale, balance: blockchain.Balance) = {
+            if (validPassword) {
+              if (balance.coins.find(_.denom == whitelistSale.denom).map(_.amount).getOrElse(MicroNumber.zero) >= whitelistSale.price) {
+                Future()
+              } else constants.Response.INSUFFICIENT_BALANCE.throwFutureBaseException()
+            } else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+          }
+
+          (for {
+            whitelistSale <- whitelistSale
+            (validPassword, key) <- keyValidPassword
+            balance <- balance
+            _ <- validateAndTransfer(validPassword, key, whitelistSale, balance)
+          } yield PartialContent(views.html.sale.createSuccessful())
+            ).recover {
+            case baseException: BaseException => {
+              try {
+                val whitelistSale = Await.result(masterNFTWhitelistSales.Service.tryGet(acceptWhitelistSaleOfferData.saleId), Duration.Inf)
+                BadRequest(views.html.sale.acceptWhitelistSaleOffer(AcceptWhitelistSaleOffer.form.withGlobalError(baseException.failure.message), saleId = acceptWhitelistSaleOfferData.saleId, whitelistSale = whitelistSale))
+              } catch {
+                case baseException: BaseException => BadRequest(baseException.failure.message).withNewSession
+              }
+            }
+          }
+        }
+      )
+  }
 
 
 }

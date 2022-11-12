@@ -70,6 +70,7 @@ object FormField {
   val COLLECTION_TWITTER: StringFormField = StringFormField("COLLECTION_TWITTER", 1, 15, RegularExpression.TWITTER_USERNAME)
   val COLLECTION_INSTAGRAM: StringFormField = StringFormField("COLLECTION_INSTAGRAM", 1, 30, RegularExpression.INSTAGRAM_USERNAME)
   val WHITELIST_SALE_NFT_FILE_NAMES: StringFormField = StringFormField("WHITELIST_SALE_NFT_FILE_NAMES", 1, Int.MaxValue)
+  val WHITELIST_SALE_ID: StringFormField = StringFormField("WHITELIST_SALE_ID", 16, 16)
 
   // UrlFormField
   val COLLECTION_WEBSITE: UrlFormField = UrlFormField("COLLECTION_WEBSITE")

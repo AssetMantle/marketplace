@@ -1,0 +1,10 @@
+@import views.html.base.form._
+@import views.sale.companion.AcceptWhitelistSaleOffer
+@import models.master._
+
+@(acceptWhitelistSaleForm: Form[AcceptWhitelistSaleOffer.Data] = AcceptWhitelistSaleOffer.form, saleId: String, whitelistSale: NFTWhitelistSale)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.NFT_WHITELIST_SALE_ACCEPT_OFFER, acceptWhitelistSaleForm) {
+    @commonInputText(acceptWhitelistSaleForm, constants.FormField.WHITELIST_SALE_ID, Symbol("value") -> saleId, Symbol("readonly") -> true, Symbol("containerDivClass") -> "hidden")
+    @commonInputPassword(acceptWhitelistSaleForm, constants.FormField.PASSWORD)
+}
