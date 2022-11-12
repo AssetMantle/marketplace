@@ -131,6 +131,8 @@ class Accounts @Inject()(
 
     def tryGet(username: String): Future[Account] = tryGetById(username).map(_.deserialize)
 
+    def isVerifiedCreator(username: String): Future[Boolean] = tryGetById(username).map(x => x.accountType == constants.Account.Type.GENESIS_CREATOR || x.accountType == constants.Account.Type.VERIFIED_CREATOR)
+
     def get(username: String): Future[Option[Account]] = getById(username).map(_.map(_.deserialize))
 
     def getLanguage(id: String): Future[Lang] = get(id).map(x => x.fold(Lang("en"))(_.language))

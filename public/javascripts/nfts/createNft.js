@@ -63,3 +63,7 @@ function addProperty(property){
     countHashtags();
     createHashtag();
 }
+
+function setTagBackButton(collectionId, fileName){
+    $("#modalBackButton").attr("onclick", `getForm(jsRoutes.controllers.NFTController.basicDetailsForm('${collectionId}', '${fileName}'))`);
+}

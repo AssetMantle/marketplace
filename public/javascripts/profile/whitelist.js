@@ -96,7 +96,7 @@ $(function () {
     $('[data-toggle="tooltip"]').tooltip();
 })
 
-function whitelistMember(form, route, snackBarMessage) {
+function whitelistMember(form, route, snackBarMessage, fieldIndex) {
     $.ajax({
         url: route.url,
         type: 'POST',
@@ -106,6 +106,7 @@ function whitelistMember(form, route, snackBarMessage) {
         statusCode: {
             200: function () {
                 showSnackbar('', snackBarMessage, 'info');
+                $("#whitelistUser_"+fieldIndex).remove();
             },
             401: function () {
                 console.log("400 response");
@@ -117,9 +118,9 @@ function whitelistMember(form, route, snackBarMessage) {
     });
 }
 
-function removeWhitelistMember(username, removedMessage){
+function removeWhitelistMember(username, removedMessage, index){
     const form = $("#removeWhitelistMember_" + username + " form");
-    whitelistMember(form, jsRoutes.controllers.WhitelistController.deleteMember(), removedMessage);
+    whitelistMember(form, jsRoutes.controllers.WhitelistController.deleteMember(), removedMessage, index);
 }
 
 function searchMember() {

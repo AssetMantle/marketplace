@@ -18,13 +18,13 @@ function loadMoreNFTs(collectionId) {
             type: route.type,
             async: true,
             beforeSend: function () {
-                loading.classList.add('show');
+                // loading.classList.add('show');
                 if ($(".noNFT").length === 0) {
                     $("#loadMoreBtnContainer").addClass("hide");
                 }
             },
             complete: function () {
-                loading.classList.remove('show');
+                // loading.classList.remove('show');
                 if ($(".noNFT").length === 0) {
                     $("#loadMoreBtnContainer").removeClass("hide");
                 }

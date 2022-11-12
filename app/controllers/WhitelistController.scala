@@ -36,13 +36,13 @@ class WhitelistController @Inject()(
   def whitelistSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
-        val isCreator = masterCollections.Service.isCreator(loginState.username)
+        val isVerifiedCreator = masterAccounts.Service.isVerifiedCreator(loginState.username)
         val whitelistsMade = masterWhitelists.Service.totalWhitelistsByOwner(loginState.username)
 
         (for {
-          isCreator <- isCreator
+          isVerifiedCreator <- isVerifiedCreator
           whitelistsMade <- whitelistsMade
-        } yield Ok(views.html.profile.whitelist.whitelistSection(isCreator = isCreator, whitelistsMade = whitelistsMade))
+        } yield Ok(views.html.profile.whitelist.whitelistSection(isVerifiedCreator = isVerifiedCreator, whitelistsMade = whitelistsMade))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

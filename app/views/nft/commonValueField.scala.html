@@ -8,12 +8,16 @@
                 <div class="dropdown" id="booleanOptionList">
                     <input type="hidden" class="dp-input" value=""/>
                     <div class="dropdownHead" onclick="showOptions(this)">
+                    @if(propertyValue.nonEmpty) {
+                        <div class="currentSelected">@propertyValue</div>
+                    }else{
                         <div class="currentSelected">@Messages(constants.View.NFT_PROPERTY_BOOLEAN_FIELD_LABEL)</div>
+                    }
                     </div>
                     <div class="dropdownBody">
                         <div class="dropdownBodyInner">
-                            <div class="dropdownItem" value="true" onclick="setOption(this); setBooleanValue(@index, 'true');">True</div>
-                            <div class="dropdownItem" value="false" onclick="setOption(this); setBooleanValue(@index, 'false');">False</div>
+                            <div class="dropdownItem" value="@constants.NFT.Data.TRUE" onclick="setOption(this); setBooleanValue(@index, '@constants.NFT.Data.TRUE');">@Messages(constants.View.TRUE)</div>
+                            <div class="dropdownItem" value="@constants.NFT.Data.FALSE" onclick="setOption(this); setBooleanValue(@index, '@constants.NFT.Data.FALSE');">@Messages(constants.View.FALSE)</div>
                         </div>
                     </div>
                 </div>
