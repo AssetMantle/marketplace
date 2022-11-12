@@ -108,7 +108,7 @@ object FormField {
 
   // MicroNumberFormField
   val SEND_COIN_AMOUNT: MicroNumberFormField = MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.zero, MicroNumber(Int.MaxValue), 6)
-  val NFT_SALE_RATE: MicroNumberFormField = MicroNumberFormField("NFT_SALE_RATE", MicroNumber.zero, MicroNumber(Int.MaxValue))
+  val NFT_WHITELIST_SALE_PRICE: MicroNumberFormField = MicroNumberFormField("NFT_WHITELIST_SALE_PRICE", MicroNumber.zero, MicroNumber(Int.MaxValue))
 
   // NestedFormField
   val COLLECTION_PROPERTIES: NestedFormField = NestedFormField("COLLECTION_PROPERTIES")

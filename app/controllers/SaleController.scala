@@ -54,7 +54,7 @@ class SaleController @Inject()(
       for {
         whitelists <- whitelists
         collections <- collections
-      } yield Ok(views.html.sale.createWhitelistSale(whitelists = whitelists, whitelistId = whitelistId, collections = collections.toMap))
+      } yield Ok(views.html.sale.createWhitelistSale(collections = collections.toMap, whitelistId = whitelistId, whitelists = whitelists))
   }
 
   def createWhitelistSale(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -75,7 +75,7 @@ class SaleController @Inject()(
 
           def addToSale(isCollectionOwner: Boolean, verifyNFTsCollection: Boolean) = if (isCollectionOwner && verifyNFTsCollection) {
             if (createData.nftFileNames.isDefined && createData.nftFileNames.get.split(",").nonEmpty) masterNFTWhitelistSales.Service.add(createData.toNFTWhitelistSales(quantity = 1, fileNames = createData.nftFileNames.get.split(","), denom = constants.Blockchain.StakingToken))
-            else  {
+            else {
               val nftIds = masterNFTs.Service.getIdsAllForCollection(createData.collectionId)
               for {
                 nftIds <- nftIds
@@ -96,5 +96,19 @@ class SaleController @Inject()(
         }
       )
   }
+
+//  def acceptWhitelistSaleOfferForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+//    implicit request =>
+//      val whitelistSale = masterNFTWhitelistSales.Service.tryGet(id)
+//      def nft(fileName: String) = masterNFTs.Service.tryGet(fileName)
+//      def collection(id: String) = masterCollections.Service.tryGet(id)
+//
+//      for {
+//        whitelistSale <- whitelistSale
+//        nft <- nft(whitelistSale.fileName)
+//        collection <- collection(nft.collectionId)
+//      } yield Ok(views.html.sale.acceptWhitelistSaleOffer(collections = collections.toMap, whitelistId = whitelistId, whitelists = whitelists))
+//  }
+
 
 }

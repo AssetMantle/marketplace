@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS MASTER."NFTWhitelistSale"
     "fileName"             VARCHAR NOT NULL,
     "whitelistId"          VARCHAR NOT NULL,
     "quantity"             BIGINT  NOT NULL,
-    "rate"                 NUMERIC NOT NULL,
+    "price"                NUMERIC NOT NULL,
     "denom"                VARCHAR NOT NULL,
     "creatorFee"           NUMERIC NOT NULL,
     "startTimeEpoch"       BIGINT  NOT NULL,
