@@ -98,7 +98,23 @@ class SaleController @Inject()(
             _ <- addToSale(collection = collection, collectionAnalysis = collectionAnalysis)
           } yield PartialContent(views.html.sale.createSuccessful())
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.sale.createWhitelistSale(CreateWhitelistSale.form.withGlobalError(baseException.failure.message), Map(), whitelistId = Option(createData.whitelistId), Map()))
+            case baseException: BaseException => {
+              try {
+                val collections = masterCollections.Service.getByCreator(loginState.username)
+                val whitelists = masterWhitelists.Service.getAll(loginState.username)
+
+                def totalNFTs(ids: Seq[String]) = collectionsAnalysis.Service.getForCollections(ids)
+
+                val result = for {
+                  whitelists <- whitelists
+                  collections <- collections
+                  totalNFTs <- totalNFTs(collections.map(_._1))
+                } yield BadRequest(views.html.sale.createWhitelistSale(CreateWhitelistSale.form.withGlobalError(baseException.failure.message), whitelists = whitelists, whitelistId = Option(createData.whitelistId), collections = collections.map(x => x._1 -> s"${x._2} (${totalNFTs.find(_.id == x._1).fold("0")(_.totalNFTs.toString)})").toMap))
+                Await.result(result, Duration.Inf)
+              } catch {
+                case baseException: BaseException => BadRequest(views.html.sale.createWhitelistSale(CreateWhitelistSale.form.withGlobalError(baseException.failure.message), Map(), whitelistId = Option(createData.whitelistId), Map()))
+              }
+            }
           }
         }
       )
