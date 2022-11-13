@@ -149,13 +149,7 @@ class CollectionController @Inject()(
   // createdSection: Do not do caching here as it will then show draft collections to non-owners
   def createdSection(accountId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      if (loginState.isDefined && loginState.get.username == accountId) {
-        val account = masterAccounts.Service.tryGet(loginState.get.username)
-        for {
-          account <- account
-        } yield Ok(views.html.profile.created.createdSection(accountId, account.accountType == constants.Account.Type.GENESIS_CREATOR))
-      } else Future(Ok(views.html.profile.created.createdSection(accountId, false)))
-
+      Future(Ok(views.html.profile.created.createdSection(accountId, allowCreateCollection = loginState.fold("")(_.username) == accountId)))
   }
 
   // createdCollectionPerPage: Do not do caching here as it will then show draft collections to non-owners
@@ -193,8 +187,7 @@ class CollectionController @Inject()(
         createData => {
           val account = masterAccounts.Service.tryGet(loginState.username)
 
-          def collectionDraft(account: Account) = if (account.accountType == constants.Account.Type.GENESIS_CREATOR) masterTransactionCollectionDrafts.Service.add(name = createData.name, description = createData.description, socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw)
-          else constants.Response.NOT_GENESIS_CREATOR.throwFutureBaseException()
+          def collectionDraft(account: Account) = masterTransactionCollectionDrafts.Service.add(name = createData.name, description = createData.description, socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw)
 
           (for {
             account <- account

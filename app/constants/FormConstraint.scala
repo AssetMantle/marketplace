@@ -93,6 +93,13 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
+  val createCollectionConstraint: Constraint[collection.Create.Data] = Constraint("constraints.CreateCollection")({ createData: collection.Create.Data =>
+    val errors = Seq(
+      if (!createData.termsAccepted) Option(ValidationError(constants.Response.TERMS_AND_CONDITION_NOT_ACCEPTED.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
   val collectionPropertiesConstraint: Constraint[collection.DefineProperties.Property] = Constraint("constraints.DefinePropertiesProperty")({ propertyData: collection.DefineProperties.Property =>
     val errors = Seq(
       if (!constants.NFT.Data.TypesList.contains(propertyData.propertyType)) Option(ValidationError(constants.Response.NFT_PROPERTY_TYPE_NOT_FOUND.message)) else None,
