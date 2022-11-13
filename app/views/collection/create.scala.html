@@ -12,6 +12,7 @@
         @commonInputURL(createForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false)
         @commonInputText(createForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false)
         @commonInputText(createForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)
+        @commonToggleButton(createForm, constants.FormField.CREATE_COLLECTION_TERMS_AND_CONDITION)
     }
 } else {
     <div class="d-flex gap-3 align-items-center maxDraftLimitInfo">
