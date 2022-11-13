@@ -1,5 +1,6 @@
 package service
 
+import models.analytics.{CollectionAnalysis, CollectionsAnalysis}
 import models.master
 import models.master.Collection
 import play.api.libs.json.Reads
@@ -12,6 +13,7 @@ import scala.io.{Source => ScalaSource}
 
 @Singleton
 class Starter @Inject()(
+                         collectionsAnalysis: CollectionsAnalysis,
                          masterAccounts: master.Accounts,
                          masterCollections: master.Collections,
                          masterCollectionFiles: master.CollectionFiles,
@@ -40,10 +42,30 @@ class Starter @Inject()(
     obj
   }
 
+  private def updateCollectionAnalysis() = {
+    val collections = masterCollections.Service.fetchAll()
+
+    def updateAnalytics(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
+      val totalNFTs = masterNFTs.Service.countNFTs(collection.id)
+
+      def update(totalNFTs: Int) = collectionsAnalysis.Service.add(CollectionAnalysis(id = collection.id, totalNFTs = totalNFTs, totalSold = 0, totalTraded = 0, floorPrice = 0, totalVolume = 0, bestOffer = 0, listed = 0, owners = 0, uniqueOwners = 0))
+
+      for {
+        totalNFTs <- totalNFTs
+        _ <- update(totalNFTs)
+      } yield ()
+    }
+
+    for {
+      collections <- collections
+      _ <- updateAnalytics(collections)
+    } yield ()
+  }
+
   def start(): Future[Unit] = {
 
     (for {
-      _ <- Future()
+      _ <- updateCollectionAnalysis()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)

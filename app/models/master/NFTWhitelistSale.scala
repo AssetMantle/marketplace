@@ -76,6 +76,7 @@ object NFTWhitelistSales {
 
 @Singleton
 class NFTWhitelistSales @Inject()(
+                                   masterNFTs: NFTs,
                                    protected val databaseConfigProvider: DatabaseConfigProvider
                                  )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[NFTWhitelistSales.NFTWhitelistSaleTable, NFTWhitelistSales.NFTWhitelistSaleSerialized, String](
@@ -97,5 +98,17 @@ class NFTWhitelistSales @Inject()(
     def tryGet(id: String): Future[NFTWhitelistSale] = filterHead(_.id === id).map(_.deserialize)
 
     def getByPageNumber(whitelistIds: Seq[String], pageNumber: Int): Future[Seq[NFTWhitelistSale]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.whitelistId.inSet(whitelistIds))(_.endTimeEpoch).map(_.map(_.deserialize))
+  }
+
+  object Utility {
+
+    def addRandomNFTsForSale(whitelistId: String, collectionId: String, numberOfNFTs: Int, price: MicroNumber, denom: String, creatorFee: BigDecimal, startTimeEpoch: Long, endTimeEpoch: Long): Future[Unit] = {
+      val randomNumberNFTs = masterNFTs.Service.getRandomNFTs(collectionId, numberOfNFTs)
+
+      for {
+        randomNumberNFTs <- randomNumberNFTs
+        _ <- Service.add(randomNumberNFTs.map(x => NFTWhitelistSale(id = utilities.IdGenerator.getRandomHexadecimal, fileName = x, whitelistId = whitelistId, quantity = 1, price = price, denom = denom, creatorFee = creatorFee, startTimeEpoch = startTimeEpoch, endTimeEpoch = endTimeEpoch)))
+      } yield ()
+    }
   }
 }

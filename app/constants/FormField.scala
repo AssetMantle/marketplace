@@ -69,7 +69,6 @@ object FormField {
   val NFT_PROPERTY_VALUE: StringFormField = StringFormField("NFT_PROPERTY_VALUE", 1, 30)
   val COLLECTION_TWITTER: StringFormField = StringFormField("COLLECTION_TWITTER", 1, 15, RegularExpression.TWITTER_USERNAME)
   val COLLECTION_INSTAGRAM: StringFormField = StringFormField("COLLECTION_INSTAGRAM", 1, 30, RegularExpression.INSTAGRAM_USERNAME)
-  val WHITELIST_SALE_NFT_FILE_NAMES: StringFormField = StringFormField("WHITELIST_SALE_NFT_FILE_NAMES", 1, Int.MaxValue)
   val WHITELIST_SALE_ID: StringFormField = StringFormField("WHITELIST_SALE_ID", 16, 16)
 
   // UrlFormField
@@ -78,6 +77,7 @@ object FormField {
   // IntFormField
   val GAS_AMOUNT: IntFormField = IntFormField("GAS_AMOUNT", 20000, 2000000)
   val WHITELIST_MAX_MEMBERS: IntFormField = IntFormField("WHITELIST_MAX_MEMBERS", 1, Int.MaxValue)
+  val WHITELIST_SALE_NFT_NUMBER: IntFormField = IntFormField("WHITELIST_SALE_NFT_NUMBER", 1, Int.MaxValue)
 
   // EpochFormField
   val WHITELIST_INVITE_START_EPOCH: EpochFormField = EpochFormField("WHITELIST_INVITE_START_EPOCH", 1, Int.MaxValue)

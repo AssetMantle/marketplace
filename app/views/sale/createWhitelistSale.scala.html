@@ -1,18 +1,19 @@
 @import views.html.base.form._
 @import views.sale.companion.CreateWhitelistSale
+@import models.analytics.CollectionAnalysis
 
 @(createSaleForm: Form[CreateWhitelistSale.Data] = CreateWhitelistSale.form, collections: Map[String, String], whitelistId: Option[String], whitelists: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-    @commonForm(constants.Form.NFT_WHITELIST_SALE, createSaleForm) {
-        @commonCustomSelect(createSaleForm, constants.FormField.SELECT_COLLECTION_ID, collections)
-        @commonInputText(createSaleForm, constants.FormField.WHITELIST_SALE_NFT_FILE_NAMES, Symbol("required") -> false)
-        @if(whitelistId.getOrElse("") != "") {
-            @commonCustomSelect(createSaleForm, constants.FormField.SELECT_WHITELIST_ID, whitelists, Symbol("value") -> whitelistId.get)
-        } else {
-            @commonCustomSelect(createSaleForm, constants.FormField.SELECT_WHITELIST_ID, whitelists)
-        }
-        @commonInputMicornumber(createSaleForm, constants.FormField.NFT_WHITELIST_SALE_PRICE)
-        @commonInputBigDecimal(createSaleForm, constants.FormField.NFT_SALE_CREATOR_FEE)
-        @commonInputEpochTIme(createSaleForm, constants.FormField.NFT_SALE_START_EPOCH, setCurrentTime = true)
-        @commonInputEpochTIme(createSaleForm, constants.FormField.NFT_SALE_END_EPOCH, setCurrentTime = false)
+@commonForm(constants.Form.NFT_WHITELIST_SALE, createSaleForm) {
+    @commonCustomSelect(createSaleForm, constants.FormField.SELECT_COLLECTION_ID, collections)
+    @commonInputInt(createSaleForm, constants.FormField.WHITELIST_SALE_NFT_NUMBER)
+    @if(whitelistId.getOrElse("") != "") {
+        @commonCustomSelect(createSaleForm, constants.FormField.SELECT_WHITELIST_ID, whitelists, Symbol("value") -> whitelistId.get)
+    } else {
+        @commonCustomSelect(createSaleForm, constants.FormField.SELECT_WHITELIST_ID, whitelists)
     }
+    @commonInputMicornumber(createSaleForm, constants.FormField.NFT_WHITELIST_SALE_PRICE)
+    @commonInputBigDecimal(createSaleForm, constants.FormField.NFT_SALE_CREATOR_FEE)
+    @commonInputEpochTIme(createSaleForm, constants.FormField.NFT_SALE_START_EPOCH, setCurrentTime = true)
+    @commonInputEpochTIme(createSaleForm, constants.FormField.NFT_SALE_END_EPOCH, setCurrentTime = false)
+}
