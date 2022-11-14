@@ -4,6 +4,7 @@
 @(createForm: Form[Create.Data] = Create.form, totalDrafts: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @if(totalDrafts < constants.CommonConfig.MaxCollectionDrafts) {
+    <div id="createCollectionForm">
     @commonForm(constants.Form.CREATE_COLLECTION, createForm) {
         @commonInputText(createForm, constants.FormField.COLLECTION_NAME)
         @commonDescriptionText(createForm, constants.FormField.COLLECTION_DESCRIPTION)
@@ -12,10 +13,45 @@
         @commonInputURL(createForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false)
         @commonInputText(createForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false)
         @commonInputText(createForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)
+
+        <div class="d-flex align-items-center mt-4">
+            @commonCheckbox(createForm, constants.FormField.CREATE_COLLECTION_TERMS_AND_CONDITION, Symbol("id") -> "termsCondition", Symbol("oninput") -> """activeButton()""")
+            <span class="termsConditionMessage">
+                <label for="termsCondition">
+                @Messages(constants.View.CREATE_COLLECTION_TERMS_CONDITION_MESSAGE)
+                </label>
+                <a class="link" onclick="showHideModalScreen('#createCollectionTermsConditionModal', '#createCollectionForm')">@Messages(constants.View.TERMS_CONDITION_LABEL)</a>
+            </span>
+        </div>
+
+        <div class="d-flex align-items-center mt-4">
+            <span class="me-0 ms-0 termsConditionMessage">
+                <a class="link" onclick="showHideModalScreen('#createCollectionTypeform', '#createCollectionForm')" style="text-transform: none !important; ">@Messages(constants.View.TYPE_FORM_LINK)</a>
+            </span>
+        </div>
     }
+    </div>
+
+    <div id="createCollectionTypeform" style="display: none;">
+        <div class="header-with-icon mb-3">
+            <div class="d-flex align-items-center form-top">
+                <div class="title-icon back-button-icon" onclick="showHideModalScreen('#createCollectionForm', '#createCollectionTypeform')">
+                    <i class="bi bi-chevron-left iconDefault"></i>
+                </div>
+                <div class="title-text">@Messages(constants.View.CREATE_COLLECTION_TYPE_FORM_TITLE)</div>
+            </div>
+        </div>
+        <script type="text/javascript" src="@routes.Assets.versioned("javascripts/typeFormEmbed.js")"></script>
+        <iframe class="airtable-embed airtable-dynamic-height" src="https://airtable.com/embed/shrdCR3ZZIElFFDFA?backgroundColor=purple" frameborder="0" onmousewheel="" width="100%" height="400" style="background: transparent; border: 1px solid #ccc;"></iframe>
+    </div>
+
+    <div id="createCollectionTermsConditionModal" style="display: none;">
+    @views.html.collection.termsConditions()
+    </div>
 } else {
     <div class="d-flex gap-3 align-items-center maxDraftLimitInfo">
         <i class="bi bi-info-circle iconDefault iconLarge"></i>
         @Messages(constants.View.MAX_DRAFT_COLLECTIONS_REACHED)
     </div>
 }
+<script src="@routes.Assets.versioned("javascripts/collections/createCollection.js")"></script>

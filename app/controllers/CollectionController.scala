@@ -195,8 +195,7 @@ class CollectionController @Inject()(
         createData => {
           val account = masterAccounts.Service.tryGet(loginState.username)
 
-          def collectionDraft(account: Account) = if (account.accountType == constants.Account.Type.GENESIS_CREATOR) masterTransactionCollectionDrafts.Service.add(name = createData.name, description = createData.description, socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw)
-          else constants.Response.NOT_GENESIS_CREATOR.throwFutureBaseException()
+          def collectionDraft(account: Account) = masterTransactionCollectionDrafts.Service.add(name = createData.name, description = createData.description, socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw)
 
           (for {
             account <- account

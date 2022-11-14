@@ -96,7 +96,7 @@ object FormField {
   val COLLECTION_PROPERTY_MUTABLE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_MUTABLE")
   val COLLECTION_PROPERTY_SET_DEFAULT_VALUE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_SET_DEFAULT_VALUE")
   val COLLECTION_PROPERTY_HIDE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_HIDE")
-
+  val CREATE_COLLECTION_TERMS_AND_CONDITION: BooleanFormField = BooleanFormField("CREATE_COLLECTION_TERMS_AND_CONDITION")
 
   // SelectFormField
   val GAS_PRICE: SelectFormField = SelectFormField("GAS_PRICE", Seq(constants.CommonConfig.Blockchain.LowGasPrice.toString, constants.CommonConfig.Blockchain.MediumGasPrice.toString, constants.CommonConfig.Blockchain.HighGasPrice.toString))

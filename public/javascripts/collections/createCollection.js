@@ -245,3 +245,36 @@ $(".selectedBooleanType").each((index,element)=>{
 function setDefinePropertyBackButton(collectionId){
     $("#modalBackButton").attr("onclick", `getForm(jsRoutes.controllers.CollectionController.uploadCollectionFilesForm('${collectionId}'))`);
 }
+
+flag1 = 0;
+flag2 = 0;
+$(document).ready(function () {
+    $('#FORM_CREATE_COLLECTION_SUBMIT').addClass("disable");
+});
+
+$("#COLLECTION_NAME").on("keyup",function(){
+    if($("#COLLECTION_NAME").val() !== ""){
+        flag1 = 1;
+    }else{
+        flag1 = 0;
+    }
+    activeButton();
+});
+
+$("#COLLECTION_DESCRIPTION").on("keyup",function(){
+    if($("#COLLECTION_DESCRIPTION").val() !== ""){
+        flag2 = 1;
+    }else{
+        flag2 = 0;
+    }
+    activeButton();
+});
+
+function activeButton() {
+    let termsCondition = document.getElementById("termsCondition");
+    if(flag1 !== 0 && flag2 !== 0 && termsCondition.checked === true){
+        $("#FORM_CREATE_COLLECTION_SUBMIT").removeClass("disable");
+    } else {
+        $("#FORM_CREATE_COLLECTION_SUBMIT").addClass("disable");
+    }
+}
