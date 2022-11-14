@@ -74,6 +74,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.ownedNFTsPerPage,
         routes.javascript.NFTController.offerSection,
         routes.javascript.NFTController.offeredNFTsPerPage,
+        routes.javascript.NFTController.modalView,
 
         routes.javascript.SettingController.viewSettings,
         routes.javascript.SettingController.settings,

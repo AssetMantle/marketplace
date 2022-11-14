@@ -454,4 +454,23 @@ class NFTController @Inject()(
     }
   }
 
+  def modalView(fileName: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val nft = masterNFTs.Service.tryGet(fileName)
+        val nftProperties = masterNFTProperties.Service.getForNFT(fileName)
+
+        def getCollection(collectionID: String) = masterCollections.Service.tryGet(collectionID)
+
+        (for {
+          nft <- nft
+          nftProperties <- nftProperties
+          collection <- getCollection(nft.collectionId)
+        } yield Ok(views.html.nft.modalView(collection, nft, nftProperties))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
 }

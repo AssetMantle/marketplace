@@ -24,7 +24,7 @@
                                         @if(nft.isDefined) {
                                             <tr>
                                                 <td class="text-end tableFieldNo">@(index + 1)</td>
-                                                <td class="tableFieldName">@nft.get.name</td>
+                                                <td onclick="getForm(jsRoutes.controllers.NFTController.modalView('@nft.get.fileName'))" class="tableFieldName">@nft.get.name</td>
                                                 <td class="tableFieldName">@collections.find(_.id == nft.get.collectionId).map(_.name).getOrElse("")</td>
                                                 <td class="tableFieldStartEpoch">
                                                     <span id="startEpoch_@nftWhitelistSale.id">@nftWhitelistSale.startTimeEpoch</span> -

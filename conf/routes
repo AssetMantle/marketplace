@@ -79,6 +79,7 @@ GET         /nftDetails                                       controllers.NFTCon
 GET         /nftInfo                                          controllers.NFTController.info( nftId: String)
 GET         /nftFile                                          controllers.NFTController.file( nftId: String)
 GET         /likesCounter                                     controllers.NFTController.likesCounter(nftId: String)
+GET         /nftModalView                                     controllers.NFTController.modalView(fileName: String)
 
 # Create NFT
 GET         /selectCollection                                 controllers.NFTController.selectCollection()
