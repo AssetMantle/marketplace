@@ -134,7 +134,7 @@ object Response {
   val NOT_GENESIS_CREATOR = new Failure("NOT_GENESIS_CREATOR")
   val COLLECTION_NOT_FOUND = new Failure("COLLECTION_NOT_FOUND")
   val NOT_COLLECTION_OWNER_OR_COLLECTION_NOT_PUBLIC = new Failure("NOT_COLLECTION_OWNER_OR_COLLECTION_NOT_PUBLIC")
-  val INVALID_NUMBER_OF_NFTS = new Failure("INVALID_NUMBER_OF_NFTS")
+  val NOT_ENOUGH_NFTS_IN_COLLECTION = new Failure("NOT_ENOUGH_NFTS_IN_COLLECTION")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
