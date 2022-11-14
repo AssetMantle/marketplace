@@ -1,9 +1,9 @@
-@import views.html.nft._
 @import controllers.actions.LoginState
 @import models.masterTransaction.NFTDraft
+@import views.html.nft._
 
 @(collection: master.Collection, nfts: Seq[master.NFT], likedNFTIds: Seq[String], nftDrafts: Seq[NFTDraft], pageNumber: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
-<div class="row m-0 nftPage">
+
 
     @if(loginState.fold("")(_.username) == collection.creatorId && pageNumber == 1) {
         <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 createNFTCard" onclick="getForm(jsRoutes.controllers.NFTController.uploadNFTFileForm('@collection.id'))">
@@ -21,7 +21,7 @@
                 </div>
             </div>
         </div>
-        @nftDrafts.map{nftDraft =>
+        @nftDrafts.map { nftDraft =>
             @commonNFTCard(collection, nftDraft.toNFT(collection.creatorId), None, JavaScript(s"getForm(jsRoutes.controllers.NFTController.basicDetailsForm('${nftDraft.collectionId}','${nftDraft.fileName}'))"), draft = true)
         }
     }
@@ -37,6 +37,5 @@
     } else {
         <div class="noNFT"></div>
     }
-</div>
 
-<script src="@routes.Assets.versioned("javascripts/nfts/wishlist.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/nfts/wishlist.js")"></script>
