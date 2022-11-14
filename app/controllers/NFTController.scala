@@ -4,6 +4,7 @@ import akka.stream.scaladsl.{Source, StreamConverters}
 import akka.util.ByteString
 import controllers.actions._
 import exceptions.BaseException
+import models.analytics.CollectionsAnalysis
 import models.master.Collection
 import models.masterTransaction.NFTDraft
 import models.{master, masterTransaction}
@@ -26,6 +27,7 @@ class NFTController @Inject()(
                                withLoginActionAsync: WithLoginActionAsync,
                                withoutLoginAction: WithoutLoginAction,
                                withLoginAction: WithLoginAction,
+                               collectionsAnalysis: CollectionsAnalysis,
                                masterAccounts: master.Accounts,
                                masterCollections: master.Collections,
                                masterNFTs: master.NFTs,
@@ -346,6 +348,7 @@ class NFTController @Inject()(
                 _ <- add
                 _ <- addProperties()
                 _ <- delete
+                _ <- collectionsAnalysis.Utility.onNewNFT(collection.id)
                 _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.NFT_CREATED, nftDraft.name.getOrElse(""))(nftDraft.fileName)
               } yield ()
             } else Future()

@@ -1,6 +1,7 @@
 package models.analytics
 
 import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.master._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -55,6 +56,8 @@ object CollectionsAnalysis {
 
 @Singleton
 class CollectionsAnalysis @Inject()(
+                                     masterCollections: Collections,
+                                     masterNFTs: NFTs,
                                      protected val databaseConfigProvider: DatabaseConfigProvider
                                    )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[CollectionsAnalysis.CollectionAnalysisTable, CollectionAnalysis, String](
@@ -75,16 +78,20 @@ class CollectionsAnalysis @Inject()(
 
     def getForCollections(ids: Seq[String]): Future[Seq[CollectionAnalysis]] = filter(_.id.inSet(ids))
 
+    def update(collectionAnalysis: CollectionAnalysis): Future[Unit] = updateById(collectionAnalysis)
   }
 
   object Utility {
 
-    def onNewCollection(id: String): Future[Unit] = {
-      Future()
-    }
+    def onNewCollection(id: String): Future[String] = Service.add(CollectionAnalysis(id = id, totalNFTs = 0, totalSold = 0, totalTraded = 0, floorPrice = 0, totalVolume = 0, bestOffer = 0, listed = 0, owners = 0, uniqueOwners = 0))
 
-    def onNewNFT(id: String): Future[Unit] = {
-      Future()
+    def onNewNFT(collectionId: String): Future[Unit] = {
+      val collectionAnalysis = Service.tryGet(collectionId)
+
+      for {
+        collectionAnalysis <- collectionAnalysis
+        _ <- Service.update(collectionAnalysis.copy(totalNFTs = collectionAnalysis.totalNFTs + 1))
+      } yield ()
     }
 
   }

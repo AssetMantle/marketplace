@@ -2,6 +2,7 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
+import models.analytics.CollectionsAnalysis
 import models.master.{Account, Collection}
 import models.masterTransaction.CollectionDraft
 import models.{master, masterTransaction}
@@ -24,6 +25,7 @@ class CollectionController @Inject()(
                                       withoutLoginActionAsync: WithoutLoginActionAsync,
                                       withLoginActionAsync: WithLoginActionAsync,
                                       withLoginAction: WithLoginAction,
+                                      collectionsAnalysis: CollectionsAnalysis,
                                       masterAccounts: master.Accounts,
                                       masterCollections: master.Collections,
                                       masterTransactionCollectionDrafts: masterTransaction.CollectionDrafts,
@@ -369,6 +371,7 @@ class CollectionController @Inject()(
             for {
               _ <- add
               _ <- deleteDraft()
+              _ <- collectionsAnalysis.Utility.onNewCollection(collectionDraft.id)
               _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.COLLECTION_CREATED, collectionDraft.name)(collectionDraft.id)
             } yield ()
           } else Future("")
