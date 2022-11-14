@@ -25,8 +25,8 @@
         </div>
 
         <div class="d-flex align-items-center mt-4">
-            <span class="termsConditionMessage">
-                <a class="link" onclick="showHideModalScreen('#createCollectionTypeform', '#createCollectionForm')">@Messages(constants.View.TYPE_FORM_LINK)</a>
+            <span class="me-0 ms-0 termsConditionMessage">
+                <a class="link" onclick="showHideModalScreen('#createCollectionTypeform', '#createCollectionForm')" style="text-transform: none !important; ">@Messages(constants.View.TYPE_FORM_LINK)</a>
             </span>
         </div>
     }
@@ -40,10 +40,9 @@
                 </div>
                 <div class="title-text">@Messages(constants.View.CREATE_COLLECTION_TYPE_FORM_TITLE)</div>
             </div>
-            <div class="mt-3 termsConditionSubTitle">@Messages(constants.View.CREATE_COLLECTION_TYPE_FORM_SUBTITLE)</div>
         </div>
         <script type="text/javascript" src="@routes.Assets.versioned("javascripts/typeFormEmbed.js")"></script>
-        <iframe class="airtable-embed airtable-dynamic-height" src="https://airtable.com/embed/shrdCR3ZZIElFFDFA?backgroundColor=purple" frameborder="0" onmousewheel="" width="100%" height="3575" style="background: transparent; border: 1px solid #ccc;"></iframe>
+        <iframe class="airtable-embed airtable-dynamic-height" src="https://airtable.com/embed/shrdCR3ZZIElFFDFA?backgroundColor=purple" frameborder="0" onmousewheel="" width="100%" height="400" style="background: transparent; border: 1px solid #ccc;"></iframe>
     </div>
 
     <div id="createCollectionTermsConditionModal" style="display: none;">
