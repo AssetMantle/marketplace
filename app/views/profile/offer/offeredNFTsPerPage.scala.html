@@ -4,16 +4,47 @@
 @(pageNumber: Int, nfts: Seq[NFT], nftWhitelistSales: Seq[NFTWhitelistSale], collections: Seq[Collection])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @if(nftWhitelistSales.nonEmpty) {
-    @nftWhitelistSales.map { nftWhitelistSale =>
-        @defining(nfts.find(_.fileName == nftWhitelistSale.fileName)) { nft =>
-            @if(nft.isDefined) {
-                <div>@nft.get.name</div>
-                <div>@collections.find(_.id == nft.get.collectionId).map(_.name).getOrElse("")</div>
-                <div>@nftWhitelistSale.startTimeEpoch</div>
-                <div>@nftWhitelistSale.endTimeEpoch</div>
-            }
-        }
-    }
+    <div class="contentBody">
+        <div class="container contentTableContainer" id="offeredNFTsList">
+            <div class="row">
+                <div class="col-sm-12 col-md-12">
+                    <div class="table-responsive">
+                        <table class="table contentTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-end tableFieldNo">@Messages(constants.View.OFFERS_TABLE_TITLE_NO)</th>
+                                    <th class="tableFieldName">@Messages(constants.View.OFFERS_TABLE_TITLE_NAME)</th>
+                                    <th class="tableFieldName">@Messages(constants.View.OFFERS_TABLE_TITLE_COLLECTION_NAME)</th>
+                                    <th class="tableFieldStartEpoch">@Messages(constants.View.OFFERS_TABLE_TITLE_DURATION)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="offerListTableBody">
+                                @nftWhitelistSales.zipWithIndex.map { case (nftWhitelistSale, index) =>
+                                    @defining(nfts.find(_.fileName == nftWhitelistSale.fileName)) { nft =>
+                                        @if(nft.isDefined) {
+                                            <tr>
+                                                <td class="text-end tableFieldNo">@(index + 1)</td>
+                                                <td class="tableFieldName">@nft.get.name</td>
+                                                <td class="tableFieldName">@collections.find(_.id == nft.get.collectionId).map(_.name).getOrElse("")</td>
+                                                <td class="tableFieldStartEpoch">
+                                                    <span id="startEpoch_@nftWhitelistSale.id">@nftWhitelistSale.startTimeEpoch</span> -
+                                                    <span id="endEpoch_@nftWhitelistSale.id">@nftWhitelistSale.endTimeEpoch</span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                  <script>epochToDateTime('startEpoch_@nftWhitelistSale.id'); epochToDateTime('endEpoch_@nftWhitelistSale.id')</script>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 } else {
-
+    <div id="noOfferedNftsPerPage" class="noOfferLeft"></div>
+    <div id="noOffer" class="h-100 mt-3 d-flex flex-column justify-content-center align-items-center emptyOfferList">
+        <div class="message">@Messages(constants.View.NO_NFT_OFFERS)</div>
+    </div>
 }

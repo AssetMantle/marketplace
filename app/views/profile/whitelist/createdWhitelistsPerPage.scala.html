@@ -6,7 +6,9 @@
 @whitelists.zipWithIndex.map { case (x, index) =>
 <tr>
     <td class="text-end tableFieldNo">@(lastIndex + index + 1)</td>
-    <td class="tableFieldName" data-toggle="tooltip" data-placement="top" title="@x.name">@x.name</td>
+    <td class="tableFieldName" >
+          <span data-toggle="tooltip" data-placement="top" title="@x.description">@x.name</span>
+    </td>
     <td class="text-end tableFieldMaxMembers">@x.maxMembers</td>
     <td id="startEpoch_@x.id" class="text-end tableFieldStartEpoch epochValue">@x.startEpoch</td>
     <td  id="endEpoch_@x.id" class="text-end tableFieldEndEpoch epochValue">@x.endEpoch</td>
@@ -15,14 +17,11 @@
             <div onclick="getForm(jsRoutes.controllers.WhitelistController.listMembers('@x.id'))">
                 <i class="bi bi-person iconDefault iconMedium icon"></i>
             </div>
-            <div data-toggle="tooltip" data-placement="top" title="@x.description">
-                <i class="bi bi-info-circle iconDefault iconMedium"></i>
-            </div>
             <div onclick="getForm(jsRoutes.controllers.WhitelistController.editWhitelistForm('@x.id'))">
                 <i class="bi bi-pencil iconDefault iconMedium icon"></i>
             </div>
             <div onclick="getForm(jsRoutes.controllers.SaleController.createWhitelistSaleForm('@x.id'))">
-                <i class="bi bi-pencil iconDefault iconMedium icon"></i>
+                <i class="bi bi-node-plus iconDefault iconMedium icon"></i>
             </div>
             <div>
                 <div class="p-0 userAddressData username-data" data-value="@constants.CommonConfig.WebAppUrl.concat(s"""/acceptWhitelistInvite/${x.id}""")"></div>
@@ -36,5 +35,6 @@
 <script>
     epochToDateTime('startEpoch_@x.id');
     epochToDateTime('endEpoch_@x.id');
+    $('[data-toggle="tooltip"]').tooltip();
 </script>
 }
