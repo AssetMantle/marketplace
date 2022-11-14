@@ -62,7 +62,7 @@ object FormField {
   val COLLECTION_PROPERTY_NAME: StringFormField = StringFormField("COLLECTION_PROPERTY_NAME", 1, 30)
   val COLLECTION_PROPERTY_DEFAULT_VALUE: StringFormField = StringFormField("COLLECTION_PROPERTY_DEFAULT_VALUE", 1, 30)
   val NFT_NAME: StringFormField = StringFormField("NFT_NAME", 3, 50)
-  val NFT_DESCRIPTION: StringFormField = StringFormField("NFT_DESCRIPTION", 0, 256)
+  val NFT_DESCRIPTION: StringFormField = StringFormField("NFT_DESCRIPTION", 3, 256)
   val NFT_FILE_NAME: StringFormField = StringFormField("NFT_FILE_NAME", 64, 255)
   val NFT_TAGS: StringFormField = StringFormField("NFT_TAGS", 0, (constants.NFT.Tags.MaximumLength + 1) * constants.NFT.Tags.MaximumAllowed)
   val NFT_PROPERTY_NAME: StringFormField = StringFormField("NFT_PROPERTY_NAME", 1, 30)
