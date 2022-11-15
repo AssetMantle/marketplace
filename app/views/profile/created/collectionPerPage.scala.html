@@ -33,7 +33,9 @@
 } else {
     @if(totalCollections == 0) {
         <div id="noCreatedCollectionsPerPage" class="noCollectionLeft"></div>
-        <div id="noCollection" class="emptyCreated"></div>
+        <div id="noCollection" class="h-100 mt-3 d-flex flex-column justify-content-center align-items-center emptyCreated">
+            <div class="message">@Messages(constants.View.NO_COLLECTION_FOUND)</div>
+        </div>
     } else {}
 }
 <script src="@routes.Assets.versioned("javascripts/profile/created/collectionPerPage.js")" type="text/javascript"></script>

@@ -961,8 +961,10 @@
 .whitelistFieldMessage{
   @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
 }
+.emptyCreated,
 .emptyWishlist,
-.emptyOfferList{
+.emptyOfferList,
+.emptyOwnedList{
   background-color: var(--card-dark);
   width: 100%;
   border-radius: 10px;
