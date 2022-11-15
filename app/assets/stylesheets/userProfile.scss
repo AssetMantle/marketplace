@@ -709,24 +709,24 @@
         }
         #createdWhitelists{
           .tableFieldNo{min-width: 50px;}
-          .tableFieldName{min-width: 100px;max-width: 100px;}
+          .tableFieldName{min-width: 130px;max-width: 130px;}
           .tableFieldDescription{ min-width: 150px;}
           .tableFieldStatus{min-width: 90px;}
           .tableFieldTotalMembers{min-width: 120px;}
           .tableFieldMaxMembers{min-width: 90px;}
-          .tableFieldStartEpoch{min-width: 155px;}
-          .tableFieldEndEpoch{min-width: 155px;}
+          .tableFieldStartEpoch{min-width: 180px;}
+          .tableFieldEndEpoch{min-width: 180px;}
           .tableFieldSale{min-width: 140px;}
-          .tableFieldAction{min-width: 105px;width:105px; i{cursor: pointer;}}
+          .tableFieldAction{min-width: 155px;width:155px; i{cursor: pointer;}}
         }
         #joinedWhitelist{
           .tableFieldNo{min-width: 50px;}
-          .tableFieldName{min-width: 150px;max-width: 150px;}
-          .tableFieldStartEpoch{min-width: 290px;}
-          .tableFieldEndEpoch{min-width: 170px;}
+          .tableFieldName{min-width: 180px;max-width: 180px;}
+          .tableFieldStartEpoch{min-width: 180px;}
+          .tableFieldEndEpoch{min-width: 180px;}
           .tableFieldStatus{min-width: 50px;}
           .tableFieldTotalMembers{min-width: 120px;}
-          .tableFieldMaxMembers{min-width: 120px;}
+          .tableFieldMaxMembers{min-width: 115px;}
           .tableFieldSale{min-width: 130px;}
           .tableFieldAction{min-width: 100px;width:100px; i{cursor: pointer;}}
         }
@@ -749,11 +749,10 @@
         }
         #offeredNFTsList{
           .tableFieldNo{min-width: 50px;}
-          .tableFieldNftName{min-width: 150px;max-width: 150px;}
-          .tableFieldCollectionName{min-width: 150px;max-width: 150px;}
-          .tableFieldStartEpoch{min-width: 355px;}
-          .tableFieldSaleStart{min-width: 177px;}
-          .tableFieldSaleEnd{min-width: 177px;}
+          .tableFieldNftName{min-width: 180px;max-width: 180px;}
+          .tableFieldCollectionName{min-width: 180px;max-width: 180px;}
+          .tableFieldSaleStart{min-width: 195px;}
+          .tableFieldSaleEnd{min-width: 195px;}
           tbody{
             tr {
               td{
