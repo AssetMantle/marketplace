@@ -12,7 +12,7 @@ document.onload = function () {
 function loadMoreNFTs(accountId, collectionId) {
     const loading = document.querySelector('.loading');
     if ($(".noNFT").length === 0) {
-        let route = jsRoutes.controllers.WishlistController.collectionNFTsPerPage(accountId, collectionId, $(".nftPage").length + 1);
+        let route = jsRoutes.controllers.WishlistController.collectionNFTsPerPage(accountId, collectionId, $(".nftsPerPage").length + 1);
         $.ajax({
             url: route.url,
             type: route.type,
@@ -43,7 +43,7 @@ function loadMoreNFTs(accountId, collectionId) {
             }
         });
     } else {
-        $(".nftPage:last").css("margin-top", "0px");
+        $(".nftsPerPage:last").css("margin-top", "0px");
         $("#loadMoreBtnContainer").addClass("hide");
     }
 }
