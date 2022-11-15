@@ -123,6 +123,8 @@ class Collections @Inject()(
 
     def fetchAll(): Future[Seq[Collection]] = getAll.map(_.map(_.deserialize))
 
+    def fetchAllPublic(): Future[Seq[Collection]] = filter(_.public).map(_.map(_.deserialize))
+
     def get(id: String): Future[Option[Collection]] = getById(id).map(_.map(_.deserialize))
 
     def getByName(name: String): Future[Option[Collection]] = filter(_.name === name).map(_.map(_.deserialize).headOption)

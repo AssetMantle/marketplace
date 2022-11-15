@@ -145,7 +145,7 @@ class Starter @Inject()(
   }
 
   private def updateAccountType() = {
-    val collections = masterCollections.Service.fetchAll()
+    val collections = masterCollections.Service.fetchAllPublic()
 
     def update(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
       masterAccounts.Service.updateAccountType(accountId = collection.creatorId, accountType = constants.Account.Type.GENESIS_CREATOR)
