@@ -13,8 +13,8 @@
                             <thead>
                                 <tr>
                                     <th class="text-end tableFieldNo">@Messages(constants.View.OFFERS_TABLE_TITLE_NO)</th>
-                                    <th class="tableFieldName">@Messages(constants.View.OFFERS_TABLE_TITLE_NAME)</th>
-                                    <th class="tableFieldName">@Messages(constants.View.OFFERS_TABLE_TITLE_COLLECTION_NAME)</th>
+                                    <th class="tableFieldNftName">@Messages(constants.View.OFFERS_TABLE_TITLE_NAME)</th>
+                                    <th class="tableFieldCollectionName">@Messages(constants.View.OFFERS_TABLE_TITLE_COLLECTION_NAME)</th>
                                     <th class="tableFieldSaleStart">@Messages(constants.View.OFFERS_TABLE_TITLE_SALE_START)</th>
                                     <th class="tableFieldSaleEnd">@Messages(constants.View.OFFERS_TABLE_TITLE_SALE_END)</th>
                                 </tr>
@@ -25,8 +25,8 @@
                                         @if(nft.isDefined) {
                                             <tr>
                                                 <td class="text-end tableFieldNo">@(index + 1)</td>
-                                                <td onclick="getForm(jsRoutes.controllers.NFTController.modalView('@nft.get.fileName'))" class="tableFieldName">@nft.get.name</td>
-                                                <td class="tableFieldName">@collections.find(_.id == nft.get.collectionId).map(_.name).getOrElse("")</td>
+                                                <td onclick="getForm(jsRoutes.controllers.NFTController.modalView('@nft.get.fileName'))" class="tableFieldNftName">@nft.get.name</td>
+                                                <td class="tableFieldCollectionName">@collections.find(_.id == nft.get.collectionId).map(_.name).getOrElse("")</td>
                                                 <td class="tableFieldSaleStart">
                                                     <span id="startEpoch_@nftWhitelistSale.id">@nftWhitelistSale.startTimeEpoch</span>
                                                 </td>
