@@ -11,8 +11,16 @@ document.onload = function () {
 
 function loadMoreNFTs(accountId, collectionId) {
     const loading = document.querySelector('.loading');
+    let totalNfts = $(".singleNFTCard").length;
+    let draftNFT = $('.draftNft').length;
+    let createCard = $(".createNFTCard").length;
+    let totalWishlist = (totalNfts - createCard - draftNFT);
+    let pageNumber = Math.floor(totalWishlist / 6) + 1;
+    if (totalWishlist < (pageNumber * 6) && totalWishlist > ((pageNumber - 1) * 6) && totalWishlist % 6 !== 0) {
+        pageNumber = pageNumber + 1;
+    }
     if ($(".noNFT").length === 0) {
-        let route = jsRoutes.controllers.WishlistController.collectionNFTsPerPage(accountId, collectionId, $(".nftPage").length + 1);
+        let route = jsRoutes.controllers.WishlistController.collectionNFTsPerPage(accountId, collectionId, pageNumber);
         $.ajax({
             url: route.url,
             type: route.type,
@@ -43,7 +51,7 @@ function loadMoreNFTs(accountId, collectionId) {
             }
         });
     } else {
-        $(".nftPage:last").css("margin-top", "0px");
+        $(".nftsPerPage:last").css("margin-top", "0px");
         $("#loadMoreBtnContainer").addClass("hide");
     }
 }
