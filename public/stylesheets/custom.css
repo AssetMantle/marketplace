@@ -2622,3 +2622,53 @@ footer.section{
 .formBody{
     background-color: var(--dark);
 }
+
+.customTooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.customTooltip .tooltipText {
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: rgba(255, 253, 250, 0.75);
+    visibility: hidden;
+    width: 240px;
+    background-color: #424242;
+    text-align: center;
+    border-radius: 6px;
+    padding: 12px 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: calc(100% + 8px);
+    left: 0%;
+    margin-left: -200px;
+}
+
+.customTooltip .tooltipText:after {
+    content: "";
+    position:absolute;
+    right:22px;
+    top: 100%;
+    border:8px solid #000;
+    border-color: #424242 transparent transparent transparent;
+}
+
+.customTooltip:hover .tooltipText {
+    visibility: visible;
+}
+@media (max-width: 1200px){
+    .customTooltip .tooltipText {
+        width: 180px;
+        margin-left: -140px;
+    }
+}
+@media (max-width: 990px){
+    .customTooltip .tooltipText {
+        width: 180px;
+        margin-left: -140px;
+    }
+}

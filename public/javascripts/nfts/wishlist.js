@@ -61,7 +61,7 @@ function wishlist(form, route, wishlistButton, snackBarMessage, NFTId, add) {
 }
 
 function addRemoveWishlist(element, NFTId, addMessage, removedMessage) {
-    let wishlistIcon = $(element).children(".addToWishlist");
+    let wishlistIcon = $(element).find(".addToWishlist");
     if (!$(wishlistIcon).hasClass("clicked")) {
         const form = $("#addToWishlist_" + NFTId + " form")
         wishlist(form, jsRoutes.controllers.WishlistController.add(), element, addMessage, NFTId, true);
