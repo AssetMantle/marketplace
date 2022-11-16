@@ -9,8 +9,8 @@
             <li class="active">@Messages(constants.View.OVERVIEW)</li>
         </ul>
         <ul class="d-flex gap-3 rightOptions">
-            <li onclick="viewNFT('@nft.fileName'); closeModal();">
-                <i class="bi bi-globe2 iconDefault iconMedium icon"></i>
+            <li onclick="viewNFT('@nft.fileName'); closeModal();" style="cursor: pointer;">
+                <img src="@routes.Assets.versioned("images/icon/createNFT.svg")"/>
             </li>
         </ul>
     </div>

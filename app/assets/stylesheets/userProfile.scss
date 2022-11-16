@@ -496,6 +496,9 @@
         text-transform: capitalize;
         .title{
           @include setFont(var(--font-type-1), normal, 400, 16px, 19px, var(--gray));
+          padding: 2px 12px;
+          border-radius: 20px;
+          background-color: var(--card-dark);
         }
         .titleMenu{
           a{
@@ -531,7 +534,7 @@
           }
         }
         .contentTableContainer{
-          padding: 20px 32px 20px 32px;
+          padding: 20px 6px 20px 6px;
           .contentTable{
             border-collapse: collapse;
             width: 100%;
@@ -706,24 +709,24 @@
         }
         #createdWhitelists{
           .tableFieldNo{min-width: 50px;}
-          .tableFieldName{min-width: 100px;max-width: 100px;}
+          .tableFieldName{min-width: 130px;max-width: 130px;}
           .tableFieldDescription{ min-width: 150px;}
           .tableFieldStatus{min-width: 90px;}
           .tableFieldTotalMembers{min-width: 120px;}
           .tableFieldMaxMembers{min-width: 90px;}
-          .tableFieldStartEpoch{min-width: 155px;}
-          .tableFieldEndEpoch{min-width: 155px;}
+          .tableFieldStartEpoch{min-width: 180px;}
+          .tableFieldEndEpoch{min-width: 180px;}
           .tableFieldSale{min-width: 140px;}
-          .tableFieldAction{min-width: 105px;width:105px; i{cursor: pointer;}}
+          .tableFieldAction{min-width: 155px;width:155px; i{cursor: pointer;}}
         }
         #joinedWhitelist{
           .tableFieldNo{min-width: 50px;}
-          .tableFieldName{min-width: 150px;max-width: 150px;}
-          .tableFieldStartEpoch{min-width: 290px;}
-          .tableFieldEndEpoch{min-width: 170px;}
+          .tableFieldName{min-width: 180px;max-width: 180px;}
+          .tableFieldStartEpoch{min-width: 180px;}
+          .tableFieldEndEpoch{min-width: 180px;}
           .tableFieldStatus{min-width: 50px;}
           .tableFieldTotalMembers{min-width: 120px;}
-          .tableFieldMaxMembers{min-width: 120px;}
+          .tableFieldMaxMembers{min-width: 115px;}
           .tableFieldSale{min-width: 130px;}
           .tableFieldAction{min-width: 100px;width:100px; i{cursor: pointer;}}
         }
@@ -746,13 +749,16 @@
         }
         #offeredNFTsList{
           .tableFieldNo{min-width: 50px;}
-          .tableFieldName{min-width: 150px;max-width: 150px;}
-          .tableFieldStartEpoch{min-width: 355px;}
+          .tableFieldNftName{min-width: 180px;max-width: 180px;}
+          .tableFieldCollectionName{min-width: 180px;max-width: 180px;}
+          .tableFieldSaleStart{min-width: 195px;}
+          .tableFieldSaleEnd{min-width: 195px;}
           tbody{
             tr {
               td{
-                &.tableFieldName{
-                  color: var(--gray) !important;
+                &.tableFieldNftName{
+                  @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--dark));
+                  cursor: pointer;
                 }
               }
             }
@@ -959,8 +965,10 @@
 .whitelistFieldMessage{
   @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
 }
+.emptyCreated,
 .emptyWishlist,
-.emptyOfferList{
+.emptyOfferList,
+.emptyOwnedList{
   background-color: var(--card-dark);
   width: 100%;
   border-radius: 10px;
