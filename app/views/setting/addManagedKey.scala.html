@@ -2,7 +2,7 @@
 @import views.html.base.form._
 
 @(managedAddressForm: Form[AddManagedKey.Data] = AddManagedKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
+<link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/userProfile.css")"/>
 @commonForm(constants.Form.ADD_MANAGED_KEY, managedAddressForm) {
     <div id="newManagedAddressScreen" class="mb-0">
         <div class="modal-body">
@@ -79,4 +79,4 @@
         </div>
     </div>
 }
-<script src="@routes.Assets.versioned("javascripts/settings/managedAddress.js")" type="text/javascript"></script>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/settings/managedAddress.js")" type="text/javascript"></script>

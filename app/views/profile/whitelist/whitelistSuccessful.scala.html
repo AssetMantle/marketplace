@@ -1,6 +1,6 @@
 @(whitelistId: String, edited: Boolean = false)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
+<link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/userProfile.css")"/>
 
 @if(!edited) {
     @views.html.base.modal.successModal(heading = constants.View.CREATE_WHITELIST_SUCCESS_TITLE, subHeading = constants.View.CREATE_WHITELIST_SUCCESS_SUBTITLE)

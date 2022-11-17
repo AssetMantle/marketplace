@@ -4,7 +4,7 @@
 @import helper.{form, _}
 
 @(collection: master.Collection, nft: master.NFT, liked: Option[Boolean], onClickFunction: JavaScript, draft: Boolean = false)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
-<link href="@routes.Assets.versioned("stylesheets/explorer.css")"/>
+<link href="@utilities.PublicResource.getVersionedRoute("stylesheets/explorer.css")"/>
 @if(draft){
 <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 draftNft">
     <div class="card border-0 h-100" style="cursor: pointer;">

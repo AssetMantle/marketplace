@@ -20,7 +20,7 @@
         </div>
     </div>
 }
-<script src="@routes.Assets.versioned("javascripts/nfts/createNft.js")"></script>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/createNft.js")"></script>
 @if(tags.nonEmpty) {
     @tags.map { tag =>
         <script>

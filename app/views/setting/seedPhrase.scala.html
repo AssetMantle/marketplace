@@ -1,5 +1,5 @@
 @(seeds: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
+<link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/userProfile.css")"/>
 <div class="modal-header">
     <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.VIEW_MNEMONICS_SEED_PHRASE_TITLE)</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">

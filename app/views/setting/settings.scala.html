@@ -86,7 +86,7 @@
         </div>
     </div>
 </div>
-<script src="@routes.Assets.versioned("javascripts/settings/settings.js")" type="text/javascript"></script>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/settings/settings.js")" type="text/javascript"></script>
 <script>
         fetchBalances('@keys.map(_.address).mkString(",")')
         checkAndPushState(jsRoutes.controllers.SettingController.viewSettings().url, '', "setting");
