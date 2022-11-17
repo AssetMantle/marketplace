@@ -14,22 +14,16 @@ ENV JAVA_OPTS="-Xms4G -Xmx8G -Xss6M -XX:ReservedCodeCacheSize=256M -XX:+CMSClass
 ENV JVM_OPTS="-Xms4G -Xmx8G -Xss6M -XX:ReservedCodeCacheSize=256M -XX:+CMSClassUnloadingEnabled -XX:+UseG1GC"
 ENV SBT_OPTS="-Xms4G -Xmx8G -Xss6M -XX:ReservedCodeCacheSize=256M -XX:+CMSClassUnloadingEnabled -XX:+UseG1GC"
 COPY . .
-
-FROM base as version
-SHELL [ "/bin/bash", "-cx" ]
-RUN --mount=type=cache,target=/var/lib/apt/cache \
-  --mount=type=cache,target=/var/lib/cache <<EOF
-apt update
-apt install git -y
-git rev-parse --short HEAD >git_version
-cat git_version
-EOF
-
-FROM base as build
 RUN --mount=type=cache,target=/root/.sbt \
   --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/root/.ivy2 \
   sbt dist
+
+FROM $BUILD_IMAGE as version
+SHELL [ "/bin/bash", "-cx" ]
+ARG APP_VERSION
+RUN echo ${APP_VERSION} >git_version; \
+ cat git_version
 
 FROM $BUILD_IMAGE as extract
 SHELL [ "/bin/bash", "-cx" ]
