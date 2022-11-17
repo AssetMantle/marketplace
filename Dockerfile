@@ -17,7 +17,9 @@ COPY . .
 RUN --mount=type=cache,target=/root/.sbt \
   --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/root/.ivy2 \
-  sbt dist
+  sbt dist; \
+  echo ${APP_VERSION} >git_version; \
+ cat git_version
 
 FROM $BUILD_IMAGE as version
 SHELL [ "/bin/bash", "-cx" ]
