@@ -8,7 +8,7 @@ libraryDependencies ++= Seq(
 )
 scalaVersion := "2.13.8"
 
-version := "0.1.4"
+version := sys.env.getOrElse("APP_VERSION", "dev")
 
 lazy val GatlingTest = config("gatling") extend Test
 
