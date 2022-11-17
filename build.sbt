@@ -8,6 +8,8 @@ libraryDependencies ++= Seq(
 )
 scalaVersion := "2.13.8"
 
+version := sys.env.getOrElse("APP_VERSION", "dev")
+
 lazy val GatlingTest = config("gatling") extend Test
 
 GatlingTest / scalaSource := baseDirectory.value / "gatling/simulation"
@@ -23,13 +25,6 @@ resolvers += "Akka Snapshot Repository" at "https://repo.akka.io/snapshots/"
 resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/"
 
 resolvers += "Maven Central Server" at "https://repo1.maven.org/maven2"
-
-libraryDependencies += "com.typesafe" % "config" % "1.4.2"
-
-import com.typesafe.config.ConfigFactory
-
-private val applicationConf = ConfigFactory.load()
-version := applicationConf.getString("app.version")
 
 libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
