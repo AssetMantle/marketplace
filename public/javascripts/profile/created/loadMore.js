@@ -47,3 +47,10 @@ function loadCreatedCollectionOnScroll(accountId) {
         }
     }, 300);
 }
+
+function loadFirstCreatedCollections(accountId){
+    loadMoreCollections(accountId);
+    if($(document).height() > 1000){
+        loadCreatedCollectionOnScroll(accountId);
+    }
+}

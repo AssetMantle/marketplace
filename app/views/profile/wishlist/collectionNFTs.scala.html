@@ -33,7 +33,7 @@
 </div>
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/profile/wishlist/nftLoadMore.js")" type="text/javascript"></script>
 <script>
-     loadFirstNFTBulk('nftsPerPage', jsRoutes.controllers.WishlistController.collectionNFTsPerPage('@accountId', '@collection.id', 1));
+     loadFirstWishlistNFTs('@accountId', '@collection.id');
      checkAndPushState(jsRoutes.controllers.WishlistController.viewCollectionNFTs('@accountId', '@collection.id').url, ('@accountId' + '/WISHLIST/' + '@collection.id'), "wishListCollection");
      window.onscroll = function() { loadWishlistNftOnScroll('@{accountId}', '@{collection.id}'); }
 </script>

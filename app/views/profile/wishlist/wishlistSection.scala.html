@@ -25,5 +25,5 @@
 </div>
 
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/profile/wishlist/loadMore.js")" type="text/javascript"></script>
-<script>componentResource("wishlistCollectionsPerPage", jsRoutes.controllers.WishlistController.collectionPerPage('@accountId', 1))</script>
+<script>loadFirstWishlistCollections('@accountId');</script>
 <script> window.onscroll = function() { loadWishlistCollectionOnScroll('@accountId'); } </script>
