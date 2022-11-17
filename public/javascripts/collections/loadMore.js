@@ -39,3 +39,10 @@ function loadCollectionOnScroll() {
         }
     }, 300);
 }
+
+function loadFirstCollections(){
+    loadMoreCollections();
+    if($(document).height() > 1000){
+        setTimeout(loadMoreCollections, 1000);
+    }
+}

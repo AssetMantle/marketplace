@@ -32,7 +32,7 @@
         </div>
     </div>
 }
-<script src="@routes.Assets.versioned("javascripts/nfts/setProperties.js")"></script>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/setProperties.js")"></script>
 <script>
         hideSubmitButton();
         setPropertyBackButton('@collection.id','@fileName');

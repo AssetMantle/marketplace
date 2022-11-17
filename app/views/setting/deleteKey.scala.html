@@ -2,7 +2,7 @@
 @import views.html.base.form._
 
 @(deleteKeyForm: Form[DeleteKey.Data] = DeleteKey.form, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
+<link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/userProfile.css")"/>
 @commonForm(constants.Form.DELETE_KEY, deleteKeyForm) {
     <div class="modal-body">
         <div class="mb-3">

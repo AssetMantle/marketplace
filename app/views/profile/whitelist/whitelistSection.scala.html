@@ -46,7 +46,7 @@
     <div id="whitelistSectionContent"></div>
 </div>
 
-<script src="@routes.Assets.versioned("javascripts/profile/whitelist.js")"></script>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/profile/whitelist.js")"></script>
 @if(isVerifiedCreator || whitelistsMade > 0) {
     <script>showWhitelistScreen('created');</script>
 } else {

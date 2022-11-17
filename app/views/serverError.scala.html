@@ -2,7 +2,7 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState] = None)
 @views.html.base.common(constants.View.HOME)
-<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/pageNotFound.css")"/>
+<link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/pageNotFound.css")"/>
 
 <div class="errorPageContainer">
     <div class="imageContainer">

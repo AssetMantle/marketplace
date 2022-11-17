@@ -47,3 +47,12 @@ function loadWishlistCollectionOnScroll(accountId) {
         }
     }, 300);
 }
+
+function loadFirstWishlistCollections(accountId){
+    componentResource('wishlistCollectionsPerPage', jsRoutes.controllers.WishlistController.collectionPerPage(`${accountId}`, 1));
+    if($(document).height() > 1000) {
+        setTimeout(() => {
+            loadWishlistCollectionOnScroll(`${accountId}`)
+        }, 1000);
+    }
+}
