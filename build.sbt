@@ -24,6 +24,13 @@ resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releas
 
 resolvers += "Maven Central Server" at "https://repo1.maven.org/maven2"
 
+libraryDependencies += "com.typesafe" % "config" % "1.4.2"
+
+import com.typesafe.config.ConfigFactory
+
+private val applicationConf = ConfigFactory.load()
+version := applicationConf.getString("app.version")
+
 libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
 libraryDependencies ++= Seq(
