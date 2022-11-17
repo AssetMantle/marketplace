@@ -2,7 +2,7 @@
 ARG BUILD_IMAGE=adoptopenjdk:11-jdk-hotspot
 ARG JRE_IMAGE=adoptopenjdk:11-jre-hotspot
 
-FROM $BUILD_IMAGE as base
+FROM $BUILD_IMAGE as build
 ARG SBT_VERSION=1.7.0
 SHELL [ "/bin/bash", "-cx" ]
 WORKDIR /tmp
