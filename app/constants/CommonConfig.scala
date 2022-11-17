@@ -14,6 +14,7 @@ object CommonConfig {
   val DefaultPublicFolder: String = config.get[String]("webApp.defaultPublicFolder")
   val PushNotificationURL: String = config.get[String]("webApp.pushNotification.url")
   val PushNotificationAuthorizationKey: String = config.get[String]("webApp.pushNotification.authorizationKey")
+  val AppVersion: String = config.get[String]("app.version.authorizationKey")
 
   val SessionTokenTimeout: Int = config.get[Int]("play.http.session.token.timeout")
 

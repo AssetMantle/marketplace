@@ -8,8 +8,6 @@ libraryDependencies ++= Seq(
 )
 scalaVersion := "2.13.8"
 
-version := "0.1.4"
-
 lazy val GatlingTest = config("gatling") extend Test
 
 GatlingTest / scalaSource := baseDirectory.value / "gatling/simulation"
