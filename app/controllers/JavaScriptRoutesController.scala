@@ -116,6 +116,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WhitelistController.leaveWhitelist,
         routes.javascript.WhitelistController.listMembers,
         routes.javascript.WhitelistController.deleteMember,
+        routes.javascript.WhitelistController.whitelistDetail,
 
       )
     ).as("text/javascript")

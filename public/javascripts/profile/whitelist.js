@@ -138,3 +138,19 @@ function searchMember() {
         }
     }
 }
+
+function setOffersStatus(startEpoch, endEpoch){
+    let currentEpoch = Date.now();
+    currentEpoch = Math.floor(currentEpoch / 1000);
+    if(currentEpoch > startEpoch && currentEpoch < endEpoch){
+        $(".statusOptions .option").removeClass("active");
+        $(".statusOptions .option.started").addClass("active");
+    }
+    else if(currentEpoch > startEpoch && currentEpoch > endEpoch){
+        $(".statusOptions .option").removeClass("active");
+        $(".statusOptions .option.ended").addClass("active");
+    }else{
+        $(".statusOptions .option").removeClass("active");
+        $(".statusOptions .option.notStarted").addClass("active");
+    }
+}

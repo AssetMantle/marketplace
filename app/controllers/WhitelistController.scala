@@ -288,5 +288,18 @@ class WhitelistController @Inject()(
         }
       )
   }
-}
 
+  def whitelistDetail(whitelistId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val whitelist = masterWhitelists.Service.tryGet(whitelistId)
+
+        (for {
+          whitelist <- whitelist
+        } yield Ok(views.html.profile.whitelist.whitelistDetail(whitelist = whitelist))
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
+  }
+}
