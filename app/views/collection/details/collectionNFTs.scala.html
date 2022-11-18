@@ -1,14 +1,20 @@
+@import controllers.actions.LoginState
 @import views.html.nft._
 @import views.html.base.buttons.commonPrimaryButton
 
-@(collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 <div class="item item-center nftContainer">
     <div class="profileCover">
         <div class="profileCoverContainer" id="collectionUncompressedCoverImage_@collection.id">
-            @collection.getCoverFileURL.fold{
+            @if(loginState.fold("")(_.username) == collection.creatorId) {
+                <div class="editCollectionCover" onclick="getForm(jsRoutes.controllers.CollectionController.uploadCollectionFilesForm('@collection.id'))">
+                    <i class="bi bi-pencil iconDefault"></i>
+                </div>
+            }
+            @collection.getCoverFileURL.fold {
                 <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
-            }{uri =>
+            } { uri =>
                 <img src="@uri">
             }
         </div>
