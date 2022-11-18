@@ -24,6 +24,7 @@ RUN --mount=type=cache,target=/root/.sbt \
 FROM $BUILD_IMAGE as version
 SHELL [ "/bin/bash", "-cx" ]
 ARG APP_VERSION
+WORKDIR /app
 RUN echo ${APP_VERSION} >git_version; \
  cat git_version
 
