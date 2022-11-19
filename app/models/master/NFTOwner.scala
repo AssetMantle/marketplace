@@ -73,7 +73,7 @@ class NFTOwners @Inject()(
 
     def getByOwnerId(ownerId: String): Future[Seq[NFTOwner]] = filter(_.ownerId === ownerId)
 
-    def getByOwnerIdAndPageNumber(ownerId: String, pageNumber: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.ownerId === ownerId)(_.createdOnMillisEpoch).map(_.map(_.fileName))
+    def getByOwnerIdAndPageNumber(ownerId: String, pageNumber: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.ownerId === ownerId)(_.fileName).map(_.map(_.fileName))
 
     def update(NFTOwner: NFTOwner): Future[Unit] = updateById1AndId2(NFTOwner)
 

@@ -5,7 +5,20 @@
 
 @(whitelist: Whitelist, members: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-<div class="whitelistMembersContainer mt-3">
+<div class="whitelistMembersContainer">
+    <div class="singleItemDetailContainer">
+        <div class="headerWithIcon">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-1 my-3 headerTop">
+                    <div class="title-icon back-button-icon" onclick="setCreatedWhitelistCurrentPage(0); componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.createdWhitelists());">
+                        <i class="bi bi-chevron-left iconDefault"></i>
+                    </div>
+                    <h3 class="titleText">@whitelist.name</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="searchField d-flex">
         <i class="bi bi-search iconWhite iconSmall"></i>
         <input type="text" id="searchMemberField" onkeyup="searchMember()" placeholder="Search">
