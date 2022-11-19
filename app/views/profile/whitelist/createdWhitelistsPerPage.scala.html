@@ -14,7 +14,7 @@
     <td  id="endEpoch_@x.id" class="text-end tableFieldEndEpoch epochValue">@x.endEpoch</td>
     <td class="text-end tableFieldAction whitelistActionButton">
         <div class="d-flex gap-3">
-            <div onclick="getForm(jsRoutes.controllers.WhitelistController.listMembers('@x.id'))">
+            <div onclick="componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.listMembers('@x.id'));">
                 <i class="bi bi-person iconDefault iconMedium icon"></i>
             </div>
             <div onclick="getForm(jsRoutes.controllers.WhitelistController.editWhitelistForm('@x.id'))">
