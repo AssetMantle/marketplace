@@ -764,6 +764,12 @@
             }
           }
         }
+        #whitelistOffersList{
+          .tableFieldNo{min-width: 50px;}
+          .tableFieldName{min-width: 250px;max-width: 250px;}
+          .tableFieldStatus{min-width: 100px;}
+          .tableFieldDuration{min-width: 420px;}
+        }
       }
     }
   }
