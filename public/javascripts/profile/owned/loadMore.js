@@ -48,3 +48,12 @@ function loadOwnedNFTsOnScroll(accountId) {
         }
     }, 300);
 }
+
+function setEmptyContainer(){
+    let nftCard = $(".singleNFTCard").length;
+    if(nftCard !== 0){
+        $("#noOwnedNFTFound").hide();
+    }else{
+        $("#noOwnedNFTFound").show();
+    }
+}
