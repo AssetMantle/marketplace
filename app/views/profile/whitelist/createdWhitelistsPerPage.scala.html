@@ -6,15 +6,15 @@
 @whitelists.zipWithIndex.map { case (x, index) =>
 <tr>
     <td class="text-end tableFieldNo">@(lastIndex + index + 1)</td>
-    <td class="tableFieldName" >
-          <span data-toggle="tooltip" data-placement="top" title="@x.description">@x.name</span>
+    <td class="tableFieldName" style="cursor:pointer;" onclick="componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.whitelistDetail('@x.id'));">
+          <span>@x.name</span>
     </td>
     <td class="text-end tableFieldMaxMembers">@x.maxMembers</td>
     <td id="startEpoch_@x.id" class="text-end tableFieldStartEpoch epochValue">@x.startEpoch</td>
     <td  id="endEpoch_@x.id" class="text-end tableFieldEndEpoch epochValue">@x.endEpoch</td>
     <td class="text-end tableFieldAction whitelistActionButton">
         <div class="d-flex gap-3">
-            <div onclick="getForm(jsRoutes.controllers.WhitelistController.listMembers('@x.id'))">
+            <div onclick="componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.listMembers('@x.id'));">
                 <i class="bi bi-person iconDefault iconMedium icon"></i>
             </div>
             <div onclick="getForm(jsRoutes.controllers.WhitelistController.editWhitelistForm('@x.id'))">
@@ -35,6 +35,5 @@
 <script>
     epochToDateTime('startEpoch_@x.id');
     epochToDateTime('endEpoch_@x.id');
-    $('[data-toggle="tooltip"]').tooltip();
 </script>
 }
