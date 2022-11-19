@@ -6,7 +6,7 @@
 @whitelists.zipWithIndex.map { case (x, index) =>
 <tr>
     <td class="text-end tableFieldNo">@(lastIndex + index + 1)</td>
-    <td class="tableFieldName" style="cursor:pointer;" onclick="componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.whitelistDetail('@x.id'));">
+    <td class="tableFieldName" style="cursor:pointer;" onclick="componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.detail('@x.id'));">
           <span>@x.name</span>
     </td>
     <td class="text-end tableFieldMaxMembers">@x.maxMembers</td>

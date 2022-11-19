@@ -9,14 +9,17 @@
     } else {
         @commonCustomSelect(createSaleForm, constants.FormField.SELECT_COLLECTION_ID, collections, Symbol("class") -> "custom-select sources filledSelect")
     }
+    <div id="collectionOwnedNFTs"></div>
     @commonInputInt(createSaleForm, constants.FormField.SALE_NFT_NUMBER)
     @if(whitelistId.getOrElse("") != "") {
         @commonCustomSelect(createSaleForm, constants.FormField.SELECT_WHITELIST_ID, whitelists, Symbol("value") -> whitelistId.get, Symbol("class") -> "custom-select sources filledSelect")
     } else {
         @commonCustomSelect(createSaleForm, constants.FormField.SELECT_WHITELIST_ID, whitelists, Symbol("class") -> "custom-select sources filledSelect")
     }
-    @commonInputMicornumber(createSaleForm, constants.FormField.NFT_WHITELIST_SALE_PRICE)
+    @commonInputMicroNumber(createSaleForm, constants.FormField.NFT_WHITELIST_SALE_PRICE)
+    @commonInputInt(createSaleForm, constants.FormField.SALE_MAX_MINT_PER_ACCOUNT)
     @commonInputBigDecimal(createSaleForm, constants.FormField.NFT_SALE_CREATOR_FEE)
     @commonInputEpochTIme(createSaleForm, constants.FormField.NFT_SALE_START_EPOCH, setCurrentTime = true)
     @commonInputEpochTIme(createSaleForm, constants.FormField.NFT_SALE_END_EPOCH, setCurrentTime = false)
 }
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/sale/createCollectionSale.js")" type="text/javascript"></script>

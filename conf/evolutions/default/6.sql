@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS MASTER."NFTOwner"
 CREATE TABLE IF NOT EXISTS MASTER."Sale"
 (
     "id"                   VARCHAR NOT NULL,
+    "whitelistId"          VARCHAR NOT NULL,
     "collectionId"         VARCHAR NOT NULL,
     "numberOfNFTs"         BIGINT  NOT NULL,
     "maxMintPerAccount"    BIGINT  NOT NULL,
@@ -52,7 +53,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Sale"
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
     PRIMARY KEY ("id"),
-    UNIQUE ("id", "collectionId")
+    UNIQUE ("whitelistId", "collectionId")
 );
 
 ALTER TABLE MASTER."Collection"
@@ -65,8 +66,6 @@ ALTER TABLE MASTER."NFT"
     ADD COLUMN IF NOT EXISTS "totalSupply" BIGINT NOT NULL default 1;
 ALTER TABLE MASTER."NFT"
     ADD COLUMN IF NOT EXISTS "isMinted" BOOLEAN NOT NULL default false;
-ALTER TABLE MASTER."Whitelist"
-    ADD COLUMN IF NOT EXISTS "saleId" VARCHAR default null;
 ALTER TABLE MASTER."NFT"
     ADD CONSTRAINT uniqueNFTIdCollectionId UNIQUE ("fileName", "collectionId");
 
@@ -81,8 +80,8 @@ ALTER TABLE MASTER."NFTOwner"
     ADD CONSTRAINT NFTOwner_saleId FOREIGN KEY ("saleId") REFERENCES MASTER."Sale" ("id");
 ALTER TABLE MASTER."NFTOwner"
     ADD CONSTRAINT NFTOwner_collectionId FOREIGN KEY ("collectionId") REFERENCES MASTER."Collection" ("id");
-ALTER TABLE MASTER."Whitelist"
-    ADD CONSTRAINT Whitelist_SaleId FOREIGN KEY ("saleId") REFERENCES MASTER."Sale" ("id");
+ALTER TABLE MASTER."Sale"
+    ADD CONSTRAINT Sale_WhitelistId FOREIGN KEY ("whitelistId") REFERENCES MASTER."Whitelist" ("id");
 
 CREATE TRIGGER COLLECTION_ANALYSIS_LOG
     BEFORE INSERT OR UPDATE

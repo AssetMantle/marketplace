@@ -1,10 +1,8 @@
 package models.master
 
-import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.i18n.Lang
 import slick.jdbc.H2Profile.api._
 
 import java.sql.Timestamp

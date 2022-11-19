@@ -415,9 +415,12 @@ class CollectionController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val countNFts = masterNFTOwners.Service.countForOwner(collectionId = collectionId, ownerId = accountId)
-        for {
+        (for {
           countNFts <- countNFts
         } yield Ok(countNFts.toString)
+          ).recover{
+          case _: BaseException => BadRequest("0")
+        }
     }
   }
 

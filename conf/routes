@@ -154,10 +154,9 @@ GET         /whitelistInviteDetails                           controllers.Whitel
 POST        /acceptWhitelistInvite                            controllers.WhitelistController.acceptInvite()
 GET         /leaveWhitelistDetails                            controllers.WhitelistController.leaveWhitelistDetails(whitelistId: String)
 POST        /leaveWhitelist                                   controllers.WhitelistController.leaveWhitelist()
-GET         /leaveWhitelist                                   controllers.WhitelistController.listMembers(whitelistId: String)
 POST        /deleteMember                                     controllers.WhitelistController.deleteMember()
 GET         /listMembers                                      controllers.WhitelistController.listMembers(whitelistId: String)
-GET         /whitelistDetail                                  controllers.WhitelistController.whitelistDetail(whitelistId: String)
+GET         /whitelistDetail                                  controllers.WhitelistController.detail(whitelistId: String)
 
 #GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()

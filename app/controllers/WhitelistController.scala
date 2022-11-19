@@ -25,6 +25,7 @@ class WhitelistController @Inject()(
                                      masterCollections: master.Collections,
                                      masterWhitelists: master.Whitelists,
                                      masterWhitelistMembers: master.WhitelistMembers,
+                                     masterSales: master.Sales,
                                    )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -289,14 +290,18 @@ class WhitelistController @Inject()(
       )
   }
 
-  def whitelistDetail(whitelistId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def detail(whitelistId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val whitelist = masterWhitelists.Service.tryGet(whitelistId)
+        val members = masterWhitelistMembers.Service.getWhitelistsMemberCount(whitelistId)
+        val sales = masterSales.Service.getByWhitelistId(whitelistId)
 
         (for {
           whitelist <- whitelist
-        } yield Ok(views.html.profile.whitelist.whitelistDetail(whitelist = whitelist))
+          members <- members
+          sales <- sales
+        } yield Ok(views.html.profile.whitelist.whitelistDetail(whitelist = whitelist, totalMembers = members, sales = sales))
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }
