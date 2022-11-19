@@ -1,6 +1,6 @@
 package models.master
 
-import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
+import models.Trait.{Entity, GenericDaoImpl, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -9,27 +9,13 @@ import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class NFT(fileName: String, collectionId: String, name: String, description: String, ownerId: Option[String], supply: Long, ipfsLink: String, edition: Option[Int], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class NFT(fileName: String, collectionId: String, name: String, description: String, totalSupply: Long, isMinted: Boolean, ipfsLink: String, edition: Option[Int], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Entity[String] {
 
   def getFileHash: String = utilities.FileOperations.getFileNameWithoutExtension(fileName)
 
   def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + this.collectionId + "/nfts/" + this.fileName
 
-  def serialize(): NFTs.NFTSerialized = NFTs.NFTSerialized(
-    fileName = this.fileName,
-    collectionId = collectionId,
-    name = this.name,
-    description = this.description,
-    ownerId = this.ownerId,
-    supply = this.supply,
-    ipfsLink = this.ipfsLink,
-    edition = this.edition,
-    createdBy = this.createdBy,
-    createdOn = this.createdOn,
-    createdOnTimeZone = this.createdOnTimeZone,
-    updatedBy = this.updatedBy,
-    updatedOn = this.updatedOn,
-    updatedOnTimeZone = this.updatedOnTimeZone)
+  def id: String = fileName
 }
 
 object NFTs {
@@ -38,24 +24,9 @@ object NFTs {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class NFTSerialized(fileName: String, collectionId: String, name: String, description: String, ownerId: Option[String], supply: Long, ipfsLink: String, edition: Option[Int], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
-    def deserialize: NFT = NFT(
-      fileName = fileName,
-      collectionId = collectionId,
-      name = name,
-      description = description,
-      ownerId = ownerId,
-      supply = supply,
-      ipfsLink = ipfsLink,
-      edition = edition,
-      createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  class NFTTable(tag: Tag) extends Table[NFT](tag, "NFT") with ModelTable[String] {
 
-    def id: String = fileName
-  }
-
-  class NFTTable(tag: Tag) extends Table[NFTSerialized](tag, "NFT") with ModelTable[String] {
-
-    def * = (fileName, collectionId, name, description, ownerId.?, supply, ipfsLink, edition.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (NFTSerialized.tupled, NFTSerialized.unapply)
+    def * = (fileName, collectionId, name, description, totalSupply, isMinted, ipfsLink, edition.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (NFT.tupled, NFT.unapply)
 
     def fileName = column[String]("fileName", O.PrimaryKey)
 
@@ -65,9 +36,9 @@ object NFTs {
 
     def description = column[String]("description")
 
-    def ownerId = column[String]("ownerId")
+    def totalSupply = column[Long]("totalSupply")
 
-    def supply = column[Long]("supply")
+    def isMinted = column[Boolean]("isMinted")
 
     def ipfsLink = column[String]("ipfsLink")
 
@@ -95,7 +66,7 @@ object NFTs {
 class NFTs @Inject()(
                       protected val databaseConfigProvider: DatabaseConfigProvider
                     )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[NFTs.NFTTable, NFTs.NFTSerialized, String](
+  extends GenericDaoImpl[NFTs.NFTTable, NFT, String](
     databaseConfigProvider,
     NFTs.TableQuery,
     executionContext,
@@ -106,55 +77,39 @@ class NFTs @Inject()(
 
   object Service {
 
-    def add(fileName: String, collectionId: String, name: String, description: String, ownerId: Option[String], supply: Long, ipfsLink: String, edition: Option[Int]): Future[String] = {
+    def add(fileName: String, collectionId: String, name: String, description: String, totalSupply: Long, isMinted: Boolean, ipfsLink: String, edition: Option[Int]): Future[String] = {
       val nft = NFT(
         fileName = fileName,
         collectionId = collectionId,
         name = name,
         description = description,
-        ownerId = ownerId,
-        supply = supply,
+        totalSupply = totalSupply,
         ipfsLink = ipfsLink,
-        edition = edition)
-      create(nft.serialize())
+        edition = edition,
+        isMinted = isMinted)
+      create(nft)
     }
 
-    def add(nft: NFT): Future[String] = create(nft.serialize())
+    def add(nft: NFT): Future[String] = create(nft)
 
-    def fetchAll(): Future[Seq[NFT]] = getAll.map(_.map(_.deserialize))
+    def tryGet(nftId: String): Future[NFT] = tryGetById(nftId)
 
-    def tryGet(nftId: String): Future[NFT] = tryGetById(nftId).map(_.deserialize)
+    def getAllIdsForCollection(collectionId: String): Future[Seq[String]] = filter(_.collectionId === collectionId).map(_.map(_.id))
 
-    def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[NFT]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.collectionId === collectionId)(_.createdOn).map(_.map(_.deserialize))
-
-    def getByOwnerIdAndPageNumber(ownerId: String, pageNumber: Int): Future[Seq[NFT]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.ownerId.? === Option(ownerId))(_.collectionId).map(_.map(_.deserialize))
-
-    def getAllForCollection(collectionId: String): Future[Seq[NFT]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize))
-
-    def getIdsAllForCollection(collectionId: String): Future[Seq[String]] = filter(_.collectionId === collectionId).map(_.map(_.fileName))
-
-    def getAllForCollectionOwner(collectionId: String): Future[Seq[NFT]] = {
-      val ownerId: Option[String] = null
-      filter(x => x.collectionId === collectionId && x.ownerId.? === ownerId).map(_.map(_.deserialize))
-    }
-
+    def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[NFT]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.collectionId === collectionId)(_.createdOn)
 
     def checkExists(id: String): Future[Boolean] = exists(id)
 
     def deleteByCollectionId(id: String): Future[Int] = filterAndDelete(_.collectionId === id)
 
-    def getByIds(ids: Seq[String]): Future[Seq[NFT]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
+    def getByIds(ids: Seq[String]): Future[Seq[NFT]] = filter(_.id.inSet(ids))
 
     def deleteCollections(collectionIds: Seq[String]): Future[Int] = filterAndDelete(_.collectionId.inSet(collectionIds))
 
-    def update(nft: NFT): Future[Unit] = updateById(nft.serialize())
-
-    def getCollectionIds(nfts: Seq[String]): Future[Seq[String]] = filter(_.id.inSet(nfts)).map(_.map(_.collectionId))
-
-    def verifyNFTsCollection(fileNames: Seq[String], collectionId: String): Future[Boolean] = filter(x => x.fileName.inSet(fileNames) && x.collectionId === collectionId).map(_.length == fileNames.length)
+    def update(nft: NFT): Future[Unit] = updateById(nft)
 
     def countNFTs(collectionId: String): Future[Int] = filterAndCount(_.collectionId === collectionId)
 
-    def getRandomNFTs(collectionId: String, n: Int): Future[Seq[String]] = filter(_.collectionId === collectionId).map(x => util.Random.shuffle(x.map(_.fileName)).take(n))
+    def getRandomNFTs(collectionId: String, n: Int, filterOut: Seq[String]): Future[Seq[String]] = filter(x => x.collectionId === collectionId && !x.fileName.inSet(filterOut)).map(x => util.Random.shuffle(x.map(_.fileName)).take(n))
   }
 }

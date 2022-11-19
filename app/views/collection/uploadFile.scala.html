@@ -1,12 +1,11 @@
 @import views.html.base._
-@import views.html.base.buttons._
 @import controllers.actions.LoginState
-@import models.masterTransaction.CollectionDraft
+@import models.master.Collection
 
-@(collectionDraft: CollectionDraft)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(collection: Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div class="modal-header mb-3">
-    <div class="title-icon back-button-icon" id="modalBackButton" onclick="getForm(jsRoutes.controllers.CollectionController.editForm('@collectionDraft.id'))">
+    <div class="title-icon back-button-icon" id="modalBackButton" onclick="getForm(jsRoutes.controllers.CollectionController.editForm('@collection.id'))">
         <i class="bi bi-chevron-left iconDefault"></i>
     </div>
     <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.COLLECTION_PROFILE_COVER_TITLE)</h5>
@@ -16,10 +15,6 @@
 </div>
 
 <div class="d-flex gap-3">
-    @commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = collectionDraft.id, documentType = constants.Collection.File.PROFILE, label = constants.View.COLLECTION_PROFILE_IMAGE_TITLE, fileUrl = collectionDraft.getProfileFileURL)
-    @commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = collectionDraft.id, documentType = constants.Collection.File.COVER, label = constants.View.COLLECTION_COVER_IMAGE_TITLE, fileUrl = collectionDraft.getCoverFileURL)
-</div>
-
-<div class="horizontal-align">
-    @commonModalPrimaryButton(constants.View.NEXT, constants.Form.DEFINE_COLLECTION_PROPERTIES.get, Symbol("parameters") -> s"'${collectionDraft.id}'")
+    @commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = collection.id, documentType = constants.Collection.File.PROFILE, label = constants.View.COLLECTION_PROFILE_IMAGE_TITLE, fileUrl = collection.getProfileFileURL)
+    @commonUploadFile(fileUploadForm = constants.File.COLLECTION_FILE_FORM, id = collection.id, documentType = constants.Collection.File.COVER, label = constants.View.COLLECTION_COVER_IMAGE_TITLE, fileUrl = collection.getCoverFileURL)
 </div>

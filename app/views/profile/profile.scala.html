@@ -11,7 +11,6 @@
                 @commonHorizontalSwitcher(
                     ListMap(
                         constants.View.OWNED -> (routes.javascript.NFTController.ownedSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.OWNED}')")),
-                        constants.View.OFFER -> (routes.javascript.NFTController.offerSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.OFFER}')")),
                         constants.View.CREATED -> (routes.javascript.CollectionController.createdSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.CREATED}')")),
                         constants.View.WHITELIST -> (routes.javascript.WhitelistController.whitelistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WHITELIST}')")),
                         constants.View.WISHLIST -> (routes.javascript.WishlistController.wishlistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WISHLIST}')")),

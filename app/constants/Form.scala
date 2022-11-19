@@ -44,7 +44,6 @@ object Form {
   val NFT_TAGS: Form = Form("NFT_TAGS", routes.javascript.NFTController.tagsForm, routes.NFTController.tags())
   val NFT_SET_PROPERTIES: Form = Form("NFT_SET_PROPERTIES", routes.javascript.NFTController.setPropertiesForm, routes.NFTController.setProperties())
 
-  val NFT_WHITELIST_SALE: Form = Form("NFT_WHITELIST_SALE", routes.javascript.SaleController.createWhitelistSaleForm, routes.SaleController.createWhitelistSale())
-  val NFT_WHITELIST_SALE_ACCEPT_OFFER: Form = Form("NFT_WHITELIST_SALE_ACCEPT_OFFER", routes.javascript.SaleController.acceptWhitelistSaleOfferForm, routes.SaleController.acceptWhitelistSaleOffer())
+  val COLLECTION_SALE: Form = Form("COLLECTION_SALE", routes.javascript.SaleController.createCollectionSaleForm, routes.SaleController.createCollectionSale())
 
 }

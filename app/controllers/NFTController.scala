@@ -1,7 +1,5 @@
 package controllers
 
-import akka.stream.scaladsl.{Source, StreamConverters}
-import akka.util.ByteString
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
@@ -31,13 +29,13 @@ class NFTController @Inject()(
                                masterAccounts: master.Accounts,
                                masterCollections: master.Collections,
                                masterNFTs: master.NFTs,
+                               masterNFTOwners: master.NFTOwners,
                                masterNFTProperties: master.NFTProperties,
                                masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                masterWishLists: master.WishLists,
                                masterWhitelists: master.Whitelists,
                                masterWhitelistMembers: master.WhitelistMembers,
                                masterCollectionFiles: master.CollectionFiles,
-                               masterNFTWhitelistSales: master.NFTWhitelistSales,
                                utilitiesNotification: utilities.Notification,
                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -114,24 +112,6 @@ class NFTController @Inject()(
     }
   }
 
-  def file(nftId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val nft = masterNFTs.Service.tryGet(nftId)
-
-      def getCollection(collectionID: String) = masterCollections.Service.tryGet(collectionID)
-
-      (for {
-        nft <- nft
-        collection <- getCollection(nft.collectionId)
-      } yield {
-        val source: Source[ByteString, _] = StreamConverters.fromInputStream(() => utilities.AmazonS3.getFullObject(collection.name + "/nfts/" + nft.fileName).getObjectContent.getDelegateStream)
-        Ok.chunked(source, inline = true, Option(nft.fileName))
-      }
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
   def likesCounter(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
@@ -180,8 +160,8 @@ class NFTController @Inject()(
           try {
             request.body.file(constants.File.KEY_FILE) match {
               case None => BadRequest(constants.View.BAD_REQUEST)
-              case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.COLLECTION_FILE_FORM.maxFileSize) {
-                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, constants.Collection.getNFTFilePath)
+              case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.COLLECTION_DRAFT_FILE_FORM.maxFileSize) {
+                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, constants.Collection.getNFTFilePath(collectionId))
                 Ok
               } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
             }
@@ -194,10 +174,9 @@ class NFTController @Inject()(
 
   def uploadNFTFile(collectionId: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val oldFilePath = constants.Collection.getNFTFilePath + name
-      val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
-      val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(name)
-      val awsKey = collectionId + "/nfts/" + newFileName
+      val oldFilePath = constants.Collection.getNFTFilePath(collectionId) + name
+      val newFileName = utilities.FileOperations.getFileHash(oldFilePath) + "." + utilities.FileOperations.fileExtensionFromName(name)
+      val awsKey = constants.NFT.getAwsKey(collectionId = collectionId, fileName = newFileName)
       val collection = masterCollections.Service.tryGet(id = collectionId)
 
       def uploadToAws(collection: Collection) = if (collection.creatorId == loginState.username) Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
@@ -410,66 +389,20 @@ class NFTController @Inject()(
   def ownedNFTsPerPage(accountId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit optionalLoginState =>
       implicit request =>
-        val nfts = masterNFTs.Service.getByOwnerIdAndPageNumber(accountId, pageNumber)
+        val nftIds = masterNFTOwners.Service.getByOwnerIdAndPageNumber(accountId, pageNumber)
+
+        def nfts(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds)
 
         def collections(collectionIds: Seq[String]) = masterCollections.Service.getCollections(collectionIds)
 
         def wishLists(nftIds: Seq[String]) = masterWishLists.Service.get(accountId = accountId, nftIds = nftIds)
 
         (for {
-          nfts <- nfts
+          nftIds <- nftIds
+          nfts <- nfts(nftIds)
           collections <- collections(nfts.map(_.collectionId))
           wishLists <- wishLists(nfts.map(_.fileName))
         } yield Ok(views.html.profile.owned.ownedNFTsPerPage(nfts, collections, wishLists))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def offerSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withLoginActionAsync { implicit loginState =>
-      implicit request =>
-        Future(Ok(views.html.profile.offer.offerSection()))
-    }
-  }
-
-  def offeredNFTsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val whitelistIds = masterWhitelistMembers.Service.getAllForMember(loginState.username)
-
-        def nftWhitelistSales(whitelistIds: Seq[String]) = masterNFTWhitelistSales.Service.getByPageNumber(whitelistIds, pageNumber)
-
-        def nfts(fileNames: Seq[String]) = masterNFTs.Service.getByIds(fileNames)
-
-        def collections(collectionIds: Seq[String]) = masterCollections.Service.getCollections(collectionIds)
-
-        (for {
-          whitelistIds <- whitelistIds
-          nftWhitelistSales <- nftWhitelistSales(whitelistIds)
-          nfts <- nfts(nftWhitelistSales.map(_.fileName))
-          collections <- collections(nfts.map(_.collectionId))
-        } yield Ok(views.html.profile.offer.offeredNFTsPerPage(pageNumber, nfts, nftWhitelistSales, collections))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def modalView(fileName: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val nft = masterNFTs.Service.tryGet(fileName)
-        val nftProperties = masterNFTProperties.Service.getForNFT(fileName)
-
-        def getCollection(collectionID: String) = masterCollections.Service.tryGet(collectionID)
-
-        (for {
-          nft <- nft
-          nftProperties <- nftProperties
-          collection <- getCollection(nft.collectionId)
-        } yield Ok(views.html.nft.modalView(collection, nft, nftProperties))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

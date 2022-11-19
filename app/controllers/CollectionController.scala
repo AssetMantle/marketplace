@@ -30,6 +30,7 @@ class CollectionController @Inject()(
                                       masterCollections: master.Collections,
                                       masterTransactionCollectionDrafts: masterTransaction.CollectionDrafts,
                                       masterNFTs: master.NFTs,
+                                      masterNFTOwners: master.NFTOwners,
                                       masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                       masterCollectionFiles: master.CollectionFiles,
                                       masterWishLists: master.WishLists,
@@ -202,7 +203,7 @@ class CollectionController @Inject()(
           (for {
             account <- account
             collectionDraft <- collectionDraft(account)
-          } yield PartialContent(views.html.collection.uploadFile(collectionDraft = collectionDraft))
+          } yield PartialContent(views.html.collection.uploadDraftFile(collectionDraft = collectionDraft))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message), 0))
           }
@@ -238,7 +239,7 @@ class CollectionController @Inject()(
 
           (for {
             collectionDraft <- update
-          } yield PartialContent(views.html.collection.uploadFile(collectionDraft = collectionDraft))
+          } yield PartialContent(views.html.collection.uploadDraftFile(collectionDraft = collectionDraft))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.collection.edit(Edit.form.withGlobalError(baseException.failure.message), None))
           }
@@ -246,30 +247,30 @@ class CollectionController @Inject()(
       )
   }
 
-  def uploadCollectionFilesForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def uploadCollectionDraftFilesForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id)
       (for {
         collectionDraft <- collectionDraft
-      } yield if (collectionDraft.creatorId == loginState.username) Ok(views.html.collection.uploadFile(collectionDraft = collectionDraft)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+      } yield if (collectionDraft.creatorId == loginState.username) Ok(views.html.collection.uploadDraftFile(collectionDraft = collectionDraft)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
   }
 
-  def uploadCollectionFileForm(id: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def uploadCollectionDraftFileForm(id: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val checkCollectionOwner = masterTransactionCollectionDrafts.Service.isOwner(id = id, accountId = loginState.username)
       (for {
         collectionOwner <- checkCollectionOwner
-      } yield if (collectionOwner) Ok(views.html.base.commonUploadFile(constants.File.COLLECTION_FILE_FORM, id = id, documentType = documentType))
+      } yield if (collectionOwner) Ok(views.html.base.commonUploadFile(constants.File.COLLECTION_DRAFT_FILE_FORM, id = id, documentType = documentType))
       else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
   }
 
-  def storeCollectionFile(id: String, documentType: String) = withLoginAction.applyMultipartFormData { implicit loginState =>
+  def storeCollectionDraftFile(id: String, documentType: String) = withLoginAction.applyMultipartFormData { implicit loginState =>
     implicit request =>
       UploadFile.form.bindFromRequest.fold(
         formWithErrors => {
@@ -279,8 +280,8 @@ class CollectionController @Inject()(
           try {
             request.body.file(constants.File.KEY_FILE) match {
               case None => BadRequest(constants.View.BAD_REQUEST)
-              case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.COLLECTION_FILE_FORM.maxFileSize) {
-                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, constants.Collection.getFilePath)
+              case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.COLLECTION_DRAFT_FILE_FORM.maxFileSize) {
+                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, constants.Collection.getFilePath(id))
                 Ok
               } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
             }
@@ -291,10 +292,10 @@ class CollectionController @Inject()(
       )
   }
 
-  def uploadCollectionFile(id: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def uploadCollectionDraftFile(id: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id = id)
-      val oldFilePath = constants.Collection.getFilePath + name
+      val oldFilePath = constants.Collection.getFilePath(id) + name
       val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
       val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(name)
       val awsKey = id + "/others/" + newFileName
@@ -410,4 +411,102 @@ class CollectionController @Inject()(
       )
   }
 
+  def countAccountNFTs(collectionId: String, accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val countNFts = masterNFTOwners.Service.countForOwner(collectionId = collectionId, ownerId = accountId)
+        for {
+          countNFts <- countNFts
+        } yield Ok(countNFts.toString)
+    }
+  }
+
+  def uploadCollectionFilesForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val collection = masterCollections.Service.tryGet(id)
+      (for {
+        collection <- collection
+      } yield if (collection.creatorId == loginState.username) Ok(views.html.collection.uploadFile(collection = collection)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def uploadCollectionFileForm(id: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val checkCollectionOwner = masterCollections.Service.isOwner(id = id, accountId = loginState.username)
+      (for {
+        collectionOwner <- checkCollectionOwner
+      } yield if (collectionOwner) Ok(views.html.base.commonUploadFile(constants.File.COLLECTION_FILE_FORM, id = id, documentType = documentType))
+      else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def storeCollectionFile(id: String, documentType: String) = withLoginAction.applyMultipartFormData { implicit loginState =>
+    implicit request =>
+      UploadFile.form.bindFromRequest.fold(
+        formWithErrors => {
+          BadRequest(constants.View.BAD_REQUEST)
+        },
+        fileUploadInfo => {
+          try {
+            request.body.file(constants.File.KEY_FILE) match {
+              case None => BadRequest(constants.View.BAD_REQUEST)
+              case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.COLLECTION_FILE_FORM.maxFileSize) {
+                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, constants.Collection.getFilePath(id))
+                Ok
+              } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+            }
+          } catch {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        }
+      )
+  }
+
+  def uploadCollectionFile(id: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val collection = masterCollections.Service.tryGet(id = id)
+      val oldFilePath = constants.Collection.getFilePath(id) + name
+      val newFileName = utilities.FileOperations.getFileHash(oldFilePath) + "." + utilities.FileOperations.fileExtensionFromName(name)
+      val awsKey = id + "/others/" + newFileName
+
+      def uploadToAws(collection: Collection) = if (collection.creatorId == loginState.username) {
+        val uploadLatest = Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
+
+        def deleteOldAws() = Future(documentType match {
+          case constants.Collection.File.PROFILE => collection.profileFileName.map(x => utilities.AmazonS3.deleteObject(id + "/others/" + x))
+          case constants.Collection.File.COVER => collection.coverFileName.map(x => utilities.AmazonS3.deleteObject(id + "/others/" + x))
+          case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwBaseException()
+        })
+
+        for {
+          _ <- uploadLatest
+          _ <- deleteOldAws()
+        } yield ()
+      } else {
+        utilities.FileOperations.deleteFile(oldFilePath)
+        constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
+      }
+
+      def deleteLocalFile() = Future(utilities.FileOperations.deleteFile(oldFilePath))
+
+      def updateFile = documentType match {
+        case constants.Collection.File.PROFILE => masterCollections.Service.updateProfile(id = id, fileName = newFileName)
+        case constants.Collection.File.COVER => masterCollections.Service.updateCover(id = id, fileName = newFileName)
+        case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwFutureBaseException()
+      }
+
+      (for {
+        collection <- collection
+        _ <- uploadToAws(collection)
+        _ <- deleteLocalFile()
+        _ <- updateFile
+      } yield Ok(constants.CommonConfig.AmazonS3.s3BucketURL + awsKey)
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
 }

@@ -9,7 +9,7 @@ import views.base.companion.UploadFile.UploadFile
 
 import java.io._
 import java.nio.file.InvalidPathException
-import java.security.{DigestInputStream, MessageDigest}
+import java.security.{DigestInputStream, MessageDigest, Permission}
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -21,6 +21,15 @@ object FileOperations {
   private val uploadedParts: ConcurrentMap[String, Set[UploadFile]] = new ConcurrentHashMap(8, 0.9f, 1)
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  System.setSecurityManager(new SecurityManager() {
+
+    override def checkPermission(perm: Permission): Unit = {
+    }
+
+    override def checkPermission(perm: Permission, context: Object): Unit = {
+    }
+  })
 
   def savePartialFile(filePart: Array[Byte], fileInfo: UploadFile, uploadPath: String): Set[UploadFile] = {
     try {
@@ -203,6 +212,16 @@ object FileOperations {
       case e: Exception => logger.error(e.getMessage)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
+  }
+
+  def checkAndCreateDirectory(path: String): String = try {
+    val directory = new File(path)
+    if (!directory.exists()) {
+      directory.mkdirs()
+      path
+    } else constants.Response.DIRECTORY_CREATION_FAILED.throwBaseException()
+  } catch {
+    case exception: Exception => constants.Response.DIRECTORY_CREATION_FAILED.throwBaseException(exception)
   }
 
 }

@@ -77,7 +77,8 @@ object FormField {
   // IntFormField
   val GAS_AMOUNT: IntFormField = IntFormField("GAS_AMOUNT", 20000, 2000000)
   val WHITELIST_MAX_MEMBERS: IntFormField = IntFormField("WHITELIST_MAX_MEMBERS", 1, Int.MaxValue)
-  val WHITELIST_SALE_NFT_NUMBER: IntFormField = IntFormField("WHITELIST_SALE_NFT_NUMBER", 1, Int.MaxValue)
+  val SALE_NFT_NUMBER: IntFormField = IntFormField("SALE_NFT_NUMBER", 1, Int.MaxValue)
+  val SALE_MAX_MINT_PER_ACCOUNT: IntFormField = IntFormField("SALE_MAX_MINT_PER_ACCOUNT", 1, Int.MaxValue)
 
   // EpochFormField
   val WHITELIST_INVITE_START_EPOCH: EpochFormField = EpochFormField("WHITELIST_INVITE_START_EPOCH", 1, Int.MaxValue)

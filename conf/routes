@@ -55,12 +55,17 @@ GET         /createCollection                                 controllers.Collec
 POST        /createCollection                                 controllers.CollectionController.create()
 GET         /editCollection                                   controllers.CollectionController.editForm(id: String)
 POST        /editCollection                                   controllers.CollectionController.edit()
-GET         /uploadCollectionFilesForm                        controllers.CollectionController.uploadCollectionFilesForm(id: String)
 GET         /defineProperties                                 controllers.CollectionController.definePropertiesForm(id: String)
 POST        /defineProperties                                 controllers.CollectionController.defineProperties()
 GET         /deleteCollectionDraft                            controllers.CollectionController.deleteDraftForm(collectionId: String)
 POST        /deleteCollectionDraft                            controllers.CollectionController.deleteDraft()
 
+GET         /uploadCollectionDraftFilesForm                   controllers.CollectionController.uploadCollectionDraftFilesForm(id: String)
+GET         /uploadCollectionDraftFileForm                    controllers.CollectionController.uploadCollectionDraftFileForm(id: String, documentType: String)
+POST        /storeCollectionDraftFile                         controllers.CollectionController.storeCollectionDraftFile(id: String, documentType: String)
+GET         /uploadCollectionDraftFile                        controllers.CollectionController.uploadCollectionDraftFile(id: String, documentType: String, name: String)
+
+GET         /uploadCollectionFilesForm                        controllers.CollectionController.uploadCollectionFilesForm(id: String)
 GET         /uploadCollectionFileForm                         controllers.CollectionController.uploadCollectionFileForm(id: String, documentType: String)
 POST        /storeCollectionFile                              controllers.CollectionController.storeCollectionFile(id: String, documentType: String)
 GET         /uploadCollectionFile                             controllers.CollectionController.uploadCollectionFile(id: String, documentType: String, name: String)
@@ -77,9 +82,7 @@ POST        /deleteFromWishList                               controllers.Wishli
 GET         /nft/:nftId                                       controllers.NFTController.viewNFT( nftId: String)
 GET         /nftDetails                                       controllers.NFTController.details( nftId: String)
 GET         /nftInfo                                          controllers.NFTController.info( nftId: String)
-GET         /nftFile                                          controllers.NFTController.file( nftId: String)
 GET         /likesCounter                                     controllers.NFTController.likesCounter(nftId: String)
-GET         /nftModalView                                     controllers.NFTController.modalView(fileName: String)
 
 # Create NFT
 GET         /selectCollection                                 controllers.NFTController.selectCollection()
@@ -97,8 +100,6 @@ GET         /deleteNftDraft                                   controllers.NFTCon
 POST        /deleteNftDraft                                   controllers.NFTController.deleteDraft()
 GET         /ownedSection                                     controllers.NFTController.ownedSection(accountId: String)
 GET         /ownedNFTsPerPage                                 controllers.NFTController.ownedNFTsPerPage(accountId: String, pageNumber: Int)
-GET         /offerSection                                     controllers.NFTController.offerSection()
-GET         /offeredNFTsPerPage                               controllers.NFTController.offeredNFTsPerPage(pageNumber: Int)
 
 GET         /settings                                         controllers.SettingController.viewSettings()
 GET         /profileSettings                                  controllers.SettingController.settings()
@@ -143,10 +144,8 @@ POST        /createWhitelist                                  controllers.Whitel
 GET         /editWhitelist                                    controllers.WhitelistController.editWhitelistForm(whitelistId: String)
 POST        /editWhitelist                                    controllers.WhitelistController.editWhitelist()
 
-GET         /createSale                                       controllers.SaleController.createWhitelistSaleForm(whitelistId: Option[String])
-POST        /createSale                                       controllers.SaleController.createWhitelistSale()
-GET         /acceptWhitelistSaleOffer                         controllers.SaleController.acceptWhitelistSaleOfferForm(id: String)
-POST        /acceptWhitelistSaleOffer                         controllers.SaleController.acceptWhitelistSaleOffer()
+GET         /createSale                                       controllers.SaleController.createCollectionSaleForm(whitelistId: Option[String], collectionId: Option[String])
+POST        /createSale                                       controllers.SaleController.createCollectionSale()
 
 # Should be not changed it will be public
 GET         /acceptWhitelistInvite/:whitelistId               controllers.WhitelistController.viewAcceptInviteDetails(whitelistId: String)

@@ -11,6 +11,8 @@ object NFT {
     val MaximumAllowed = 5
   }
 
+  def getAwsKey(collectionId: String, fileName: String): String = collectionId + "/nfts/" + fileName
+
   object Data {
     val STRING = "STRING"
     val BOOLEAN = "BOOLEAN"

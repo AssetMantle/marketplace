@@ -2,7 +2,7 @@ package service
 
 import models.analytics.{CollectionAnalysis, CollectionsAnalysis}
 import models.master
-import models.master.Collection
+import models.master.{Collection, NFTOwner}
 import play.api.libs.json.Reads
 import play.api.{Configuration, Logger}
 
@@ -18,6 +18,7 @@ class Starter @Inject()(
                          masterCollections: master.Collections,
                          masterCollectionFiles: master.CollectionFiles,
                          masterNFTs: master.NFTs,
+                         masterNFTOwners: master.NFTOwners,
                          masterNFTProperties: master.NFTProperties,
                          masterWishLists: master.WishLists,
                          utilitiesOperations: utilities.Operations,
@@ -27,7 +28,7 @@ class Starter @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val uploadCollectionFilePath = constants.CommonConfig.Files.CollectionPath + "/upload.json"
+  private val uploadCollectionDraftFilePath = constants.CommonConfig.Files.CollectionPath + "/upload.json"
 
   def getListOfFiles(dir: String): List[String] = {
     val file = new File(dir)
@@ -62,10 +63,31 @@ class Starter @Inject()(
     } yield ()
   }
 
+  private def addNFTOwners() = {
+    val collections = masterCollections.Service.fetchAll()
+
+    def updateNFTs(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
+      val nftIds = masterNFTs.Service.getAllIdsForCollection(collection.id)
+
+      def update(nftIds: Seq[String]) = masterNFTOwners.Service.add(nftIds.map(x => NFTOwner(fileName = x, ownerId = collection.creatorId, isCreator = true, collectionId = collection.id, quantity = 1, saleId = None)))
+
+      for {
+        nftIds <- nftIds
+        _ <- update(nftIds)
+      } yield ()
+    }
+
+    for {
+      collections <- collections
+      _ <- updateNFTs(collections)
+    } yield ()
+  }
+
   def start(): Future[Unit] = {
 
     (for {
-      _ <- updateCollectionAnalysis()
+//      _ <- updateCollectionAnalysis()
+      _ <- addNFTOwners()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)

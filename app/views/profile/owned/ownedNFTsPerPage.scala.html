@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
-@import models.master._
+@import models.master
 @import views.html.nft.commonNFTCard
 
-@(nfts: Seq[NFT], collections: Seq[Collection], likedNFTs: Seq[WishList])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(nfts: Seq[master.NFT], collections: Seq[master.Collection], likedNFTs: Seq[master.WishList])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 <div class="row m-0 p-0 ownedNFTPage">
     @if(nfts.nonEmpty) {

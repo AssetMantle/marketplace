@@ -30,7 +30,7 @@ public final class Keys {
    * It's needed for Any serialization and SDK compatibility.
    * It must not be used in a non Tendermint key context because it doesn't implement
    * ADR-28. Nevertheless, you will like to use ed25519 in app user level
-   * then you must createWhitelistSale a new proto message and follow ADR-28 for Address construction.
+   * then you must createCollectionSale a new proto message and follow ADR-28 for Address construction.
    * </pre>
    *
    * Protobuf type {@code cosmos.crypto.ed25519.PubKey}
@@ -287,7 +287,7 @@ public final class Keys {
      * It's needed for Any serialization and SDK compatibility.
      * It must not be used in a non Tendermint key context because it doesn't implement
      * ADR-28. Nevertheless, you will like to use ed25519 in app user level
-     * then you must createWhitelistSale a new proto message and follow ADR-28 for Address construction.
+     * then you must createCollectionSale a new proto message and follow ADR-28 for Address construction.
      * </pre>
      *
      * Protobuf type {@code cosmos.crypto.ed25519.PubKey}

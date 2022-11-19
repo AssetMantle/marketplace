@@ -13,7 +13,7 @@ case class CollectionAnalysis(id: String, totalNFTs: Long, totalSold: Long, tota
 
 object CollectionsAnalysis {
 
-  implicit val module: String = constants.Module.MASTER_NFT_WHITELIST_SALE
+  implicit val module: String = constants.Module.ANALYTICS_COLLECTION
 
   implicit val logger: Logger = Logger(this.getClass)
 
@@ -91,6 +91,24 @@ class CollectionsAnalysis @Inject()(
       for {
         collectionAnalysis <- collectionAnalysis
         _ <- Service.update(collectionAnalysis.copy(totalNFTs = collectionAnalysis.totalNFTs + 1))
+      } yield ()
+    }
+
+    def onCreateSale(collectionId: String): Future[Unit] = {
+      val collectionAnalysis = Service.tryGet(collectionId)
+
+      for {
+        collectionAnalysis <- collectionAnalysis
+        _ <- Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed + 1))
+      } yield ()
+    }
+
+    def onSale(collectionId: String): Future[Unit] = {
+      val collectionAnalysis = Service.tryGet(collectionId)
+
+      for {
+        collectionAnalysis <- collectionAnalysis
+        _ <- Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed - 1))
       } yield ()
     }
 

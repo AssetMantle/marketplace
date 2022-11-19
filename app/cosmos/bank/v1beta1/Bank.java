@@ -4271,7 +4271,7 @@ public final class Bank {
      * exponent represents power of 10 exponent that one must
      * raise the base_denom to in order to equal the given DenomUnit's denom
      * 1 denom = 1^exponent base_denom
-     * (e.g. with a base_denom of uatom, one can createWhitelistSale a DenomUnit of 'atom' with
+     * (e.g. with a base_denom of uatom, one can createCollectionSale a DenomUnit of 'atom' with
      * exponent = 6, thus: 1 atom = 10^6 uatom).
      * </pre>
      *
@@ -4482,7 +4482,7 @@ public final class Bank {
      * exponent represents power of 10 exponent that one must
      * raise the base_denom to in order to equal the given DenomUnit's denom
      * 1 denom = 1^exponent base_denom
-     * (e.g. with a base_denom of uatom, one can createWhitelistSale a DenomUnit of 'atom' with
+     * (e.g. with a base_denom of uatom, one can createCollectionSale a DenomUnit of 'atom' with
      * exponent = 6, thus: 1 atom = 10^6 uatom).
      * </pre>
      *
@@ -5007,7 +5007,7 @@ public final class Bank {
        * exponent represents power of 10 exponent that one must
        * raise the base_denom to in order to equal the given DenomUnit's denom
        * 1 denom = 1^exponent base_denom
-       * (e.g. with a base_denom of uatom, one can createWhitelistSale a DenomUnit of 'atom' with
+       * (e.g. with a base_denom of uatom, one can createCollectionSale a DenomUnit of 'atom' with
        * exponent = 6, thus: 1 atom = 10^6 uatom).
        * </pre>
        *
@@ -5023,7 +5023,7 @@ public final class Bank {
        * exponent represents power of 10 exponent that one must
        * raise the base_denom to in order to equal the given DenomUnit's denom
        * 1 denom = 1^exponent base_denom
-       * (e.g. with a base_denom of uatom, one can createWhitelistSale a DenomUnit of 'atom' with
+       * (e.g. with a base_denom of uatom, one can createCollectionSale a DenomUnit of 'atom' with
        * exponent = 6, thus: 1 atom = 10^6 uatom).
        * </pre>
        *
@@ -5042,7 +5042,7 @@ public final class Bank {
        * exponent represents power of 10 exponent that one must
        * raise the base_denom to in order to equal the given DenomUnit's denom
        * 1 denom = 1^exponent base_denom
-       * (e.g. with a base_denom of uatom, one can createWhitelistSale a DenomUnit of 'atom' with
+       * (e.g. with a base_denom of uatom, one can createCollectionSale a DenomUnit of 'atom' with
        * exponent = 6, thus: 1 atom = 10^6 uatom).
        * </pre>
        *

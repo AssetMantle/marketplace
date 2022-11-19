@@ -39,6 +39,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.createdCollectionPerPage,
         routes.javascript.CollectionController.createForm,
         routes.javascript.CollectionController.editForm,
+        routes.javascript.CollectionController.uploadCollectionDraftFilesForm,
+        routes.javascript.CollectionController.uploadCollectionDraftFileForm,
+        routes.javascript.CollectionController.storeCollectionDraftFile,
+        routes.javascript.CollectionController.uploadCollectionDraftFile,
         routes.javascript.CollectionController.uploadCollectionFilesForm,
         routes.javascript.CollectionController.uploadCollectionFileForm,
         routes.javascript.CollectionController.storeCollectionFile,
@@ -58,7 +62,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.viewNFT,
         routes.javascript.NFTController.info,
         routes.javascript.NFTController.details,
-        routes.javascript.NFTController.file,
         routes.javascript.NFTController.likesCounter,
         routes.javascript.NFTController.selectCollection,
         routes.javascript.NFTController.uploadNFTFileForm,
@@ -72,9 +75,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.collectionInfo,
         routes.javascript.NFTController.ownedSection,
         routes.javascript.NFTController.ownedNFTsPerPage,
-        routes.javascript.NFTController.offerSection,
-        routes.javascript.NFTController.offeredNFTsPerPage,
-        routes.javascript.NFTController.modalView,
 
         routes.javascript.SettingController.viewSettings,
         routes.javascript.SettingController.settings,
@@ -99,8 +99,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.notificationPopup,
         routes.javascript.ProfileController.loadMoreNotifications,
 
-        routes.javascript.SaleController.createWhitelistSaleForm,
-        routes.javascript.SaleController.acceptWhitelistSaleOfferForm,
+        routes.javascript.SaleController.createCollectionSaleForm,
 
         routes.javascript.WhitelistController.whitelistSection,
         routes.javascript.WhitelistController.createdWhitelists,
