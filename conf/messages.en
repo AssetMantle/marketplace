@@ -403,6 +403,7 @@ HASH=Hash
 RESPONSE.FAILURE.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED=Amount cannot have more than 6 digits after decimal
 RESPONSE.FAILURE.TERMS_AND_CONDITION_NOT_ACCEPTED=Terms & Conditions not accepted
 RESPONSE.FAILURE.BALANCE_FETCH_FAILED=Unable to fetch balance
+WISHLIST_TOOLTIP=Add to wishlist
 
 #Logs
 CONTROLLERS_REQUEST=REQUEST "{0} {1}" from {2} by username: {3}
