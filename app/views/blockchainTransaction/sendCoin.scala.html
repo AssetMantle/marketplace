@@ -10,7 +10,7 @@
     @commonInputText(sendCoin, constants.FormField.TO_ADDRESS)
     <div class="sendCoinAmountField">
         <div id="availableBalance" class="availableBalance" onclick="setAvailableBalance('@constants.FormField.SEND_COIN_AMOUNT.name',@balance)">@Messages(constants.View.SEND_COIN_AVAILABLE_BALANCE, balance)</div>
-        @commonInputMicornumber(sendCoin, constants.FormField.SEND_COIN_AMOUNT)
+        @commonInputMicroNumber(sendCoin, constants.FormField.SEND_COIN_AMOUNT)
     </div>
     @commonInputInt(sendCoin, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultSendCoinGasAmount, Symbol("class") -> "hidden")
     @commonSelectGas(sendCoin)

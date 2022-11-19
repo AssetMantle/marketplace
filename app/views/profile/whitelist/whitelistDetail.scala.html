@@ -1,8 +1,9 @@
 @import models.master.Whitelist
 @import controllers.actions.LoginState
 @import views.html.base.buttons._
+@import models.master.Sale
 
-@(whitelist: Whitelist)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(whitelist: Whitelist, totalMembers: Int, sales: Seq[Sale])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div class="singleItemDetailContainer">
 
@@ -58,7 +59,7 @@
             <div class="col">
                 <div class="d-flex gap-3 align-items-center field">
                     <div class="fieldTitle">@Messages(constants.View.WHITELIST_DETAIL_FIELD_TITLE_COLLECTION_ON_SALE)</div>
-                    <div class="fieldValue">00</div>
+                    <div class="fieldValue">@sales.length</div>
                 </div>
             </div>
         </div>
@@ -66,7 +67,7 @@
             <div class="col">
                 <div class="d-flex gap-3 align-items-center field">
                     <div class="fieldTitle">@Messages(constants.View.WHITELIST_DETAIL_FIELD_TITLE_TOTAL_MEMBERS)</div>
-                    <div class="fieldValue">00</div>
+                    <div class="fieldValue">@totalMembers</div>
                 </div>
             </div>
             <div class="col">
@@ -76,17 +77,17 @@
                 </div>
             </div>
         </div>
-        <div class="row p-0 m-0 mt-3 detailBody">
-            <div class="col">
-                <div class="d-flex gap-3 align-items-center field">
-                    <div class="fieldTitle">@Messages(constants.View.WHITELIST_DETAIL_FIELD_TITLE_MEMBER_REQUESTS)</div>
-                    <div class="d-flex gap-2 align-items-center fieldValue">
-                        <span>00</span>
-                        @commonTertiaryButton(Messages(constants.View.WHITELIST_OFFERS_VIEW_ALL_LINK), JavaScript(""), Option("bi-chevron-right"), Option(false))
-                    </div>
-                </div>
-            </div>
-        </div>
+@*        <div class="row p-0 m-0 mt-3 detailBody">*@
+@*            <div class="col">*@
+@*                <div class="d-flex gap-3 align-items-center field">*@
+@*                    <div class="fieldTitle">@Messages(constants.View.WHITELIST_DETAIL_FIELD_TITLE_MEMBER_REQUESTS)</div>*@
+@*                    <div class="d-flex gap-2 align-items-center fieldValue">*@
+@*                        <span>00</span>*@
+@*                        @commonTertiaryButton(Messages(constants.View.WHITELIST_OFFERS_VIEW_ALL_LINK), JavaScript(""), Option("bi-chevron-right"), Option(false))*@
+@*                    </div>*@
+@*                </div>*@
+@*            </div>*@
+@*        </div>*@
     </div>
 
     <div class="contentBody">
@@ -106,7 +107,14 @@
                                     <th class="tableFieldDuration">@Messages(constants.View.WHITELIST_OFFERS_DURATION_TITLE)</th>
                                 </tr>
                             </thead>
-                            <tbody id="WhitelistOffersListTableBody"></tbody>
+                            <tbody id="WhitelistOffersListTableBody">
+                                @sales.zipWithIndex.map{ case (sale, index) =>
+                                  <tr>@(index + 1)</tr>
+                                  <tr>@sale.collectionId</tr>
+                                  <tr>@sale.getStatus</tr>
+                                <tr>@sale.collectionId</tr>
+                                }
+                            </tbody>
                         </table>
                     </div>
                 </div>

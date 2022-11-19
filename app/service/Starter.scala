@@ -57,10 +57,13 @@ class Starter @Inject()(
       } yield ()
     }
 
-    for {
+    (for {
       collections <- collections
       _ <- updateAnalytics(collections)
     } yield ()
+      ).recover {
+      case exception: Exception =>
+    }
   }
 
   private def addNFTOwners() = {
@@ -71,10 +74,13 @@ class Starter @Inject()(
 
       def update(nftIds: Seq[String]) = masterNFTOwners.Service.add(nftIds.map(x => NFTOwner(fileName = x, ownerId = collection.creatorId, isCreator = true, collectionId = collection.id, quantity = 1, saleId = None)))
 
-      for {
+      (for {
         nftIds <- nftIds
         _ <- update(nftIds)
       } yield ()
+        ).recover {
+        case exception: Exception =>
+      }
     }
 
     for {
@@ -86,7 +92,7 @@ class Starter @Inject()(
   def start(): Future[Unit] = {
 
     (for {
-//      _ <- updateCollectionAnalysis()
+      _ <- updateCollectionAnalysis()
       _ <- addNFTOwners()
     } yield ()
       ).recover {
