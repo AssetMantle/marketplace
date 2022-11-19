@@ -102,3 +102,12 @@ function loadArtNftOnScroll(collectionId) {
         }
     }, 300);
 }
+
+function loadFirstNFTs(collectionId){
+    loadFirstNFTBulk('nftsPerPage', jsRoutes.controllers.CollectionController.collectionNFTsPerPage(`${collectionId}`, 1));
+    if($(document).height() > 1000) {
+        setTimeout(() => {
+            loadArtNftOnScroll(`${collectionId}`)
+        }, 1000);
+    }
+}

@@ -3,7 +3,7 @@
 
 @(viewMnemonicsForm: Form[ViewMnemonics.Data] = ViewMnemonics.form, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
+<link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/userProfile.css")"/>
 @commonForm(constants.Form.VIEW_MNEMONICS, viewMnemonicsForm) {
     @commonInputText(viewMnemonicsForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly")
     <div class="modal-body">
