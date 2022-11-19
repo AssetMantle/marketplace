@@ -219,7 +219,7 @@ object FileOperations {
     if (!directory.exists()) {
       directory.mkdirs()
       path
-    } else constants.Response.DIRECTORY_CREATION_FAILED.throwBaseException()
+    } else path
   } catch {
     case exception: Exception => constants.Response.DIRECTORY_CREATION_FAILED.throwBaseException(exception)
   }
