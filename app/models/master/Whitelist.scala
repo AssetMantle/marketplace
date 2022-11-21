@@ -109,9 +109,12 @@ class Whitelists @Inject()(
 
     def getByIds(whitelistIds: Seq[String]): Future[Seq[Whitelist]] = filter(_.id.inSet(whitelistIds)).map(_.map(_.deserialize))
 
+    def getIdsByOwnerId(ownerId: String): Future[Seq[String]] = filter(_.ownerId === ownerId).map(_.map(_.id))
+
     def hasWhitelist(accountId: String): Future[Boolean] = filter(_.ownerId === accountId).map(_.nonEmpty)
 
-    def getAll(ownerId: String): Future[Map[String, String]] = filter(_.ownerId === ownerId).map(_.map(x => x.id -> x.name).toMap)
+    def getAllByOwner(ownerId: String) = filter(_.ownerId === ownerId).map(_.map(_.id))
+    def getIdNameMapForOwner(ownerId: String): Future[Map[String, String]] = filter(_.ownerId === ownerId).map(_.map(x => x.id -> x.name).toMap)
 
   }
 }

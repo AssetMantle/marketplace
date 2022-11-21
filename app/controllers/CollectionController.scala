@@ -30,9 +30,11 @@ class CollectionController @Inject()(
                                       masterCollections: master.Collections,
                                       masterTransactionCollectionDrafts: masterTransaction.CollectionDrafts,
                                       masterNFTs: master.NFTs,
+                                      masterSales: master.Sales,
                                       masterNFTOwners: master.NFTOwners,
                                       masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                       masterCollectionFiles: master.CollectionFiles,
+                                      masterWhitelists: master.Whitelists,
                                       masterWishLists: master.WishLists,
                                       utilitiesNotification: utilities.Notification,
                                     )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -414,11 +416,18 @@ class CollectionController @Inject()(
   def countAccountNFTs(collectionId: String, accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val countNFts = masterNFTOwners.Service.countForOwner(collectionId = collectionId, ownerId = accountId)
+        val whitelistIds = masterWhitelists.Service.getAllByOwner(accountId)
+
+        def currentOnSaleIds(whitelistIds: Seq[String]) = masterSales.Service.getIdsCurrentOnSaleByWhitelistIds(whitelistIds)
+
+        def countNFts(currentOnSaleIds: Seq[String]) = masterNFTOwners.Service.countForOwnerNotOnSale(collectionId = collectionId, currentOnSaleIds = currentOnSaleIds, ownerId = accountId)
+
         (for {
-          countNFts <- countNFts
+          whitelistIds <- whitelistIds
+          currentOnSaleIds <- currentOnSaleIds(whitelistIds)
+          countNFts <- countNFts(currentOnSaleIds)
         } yield Ok(countNFts.toString)
-          ).recover{
+          ).recover {
           case _: BaseException => BadRequest("0")
         }
     }

@@ -9,7 +9,6 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import utilities.MicroNumber
 import views.sale.companion._
 
 import javax.inject.{Inject, Singleton}
@@ -45,7 +44,7 @@ class SaleController @Inject()(
 
   def createCollectionSaleForm(whitelistId: Option[String], collectionId: Option[String]): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val whitelists = masterWhitelists.Service.getAll(loginState.username)
+      val whitelists = masterWhitelists.Service.getIdNameMapForOwner(loginState.username)
       val collections = masterCollections.Service.getByCreator(loginState.username)
 
       for {
@@ -60,7 +59,7 @@ class SaleController @Inject()(
       CreateCollectionSale.form.bindFromRequest().fold(
         formWithErrors => {
           val collections = masterCollections.Service.getByCreator(loginState.username)
-          val whitelists = masterWhitelists.Service.getAll(loginState.username)
+          val whitelists = masterWhitelists.Service.getIdNameMapForOwner(loginState.username)
 
           for {
             whitelists <- whitelists
@@ -69,28 +68,37 @@ class SaleController @Inject()(
         },
         createData => {
           val collection = masterCollections.Service.tryGet(id = createData.collectionId)
-          val countNFts = masterNFTOwners.Service.countForOwner(collectionId = createData.collectionId, ownerId = loginState.username)
+          val whitelistIds = masterWhitelists.Service.getIdsByOwnerId(loginState.username)
+
+          def currentOnSaleIds(whitelistIds: Seq[String]) = masterSales.Service.getIdsCurrentOnSaleByWhitelistIds(whitelistIds)
+
+          def countNFts(currentOnSaleIds: Seq[String]) = masterNFTOwners.Service.countForOwnerNotOnSale(collectionId = createData.collectionId, currentOnSaleIds = currentOnSaleIds, ownerId = loginState.username)
 
           def updateCreatorFee(collection: Collection) = if (collection.creatorFee != createData.creatorFee) masterCollections.Service.update(collection.copy(creatorFee = createData.creatorFee)) else Future()
 
-          def addToSale(collection: Collection, countNFts: Int) = if (collection.creatorId == loginState.username && collection.public) {
+          def addToSale(collection: Collection, countNFts: Int, currentOnSaleIds: Seq[String]) = if (collection.creatorId == loginState.username && collection.public) {
             if (createData.nftForSale <= countNFts) {
-              masterSales.Service.add(createData.toNewSale)
+              for {
+                saleId <- masterSales.Service.add(createData.toNewSale)
+                _ <- masterNFTOwners.Service.addRandomNFTsToSale(collectionId = collection.id, nfts = createData.nftForSale, ownerId = loginState.username, saleId = saleId, currentOnSaleIds= currentOnSaleIds)
+              } yield ()
             } else constants.Response.NOT_ENOUGH_NFTS_IN_COLLECTION.throwFutureBaseException()
           } else constants.Response.NOT_COLLECTION_OWNER_OR_COLLECTION_NOT_PUBLIC.throwFutureBaseException()
 
           (for {
             collection <- collection
-            countNFts <- countNFts
+            whitelistIds <- whitelistIds
+            currentOnSaleIds <- currentOnSaleIds(whitelistIds)
+            countNFts <- countNFts(currentOnSaleIds)
             _ <- updateCreatorFee(collection)
-            _ <- addToSale(collection = collection, countNFts = countNFts)
+            _ <- addToSale(collection = collection, countNFts = countNFts, currentOnSaleIds = currentOnSaleIds)
             _ <- collectionsAnalysis.Utility.onCreateSale(collection.id)
           } yield PartialContent(views.html.sale.createSuccessful())
             ).recover {
             case baseException: BaseException => {
               try {
                 val collections = masterCollections.Service.getByCreator(loginState.username)
-                val whitelists = masterWhitelists.Service.getAll(loginState.username)
+                val whitelists = masterWhitelists.Service.getIdNameMapForOwner(loginState.username)
 
                 val result = for {
                   whitelists <- whitelists

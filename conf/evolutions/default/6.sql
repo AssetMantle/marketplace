@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS MASTER."NFTOwner"
 (
     "fileName"             VARCHAR NOT NULL,
     "ownerId"              VARCHAR NOT NULL,
-    "isCreator"            BOOLEAN NOT NULL,
+    "creatorId"            VARCHAR NOT NULL,
     "collectionId"         VARCHAR NOT NULL,
     "quantity"             BIGINT  NOT NULL,
     "saleId"               VARCHAR,

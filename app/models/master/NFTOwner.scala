@@ -7,8 +7,9 @@ import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Random
 
-case class NFTOwner(fileName: String, ownerId: String, isCreator: Boolean, collectionId: String, quantity: Long, saleId: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
+case class NFTOwner(fileName: String, ownerId: String, creatorId: String, collectionId: String, quantity: Long, saleId: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
   def id1: String = fileName
 
   def id2: String = ownerId
@@ -23,13 +24,13 @@ object NFTOwners {
 
   class NFTOwnerTable(tag: Tag) extends Table[NFTOwner](tag, "NFTOwner") with ModelTable2[String, String] {
 
-    def * = (fileName, ownerId, isCreator, collectionId, quantity, saleId.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTOwner.tupled, NFTOwner.unapply)
+    def * = (fileName, ownerId, creatorId, collectionId, quantity, saleId.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTOwner.tupled, NFTOwner.unapply)
 
     def fileName = column[String]("fileName", O.PrimaryKey)
 
     def ownerId = column[String]("ownerId", O.PrimaryKey)
 
-    def isCreator = column[Boolean]("isCreator")
+    def creatorId = column[String]("creatorId")
 
     def collectionId = column[String]("collectionId")
 
@@ -79,8 +80,18 @@ class NFTOwners @Inject()(
 
     def countForOwner(collectionId: String, ownerId: String): Future[Int] = filterAndCount(x => x.collectionId === collectionId && x.ownerId === ownerId)
 
+    def countForOwnerNotOnSale(collectionId: String, currentOnSaleIds: Seq[String], ownerId: String): Future[Int] = filterAndCount(x => x.collectionId === collectionId && x.ownerId === ownerId && !x.saleId.inSet(currentOnSaleIds))
+
+    def addRandomNFTsToSale(collectionId: String, ownerId: String, nfts: Int, saleId: String, currentOnSaleIds: Seq[String]): Future[Unit] = {
+      val notOnSaleNFTs = filter(x => x.ownerId === ownerId && x.collectionId === collectionId && !x.saleId.inSet(currentOnSaleIds))
+      for {
+        notOnSaleNFTs <- notOnSaleNFTs
+        _ <- upsertMultiple(Random.shuffle(notOnSaleNFTs).take(nfts).map(_.copy(saleId = Option(saleId))))
+      } yield ()
+    }
+
 
     //    https://scala-slick.org/doc/3.1.1/sql-to-slick.html#id21
-    //    def getQuery = NFTOwners.TableQuery.filter(x => x.ownerId === "asd" && x.isCreator)
+    //    def getQuery = NFTOwners.TableQuery.filter(x => x.ownerId === "asd" && x.creatorId)
   }
 }

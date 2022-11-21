@@ -101,6 +101,11 @@ class Sales @Inject()(
     def tryGet(id: String): Future[Sale] = filterHead(_.id === id).map(_.deserialize)
 
     def getByWhitelistId(whitelistId: String): Future[Seq[Sale]] = filter(_.whitelistId === whitelistId).map(_.map(_.deserialize))
+
+    def getIdsCurrentOnSaleByWhitelistIds(whitelistIds: Seq[String]): Future[Seq[String]] = {
+      val currentEpoch = utilities.Date.currentEpoch
+      filter(x => x.whitelistId.inSet(whitelistIds) && x.endTimeEpoch > currentEpoch).map(_.map(_.id))
+    }
   }
 
 }

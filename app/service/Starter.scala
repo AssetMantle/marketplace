@@ -72,7 +72,7 @@ class Starter @Inject()(
     def updateNFTs(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
       val nftIds = masterNFTs.Service.getAllIdsForCollection(collection.id)
 
-      def update(nftIds: Seq[String]) = masterNFTOwners.Service.add(nftIds.map(x => NFTOwner(fileName = x, ownerId = collection.creatorId, isCreator = true, collectionId = collection.id, quantity = 1, saleId = None)))
+      def update(nftIds: Seq[String]) = masterNFTOwners.Service.add(nftIds.map(x => NFTOwner(fileName = x, ownerId = collection.creatorId, creatorId = collection.creatorId, collectionId = collection.id, quantity = 1, saleId = None)))
 
       (for {
         nftIds <- nftIds

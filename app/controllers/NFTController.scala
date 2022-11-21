@@ -317,16 +317,19 @@ class NFTController @Inject()(
             val updateDraft = masterTransactionNFTDrafts.Service.updateProperties(setPropertiesData.fileName, setPropertiesData.getNFTProperties(collection.properties.getOrElse(Seq())))
 
             def addToNFT(nftDraft: NFTDraft) = if (!setPropertiesData.saveNFTDraft) {
-              val add = masterNFTs.Service.add(nftDraft.toNFT(loginState.username))
+              val add = masterNFTs.Service.add(nftDraft.toNFT())
 
               def addProperties() = masterNFTProperties.Service.addMultiple(nftDraft.getNFTProperties)
 
-              def delete = masterTransactionNFTDrafts.Service.deleteNFT(nftDraft.fileName)
+              def addOwner(nftOwner: master.NFTOwner) = masterNFTOwners.Service.add(nftOwner)
+
+              def deleteDraft = masterTransactionNFTDrafts.Service.deleteNFT(nftDraft.fileName)
 
               for {
-                _ <- add
+                nft <- add
                 _ <- addProperties()
-                _ <- delete
+                _ <- addOwner(nftDraft.toNFTOwner(ownerID = collection.creatorId, creatorId = collection.creatorId, saleId = None))
+                _ <- deleteDraft
                 _ <- collectionsAnalysis.Utility.onNewNFT(collection.id)
                 _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.NFT_CREATED, nftDraft.name.getOrElse(""))(nftDraft.fileName)
               } yield ()
@@ -335,7 +338,7 @@ class NFTController @Inject()(
             for {
               draft <- updateDraft
               _ <- addToNFT(draft)
-            } yield draft.toNFT(loginState.username)
+            } yield draft.toNFT()
           } else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
 
           (for {
