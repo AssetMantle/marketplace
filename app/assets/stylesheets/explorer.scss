@@ -57,6 +57,12 @@
       text-transform: capitalize;
     }
   }
+  .analysisTitle{
+    @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+  }
+  .analysisValue{
+    @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+  }
 }
 .collectionContainer{
   width: 100%;
@@ -650,29 +656,29 @@
             font-size: 12px !important;
           }
         }
-        .statusOptions{
-          .option{
-            display: none;
-            &.active{
-              display: block;
-            }
-          }
-          .statusBadge{
-            height: 12px;
-            width: 12px;
-            aspect-ratio: 1;
-            border-radius: 50%;
-            &.notStarted{
-              background-color: var(--disable);
-            }
-            &.started{
-              background-color: var(--connected);
-            }
-            &.ended{
-              background-color: var(--error);
-            }
-          }
-        }
+      }
+    }
+  }
+  .statusOptions{
+    .option{
+      display: none;
+      &.active{
+        display: block;
+      }
+    }
+    .statusBadge{
+      height: 12px;
+      width: 12px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      &.notStarted{
+        background-color: var(--disable);
+      }
+      &.started{
+        background-color: var(--connected);
+      }
+      &.ended{
+        background-color: var(--error);
       }
     }
   }

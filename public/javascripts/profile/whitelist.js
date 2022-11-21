@@ -154,3 +154,19 @@ function setOffersStatus(startEpoch, endEpoch){
         $(".statusOptions .option.notStarted").addClass("active");
     }
 }
+
+function setSaleStatus(saleId){
+    let status = $("#"+saleId+" .status").text();
+    if(status === "Ongoing"){
+        $("#" + saleId + ".statusOptions .option").removeClass("active");
+        $("#" + saleId + ".statusOptions .option.started").addClass("active");
+    }
+    else if(status === "Ended"){
+        $("#" + saleId + ".statusOptions .option").removeClass("active");
+        $("#" + saleId + ".statusOptions .option.ended").addClass("active");
+    }
+    else{
+        $("#" + saleId + ".statusOptions .option").removeClass("active");
+        $("#" + saleId + ".statusOptions .option.notStarted").addClass("active");
+    }
+}
