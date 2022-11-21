@@ -76,14 +76,19 @@ class SaleController @Inject()(
 
           def updateCreatorFee(collection: Collection) = if (collection.creatorFee != createData.creatorFee) masterCollections.Service.update(collection.copy(creatorFee = createData.creatorFee)) else Future()
 
-          def addToSale(collection: Collection, countNFts: Int, currentOnSaleIds: Seq[String]) = if (collection.creatorId == loginState.username && collection.public) {
-            if (createData.nftForSale <= countNFts) {
+          def addToSale(collection: Collection, countNFts: Int, currentOnSaleIds: Seq[String]) = {
+            val errors = Seq(
+              if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
+              if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
+              if (createData.nftForSale > countNFts) Option(constants.Response.NOT_ENOUGH_NFTS_IN_COLLECTION) else None,
+            ).flatten
+            if (errors.isEmpty) {
               for {
                 saleId <- masterSales.Service.add(createData.toNewSale)
                 _ <- masterNFTOwners.Service.addRandomNFTsToSale(collectionId = collection.id, nfts = createData.nftForSale, ownerId = loginState.username, saleId = saleId, currentOnSaleIds = currentOnSaleIds)
               } yield ()
-            } else constants.Response.NOT_ENOUGH_NFTS_IN_COLLECTION.throwFutureBaseException()
-          } else constants.Response.NOT_COLLECTION_OWNER_OR_COLLECTION_NOT_PUBLIC.throwFutureBaseException()
+            } else errors.head.throwFutureBaseException()
+          }
 
           (for {
             collection <- collection
