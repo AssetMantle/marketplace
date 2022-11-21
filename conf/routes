@@ -137,6 +137,8 @@ GET         /profileSection                                   controllers.Profil
 GET         /notificationPopup                                controllers.ProfileController.notificationPopup()
 GET         /loadMoreNotifications                            controllers.ProfileController.loadMoreNotifications(pageNumber: Int)
 GET         /markNotificationRead                             controllers.ProfileController.markNotificationRead(notificationId: String)
+GET         /countUnreadNotification                          controllers.ProfileController.countUnreadNotification()
+GET         /markAllNotificationRead                          controllers.ProfileController.markAllNotificationRead()
 
 GET         /whitelistSection                                 controllers.WhitelistController.whitelistSection()
 GET         /createdWhitelists                                controllers.WhitelistController.createdWhitelists()

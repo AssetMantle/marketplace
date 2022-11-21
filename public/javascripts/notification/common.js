@@ -55,11 +55,29 @@ function markAsRead(id) {
             statusCode: {
                 200: function (data) {
                     element.removeClass("unread").addClass("read");
+                    console.log(data);
                 },
                 400: function (data) {
                     console.log(data.responseText)
                 },
             }
-        })
+        });
     }
+}
+
+function countUnread() {
+    let route = jsRoutes.controllers.ProfileController.countUnreadNotification();
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                console.log(data);
+            },
+            400: function (data) {
+                console.log(data.responseText)
+            },
+        }
+    })
 }

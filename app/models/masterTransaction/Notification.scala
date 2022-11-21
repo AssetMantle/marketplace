@@ -1,5 +1,6 @@
 package models.masterTransaction
 
+import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -62,7 +63,8 @@ object Notifications {
 }
 
 @Singleton
-class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider
+class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider,
+                              utilitiesOperations: utilities.Operations,
                              )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[Notifications.NotificationTable, Notifications.NotificationSerializable, String](
     databaseConfigProvider,
@@ -91,7 +93,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def update(notification: Notification): Future[Unit] = updateById(notification.serialize())
 
-    def markNotificationRead(notificationId: String, accountId: String): Future[Unit] = {
+    def markNotificationRead(notificationId: String, accountId: String): Future[Int] = {
       val notification = tryGetById(notificationId)
 
       def updateRead(notification: Notification) = if (notification.accountID.getOrElse("") == accountId) update(notification.copy(read = true))
@@ -100,9 +102,26 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
       for {
         notification <- notification
         _ <- updateRead(notification.deserialize())
-      } yield ()
+        unread <- getNumberOfUnread(accountId)
+      } yield unread
     }
 
+    def markAllRead(accountId: String) = {
+      val notifications = filter(x => x.accountID === accountId && !x.read)
+
+      def updateRead(notifications: Seq[Notification]) = utilitiesOperations.traverse(notifications) { notification =>
+        (for {
+          _ <- update(notification.copy(read = true))
+        } yield ()
+          ).recover {
+          case _: BaseException =>
+        }
+      }
+
+      for {
+        notifications <- notifications
+      } yield updateRead(notifications.map(_.deserialize()))
+    }
   }
 
 }
