@@ -105,6 +105,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.profile,
         routes.javascript.ProfileController.notificationPopup,
         routes.javascript.ProfileController.loadMoreNotifications,
+        routes.javascript.ProfileController.markNotificationRead,
 
         routes.javascript.SaleController.createCollectionSaleForm,
         routes.javascript.SaleController.buySaleNFTForm,

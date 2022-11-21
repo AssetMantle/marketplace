@@ -43,3 +43,23 @@ function onNotificationClick(route) {
         });
     }
 }
+
+function markAsRead(id) {
+    let route = jsRoutes.controllers.ProfileController.markNotificationRead(id);
+    let element = $('#' + id);
+    if (element.attr("class").includes("unread")) {
+        $.ajax({
+            url: route.url,
+            type: route.type,
+            async: true,
+            statusCode: {
+                200: function (data) {
+                    element.removeClass("unread").addClass("read");
+                },
+                400: function (data) {
+                    console.log(data.responseText)
+                },
+            }
+        })
+    }
+}

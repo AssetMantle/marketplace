@@ -136,6 +136,7 @@ GET         /profile/:accountId                               controllers.Profil
 GET         /profileSection                                   controllers.ProfileController.profile(accountId: String, activeTab: String)
 GET         /notificationPopup                                controllers.ProfileController.notificationPopup()
 GET         /loadMoreNotifications                            controllers.ProfileController.loadMoreNotifications(pageNumber: Int)
+GET         /markNotificationRead                             controllers.ProfileController.markNotificationRead(notificationId: String)
 
 GET         /whitelistSection                                 controllers.WhitelistController.whitelistSection()
 GET         /createdWhitelists                                controllers.WhitelistController.createdWhitelists()

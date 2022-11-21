@@ -68,4 +68,16 @@ class ProfileController @Inject()(
         }
     }
   }
+
+  def markNotificationRead(notificationId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val markRead = masterTransactionNotifications.Service.markNotificationRead(notificationId = notificationId, accountId = loginState.username)
+      (for {
+        markRead <- markRead
+      } yield Ok
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
 }

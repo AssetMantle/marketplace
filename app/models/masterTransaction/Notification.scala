@@ -24,7 +24,6 @@ object Notifications {
   implicit val module: String = constants.Module.MASTER_TRANSACTION_NOTIFICATION
 
   implicit val logger: Logger = Logger(this.getClass)
-  val TableQuery = new TableQuery(tag => new NotificationTable(tag))
 
   case class NotificationSerializable(id: String, accountID: Option[String], title: String, messageParameters: String, jsRoute: Option[String], read: Boolean, createdOnMillisEpoch: Option[Long], createdBy: Option[String], updatedOnMillisEpoch: Option[Long], updatedBy: Option[String]) extends Entity[String] {
     def deserialize(): Notification = Notification(id = id, accountID = accountID, title = title, messageParameters = utilities.JSON.convertJsonStringToObject[Seq[String]](messageParameters), jsRoute = jsRoute, read = read, createdOnMillisEpoch = createdOnMillisEpoch, createdBy = createdBy, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
@@ -46,6 +45,8 @@ object Notifications {
 
     def read = column[Boolean]("read")
 
+    val a: Shape[_ <: FlatShapeLevel, Rep[Boolean], Boolean, _] = read.shape
+
     def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def createdBy = column[String]("createdBy")
@@ -55,6 +56,8 @@ object Notifications {
     def updatedBy = column[String]("updatedBy")
 
   }
+
+  val TableQuery = new TableQuery(tag => new NotificationTable(tag))
 
 }
 
@@ -87,6 +90,18 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     def getClickableNotifications: Future[Seq[Notification]] = filter(_.jsRoute =!= "").map(_.map(_.deserialize()))
 
     def update(notification: Notification): Future[Unit] = updateById(notification.serialize())
+
+    def markNotificationRead(notificationId: String, accountId: String): Future[Unit] = {
+      val notification = tryGetById(notificationId)
+
+      def updateRead(notification: Notification) = if (notification.accountID.getOrElse("") == accountId) update(notification.copy(read = true))
+      else constants.Response.NOT_NOTIFICATION_OWNER.throwFutureBaseException()
+
+      for {
+        notification <- notification
+        _ <- updateRead(notification.deserialize())
+      } yield ()
+    }
 
   }
 
