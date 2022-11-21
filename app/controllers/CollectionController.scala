@@ -154,13 +154,7 @@ class CollectionController @Inject()(
   def createdSection(accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        if (loginState.isDefined && loginState.get.username == accountId) {
-          val account = masterAccounts.Service.tryGet(loginState.get.username)
-          for {
-            account <- account
-          } yield Ok(views.html.profile.created.createdSection(accountId, account.accountType == constants.Account.Type.GENESIS_CREATOR))
-        } else Future(Ok(views.html.profile.created.createdSection(accountId, allowCreateCollection = false)))
-
+        Future(Ok(views.html.profile.created.createdSection(accountId, allowCreateCollection = loginState.fold("")(_.username) == accountId)))
     }
   }
 
