@@ -16,8 +16,8 @@ function onCollectionSelect(collectionId, accountId) {
 
 $("#SELECT_COLLECTION_ID_field .custom-option").on("click", function() {
     let collectionId = $(this).data("value");
-    let userId = $(".userName").text();
-    componentResource('collectionOwnedNFTs', jsRoutes.controllers.CollectionController.countAccountNFTs(`${collectionId}`,`${userId}`))
+    let userId = $(".loginUserName").text();
+    componentResource('collectionOwnedNFTs', jsRoutes.controllers.CollectionController.countAccountNFTsNotOnSale(`${collectionId}`,`${userId}`))
 });
 
 function setSaleNFTValue(e){

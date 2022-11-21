@@ -5,7 +5,7 @@
 @(createSaleForm: Form[CreateCollectionSale.Data] = CreateCollectionSale.form, collectionId: Option[String], collections: Map[String, String], whitelistId: Option[String], whitelists: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonForm(constants.Form.COLLECTION_SALE, createSaleForm) {
-    <div class="hidden userName">@loginState.username</div>
+    <div class="hidden loginUserName">@loginState.username</div>
     @if(collectionId.getOrElse("") != "") {
         @commonCustomSelect(createSaleForm, constants.FormField.SELECT_COLLECTION_ID, collections, Symbol("value") -> collectionId.get, Symbol("class") -> "custom-select sources filledSelect")
     } else {
