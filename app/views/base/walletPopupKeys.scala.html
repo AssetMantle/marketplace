@@ -1,0 +1,22 @@
+@import controllers.actions.LoginState
+@(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+<div id="changeActiveKeyFormContainer" class="hidden">
+    @views.html.setting.changeActiveKey()
+</div>
+@keys.filter(_.encryptedPrivateKey.nonEmpty).sortBy(_.name).map { key =>
+    <div class="d-flex flex-row-reverse justify-content-between walletAddressItem">
+        @if(key.active) {
+            <input type="radio" name="address" class='activeKey' id='@key.address' checked onclick="changeActive('@key.address')"/>
+        } else {
+            <input type="radio" name="address" id='@key.address' onclick="changeActive('@key.address')"/>
+        }
+    <label for="radio1" class="walletAddressLabel">@key.name</label>
+    </div>
+}
+@keys.filter(_.encryptedPrivateKey.isEmpty).sortBy(_.name).map { key =>
+    <div class="d-flex flex-row-reverse justify-content-between walletAddressItem">
+        <input type="radio" class="invisible"/>
+        <label for="radio1" class="walletAddressLabel">@key.name</label>
+    </div>
+}

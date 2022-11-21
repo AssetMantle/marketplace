@@ -51,15 +51,7 @@ class ProfileController @Inject()(
   def notificationPopup(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
-        val unread = masterTransactionNotifications.Service.getNumberOfUnread(loginState.username)
-        val notifications = masterTransactionNotifications.Service.get(loginState.username, 1)
-        (for {
-          unread <- unread
-          notifications <- notifications
-        } yield Ok(views.html.notification.commonNotificationPopup(unread, notifications))
-          ).recover {
-          case baseException: BaseException => BadRequest(baseException.failure.message)
-        }
+        Future(Ok(views.html.notification.commonNotificationPopup()))
     }
   }
 

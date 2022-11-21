@@ -80,6 +80,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SettingController.viewSettings,
         routes.javascript.SettingController.settings,
         routes.javascript.SettingController.walletPopup,
+        routes.javascript.SettingController.walletPopupKeys,
         routes.javascript.SettingController.addNewKey,
         routes.javascript.SettingController.addManagedKeyForm,
         routes.javascript.SettingController.addUnmanagedKeyForm,

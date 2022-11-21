@@ -105,6 +105,7 @@ GET         /ownedNFTsPerPage                                 controllers.NFTCon
 GET         /settings                                         controllers.SettingController.viewSettings()
 GET         /profileSettings                                  controllers.SettingController.settings()
 GET         /walletPopup                                      controllers.SettingController.walletPopup()
+GET         /walletPopupKeys                                  controllers.SettingController.walletPopupKeys()
 
 GET         /addNewKey                                        controllers.SettingController.addNewKey()
 
