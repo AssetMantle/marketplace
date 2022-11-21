@@ -83,7 +83,7 @@ class WhitelistController @Inject()(
           Future(BadRequest(views.html.profile.whitelist.create(formWithErrors)))
         },
         createData => {
-          val create = if (loginState.isVerifiedCreator) masterWhitelists.Service.addWhitelist(ownerId = loginState.username, name = createData.name, description = createData.description, maxMembers = createData.maxMembers, startEpoch = createData.startEpoch, endEpoch = createData.endEpoch)
+          val create = if (loginState.isCreator) masterWhitelists.Service.addWhitelist(ownerId = loginState.username, name = createData.name, description = createData.description, maxMembers = createData.maxMembers, startEpoch = createData.startEpoch, endEpoch = createData.endEpoch)
           else constants.Response.NO_COLLECTION_TO_CREATE_WHITELIST.throwFutureBaseException()
 
           (for {
