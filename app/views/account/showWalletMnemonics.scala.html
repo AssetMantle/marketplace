@@ -1,4 +1,5 @@
 @import views.account.companion.VerifyMnemonics
+@import views.html.base.buttons._
 
 @(walletMnemonicsForm: Form[VerifyMnemonics.Data] = VerifyMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div id="walletMnemonics">
@@ -33,8 +34,8 @@
         </ul>
     </div>
     <div class="horizontal-align">
-        @views.html.base.buttons.commonSecondaryButton(constants.View.CANCEL, JavaScript(s"closeModal()"), Symbol("data-bs-dismiss") -> "modal", Symbol("aria-label") -> "Close")
-        @views.html.base.buttons.commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideModalScreen('#verificationForm', '#walletMnemonics')"))
+        @commonSecondaryButton(constants.View.CANCEL, JavaScript(s"closeModal()"), Symbol("data-bs-dismiss") -> "modal", Symbol("aria-label") -> "Close")
+        @commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideModalScreen('#verificationForm', '#walletMnemonics')"))
     </div>
 </div>
 
