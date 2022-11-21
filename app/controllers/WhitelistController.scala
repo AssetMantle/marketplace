@@ -37,13 +37,11 @@ class WhitelistController @Inject()(
   def whitelistSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
-        val isVerifiedCreator = masterAccounts.Service.isVerifiedCreator(loginState.username)
         val whitelistsMade = masterWhitelists.Service.totalWhitelistsByOwner(loginState.username)
 
         (for {
-          isVerifiedCreator <- isVerifiedCreator
           whitelistsMade <- whitelistsMade
-        } yield Ok(views.html.profile.whitelist.whitelistSection(isVerifiedCreator = isVerifiedCreator, whitelistsMade = whitelistsMade))
+        } yield Ok(views.html.profile.whitelist.whitelistSection(whitelistsMade = whitelistsMade))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -85,14 +83,11 @@ class WhitelistController @Inject()(
           Future(BadRequest(views.html.profile.whitelist.create(formWithErrors)))
         },
         createData => {
-          val isVerifiedCreator = masterAccounts.Service.isVerifiedCreator(loginState.username)
-
-          def create(isVerifiedCreator: Boolean) = if (isVerifiedCreator) masterWhitelists.Service.addWhitelist(ownerId = loginState.username, name = createData.name, description = createData.description, maxMembers = createData.maxMembers, startEpoch = createData.startEpoch, endEpoch = createData.endEpoch)
+          val create = if (loginState.isVerifiedCreator) masterWhitelists.Service.addWhitelist(ownerId = loginState.username, name = createData.name, description = createData.description, maxMembers = createData.maxMembers, startEpoch = createData.startEpoch, endEpoch = createData.endEpoch)
           else constants.Response.NO_COLLECTION_TO_CREATE_WHITELIST.throwFutureBaseException()
 
           (for {
-            isVerifiedCreator <- isVerifiedCreator
-            id <- create(isVerifiedCreator)
+            id <- create
           } yield PartialContent(views.html.profile.whitelist.whitelistSuccessful(whitelistId = id))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.profile.whitelist.create(Create.form.withGlobalError(baseException.failure.message)))

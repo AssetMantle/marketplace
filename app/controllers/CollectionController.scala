@@ -370,8 +370,11 @@ class CollectionController @Inject()(
 
             def deleteDraft() = masterTransactionCollectionDrafts.Service.delete(collectionDraft.id)
 
+            def updateAccountToCreator() = masterAccounts.Service.updateAccountToCreator(loginState.username)
+
             for {
               _ <- add
+              _ <- updateAccountToCreator()
               _ <- deleteDraft()
               _ <- collectionsAnalysis.Utility.onNewCollection(collectionDraft.id)
               _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.COLLECTION_CREATED, collectionDraft.name)(collectionDraft.id)

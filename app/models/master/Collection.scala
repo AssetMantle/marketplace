@@ -135,8 +135,6 @@ class Collections @Inject()(
 
     def getCollections(collectionIds: Seq[String]): Future[Seq[Collection]] = filter(_.id.inSet(collectionIds)).map(_.map(_.deserialize))
 
-    def isCreator(accountId: String): Future[Boolean] = filterAndExists(_.creatorId === accountId)
-
     def totalCreated(creatorId: String): Future[Int] = filterAndCount(_.creatorId === creatorId)
 
     def total(category: String): Future[Int] = filterAndCount(_.category === category)

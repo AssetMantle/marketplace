@@ -43,6 +43,22 @@ class Starter @Inject()(
     obj
   }
 
+  private def updateAccountType() = {
+    val collections = masterCollections.Service.fetchAll()
+
+    def update(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
+      masterAccounts.Service.updateAccountToCreator(collection.creatorId)
+    }
+
+    (for {
+      collections <- collections
+      _ <- update(collections)
+    } yield ()
+      ).recover {
+      case exception: Exception =>
+    }
+  }
+
   private def updateCollectionAnalysis() = {
     val collections = masterCollections.Service.fetchAll()
 
@@ -92,6 +108,7 @@ class Starter @Inject()(
   def start(): Future[Unit] = {
 
     (for {
+      _ <- updateAccountType()
       _ <- updateCollectionAnalysis()
       _ <- addNFTOwners()
     } yield ()

@@ -123,11 +123,14 @@ class Accounts @Inject()(
     //      } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = account.passwordHash, salt = account.salt, iterations = account.iterations), account.deserialize)
     //    }
 
-    def updateAccountType(accountId: String, accountType: String): Future[Unit] = {
+    def updateAccountToCreator(accountId: String): Future[Unit] = {
       val account = tryGetById(accountId)
+
+      def update(account: Account) = if (!account.isCreator) updateById(account.copy(accountType = constants.Account.Type.CREATOR).serialize()) else Future()
+
       for {
         account <- account
-        _ <- updateById(account.copy(accountType = accountType))
+        _ <- update(account.deserialize)
       } yield ()
     }
 
@@ -135,19 +138,10 @@ class Accounts @Inject()(
 
     def tryGet(username: String): Future[Account] = tryGetById(username).map(_.deserialize)
 
-    def isVerifiedCreator(username: String): Future[Boolean] = tryGetById(username).map(x => x.accountType == constants.Account.Type.GENESIS_CREATOR || x.accountType == constants.Account.Type.VERIFIED_CREATOR)
-
     def get(username: String): Future[Option[Account]] = getById(username).map(_.map(_.deserialize))
 
     def getLanguage(id: String): Future[Lang] = get(id).map(x => x.fold(Lang("en"))(_.language))
 
-    def getAccountType(id: String): Future[String] = tryGetById(id).map(_.accountType)
-
-    def tryVerifyingAccountType(id: String, accountType: String): Future[Boolean] = getAccountType(id).map(_ == accountType)
-
     def checkAccountExists(username: String): Future[Boolean] = exists(username)
-
-    def getAllIncorrectLang(): Future[Seq[Account]] = filter(_.accountType === "en").map(_.map(_.deserialize))
-
   }
 }
