@@ -86,6 +86,7 @@ class NFTOwners @Inject()(
       } yield ()
     }
 
+    def getAllSaleIds(fileName: String): Future[Seq[String]] = filter(_.fileName === fileName).map(_.flatMap(_.saleId))
     def tryGet(fileName: String, ownerId: String): Future[NFTOwner] = tryGetById1AndId2(id1 = fileName, id2 = ownerId)
 
     def tryGetByNFTAndSaleId(fileName: String, saleId: String): Future[NFTOwner] = filterHead(x => x.saleId === saleId && x.fileName === fileName)

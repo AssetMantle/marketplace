@@ -1,6 +1,10 @@
 @import models.master.Sale
 @import controllers.actions.LoginState
 
-@(sale: Sale)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(sales: Seq[Sale], allWhitelistIds: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
-@sale.whitelistId
+@if(loginState.isDefined) {
+    @sales.find(x => allWhitelistIds.contains(x.whitelistId)).fold("")(_.collectionId)
+} else {
+    @sales.length
+}

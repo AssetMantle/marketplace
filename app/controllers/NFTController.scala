@@ -3,7 +3,7 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
-import models.master.{Collection, Sale}
+import models.master.Collection
 import models.masterTransaction.NFTDraft
 import models.{master, masterTransaction}
 import play.api.Logger
@@ -130,14 +130,17 @@ class NFTController @Inject()(
   def saleInfo(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val nftSaleId = masterNFTOwners.Service.tryGet(fileName = nftId, ownerId = loginState.username)
+        val saleIds = masterNFTOwners.Service.getAllSaleIds(fileName = nftId)
+        val allWhitelistIds = if (loginState.isDefined) masterWhitelistMembers.Service.getAllForMember(accountId = loginState.get.username)
+        else Future(Seq())
 
-        def sale(saleId: String) = masterSales.Service.tryGet(saleId)
+        def sales(saleIds: Seq[String]) = masterSales.Service.get(saleIds)
 
         (for {
-          nftSaleId <- nftSaleId
-          sale <- sale(nftSaleId.saleId.getOrElse(constants.Response.NO_SALE_ON_NFT.throwBaseException()))
-        } yield Ok(views.html.nft.detail.saleInfo(sale))
+          saleIds <- saleIds
+          allWhitelistIds <- allWhitelistIds
+          sales <- sales(saleIds)
+        } yield Ok(views.html.nft.detail.saleInfo(sales = sales, allWhitelistIds = allWhitelistIds))
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }
