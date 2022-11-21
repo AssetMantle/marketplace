@@ -765,3 +765,51 @@ body.modal-open::-webkit-scrollbar {
     @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
   }
 }
+
+.randomNFTSaleField{
+  label{
+    @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+  }
+  input{
+    @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+    height: 36px;
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    border: 1px solid var(--inactive-gray);
+    padding: calc(var(--size-bezel) * 2) 12px;
+    background: transparent;
+    border-radius: var(--size-radius);
+    letter-spacing: 1px;
+    outline: none !important;
+    box-shadow: none !important;
+    &:focus{
+      border-color: var(--dark);
+      background-color: transparent;
+      color: var(--mantle-off-white);
+      +.input-group-text{
+        border-color: var(--dark);
+      }
+    }
+    &::placeholder{
+      color: var(--inactive-gray);
+    }
+    &::-webkit-inner-spin-button{
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+    &::-webkit-outer-spin-button{
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+  }
+  .input-group-text{
+    @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--default));
+    height: 36px;
+    padding: calc(var(--size-bezel) * 2) 12px;
+    background-color: var(--card-dark);
+    border-color: var(--inactive-gray);
+  }
+}
