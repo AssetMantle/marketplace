@@ -2,24 +2,38 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="notificationPopupContainer">
-    <div class="d-flex justify-content-between align-items-center headerContainer">
-        <div class="title">@Messages(constants.View.NOTIFICATION_POPUP_TITLE)</div>
-        @* <div class="titleLink">@Messages(constants.View.NOTIFICATION_POPUP_MARK_ALL_AS_READ)</div>*@
+    <div class="haveNotification" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center headerContainer">
+            <div class="title">@Messages(constants.View.NOTIFICATION_POPUP_TITLE)</div>
+            <div class="titleLink" onclick="markAllAsRead()">@Messages(constants.View.NOTIFICATION_POPUP_MARK_ALL_AS_READ)</div>
+        </div>
+        <div class="separator"></div>
+        @* <div class="emailContainer">*@
+        @* <div class="text-end closeEmailContainer">*@
+        @* <i class="bi bi-x iconDefault iconLarge"></i>*@
+        @* </div>*@
+        @* <div class="emailInputField">*@
+        @* <span class="emailNotificationLabel">@Messages(constants.View.NOTIFICATION_POPUP_EMAIL_LABEL)</span>*@
+        @* <input type="text" placeholder="email@@email.com"/>*@
+        @* <div class="emailNotificationButton">@Messages(constants.View.NOTIFICATION_POPUP_EMAIL_SUBMIT)</div>*@
+        @* </div>*@
+        @* </div>*@
+        @* <div class="separator"></div>*@
+        <div id="notificationList"></div>
+        <div class="d-flex justify-content-between">
+            <div class="markAsReadButton">
+                <span onclick="markListItemAsRead()" id="markAsReadButton"  style="display: none;">@Messages(constants.View.NOTIFICATION_POPUP_MARK_AS_READ)</span>
+            </div>
+            <div class="loadOlderNotificationButton" style="display: none;" onclick="loadMoreNotifications()">@Messages(constants.View.NOTIFICATION_POPUP_LOAD_MORE)</div>
+        </div>
     </div>
-    <div class="separator"></div>
-    @* <div class="emailContainer">*@
-    @* <div class="text-end closeEmailContainer">*@
-    @* <i class="bi bi-x iconDefault iconLarge"></i>*@
-    @* </div>*@
-    @* <div class="emailInputField">*@
-    @* <span class="emailNotificationLabel">@Messages(constants.View.NOTIFICATION_POPUP_EMAIL_LABEL)</span>*@
-    @* <input type="text" placeholder="email@@email.com"/>*@
-    @* <div class="emailNotificationButton">@Messages(constants.View.NOTIFICATION_POPUP_EMAIL_SUBMIT)</div>*@
-    @* </div>*@
-    @* </div>*@
-    @* <div class="separator"></div>*@
-    <div id="notificationList"></div>
-    <div class="loadOlderNotificationButton" onclick="loadMoreNotifications()">@Messages(constants.View.NOTIFICATION_POPUP_LOAD_MORE)</div>
+    <div class="noNotification" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center headerContainer">
+            <div class="title">@Messages(constants.View.NOTIFICATION_POPUP_TITLE)</div>
+        </div>
+        <div class="separator"></div>
+        <div class="emptyNotificationList">@Messages(constants.View.EMPTY_NOTIFICATION)</div>
+    </div>
 </div>
 <script>loadMoreNotifications();
 countUnread();</script>

@@ -9,21 +9,34 @@
             <div class="list">
                 <div class="mb-4 singleNotification">
                     <div class="d-flex gap-2">
-                        <div class="d-flex justify-content-center align-items-center notificationIcon">
-                            <i class="bi bi-info-circle iconWhite"></i>
-                        </div>
                         @defining(if(notification.read) "notificationDetail read" else "notificationDetail unread") { notificationClass =>
-                            <div id="@notification.id" onmouseover="markAsRead('@notification.id',)" onclick="onNotificationClick(@notification.jsRoute.getOrElse(""))" class="@notificationClass">
-                                <div class="mb-2 title">@Messages(notification.title)</div>
-                                <div class="mb-2 description">@Messages(notification.message, notification.messageParameters: _*)</div>
-                                <div id="notificationDateTime_@notification.id" class="dateTime">@notification.createdOnMillisEpoch</div>
-                            </div>
+                            @if(notification.isClickable) {
+                                <div id="notificationIcon_@notification.id" class="d-flex justify-content-center align-items-center notificationIcon" onclick="addToReadList('@notification.id')">
+                                    <i class="bi bi-info-circle iconWhite"></i>
+                                </div>
+
+                                <div id="@notification.id" onmouseover="" onclick="onNotificationClick(@notification.jsRoute.getOrElse(""))" class="@notificationClass">
+                                    <div class="mb-2 title clickable">@Messages(notification.title)</div>
+                                    <div class="mb-2 description">@Messages(notification.message, notification.messageParameters: _*)</div>
+                                    <div id="notificationDateTime_@notification.id" class="dateTime">@notification.createdOnMillisEpoch</div>
+                                </div>
+                            } else {
+                                <div id="notificationIcon_@notification.id" class="d-flex justify-content-center align-items-center notificationIcon" onclick="addToReadList('@notification.id')">
+                                    <i class="bi bi-info-circle iconWhite"></i>
+                                </div>
+
+                                <div id="@notification.id" onmouseover="" class="@notificationClass">
+                                    <div class="mb-2 title">@Messages(notification.title)</div>
+                                    <div class="mb-2 description">@Messages(notification.message, notification.messageParameters: _*)</div>
+                                    <div id="notificationDateTime_@notification.id" class="dateTime">@notification.createdOnMillisEpoch</div>
+                                </div>
+                            }
                         }
                     </div>
+                    <div class="separator"></div>
                 </div>
             </div>
         </div>
-        <div class="separator"></div>
-      <script>convertMillisEpochToLocal('notificationDateTime_@notification.id')</script>
+        <script>convertMillisEpochToLocal('notificationDateTime_@notification.id')</script>
     }
 </div>
