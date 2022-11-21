@@ -2,7 +2,6 @@
 $('#GAS_PRICE option:eq(2)').prop('selected', true);
 
 // Gas Price
-const microFactor = 1000000;
 let route = jsRoutes.controllers.BlockchainTransactionController.gasTokenPrice();
 $.ajax({
     url: route.url,

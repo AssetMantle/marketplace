@@ -1,6 +1,7 @@
 function viewCollections(section) {
     componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsSection(section));
     $('#leftContent').html('');
+    $('#rightContent').html('');
 }
 
 function viewCollection(collectionId) {

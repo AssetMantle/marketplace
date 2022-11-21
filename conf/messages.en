@@ -785,3 +785,6 @@ NFT_SALE_SUCCESS_TITLE=Collection opened to Whitelist Sale Successfully
 NFT_SALE_SUCCESS_SUBTITLE=Your collection is now available for private sale to your requested whitelist.
 SALE_ONGOING=Ongoing
 SALE_EXPIRED=Ended
+COLLECTION_CURRENT_PRICE_TITLE=Current Price
+COLLECTION_CURRENT_PRICE_SUBTITLE=(Incl. Creator Royalties)
+NFT_SALE_TITLE=Sales
