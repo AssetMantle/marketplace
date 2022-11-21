@@ -49,6 +49,7 @@ GET         /collectionsPerPage                               controllers.Collec
 GET         /collectionNFTs                                   controllers.CollectionController.collectionNFTs(id: String)
 GET         /collectionNFTsPerPage                            controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionInfo                                   controllers.CollectionController.info(id: String)
+GET         /collectionAnalysis                               controllers.CollectionController.analysis(id: String)
 GET         /created                                          controllers.CollectionController.createdSection(accountId: String)
 GET         /createdCollectionPerPage                         controllers.CollectionController.createdCollectionPerPage(accountId: String, pageNumber: Int)
 GET         /countAccountNFTs                                 controllers.CollectionController.countAccountNFTs(collectionId: String, accountId: String)

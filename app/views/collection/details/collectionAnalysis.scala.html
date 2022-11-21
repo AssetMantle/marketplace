@@ -1,0 +1,11 @@
+@import models.analytics.CollectionAnalysis
+@(collectionAnalysis: CollectionAnalysis)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="sticky-top item-sticky">
+    <div class="card leftInfoCard">
+        <div class="title">@collectionAnalysis.totalNFTs</div>
+        <div class="description">
+            @collectionAnalysis.owners
+        </div>
+    </div>
+</div>
