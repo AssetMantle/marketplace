@@ -93,6 +93,8 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def update(notification: Notification): Future[Unit] = updateById(notification.serialize())
 
+
+    // TODO optimize by creating filterAndUpdate
     def markNotificationRead(notificationId: String, accountId: String): Future[Int] = {
       val notification = tryGetById(notificationId)
 
@@ -106,7 +108,8 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
       } yield unread
     }
 
-    def markAllRead(accountId: String) = {
+    // TODO optimize by creating filterAndUpdate
+    def markAllRead(accountId: String): Future[Int] = {
       val notifications = filter(x => x.accountID === accountId && !x.read)
 
       def updateRead(notifications: Seq[Notification]) = utilitiesOperations.traverse(notifications) { notification =>
@@ -120,7 +123,10 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
       for {
         notifications <- notifications
-      } yield updateRead(notifications.map(_.deserialize()))
+      } yield {
+        updateRead(notifications.map(_.deserialize()))
+        0
+      }
     }
   }
 

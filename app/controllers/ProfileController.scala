@@ -7,6 +7,7 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import views.notification.companion.MarkNotificationsRead
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -69,6 +70,7 @@ class ProfileController @Inject()(
     }
   }
 
+  // TODO: As form
   def markNotificationRead(notificationId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val markRead = masterTransactionNotifications.Service.markNotificationRead(notificationId = notificationId, accountId = loginState.username)
@@ -78,6 +80,25 @@ class ProfileController @Inject()(
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
+  }
+
+  def markNotificationsRead(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      MarkNotificationsRead.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest)
+        },
+        markNotificationsReadData => {
+          val update = if (markNotificationsReadData.markAllRead) masterTransactionNotifications.Service.markAllRead(loginState.username)
+          else masterTransactionNotifications.Service.markNotificationRead(notificationId = markNotificationsReadData.notificationId.getOrElse(""), accountId = loginState.username)
+          (for {
+            unread <- update
+          } yield Ok(unread.toString)
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        }
+      )
   }
 
   def countUnreadNotification(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -91,6 +112,7 @@ class ProfileController @Inject()(
       }
   }
 
+  // TODO: As form
   def markAllNotificationRead(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val mark = masterTransactionNotifications.Service.markAllRead(loginState.username)
