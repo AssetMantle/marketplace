@@ -4,7 +4,7 @@ import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
 import models.master.{Collection, NFTOwner, Sale}
-import models.{blockchain, master, masterTransaction}
+import models.{blockchain, master}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -33,7 +33,8 @@ class SaleController @Inject()(
                                 masterNFTOwners: master.NFTOwners,
                                 masterSales: master.Sales,
                                 masterWhitelistMembers: master.WhitelistMembers,
-                                masterTransactionNotifications: masterTransaction.Notifications,
+                                utilitiesNotification: utilities.Notification,
+                                utilitiesOperations: utilities.Operations,
                               )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -69,6 +70,7 @@ class SaleController @Inject()(
         createData => {
           val collection = masterCollections.Service.tryGet(id = createData.collectionId)
           val whitelistIds = masterWhitelists.Service.getIdsByOwnerId(loginState.username)
+          val whitelistMembers = masterWhitelistMembers.Service.getAllMembers(createData.whitelistId)
 
           def currentOnSaleIds(whitelistIds: Seq[String]) = masterSales.Service.getIdsCurrentOnSaleByWhitelistIds(whitelistIds)
 
@@ -90,15 +92,23 @@ class SaleController @Inject()(
             } else errors.head.throwFutureBaseException()
           }
 
+          def sendNotifications(whitelistMembers: Seq[String], collectionName: String): Unit = whitelistMembers.foreach { member =>
+            utilitiesNotification.send(accountID = member, constants.Notification.SALE_ON_WHITELIST, collectionName)(s"'$member', '${constants.View.WHITELIST}'")
+          }
+
           (for {
             collection <- collection
             whitelistIds <- whitelistIds
+            whitelistMembers <- whitelistMembers
             currentOnSaleIds <- currentOnSaleIds(whitelistIds)
             countNFts <- countNFts(currentOnSaleIds)
             _ <- updateCreatorFee(collection)
             _ <- addToSale(collection = collection, countNFts = countNFts, currentOnSaleIds = currentOnSaleIds)
             _ <- collectionsAnalysis.Utility.onCreateSale(collection.id)
-          } yield PartialContent(views.html.sale.createSuccessful())
+          } yield {
+            sendNotifications(whitelistMembers, collection.name)
+            PartialContent(views.html.sale.createSuccessful())
+          }
             ).recover {
             case baseException: BaseException => {
               try {

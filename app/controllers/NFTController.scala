@@ -366,7 +366,7 @@ class NFTController @Inject()(
                 _ <- addOwner(nftDraft.toNFTOwner(ownerID = collection.creatorId, creatorId = collection.creatorId, saleId = None))
                 _ <- deleteDraft
                 _ <- collectionsAnalysis.Utility.onNewNFT(collection.id)
-                _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.NFT_CREATED, nftDraft.name.getOrElse(""))(nftDraft.fileName)
+                _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.NFT_CREATED, nftDraft.name.getOrElse(""))(s"'${nftDraft.fileName}'")
               } yield ()
             } else Future()
 

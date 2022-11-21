@@ -16,6 +16,8 @@ case class Notification(id: String, accountID: Option[String], title: String, me
 
   def serialize(): Notifications.NotificationSerializable = Notifications.NotificationSerializable(id = this.id, accountID = this.accountID, title = title, messageParameters = Json.toJson(this.messageParameters).toString, jsRoute = this.jsRoute, read = this.read, createdOnMillisEpoch = this.createdOnMillisEpoch, createdBy = this.createdBy, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 
+  def isClickable: Boolean = this.jsRoute.isDefined
+
 }
 
 object Notifications {
@@ -81,6 +83,10 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
 
     def getNumberOfUnread(accountID: String): Future[Int] = filterAndCount(x => x.accountID === accountID && !x.read)
+
+    def getClickableNotifications: Future[Seq[Notification]] = filter(_.jsRoute =!= "").map(_.map(_.deserialize()))
+
+    def update(notification: Notification): Future[Unit] = updateById(notification.serialize())
 
   }
 

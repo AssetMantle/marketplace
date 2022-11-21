@@ -1,8 +1,8 @@
 package service
 
 import models.analytics.{CollectionAnalysis, CollectionsAnalysis}
-import models.master
 import models.master.{Collection, NFTOwner}
+import models.{master, masterTransaction}
 import play.api.libs.json.Reads
 import play.api.{Configuration, Logger}
 
@@ -21,6 +21,7 @@ class Starter @Inject()(
                          masterNFTOwners: master.NFTOwners,
                          masterNFTProperties: master.NFTProperties,
                          masterWishLists: master.WishLists,
+                         masterTransactionNotifications: masterTransaction.Notifications,
                          utilitiesOperations: utilities.Operations,
                        )(implicit exec: ExecutionContext, configuration: Configuration) {
 
@@ -105,9 +106,35 @@ class Starter @Inject()(
     } yield ()
   }
 
+  private def correctNotifications() = {
+    val incorrectNotifications = masterTransactionNotifications.Service.getClickableNotifications
+
+    def update(incorrectNotifications: Seq[masterTransaction.Notification]) = utilitiesOperations.traverse(incorrectNotifications) { notification =>
+      if ((notification.jsRoute.getOrElse("").contains("CollectionController.viewCollection(") && !notification.jsRoute.getOrElse("").contains("CollectionController.viewCollection('")) || (notification.jsRoute.getOrElse("").contains("NFTController.viewNFT(") && !notification.jsRoute.getOrElse("").contains("NFTController.viewNFT('"))) {
+        val updatedRoute1 = notification.jsRoute.getOrElse("").split("\\(")
+        val updatedRoute2 = updatedRoute1.last.split("\\)")
+        val route = s"${updatedRoute1.head}('${updatedRoute2.head}')"
+        println(route)
+        masterTransactionNotifications.Service.update(notification.copy(jsRoute = Option(route)))
+      } else {
+        println("already corrected: " + notification.jsRoute.getOrElse(""))
+        Future()
+      }
+    }
+
+    (for {
+      incorrectNotifications <- incorrectNotifications
+      _ <- update(incorrectNotifications)
+    } yield ()
+      ).recover {
+      case exception: Exception =>
+    }
+  }
+
   def start(): Future[Unit] = {
 
     (for {
+      _ <- correctNotifications()
       _ <- updateAccountType()
       _ <- updateCollectionAnalysis()
       _ <- addNFTOwners()
