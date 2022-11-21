@@ -422,7 +422,7 @@ class CollectionController @Inject()(
       )
   }
 
-  def countAccountNFTs(collectionId: String, accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def countAccountNFTsNotOnSale(collectionId: String, accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val whitelistIds = masterWhitelists.Service.getAllByOwner(accountId)
