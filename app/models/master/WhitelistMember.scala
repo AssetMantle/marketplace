@@ -90,7 +90,7 @@ class WhitelistMembers @Inject()(
 
     def totalJoined(accountId: String): Future[Int] = filterAndCount(_.accountId === accountId)
 
-    def isMember(whitelistId: String, accountId: String) = exists(id1 = whitelistId, id2 = accountId)
+    def isMember(whitelistId: String, accountId: String): Future[Boolean] = exists(id1 = whitelistId, id2 = accountId)
 
     def deleteAllMembers(whitelistId: String): Future[Int] = filterAndDelete(_.whitelistId === whitelistId)
 

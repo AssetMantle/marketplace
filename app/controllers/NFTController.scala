@@ -184,7 +184,7 @@ class NFTController @Inject()(
 
   def storeNFTFile(collectionId: String, documentType: String) = withLoginAction.applyMultipartFormData { implicit loginState =>
     implicit request =>
-      UploadFile.form.bindFromRequest.fold(
+      UploadFile.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(constants.View.BAD_REQUEST)
         },

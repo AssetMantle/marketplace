@@ -1,7 +1,7 @@
 package constants
 
 import play.api.data.Forms._
-import play.api.data.Mapping
+import play.api.data.{FormError, Mapping}
 import play.api.data.format.Formats._
 import play.api.data.format.Formatter
 import play.api.data.validation.Constraints
@@ -243,7 +243,7 @@ object FormField {
   implicit object UrlFormatter extends Formatter[URL] {
     override val format: Option[(String, Nil.type)] = Some(("URL", Nil))
 
-    override def bind(key: String, data: Map[String, String]) = parsing(new URL(_), "Invalid URL", Nil)(key, data)
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], URL] = parsing(new URL(_), "Invalid URL", Nil)(key, data)
 
     override def unbind(key: String, value: URL): Map[String, String] = Map(key -> value.toString)
   }
