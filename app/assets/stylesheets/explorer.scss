@@ -57,6 +57,12 @@
       text-transform: capitalize;
     }
   }
+  .analysisTitle{
+    @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+  }
+  .analysisValue{
+    @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+  }
 }
 .collectionContainer{
   width: 100%;

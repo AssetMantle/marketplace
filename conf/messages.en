@@ -237,6 +237,8 @@ TERMS_CONDITIONS_MESSAGE_3=By clicking on the Agree and continue button, you agr
 TERMS_CONDITIONS_MESSAGE_4=Click Agree and continue only if you are sure you know what you are doing and are confident in managing your keys, services, devices, tokens (NFTs and fungibles) that are used within the app/website.
 TERMS_CONDITIONS_DATE_MESSAGE=Last Updated:
 TERMS_CONDITIONS_DATE=July 01, 2022
+COLLECTION_TOTAL_NFT_TITLE=Total NFTs
+COLLECTION_OWNER_TITLE=Owners
 
 #//NFT
 NFT_CATEGORY_TITLE=Category:
