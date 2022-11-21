@@ -143,6 +143,7 @@ object Response {
   val SALE_NOT_STARTED = new Failure("SALE_NOT_STARTED")
   val SALE_EXPIRED = new Failure("SALE_EXPIRED")
   val NO_SALE_ON_NFT = new Failure("NO_SALE_ON_NFT")
+  val NOT_NOTIFICATION_OWNER = new Failure("NOT_NOTIFICATION_OWNER")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

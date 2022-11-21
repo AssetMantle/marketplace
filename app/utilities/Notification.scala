@@ -57,13 +57,13 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   }
 
   def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(routeParameters: String*): Future[Unit] = {
-    val language = masterAccounts.Service.getLanguage(accountID)
+//    val language = masterAccounts.Service.getLanguage(accountID)
     val notificationID = masterTransactionNotifications.Service.add(accountID = accountID, notification = notification, messagesParameters: _*)(routeParameters: _*)
 
     def pushNotification(implicit language: Lang): Future[Unit] = notification.pushNotification.fold(Future())(pushNotification => sendPushNotification(accountID = accountID, pushNotification = pushNotification, messageParameters = messagesParameters: _*))
 
     (for {
-      language <- language
+//      language <- language
       notificationID <- notificationID
 //      _ <- pushNotification(language)
     } yield ()

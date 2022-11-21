@@ -68,4 +68,38 @@ class ProfileController @Inject()(
         }
     }
   }
+
+  def markNotificationRead(notificationId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val markRead = masterTransactionNotifications.Service.markNotificationRead(notificationId = notificationId, accountId = loginState.username)
+      (for {
+        unread <- markRead
+      } yield Ok(unread.toString)
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def countUnreadNotification(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val unread = masterTransactionNotifications.Service.getNumberOfUnread(loginState.username)
+      (for {
+        unread <- unread
+      } yield Ok(unread.toString)
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def markAllNotificationRead(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val mark = masterTransactionNotifications.Service.markAllRead(loginState.username)
+      (for {
+        _ <- mark
+      } yield Ok
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
 }

@@ -384,7 +384,7 @@ class CollectionController @Inject()(
               _ <- updateAccountToCreator()
               _ <- deleteDraft()
               _ <- collectionsAnalysis.Utility.onNewCollection(collectionDraft.id)
-              _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.COLLECTION_CREATED, collectionDraft.name)(collectionDraft.id)
+              _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.COLLECTION_CREATED, collectionDraft.name)(s"'${collectionDraft.id}'")
             } yield ()
           } else Future("")
 

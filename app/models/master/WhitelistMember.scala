@@ -88,6 +88,8 @@ class WhitelistMembers @Inject()(
 
     def getAllForMember(accountId: String): Future[Seq[String]] = filter(_.accountId === accountId).map(_.map(_.whitelistId))
 
+    def getAllMembers(id: String): Future[Seq[String]] = filter(_.whitelistId === id).map(_.map(_.accountId))
+
     def totalJoined(accountId: String): Future[Int] = filterAndCount(_.accountId === accountId)
 
     def isMember(whitelistId: String, accountId: String): Future[Boolean] = exists(id1 = whitelistId, id2 = accountId)

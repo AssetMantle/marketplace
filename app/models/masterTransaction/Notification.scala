@@ -1,5 +1,6 @@
 package models.masterTransaction
 
+import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -16,13 +17,14 @@ case class Notification(id: String, accountID: Option[String], title: String, me
 
   def serialize(): Notifications.NotificationSerializable = Notifications.NotificationSerializable(id = this.id, accountID = this.accountID, title = title, messageParameters = Json.toJson(this.messageParameters).toString, jsRoute = this.jsRoute, read = this.read, createdOnMillisEpoch = this.createdOnMillisEpoch, createdBy = this.createdBy, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 
+  def isClickable: Boolean = this.jsRoute.isDefined
+
 }
 
 object Notifications {
   implicit val module: String = constants.Module.MASTER_TRANSACTION_NOTIFICATION
 
   implicit val logger: Logger = Logger(this.getClass)
-  val TableQuery = new TableQuery(tag => new NotificationTable(tag))
 
   case class NotificationSerializable(id: String, accountID: Option[String], title: String, messageParameters: String, jsRoute: Option[String], read: Boolean, createdOnMillisEpoch: Option[Long], createdBy: Option[String], updatedOnMillisEpoch: Option[Long], updatedBy: Option[String]) extends Entity[String] {
     def deserialize(): Notification = Notification(id = id, accountID = accountID, title = title, messageParameters = utilities.JSON.convertJsonStringToObject[Seq[String]](messageParameters), jsRoute = jsRoute, read = read, createdOnMillisEpoch = createdOnMillisEpoch, createdBy = createdBy, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
@@ -44,6 +46,8 @@ object Notifications {
 
     def read = column[Boolean]("read")
 
+    val a: Shape[_ <: FlatShapeLevel, Rep[Boolean], Boolean, _] = read.shape
+
     def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def createdBy = column[String]("createdBy")
@@ -54,10 +58,13 @@ object Notifications {
 
   }
 
+  val TableQuery = new TableQuery(tag => new NotificationTable(tag))
+
 }
 
 @Singleton
-class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider
+class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider,
+                              utilitiesOperations: utilities.Operations,
                              )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[Notifications.NotificationTable, Notifications.NotificationSerializable, String](
     databaseConfigProvider,
@@ -82,6 +89,39 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getNumberOfUnread(accountID: String): Future[Int] = filterAndCount(x => x.accountID === accountID && !x.read)
 
+    def getClickableNotifications: Future[Seq[Notification]] = filter(_.jsRoute =!= "").map(_.map(_.deserialize()))
+
+    def update(notification: Notification): Future[Unit] = updateById(notification.serialize())
+
+    def markNotificationRead(notificationId: String, accountId: String): Future[Int] = {
+      val notification = tryGetById(notificationId)
+
+      def updateRead(notification: Notification) = if (notification.accountID.getOrElse("") == accountId) update(notification.copy(read = true))
+      else constants.Response.NOT_NOTIFICATION_OWNER.throwFutureBaseException()
+
+      for {
+        notification <- notification
+        _ <- updateRead(notification.deserialize())
+        unread <- getNumberOfUnread(accountId)
+      } yield unread
+    }
+
+    def markAllRead(accountId: String) = {
+      val notifications = filter(x => x.accountID === accountId && !x.read)
+
+      def updateRead(notifications: Seq[Notification]) = utilitiesOperations.traverse(notifications) { notification =>
+        (for {
+          _ <- update(notification.copy(read = true))
+        } yield ()
+          ).recover {
+          case _: BaseException =>
+        }
+      }
+
+      for {
+        notifications <- notifications
+      } yield updateRead(notifications.map(_.deserialize()))
+    }
   }
 
 }
