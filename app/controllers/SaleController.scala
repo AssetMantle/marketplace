@@ -80,7 +80,7 @@ class SaleController @Inject()(
             if (createData.nftForSale <= countNFts) {
               for {
                 saleId <- masterSales.Service.add(createData.toNewSale)
-                _ <- masterNFTOwners.Service.addRandomNFTsToSale(collectionId = collection.id, nfts = createData.nftForSale, ownerId = loginState.username, saleId = saleId, currentOnSaleIds= currentOnSaleIds)
+                _ <- masterNFTOwners.Service.addRandomNFTsToSale(collectionId = collection.id, nfts = createData.nftForSale, ownerId = loginState.username, saleId = saleId, currentOnSaleIds = currentOnSaleIds)
               } yield ()
             } else constants.Response.NOT_ENOUGH_NFTS_IN_COLLECTION.throwFutureBaseException()
           } else constants.Response.NOT_COLLECTION_OWNER_OR_COLLECTION_NOT_PUBLIC.throwFutureBaseException()

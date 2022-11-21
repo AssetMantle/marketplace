@@ -15,10 +15,6 @@ object Collection {
     val INSTAGRAM = "INSTAGRAM"
   }
 
-  def getFilePath(collectionId: String): String = utilities.FileOperations.checkAndCreateDirectory(File.AllCollectionsPath + collectionId + "/others/")
-
-  def getNFTFilePath(collectionId: String): String = utilities.FileOperations.checkAndCreateDirectory(File.AllCollectionsPath + collectionId + "/nfts/")
-
   object Category {
     val ART = "ART"
     val PHOTOGRAPHY = "PHOTOGRAPHY"

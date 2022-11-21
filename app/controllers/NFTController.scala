@@ -161,7 +161,7 @@ class NFTController @Inject()(
             request.body.file(constants.File.KEY_FILE) match {
               case None => BadRequest(constants.View.BAD_REQUEST)
               case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.COLLECTION_DRAFT_FILE_FORM.maxFileSize) {
-                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, constants.Collection.getNFTFilePath(collectionId))
+                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, utilities.Collection.getNFTFilePath(collectionId))
                 Ok
               } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
             }
@@ -174,9 +174,9 @@ class NFTController @Inject()(
 
   def uploadNFTFile(collectionId: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val oldFilePath = constants.Collection.getNFTFilePath(collectionId) + name
+      val oldFilePath = utilities.Collection.getNFTFilePath(collectionId) + name
       val newFileName = utilities.FileOperations.getFileHash(oldFilePath) + "." + utilities.FileOperations.fileExtensionFromName(name)
-      val awsKey = constants.NFT.getAwsKey(collectionId = collectionId, fileName = newFileName)
+      val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collectionId, fileName = newFileName)
       val collection = masterCollections.Service.tryGet(id = collectionId)
 
       def uploadToAws(collection: Collection) = if (collection.creatorId == loginState.username) Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))

@@ -174,8 +174,8 @@ class AccountController @Inject()(
                     _ <- deleteUnverifiedKey()
                   } yield PartialContent(views.html.account.showWalletMnemonics(username = signInData.username, address = wallet.address, partialMnemonics = wallet.mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
                 } else {
-                  implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = signInData.username, address = key.get.address))
-                  implicit val loginState: LoginState = LoginState(username = signInData.username, address = key.get.address)
+                  implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = signInData.username, address = key.get.address, isCreator = account.isCreator, isVerifiedCreator = account.isVerifiedCreator))
+                  implicit val loginState: LoginState = LoginState(username = signInData.username, address = key.get.address, isCreator = account.isCreator, isVerifiedCreator = account.isVerifiedCreator)
                   val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.upsert(id = loginState.username, token = signInData.pushNotificationToken)
                   val result = if (signInData.callbackUrl != "/") withUsernameToken.InternalRedirectOnSubmitForm(signInData.callbackUrl)
                   else withUsernameToken.Ok(views.html.collection.viewCollections())
@@ -214,15 +214,16 @@ class AccountController @Inject()(
         },
         migrateWalletToKeyData => {
           val validateAndKey = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(migrateWalletToKeyData.username, password = migrateWalletToKeyData.password)
+          val account = masterAccounts.Service.tryGet(migrateWalletToKeyData.username)
 
-          def update(validated: Boolean, key: master.Key) = if (validated) {
+          def update(validated: Boolean, key: master.Key, account: master.Account) = if (validated) {
             val wallet = Future(utilities.Wallet.getWallet(key.partialMnemonics.get ++ Seq(migrateWalletToKeyData.seed1, migrateWalletToKeyData.seed2, migrateWalletToKeyData.seed3, migrateWalletToKeyData.seed4), hdPath = key.hdPath.getOrElse(constants.Response.HD_PATH_NOT_FOUND.throwBaseException())))
 
             def updateKey(wallet: utilities.Wallet) = masterKeys.Service.updateOnMigration(key = key, password = migrateWalletToKeyData.password, privateKey = wallet.privateKey)
 
             def getResult(username: String, address: String) = {
-              implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = username, address = address))
-              implicit val loginState: LoginState = LoginState(username = username, address = address)
+              implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = username, address = address, isCreator = account.isCreator, isVerifiedCreator = account.isVerifiedCreator))
+              implicit val loginState: LoginState = LoginState(username = username, address = address, isCreator = account.isCreator, isVerifiedCreator = account.isVerifiedCreator)
               withUsernameToken.Ok(views.html.collection.viewCollections())
             }
 
@@ -235,7 +236,8 @@ class AccountController @Inject()(
 
           (for {
             (validated, key) <- validateAndKey
-            result <- update(validated, key)
+            account <- account
+            result <- update(validated, key, account)
           } yield result
             ).recover {
             case baseException: BaseException => BadRequest(views.html.account.migrateWalletToKey(MigrateWalletToKey.form.withGlobalError(baseException.failure.message), migrateWalletToKeyData.username, migrateWalletToKeyData.walletAddress))
@@ -338,7 +340,7 @@ class AccountController @Inject()(
           val changeActive = masterKeys.Service.changeActive(accountId = oldLoginState.username, oldAddress = oldLoginState.address, newAddress = changeKeyData.address)
 
           def getResult = {
-            implicit val loginState: LoginState = LoginState(username = oldLoginState.username, address = changeKeyData.address)
+            implicit val loginState: LoginState = LoginState(username = oldLoginState.username, address = changeKeyData.address, isCreator = oldLoginState.isCreator, isVerifiedCreator = oldLoginState.isVerifiedCreator)
             withUsernameToken.Ok(views.html.setting.changeActiveKey())
           }
 

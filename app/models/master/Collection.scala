@@ -39,9 +39,9 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
 
   def getInstagram: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.INSTAGRAM).map("https://www.instagram.com/" + _.url)
 
-  def getProfileFileURL: Option[String] = this.profileFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + this.id + "/others/" + x)
+  def getProfileFileURL: Option[String] = this.profileFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getFileAwsKey(collectionId = this.id, fileName = x))
 
-  def getCoverFileURL: Option[String] = this.coverFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + this.id + "/others/" + x)
+  def getCoverFileURL: Option[String] = this.coverFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getFileAwsKey(collectionId = this.id, fileName = x))
 
 }
 
@@ -134,8 +134,6 @@ class Collections @Inject()(
     def getCollectionsByPage(collectionIds: Seq[String], pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.id.inSet(collectionIds))(_.createdOn).map(_.map(_.deserialize))
 
     def getCollections(collectionIds: Seq[String]): Future[Seq[Collection]] = filter(_.id.inSet(collectionIds)).map(_.map(_.deserialize))
-
-    def isCreator(accountId: String): Future[Boolean] = filterAndExists(_.creatorId === accountId)
 
     def totalCreated(creatorId: String): Future[Int] = filterAndCount(_.creatorId === creatorId)
 

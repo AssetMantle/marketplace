@@ -13,7 +13,7 @@ case class NFT(fileName: String, collectionId: String, name: String, description
 
   def getFileHash: String = utilities.FileOperations.getFileNameWithoutExtension(fileName)
 
-  def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + this.collectionId + "/nfts/" + this.fileName
+  def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getNFTFileAwsKey(collectionId = this.collectionId, fileName = this.fileName)
 
   def id: String = fileName
 }

@@ -1,8 +1,7 @@
 @import controllers.actions.LoginState
-@import views.account.companion.ChangeActiveKey
 @import views.html.base.buttons._
 
-@(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="walletPopupContainer">
     <div class="d-flex flex-row justify-content-between headerContainer">
         <div class="d-flex flex-row align-content-between gap-2 userDetails">
@@ -14,7 +13,7 @@
                 <div class="userBalance" id="walletBalance_@loginState.address"></div>
             </div>
         </div>
-        <i id="openWalletMenu" class="bi bi-list iconDefault iconLarge" onclick="openCloseWalletScreen(this, 'addressBook')"></i>
+        <i id="openWalletMenu" class="bi bi-list iconDefault iconLarge" onclick="fetchKeys(); openCloseWalletScreen(this, 'addressBook');"></i>
     </div>
     <div class="row p-2 mx-0 mt-3 justify-content-between align-items-center userAddressBox">
         <div class="col-10 p-0 userAddressData username-data" data-value="@loginState.address">@loginState.address</div>
@@ -61,26 +60,7 @@
             <i id="addressBookCloseBtn" class="bi bi-x iconDefault iconLarge mt-1" style="cursor: pointer;" onclick="openCloseWalletScreen(this, 'addressBook')"></i>
         </div>
         <div class="d-flex flex-column justify-content-between">
-            <div class="mt-2 walletAddressList">
-                <div id="changeActiveKeyFormContainer" class="hidden">
-                @views.html.setting.changeActiveKey()
-                </div>
-                @keys.filter(_.encryptedPrivateKey.nonEmpty).sortBy(_.name).map { key =>
-                    <div class="d-flex flex-row-reverse justify-content-between walletAddressItem">
-                        @if(key.active) {
-                            <input type="radio" name="address" class='activeKey' id='@key.address' checked onclick="changeActive('@key.address')"/>
-                        } else {
-                            <input type="radio" name="address" id='@key.address' onclick="changeActive('@key.address')"/>
-                        }
-                    <label for="radio1" class="walletAddressLabel">@key.name</label>
-                    </div>
-                }
-                @keys.filter(_.encryptedPrivateKey.isEmpty).sortBy(_.name).map { key =>
-                    <div class="d-flex flex-row-reverse justify-content-between walletAddressItem">
-                        <input type="radio" class="invisible"/>
-                        <label for="radio1" class="walletAddressLabel">@key.name</label>
-                    </div>
-                }
+            <div id="walletAddressList" class="mt-2 walletAddressList">
             </div>
             <div class="text-center d-flex flex-column align-items-end bottomMenu buttons">
                 <div class="d-flex justify-content-center w-100">
