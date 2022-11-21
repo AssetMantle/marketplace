@@ -783,3 +783,5 @@ SALE_MAX_MINT_PER_ACCOUNT=Maximum number of Tokens
 PLACEHOLDER.SALE_MAX_MINT_PER_ACCOUNT=Maximum number of NFTs buyers can mint
 NFT_SALE_SUCCESS_TITLE=Collection opened to Whitelist Sale Successfully
 NFT_SALE_SUCCESS_SUBTITLE=Your collection is now available for private sale to your requested whitelist.
+SALE_ONGOING=Ongoing
+SALE_EXPIRED=Ended

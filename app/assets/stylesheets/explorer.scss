@@ -656,29 +656,29 @@
             font-size: 12px !important;
           }
         }
-        .statusOptions{
-          .option{
-            display: none;
-            &.active{
-              display: block;
-            }
-          }
-          .statusBadge{
-            height: 12px;
-            width: 12px;
-            aspect-ratio: 1;
-            border-radius: 50%;
-            &.notStarted{
-              background-color: var(--disable);
-            }
-            &.started{
-              background-color: var(--connected);
-            }
-            &.ended{
-              background-color: var(--error);
-            }
-          }
-        }
+      }
+    }
+  }
+  .statusOptions{
+    .option{
+      display: none;
+      &.active{
+        display: block;
+      }
+    }
+    .statusBadge{
+      height: 12px;
+      width: 12px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      &.notStarted{
+        background-color: var(--disable);
+      }
+      &.started{
+        background-color: var(--connected);
+      }
+      &.ended{
+        background-color: var(--error);
       }
     }
   }
