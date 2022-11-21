@@ -24,6 +24,10 @@ case class Account(id: String, passwordHash: Array[Byte], salt: Array[Byte], ite
     updatedBy = this.updatedBy,
     updatedOn = this.updatedOn,
     updatedOnTimeZone = this.updatedOnTimeZone)
+
+  def isCreator: Boolean = utilities.Account.isCreator(this.accountType)
+
+  def isVerifiedCreator: Boolean = utilities.Account.isVerifiedCreator(this.accountType)
 }
 
 object Accounts {
