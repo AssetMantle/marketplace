@@ -1,6 +1,6 @@
 @import models.master.Sale
 @import controllers.actions.LoginState
 
-@(sale: Sale)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(sale: Sale)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 @sale.whitelistId

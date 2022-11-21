@@ -128,7 +128,7 @@ class NFTController @Inject()(
   }
 
   def saleInfo(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withLoginActionAsync { implicit loginState =>
+    withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val nftSaleId = masterNFTOwners.Service.tryGet(fileName = nftId, ownerId = loginState.username)
 
