@@ -1,16 +1,31 @@
+@import controllers.actions.LoginState
 @import views.html.base.form._
 @import views.sale.companion.CreateCollectionSale
 
-@(createSaleForm: Form[CreateCollectionSale.Data] = CreateCollectionSale.form, collectionId: Option[String], collections: Map[String, String], whitelistId: Option[String], whitelists: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(createSaleForm: Form[CreateCollectionSale.Data] = CreateCollectionSale.form, collectionId: Option[String], collections: Map[String, String], whitelistId: Option[String], whitelists: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonForm(constants.Form.COLLECTION_SALE, createSaleForm) {
+    <div class="hidden loginUserName">@loginState.username</div>
     @if(collectionId.getOrElse("") != "") {
         @commonCustomSelect(createSaleForm, constants.FormField.SELECT_COLLECTION_ID, collections, Symbol("value") -> collectionId.get, Symbol("class") -> "custom-select sources filledSelect")
     } else {
         @commonCustomSelect(createSaleForm, constants.FormField.SELECT_COLLECTION_ID, collections, Symbol("class") -> "custom-select sources filledSelect")
     }
-    <div id="collectionOwnedNFTs"></div>
-    @commonInputInt(createSaleForm, constants.FormField.SALE_NFT_NUMBER)
+    <div class="hidden">
+        @commonInputInt(createSaleForm, constants.FormField.SALE_NFT_NUMBER)
+    </div>
+
+    <div class="mb-3 randomNFTSaleField">
+        <label for="saleNFTNumber" class="form-label">@Messages(constants.View.SALE_NFT_NUMBER)</label>
+        <div class="input-group mt-2">
+            <input type="number" id="saleNFTNumber" class="form-control" placeholder="@Messages(constants.View.SALE_NFT_PLACEHOLDER)" aria-label="Recipient's username" aria-describedby="basic-addon2" onkeyup="setSaleNFTValue(event)">
+            <span class="input-group-text gap-1">
+                <span id="collectionOwnedNFTs">0</span>
+                <span>@Messages(constants.View.TOTAL)</span>
+            </span>
+        </div>
+    </div>
+
     @if(whitelistId.getOrElse("") != "") {
         @commonCustomSelect(createSaleForm, constants.FormField.SELECT_WHITELIST_ID, whitelists, Symbol("value") -> whitelistId.get, Symbol("class") -> "custom-select sources filledSelect")
     } else {

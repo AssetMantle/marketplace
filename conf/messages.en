@@ -237,6 +237,8 @@ TERMS_CONDITIONS_MESSAGE_3=By clicking on the Agree and continue button, you agr
 TERMS_CONDITIONS_MESSAGE_4=Click Agree and continue only if you are sure you know what you are doing and are confident in managing your keys, services, devices, tokens (NFTs and fungibles) that are used within the app/website.
 TERMS_CONDITIONS_DATE_MESSAGE=Last Updated:
 TERMS_CONDITIONS_DATE=July 01, 2022
+COLLECTION_TOTAL_NFT_TITLE=Total NFTs
+COLLECTION_OWNER_TITLE=Owners
 
 #//NFT
 NFT_CATEGORY_TITLE=Category:
@@ -775,3 +777,11 @@ FORM.COLLECTION_SALE.SUBTITLE=
 FORM.COLLECTION_SALE.SUBMIT=Submit
 SALE_NFT_NUMBER=No of NFTs
 PLACEHOLDER.SALE_NFT_NUMBER=Random no of NFTs
+SALE_NFT_PLACEHOLDER=Random no of NFTs
+TOTAL=Total
+SALE_MAX_MINT_PER_ACCOUNT=Maximum number of Tokens
+PLACEHOLDER.SALE_MAX_MINT_PER_ACCOUNT=Maximum number of NFTs buyers can mint
+NFT_SALE_SUCCESS_TITLE=Collection opened to Whitelist Sale Successfully
+NFT_SALE_SUCCESS_SUBTITLE=Your collection is now available for private sale to your requested whitelist.
+SALE_ONGOING=Ongoing
+SALE_EXPIRED=Ended

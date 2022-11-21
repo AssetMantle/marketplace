@@ -109,10 +109,42 @@
                             </thead>
                             <tbody id="WhitelistOffersListTableBody">
                                 @sales.zipWithIndex.map{ case (sale, index) =>
-                                  <tr>@(index + 1)</tr>
-                                  <tr>@sale.collectionId</tr>
-                                  <tr>@sale.getStatus</tr>
-                                <tr>@sale.collectionId</tr>
+                                    <tr>
+                                        <td class="text-end tableFieldNo">@(index + 1)</td>
+                                        <td class="tableFieldName">@sale.collectionId</td>
+                                        <td class="tableFieldStatus" id="saleStatus_@sale.collectionId">
+                                          <div class="hidden status">@sale.getStatus</div>
+                                            <div class="statusOptions">
+                                                <div class="option notStarted active">
+                                                    <div class="d-flex gap-2 align-items-center">
+                                                        <div class="statusBadge notStarted"></div>
+                                                        <span>@Messages(constants.View.WHITELIST_DETAIL_FIELD_VALUE_STATUS_NOT_STARTED)</span>
+                                                    </div>
+                                                </div>
+                                                <div class="option started">
+                                                    <div class="d-flex gap-2 align-items-center">
+                                                        <div class="statusBadge started"></div>
+                                                        <span>@Messages(constants.View.WHITELIST_DETAIL_FIELD_VALUE_STATUS_STARTED)</span>
+                                                    </div>
+                                                </div>
+                                                <div class="option ended">
+                                                    <div class="d-flex gap-2 align-items-center">
+                                                        <div class="statusBadge ended"></div>
+                                                        <span>@Messages(constants.View.WHITELIST_DETAIL_FIELD_VALUE_STATUS_ENDED)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="tableFieldDuration">
+                                            <span id="startTimeEpoch_@sale.collectionId">@sale.startTimeEpoch</span> -
+                                            <span id="endTimeEpoch_@sale.collectionId">@sale.endTimeEpoch</span>
+                                        </td>
+                                    </tr>
+                                  <script>
+                                        setSaleStatus('saleStatus_@sale.collectionId');
+                                        epochToDateTime('startTimeEpoch_@sale.collectionId');
+                                        epochToDateTime('endTimeEpoch_@sale.collectionId');
+                                  </script>
                                 }
                             </tbody>
                         </table>
