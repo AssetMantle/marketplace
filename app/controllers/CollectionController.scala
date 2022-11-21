@@ -281,7 +281,7 @@ class CollectionController @Inject()(
 
   def storeCollectionDraftFile(id: String, documentType: String) = withLoginAction.applyMultipartFormData { implicit loginState =>
     implicit request =>
-      UploadFile.form.bindFromRequest.fold(
+      UploadFile.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(constants.View.BAD_REQUEST)
         },
@@ -467,7 +467,7 @@ class CollectionController @Inject()(
 
   def storeCollectionFile(id: String, documentType: String) = withLoginAction.applyMultipartFormData { implicit loginState =>
     implicit request =>
-      UploadFile.form.bindFromRequest.fold(
+      UploadFile.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(constants.View.BAD_REQUEST)
         },

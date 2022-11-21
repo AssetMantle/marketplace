@@ -3,7 +3,7 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
-import models.master.Collection
+import models.master.{Collection, NFTOwner, Sale}
 import models.{blockchain, master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
@@ -114,6 +114,47 @@ class SaleController @Inject()(
                 case baseException: BaseException => BadRequest(views.html.sale.createCollectionSale(CreateCollectionSale.form.withGlobalError(baseException.failure.message), collections = Map(), collectionId = Option(createData.collectionId), whitelistId = Option(createData.whitelistId), whitelists = Map()))
               }
             }
+          }
+        }
+      )
+  }
+
+  def buySaleNFTForm(saleId: String, nftId: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.sale.buySaleNFT(saleId = saleId, nftId = nftId))
+  }
+
+  def buySaleNFT(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      BuySaleNFT.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.sale.buySaleNFT(formWithErrors, saleId = formWithErrors.data.getOrElse(constants.FormField.SALE_ID.name, ""), nftId = formWithErrors.data.getOrElse(constants.FormField.NFT_FILE_NAME.name, ""))))
+        },
+        buySaleNFTData => {
+          val sale = masterSales.Service.tryGet(buySaleNFTData.saleId)
+          val nftOwner = masterNFTOwners.Service.tryGetByNFTAndSaleId(fileName = buySaleNFTData.fileName, saleId = buySaleNFTData.saleId)
+
+          def isWhitelistMember(sale: Sale) = masterWhitelistMembers.Service.isMember(whitelistId = sale.whitelistId, accountId = loginState.username)
+
+          def validateAndTransfer(nftOwner: NFTOwner, sale: Sale, isWhitelistMember: Boolean) = {
+            val errors = Seq(
+              if (nftOwner.ownerId == loginState.username) Option(constants.Response.CANNOT_SELL_TO_YOURSELF) else None,
+              if (!isWhitelistMember) Option(constants.Response.NOT_MEMBER_OF_WHITELIST) else None,
+              if (sale.startTimeEpoch > utilities.Date.currentEpoch) Option(constants.Response.SALE_NOT_STARTED) else None,
+              if (utilities.Date.currentEpoch > sale.endTimeEpoch) Option(constants.Response.SALE_EXPIRED) else None,
+            ).flatten
+            if (errors.nonEmpty) {
+              masterNFTOwners.Service.update(nftOwner.copy(ownerId = loginState.username))
+            } else errors.head.throwFutureBaseException()
+          }
+
+          (for {
+            sale <- sale
+            nftOwner <- nftOwner
+            isWhitelistMember <- isWhitelistMember(sale)
+            _ <- validateAndTransfer(nftOwner, sale, isWhitelistMember)
+          } yield PartialContent(views.html.sale.createSuccessful())
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.sale.buySaleNFT(BuySaleNFT.form.withGlobalError(baseException.failure.message), saleId = buySaleNFTData.saleId, nftId = buySaleNFTData.fileName))
           }
         }
       )

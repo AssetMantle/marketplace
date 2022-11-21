@@ -10,7 +10,7 @@ package com.google.api;
  * request message are mapped to URL path, URL query parameters, and
  * HTTP request body. The mapping is typically specified as an
  * `google.api.http` annotation on the RPC method,
- * see "google/api/annotations.proto" for details.
+ * see "google/api/annotations.proto" for view.
  * The mapping consists of a field specifying the path template and
  * method kind.  The path template can refer to fields in the request
  * message, as in the example below which describes a REST GET
@@ -390,7 +390,7 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * Selects methods to which this rule applies.
-   * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
+   * Refer to [selector][google.api.DocumentationRule.selector] for syntax view.
    * </pre>
    *
    * <code>string selector = 1;</code>
@@ -412,7 +412,7 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * Selects methods to which this rule applies.
-   * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
+   * Refer to [selector][google.api.DocumentationRule.selector] for syntax view.
    * </pre>
    *
    * <code>string selector = 1;</code>
@@ -1265,7 +1265,7 @@ private static final long serialVersionUID = 0L;
    * request message are mapped to URL path, URL query parameters, and
    * HTTP request body. The mapping is typically specified as an
    * `google.api.http` annotation on the RPC method,
-   * see "google/api/annotations.proto" for details.
+   * see "google/api/annotations.proto" for view.
    * The mapping consists of a field specifying the path template and
    * method kind.  The path template can refer to fields in the request
    * message, as in the example below which describes a REST GET
@@ -1724,7 +1724,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Selects methods to which this rule applies.
-     * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
+     * Refer to [selector][google.api.DocumentationRule.selector] for syntax view.
      * </pre>
      *
      * <code>string selector = 1;</code>
@@ -1745,7 +1745,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Selects methods to which this rule applies.
-     * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
+     * Refer to [selector][google.api.DocumentationRule.selector] for syntax view.
      * </pre>
      *
      * <code>string selector = 1;</code>
@@ -1767,7 +1767,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Selects methods to which this rule applies.
-     * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
+     * Refer to [selector][google.api.DocumentationRule.selector] for syntax view.
      * </pre>
      *
      * <code>string selector = 1;</code>
@@ -1787,7 +1787,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Selects methods to which this rule applies.
-     * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
+     * Refer to [selector][google.api.DocumentationRule.selector] for syntax view.
      * </pre>
      *
      * <code>string selector = 1;</code>
@@ -1802,7 +1802,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Selects methods to which this rule applies.
-     * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
+     * Refer to [selector][google.api.DocumentationRule.selector] for syntax view.
      * </pre>
      *
      * <code>string selector = 1;</code>

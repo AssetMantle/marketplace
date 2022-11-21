@@ -72,13 +72,9 @@ class NFTOwners @Inject()(
 
     def add(nftOwners: Seq[NFTOwner]): Future[Unit] = create(nftOwners)
 
-    def getByOwnerId(ownerId: String): Future[Seq[NFTOwner]] = filter(_.ownerId === ownerId)
-
     def getByOwnerIdAndPageNumber(ownerId: String, pageNumber: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(x => x.ownerId === ownerId && x.ownerId =!= x.creatorId)(_.fileName).map(_.map(_.fileName))
 
     def update(NFTOwner: NFTOwner): Future[Unit] = updateById1AndId2(NFTOwner)
-
-    def countForOwner(collectionId: String, ownerId: String): Future[Int] = filterAndCount(x => x.collectionId === collectionId && x.ownerId === ownerId)
 
     def countForOwnerNotOnSale(collectionId: String, currentOnSaleIds: Seq[String], ownerId: String): Future[Int] = filterAndCount(x => x.collectionId === collectionId && x.ownerId === ownerId && !x.saleId.inSet(currentOnSaleIds))
 
@@ -90,7 +86,10 @@ class NFTOwners @Inject()(
       } yield ()
     }
 
+    def getAllSaleIds(fileName: String): Future[Seq[String]] = filter(_.fileName === fileName).map(_.flatMap(_.saleId))
+    def tryGet(fileName: String, ownerId: String): Future[NFTOwner] = tryGetById1AndId2(id1 = fileName, id2 = ownerId)
 
+    def tryGetByNFTAndSaleId(fileName: String, saleId: String): Future[NFTOwner] = filterHead(x => x.saleId === saleId && x.fileName === fileName)
     //    https://scala-slick.org/doc/3.1.1/sql-to-slick.html#id21
     //    def getQuery = NFTOwners.TableQuery.filter(x => x.ownerId === "asd" && x.creatorId)
   }

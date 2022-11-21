@@ -62,8 +62,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WishlistController.delete,
 
         routes.javascript.NFTController.viewNFT,
-        routes.javascript.NFTController.info,
         routes.javascript.NFTController.details,
+        routes.javascript.NFTController.details,
+        routes.javascript.NFTController.detailViewLeftCards,
+        routes.javascript.NFTController.detailViewRightCards,
+        routes.javascript.NFTController.info,
+        routes.javascript.NFTController.collectionInfo,
+        routes.javascript.NFTController.saleInfo,
         routes.javascript.NFTController.likesCounter,
         routes.javascript.NFTController.selectCollection,
         routes.javascript.NFTController.uploadNFTFileForm,
@@ -74,7 +79,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.tagsForm,
         routes.javascript.NFTController.deleteDraftForm,
         routes.javascript.NFTController.deleteDraft,
-        routes.javascript.NFTController.collectionInfo,
         routes.javascript.NFTController.ownedSection,
         routes.javascript.NFTController.ownedNFTsPerPage,
 
@@ -103,6 +107,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.loadMoreNotifications,
 
         routes.javascript.SaleController.createCollectionSaleForm,
+        routes.javascript.SaleController.buySaleNFTForm,
 
         routes.javascript.WhitelistController.whitelistSection,
         routes.javascript.WhitelistController.createdWhitelists,

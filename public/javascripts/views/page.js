@@ -24,9 +24,9 @@ function viewCreatedCollection(lastPart) {
 }
 
 function viewNFT(nftId) {
-    componentResource('leftContent', jsRoutes.controllers.NFTController.info(nftId));
+    componentResource('leftContent', jsRoutes.controllers.NFTController.detailViewLeftCards(nftId));
     componentResource('centerContent', jsRoutes.controllers.NFTController.details(nftId));
-    componentResource('rightContent', jsRoutes.controllers.NFTController.collectionInfo(nftId));
+    componentResource('rightContent', jsRoutes.controllers.NFTController.detailViewRightCards(nftId));
 }
 
 function viewSetting() {

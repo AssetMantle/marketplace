@@ -3210,20 +3210,20 @@ public final class Staking {
 
     /**
      * <pre>
-     * details define other optional details.
+     * view define other optional view.
      * </pre>
      *
-     * <code>string details = 5;</code>
-     * @return The details.
+     * <code>string view = 5;</code>
+     * @return The view.
      */
     java.lang.String getDetails();
     /**
      * <pre>
-     * details define other optional details.
+     * view define other optional view.
      * </pre>
      *
-     * <code>string details = 5;</code>
-     * @return The bytes for details.
+     * <code>string view = 5;</code>
+     * @return The bytes for view.
      */
     com.google.protobuf.ByteString
         getDetailsBytes();
@@ -3532,11 +3532,11 @@ public final class Staking {
     private volatile java.lang.Object details_;
     /**
      * <pre>
-     * details define other optional details.
+     * view define other optional view.
      * </pre>
      *
-     * <code>string details = 5;</code>
-     * @return The details.
+     * <code>string view = 5;</code>
+     * @return The view.
      */
     @java.lang.Override
     public java.lang.String getDetails() {
@@ -3553,11 +3553,11 @@ public final class Staking {
     }
     /**
      * <pre>
-     * details define other optional details.
+     * view define other optional view.
      * </pre>
      *
-     * <code>string details = 5;</code>
-     * @return The bytes for details.
+     * <code>string view = 5;</code>
+     * @return The bytes for view.
      */
     @java.lang.Override
     public com.google.protobuf.ByteString
@@ -4335,11 +4335,11 @@ public final class Staking {
       private java.lang.Object details_ = "";
       /**
        * <pre>
-       * details define other optional details.
+       * view define other optional view.
        * </pre>
        *
-       * <code>string details = 5;</code>
-       * @return The details.
+       * <code>string view = 5;</code>
+       * @return The view.
        */
       public java.lang.String getDetails() {
         java.lang.Object ref = details_;
@@ -4355,11 +4355,11 @@ public final class Staking {
       }
       /**
        * <pre>
-       * details define other optional details.
+       * view define other optional view.
        * </pre>
        *
-       * <code>string details = 5;</code>
-       * @return The bytes for details.
+       * <code>string view = 5;</code>
+       * @return The bytes for view.
        */
       public com.google.protobuf.ByteString
           getDetailsBytes() {
@@ -4376,11 +4376,11 @@ public final class Staking {
       }
       /**
        * <pre>
-       * details define other optional details.
+       * view define other optional view.
        * </pre>
        *
-       * <code>string details = 5;</code>
-       * @param value The details to set.
+       * <code>string view = 5;</code>
+       * @param value The view to set.
        * @return This builder for chaining.
        */
       public Builder setDetails(
@@ -4395,10 +4395,10 @@ public final class Staking {
       }
       /**
        * <pre>
-       * details define other optional details.
+       * view define other optional view.
        * </pre>
        *
-       * <code>string details = 5;</code>
+       * <code>string view = 5;</code>
        * @return This builder for chaining.
        */
       public Builder clearDetails() {
@@ -4409,11 +4409,11 @@ public final class Staking {
       }
       /**
        * <pre>
-       * details define other optional details.
+       * view define other optional view.
        * </pre>
        *
-       * <code>string details = 5;</code>
-       * @param value The bytes for details to set.
+       * <code>string view = 5;</code>
+       * @param value The bytes for view to set.
        * @return This builder for chaining.
        */
       public Builder setDetailsBytes(

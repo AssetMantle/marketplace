@@ -138,6 +138,11 @@ object Response {
   val COLLECTION_ID_OR_WHITELIST_ID_DOES_NOT_EXIST = new Failure("COLLECTION_ID_OR_WHITELIST_ID_DOES_NOT_EXIST")
   val NOT_ENOUGH_NFTS_IN_COLLECTION = new Failure("NOT_ENOUGH_NFTS_IN_COLLECTION")
   val DIRECTORY_CREATION_FAILED = new Failure("DIRECTORY_CREATION_FAILED")
+  val CANNOT_SELL_TO_YOURSELF = new Failure("CANNOT_SELL_TO_YOURSELF")
+  val NOT_MEMBER_OF_WHITELIST = new Failure("NOT_MEMBER_OF_WHITELIST")
+  val SALE_NOT_STARTED = new Failure("SALE_NOT_STARTED")
+  val SALE_EXPIRED = new Failure("SALE_EXPIRED")
+  val NO_SALE_ON_NFT = new Failure("NO_SALE_ON_NFT")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

@@ -80,7 +80,7 @@ abstract class GenericDaoImpl3[
     }
   }
 
-  def deleteAll(): Future[Unit] = db.run((sqlu"""TRUNCATE TABLE ${tableQuery.baseTableRow.tableName} RESTART IDENTITY CASCADE""").asTry).map {
+  def deleteAll(): Future[Unit] = db.run(sqlu"""TRUNCATE TABLE ${tableQuery.baseTableRow.tableName} RESTART IDENTITY CASCADE""".asTry).map {
     case Success(result) => ()
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_DELETE_ALL_FAILED"), psqlException)

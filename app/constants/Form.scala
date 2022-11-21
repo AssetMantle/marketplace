@@ -45,5 +45,6 @@ object Form {
   val NFT_SET_PROPERTIES: Form = Form("NFT_SET_PROPERTIES", routes.javascript.NFTController.setPropertiesForm, routes.NFTController.setProperties())
 
   val COLLECTION_SALE: Form = Form("COLLECTION_SALE", routes.javascript.SaleController.createCollectionSaleForm, routes.SaleController.createCollectionSale())
+  val BUY_NFT_SALE: Form = Form("BUY_NFT_SALE", routes.javascript.SaleController.buySaleNFTForm, routes.SaleController.buySaleNFT())
 
 }
