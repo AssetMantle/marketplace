@@ -174,7 +174,7 @@
                 @optionalLoginState match {
                     case Some(loginState) => {
                         <ul class="d-flex flex-row gap-2 align-items-center mb-0 links">
-                            <li id="userNotification" class="menuItem menuIcon" onmouseover="showNotification();">
+                            <li id="userNotification" class="menuItem menuIcon" onmouseover="showNotification();" onmouseleave="closeWallet();">
                                 <div id="notificationPopup" class="notificationPopup popupContainer">
                                     @views.html.notification.commonNotificationPopup()(requestHeader, messagesProvider, loginState)
                                 </div>
@@ -182,16 +182,16 @@
                                     <i class="bi bi-bell iconWhite wallet"></i>
                                 </a>
                             </li>
-                            <li id="userWallet" class="menuItem menuIcon" onmouseover="showWallet();">
+                            <li id="userWallet" class="menuItem menuIcon" onmouseover="showWallet();" onmouseleave="closeWallet();">
                                 <div id="walletPopup" class="walletPopup popupContainer">
                                     @views.html.base.commonWalletPopup()(requestHeader, messagesProvider, loginState)
                                 </div>
-                                <a class="desktop-link" target="_blank">
+                                <a class="desktop-link" href="@routes.ProfileController.viewProfile(loginState.username, constants.View.CREATED)">
                                     <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="35" height="35"/>
                                 </a>
                             </li>
                         </ul>
-                        <div id="walletBackDrop" onclick="closeWallet()"></div>
+                        <div id="walletBackDrop"></div>
                     }
                     case _ => {
                         <ul class="links">
