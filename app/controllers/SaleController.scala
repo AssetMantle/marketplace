@@ -132,15 +132,17 @@ class SaleController @Inject()(
         buySaleNFTData => {
           val sale = masterSales.Service.tryGet(buySaleNFTData.saleId)
           val nftOwner = masterNFTOwners.Service.tryGetByNFTAndSaleId(fileName = buySaleNFTData.fileName, saleId = buySaleNFTData.saleId)
+          val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = buySaleNFTData.password)
 
           def isWhitelistMember(sale: Sale) = masterWhitelistMembers.Service.isMember(whitelistId = sale.whitelistId, accountId = loginState.username)
 
-          def validateAndTransfer(nftOwner: NFTOwner, sale: Sale, isWhitelistMember: Boolean) = {
+          def validateAndTransfer(nftOwner: NFTOwner, verifyPassword: Boolean, sale: Sale, isWhitelistMember: Boolean) = {
             val errors = Seq(
               if (nftOwner.ownerId == loginState.username) Option(constants.Response.CANNOT_SELL_TO_YOURSELF) else None,
               if (!isWhitelistMember) Option(constants.Response.NOT_MEMBER_OF_WHITELIST) else None,
               if (sale.startTimeEpoch > utilities.Date.currentEpoch) Option(constants.Response.SALE_NOT_STARTED) else None,
-              if (utilities.Date.currentEpoch > sale.endTimeEpoch) Option(constants.Response.SALE_EXPIRED) else None,
+              if (utilities.Date.currentEpoch >= sale.endTimeEpoch) Option(constants.Response.SALE_EXPIRED) else None,
+              if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
             ).flatten
             if (errors.nonEmpty) {
               masterNFTOwners.Service.update(nftOwner.copy(ownerId = loginState.username))
@@ -150,8 +152,9 @@ class SaleController @Inject()(
           (for {
             sale <- sale
             nftOwner <- nftOwner
+            (verifyPassword, _) <- verifyPassword
             isWhitelistMember <- isWhitelistMember(sale)
-            _ <- validateAndTransfer(nftOwner, sale, isWhitelistMember)
+            _ <- validateAndTransfer(nftOwner, verifyPassword, sale, isWhitelistMember)
           } yield PartialContent(views.html.sale.createSuccessful())
             ).recover {
             case baseException: BaseException => BadRequest(views.html.sale.buySaleNFT(BuySaleNFT.form.withGlobalError(baseException.failure.message), saleId = buySaleNFTData.saleId, nftId = buySaleNFTData.fileName))
