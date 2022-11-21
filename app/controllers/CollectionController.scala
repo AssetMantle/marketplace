@@ -283,7 +283,7 @@ class CollectionController @Inject()(
             request.body.file(constants.File.KEY_FILE) match {
               case None => BadRequest(constants.View.BAD_REQUEST)
               case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.COLLECTION_DRAFT_FILE_FORM.maxFileSize) {
-                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, constants.Collection.getFilePath(id))
+                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, utilities.Collection.getFilePath(id))
                 Ok
               } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
             }
@@ -297,17 +297,16 @@ class CollectionController @Inject()(
   def uploadCollectionDraftFile(id: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id = id)
-      val oldFilePath = constants.Collection.getFilePath(id) + name
-      val fileHash = utilities.FileOperations.getFileHash(oldFilePath)
-      val newFileName = fileHash + "." + utilities.FileOperations.fileExtensionFromName(name)
-      val awsKey = id + "/others/" + newFileName
+      val oldFilePath = utilities.Collection.getFilePath(id) + name
+      val newFileName = utilities.FileOperations.getFileHash(oldFilePath) + "." + utilities.FileOperations.fileExtensionFromName(name)
+      val awsKey = utilities.Collection.getFileAwsKey(collectionId = id, fileName = newFileName)
 
       def uploadToAws(collectionDraft: CollectionDraft) = if (collectionDraft.creatorId == loginState.username) {
         val uploadLatest = Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
 
         def deleteOldAws() = Future(documentType match {
-          case constants.Collection.File.PROFILE => collectionDraft.profileFileName.map(x => utilities.AmazonS3.deleteObject(id + "/others/" + x))
-          case constants.Collection.File.COVER => collectionDraft.coverFileName.map(x => utilities.AmazonS3.deleteObject(id + "/others/" + x))
+          case constants.Collection.File.PROFILE => collectionDraft.profileFileName.map(x => utilities.AmazonS3.deleteObject(utilities.Collection.getFileAwsKey(collectionId = id, fileName = x)))
+          case constants.Collection.File.COVER => collectionDraft.coverFileName.map(x => utilities.AmazonS3.deleteObject(utilities.Collection.getFileAwsKey(collectionId = id, fileName = x)))
           case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwBaseException()
         })
 
@@ -467,7 +466,7 @@ class CollectionController @Inject()(
             request.body.file(constants.File.KEY_FILE) match {
               case None => BadRequest(constants.View.BAD_REQUEST)
               case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.COLLECTION_FILE_FORM.maxFileSize) {
-                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, constants.Collection.getFilePath(id))
+                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, utilities.Collection.getFilePath(id))
                 Ok
               } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
             }
@@ -481,16 +480,16 @@ class CollectionController @Inject()(
   def uploadCollectionFile(id: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val collection = masterCollections.Service.tryGet(id = id)
-      val oldFilePath = constants.Collection.getFilePath(id) + name
+      val oldFilePath = utilities.Collection.getFilePath(id) + name
       val newFileName = utilities.FileOperations.getFileHash(oldFilePath) + "." + utilities.FileOperations.fileExtensionFromName(name)
-      val awsKey = id + "/others/" + newFileName
+      val awsKey = utilities.Collection.getFileAwsKey(collectionId = id, fileName = newFileName)
 
       def uploadToAws(collection: Collection) = if (collection.creatorId == loginState.username) {
         val uploadLatest = Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
 
         def deleteOldAws() = Future(documentType match {
-          case constants.Collection.File.PROFILE => collection.profileFileName.map(x => utilities.AmazonS3.deleteObject(id + "/others/" + x))
-          case constants.Collection.File.COVER => collection.coverFileName.map(x => utilities.AmazonS3.deleteObject(id + "/others/" + x))
+          case constants.Collection.File.PROFILE => collection.profileFileName.map(x => utilities.AmazonS3.deleteObject(utilities.Collection.getFileAwsKey(collectionId = id, fileName = x)))
+          case constants.Collection.File.COVER => collection.coverFileName.map(x => utilities.AmazonS3.deleteObject(utilities.Collection.getFileAwsKey(collectionId = id, fileName = x)))
           case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwBaseException()
         })
 
