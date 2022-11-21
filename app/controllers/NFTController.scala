@@ -3,7 +3,7 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
-import models.master.Collection
+import models.master.{Collection, Sale}
 import models.masterTransaction.NFTDraft
 import models.{master, masterTransaction}
 import play.api.Logger
@@ -29,6 +29,7 @@ class NFTController @Inject()(
                                masterAccounts: master.Accounts,
                                masterCollections: master.Collections,
                                masterNFTs: master.NFTs,
+                               masterSales: master.Sales,
                                masterNFTOwners: master.NFTOwners,
                                masterNFTProperties: master.NFTProperties,
                                masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
@@ -72,10 +73,17 @@ class NFTController @Inject()(
           nftProperties <- nftProperties
           liked <- liked
           collection <- getCollection(nft.collectionId)
-        } yield Ok(views.html.nft.details(collection, nft, nftProperties, liked))
+        } yield Ok(views.html.nft.detail.view(collection, nft, nftProperties, liked))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
+    }
+  }
+
+  def detailViewLeftCards(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginAction {
+      implicit request =>
+        Ok(views.html.nft.detail.leftCards(nftId))
     }
   }
 
@@ -88,10 +96,17 @@ class NFTController @Inject()(
         (for {
           nft <- nft
           liked <- liked
-        } yield Ok(views.html.nft.info(nft, liked))
+        } yield Ok(views.html.nft.detail.info(nft, liked))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
+    }
+  }
+
+  def detailViewRightCards(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.nft.detail.rightCards(nftId)))
     }
   }
 
@@ -105,9 +120,26 @@ class NFTController @Inject()(
         (for {
           nft <- nft
           collection <- collection(nft.collectionId)
-        } yield Ok(views.html.nft.collectionInfo(nft, collection))
+        } yield Ok(views.html.nft.detail.collectionInfo(nft, collection))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def saleInfo(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val nftSaleId = masterNFTOwners.Service.tryGet(fileName = nftId, ownerId = loginState.username)
+
+        def sale(saleId: String) = masterSales.Service.tryGet(saleId)
+
+        (for {
+          nftSaleId <- nftSaleId
+          sale <- sale(nftSaleId.saleId.getOrElse(constants.Response.NO_SALE_ON_NFT.throwBaseException()))
+        } yield Ok(views.html.nft.detail.saleInfo(sale))
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
         }
     }
   }

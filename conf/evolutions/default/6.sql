@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS MASTER."NFTOwner"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("fileName", "ownerId")
+    PRIMARY KEY ("fileName", "ownerId"),
+    UNIQUE ("fileName", "ownerId", "saleId")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Sale"

@@ -83,7 +83,11 @@ POST        /deleteFromWishList                               controllers.Wishli
 
 GET         /nft/:nftId                                       controllers.NFTController.viewNFT( nftId: String)
 GET         /nftDetails                                       controllers.NFTController.details( nftId: String)
+GET         /nftDetailViewLeftCards                           controllers.NFTController.detailViewLeftCards( nftId: String)
 GET         /nftInfo                                          controllers.NFTController.info( nftId: String)
+GET         /nftDetailViewRightCards                          controllers.NFTController.detailViewRightCards( nftId: String)
+GET         /nftCollectionInfo                                controllers.NFTController.collectionInfo(nftId: String)
+GET         /nftSaleInfo                                      controllers.NFTController.saleInfo(nftId: String)
 GET         /likesCounter                                     controllers.NFTController.likesCounter(nftId: String)
 
 # Create NFT
@@ -97,7 +101,6 @@ GET         /nftTags                                          controllers.NFTCon
 POST        /nftTags                                          controllers.NFTController.tags()
 GET         /setProperties                                    controllers.NFTController.setPropertiesForm(collectionId: String, fileName: String)
 POST        /setProperties                                    controllers.NFTController.setProperties()
-GET         /nftCollectionInfo                                controllers.NFTController.collectionInfo(nftId: String)
 GET         /deleteNftDraft                                   controllers.NFTController.deleteDraftForm(fileName: String, fileHash: String)
 POST        /deleteNftDraft                                   controllers.NFTController.deleteDraft()
 GET         /ownedSection                                     controllers.NFTController.ownedSection(accountId: String)
@@ -149,6 +152,8 @@ POST        /editWhitelist                                    controllers.Whitel
 
 GET         /createSale                                       controllers.SaleController.createCollectionSaleForm(whitelistId: Option[String], collectionId: Option[String])
 POST        /createSale                                       controllers.SaleController.createCollectionSale()
+GET         /buySaleNFT                                       controllers.SaleController.buySaleNFTForm(saleId: String, nftId: String)
+POST        /buySaleNFT                                       controllers.SaleController.buySaleNFT()
 
 # Should be not changed it will be public
 GET         /acceptWhitelistInvite/:whitelistId               controllers.WhitelistController.viewAcceptInviteDetails(whitelistId: String)

@@ -1,6 +1,5 @@
 package models.master
 
-import exceptions.BaseException
 import models.Trait.{Entity2, GenericDaoImpl2, Logged, ModelTable2}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -90,6 +89,8 @@ class WhitelistMembers @Inject()(
     def getAllForMember(accountId: String): Future[Seq[String]] = filter(_.accountId === accountId).map(_.map(_.whitelistId))
 
     def totalJoined(accountId: String): Future[Int] = filterAndCount(_.accountId === accountId)
+
+    def isMember(whitelistId: String, accountId: String) = exists(id1 = whitelistId, id2 = accountId)
 
     def deleteAllMembers(whitelistId: String): Future[Int] = filterAndDelete(_.whitelistId === whitelistId)
 
