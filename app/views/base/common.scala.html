@@ -174,7 +174,7 @@
                 @optionalLoginState match {
                     case Some(loginState) => {
                         <ul class="d-flex flex-row gap-2 align-items-center mb-0 links">
-                            <li id="userNotification" class="menuItem menuIcon" onmouseover="showNotification();" onmouseleave="closeWallet(); clearMarkAsReadList();">
+                            <li id="userNotification" class="menuItem menuIcon" onmouseover="showNotification();" onmouseleave="closeWallet();">
                                 <div id="notificationPopup" class="notificationPopup popupContainer">
                                     @views.html.notification.commonNotificationPopup()(requestHeader, messagesProvider, loginState)
                                 </div>

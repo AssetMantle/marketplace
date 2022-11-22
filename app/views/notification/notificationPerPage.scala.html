@@ -1,29 +1,44 @@
 @import controllers.actions.LoginState
 @import models.masterTransaction.Notification
+@import views.html.base.form._
+@import helper._
 
 @(notifications: Seq[Notification], page: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div class="notificationsPerPage">
     @notifications.map { notification =>
+        <div id="markAsRead_@notification.id" class="hidden">
+        @defining(views.notification.companion.MarkNotificationsRead.form) { markAsReadForm =>
+            @form(routes.ProfileController.markNotificationsRead()) {
+                @CSRF.formField
+                @commonInputText(markAsReadForm, constants.FormField.NOTIFICATION_ID, Symbol("value") -> notification.id, Symbol("readonly") -> "readonly")
+                @commonCheckbox(markAsReadForm, constants.FormField.MARK_ALL_NOTIFICATION_READ, Symbol("class") -> "am-checkbox", Symbol("style") -> "display:block;")
+            }
+        }
+        </div>
         <div class="notificationList">
             <div class="list">
-                @defining(if(notification.isClickable) "mb-4 singleNotification clickable" else "mb-4 singleNotification") { notificationDivClass =>
-                    <div onclick='onNotificationClick(@notification.jsRoute.getOrElse(""))' class="@notificationDivClass">
-                        <div class="d-flex gap-2">
-                            <div id="notificationIcon_@notification.id" class="d-flex justify-content-center align-items-center notificationIcon" onclick="addToReadList('@notification.id')">
-                                <i class="bi bi-info-circle iconWhite"></i>
-                            </div>
-                            @defining(if(notification.read) "notificationDetail read" else "notificationDetail unread") { notificationClass =>
-                                <div id="@notification.id" onmouseover="" class="@notificationClass">
-                                    <div class="mb-2 title">@Messages(notification.title)</div>
-                                    <div class="mb-2 description">@Messages(notification.message, notification.messageParameters: _*)</div>
-                                    <div id="notificationDateTime_@notification.id" class="dateTime">@notification.createdOnMillisEpoch</div>
+            @defining(if(notification.isClickable) "mb-4 singleNotification clickable" else "mb-4 singleNotification") { notificationDivClass =>
+                <div  class="@notificationDivClass">
+                    <div  class="@notificationDivClass">
+                        @defining(if(notification.read) "notificationDetail read" else "notificationDetail unread") { notificationClass =>
+                            <div id="@notification.id" class="@notificationClass">
+                                <div class="d-flex gap-2">
+                                    <div onclick='markAsRead("@notification.id")' id="notificationIcon_@notification.id" class="d-flex justify-content-center align-items-center notificationIcon">
+                                        <i class="bi bi-info-circle iconWhite"></i>
+                                    </div>
+                                    <div onclick='onNotificationClick(@notification.jsRoute.getOrElse(""))'>
+                                        <div class="mb-2 title">@Messages(notification.title)</div>
+                                        <div class="mb-2 description">@Messages(notification.message, notification.messageParameters: _*)</div>
+                                        <div id="notificationDateTime_@notification.id" class="dateTime">@notification.createdOnMillisEpoch</div>
+                                    </div>
                                 </div>
-                            }
-                        </div>
+                            </div>
+                        }
                         <div class="separator"></div>
                     </div>
-                }
+                </div>
+            }
             </div>
         </div>
         <script>convertMillisEpochToLocal('notificationDateTime_@notification.id')</script>
