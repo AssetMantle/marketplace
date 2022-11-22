@@ -159,7 +159,7 @@ class SaleController @Inject()(
               if (utilities.Date.currentEpoch >= sale.endTimeEpoch) Option(constants.Response.SALE_EXPIRED) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
             ).flatten
-            if (errors.nonEmpty) {
+            if (errors.isEmpty) {
               if (!buySaleNFTData.mintNFT) {
                 blockchainTransactionBuyAssetWithoutMints.Utility.transaction(
                   sellerAccountId = sellerKey.accountId,

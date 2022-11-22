@@ -145,6 +145,7 @@ object Response {
   val NO_SALE_ON_NFT = new Failure("NO_SALE_ON_NFT")
   val NOT_NOTIFICATION_OWNER = new Failure("NOT_NOTIFICATION_OWNER")
   val NFT_NOT_ON_SALE = new Failure("NFT_NOT_ON_SALE")
+  val HANDLE_MULTIPLE_NFT_QUANTITY_CASE = new Failure("HANDLE_MULTIPLE_NFT_QUANTITY_CASE")
 
   class Failure(private val response: String) {
     val message: String = PREFIX + FAILURE_PREFIX + response

@@ -121,14 +121,13 @@ class CollectionController @Inject()(
         val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
         else masterCollections.Service.tryGet(id)
         val likedNFTs = loginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollection(accountId = x.username, collectionId = id))
-
-        def nfts(creatorId: String) = if (loginState.fold("")(_.username) == creatorId || pageNumber == 1) masterNFTs.Service.getByPageNumber(id, pageNumber) else Future(Seq())
+        val nfts = masterNFTs.Service.getByPageNumber(id, pageNumber)
 
         def nftDrafts(collection: Collection) = if (loginState.fold("")(_.username) == collection.creatorId) masterTransactionNFTDrafts.Service.getAllForCollection(id) else Future(Seq())
 
         (for {
           collection <- collection
-          nfts <- nfts(collection.creatorId)
+          nfts <- nfts
           nftDrafts <- nftDrafts(collection)
           likedNFTs <- likedNFTs
         } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts, likedNFTs, nftDrafts, pageNumber))

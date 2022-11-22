@@ -1,7 +1,7 @@
 package models.blockchainTransaction
 
 import exceptions.BaseException
-import models.Trait.{BlockchainTransaction, Entity3, GenericDaoImpl3, Logged, ModelTable3}
+import models.Trait._
 import models.blockchain.Transaction
 import models.common.Coin
 import models.{blockchain, master}
@@ -12,14 +12,13 @@ import play.api.libs.json.Json
 import slick.jdbc.H2Profile.api._
 import transactions.responses.blockchain.BroadcastTxSyncResponse
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class BuyAssetWithoutMint(sellerAccountId: String, buyerAccountId: String, txHash: String, txRawBytes: Array[Byte], nftId: String, saleId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged with BlockchainTransaction {
+case class BuyAssetWithoutMint(sellerAccountId: String, buyerAccountId: String, txHash: String, txRawBytes: Array[Byte], nftId: String, saleId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
 
-  def serialize(): BuyAssetWithoutMints.BuyAssetWithoutMintSerialized = BuyAssetWithoutMints.BuyAssetWithoutMintSerialized(sellerAccountId = this.sellerAccountId, buyerAccountId = this.buyerAccountId, txHash = this.txHash, txRawBytes = this.txRawBytes, nftId = this.nftId, saleId = this.saleId, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, broadcasted = this.broadcasted, status = this.status, memo = this.memo, log = this.log, createdBy = this.createdBy, createdOn = this.createdOn, createdOnTimeZone = this.createdOnTimeZone, updatedBy = this.updatedBy, updatedOn = this.updatedOn, updatedOnTimeZone = this.updatedOnTimeZone)
+  def serialize(): BuyAssetWithoutMints.BuyAssetWithoutMintSerialized = BuyAssetWithoutMints.BuyAssetWithoutMintSerialized(sellerAccountId = this.sellerAccountId, buyerAccountId = this.buyerAccountId, txHash = this.txHash, txRawBytes = this.txRawBytes, nftId = this.nftId, saleId = this.saleId, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, broadcasted = this.broadcasted, status = this.status, memo = this.memo, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 
   def getTxRawAsHexString: String = this.txRawBytes.map("%02x".format(_)).mkString.toUpperCase
 }
@@ -30,8 +29,8 @@ object BuyAssetWithoutMints {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_BUY_ASSET_WITHOUT_MINT
 
-  case class BuyAssetWithoutMintSerialized(sellerAccountId: String, buyerAccountId: String, txHash: String, txRawBytes: Array[Byte], nftId: String, saleId: String, fromAddress: String, toAddress: String, amount: String, broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity3[String, String, String] {
-    def deserialize: BuyAssetWithoutMint = BuyAssetWithoutMint(sellerAccountId = this.sellerAccountId, buyerAccountId = buyerAccountId, txHash = txHash, txRawBytes = this.txRawBytes, nftId = this.nftId, saleId = this.saleId, fromAddress = fromAddress, toAddress = toAddress, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), broadcasted = broadcasted, status = status, memo = memo, log = log, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class BuyAssetWithoutMintSerialized(sellerAccountId: String, buyerAccountId: String, txHash: String, txRawBytes: Array[Byte], nftId: String, saleId: String, fromAddress: String, toAddress: String, amount: String, broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity3[String, String, String] {
+    def deserialize: BuyAssetWithoutMint = BuyAssetWithoutMint(sellerAccountId = this.sellerAccountId, buyerAccountId = buyerAccountId, txHash = txHash, txRawBytes = this.txRawBytes, nftId = this.nftId, saleId = this.saleId, fromAddress = fromAddress, toAddress = toAddress, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), broadcasted = broadcasted, status = status, memo = memo, log = log, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
     def id1: String = sellerAccountId
 
@@ -42,7 +41,7 @@ object BuyAssetWithoutMints {
 
   class BuyAssetWithoutMintTable(tag: Tag) extends Table[BuyAssetWithoutMintSerialized](tag, "BuyAssetWithoutMint") with ModelTable3[String, String, String] {
 
-    def * = (sellerAccountId, buyerAccountId, txHash, txRawBytes, nftId, saleId, fromAddress, toAddress, amount, broadcasted, status.?, memo.?, log.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (BuyAssetWithoutMintSerialized.tupled, BuyAssetWithoutMintSerialized.unapply)
+    def * = (sellerAccountId, buyerAccountId, txHash, txRawBytes, nftId, saleId, fromAddress, toAddress, amount, broadcasted, status.?, memo.?, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (BuyAssetWithoutMintSerialized.tupled, BuyAssetWithoutMintSerialized.unapply)
 
     def sellerAccountId = column[String]("sellerAccountId", O.PrimaryKey)
 
@@ -72,15 +71,11 @@ object BuyAssetWithoutMints {
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
     def id1 = sellerAccountId
 
@@ -165,8 +160,9 @@ class BuyAssetWithoutMints @Inject()(
         val broadcastTx = broadcastTxSync.Service.get(buyAssetWithoutMint.getTxRawAsHexString)
 
         def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = {
-          val updatedBuyAssetWithoutMint = if (errorResponse.nonEmpty || (successResponse.nonEmpty && successResponse.get.result.code != 0)) buyAssetWithoutMint.copy(broadcasted = true, status = Option(false), log = Option(errorResponse.get.error.data))
-          else buyAssetWithoutMint.copy(broadcasted = true)
+          val updatedBuyAssetWithoutMint = if (errorResponse.isDefined || (successResponse.isDefined && successResponse.get.result.code != 0)) {
+            buyAssetWithoutMint.copy(broadcasted = true, status = Option(false), log = Option(errorResponse.fold(successResponse.get.result.log)(_.error.data)))
+          } else buyAssetWithoutMint.copy(broadcasted = true)
           Service.update(updatedBuyAssetWithoutMint)
         }
 

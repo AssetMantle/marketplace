@@ -89,11 +89,18 @@ class NFTOwners @Inject()(
       } yield ()
     }
 
+    def delete(nftId: String, ownerId: String) = deleteById1AndId2(id1 = nftId, id2 = ownerId)
+
     def markNFTSold(nftId: String, saleId: String, sellerAccountId: String, buyerAccountId: String): Future[Unit] = {
       val nftOwner = tryGet(fileName = nftId, ownerId = sellerAccountId)
 
       def verifyAndUpdate(nftOwner: NFTOwner) = if (nftOwner.saleId.getOrElse("") == saleId) {
-        update(nftOwner.copy(saleId = None, ownerId = buyerAccountId))
+        if (nftOwner.quantity == 1) {
+          for {
+            _ <- delete(nftId = nftOwner.fileName, ownerId = nftOwner.ownerId)
+            _ <- create(nftOwner.copy(saleId = None, ownerId = buyerAccountId))
+          } yield ()
+        } else constants.Response.HANDLE_MULTIPLE_NFT_QUANTITY_CASE.throwFutureBaseException()
       } else constants.Response.NFT_NOT_ON_SALE.throwFutureBaseException()
 
       for {

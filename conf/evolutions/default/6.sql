@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."BuyAssetWithoutMint"
     "sellerAccountId"      VARCHAR NOT NULL,
     "buyerAccountId"       VARCHAR NOT NULL,
     "txHash"               VARCHAR NOT NULL,
-    "txRawHexBytes"        BYTEA   NOT NULL,
+    "txRawBytes"           BYTEA   NOT NULL,
     "nftId"                VARCHAR NOT NULL,
     "saleId"               VARCHAR NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
