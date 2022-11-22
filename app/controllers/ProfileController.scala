@@ -70,18 +70,6 @@ class ProfileController @Inject()(
     }
   }
 
-  // TODO: As form
-  def markNotificationRead(notificationId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val markRead = masterTransactionNotifications.Service.markNotificationRead(notificationId = notificationId, accountId = loginState.username)
-      (for {
-        unread <- markRead
-      } yield Ok(unread.toString)
-        ).recover {
-        case baseException: BaseException => BadRequest(baseException.failure.message)
-      }
-  }
-
   def markNotificationsRead(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       MarkNotificationsRead.form.bindFromRequest().fold(
@@ -111,17 +99,4 @@ class ProfileController @Inject()(
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
   }
-
-  // TODO: As form
-  def markAllNotificationRead(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val mark = masterTransactionNotifications.Service.markAllRead(loginState.username)
-      (for {
-        _ <- mark
-      } yield Ok
-        ).recover {
-        case baseException: BaseException => BadRequest(baseException.failure.message)
-      }
-  }
-
 }
