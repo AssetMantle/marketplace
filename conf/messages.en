@@ -606,6 +606,8 @@ NOTIFICATION_POPUP_TITLE_OLD=Old
 NOTIFICATION_POPUP_EMAIL_LABEL=Add your email to get all the notifications
 NOTIFICATION_POPUP_EMAIL_SUBMIT=Get Notified
 NOTIFICATION_POPUP_LOAD_MORE=More...
+EMPTY_NOTIFICATION=No activity found!
+NOTIFICATION_POPUP_MARK_AS_READ=Mark as read
 
 #404 page
 ERROR_PAGE_TITLE=Page Not Found
@@ -785,3 +787,6 @@ NFT_SALE_SUCCESS_TITLE=Collection opened to Whitelist Sale Successfully
 NFT_SALE_SUCCESS_SUBTITLE=Your collection is now available for private sale to your requested whitelist.
 SALE_ONGOING=Ongoing
 SALE_EXPIRED=Ended
+COLLECTION_CURRENT_PRICE_TITLE=Current Price
+COLLECTION_CURRENT_PRICE_SUBTITLE=(Incl. Creator Royalties)
+NFT_SALE_TITLE=Sales

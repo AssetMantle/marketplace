@@ -63,6 +63,18 @@
   .analysisValue{
     @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
   }
+  .priceHolder{
+    .nft-mantle-price{
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--default));
+      margin-left: 4px;
+    }
+    .nft-dollar-price{
+      @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));
+    }
+  }
+  .form-primary-button{
+    width: 100%;
+  }
 }
 .collectionContainer{
   width: 100%;

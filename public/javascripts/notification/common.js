@@ -55,7 +55,7 @@ function markAsRead(id) {
             statusCode: {
                 200: function (data) {
                     element.removeClass("unread").addClass("read");
-                    console.log(data);
+                    countUnread();
                 },
                 400: function (data) {
                     console.log(data.responseText)
@@ -73,11 +73,66 @@ function countUnread() {
         async: true,
         statusCode: {
             200: function (data) {
-                console.log(data);
+                if(data > 0){
+                    $(".haveNotification").show();
+                    $(".noNotification").hide();
+                    if(data > 2){
+                        $(".loadOlderNotificationButton").show();
+                    }
+                }else{
+                    $(".haveNotification").hide();
+                    $(".noNotification").show();
+                }
             },
             400: function (data) {
                 console.log(data.responseText)
             },
         }
     })
+}
+
+function markAllAsRead() {
+    let route = jsRoutes.controllers.ProfileController.markAllNotificationRead();
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function () {
+                countUnread();
+            },
+            400: function (data) {
+                console.log(data.responseText)
+            },
+        }
+    })
+}
+
+let list = [];
+function addToReadList(notificationId){
+    $("#markAsReadButton").show();
+    $("#notificationIcon_"+notificationId).toggleClass("active");
+    if($("#notificationIcon_"+notificationId).hasClass("active")){
+        list.push(notificationId);
+    }else{
+        const index = list.indexOf(notificationId);
+        if (index > -1) {
+            list.splice(index, 1);
+        }
+    }
+}
+
+function markListItemAsRead(){
+    list.forEach((id)=>{
+        markAsRead(id,);
+    });
+    $("#markAsReadButton").hide();
+}
+
+function clearMarkAsReadList(){
+    list = [];
+    $(".notificationIcon").each((index,item)=>{
+       $(item).removeClass("active");
+    });
+    $("#markAsReadButton").hide();
 }
