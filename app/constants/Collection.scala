@@ -5,6 +5,8 @@ object Collection {
   object File {
     val PROFILE = "PROFILE"
     val COVER = "COVER"
+
+    val AllCollectionsPath: String = constants.CommonConfig.Files.CollectionPath + "/"
   }
 
   object SocialProfile {
@@ -12,10 +14,6 @@ object Collection {
     val TWITTER = "TWITTER"
     val INSTAGRAM = "INSTAGRAM"
   }
-
-  def getFilePath: String = constants.CommonConfig.Files.CollectionPath + "/"
-
-  def getNFTFilePath: String = constants.CommonConfig.Files.CollectionPath + "/nfts/"
 
   object Category {
     val ART = "ART"

@@ -1,8 +1,8 @@
 package service
 
-import models.common.Collection.SocialProfile
-import models.master
-import models.master.{Collection, CollectionFile}
+import models.analytics.{CollectionAnalysis, CollectionsAnalysis}
+import models.master.{Collection, NFTOwner}
+import models.{master, masterTransaction}
 import play.api.libs.json.Reads
 import play.api.{Configuration, Logger}
 
@@ -13,12 +13,15 @@ import scala.io.{Source => ScalaSource}
 
 @Singleton
 class Starter @Inject()(
+                         collectionsAnalysis: CollectionsAnalysis,
                          masterAccounts: master.Accounts,
                          masterCollections: master.Collections,
                          masterCollectionFiles: master.CollectionFiles,
                          masterNFTs: master.NFTs,
+                         masterNFTOwners: master.NFTOwners,
                          masterNFTProperties: master.NFTProperties,
                          masterWishLists: master.WishLists,
+                         masterTransactionNotifications: masterTransaction.Notifications,
                          utilitiesOperations: utilities.Operations,
                        )(implicit exec: ExecutionContext, configuration: Configuration) {
 
@@ -26,7 +29,7 @@ class Starter @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val uploadCollectionFilePath = constants.CommonConfig.Files.CollectionPath + "/upload.json"
+  private val uploadCollectionDraftFilePath = constants.CommonConfig.Files.CollectionPath + "/upload.json"
 
   def getListOfFiles(dir: String): List[String] = {
     val file = new File(dir)
@@ -41,130 +44,100 @@ class Starter @Inject()(
     obj
   }
 
-  private def updateCollectionAwsFiles() = {
-    val collectionFiles = masterCollectionFiles.Service.fetchAll()
-    val collections = masterCollections.Service.fetchAll()
-
-    def update(collectionFiles: Seq[CollectionFile], collections: Seq[Collection]): Unit = collectionFiles.foreach { collectionFile =>
-      try {
-        val sourceKey = collections.find(_.id == collectionFile.id).fold("")(_.name) + "/others/" + collectionFile.fileName
-        val destinationKey = collectionFile.id + "/others/" + collectionFile.fileName
-        if (!utilities.AmazonS3.exists(destinationKey)) {
-          utilities.AmazonS3.copyObject(sourceKey = sourceKey, destinationKey = destinationKey)
-        }
-      } catch {
-        case exception: Exception => logger.error(exception.getLocalizedMessage)
-      }
-    }
-
-    for {
-      collectionFiles <- collectionFiles
-      collections <- collections
-    } yield update(collectionFiles, collections)
-
-  }
-
-  private def updateCollectionNFTAwsFiles() = {
+  private def updateAccountType() = {
     val collections = masterCollections.Service.fetchAll()
 
     def update(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
-      val nfts = masterNFTs.Service.getAllForCollection(collection.id)
-
-      for {
-        nfts <- nfts
-      } yield {
-        nfts.foreach { nft =>
-          try {
-            val sourceKey = collections.find(_.id == nft.collectionId).fold("")(_.name) + "/nfts/" + nft.fileName
-            val destinationKey = nft.collectionId + "/nfts/" + nft.fileName
-            //            println(destinationKey)
-            if (!utilities.AmazonS3.exists(destinationKey)) {
-              utilities.AmazonS3.copyObject(sourceKey = sourceKey, destinationKey = destinationKey)
-            }
-          } catch {
-            case exception: Exception => logger.error(exception.getLocalizedMessage)
-          }
-        }
-      }
+      masterAccounts.Service.updateAccountToCreator(collection.creatorId)
     }
 
-    for {
+    (for {
       collections <- collections
-    } yield update(collections)
-
+      _ <- update(collections)
+    } yield ()
+      ).recover {
+      case exception: Exception =>
+    }
   }
 
-  private def updateNFTProperties() = {
+  private def updateCollectionAnalysis() = {
     val collections = masterCollections.Service.fetchAll()
 
-    def update(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
-      println(collection.name)
-      println(collection.id)
-      val nfts = masterNFTs.Service.getAllForCollection(collection.id)
+    def updateAnalytics(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
+      val totalNFTs = masterNFTs.Service.countNFTs(collection.id)
 
-      def updateNFTs(nfts: Seq[master.NFT]) = {
-        val updateCollectionProperties = masterCollections.Service.updateById(collection.copy(properties = Option(nfts.head.properties.map(_.toBaseNFTProperty).map(x => models.common.Collection.Property(name = x.name, `type` = x.`type`, defaultValue = "")))))
-        val nftsUpdate = utilitiesOperations.traverse(nfts)(nft => masterNFTProperties.Service.addMultiple(nft.properties.map(_.toBaseNFTProperty.toNFTProperty(nft.fileName))))
-        for {
-          _ <- updateCollectionProperties
-          _ <- nftsUpdate
-        } yield ()
-      }
+      def update(totalNFTs: Int) = collectionsAnalysis.Service.add(CollectionAnalysis(id = collection.id, totalNFTs = totalNFTs, totalSold = 0, totalTraded = 0, floorPrice = 0, totalVolume = 0, bestOffer = 0, listed = 0, owners = 0, uniqueOwners = 0))
 
       for {
-        nfts <- nfts
-        _ <- updateNFTs(nfts)
+        totalNFTs <- totalNFTs
+        _ <- update(totalNFTs)
       } yield ()
     }
 
-
-    for {
+    (for {
       collections <- collections
-      _ <- update(collections)
+      _ <- updateAnalytics(collections)
     } yield ()
+      ).recover {
+      case exception: Exception =>
+    }
   }
 
-  private def updateSocialURLsAndCollectionFiles() = {
+  private def addNFTOwners() = {
     val collections = masterCollections.Service.fetchAll()
-    val collectionFiles = masterCollectionFiles.Service.fetchAll()
 
-    def update(collections: Seq[Collection], collectionFiles: Seq[CollectionFile]) = utilitiesOperations.traverse(collections) { collection =>
-      masterCollections.Service.updateById(collection.copy(
-        socialProfiles = if (collection.website == "") collection.socialProfiles.map(x => x.copy(url = x.url.split("/").last)) else SocialProfile(name = constants.Collection.SocialProfile.WEBSITE, url = collection.website) +: collection.socialProfiles.map(x => x.copy(url = x.url.split("/").last)),
-        profileFileName = collectionFiles.find(x => x.id == collection.id && x.documentType == constants.Collection.File.PROFILE).map(_.fileName),
-        coverFileName = collectionFiles.find(x => x.id == collection.id && x.documentType == constants.Collection.File.COVER).map(_.fileName),
-        website = "",
-      ))
+    def updateNFTs(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
+      val nftIds = masterNFTs.Service.getAllIdsForCollection(collection.id)
+
+      def update(nftIds: Seq[String]) = masterNFTOwners.Service.add(nftIds.map(x => NFTOwner(fileName = x, ownerId = collection.creatorId, creatorId = collection.creatorId, collectionId = collection.id, quantity = 1, saleId = None)))
+
+      (for {
+        nftIds <- nftIds
+        _ <- update(nftIds)
+      } yield ()
+        ).recover {
+        case exception: Exception =>
+      }
     }
 
     for {
       collections <- collections
-      collectionFiles <- collectionFiles
-      _ <- update(collections, collectionFiles)
+      _ <- updateNFTs(collections)
     } yield ()
   }
 
-  private def updateAccountType() = {
-    val collections = masterCollections.Service.fetchAllPublic()
+  private def correctNotifications() = {
+    val incorrectNotifications = masterTransactionNotifications.Service.getClickableNotifications
 
-    def update(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
-      masterAccounts.Service.updateAccountType(accountId = collection.creatorId, accountType = constants.Account.Type.GENESIS_CREATOR)
+    def update(incorrectNotifications: Seq[masterTransaction.Notification]) = utilitiesOperations.traverse(incorrectNotifications) { notification =>
+      if ((notification.jsRoute.getOrElse("").contains("CollectionController.viewCollection(") && !notification.jsRoute.getOrElse("").contains("CollectionController.viewCollection('")) || (notification.jsRoute.getOrElse("").contains("NFTController.viewNFT(") && !notification.jsRoute.getOrElse("").contains("NFTController.viewNFT('"))) {
+        val updatedRoute1 = notification.jsRoute.getOrElse("").split("\\(")
+        val updatedRoute2 = updatedRoute1.last.split("\\)")
+        val route = s"${updatedRoute1.head}('${updatedRoute2.head}')"
+        println(route)
+        masterTransactionNotifications.Service.update(notification.copy(jsRoute = Option(route)))
+      } else {
+        println("already corrected: " + notification.jsRoute.getOrElse(""))
+        Future()
+      }
     }
 
-    for {
-      collections <- collections
-      _ <- update(collections)
+    (for {
+      incorrectNotifications <- incorrectNotifications
+      _ <- update(incorrectNotifications)
     } yield ()
+      ).recover {
+      case exception: Exception =>
+    }
   }
 
   def start(): Future[Unit] = {
 
     (for {
+      _ <- correctNotifications()
       _ <- updateAccountType()
-      _ <- updateNFTProperties()
-      _ <- updateCollectionAwsFiles()
-      _ <- updateCollectionNFTAwsFiles()
-      _ <- updateSocialURLsAndCollectionFiles()
+      _ <- updateCollectionAnalysis()
+      _ <- addNFTOwners()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)

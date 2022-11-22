@@ -1,7 +1,6 @@
 package models.common
 
 import cosmos.base.v1beta1.CoinOuterClass
-import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Json, Reads, Writes}
@@ -31,17 +30,15 @@ case class Coin(denom: String, amount: MicroNumber) {
 
   def add(coin: Coin): Coin = {
     if (coin.denom != denom) {
-      throw new BaseException(constants.Response.ARITHMETIC_OPERATION_ON_DIFFERENT_COIN)
-    }
-    Coin(denom = denom, amount = amount + coin.amount)
+      constants.Response.ARITHMETIC_OPERATION_ON_DIFFERENT_COIN.throwBaseException()
+    } else Coin(denom = denom, amount = amount + coin.amount)
   }
 
   def subtract(coin: Coin): Coin = {
     val result = add(coin.copy(amount = amount * -1))
     if (result.isNegative) {
-      throw new BaseException(constants.Response.COIN_AMOUNT_NEGATIVE)
-    }
-    result
+      constants.Response.COIN_AMOUNT_NEGATIVE.throwBaseException()
+    } else result
   }
 
   def toProtoCoin: CoinOuterClass.Coin = CoinOuterClass.Coin.newBuilder().setDenom(this.denom).setAmount(this.amount.toMicroString).build()

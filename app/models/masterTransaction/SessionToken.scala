@@ -91,9 +91,9 @@ class SessionTokens @Inject()(
 
     def getTimedOutIDs: Future[Seq[String]] = filter(_.sessionTokenTime < DateTime.now(DateTimeZone.UTC).getMillis - constants.CommonConfig.SessionTokenTimeout).map(_.map(_.accountId))
 
-    def deleteById(id: String): Future[Int] = delete(id)
+    def delete(id: String): Future[Int] = deleteById(id)
 
-    def deleteSessionTokens(ids: Seq[String]): Future[Unit] = deleteMultiple(ids)
+    def deleteMultiple(ids: Seq[String]): Future[Unit] = deleteByIds(ids)
 
   }
 
@@ -101,7 +101,7 @@ class SessionTokens @Inject()(
     def run(): Unit = {
       val ids = Service.getTimedOutIDs
 
-      def deleteSessionTokens(ids: Seq[String]) = Service.deleteSessionTokens(ids)
+      def deleteSessionTokens(ids: Seq[String]) = Service.deleteMultiple(ids)
 
       val forComplete = (for {
         ids <- ids

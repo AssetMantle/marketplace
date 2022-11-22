@@ -1,0 +1,10 @@
+@import views.html.base.form._
+@import views.sale.companion.BuySaleNFT
+
+@(buySaleNFTForm: Form[BuySaleNFT.Data] = BuySaleNFT.form, saleId: String, nftId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.BUY_NFT_SALE, buySaleNFTForm) {
+    @commonInputText(buySaleNFTForm, constants.FormField.SALE_ID, Symbol("value") -> saleId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> true)
+    @commonInputText(buySaleNFTForm, constants.FormField.NFT_FILE_NAME, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> true)
+    @commonInputPassword(buySaleNFTForm, constants.FormField.PASSWORD)
+}

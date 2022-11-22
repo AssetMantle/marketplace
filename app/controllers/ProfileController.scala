@@ -7,6 +7,7 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import views.notification.companion.MarkNotificationsRead
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,22 +49,14 @@ class ProfileController @Inject()(
       Future(Ok(views.html.profile.profile(accountId = accountId, activeTab = activeTab)))
   }
 
-  def notificationPopup(): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def notificationPopup(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
-        val unread = masterTransactionNotifications.Service.getNumberOfUnread(loginState.username)
-        val notifications = masterTransactionNotifications.Service.get(loginState.username, 1)
-        (for {
-          unread <- unread
-          notifications <- notifications
-        } yield Ok(views.html.notification.commonNotificationPopup(unread, notifications))
-          ).recover {
-          case baseException: BaseException => BadRequest(baseException.failure.message)
-        }
+        Future(Ok(views.html.notification.commonNotificationPopup()))
     }
   }
 
-  def loadMoreNotifications(pageNumber: Int): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def loadMoreNotifications(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val notifications = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwFutureBaseException()
@@ -75,5 +68,35 @@ class ProfileController @Inject()(
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }
     }
+  }
+
+  def markNotificationsRead(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      MarkNotificationsRead.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest)
+        },
+        markNotificationsReadData => {
+          val update = if (markNotificationsReadData.markAllRead) masterTransactionNotifications.Service.markAllRead(loginState.username)
+          else masterTransactionNotifications.Service.markNotificationRead(notificationId = markNotificationsReadData.notificationId.getOrElse(""), accountId = loginState.username)
+          (for {
+            unread <- update
+          } yield Ok(unread.toString)
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        }
+      )
+  }
+
+  def countUnreadNotification(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val unread = masterTransactionNotifications.Service.getNumberOfUnread(loginState.username)
+      (for {
+        unread <- unread
+      } yield Ok(unread.toString)
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
   }
 }

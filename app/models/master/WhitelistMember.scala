@@ -1,6 +1,5 @@
 package models.master
 
-import exceptions.BaseException
 import models.Trait.{Entity2, GenericDaoImpl2, Logged, ModelTable2}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -87,11 +86,17 @@ class WhitelistMembers @Inject()(
 
     def getAllForMember(accountId: String, pageNumber: Int, perPage: Int): Future[Seq[String]] = filterAndSortWithPagination((pageNumber - 1) * perPage, limit = perPage)(_.accountId === accountId)(_.createdOn).map(_.map(_.whitelistId))
 
+    def getAllForMember(accountId: String): Future[Seq[String]] = filter(_.accountId === accountId).map(_.map(_.whitelistId))
+
+    def getAllMembers(id: String): Future[Seq[String]] = filter(_.whitelistId === id).map(_.map(_.accountId))
+
     def totalJoined(accountId: String): Future[Int] = filterAndCount(_.accountId === accountId)
+
+    def isMember(whitelistId: String, accountId: String): Future[Boolean] = exists(id1 = whitelistId, id2 = accountId)
 
     def deleteAllMembers(whitelistId: String): Future[Int] = filterAndDelete(_.whitelistId === whitelistId)
 
-    def deleteMember(whitelistId: String, accountId: String): Future[Int] = delete(id1 = whitelistId, id2 = accountId)
+    def delete(whitelistId: String, accountId: String): Future[Int] = deleteById1AndId2(id1 = whitelistId, id2 = accountId)
 
     def getWhitelistsMemberCount(whitelistId: String): Future[Int] = filterAndCount(_.whitelistId === whitelistId)
 

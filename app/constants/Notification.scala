@@ -38,4 +38,6 @@ object Notification {
   val COLLECTION_CREATED: Notification = Notification("COLLECTION_CREATED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.CollectionController.viewCollection))
   val NFT_CREATED: Notification = Notification("NFT_CREATED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
 
+  val SALE_ON_WHITELIST: Notification = Notification("SALE_ON_WHITELIST", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ProfileController.viewProfile))
+
 }

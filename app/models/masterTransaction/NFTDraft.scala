@@ -2,7 +2,7 @@ package models.masterTransaction
 
 import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import models.common.NFT._
-import models.master.{NFT, NFTProperty}
+import models.master.{NFT, NFTOwner, NFTProperty}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -13,7 +13,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class NFTDraft(fileName: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[Seq[BaseNFTProperty]], tagNames: Option[Seq[String]], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def toNFT: NFT = NFT(fileName = fileName, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), properties = Seq(), ipfsLink = "", edition = None)
+  def toNFT(totalSupply: Int = 1): NFT = NFT(fileName = fileName, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), totalSupply = totalSupply, ipfsLink = "", edition = None, isMinted = false)
+
+  def toNFTOwner(ownerID: String, creatorId: String, saleId: Option[String], quantity: Int = 1): NFTOwner = NFTOwner(fileName = fileName, ownerId = ownerID, creatorId = creatorId, collectionId = collectionId, quantity = quantity, saleId = saleId)
 
   def getNFTProperties: Seq[NFTProperty] = this.properties.fold[Seq[NFTProperty]](Seq())(x => x.map(_.toNFTProperty(this.fileName)))
 
@@ -123,7 +125,7 @@ class NFTDrafts @Inject()(
       val draft = tryGet(fileName)
       for {
         draft <- draft
-        _ <- update(draft.copy(name = Option(name), description = Option(description)).serialize())
+        _ <- updateById(draft.copy(name = Option(name), description = Option(description)).serialize())
       } yield draft.copy(name = Option(name), description = Option(description))
     }
 
@@ -131,7 +133,7 @@ class NFTDrafts @Inject()(
       val draft = tryGet(fileName)
       for {
         nftDraft <- draft
-        _ <- update(nftDraft.copy(properties = Option(properties)).serialize())
+        _ <- updateById(nftDraft.copy(properties = Option(properties)).serialize())
       } yield nftDraft.copy(properties = Option(properties))
     }
 
@@ -139,10 +141,10 @@ class NFTDrafts @Inject()(
       val draft = tryGet(fileName)
       for {
         draft <- draft
-        _ <- update(draft.copy(tagNames = Option(tagNames)).serialize())
+        _ <- updateById(draft.copy(tagNames = Option(tagNames)).serialize())
       } yield ()
     }
 
-    def deleteById(fileName: String): Future[Int] = delete(fileName)
+    def delete(fileName: String): Future[Int] = deleteById(fileName)
   }
 }

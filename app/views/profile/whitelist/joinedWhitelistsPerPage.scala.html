@@ -8,10 +8,11 @@
     <td class="text-end tableFieldNo">@(lastIndex + index + 1)</td>
     <td class="tableFieldName">@whitelist.name</td>
     <td class="tableFieldStartEpoch">
-        <span id="startEpoch_@whitelist.id">@whitelist.startEpoch</span> - <br>
+        <span id="startEpoch_@whitelist.id">@whitelist.startEpoch</span>
+    </td>
+    <td class="tableFieldEndEpoch">
         <span id="endEpoch_@whitelist.id">@whitelist.endEpoch</span>
     </td>
-    <td id="memberCount_@whitelist.id" class="text-end tableFieldTotalMembers">00</td>
     <td class="text-end tableFieldMaxMembers">@whitelist.maxMembers</td>
     <td  class="text-end tableFieldAction">
         <div class="d-flex gap-3">
@@ -25,6 +26,6 @@
     </td>
 </tr>
   <script>epochToDateTime('startEpoch_@whitelist.id'); epochToDateTime('endEpoch_@whitelist.id')</script>
-<script><script>componentResource('memberCount_@whitelist.id',
+  <script>componentResource('memberCount_@whitelist.id',
             jsRoutes.controllers.WhitelistController.whitelistTotalMembers('@whitelist.id'))</script>
 }

@@ -219,7 +219,7 @@ class Keys @Inject()(
     ))
 
     def validateUsernamePasswordAndGetKey(username: String, address: String, password: String): Future[(Boolean, Key)] = {
-      val key = tryGetById(username, address)
+      val key = tryGetById1AndId2(username, address)
       for {
         key <- key
       } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = key.passwordHash, salt = key.salt, iterations = key.iterations), key.deserialize)
@@ -236,13 +236,13 @@ class Keys @Inject()(
 
     def getActive(accountId: String): Future[Option[Key]] = filter(x => x.id1 === accountId && x.active).map(_.headOption.map(_.deserialize))
 
-    def updateKey(key: Key): Future[Unit] = update(key.serialize())
+    def updateKey(key: Key): Future[Unit] = updateById1AndId2(key.serialize())
 
     def getActiveByAccountId(accountId: String): Future[Option[Key]] = filter(x => x.id1 === accountId && x.active).map(_.map(_.deserialize).headOption)
 
-    def deleteKey(accountId: String, address: String): Future[Int] = delete(accountId, address)
+    def delete(accountId: String, address: String): Future[Int] = deleteById1AndId2(accountId, address)
 
-    def tryGet(accountId: String, address: String): Future[Key] = tryGetById(id1 = accountId, id2 = address).map(_.deserialize)
+    def tryGet(accountId: String, address: String): Future[Key] = tryGetById1AndId2(id1 = accountId, id2 = address).map(_.deserialize)
 
     def updateKeyName(accountId: String, address: String, keyName: String): Future[Unit] = {
       val key = tryGet(accountId = accountId, address = address)
@@ -262,7 +262,7 @@ class Keys @Inject()(
       } else constants.Response.INVALID_ACTIVE_KEY.throwFutureBaseException()
 
       def updatePassword(key: Key, wallet: utilities.Wallet) = if (key.address == wallet.address) {
-        update(key.copy(
+        updateById1AndId2(key.copy(
           passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = key.salt, iterations = constants.Security.DefaultIterations),
           encryptedPrivateKey = utilities.Secrets.encryptData(data = wallet.privateKey, secret = newPassword)
         ).serialize())
@@ -281,7 +281,7 @@ class Keys @Inject()(
       def updatePassword(passwordValidated: Boolean, oldKey: Key) = if (passwordValidated) {
         if (oldKey.encryptedPrivateKey.nonEmpty && oldKey.partialMnemonics.isDefined) {
           val decryptedPrivateKey = utilities.Secrets.decryptData(encryptedData = oldKey.encryptedPrivateKey, secret = oldPassword)
-          update(oldKey.copy(
+          updateById1AndId2(oldKey.copy(
             passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = oldKey.salt, iterations = constants.Security.DefaultIterations),
             encryptedPrivateKey = utilities.Secrets.encryptData(data = decryptedPrivateKey, secret = newPassword),
           ).serialize())
@@ -300,8 +300,8 @@ class Keys @Inject()(
 
       def updateKeys(oldKey: Key, newKey: Key) = if (newKey.encryptedPrivateKey.nonEmpty) {
         for {
-          _ <- update(newKey.copy(active = true).serialize())
-          _ <- update(oldKey.copy(active = false).serialize())
+          _ <- updateById1AndId2(newKey.copy(active = true).serialize())
+          _ <- updateById1AndId2(oldKey.copy(active = false).serialize())
         } yield ()
       } else constants.Response.ACTIVATING_UNMANAGED_KEY.throwBaseException()
 
@@ -315,7 +315,7 @@ class Keys @Inject()(
     def changeManagedToUnmanaged(accountId: String, address: String, password: String): Future[Unit] = {
       val validate = validateUsernamePasswordAndGetKey(username = accountId, address = address, password = password)
 
-      def validateAndUpdate(validated: Boolean, key: Key) = if (validated) update(key.copy(encryptedPrivateKey = Array[Byte](), partialMnemonics = None).serialize())
+      def validateAndUpdate(validated: Boolean, key: Key) = if (validated) updateById1AndId2(key.copy(encryptedPrivateKey = Array[Byte](), partialMnemonics = None).serialize())
       else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
 
       for {

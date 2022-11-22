@@ -1,0 +1,159 @@
+@import models.master.Whitelist
+@import controllers.actions.LoginState
+@import views.html.base.buttons._
+@import models.master.Sale
+
+@(whitelist: Whitelist, totalMembers: Int, sales: Seq[Sale])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+<div class="singleItemDetailContainer">
+
+    <div class="headerWithIcon">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-1 my-3 headerTop">
+                <div class="title-icon back-button-icon" onclick="setCreatedWhitelistCurrentPage(0); componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.createdWhitelists());">
+                    <i class="bi bi-chevron-left iconDefault"></i>
+                </div>
+                <h3 class="titleText">@whitelist.name</h3>
+            </div>
+            <div class="p-0 userAddressData username-data" data-value="@constants.CommonConfig.WebAppUrl.concat(s"""/acceptWhitelistInvite/${whitelist.id}""")"></div>
+            <div class="sharableLink" onclick="copyToClipboard(this); showSnackbar('', '@Messages(constants.View.LINK_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
+                <i class="bi bi-share iconDefault iconSmall"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="container px-4 py-3 detailCard">
+        <div class="row p-0 m-0 mb-4 detailTitle">
+            <div class="col p-0">
+            @Messages(constants.View.WHITELIST_DETAIL_TITLE)
+            </div>
+        </div>
+        <div class="row p-0 m-0 mt-3 detailBody">
+            <div class="col">
+                <div class="d-flex gap-3 align-items-center field">
+                    <div class="fieldTitle">@Messages(constants.View.WHITELIST_DETAIL_FIELD_TITLE_STATUS)</div>
+                    <div class="fieldValue">
+                        <div class="statusOptions">
+                            <div class="option notStarted active">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <div class="statusBadge notStarted"></div>
+                                    <span>@Messages(constants.View.WHITELIST_DETAIL_FIELD_VALUE_STATUS_NOT_STARTED)</span>
+                                </div>
+                            </div>
+                            <div class="option started">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <div class="statusBadge started"></div>
+                                    <span>@Messages(constants.View.WHITELIST_DETAIL_FIELD_VALUE_STATUS_STARTED)</span>
+                                </div>
+                            </div>
+                            <div class="option ended">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <div class="statusBadge ended"></div>
+                                    <span>@Messages(constants.View.WHITELIST_DETAIL_FIELD_VALUE_STATUS_ENDED)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="d-flex gap-3 align-items-center field">
+                    <div class="fieldTitle">@Messages(constants.View.WHITELIST_DETAIL_FIELD_TITLE_COLLECTION_ON_SALE)</div>
+                    <div class="fieldValue">@sales.length</div>
+                </div>
+            </div>
+        </div>
+        <div class="row p-0 m-0 mt-3 detailBody">
+            <div class="col">
+                <div class="d-flex gap-3 align-items-center field">
+                    <div class="fieldTitle">@Messages(constants.View.WHITELIST_DETAIL_FIELD_TITLE_TOTAL_MEMBERS)</div>
+                    <div class="fieldValue">@totalMembers</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="d-flex gap-3 align-items-center field">
+                    <div class="fieldTitle">@Messages(constants.View.WHITELIST_DETAIL_FIELD_TITLE_MAX_MEMBERS)</div>
+                    <div class="fieldValue">@whitelist.maxMembers</div>
+                </div>
+            </div>
+        </div>
+@*        <div class="row p-0 m-0 mt-3 detailBody">*@
+@*            <div class="col">*@
+@*                <div class="d-flex gap-3 align-items-center field">*@
+@*                    <div class="fieldTitle">@Messages(constants.View.WHITELIST_DETAIL_FIELD_TITLE_MEMBER_REQUESTS)</div>*@
+@*                    <div class="d-flex gap-2 align-items-center fieldValue">*@
+@*                        <span>00</span>*@
+@*                        @commonTertiaryButton(Messages(constants.View.WHITELIST_OFFERS_VIEW_ALL_LINK), JavaScript(""), Option("bi-chevron-right"), Option(false))*@
+@*                    </div>*@
+@*                </div>*@
+@*            </div>*@
+@*        </div>*@
+    </div>
+
+    <div class="contentBody">
+        <div class="contentHeader mx-4 pt-3">
+            <div class="headerTitle">@Messages(constants.View.WHITELIST_OFFERS_LIST_HEADER)</div>
+        </div>
+        <div class="container contentTableContainer p-0" id="whitelistOffersList">
+            <div class="row">
+                <div class="col-sm-12 col-md-12">
+                    <div class="table-responsive">
+                        <table class="table contentTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-end tableFieldNo">@Messages(constants.View.WHITELIST_OFFERS_TABLE_TITLE_NO)</th>
+                                    <th class="tableFieldName">@Messages(constants.View.WHITELIST_OFFERS_TABLE_TITLE_NAME)</th>
+                                    <th class="tableFieldStatus">@Messages(constants.View.WHITELIST_OFFERS_LIST_TITLE_STATUS)</th>
+                                    <th class="tableFieldDuration">@Messages(constants.View.WHITELIST_OFFERS_DURATION_TITLE)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="WhitelistOffersListTableBody">
+                                @sales.zipWithIndex.map{ case (sale, index) =>
+                                    <tr>
+                                        <td class="text-end tableFieldNo">@(index + 1)</td>
+                                        <td class="tableFieldName">@sale.collectionId</td>
+                                        <td class="tableFieldStatus" id="saleStatus_@sale.collectionId">
+                                          <div class="hidden status">@sale.getStatus</div>
+                                            <div class="statusOptions">
+                                                <div class="option notStarted active">
+                                                    <div class="d-flex gap-2 align-items-center">
+                                                        <div class="statusBadge notStarted"></div>
+                                                        <span>@Messages(constants.View.WHITELIST_DETAIL_FIELD_VALUE_STATUS_NOT_STARTED)</span>
+                                                    </div>
+                                                </div>
+                                                <div class="option started">
+                                                    <div class="d-flex gap-2 align-items-center">
+                                                        <div class="statusBadge started"></div>
+                                                        <span>@Messages(constants.View.WHITELIST_DETAIL_FIELD_VALUE_STATUS_STARTED)</span>
+                                                    </div>
+                                                </div>
+                                                <div class="option ended">
+                                                    <div class="d-flex gap-2 align-items-center">
+                                                        <div class="statusBadge ended"></div>
+                                                        <span>@Messages(constants.View.WHITELIST_DETAIL_FIELD_VALUE_STATUS_ENDED)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="tableFieldDuration">
+                                            <span id="startTimeEpoch_@sale.collectionId">@sale.startTimeEpoch</span> -
+                                            <span id="endTimeEpoch_@sale.collectionId">@sale.endTimeEpoch</span>
+                                        </td>
+                                    </tr>
+                                  <script>
+                                        setSaleStatus('saleStatus_@sale.collectionId');
+                                        epochToDateTime('startTimeEpoch_@sale.collectionId');
+                                        epochToDateTime('endTimeEpoch_@sale.collectionId');
+                                  </script>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    setOffersStatus('@whitelist.startEpoch', '@whitelist.endEpoch');
+</script>

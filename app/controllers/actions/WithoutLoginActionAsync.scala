@@ -16,6 +16,7 @@ class WithoutLoginActionAsync @Inject()(
                                          messagesControllerComponents: MessagesControllerComponents,
                                          withActionAsyncLogging: WithActionAsyncLogging,
                                          masterTransactionSessionTokens: masterTransaction.SessionTokens,
+                                         masterAccounts: master.Accounts,
                                          masterKeys: master.Keys,
                                        )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -24,31 +25,33 @@ class WithoutLoginActionAsync @Inject()(
   def apply(f: => Option[LoginState] => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLogging { implicit request =>
       val username = request.session.get(constants.Session.USERNAME).getOrElse("")
-      val sessionToken = request.session.get(constants.Session.TOKEN).getOrElse("")
+      val currentSessionToken = request.session.get(constants.Session.TOKEN).getOrElse("")
       val address = request.session.get(constants.Session.ADDRESS).getOrElse("")
 
-      def verifyAndGetResult(username: String, address: String, sessionToken: String) = if (username != "" && address != "" && sessionToken != "") {
+      def verifyAndGetResult(username: String, address: String, currentSessionToken: String) = if (username != "" && address != "" && currentSessionToken != "") {
         val verify = {
-          val token = masterTransactionSessionTokens.Service.tryGet(username)
+          val storedSessionToken = masterTransactionSessionTokens.Service.tryGet(username)
           val key = masterKeys.Service.tryGetActive(username)
+          val account = masterAccounts.Service.tryGet(username)
 
           for {
-            token <- token
+            storedSessionToken <- storedSessionToken
             key <- key
-          } yield key.accountId == username && key.address == address && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.SessionTokenTimeout)
+            account <- account
+          } yield (utilities.Session.verify(username = username, key = key, address = address, storedSessionToken = storedSessionToken, currentSessionToken = currentSessionToken), account)
         }
 
         def getResult(verify: Boolean, loginState: LoginState) = if (verify) f(Option(loginState))(request)
         else constants.Response.INVALID_SESSION.throwFutureBaseException()
 
         for {
-          verify <- verify
-          result <- getResult(verify, LoginState(username, address))
+          (verify, account) <- verify
+          result <- getResult(verify, LoginState(username, address, isCreator = account.isCreator, isVerifiedCreator = account.isVerifiedCreator))
         } yield result
       } else f(None)(request)
 
       (for {
-        result <- verifyAndGetResult(username = username, address = address, sessionToken = sessionToken)
+        result <- verifyAndGetResult(username = username, address = address, currentSessionToken = currentSessionToken)
       } yield result).recover {
         case baseException: BaseException => Results.InternalServerError(views.html.index(failures = Seq(baseException.failure))).withNewSession
       }

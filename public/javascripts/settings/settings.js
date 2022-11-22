@@ -81,7 +81,6 @@ function fetchBalance(address) {
                 $("#walletBalance_" + address).html(data);
             },
             400: function (data) {
-                console.log(data.responseText)
                 $("#walletBalance_" + address).html(data.responseText);
             }
         }
@@ -107,4 +106,26 @@ function showHideSeed() {
         $(".closeEye").removeClass("hidden");
         $(".openEye").addClass("hidden");
     }
+}
+
+function fetchKeys() {
+    let route = jsRoutes.controllers.SettingController.walletPopupKeys();
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                $('#walletAddressList').html(data);
+            },
+            400: function (data) {
+            },
+            204: function (data) {
+
+            },
+            500: function (data) {
+                console.log(data.responseText)
+            }
+        }
+    });
 }

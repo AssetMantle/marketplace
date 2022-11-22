@@ -1,5 +1,6 @@
 @import views.setting.companion.AddUnmanagedKey
 @import views.html.base.form._
+@import views.html.base.buttons._
 
 @(unmanagedAddressForm: Form[AddUnmanagedKey.Data] = AddUnmanagedKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/userProfile.css")"/>
@@ -24,7 +25,7 @@
             </div>
         </div>
         <div class="horizontal-align">
-            @views.html.base.buttons.commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideUnmanagedAddressModalScreen('#newUnmanagedAddressPasswordScreen', '#newUnmanagedAddressScreen')"),Symbol("id") -> "newUnmanagedAddressScreenBtn", Symbol("class") -> "disable")
+            @commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideUnmanagedAddressModalScreen('#newUnmanagedAddressPasswordScreen', '#newUnmanagedAddressScreen')"),Symbol("id") -> "newUnmanagedAddressScreenBtn", Symbol("class") -> "disable")
         </div>
     </div>
 

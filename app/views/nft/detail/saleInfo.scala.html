@@ -1,0 +1,32 @@
+@import models.master.Sale
+@import controllers.actions.LoginState
+
+@(sales: Seq[Sale], allWhitelistIds: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+<div class="sticky-top item-sticky">
+    <div class="card rightInfoCard">
+        @if(loginState.isDefined) {
+            <div class="title">@Messages(constants.View.COLLECTION_CURRENT_PRICE_TITLE)</div>
+            <div class="description mt-1">@Messages(constants.View.COLLECTION_CURRENT_PRICE_SUBTITLE)</div>
+            <div class="priceHolder">
+                <div class="d-flex flex-row gap-1 align-items-center mt-3">
+                    <img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/>
+                    <div id="nft-mantle-price" class="nft-mantle-price">--</div>
+                    <div id="nft-dollar-price" class="nft-dollar-price">($--)</div>
+                </div>
+                <div id="salePrice" class="salePrice hidden">@sales.find(x => allWhitelistIds.contains(x.whitelistId)).fold("")(_.price.toString)</div>
+            </div>
+            @if(loginState.fold("")(_.username) == sales.find(x => allWhitelistIds.contains(x.whitelistId)).fold("")(_.collectionId)) {
+
+            }else{
+                <button class="mt-5 form-primary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, ""))">@Messages(constants.View.BUYNOW)</button>
+            }
+        } else {
+            <div class="d-flex flex-column gap-1">
+                <div class="analysisTitle">@Messages(constants.View.NFT_SALE_TITLE)</div>
+                <div class="analysisValue">@sales.length</div>
+            </div>
+        }
+    </div>
+</div>
+<script src="@routes.Assets.versioned("javascripts/nfts/saleInfo.js")"></script>

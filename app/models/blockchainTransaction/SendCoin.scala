@@ -114,11 +114,11 @@ class SendCoins @Inject()(
       } yield sendCoin
     }
 
-    def tryGet(accountId: String, txHash: String): Future[SendCoin] = tryGetById(id1 = accountId, id2 = txHash).map(_.deserialize)
+    def tryGet(accountId: String, txHash: String): Future[SendCoin] = tryGetById1AndId2(id1 = accountId, id2 = txHash).map(_.deserialize)
 
     def updateSendCoin(sendCoin: SendCoin): Future[SendCoin] = {
       for {
-        _ <- update(sendCoin.serialize())
+        _ <- updateById1AndId2(sendCoin.serialize())
       } yield sendCoin
     }
 

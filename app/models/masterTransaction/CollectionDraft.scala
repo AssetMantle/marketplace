@@ -19,11 +19,11 @@ case class CollectionDraft(id: String, creatorId: String, name: String, descript
 
   def getInstagram: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.INSTAGRAM).map(_.url)
 
-  def toCollection(public: Boolean = false): Collection = Collection(id = id, creatorId = creatorId, classificationId = None, name = name, description = description, website = "", socialProfiles = socialProfiles, category = category, nsfw = nsfw, properties = Option(this.properties), profileFileName = this.profileFileName, coverFileName = this.coverFileName, public = public)
+  def toCollection(public: Boolean = false, creatorFee: BigDecimal = 0): Collection = Collection(id = id, creatorId = creatorId, classificationId = None, name = name, description = description, socialProfiles = socialProfiles, category = category, nsfw = nsfw, properties = Option(this.properties), profileFileName = this.profileFileName, coverFileName = this.coverFileName, public = public, creatorFee = creatorFee)
 
-  def getProfileFileURL: Option[String] = this.profileFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + this.id + "/others/" + x)
+  def getProfileFileURL: Option[String] = this.profileFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getFileAwsKey(collectionId = this.id, fileName = x))
 
-  def getCoverFileURL: Option[String] = this.coverFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + this.id + "/others/" + x)
+  def getCoverFileURL: Option[String] = this.coverFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getFileAwsKey(collectionId = this.id, fileName = x))
 
   def serialize(): CollectionDrafts.CollectionDraftSerialized = CollectionDrafts.CollectionDraftSerialized(
     id = this.id,
@@ -127,7 +127,7 @@ class CollectionDrafts @Inject()(
       val collectionDraft = tryGet(id)
 
       def validateAndUpdate(collectionDraft: CollectionDraft) = if (collectionDraft.creatorId == creatorId) {
-        update(collectionDraft.copy(name = name, description = description, socialProfiles = socialProfiles, category = category, nsfw = nsfw).serialize())
+        updateById(collectionDraft.copy(name = name, description = description, socialProfiles = socialProfiles, category = category, nsfw = nsfw).serialize())
       } else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
 
       for {
@@ -142,7 +142,7 @@ class CollectionDrafts @Inject()(
       val collectionDraft = tryGet(id)
       for {
         collectionDraft <- collectionDraft
-        _ <- update(collectionDraft.copy(profileFileName = Option(fileName)).serialize())
+        _ <- updateById(collectionDraft.copy(profileFileName = Option(fileName)).serialize())
       } yield ()
     }
 
@@ -150,7 +150,7 @@ class CollectionDrafts @Inject()(
       val collectionDraft = tryGet(id)
       for {
         collectionDraft <- collectionDraft
-        _ <- update(collectionDraft.copy(coverFileName = Option(fileName)).serialize())
+        _ <- updateById(collectionDraft.copy(coverFileName = Option(fileName)).serialize())
       } yield ()
     }
 
@@ -158,7 +158,7 @@ class CollectionDrafts @Inject()(
       val collectionDraft = tryGet(id)
       for {
         collectionDraft <- collectionDraft
-        _ <- update(collectionDraft.copy(properties = properties).serialize())
+        _ <- updateById(collectionDraft.copy(properties = properties).serialize())
       } yield collectionDraft.copy(properties = properties)
     }
 
@@ -166,7 +166,7 @@ class CollectionDrafts @Inject()(
 
     def getByCreatorAndPage(creatorId: String, pageNumber: Int): Future[Seq[CollectionDraft]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.creatorId === creatorId)(_.createdOnMillisEpoch).map(_.map(_.deserialize))
 
-    def deleteById(id: String): Future[Int] = delete(id)
+    def delete(id: String): Future[Int] = deleteById(id)
 
     def checkOwnerAndDelete(id: String, accountId: String): Future[Unit] = {
       val draft = tryGet(id)
