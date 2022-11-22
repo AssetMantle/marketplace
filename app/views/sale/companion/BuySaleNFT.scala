@@ -9,8 +9,10 @@ object BuySaleNFT {
       constants.FormField.SALE_ID.mapping,
       constants.FormField.NFT_FILE_NAME.mapping,
       constants.FormField.MINT_NFT.mapping,
+      constants.FormField.GAS_AMOUNT.mapping,
+      constants.FormField.GAS_PRICE.mapping,
       constants.FormField.PASSWORD.mapping
     )(Data.apply)(Data.unapply))
 
-  case class Data(saleId: String, fileName: String, mintNFT: Boolean, password: String)
+  case class Data(saleId: String, fileName: String, mintNFT: Boolean, gasAmount: Int, gasPrice: String, password: String)
 }

@@ -50,6 +50,19 @@ class BlockchainTransactionController @Inject()(
     }
   }
 
+  def balance(address: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val balance = blockchainBalances.Service.get(address)
+        (for {
+          balance <- balance
+        } yield Ok(balance.fold(MicroNumber.zero)(_.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount)).toString)
+          ).recover {
+          case _: BaseException => BadRequest("0")
+        }
+    }
+  }
+
   def sendCoinForm(fromAddress: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val balance = blockchainBalances.Service.get(fromAddress)
@@ -90,8 +103,8 @@ class BlockchainTransactionController @Inject()(
           (for {
             balance <- balance
             (validatePassword, key) <- validateAndKey
-            sendCoin <- checkBalanceAndBroadcast(balance, validatePassword, key)
-          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(broadcasted = sendCoin.broadcasted, status = sendCoin.status, txHash = sendCoin.txHash, log = sendCoin.log.getOrElse("")))
+            blockchainTransaction <- checkBalanceAndBroadcast(balance, validatePassword, key)
+          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.blockchainTransaction.sendCoin(SendCoin.form.withGlobalError(baseException.failure.message), sendCoinData.fromAddress, sendCoinData.sendCoinAmount))
           }
@@ -99,5 +112,51 @@ class BlockchainTransactionController @Inject()(
       )
   }
 
+  def mintForm(nftId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.blockchainTransaction.mint(nftId = nftId)))
+  }
+
+  def mint(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Mint.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.blockchainTransaction.mint(formWithErrors, nftId = formWithErrors.data.getOrElse(constants.FormField.NFT_FILE_NAME.name, ""))))
+        },
+        mintData => {
+          val balance = blockchainBalances.Service.get(loginState.address)
+          val validateAndKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = mintData.password)
+
+          def checkBalanceAndBroadcast(balance: Option[models.blockchain.Balance], validatePassword: Boolean, key: master.Key) = {
+            val errors = Seq(
+              if (!validatePassword) Option(constants.Response.INVALID_PASSWORD) else None,
+              //             if (balance.) TODO check min mint amount
+            ).flatten
+
+            if (errors.nonEmpty) {
+              blockchainTransactionSendCoins.Utility.transaction(
+                accountId = loginState.username,
+                fromAddress = "",
+                toAddress = "",
+                amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber.zero)),
+                gasLimit = mintData.gasAmount,
+                gasPrice = mintData.gasPrice.toDouble,
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, mintData.password)),
+                memo = None
+              )
+            } else errors.head.throwFutureBaseException()
+          }
+
+          (for {
+            balance <- balance
+            (validatePassword, key) <- validateAndKey
+            blockchainTransaction <- checkBalanceAndBroadcast(balance, validatePassword, key)
+          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.blockchainTransaction.mint(Mint.form.withGlobalError(baseException.failure.message), mintData.nftId))
+          }
+        }
+      )
+  }
 
 }

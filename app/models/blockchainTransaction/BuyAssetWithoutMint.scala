@@ -1,7 +1,7 @@
 package models.blockchainTransaction
 
 import exceptions.BaseException
-import models.Trait.{Entity3, GenericDaoImpl3, Logged, ModelTable3}
+import models.Trait.{BlockchainTransaction, Entity3, GenericDaoImpl3, Logged, ModelTable3}
 import models.blockchain.Transaction
 import models.common.Coin
 import models.{blockchain, master}
@@ -17,7 +17,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class BuyAssetWithoutMint(sellerAccountId: String, buyerAccountId: String, txHash: String, txRawBytes: Array[Byte], nftId: String, saleId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class BuyAssetWithoutMint(sellerAccountId: String, buyerAccountId: String, txHash: String, txRawBytes: Array[Byte], nftId: String, saleId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged with BlockchainTransaction {
 
   def serialize(): BuyAssetWithoutMints.BuyAssetWithoutMintSerialized = BuyAssetWithoutMints.BuyAssetWithoutMintSerialized(sellerAccountId = this.sellerAccountId, buyerAccountId = this.buyerAccountId, txHash = this.txHash, txRawBytes = this.txRawBytes, nftId = this.nftId, saleId = this.saleId, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, broadcasted = this.broadcasted, status = this.status, memo = this.memo, log = this.log, createdBy = this.createdBy, createdOn = this.createdOn, createdOnTimeZone = this.createdOnTimeZone, updatedBy = this.updatedBy, updatedOn = this.updatedOn, updatedOnTimeZone = this.updatedOnTimeZone)
 
@@ -139,7 +139,7 @@ class BuyAssetWithoutMints @Inject()(
 
   object Utility {
 
-    def transaction(sellerAccountId: String, buyerAccountId: String, nftId: String, saleId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: Double, gasLimit: Int, ecKey: ECKey): Future[BuyAssetWithoutMint] = {
+    def transaction(sellerAccountId: String, buyerAccountId: String, nftId: String, saleId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: Double, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount(fromAddress))

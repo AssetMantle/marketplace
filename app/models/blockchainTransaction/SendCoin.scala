@@ -1,7 +1,7 @@
 package models.blockchainTransaction
 
 import exceptions.BaseException
-import models.Trait.{Entity2, GenericDaoImpl2, Logged, ModelTable2}
+import models.Trait.{BlockchainTransaction, Entity2, GenericDaoImpl2, Logged, ModelTable2}
 import models.common.Coin
 import org.bitcoinj.core.ECKey
 import play.api.Logger
@@ -15,7 +15,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class SendCoin(accountId: String, txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class SendCoin(accountId: String, txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged with BlockchainTransaction{
 
   def serialize(): SendCoins.SendCoinSerialized = SendCoins.SendCoinSerialized(accountId = this.accountId, txHash = this.txHash, txRawBytes = this.txRawBytes, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, broadcasted = this.broadcasted, status = this.status, memo = this.memo, log = this.log, createdBy = this.createdBy, createdOn = this.createdOn, createdOnTimeZone = this.createdOnTimeZone, updatedBy = this.updatedBy, updatedOn = this.updatedOn, updatedOnTimeZone = this.updatedOnTimeZone)
 
@@ -125,7 +125,7 @@ class SendCoins @Inject()(
 
   object Utility {
 
-    def transaction(accountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: Double, gasLimit: Int, ecKey: ECKey, memo: Option[String]): Future[SendCoin] = {
+    def transaction(accountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: Double, gasLimit: Int, ecKey: ECKey, memo: Option[String]): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount(fromAddress))

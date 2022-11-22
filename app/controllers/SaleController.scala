@@ -3,8 +3,10 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
-import models.master.{Collection, NFTOwner, Sale}
-import models.{blockchain, master}
+import models.common.Coin
+import models.master.{Collection, Key, NFTOwner, Sale}
+import models.{blockchain, blockchainTransaction, master}
+import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -33,6 +35,7 @@ class SaleController @Inject()(
                                 masterNFTOwners: master.NFTOwners,
                                 masterSales: master.Sales,
                                 masterWhitelistMembers: master.WhitelistMembers,
+                                blockchainTransactionBuyAssetWithoutMints: blockchainTransaction.BuyAssetWithoutMints,
                                 utilitiesNotification: utilities.Notification,
                                 utilitiesOperations: utilities.Operations,
                               )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -144,9 +147,11 @@ class SaleController @Inject()(
           val nftOwner = masterNFTOwners.Service.tryGetByNFTAndSaleId(fileName = buySaleNFTData.fileName, saleId = buySaleNFTData.saleId)
           val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = buySaleNFTData.password)
 
+          def sellerKey(NFTOwner: NFTOwner) = masterKeys.Service.tryGetActive(NFTOwner.ownerId)
+
           def isWhitelistMember(sale: Sale) = masterWhitelistMembers.Service.isMember(whitelistId = sale.whitelistId, accountId = loginState.username)
 
-          def validateAndTransfer(nftOwner: NFTOwner, verifyPassword: Boolean, sale: Sale, isWhitelistMember: Boolean) = {
+          def validateAndTransfer(nftOwner: NFTOwner, verifyPassword: Boolean, sale: Sale, isWhitelistMember: Boolean, buyerKey: Key, sellerKey: Key) = {
             val errors = Seq(
               if (nftOwner.ownerId == loginState.username) Option(constants.Response.CANNOT_SELL_TO_YOURSELF) else None,
               if (!isWhitelistMember) Option(constants.Response.NOT_MEMBER_OF_WHITELIST) else None,
@@ -155,17 +160,33 @@ class SaleController @Inject()(
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
             ).flatten
             if (errors.nonEmpty) {
-              masterNFTOwners.Service.update(nftOwner.copy(ownerId = loginState.username))
+              if (!buySaleNFTData.mintNFT) {
+                blockchainTransactionBuyAssetWithoutMints.Utility.transaction(
+                  sellerAccountId = sellerKey.accountId,
+                  buyerAccountId = loginState.username,
+                  saleId = sale.id,
+                  nftId = buySaleNFTData.fileName,
+                  fromAddress = buyerKey.address,
+                  toAddress = sellerKey.address,
+                  amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = sale.price)),
+                  gasLimit = buySaleNFTData.gasAmount,
+                  gasPrice = buySaleNFTData.gasPrice.toDouble,
+                  ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buySaleNFTData.password))
+                )
+              } else {
+                constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+              }
             } else errors.head.throwFutureBaseException()
           }
 
           (for {
             sale <- sale
             nftOwner <- nftOwner
-            (verifyPassword, _) <- verifyPassword
+            sellerKey <- sellerKey(nftOwner)
+            (verifyPassword, buyerKey) <- verifyPassword
             isWhitelistMember <- isWhitelistMember(sale)
-            _ <- validateAndTransfer(nftOwner, verifyPassword, sale, isWhitelistMember)
-          } yield PartialContent(views.html.sale.createSuccessful())
+            blockchainTransaction <- validateAndTransfer(nftOwner = nftOwner, verifyPassword = verifyPassword, sale = sale, isWhitelistMember = isWhitelistMember, buyerKey = buyerKey, sellerKey = sellerKey)
+          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.sale.buySaleNFT(BuySaleNFT.form.withGlobalError(baseException.failure.message), saleId = buySaleNFTData.saleId, nftId = buySaleNFTData.fileName))
           }

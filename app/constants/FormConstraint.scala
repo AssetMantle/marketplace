@@ -79,6 +79,13 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
+  val mintConstraint: Constraint[Mint.Data] = Constraint("constraints.Mint")({ mintData: Mint.Data =>
+    val errors = Seq(
+      if (mintData.gasPrice.toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_NUMBER_FORMAT.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
   val createWhitelistInviteConstraint: Constraint[whitelist.Create.Data] = Constraint("constraints.CreateWhitelist")({ createWhitelistData: whitelist.Create.Data =>
     val errors = Seq(
       if (createWhitelistData.startEpoch >= createWhitelistData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
