@@ -16,7 +16,7 @@ object CreateCollectionSale {
       constants.FormField.NFT_SALE_CREATOR_FEE.mapping,
       constants.FormField.NFT_SALE_START_EPOCH.mapping,
       constants.FormField.NFT_SALE_END_EPOCH.mapping,
-    )(Data.apply)(Data.unapply))
+    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.createSale))
 
   case class Data(collectionId: String, nftForSale: Int, maxMintPerAccount: Int, whitelistId: String, price: MicroNumber, creatorFee: BigDecimal, startEpoch: Int, endEpoch: Int) {
 

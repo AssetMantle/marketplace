@@ -6,5 +6,6 @@
 @commonForm(constants.Form.BUY_NFT_SALE, buySaleNFTForm) {
     @commonInputText(buySaleNFTForm, constants.FormField.SALE_ID, Symbol("value") -> saleId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> true)
     @commonInputText(buySaleNFTForm, constants.FormField.NFT_FILE_NAME, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> true)
+    @commonCheckbox(buySaleNFTForm, constants.FormField.MINT_NFT)
     @commonInputPassword(buySaleNFTForm, constants.FormField.PASSWORD)
 }

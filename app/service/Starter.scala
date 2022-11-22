@@ -2,7 +2,7 @@ package service
 
 import models.analytics.{CollectionAnalysis, CollectionsAnalysis}
 import models.master.{Collection, NFTOwner}
-import models.{master, masterTransaction}
+import models.{blockchainTransaction, master, masterTransaction}
 import play.api.libs.json.Reads
 import play.api.{Configuration, Logger}
 
@@ -23,6 +23,7 @@ class Starter @Inject()(
                          masterWishLists: master.WishLists,
                          masterTransactionNotifications: masterTransaction.Notifications,
                          utilitiesOperations: utilities.Operations,
+                         blockchainTransactionSendCoins: blockchainTransaction.SendCoins
                        )(implicit exec: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.STARTER_SERVICE
@@ -132,7 +133,6 @@ class Starter @Inject()(
   }
 
   def start(): Future[Unit] = {
-
     (for {
       _ <- correctNotifications()
       _ <- updateAccountType()

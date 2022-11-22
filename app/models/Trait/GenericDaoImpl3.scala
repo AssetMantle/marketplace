@@ -122,21 +122,21 @@ abstract class GenericDaoImpl3[
     }
   }
 
-  def getById(id1: PK1, id2: PK2, id3: PK3): Future[Option[E]] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2 && x.id3 === id3).result.headOption)
+  def getById1Id2Id3(id1: PK1, id2: PK2, id3: PK3): Future[Option[E]] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2 && x.id3 === id3).result.headOption)
 
   def getAll: Future[Seq[E]] = db.run(tableQuery.result)
 
   def getAllByPageNumber[C1 <: Rep[_]](offset: Int, limit: Int)(sortExpr: T => C1)(implicit ev: C1 => Ordered): Future[Seq[E]] = db.run(tableQuery.sortBy(sortExpr).drop(offset).take(limit).result)
 
 
-  def tryGetById(id1: PK1, id2: PK2, id3: PK3): Future[E] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2 && x.id3 === id3).result.head.asTry).map {
+  def tryGetById1Id2Id3(id1: PK1, id2: PK2, id3: PK3): Future[E] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2 && x.id3 === id3).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
     }
   }
 
-  def update(update: E): Future[Unit] = db.run(tableQuery.filter(x => x.id1 === update.id1 && x.id2 === update.id2).update(update).asTry).map {
+  def updateById1Id2Id3(update: E): Future[Unit] = db.run(tableQuery.filter(x => x.id1 === update.id1 && x.id2 === update.id2 && x.id3 === update.id3).update(update).asTry).map {
     case Success(result) => ()
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_UPDATE_FAILED"), psqlException)

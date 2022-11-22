@@ -141,4 +141,18 @@ function showSnackbar(title, message, status) {
 function truncate(message, fieldId, length) {
     let newMessage = (message.length > length) ? message.slice(0, length - 1) + '&hellip;' : message;
     $("#" + fieldId).html(newMessage);
-};
+}
+
+function getNFTPrice(nftId) {
+    let route = jsRoutes.controllers.NFTController.price(nftId);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                $("#price_" + nftId.split(".")[0]).html(data);
+            }
+        }
+    });
+}

@@ -76,11 +76,11 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def add(accountID: String, notification: constants.Notification, parameters: String*)(routeParameters: String*): Future[String] = create(Notification(id = utilities.IdGenerator.getRandomHexadecimal, accountID = Option(accountID), title = notification.name, messageParameters = parameters, jsRoute = notification.route.fold[Option[String]](None)(x => Option(utilities.JsRoutes.getJsRouteString(x, routeParameters: _*)))).serialize())
+    def add(accountID: String, notification: constants.Notification, parameters: String*)(routeParameters: String = ""): Future[String] = create(Notification(id = utilities.IdGenerator.getRandomHexadecimal, accountID = Option(accountID), title = notification.name, messageParameters = parameters, jsRoute = notification.route.fold[Option[String]](None)(x => Option(utilities.JsRoutes.getJsRouteString(x, routeParameters)))).serialize())
 
     def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = filterAndReverseSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NotificationsPerPage, limit = constants.CommonConfig.Pagination.NotificationsPerPage)(_.accountID.? === Option(accountID))(_.createdOnMillisEpoch.desc.column)(_.desc).map(_.map(_.deserialize()))
 
-    def add(notification: constants.Notification, parameters: String*)(routeParameters: String*): Future[String] = create(Notification(id = utilities.IdGenerator.getRandomHexadecimal, accountID = None, title = notification.name, messageParameters = parameters, jsRoute = notification.route.fold[Option[String]](None)(x => Option(utilities.JsRoutes.getJsRouteString(x, routeParameters: _*)))).serialize())
+    def add(notification: constants.Notification, parameters: String*)(routeParameters: String): Future[String] = create(Notification(id = utilities.IdGenerator.getRandomHexadecimal, accountID = None, title = notification.name, messageParameters = parameters, jsRoute = notification.route.fold[Option[String]](None)(x => Option(utilities.JsRoutes.getJsRouteString(x, routeParameters)))).serialize())
 
     def getPublic(pageNumber: Int): Future[Seq[Notification]] = {
       val accountId: Option[String] = null

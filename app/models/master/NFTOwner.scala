@@ -76,7 +76,10 @@ class NFTOwners @Inject()(
 
     def update(NFTOwner: NFTOwner): Future[Unit] = updateById1AndId2(NFTOwner)
 
-    def countForOwnerNotOnSale(collectionId: String, currentOnSaleIds: Seq[String], ownerId: String): Future[Int] = filterAndCount(x => x.collectionId === collectionId && x.ownerId === ownerId && !x.saleId.inSet(currentOnSaleIds))
+    def countForOwnerNotOnSale(collectionId: String, currentOnSaleIds: Seq[String], ownerId: String): Future[Int] = {
+      val nullSaleId: Option[String] = null
+      filterAndCount(x => x.collectionId === collectionId && x.ownerId === ownerId && (!x.saleId.inSet(currentOnSaleIds) || x.saleId.? === nullSaleId))
+    }
 
     def addRandomNFTsToSale(collectionId: String, ownerId: String, nfts: Int, saleId: String, currentOnSaleIds: Seq[String]): Future[Unit] = {
       val notOnSaleNFTs = filter(x => x.ownerId === ownerId && x.collectionId === collectionId && !x.saleId.inSet(currentOnSaleIds))
@@ -86,7 +89,21 @@ class NFTOwners @Inject()(
       } yield ()
     }
 
-    def getAllSaleIds(fileName: String): Future[Seq[String]] = filter(_.fileName === fileName).map(_.flatMap(_.saleId))
+    def markNFTSold(nftId: String, saleId: String, sellerAccountId: String, buyerAccountId: String): Future[Unit] = {
+      val nftOwner = tryGet(fileName = nftId, ownerId = sellerAccountId)
+
+      def verifyAndUpdate(nftOwner: NFTOwner) = if (nftOwner.saleId.getOrElse("") == saleId) {
+        update(nftOwner.copy(saleId = None, ownerId = buyerAccountId))
+      } else constants.Response.NFT_NOT_ON_SALE.throwFutureBaseException()
+
+      for {
+        nftOwner <- nftOwner
+        _ <- verifyAndUpdate(nftOwner)
+      } yield ()
+    }
+
+    def getSaleId(fileName: String): Future[Option[String]] = filterHead(_.fileName === fileName).map(_.saleId)
+
     def tryGet(fileName: String, ownerId: String): Future[NFTOwner] = tryGetById1AndId2(id1 = fileName, id2 = ownerId)
 
     def tryGetByNFTAndSaleId(fileName: String, saleId: String): Future[NFTOwner] = filterHead(x => x.saleId === saleId && x.fileName === fileName)

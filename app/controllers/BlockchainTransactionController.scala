@@ -83,6 +83,7 @@ class BlockchainTransactionController @Inject()(
               gasLimit = sendCoinData.gasAmount,
               gasPrice = sendCoinData.gasPrice.toDouble,
               ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, sendCoinData.password)),
+              memo = None
             )
           }
 

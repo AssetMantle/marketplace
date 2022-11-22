@@ -10,6 +10,7 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import utilities.MicroNumber
 import views.base.companion.UploadFile
 import views.nft.companion._
 
@@ -130,17 +131,18 @@ class NFTController @Inject()(
   def saleInfo(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val saleIds = masterNFTOwners.Service.getAllSaleIds(fileName = nftId)
-        val allWhitelistIds = if (loginState.isDefined) masterWhitelistMembers.Service.getAllForMember(accountId = loginState.get.username)
-        else Future(Seq())
+        val saleId = if (loginState.isDefined) masterNFTOwners.Service.getSaleId(nftId) else Future(None)
 
-        def sales(saleIds: Seq[String]) = masterSales.Service.get(saleIds)
+        def sale(saleId: String) = if (saleId != "") masterSales.Service.tryGet(saleId).map(Option(_)) else Future(None)
+
+        def saleOffered(whitelistId: String) = if (loginState.isDefined && whitelistId != "") masterWhitelistMembers.Service.isMember(whitelistId = whitelistId, accountId = loginState.get.username)
+        else Future(false)
 
         (for {
-          saleIds <- saleIds
-          allWhitelistIds <- allWhitelistIds
-          sales <- sales(saleIds)
-        } yield Ok(views.html.nft.detail.saleInfo(sales = sales, allWhitelistIds = allWhitelistIds))
+          saleId <- saleId
+          sale <- sale(saleId.getOrElse(""))
+          saleOffered <- saleOffered(sale.fold("")(_.whitelistId))
+        } yield Ok(views.html.nft.detail.saleInfo(sale = sale, nftId = nftId, saleOffered = saleOffered, onSale = saleId.isDefined))
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }
@@ -443,6 +445,23 @@ class NFTController @Inject()(
         } yield Ok(views.html.profile.owned.ownedNFTsPerPage(nfts, collections, wishLists))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def price(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req, cacheWithUsername = false), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit optionalLoginState =>
+      implicit request =>
+        val saleId = masterNFTOwners.Service.getSaleId(nftId)
+
+        def price(saleId: Option[String]) = saleId.fold(Future("--"))(x => masterSales.Service.tryGet(x).map(_.price.toString))
+
+        (for {
+          saleId <- saleId
+          price <- price(saleId)
+        } yield Ok(price)
+          ).recover {
+          case _: BaseException => BadRequest("--")
         }
     }
   }
