@@ -769,25 +769,29 @@
             .dateTime{
               @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));
             }
+            &.read{
+              .notificationIcon{
+                background-color: var(--default);
+                i{
+                  color:var(--card-dark);
+                }
+              }
+            }
           }
-          &:has(.notificationDetail.read){
-            display: none;
+          &.clickable{
+            cursor: pointer;
           }
         }
       }
 
     }
-    .loadOlderNotificationButton,
-    .markAsReadButton{
+    .loadOlderNotificationButton{
       @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
       text-align: right;
       text-transform: capitalize;
       margin-top: 32px;
       cursor: pointer;
     }
-  }
-  .emptyNotificationList{
-    @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));
   }
 }
 // Common Upload File

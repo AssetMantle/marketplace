@@ -44,27 +44,6 @@ function onNotificationClick(route) {
     }
 }
 
-function markAsRead(id) {
-    let route = jsRoutes.controllers.ProfileController.markNotificationRead(id);
-    let element = $('#' + id);
-    if (element.attr("class").includes("unread")) {
-        $.ajax({
-            url: route.url,
-            type: route.type,
-            async: true,
-            statusCode: {
-                200: function (data) {
-                    element.removeClass("unread").addClass("read");
-                    countUnread();
-                },
-                400: function (data) {
-                    console.log(data.responseText)
-                },
-            }
-        });
-    }
-}
-
 function countUnread() {
     let route = jsRoutes.controllers.ProfileController.countUnreadNotification();
     $.ajax({
@@ -72,67 +51,62 @@ function countUnread() {
         type: route.type,
         async: true,
         statusCode: {
-            200: function (data) {
-                if(data > 0){
-                    $(".haveNotification").show();
-                    $(".noNotification").hide();
-                    if(data > 2){
-                        $(".loadOlderNotificationButton").show();
-                    }
-                }else{
-                    $(".haveNotification").hide();
-                    $(".noNotification").show();
+            200: function (data) {},
+            400: function (data) {
+                console.log(data.responseText)
+            },
+        }
+    })
+}
+
+function markAsRead(notificationId) {
+    const form = $("#markAsRead_" + notificationId + " form");
+    const route = jsRoutes.controllers.ProfileController.markNotificationsRead();
+    let element = $("#" + notificationId);
+    if (element.attr("class").includes("unread")) {
+        $("#notificationIcon_" + notificationId).toggleClass("active");
+        $.ajax({
+            url: route.url,
+            type: 'POST',
+            contentType: 'application/x-www-form-urlencoded',
+            data: form.serialize(),
+            async: true,
+            statusCode: {
+                200: function () {
+                    element.removeClass("unread").addClass("read");
+                },
+                401: function () {
+                    console.log("400 response");
+                },
+                500: function () {
+                    console.log("500 response");
                 }
-            },
-            400: function (data) {
-                console.log(data.responseText)
-            },
-        }
-    })
-}
-
-function markAllAsRead() {
-    let route = jsRoutes.controllers.ProfileController.markAllNotificationRead();
-    $.ajax({
-        url: route.url,
-        type: route.type,
-        async: true,
-        statusCode: {
-            200: function () {
-                countUnread();
-            },
-            400: function (data) {
-                console.log(data.responseText)
-            },
-        }
-    })
-}
-
-let list = [];
-function addToReadList(notificationId){
-    $("#markAsReadButton").show();
-    $("#notificationIcon_"+notificationId).toggleClass("active");
-    if($("#notificationIcon_"+notificationId).hasClass("active")){
-        list.push(notificationId);
-    }else{
-        const index = list.indexOf(notificationId);
-        if (index > -1) {
-            list.splice(index, 1);
-        }
+            }
+        });
     }
 }
 
-function markListItemAsRead(){
-    list.forEach((id)=>{
-        markAsRead(id,);
+function markAllAsRead(){
+    const form = $("#markAllAsRead form");
+    const route = jsRoutes.controllers.ProfileController.markNotificationsRead();
+    $.ajax({
+        url: route.url,
+        type: 'POST',
+        contentType: 'application/x-www-form-urlencoded',
+        data: form.serialize(),
+        async: true,
+        statusCode: {
+            200: function () {
+                $(".notificationDetail.unread").each((index,item)=>{
+                    $(item).removeClass("unread").addClass("read");
+                });
+            },
+            401: function () {
+                console.log("400 response");
+            },
+            500: function () {
+                console.log("500 response");
+            }
+        }
     });
-    $("#markAsReadButton").hide();
-}
-
-function clearMarkAsReadList(){
-    list = [];
-    $(".notificationIcon").each((index,item)=>{
-       $(item).removeClass("active");
-    });
-    $("#markAsReadButton").hide();
 }
