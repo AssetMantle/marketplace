@@ -6657,7 +6657,7 @@ public final class Distribution {
   }
   /**
    * <pre>
-   * CommunityPoolSpendProposal view a proposal for use of community funds,
+   * CommunityPoolSpendProposal details a proposal for use of community funds,
    * together with how many coins are proposed to be spent, and to which
    * recipient account.
    * </pre>
@@ -7116,7 +7116,7 @@ public final class Distribution {
     }
     /**
      * <pre>
-     * CommunityPoolSpendProposal view a proposal for use of community funds,
+     * CommunityPoolSpendProposal details a proposal for use of community funds,
      * together with how many coins are proposed to be spent, and to which
      * recipient account.
      * </pre>
