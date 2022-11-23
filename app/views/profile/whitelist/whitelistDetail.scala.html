@@ -90,6 +90,7 @@
 @*        </div>*@
     </div>
 
+    @if(sales.nonEmpty){
     <div class="contentBody">
         <div class="contentHeader mx-4 pt-3">
             <div class="headerTitle">@Messages(constants.View.WHITELIST_OFFERS_LIST_HEADER)</div>
@@ -153,6 +154,11 @@
             </div>
         </div>
     </div>
+    }else{
+        <div id="emptyCollectionOnSaleList" class="mt-4 h-100 d-flex flex-column justify-content-center align-items-center emptyCollectionOnSaleList">
+            <div class="message">@Messages(constants.View.NO_COLLECTION_ON_SALE)</div>
+        </div>
+    }
 </div>
 <script>
     setOffersStatus('@whitelist.startEpoch', '@whitelist.endEpoch');
