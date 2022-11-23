@@ -974,7 +974,8 @@
 .emptyCreated,
 .emptyWishlist,
 .emptyOfferList,
-.emptyOwnedList{
+.emptyOwnedList,
+.emptyMemberList{
   background-color: var(--card-dark);
   width: 100%;
   border-radius: 10px;
