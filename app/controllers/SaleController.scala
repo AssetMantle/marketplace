@@ -4,7 +4,7 @@ import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
 import models.common.Coin
-import models.master.{Collection, Key, NFTOwner, Sale}
+import models.master._
 import models.{blockchain, blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
@@ -156,15 +156,15 @@ class SaleController @Inject()(
 
           def isWhitelistMember(sale: Sale) = masterWhitelistMembers.Service.isMember(whitelistId = sale.whitelistId, accountId = loginState.username)
 
-          def validateAndTransfer(nftOwner: NFTOwner, verifyPassword: Boolean, sale: Sale, isWhitelistMember: Boolean, buyerKey: Key, sellerKey: Key, balance: MicroNumber) = {
+          def validateAndTransfer(nftOwner: NFTOwner, verifyPassword: Boolean, sale: Sale, isWhitelistMember: Boolean, buyerKey: Key, sellerKey: Key, balance: MicroNumber, nft: NFT, nftProperties: Seq[NFTProperty]) = {
             val errors = Seq(
               if (nftOwner.ownerId == loginState.username) Option(constants.Response.CANNOT_SELL_TO_YOURSELF) else None,
               if (!isWhitelistMember) Option(constants.Response.NOT_MEMBER_OF_WHITELIST) else None,
               if (sale.startTimeEpoch > utilities.Date.currentEpoch) Option(constants.Response.SALE_NOT_STARTED) else None,
               if (utilities.Date.currentEpoch >= sale.endTimeEpoch) Option(constants.Response.SALE_EXPIRED) else None,
+              if (balance == MicroNumber.zero || balance <= sale.price) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (buySaleNFTData.mintNFT && (balance - sale.price - (constants.Blockchain.AssetPropertyRate * (nftProperties.length + constants.Collection.DefaultProperty.list.length)) <= MicroNumber.zero)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
-              if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
-//              if (buySaleNFTData.mintNFT && balance - )
             ).flatten
             if (errors.isEmpty) {
               if (!buySaleNFTData.mintNFT) {
@@ -189,11 +189,13 @@ class SaleController @Inject()(
           (for {
             sale <- sale
             nftOwner <- nftOwner
+            nft <- nft
+            nftProperties <- nftProperties
             sellerKey <- sellerKey(nftOwner)
             (verifyPassword, buyerKey) <- verifyPassword
             isWhitelistMember <- isWhitelistMember(sale)
             balance <- balance
-            blockchainTransaction <- validateAndTransfer(nftOwner = nftOwner, verifyPassword = verifyPassword, sale = sale, isWhitelistMember = isWhitelistMember, buyerKey = buyerKey, sellerKey = sellerKey, balance = balance)
+            blockchainTransaction <- validateAndTransfer(nftOwner = nftOwner, verifyPassword = verifyPassword, sale = sale, isWhitelistMember = isWhitelistMember, buyerKey = buyerKey, sellerKey = sellerKey, balance = balance, nft = nft, nftProperties = nftProperties)
           } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.sale.buySaleNFT(BuySaleNFT.form.withGlobalError(baseException.failure.message), saleId = buySaleNFTData.saleId, nftId = buySaleNFTData.nftId))

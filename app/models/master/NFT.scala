@@ -5,11 +5,10 @@ import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class NFT(id: String, collectionId: String, name: String, description: String, totalSupply: Long, isMinted: Boolean, fileExtension: String, ipfsLink: String, edition: Option[Int], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Entity[String] {
+case class NFT(id: String, collectionId: String, name: String, description: String, totalSupply: Long, isMinted: Boolean, fileExtension: String, ipfsLink: String, edition: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
   def getFileHash: String = id
 
@@ -28,7 +27,7 @@ object NFTs {
 
   class NFTTable(tag: Tag) extends Table[NFT](tag, "NFT") with ModelTable[String] {
 
-    def * = (id, collectionId, name, description, totalSupply, isMinted, fileExtension, ipfsLink, edition.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (NFT.tupled, NFT.unapply)
+    def * = (id, collectionId, name, description, totalSupply, isMinted, fileExtension, ipfsLink, edition.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFT.tupled, NFT.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -50,15 +49,11 @@ object NFTs {
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   val TableQuery = new TableQuery(tag => new NFTTable(tag))
@@ -84,7 +79,7 @@ class NFTs @Inject()(
 
     def getAllIdsForCollection(collectionId: String): Future[Seq[String]] = filter(_.collectionId === collectionId).map(_.map(_.id))
 
-    def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[NFT]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.collectionId === collectionId)(_.createdOn)
+    def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[NFT]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.collectionId === collectionId)(_.createdOnMillisEpoch)
 
     def checkExists(id: String): Future[Boolean] = exists(id)
 
