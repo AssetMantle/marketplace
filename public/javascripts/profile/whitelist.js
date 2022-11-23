@@ -170,3 +170,17 @@ function setSaleStatus(saleId){
         $("#" + saleId + ".statusOptions .option.notStarted").addClass("active");
     }
 }
+
+function updateJoinedWhitelistContainer(){
+    setTimeout(()=>{
+        $("#whitelistSectionContent").html("");
+        showWhitelistScreen('joined');
+    },2000);
+}
+
+function updateCreatedWhitelistContainer(){
+    setTimeout(()=>{
+        $("#whitelistSectionContent").html("");
+        showWhitelistScreen('created');
+    },2000);
+}

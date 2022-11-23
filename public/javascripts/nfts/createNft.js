@@ -67,3 +67,11 @@ function addProperty(property){
 function setTagBackButton(collectionId, fileName){
     $("#modalBackButton").attr("onclick", `getForm(jsRoutes.controllers.NFTController.basicDetailsForm('${collectionId}', '${fileName}'))`);
 }
+
+function updateNFTContainer(collectionId){
+    if($("#nftsPerPage").length){
+        $('#nftsPerPage').html("");
+        loadFirstNFTBulk('nftsPerPage', jsRoutes.controllers.CollectionController.collectionNFTsPerPage(collectionId, 1));
+        componentResource('rightContent', jsRoutes.controllers.CollectionController.analysis(collectionId));
+    }
+}
