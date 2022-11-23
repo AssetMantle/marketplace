@@ -2,7 +2,7 @@
 $('#GAS_PRICE option:eq(2)').prop('selected', true);
 
 // Gas Price
-let route = jsRoutes.controllers.BlockchainTransactionController.gasTokenPrice();
+route = jsRoutes.controllers.BlockchainTransactionController.gasTokenPrice();
 $.ajax({
     url: route.url,
     type: route.type,
@@ -15,7 +15,7 @@ $.ajax({
                 if ($(this).val()) {
                     let totalGas = $(this).val() * $("#GAS_AMOUNT").val() / microFactor;
                     $(".gasCharges").eq(gasElementIndex).text(totalGas + " MNTL");
-                    $(".gasChargesPrice").eq(gasElementIndex).text((totalGas * mntlPrice).toFixed(5) + "$");
+                    $(".gasChargesPrice").eq(gasElementIndex).text("$" + (totalGas * mntlPrice).toFixed(5));
                     gasElementIndex++;
                 }
             });

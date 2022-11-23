@@ -7,7 +7,7 @@ $.ajax({
         200: function (data) {
             let salePrice = $("#nftMantlePrice").text();
             let currentMntlPrice = data;
-            $("#nftDollarPrice").text((salePrice * currentMntlPrice).toFixed(5) + "$");
+            $("#nftDollarPrice").text("$" + (salePrice * currentMntlPrice).toFixed(5));
         }
     }
 });
