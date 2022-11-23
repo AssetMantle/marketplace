@@ -7,7 +7,7 @@ object DeleteDraft {
 
   val form: Form[Data] = Form(
     mapping(
-      constants.FormField.NFT_FILE_NAME.mapping,
+      constants.FormField.NFT_ID.mapping,
     )(Data.apply)(Data.unapply))
 
   case class Data(nftFileName: String)

@@ -57,7 +57,7 @@ class Starter @Inject()(
       _ <- update(collections)
     } yield ()
       ).recover {
-      case exception: Exception =>
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
   }
 
@@ -90,14 +90,14 @@ class Starter @Inject()(
     def updateNFTs(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
       val nftIds = masterNFTs.Service.getAllIdsForCollection(collection.id)
 
-      def update(nftIds: Seq[String]) = masterNFTOwners.Service.add(nftIds.map(x => NFTOwner(fileName = x, ownerId = collection.creatorId, creatorId = collection.creatorId, collectionId = collection.id, quantity = 1, saleId = None)))
+      def update(nftIds: Seq[String]) = masterNFTOwners.Service.add(nftIds.map(x => NFTOwner(nftId = x, ownerId = collection.creatorId, creatorId = collection.creatorId, collectionId = collection.id, quantity = 1, saleId = None)))
 
       (for {
         nftIds <- nftIds
         _ <- update(nftIds)
       } yield ()
         ).recover {
-        case exception: Exception =>
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
       }
     }
 
@@ -111,15 +111,28 @@ class Starter @Inject()(
     val incorrectNotifications = masterTransactionNotifications.Service.getClickableNotifications
 
     def update(incorrectNotifications: Seq[masterTransaction.Notification]) = utilitiesOperations.traverse(incorrectNotifications) { notification =>
-      if ((notification.jsRoute.getOrElse("").contains("CollectionController.viewCollection(") && !notification.jsRoute.getOrElse("").contains("CollectionController.viewCollection('")) || (notification.jsRoute.getOrElse("").contains("NFTController.viewNFT(") && !notification.jsRoute.getOrElse("").contains("NFTController.viewNFT('"))) {
-        val updatedRoute1 = notification.jsRoute.getOrElse("").split("\\(")
-        val updatedRoute2 = updatedRoute1.last.split("\\)")
-        val route = s"${updatedRoute1.head}('${updatedRoute2.head}')"
-        println(route)
-        masterTransactionNotifications.Service.update(notification.copy(jsRoute = Option(route)))
-      } else {
-        println("already corrected: " + notification.jsRoute.getOrElse(""))
-        Future()
+      val notif =
+        if (notification.jsRoute.getOrElse("").contains("CollectionController.viewCollection(") && !notification.jsRoute.getOrElse("").contains("CollectionController.viewCollection('")) {
+          val updatedRoute1 = notification.jsRoute.getOrElse("").split("\\(")
+          val updatedRoute2 = updatedRoute1.last.split("\\)")
+          val route = s"${updatedRoute1.head}('${updatedRoute2.head}')"
+          println(route)
+          masterTransactionNotifications.Service.update(notification.copy(jsRoute = Option(route)))
+        } else if (notification.jsRoute.getOrElse("").contains("NFTController.viewNFT(") && !notification.jsRoute.getOrElse("").contains("NFTController.viewNFT('")) {
+          val updatedRoute1 = notification.jsRoute.getOrElse("").split("\\(")
+          val updatedRoute2 = updatedRoute1.last.split("\\.")
+          val route = s"${updatedRoute1.head}('${updatedRoute2.head}')"
+          println(route)
+          masterTransactionNotifications.Service.update(notification.copy(jsRoute = Option(route)))
+        } else {
+          println("already corrected: " + notification.jsRoute.getOrElse(""))
+          Future()
+        }
+      (for {
+        _ <- notif
+      } yield ()
+        ).recover {
+        case exception: Exception =>
       }
     }
 
@@ -128,7 +141,7 @@ class Starter @Inject()(
       _ <- update(incorrectNotifications)
     } yield ()
       ).recover {
-      case exception: Exception =>
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
   }
 

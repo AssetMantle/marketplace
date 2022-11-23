@@ -7,6 +7,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.db.NamedDatabase
 import slick.jdbc.H2Profile.api._
+import utilities.MicroNumber
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
@@ -74,5 +75,7 @@ class Balances @Inject()(
     def tryGet(address: String): Future[Balance] = tryGetById(address).map(_.deserialize)
 
     def get(address: String): Future[Option[Balance]] = getById(address).map(_.map(_.deserialize))
+
+    def getTokenBalance(address: String, denom: String = constants.Blockchain.StakingToken): Future[MicroNumber] = getById(address).map(_.fold(MicroNumber.zero)(_.deserialize.coins.find(_.denom == denom).fold(MicroNumber.zero)(_.amount)))
   }
 }

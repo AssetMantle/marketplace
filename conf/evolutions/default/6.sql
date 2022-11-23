@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."BuyAssetWithoutMint"
 
 CREATE TABLE IF NOT EXISTS MASTER."NFTOwner"
 (
-    "fileName"             VARCHAR NOT NULL,
+    "nftId"                VARCHAR NOT NULL,
     "ownerId"              VARCHAR NOT NULL,
     "creatorId"            VARCHAR NOT NULL,
     "collectionId"         VARCHAR NOT NULL,
@@ -57,8 +57,8 @@ CREATE TABLE IF NOT EXISTS MASTER."NFTOwner"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("fileName", "ownerId"),
-    UNIQUE ("fileName", "ownerId", "saleId")
+    PRIMARY KEY ("nftId", "ownerId"),
+    UNIQUE ("nftId", "ownerId", "saleId")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Sale"
@@ -90,6 +90,84 @@ WHERE "txRawBytes" = '[]';
 ALTER TABLE BLOCKCHAIN_TRANSACTION."SendCoin"
     DROP COLUMN IF EXISTS "txRawHex";
 
+ALTER TABLE MASTER."WishList"
+    DROP CONSTRAINT IF EXISTS WishList_NFT_Id;
+ALTER TABLE MASTER."NFTProperty"
+    DROP CONSTRAINT IF EXISTS NFTProperty_fileName;
+ALTER TABLE MASTER."NFTTag"
+    DROP CONSTRAINT IF EXISTS NFTTag_fileName;
+
+ALTER TABLE MASTER_TRANSACTION."NFTDraft"
+    ADD COLUMN IF NOT EXISTS "id" VARCHAR NOT NULL DEFAULT '';
+ALTER TABLE MASTER_TRANSACTION."NFTDraft"
+    ADD COLUMN IF NOT EXISTS "fileExtension" VARCHAR NOT NULL DEFAULT '';
+UPDATE MASTER_TRANSACTION."NFTDraft"
+SET "id"            = split_part("fileName", '.', 1),
+    "fileExtension" = split_part("fileName", '.', 2)
+WHERE "id" = '';
+ALTER TABLE MASTER_TRANSACTION."NFTDraft"
+    DROP COLUMN IF EXISTS "fileName";
+ALTER TABLE MASTER_TRANSACTION."NFTDraft"
+    DROP CONSTRAINT IF EXISTS "NFTDraft_pkey";
+ALTER TABLE MASTER_TRANSACTION."NFTDraft"
+    ADD PRIMARY KEY ("id");
+
+ALTER TABLE MASTER."NFTTag"
+    ADD COLUMN IF NOT EXISTS "nftId" VARCHAR NOT NULL DEFAULT '';
+UPDATE MASTER."NFTTag"
+SET "nftId" = split_part("fileName", '.', 1)
+WHERE "nftId" = '';
+ALTER TABLE MASTER."NFTTag"
+    DROP COLUMN IF EXISTS "fileName";
+ALTER TABLE MASTER."NFTTag"
+    DROP CONSTRAINT IF EXISTS "NFTTag_pkey";
+ALTER TABLE MASTER."NFTTag"
+    ADD PRIMARY KEY ("tagName", "nftId");
+
+ALTER TABLE MASTER."NFTProperty"
+    ADD COLUMN IF NOT EXISTS "nftId" VARCHAR NOT NULL DEFAULT '';
+UPDATE MASTER."NFTProperty"
+SET "nftId" = split_part("fileName", '.', 1)
+WHERE "nftId" = '';
+ALTER TABLE MASTER."NFTProperty"
+    DROP COLUMN IF EXISTS "fileName";
+ALTER TABLE MASTER."NFTProperty"
+    DROP CONSTRAINT IF EXISTS "NFTProperty_pkey";
+ALTER TABLE MASTER."NFTProperty"
+    ADD PRIMARY KEY ("nftId", "name", "type");
+
+UPDATE MASTER."WishList"
+SET "nftId" = split_part("nftId", '.', 1)
+WHERE "nftId" != '';
+
+ALTER TABLE MASTER."NFT"
+    ADD COLUMN IF NOT EXISTS "id" VARCHAR NOT NULL DEFAULT '';
+ALTER TABLE MASTER."NFT"
+    ADD COLUMN IF NOT EXISTS "fileExtension" VARCHAR NOT NULL DEFAULT '';
+UPDATE MASTER."NFT"
+SET "id"            = split_part("fileName", '.', 1),
+    "fileExtension" = split_part("fileName", '.', 2)
+WHERE "id" = '';
+ALTER TABLE MASTER."NFT"
+    DROP CONSTRAINT IF EXISTS "NFT_pkey";
+ALTER TABLE MASTER."NFT"
+    ADD PRIMARY KEY ("id");
+ALTER TABLE MASTER."WishList"
+    DROP CONSTRAINT IF EXISTS wishlist_nft_id;
+ALTER TABLE MASTER."NFTProperty"
+    DROP CONSTRAINT IF EXISTS NFTProperty_fileName;
+ALTER TABLE MASTER."NFTTag"
+    DROP CONSTRAINT IF EXISTS NFTTag_fileName;
+ALTER TABLE MASTER."NFT"
+    DROP COLUMN IF EXISTS "fileName";
+ALTER TABLE MASTER."WishList"
+    ADD CONSTRAINT WishList_NFTId FOREIGN KEY ("nftId") REFERENCES MASTER."NFT" ("id");
+ALTER TABLE MASTER."NFTProperty"
+    ADD CONSTRAINT NFTProperty_NFTId FOREIGN KEY ("nftId") REFERENCES MASTER."NFT" ("id");
+ALTER TABLE MASTER."NFTTag"
+    ADD CONSTRAINT NFTTag_NFTId FOREIGN KEY ("nftId") REFERENCES MASTER."NFT" ("id");
+
+
 ALTER TABLE MASTER."Collection"
     DROP COLUMN IF EXISTS "website";
 ALTER TABLE MASTER."Collection"
@@ -101,7 +179,7 @@ ALTER TABLE MASTER."NFT"
 ALTER TABLE MASTER."NFT"
     ADD COLUMN IF NOT EXISTS "isMinted" BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE MASTER."NFT"
-    ADD CONSTRAINT uniqueNFTIdCollectionId UNIQUE ("fileName", "collectionId");
+    ADD CONSTRAINT uniqueNFTIdCollectionId UNIQUE ("id", "collectionId");
 
 ALTER TABLE ANALYTICS."CollectionAnalysis"
     ADD CONSTRAINT CollectionAnalysis_id FOREIGN KEY ("id") REFERENCES MASTER."Collection" ("id");
@@ -113,7 +191,7 @@ ALTER TABLE BLOCKCHAIN_TRANSACTION."BuyAssetWithoutMint"
 ALTER TABLE BLOCKCHAIN_TRANSACTION."BuyAssetWithoutMint"
     ADD CONSTRAINT BuyAssetWithoutMint_saleId FOREIGN KEY ("saleId") REFERENCES MASTER."Sale" ("id");
 ALTER TABLE BLOCKCHAIN_TRANSACTION."BuyAssetWithoutMint"
-    ADD CONSTRAINT BuyAssetWithoutMint_nftId FOREIGN KEY ("nftId") REFERENCES MASTER."NFT" ("fileName");
+    ADD CONSTRAINT BuyAssetWithoutMint_nftId FOREIGN KEY ("nftId") REFERENCES MASTER."NFT" ("id");
 
 
 ALTER TABLE MASTER."Sale"
@@ -122,6 +200,8 @@ ALTER TABLE MASTER."NFTOwner"
     ADD CONSTRAINT NFTOwner_ownerId FOREIGN KEY ("ownerId") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."NFTOwner"
     ADD CONSTRAINT NFTOwner_saleId FOREIGN KEY ("saleId") REFERENCES MASTER."Sale" ("id");
+ALTER TABLE MASTER."NFTOwner"
+    ADD CONSTRAINT NFTOwner_nftId FOREIGN KEY ("nftId") REFERENCES MASTER."NFT" ("id");
 ALTER TABLE MASTER."NFTOwner"
     ADD CONSTRAINT NFTOwner_collectionId FOREIGN KEY ("collectionId") REFERENCES MASTER."Collection" ("id");
 ALTER TABLE MASTER."Sale"

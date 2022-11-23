@@ -10,7 +10,6 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import utilities.MicroNumber
 import views.base.companion.UploadFile
 import views.nft.companion._
 
@@ -33,6 +32,7 @@ class NFTController @Inject()(
                                masterSales: master.Sales,
                                masterNFTOwners: master.NFTOwners,
                                masterNFTProperties: master.NFTProperties,
+                               masterNFTTags: master.NFTTags,
                                masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                masterWishLists: master.WishLists,
                                masterWhitelists: master.Whitelists,
@@ -212,7 +212,9 @@ class NFTController @Inject()(
   def uploadNFTFile(collectionId: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val oldFilePath = utilities.Collection.getNFTFilePath(collectionId) + name
-      val newFileName = utilities.FileOperations.getFileHash(oldFilePath) + "." + utilities.FileOperations.fileExtensionFromName(name)
+      val nftId = utilities.FileOperations.getFileHash(oldFilePath)
+      val fileExtension = utilities.FileOperations.fileExtensionFromName(name)
+      val newFileName = nftId + "." + fileExtension
       val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collectionId, fileName = newFileName)
       val collection = masterCollections.Service.tryGet(id = collectionId)
 
@@ -224,7 +226,7 @@ class NFTController @Inject()(
 
       def deleteLocalFile() = Future(utilities.FileOperations.deleteFile(oldFilePath))
 
-      def add() = masterTransactionNFTDrafts.Service.add(fileName = newFileName, collectionId = collectionId)
+      def add() = masterTransactionNFTDrafts.Service.add(id = nftId, fileExtension = utilities.FileOperations.fileExtensionFromName(name), collectionId = collectionId)
 
       (for {
         collection <- collection
@@ -237,17 +239,17 @@ class NFTController @Inject()(
       }
   }
 
-  def basicDetailsForm(collectionId: String, fileName: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def basicDetailsForm(collectionId: String, nftId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val isOwner = masterCollections.Service.isOwner(id = collectionId, accountId = loginState.username)
 
-      def optionalNFTDraft(isOwner: Boolean) = if (isOwner) masterTransactionNFTDrafts.Service.get(fileName)
+      def optionalNFTDraft(isOwner: Boolean) = if (isOwner) masterTransactionNFTDrafts.Service.get(nftId)
       else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
 
       (for {
         isOwner <- isOwner
         optionalNFTDraft <- optionalNFTDraft(isOwner)
-      } yield Ok(views.html.nft.nftBasicDetail(collectionId = collectionId, fileName = fileName, optionalNFTDraft = optionalNFTDraft))
+      } yield Ok(views.html.nft.nftBasicDetail(collectionId = collectionId, nftId = nftId, optionalNFTDraft = optionalNFTDraft))
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
@@ -257,12 +259,12 @@ class NFTController @Inject()(
     implicit request =>
       NFTBasicDetail.form.bindFromRequest().fold(
         formWithErrors => {
-          val fileName = formWithErrors.data.getOrElse(constants.FormField.NFT_FILE_NAME.name, "")
-          val optionalNFTDraft = masterTransactionNFTDrafts.Service.get(fileName)
+          val nftId = formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, "")
+          val optionalNFTDraft = masterTransactionNFTDrafts.Service.get(nftId)
 
           (for {
             optionalNFTDraft <- optionalNFTDraft
-          } yield BadRequest(views.html.nft.nftBasicDetail(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""), fileName, optionalNFTDraft))
+          } yield BadRequest(views.html.nft.nftBasicDetail(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""), nftId, optionalNFTDraft))
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
           }
@@ -271,28 +273,28 @@ class NFTController @Inject()(
         basicDetailsData => {
           val isOwner = masterCollections.Service.isOwner(id = basicDetailsData.collectionId, accountId = loginState.username)
 
-          def update(isOwner: Boolean) = if (isOwner) masterTransactionNFTDrafts.Service.updateNameDescription(fileName = basicDetailsData.fileName, name = basicDetailsData.name, description = basicDetailsData.description)
+          def update(isOwner: Boolean) = if (isOwner) masterTransactionNFTDrafts.Service.updateNameDescription(id = basicDetailsData.nftId, name = basicDetailsData.name, description = basicDetailsData.description)
           else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
 
           (for {
             isOwner <- isOwner
             nftDraft <- update(isOwner)
-          } yield PartialContent(views.html.nft.tags(collectionId = basicDetailsData.collectionId, fileName = nftDraft.fileName, tags = nftDraft.tagNames.getOrElse(Seq.empty[String])))
+          } yield PartialContent(views.html.nft.tags(collectionId = basicDetailsData.collectionId, nftId = nftDraft.id, tags = nftDraft.tagNames.getOrElse(Seq.empty[String])))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.nft.nftBasicDetail(NFTBasicDetail.form.withGlobalError(baseException.failure.message), collectionId = basicDetailsData.collectionId, fileName = basicDetailsData.fileName, None))
+            case baseException: BaseException => BadRequest(views.html.nft.nftBasicDetail(NFTBasicDetail.form.withGlobalError(baseException.failure.message), collectionId = basicDetailsData.collectionId, nftId = basicDetailsData.nftId, None))
           }
         }
       )
   }
 
-  def tagsForm(collectionId: String, fileName: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def tagsForm(collectionId: String, nftId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val isOwner = masterCollections.Service.isOwner(id = collectionId, accountId = loginState.username)
-      val nftDraft = masterTransactionNFTDrafts.Service.get(fileName)
+      val nftDraft = masterTransactionNFTDrafts.Service.get(nftId)
       (for {
         isOwner <- isOwner
         nftDraft <- nftDraft
-      } yield if (isOwner) Ok(views.html.nft.tags(collectionId = collectionId, fileName = fileName, tags = nftDraft.fold[Seq[String]](Seq())(_.tagNames.getOrElse(Seq.empty[String]))))
+      } yield if (isOwner) Ok(views.html.nft.tags(collectionId = collectionId, nftId = nftId, tags = nftDraft.fold[Seq[String]](Seq())(_.tagNames.getOrElse(Seq.empty[String]))))
       else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
@@ -303,31 +305,31 @@ class NFTController @Inject()(
     implicit request =>
       NFTTags.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.nft.tags(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.NFT_FILE_NAME.name, ""), formWithErrors.data.getOrElse(constants.FormField.NFT_TAGS.name, "").split(","))))
+          Future(BadRequest(views.html.nft.tags(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.NFT_TAGS.name, "").split(","))))
         },
         tagsData => {
           val collection = masterCollections.Service.tryGet(id = tagsData.collectionId)
 
-          def update(collection: Collection) = if (collection.creatorId == loginState.username) masterTransactionNFTDrafts.Service.updateTagNames(fileName = tagsData.fileName, tagNames = tagsData.getTags)
+          def update(collection: Collection) = if (collection.creatorId == loginState.username) masterTransactionNFTDrafts.Service.updateTagNames(id = tagsData.nftId, tagNames = tagsData.getTags)
           else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
 
           (for {
             collection <- collection
             _ <- update(collection)
-          } yield PartialContent(views.html.nft.setProperties(collection = collection, fileName = tagsData.fileName))
+          } yield PartialContent(views.html.nft.setProperties(collection = collection, nftId = tagsData.nftId))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.nft.tags(NFTTags.form.withGlobalError(baseException.failure.message), collectionId = tagsData.collectionId, fileName = tagsData.fileName, tags = tagsData.getTags))
+            case baseException: BaseException => BadRequest(views.html.nft.tags(NFTTags.form.withGlobalError(baseException.failure.message), collectionId = tagsData.collectionId, nftId = tagsData.nftId, tags = tagsData.getTags))
           }
         }
       )
   }
 
-  def setPropertiesForm(collectionId: String, fileName: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def setPropertiesForm(collectionId: String, nftId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val collection = masterCollections.Service.tryGet(id = collectionId)
       (for {
         collection <- collection
-      } yield if (collection.creatorId == loginState.username) Ok(views.html.nft.setProperties(collection = collection, fileName = fileName))
+      } yield if (collection.creatorId == loginState.username) Ok(views.html.nft.setProperties(collection = collection, nftId = nftId))
       else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
@@ -341,7 +343,7 @@ class NFTController @Inject()(
           val collection = masterCollections.Service.tryGet(id = formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))
           (for {
             collection <- collection
-          } yield if (collection.creatorId == loginState.username) BadRequest(views.html.nft.setProperties(formWithErrors, collection, formWithErrors.data.getOrElse(constants.FormField.NFT_FILE_NAME.name, "")))
+          } yield if (collection.creatorId == loginState.username) BadRequest(views.html.nft.setProperties(formWithErrors, collection, formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, "")))
           else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
@@ -351,7 +353,7 @@ class NFTController @Inject()(
           val collection = masterCollections.Service.tryGet(id = setPropertiesData.collectionId)
 
           def update(collection: Collection) = if (collection.creatorId == loginState.username) {
-            val updateDraft = masterTransactionNFTDrafts.Service.updateProperties(setPropertiesData.fileName, setPropertiesData.getNFTProperties(collection.properties.getOrElse(Seq())))
+            val updateDraft = masterTransactionNFTDrafts.Service.updateProperties(setPropertiesData.nftId, setPropertiesData.getNFTProperties(collection.properties.getOrElse(Seq())))
 
             def addToNFT(nftDraft: NFTDraft) = if (!setPropertiesData.saveNFTDraft) {
               val add = masterNFTs.Service.add(nftDraft.toNFT())
@@ -360,15 +362,18 @@ class NFTController @Inject()(
 
               def addOwner(nftOwner: master.NFTOwner) = masterNFTOwners.Service.add(nftOwner)
 
-              def deleteDraft = masterTransactionNFTDrafts.Service.deleteNFT(nftDraft.fileName)
+              def addTags() = if (nftDraft.getTags.nonEmpty) masterNFTTags.Service.add(nftDraft.getTags) else Future()
+
+              def deleteDraft() = masterTransactionNFTDrafts.Service.deleteNFT(nftDraft.id)
 
               for {
                 nft <- add
                 _ <- addProperties()
                 _ <- addOwner(nftDraft.toNFTOwner(ownerID = collection.creatorId, creatorId = collection.creatorId, saleId = None))
-                _ <- deleteDraft
+                _ <- addTags()
+                _ <- deleteDraft()
                 _ <- collectionsAnalysis.Utility.onNewNFT(collection.id)
-                _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.NFT_CREATED, nftDraft.name.getOrElse(""))(s"'${nftDraft.fileName}'")
+                _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.NFT_CREATED, nftDraft.name.getOrElse(""))(s"'${nftDraft.id}'")
               } yield ()
             } else Future()
 
@@ -389,8 +394,8 @@ class NFTController @Inject()(
       )
   }
 
-  def deleteDraftForm(fileName: String, fileHash: String): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.nft.deleteDraft(fileName, fileHash))
+  def deleteDraftForm(nftId: String, fileHash: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.nft.deleteDraft(nftId, fileHash))
   }
 
   def deleteDraft(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -441,7 +446,7 @@ class NFTController @Inject()(
           nftIds <- nftIds
           nfts <- nfts(nftIds)
           collections <- collections(nfts.map(_.collectionId))
-          wishLists <- wishLists(nfts.map(_.fileName))
+          wishLists <- wishLists(nfts.map(_.id))
         } yield Ok(views.html.profile.owned.ownedNFTsPerPage(nfts, collections, wishLists))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)

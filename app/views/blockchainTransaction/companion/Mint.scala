@@ -7,7 +7,7 @@ object Mint {
 
   val form: Form[Data] = Form(
     mapping(
-      constants.FormField.NFT_FILE_NAME.mapping,
+      constants.FormField.NFT_ID.mapping,
       constants.FormField.GAS_AMOUNT.mapping,
       constants.FormField.GAS_PRICE.mapping,
       constants.FormField.PASSWORD.mapping,

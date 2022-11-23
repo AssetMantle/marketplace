@@ -9,11 +9,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 
-case class NFTProperty(fileName: String, name: String, `type`: String, `value`: String, meta: Boolean, mutable: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity3[String, String, String] with Logging {
-
-  def getFileHash: String = utilities.FileOperations.getFileNameWithoutExtension(fileName)
-
-  def id1: String = fileName
+case class NFTProperty(nftId: String, name: String, `type`: String, `value`: String, meta: Boolean, mutable: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity3[String, String, String] with Logging {
+  def id1: String = nftId
 
   def id2: String = name
 
@@ -28,9 +25,9 @@ object NFTProperties {
 
   class NFTPropertyTable(tag: Tag) extends Table[NFTProperty](tag, "NFTProperty") with ModelTable3[String, String, String] {
 
-    def * = (fileName, name, `type`, `value`, meta, mutable, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTProperty.tupled, NFTProperty.unapply)
+    def * = (nftId, name, `type`, `value`, meta, mutable, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTProperty.tupled, NFTProperty.unapply)
 
-    def fileName = column[String]("fileName", O.PrimaryKey)
+    def nftId = column[String]("nftId", O.PrimaryKey)
 
     def name = column[String]("name", O.PrimaryKey)
 
@@ -50,7 +47,7 @@ object NFTProperties {
 
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def id1 = fileName
+    def id1 = nftId
 
     def id2 = `name`
 
@@ -76,8 +73,7 @@ class NFTProperties @Inject()(
 
     def addMultiple(properties: Seq[NFTProperty]): Future[Unit] = create(properties)
 
-    def getForNFT(fileName: String): Future[Seq[NFTProperty]] = filter(_.fileName === fileName)
-
+    def getForNFT(nftId: String): Future[Seq[NFTProperty]] = filter(_.nftId === nftId)
 
   }
 }

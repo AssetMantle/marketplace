@@ -9,8 +9,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
-case class NFTOwner(fileName: String, ownerId: String, creatorId: String, collectionId: String, quantity: Long, saleId: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
-  def id1: String = fileName
+case class NFTOwner(nftId: String, ownerId: String, creatorId: String, collectionId: String, quantity: Long, saleId: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
+  def id1: String = nftId
 
   def id2: String = ownerId
 }
@@ -24,9 +24,9 @@ object NFTOwners {
 
   class NFTOwnerTable(tag: Tag) extends Table[NFTOwner](tag, "NFTOwner") with ModelTable2[String, String] {
 
-    def * = (fileName, ownerId, creatorId, collectionId, quantity, saleId.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTOwner.tupled, NFTOwner.unapply)
+    def * = (nftId, ownerId, creatorId, collectionId, quantity, saleId.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTOwner.tupled, NFTOwner.unapply)
 
-    def fileName = column[String]("fileName", O.PrimaryKey)
+    def nftId = column[String]("nftId", O.PrimaryKey)
 
     def ownerId = column[String]("ownerId", O.PrimaryKey)
 
@@ -46,7 +46,7 @@ object NFTOwners {
 
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def id1 = fileName
+    def id1 = nftId
 
     def id2 = ownerId
   }
@@ -72,7 +72,7 @@ class NFTOwners @Inject()(
 
     def add(nftOwners: Seq[NFTOwner]): Future[Unit] = create(nftOwners)
 
-    def getByOwnerIdAndPageNumber(ownerId: String, pageNumber: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(x => x.ownerId === ownerId && x.ownerId =!= x.creatorId)(_.fileName).map(_.map(_.fileName))
+    def getByOwnerIdAndPageNumber(ownerId: String, pageNumber: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(x => x.ownerId === ownerId && x.ownerId =!= x.creatorId)(_.nftId).map(_.map(_.nftId))
 
     def update(NFTOwner: NFTOwner): Future[Unit] = updateById1AndId2(NFTOwner)
 
@@ -92,12 +92,12 @@ class NFTOwners @Inject()(
     def delete(nftId: String, ownerId: String) = deleteById1AndId2(id1 = nftId, id2 = ownerId)
 
     def markNFTSold(nftId: String, saleId: String, sellerAccountId: String, buyerAccountId: String): Future[Unit] = {
-      val nftOwner = tryGet(fileName = nftId, ownerId = sellerAccountId)
+      val nftOwner = tryGet(nftId = nftId, ownerId = sellerAccountId)
 
       def verifyAndUpdate(nftOwner: NFTOwner) = if (nftOwner.saleId.getOrElse("") == saleId) {
         if (nftOwner.quantity == 1) {
           for {
-            _ <- delete(nftId = nftOwner.fileName, ownerId = nftOwner.ownerId)
+            _ <- delete(nftId = nftOwner.nftId, ownerId = nftOwner.ownerId)
             _ <- create(nftOwner.copy(saleId = None, ownerId = buyerAccountId))
           } yield ()
         } else constants.Response.HANDLE_MULTIPLE_NFT_QUANTITY_CASE.throwFutureBaseException()
@@ -109,11 +109,11 @@ class NFTOwners @Inject()(
       } yield ()
     }
 
-    def getSaleId(fileName: String): Future[Option[String]] = filterHead(_.fileName === fileName).map(_.saleId)
+    def getSaleId(nftId: String): Future[Option[String]] = filterHead(_.nftId === nftId).map(_.saleId)
 
-    def tryGet(fileName: String, ownerId: String): Future[NFTOwner] = tryGetById1AndId2(id1 = fileName, id2 = ownerId)
+    def tryGet(nftId: String, ownerId: String): Future[NFTOwner] = tryGetById1AndId2(id1 = nftId, id2 = ownerId)
 
-    def tryGetByNFTAndSaleId(fileName: String, saleId: String): Future[NFTOwner] = filterHead(x => x.saleId === saleId && x.fileName === fileName)
+    def tryGetByNFTAndSaleId(nftId: String, saleId: String): Future[NFTOwner] = filterHead(x => x.saleId === saleId && x.nftId === nftId)
     //    https://scala-slick.org/doc/3.1.1/sql-to-slick.html#id21
     //    def getQuery = NFTOwners.TableQuery.filter(x => x.ownerId === "asd" && x.creatorId)
   }

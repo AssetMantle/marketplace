@@ -1,8 +1,7 @@
 package constants
 
-import com.google.common.collect
-import com.google.common.collect.ImmutableList
 import org.bitcoinj.crypto.ChildNumber
+import utilities.MicroNumber
 
 object Blockchain {
   val AccountPrefix = "mantle"
@@ -21,6 +20,7 @@ object Blockchain {
     new ChildNumber(0, false),
     new ChildNumber(0, false)
   )
+  val AssetPropertyRate: MicroNumber = CommonConfig.Blockchain.AssetPropertyRate
 
   object Account {
     val BASE = "/cosmos.auth.v1beta1.BaseAccount"

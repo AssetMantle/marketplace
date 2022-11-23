@@ -29,13 +29,13 @@
         </div>
         @if(draft) {
             <div class="d-flex gap-2 justify-content-end pt-4">
-                <i class="bi bi-pencil iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.basicDetailsForm('@nft.collectionId', '@nft.fileName'))"></i>
-                <i class="bi bi-trash iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.deleteDraftForm('@nft.fileName', '@nft.getFileHash'))"></i>
+                <i class="bi bi-pencil iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.basicDetailsForm('@nft.collectionId', '@nft.id'))"></i>
+                <i class="bi bi-trash iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.deleteDraftForm('@nft.id', '@nft.getFileHash'))"></i>
                 <div id="deleteNftDraft_@nft.getFileHash" class="hidden">
                 @defining(views.nft.companion.DeleteDraft.form) { deleteDraftForm =>
                     @form(routes.NFTController.deleteDraft()) {
                         @CSRF.formField
-                        @commonInputText(deleteDraftForm, constants.FormField.NFT_FILE_NAME, Symbol("value") -> nft.fileName, Symbol("readonly") -> "readonly")
+                        @commonInputText(deleteDraftForm, constants.FormField.NFT_ID, Symbol("value") -> nft.id, Symbol("readonly") -> "readonly")
                     }
                 }
                 </div>
@@ -58,14 +58,14 @@
                         <span onclick="addRemoveWishlist(this, '@nft.getFileHash', '@Messages(constants.View.ADDED_TO_WISHLIST)', '@Messages(constants.View.REMOVED_FROM_WISHLIST)')">
                         @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
                         </span>
-                        <div class="nft-likes" data-id="@nft.fileName">00</div>
+                        <div class="nft-likes" data-id="@nft.id">00</div>
                     </div>
                 } else {
                     <div class="d-flex align-items-center gap-1 mt-3" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN_WITH_CALLBACK.get, s"'/collection/${collection.id}'"))">
                         <span>
                         @views.html.nft.commonCardWishlistButton()
                         </span>
-                        <div class="nft-likes" data-id="@nft.fileName">00</div>
+                        <div class="nft-likes" data-id="@nft.id">00</div>
                     </div>
                 }
             </div>
@@ -73,4 +73,4 @@
     </div>
 </div>
 </div>
-    <script>getNFTPrice('@nft.fileName')</script>
+    <script>getNFTPrice('@nft.id')</script>

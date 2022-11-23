@@ -16,7 +16,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class BuyAssetWithoutMint(sellerAccountId: String, buyerAccountId: String, txHash: String, txRawBytes: Array[Byte], nftId: String, saleId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
+case class BuyAssetWithoutMint(buyerAccountId: String, sellerAccountId: String, txHash: String, txRawBytes: Array[Byte], nftId: String, saleId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
 
   def serialize(): BuyAssetWithoutMints.BuyAssetWithoutMintSerialized = BuyAssetWithoutMints.BuyAssetWithoutMintSerialized(sellerAccountId = this.sellerAccountId, buyerAccountId = this.buyerAccountId, txHash = this.txHash, txRawBytes = this.txRawBytes, nftId = this.nftId, saleId = this.saleId, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, broadcasted = this.broadcasted, status = this.status, memo = this.memo, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 
@@ -29,8 +29,8 @@ object BuyAssetWithoutMints {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_BUY_ASSET_WITHOUT_MINT
 
-  case class BuyAssetWithoutMintSerialized(sellerAccountId: String, buyerAccountId: String, txHash: String, txRawBytes: Array[Byte], nftId: String, saleId: String, fromAddress: String, toAddress: String, amount: String, broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity3[String, String, String] {
-    def deserialize: BuyAssetWithoutMint = BuyAssetWithoutMint(sellerAccountId = this.sellerAccountId, buyerAccountId = buyerAccountId, txHash = txHash, txRawBytes = this.txRawBytes, nftId = this.nftId, saleId = this.saleId, fromAddress = fromAddress, toAddress = toAddress, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), broadcasted = broadcasted, status = status, memo = memo, log = log, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class BuyAssetWithoutMintSerialized(buyerAccountId: String, sellerAccountId: String, txHash: String, txRawBytes: Array[Byte], nftId: String, saleId: String, fromAddress: String, toAddress: String, amount: String, broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity3[String, String, String] {
+    def deserialize: BuyAssetWithoutMint = BuyAssetWithoutMint(buyerAccountId = this.buyerAccountId, sellerAccountId = this.sellerAccountId, txHash = txHash, txRawBytes = this.txRawBytes, nftId = this.nftId, saleId = this.saleId, fromAddress = fromAddress, toAddress = toAddress, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), broadcasted = broadcasted, status = status, memo = memo, log = log, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
     def id1: String = sellerAccountId
 
@@ -41,11 +41,11 @@ object BuyAssetWithoutMints {
 
   class BuyAssetWithoutMintTable(tag: Tag) extends Table[BuyAssetWithoutMintSerialized](tag, "BuyAssetWithoutMint") with ModelTable3[String, String, String] {
 
-    def * = (sellerAccountId, buyerAccountId, txHash, txRawBytes, nftId, saleId, fromAddress, toAddress, amount, broadcasted, status.?, memo.?, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (BuyAssetWithoutMintSerialized.tupled, BuyAssetWithoutMintSerialized.unapply)
-
-    def sellerAccountId = column[String]("sellerAccountId", O.PrimaryKey)
+    def * = (buyerAccountId, sellerAccountId, txHash, txRawBytes, nftId, saleId, fromAddress, toAddress, amount, broadcasted, status.?, memo.?, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (BuyAssetWithoutMintSerialized.tupled, BuyAssetWithoutMintSerialized.unapply)
 
     def buyerAccountId = column[String]("buyerAccountId", O.PrimaryKey)
+
+    def sellerAccountId = column[String]("sellerAccountId", O.PrimaryKey)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
@@ -113,8 +113,8 @@ class BuyAssetWithoutMints @Inject()(
 
   object Service {
 
-    def add(sellerAccountId: String, buyerAccountId: String, txHash: String, txRawBytes: Array[Byte], saleId: String, nftId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String]): Future[BuyAssetWithoutMint] = {
-      val buyAssetWithoutMint = BuyAssetWithoutMint(sellerAccountId = sellerAccountId, buyerAccountId = buyerAccountId, txHash = txHash, txRawBytes = txRawBytes, saleId = saleId, nftId = nftId, fromAddress = fromAddress, toAddress = toAddress, amount = amount, broadcasted = broadcasted, status = status, log = None, memo = memo)
+    def add(buyerAccountId: String, sellerAccountId: String, txHash: String, txRawBytes: Array[Byte], saleId: String, nftId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String]): Future[BuyAssetWithoutMint] = {
+      val buyAssetWithoutMint = BuyAssetWithoutMint(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, txRawBytes = txRawBytes, saleId = saleId, nftId = nftId, fromAddress = fromAddress, toAddress = toAddress, amount = amount, broadcasted = broadcasted, status = status, log = None, memo = memo)
       for {
         _ <- create(buyAssetWithoutMint.serialize())
       } yield buyAssetWithoutMint
@@ -152,7 +152,7 @@ class BuyAssetWithoutMints @Inject()(
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
         for {
-          buyAssetWithoutMint <- if (!unconfirmedTxHashes.contains(txHash)) Service.add(sellerAccountId = sellerAccountId, buyerAccountId = buyerAccountId, txHash = txHash, txRawBytes = txRawBytes, nftId = nftId, saleId = saleId, fromAddress = fromAddress, toAddress = toAddress, amount = amount, broadcasted = false, status = None, memo = Option(memo)) else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          buyAssetWithoutMint <- if (!unconfirmedTxHashes.contains(txHash)) Service.add(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, txRawBytes = txRawBytes, nftId = nftId, saleId = saleId, fromAddress = fromAddress, toAddress = toAddress, amount = amount, broadcasted = false, status = None, memo = Option(memo)) else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
         } yield buyAssetWithoutMint
       }
 
@@ -198,11 +198,11 @@ class BuyAssetWithoutMints @Inject()(
             val nft = masterNFTs.Service.tryGet(buyAssetWithoutMint.nftId)
 
             def send(nft: master.NFT) = if (transaction.get.status) {
-              utilitiesNotification.send(buyAssetWithoutMint.sellerAccountId, constants.Notification.SELLER_NFT_SALE_WITHOUT_MINT_SUCCESSFUL, nft.name)(nft.fileName)
-              utilitiesNotification.send(buyAssetWithoutMint.buyerAccountId, constants.Notification.BUYER_NFT_SALE_WITHOUT_MINT_SUCCESSFUL, nft.name)(nft.fileName)
+              utilitiesNotification.send(buyAssetWithoutMint.sellerAccountId, constants.Notification.SELLER_NFT_SALE_WITHOUT_MINT_SUCCESSFUL, nft.name)(nft.id)
+              utilitiesNotification.send(buyAssetWithoutMint.buyerAccountId, constants.Notification.BUYER_NFT_SALE_WITHOUT_MINT_SUCCESSFUL, nft.name)(nft.id)
             } else {
-              utilitiesNotification.send(buyAssetWithoutMint.sellerAccountId, constants.Notification.SELLER_NFT_SALE_WITHOUT_MINT_FAILED, nft.name)(nft.fileName)
-              utilitiesNotification.send(buyAssetWithoutMint.buyerAccountId, constants.Notification.BUYER_NFT_SALE_WITHOUT_MINT_FAILED, nft.name)(nft.fileName)
+              utilitiesNotification.send(buyAssetWithoutMint.sellerAccountId, constants.Notification.SELLER_NFT_SALE_WITHOUT_MINT_FAILED, nft.name)(nft.id)
+              utilitiesNotification.send(buyAssetWithoutMint.buyerAccountId, constants.Notification.BUYER_NFT_SALE_WITHOUT_MINT_FAILED, nft.name)(nft.id)
             }
 
             for {

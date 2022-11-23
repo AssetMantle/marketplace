@@ -53,10 +53,10 @@ class BlockchainTransactionController @Inject()(
   def balance(address: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val balance = blockchainBalances.Service.get(address)
+        val balance = blockchainBalances.Service.getTokenBalance(address)
         (for {
           balance <- balance
-        } yield Ok(balance.fold(MicroNumber.zero)(_.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount)).toString)
+        } yield Ok(balance.toString)
           ).recover {
           case _: BaseException => BadRequest("0")
         }
@@ -121,7 +121,7 @@ class BlockchainTransactionController @Inject()(
     implicit request =>
       Mint.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.blockchainTransaction.mint(formWithErrors, nftId = formWithErrors.data.getOrElse(constants.FormField.NFT_FILE_NAME.name, ""))))
+          Future(BadRequest(views.html.blockchainTransaction.mint(formWithErrors, nftId = formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, ""))))
         },
         mintData => {
           val balance = blockchainBalances.Service.get(loginState.address)

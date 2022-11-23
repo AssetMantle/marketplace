@@ -1,12 +1,12 @@
 @import views.html.base.form._
 @import views.nft.companion.NFTTags
 
-@(nftTagsForm: Form[NFTTags.Data] = NFTTags.form, collectionId: String, fileName: String, tags: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(nftTagsForm: Form[NFTTags.Data] = NFTTags.form, collectionId: String, nftId: String, tags: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.NFT_TAGS, nftTagsForm, submitDisable = false, showBackButton = true) {
     @commonInputText(nftTagsForm, constants.FormField.NFT_TAGS, Symbol("class") -> "hidden", Symbol("value") -> tags.mkString(","))
     @commonInputText(nftTagsForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionId, Symbol("containerDivClass") -> "hidden")
-    @commonInputText(nftTagsForm, constants.FormField.NFT_FILE_NAME, Symbol("value") -> fileName, Symbol("containerDivClass") -> "hidden")
+    @commonInputText(nftTagsForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden")
 
     <div class="hashtagWrapper">
         <div class="content">
@@ -15,7 +15,7 @@
                 <input type="text" id="hashtagField"/>
             </ul>
         </div>
-        <div class="mt-1 view">
+        <div class="mt-1 view details">
             <p><span>@constants.NFT.Tags.MaximumAllowed</span> @Messages(constants.View.CREATE_NFT_TAG_REMAINING_LABEL)</p>
         </div>
     </div>
@@ -29,5 +29,5 @@
     }
 }
 <script>
-    setTagBackButton('@collectionId','@fileName');
+    setTagBackButton('@collectionId','@nftId');
 </script>
