@@ -890,6 +890,12 @@
 }
 
 // Hide Modal scrollbar
+body.modal-open{
+  padding-right: 0px !important;
+}
+#commonModal{
+  padding-right: 0px !important;
+}
 #commonModal::-webkit-scrollbar{
   display: none;
 }
