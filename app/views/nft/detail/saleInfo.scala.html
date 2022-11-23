@@ -11,15 +11,15 @@
             <div class="priceHolder">
                 <div class="d-flex flex-row gap-1 align-items-center mt-3">
                     <img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/>
-                    <div id="nft-mantle-price" class="nft-mantle-price">--</div>
-                    <div id="nft-dollar-price" class="nft-dollar-price">($--)</div>
+                    <div id="nftMantlePrice" class="nft-mantle-price">@sales.find(x => allWhitelistIds.contains(x.whitelistId)).fold("--")(_.price.toString)</div>
+                    <div id="nftDollarPrice" class="nft-dollar-price">($--)</div>
                 </div>
-                <div id="salePrice" class="salePrice hidden">@sales.find(x => allWhitelistIds.contains(x.whitelistId)).fold("")(_.price.toString)</div>
             </div>
             @if(loginState.fold("")(_.username) == sales.find(x => allWhitelistIds.contains(x.whitelistId)).fold("")(_.collectionId)) {
 
             }else{
-                <button class="mt-5 form-primary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, ""))">@Messages(constants.View.BUYNOW)</button>
+                <button class="mt-5 form-primary-button">@Messages(constants.View.MINT)</button>
+                <button class="mt-3 form-secondary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, ""))">@Messages(constants.View.BUYNOW)</button>
             }
         } else {
             <div class="d-flex flex-column gap-1">

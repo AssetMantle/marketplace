@@ -209,6 +209,7 @@ object View {
   val MENU_SETTINGS = "MENU_SETTINGS"
   val MENU_SIGN_OUT = "MENU_SIGN_OUT"
   val META_DESCRIPTION = "META_DESCRIPTION"
+  val MINT = "MINT"
   val MINT_NFTS = "MINT_NFTS"
   val MISC = "MISC"
   val MORE = "MORE"

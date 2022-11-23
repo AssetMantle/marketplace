@@ -72,7 +72,8 @@
       @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));
     }
   }
-  .form-primary-button{
+  .form-primary-button,
+  .form-secondary-button{
     width: 100%;
   }
 }
