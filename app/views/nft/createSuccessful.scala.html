@@ -12,4 +12,5 @@
 <script>
     $('#nftsPerPage').html("");
     loadFirstNFTBulk('nftsPerPage', jsRoutes.controllers.CollectionController.collectionNFTsPerPage('@nft.collectionId', 1));
+    componentResource('rightContent', jsRoutes.controllers.CollectionController.analysis('@nft.collectionId'));
 </script>
