@@ -23,6 +23,8 @@
     </div>
 }
 <script>
+    if($(".createdCollectionsPerPage").length){
         $('.createdCollectionsPerPage').contents(':not(.createCollectionContainer)').remove();
         loadFirstCreatedCollections('@draft.creatorId');
+    }
 </script>
