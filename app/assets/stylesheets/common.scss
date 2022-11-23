@@ -888,3 +888,8 @@
   background-color: var(--default);
   border-radius: 5px;
 }
+
+// Hide Modal scrollbar
+#commonModal::-webkit-scrollbar{
+  display: none;
+}
