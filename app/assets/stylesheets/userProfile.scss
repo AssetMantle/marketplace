@@ -729,6 +729,15 @@
           .tableFieldMaxMembers{min-width: 115px;}
           .tableFieldSale{min-width: 130px;}
           .tableFieldAction{min-width: 100px;width:100px; i{cursor: pointer;}}
+          tbody{
+            tr {
+              td{
+                &.tableFieldName{
+                  @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+                }
+              }
+            }
+          }
         }
         #whitelistRequests,
         #offersHistory{
