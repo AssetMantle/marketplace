@@ -81,6 +81,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.deleteDraft,
         routes.javascript.NFTController.ownedSection,
         routes.javascript.NFTController.ownedNFTsPerPage,
+        routes.javascript.NFTController.price,
 
         routes.javascript.SettingController.viewSettings,
         routes.javascript.SettingController.settings,

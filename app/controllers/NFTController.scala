@@ -147,6 +147,23 @@ class NFTController @Inject()(
     }
   }
 
+  def price(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req, cacheWithUsername = false), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit optionalLoginState =>
+      implicit request =>
+        val saleId = masterNFTOwners.Service.getSaleId(nftId)
+
+        def price(saleId: Option[String]) = saleId.fold(Future("--"))(x => masterSales.Service.tryGet(x).map(_.price.toString))
+
+        (for {
+          saleId <- saleId
+          price <- price(saleId)
+        } yield Ok(price)
+          ).recover {
+          case _: BaseException => BadRequest("--")
+        }
+    }
+  }
+
   def likesCounter(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
