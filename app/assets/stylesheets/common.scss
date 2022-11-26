@@ -899,3 +899,16 @@ body.modal-open{
 #commonModal::-webkit-scrollbar{
   display: none;
 }
+
+// Notification count
+#totalUnreadNotification{
+  height: 14px;
+  width: 14px;
+  background-color: var(--default);
+  position: absolute;
+  right: 2px;
+  top: 10px;
+  border-radius: 50%;
+  @include setFont(var(--font-type-2), normal, 400, 10px, 14px, var(--header-bg));
+  text-align: center;
+}

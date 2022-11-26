@@ -51,7 +51,14 @@ function countUnread() {
         type: route.type,
         async: true,
         statusCode: {
-            200: function (data) {},
+            200: function (data) {
+                if(data > 0) {
+                    $("#totalUnreadNotification").text(data);
+                    $("#totalUnreadNotification").show();
+                }else{
+                    $("#totalUnreadNotification").hide();
+                }
+            },
             400: function (data) {
                 console.log(data.responseText)
             },
