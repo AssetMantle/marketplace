@@ -14,19 +14,31 @@
     <td  id="endEpoch_@x.id" class="text-end tableFieldEndEpoch epochValue">@x.endEpoch</td>
     <td class="text-end tableFieldAction whitelistActionButton">
         <div class="d-flex gap-3">
-            <div onclick="componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.listMembers('@x.id'));">
-                <i class="bi bi-person iconDefault iconMedium icon"></i>
+            <div class="iconTooltip">
+                <span class="tooltipText">@Messages(constants.View.WHITELIST_ICON_MEMBERS)</span>
+                <div onclick="componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.listMembers('@x.id'));">
+                    <i class="bi bi-person iconDefault iconMedium icon"></i>
+                </div>
             </div>
-            <div onclick="getForm(jsRoutes.controllers.WhitelistController.editWhitelistForm('@x.id'))">
-                <i class="bi bi-pencil iconDefault iconMedium icon"></i>
+            <div class="iconTooltip">
+                <span class="tooltipText">@Messages(constants.View.WHITELIST_ICON_EDIT)</span>
+                <div onclick="getForm(jsRoutes.controllers.WhitelistController.editWhitelistForm('@x.id'))">
+                    <i class="bi bi-pencil iconDefault iconMedium icon"></i>
+                </div>
             </div>
-            <div onclick="getForm(jsRoutes.controllers.SaleController.createCollectionSaleForm('@x.id'))">
-                <i class="bi bi-node-plus iconDefault iconMedium icon"></i>
+            <div class="iconTooltip">
+                <span class="tooltipText">@Messages(constants.View.WHITELIST_ICON_SALE)</span>
+                <div onclick="getForm(jsRoutes.controllers.SaleController.createCollectionSaleForm('@x.id'))">
+                    <i class="bi bi-node-plus iconDefault iconMedium icon"></i>
+                </div>
             </div>
             <div>
-                <div class="p-0 userAddressData username-data" data-value="@constants.CommonConfig.WebAppUrl.concat(s"""/acceptWhitelistInvite/${x.id}""")"></div>
-                <div class="text-end copyIcon" onclick="copyToClipboard(this); showSnackbar('', '@Messages(constants.View.LINK_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
-                    <i id="openWalletMenu" class="bi bi-share iconDefault iconMedium"></i>
+                <div class="iconTooltip">
+                    <span class="tooltipText">@Messages(constants.View.WHITELIST_ICON_SHARE)</span>
+                    <div class="p-0 userAddressData username-data" data-value="@constants.CommonConfig.WebAppUrl.concat(s"""/acceptWhitelistInvite/${x.id}""")"></div>
+                    <div class="text-end copyIcon" onclick="copyToClipboard(this); showSnackbar('', '@Messages(constants.View.LINK_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
+                        <i id="openWalletMenu" class="bi bi-share iconDefault iconMedium"></i>
+                    </div>
                 </div>
             </div>
         </div>

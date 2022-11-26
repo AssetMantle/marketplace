@@ -717,7 +717,7 @@
           .tableFieldStartEpoch{min-width: 180px;}
           .tableFieldEndEpoch{min-width: 180px;}
           .tableFieldSale{min-width: 140px;}
-          .tableFieldAction{min-width: 155px;width:155px; i{cursor: pointer;}}
+          .tableFieldAction{min-width: 155px;width:155px;padding:20px !important; i{cursor: pointer;}}
         }
         #joinedWhitelist{
           .tableFieldNo{min-width: 50px;}
@@ -728,7 +728,7 @@
           .tableFieldTotalMembers{min-width: 120px;}
           .tableFieldMaxMembers{min-width: 115px;}
           .tableFieldSale{min-width: 130px;}
-          .tableFieldAction{min-width: 100px;width:100px; i{cursor: pointer;}}
+          .tableFieldAction{min-width: 100px;width:100px;padding:20px !important; i{cursor: pointer;}}
           tbody{
             tr {
               td{
