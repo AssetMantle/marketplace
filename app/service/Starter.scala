@@ -68,7 +68,7 @@ class Starter @Inject()(
     def updateAnalytics(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
       val totalNFTs = masterNFTs.Service.countNFTs(collection.id)
 
-      def update(totalNFTs: Int) = collectionsAnalysis.Service.add(CollectionAnalysis(id = collection.id, totalNFTs = totalNFTs, totalSold = 0, totalTraded = 0, floorPrice = 0, totalVolume = 0, bestOffer = 0, listed = 0, owners = 0, uniqueOwners = 0))
+      def update(totalNFTs: Int) = collectionsAnalysis.Service.add(CollectionAnalysis(id = collection.id, totalNFTs = totalNFTs, totalSold = 0, totalTraded = 0, floorPrice = 0, totalVolumeTraded = 0, bestOffer = 0, listed = 0, owners = 0, uniqueOwners = 0, totalMinted = 0))
 
       for {
         totalNFTs <- totalNFTs

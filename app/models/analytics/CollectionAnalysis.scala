@@ -126,7 +126,7 @@ class CollectionsAnalysis @Inject()(
 
   object Utility {
 
-    def onNewCollection(id: String): Future[String] = Service.add(CollectionAnalysis(id = id, totalNFTs = 0, totalSold = 0, totalTraded = 0, floorPrice = 0, totalVolumeTraded = 0, bestOffer = 0, listed = 0, owners = 0, uniqueOwners = 0))
+    def onNewCollection(id: String): Future[String] = Service.add(CollectionAnalysis(id = id, totalNFTs = 0, totalSold = 0, totalTraded = 0, floorPrice = 0, totalVolumeTraded = 0, bestOffer = 0, listed = 0, owners = 0, uniqueOwners = 0, totalMinted = 0))
 
     def onNewNFT(collectionId: String): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
