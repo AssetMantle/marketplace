@@ -1,4 +1,4 @@
-@import views.html.base.form._
+@import views.html.base.buttons._
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/userProfile.css")"/>
@@ -33,7 +33,7 @@
     </div>
 </div>
 <div class="mt-3 horizontal-align">
-    @views.html.base.buttons.commonPrimaryButton(constants.View.NEXT, JavaScript(s""),Symbol("id") -> "nextBtn", Symbol("class") -> "disable")
+    @commonPrimaryButton(constants.View.NEXT, JavaScript(s""),Symbol("id") -> "nextBtn", Symbol("class") -> "disable")
 </div>
 
 <script>

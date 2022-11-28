@@ -57,6 +57,24 @@
       text-transform: capitalize;
     }
   }
+  .analysisTitle{
+    @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+  }
+  .analysisValue{
+    @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+  }
+  .priceHolder{
+    .nft-mantle-price{
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--default));
+      margin-left: 4px;
+    }
+    .nft-dollar-price{
+      @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));
+    }
+  }
+  .form-primary-button{
+    width: 100%;
+  }
 }
 .collectionContainer{
   width: 100%;
@@ -597,6 +615,82 @@
       .deleteIcon {
         width: 30px;
         cursor: pointer;
+      }
+    }
+  }
+}
+
+// Content Detail
+.singleItemDetailContainer{
+  .headerWithIcon{
+    .headerTop{
+      margin-right: 12px;
+      .back-button-icon{
+        height: 40px;
+        width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        cursor: pointer;
+        &:hover {
+          background-color: var(--popup-stroke);
+        }
+      }
+      .titleText{
+        @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--mantle-off-white));
+      }
+    }
+    .sharableLink{
+      cursor: pointer;
+    }
+  }
+  .detailCard {
+    background-color: var(--card-dark);
+    border-radius: 10px;
+    .detailTitle {
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+      padding: 16px 24px;
+    }
+
+    .detailBody {
+      .fieldTitle {
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+      }
+
+      .fieldValue {
+        @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+
+        .tertiaryButton {
+          @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--dark));
+
+          i {
+            font-size: 12px !important;
+          }
+        }
+      }
+    }
+  }
+  .statusOptions{
+    .option{
+      display: none;
+      &.active{
+        display: block;
+      }
+    }
+    .statusBadge{
+      height: 12px;
+      width: 12px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      &.notStarted{
+        background-color: var(--disable);
+      }
+      &.started{
+        background-color: var(--connected);
+      }
+      &.ended{
+        background-color: var(--error);
       }
     }
   }

@@ -100,12 +100,11 @@ object AmazonS3 {
       transferManager.upload(request).waitForCompletion()
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: AmazonClientException => logger.error(e.getLocalizedMessage)
-      case e: SdkClientException => logger.error(e.getLocalizedMessage)
       case e: InterruptedException => logger.error(e.getLocalizedMessage)
       case ioException: IOException => logger.error(ioException.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_UPLOAD_FAILURE)
+        constants.Response.AMAZON_S3_UPLOAD_FAILURE.throwBaseException(ioException)
     }
   }
 
@@ -307,7 +306,6 @@ object AmazonS3 {
   }
 
   // TODO deleteMultipleObjectsVersionedBucket
-
   def listBucketObjects(): util.List[S3ObjectSummary] = {
     try {
       val listObjects = new ListObjectsRequest().withBucketName(bucketName)

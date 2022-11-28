@@ -22,16 +22,16 @@
             </div>
         </div>
         @nftDrafts.map { nftDraft =>
-            @commonNFTCard(collection, nftDraft.toNFT, None, JavaScript(s"getForm(jsRoutes.controllers.NFTController.basicDetailsForm('${nftDraft.collectionId}','${nftDraft.fileName}'))"), draft = true)
+            @commonNFTCard(collection, nftDraft.toNFT(), None, JavaScript(s"getForm(jsRoutes.controllers.NFTController.basicDetailsForm('${nftDraft.collectionId}','${nftDraft.id}'))"), draft = true)
         }
     }
 
     @if(nfts.nonEmpty) {
         @nfts.map { nft =>
             @if(loginState.isEmpty) {
-                @commonNFTCard(collection, nft, None, JavaScript(s"viewNFT('${nft.fileName}')"))
+                @commonNFTCard(collection, nft, None, JavaScript(s"viewNFT('${nft.id}')"))
             } else {
-                @commonNFTCard(collection, nft, Option(likedNFTIds.contains(nft.fileName)), JavaScript(s"viewNFT('${nft.fileName}')"))
+                @commonNFTCard(collection, nft, Option(likedNFTIds.contains(nft.id)), JavaScript(s"viewNFT('${nft.id}')"))
             }
         }
     } else {

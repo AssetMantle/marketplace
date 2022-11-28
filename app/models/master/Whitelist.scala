@@ -1,10 +1,8 @@
 package models.master
 
-import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.i18n.Lang
 import slick.jdbc.H2Profile.api._
 
 import java.sql.Timestamp
@@ -99,7 +97,7 @@ class Whitelists @Inject()(
       val whitelist = tryGet(id)
       for {
         whitelist <- whitelist
-        _ <- update(whitelist.copy(name = name, description = description, maxMembers = maxMembers, startEpoch = startEpoch, endEpoch = endEpoch).serialize())
+        _ <- updateById(whitelist.copy(name = name, description = description, maxMembers = maxMembers, startEpoch = startEpoch, endEpoch = endEpoch).serialize())
       } yield ()
     }
 
@@ -111,9 +109,13 @@ class Whitelists @Inject()(
 
     def getByIds(whitelistIds: Seq[String]): Future[Seq[Whitelist]] = filter(_.id.inSet(whitelistIds)).map(_.map(_.deserialize))
 
-    def deleteById(id: String): Future[Int] = delete(id)
+    def getIdsByOwnerId(ownerId: String): Future[Seq[String]] = filter(_.ownerId === ownerId).map(_.map(_.id))
 
     def hasWhitelist(accountId: String): Future[Boolean] = filter(_.ownerId === accountId).map(_.nonEmpty)
+
+    def getAllByOwner(ownerId: String): Future[Seq[String]] = filter(_.ownerId === ownerId).map(_.map(_.id))
+
+    def getIdNameMapForOwner(ownerId: String): Future[Map[String, String]] = filter(_.ownerId === ownerId).map(_.map(x => x.id -> x.name).toMap)
 
   }
 }

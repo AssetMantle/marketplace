@@ -138,3 +138,35 @@ function searchMember() {
         }
     }
 }
+
+function setOffersStatus(startEpoch, endEpoch){
+    let currentEpoch = Date.now();
+    currentEpoch = Math.floor(currentEpoch / 1000);
+    if(currentEpoch > startEpoch && currentEpoch < endEpoch){
+        $(".statusOptions .option").removeClass("active");
+        $(".statusOptions .option.started").addClass("active");
+    }
+    else if(currentEpoch > startEpoch && currentEpoch > endEpoch){
+        $(".statusOptions .option").removeClass("active");
+        $(".statusOptions .option.ended").addClass("active");
+    }else{
+        $(".statusOptions .option").removeClass("active");
+        $(".statusOptions .option.notStarted").addClass("active");
+    }
+}
+
+function setSaleStatus(saleId){
+    let status = $("#"+saleId+" .status").text();
+    if(status === "Ongoing"){
+        $("#" + saleId + ".statusOptions .option").removeClass("active");
+        $("#" + saleId + ".statusOptions .option.started").addClass("active");
+    }
+    else if(status === "Ended"){
+        $("#" + saleId + ".statusOptions .option").removeClass("active");
+        $("#" + saleId + ".statusOptions .option.ended").addClass("active");
+    }
+    else{
+        $("#" + saleId + ".statusOptions .option").removeClass("active");
+        $("#" + saleId + ".statusOptions .option.notStarted").addClass("active");
+    }
+}

@@ -3,6 +3,7 @@ package constants
 import com.typesafe.config.ConfigFactory
 import play.api.Configuration
 import play.api.i18n.Lang
+import utilities.MicroNumber
 
 import scala.concurrent.duration.{Duration, DurationInt, FiniteDuration, MILLISECONDS}
 
@@ -26,15 +27,25 @@ object CommonConfig {
   object Blockchain {
     case class IBCDenom(hash: String, name: String)
 
-    val ChainId: String = config.get[String]("blockchain.chainId")
-    val StakingToken: String = config.get[String]("blockchain.stakingToken")
-    val RPCEndPoint: String = config.get[String]("blockchain.rpcURL")
-    val RestEndPoint: String = config.get[String]("blockchain.restURL")
-    val TransactionMode: String = config.get[String]("blockchain.transactionMode")
-    val IBCDenoms: Seq[IBCDenom] = config.get[Seq[Configuration]]("blockchain.ibcDenomList").map { ibcDenoms => IBCDenom(hash = ibcDenoms.get[String]("hash"), name = ibcDenoms.get[String]("name")) }
-    val LowGasPrice: Double = config.get[Double]("blockchain.lowGasPrice")
-    val MediumGasPrice: Double = config.get[Double]("blockchain.mediumGasPrice")
-    val HighGasPrice: Double = config.get[Double]("blockchain.highGasPrice")
+    def ChainId: String = config.get[String]("blockchain.chainId")
+
+    def StakingToken: String = config.get[String]("blockchain.stakingToken")
+
+    def RPCEndPoint: String = config.get[String]("blockchain.rpcURL")
+
+    def RestEndPoint: String = config.get[String]("blockchain.restURL")
+
+    def TransactionMode: String = config.get[String]("blockchain.transactionMode")
+
+    def IBCDenoms: Seq[IBCDenom] = config.get[Seq[Configuration]]("blockchain.ibcDenomList").map { ibcDenoms => IBCDenom(hash = ibcDenoms.get[String]("hash"), name = ibcDenoms.get[String]("name")) }
+
+    def LowGasPrice: Double = config.get[Double]("blockchain.lowGasPrice")
+
+    def MediumGasPrice: Double = config.get[Double]("blockchain.mediumGasPrice")
+
+    def HighGasPrice: Double = config.get[Double]("blockchain.highGasPrice")
+
+    def AssetPropertyRate: MicroNumber = MicroNumber(BigInt(config.get[Int]("blockchain.assetPropertyRate")))
   }
 
   object Pagination {

@@ -9,10 +9,10 @@ object NFTTags {
     mapping(
       constants.FormField.NFT_TAGS.mapping,
       constants.FormField.COLLECTION_ID.mapping,
-      constants.FormField.NFT_FILE_NAME.mapping,
+      constants.FormField.NFT_ID.mapping,
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.nftTagsConstraint))
 
-  case class Data(tags: String, collectionId: String, fileName: String) {
+  case class Data(tags: String, collectionId: String, nftId: String) {
 
     def getTags: Seq[String] = tags.split(constants.NFT.Tags.Separator)
   }

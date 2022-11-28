@@ -6,6 +6,7 @@ import views.blockchainTransaction.companion._
 import views.collection.{companion => collection}
 import views.nft.companion._
 import views.profile.whitelist.{companion => whitelist}
+import views.sale.{companion => sale}
 import views.setting.companion._
 
 object FormConstraint {
@@ -73,7 +74,6 @@ object FormConstraint {
       if (!sendCoin.fromAddress.startsWith("mantle") || sendCoin.fromAddress.length != 45) Option(ValidationError(constants.Response.INVALID_FROM_ADDRESS.message)) else None,
       if (!sendCoin.toAddress.startsWith("mantle") || sendCoin.toAddress.length != 45) Option(ValidationError(constants.Response.INVALID_TO_ADDRESS.message)) else None,
       if (sendCoin.fromAddress == sendCoin.toAddress) Option(ValidationError(constants.Response.FROM_AND_TO_ADDRESS_SAME.message)) else None,
-      if (sendCoin.gasPrice.toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_NUMBER_FORMAT.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })
@@ -81,7 +81,7 @@ object FormConstraint {
   val createWhitelistInviteConstraint: Constraint[whitelist.Create.Data] = Constraint("constraints.CreateWhitelist")({ createWhitelistData: whitelist.Create.Data =>
     val errors = Seq(
       if (createWhitelistData.startEpoch >= createWhitelistData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
-      if (createWhitelistData.startEpoch < (System.currentTimeMillis / 1000 - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
+      if (createWhitelistData.startEpoch < (utilities.Date.currentEpoch - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })
@@ -130,5 +130,13 @@ object FormConstraint {
       ).flatten
       if (errors.isEmpty) Valid else Invalid(errors)
     } else Valid
+  })
+
+  val createSale: Constraint[sale.CreateCollectionSale.Data] = Constraint("constraints.CreateCollectionSale")({ createCollectionSaleData: sale.CreateCollectionSale.Data =>
+    val errors = Seq(
+      if (createCollectionSaleData.startEpoch >= createCollectionSaleData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
+      if (createCollectionSaleData.startEpoch < (utilities.Date.currentEpoch - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
   })
 }

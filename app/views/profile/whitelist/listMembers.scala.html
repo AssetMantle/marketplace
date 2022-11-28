@@ -6,13 +6,18 @@
 @(whitelist: Whitelist, members: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div class="whitelistMembersContainer">
-    <div class="modal-header mb-3">
-        <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.WHITELIST_MEMBER_TITLE)</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
-                    &times;
-        </button>
+    <div class="singleItemDetailContainer">
+        <div class="headerWithIcon">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-1 my-3 headerTop">
+                    <div class="title-icon back-button-icon" onclick="setCreatedWhitelistCurrentPage(0); componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.createdWhitelists());">
+                        <i class="bi bi-chevron-left iconDefault"></i>
+                    </div>
+                    <h3 class="titleText">@whitelist.name</h3>
+                </div>
+            </div>
+        </div>
     </div>
-    <p class="sub-heading" id="modalSubtitle">@Messages(constants.View.WHITELIST_MEMBER_SUBTITLE)</p>
 
     <div class="searchField d-flex">
         <i class="bi bi-search iconWhite iconSmall"></i>

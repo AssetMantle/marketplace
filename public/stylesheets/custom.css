@@ -80,6 +80,9 @@ body{
     position: relative;
     top: 100px;
 }
+.common-container .row{
+    margin: 0px 12px;
+}
 
 
 /* Footer */

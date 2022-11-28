@@ -1,36 +1,29 @@
 package models.master
 
-import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
-import models.common.NFT._
+import models.Trait.{Entity, GenericDaoImpl, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.Json
 import slick.jdbc.H2Profile.api._
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class NFT(fileName: String, collectionId: String, name: String, description: String, properties: Seq[Property], ipfsLink: String, edition: Option[Int], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class NFT(id: String, collectionId: String, name: String, description: String, totalSupply: Long, isMinted: Boolean, fileExtension: String, ipfsLink: String, edition: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
-  def getFileHash: String = utilities.FileOperations.getFileNameWithoutExtension(fileName)
+  def getFileHash: String = id
 
-  def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + this.collectionId + "/nfts/" + this.fileName
+  def getFileName: String = this.id + "." + this.fileExtension
 
-  def serialize(): NFTs.NFTSerialized = NFTs.NFTSerialized(
-    fileName = this.fileName,
-    collectionId = collectionId,
-    name = this.name,
-    description = this.description,
-    properties = Json.toJson(this.properties).toString(),
-    ipfsLink = this.ipfsLink,
-    edition = this.edition,
-    createdBy = this.createdBy,
-    createdOn = this.createdOn,
-    createdOnTimeZone = this.createdOnTimeZone,
-    updatedBy = this.updatedBy,
-    updatedOn = this.updatedOn,
-    updatedOnTimeZone = this.updatedOnTimeZone)
+  def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getNFTFileAwsKey(collectionId = this.collectionId, fileName = this.getFileName)
+
+  def getDefaultProperties(classificationId: String): Seq[constants.NFT.Property] = Seq(
+    constants.NFT.Property(name = constants.Collection.DefaultProperty.NFT_NAME, `type` = constants.NFT.Data.STRING, `value` = this.name, meta = true, mutable = false),
+    constants.NFT.Property(name = constants.Collection.DefaultProperty.NFT_DESCRIPTION, `type` = constants.NFT.Data.STRING, `value` = this.description, meta = true, mutable = false),
+    constants.NFT.Property(name = constants.Collection.DefaultProperty.FILE_HASH, `type` = constants.NFT.Data.STRING, `value` = this.id, meta = true, mutable = false),
+    constants.NFT.Property(name = constants.Collection.DefaultProperty.CLASSIFICATION_ID, `type` = constants.NFT.Data.STRING, `value` = classificationId, meta = true, mutable = false),
+  )
+
+  def getAllProperties(classificationId: String, nftProperties: Seq[NFTProperty]): Seq[constants.NFT.Property] = this.getDefaultProperties(classificationId) ++ nftProperties.map(_.asProperty)
 }
 
 object NFTs {
@@ -39,25 +32,11 @@ object NFTs {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class NFTSerialized(fileName: String, collectionId: String, name: String, description: String, properties: String, ipfsLink: String, edition: Option[Int], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
-    def deserialize: NFT = NFT(
-      fileName = fileName,
-      collectionId = collectionId,
-      name = name,
-      description = description,
-      properties = utilities.JSON.convertJsonStringToObject[Seq[Property]](properties),
-      ipfsLink = ipfsLink,
-      edition = edition,
-      createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  class NFTTable(tag: Tag) extends Table[NFT](tag, "NFT") with ModelTable[String] {
 
-    def id: String = fileName
-  }
+    def * = (id, collectionId, name, description, totalSupply, isMinted, fileExtension, ipfsLink, edition.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFT.tupled, NFT.unapply)
 
-  class NFTTable(tag: Tag) extends Table[NFTSerialized](tag, "NFT") with ModelTable[String] {
-
-    def * = (fileName, collectionId, name, description, properties, ipfsLink, edition.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (NFTSerialized.tupled, NFTSerialized.unapply)
-
-    def fileName = column[String]("fileName", O.PrimaryKey)
+    def id = column[String]("id", O.PrimaryKey)
 
     def collectionId = column[String]("collectionId")
 
@@ -65,7 +44,11 @@ object NFTs {
 
     def description = column[String]("description")
 
-    def properties = column[String]("properties")
+    def totalSupply = column[Long]("totalSupply")
+
+    def isMinted = column[Boolean]("isMinted")
+
+    def fileExtension = column[String]("fileExtension")
 
     def ipfsLink = column[String]("ipfsLink")
 
@@ -73,17 +56,11 @@ object NFTs {
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
-
-    override def id = fileName
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   val TableQuery = new TableQuery(tag => new NFTTable(tag))
@@ -93,7 +70,7 @@ object NFTs {
 class NFTs @Inject()(
                       protected val databaseConfigProvider: DatabaseConfigProvider
                     )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[NFTs.NFTTable, NFTs.NFTSerialized, String](
+  extends GenericDaoImpl[NFTs.NFTTable, NFT, String](
     databaseConfigProvider,
     NFTs.TableQuery,
     executionContext,
@@ -103,37 +80,32 @@ class NFTs @Inject()(
 
 
   object Service {
+    def add(nft: NFT): Future[String] = create(nft)
 
-    def add(fileName: String, collectionId: String, name: String, description: String, ipfsLink: String, edition: Option[Int]): Future[String] = {
-      val nft = NFT(
-        fileName = fileName,
-        collectionId = collectionId,
-        name = name,
-        description = description,
-        properties = Seq(),
-        ipfsLink = ipfsLink,
-        edition = edition)
-      create(nft.serialize())
-    }
+    def tryGet(nftId: String): Future[NFT] = tryGetById(nftId)
 
-    def add(nft: NFT): Future[String] = create(nft.serialize())
+    def getAllIdsForCollection(collectionId: String): Future[Seq[String]] = filter(_.collectionId === collectionId).map(_.map(_.id))
 
-    def fetchAll(): Future[Seq[NFT]] = getAll.map(_.map(_.deserialize))
-
-    def tryGet(nftId: String): Future[NFT] = tryGetById(nftId).map(_.deserialize)
-
-    def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[NFT]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.collectionId === collectionId)(_.createdOn).map(_.map(_.deserialize))
-
-    def getAllForCollection(collectionId: String): Future[Seq[NFT]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize))
+    def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[NFT]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.collectionId === collectionId)(_.createdOnMillisEpoch)
 
     def checkExists(id: String): Future[Boolean] = exists(id)
 
     def deleteByCollectionId(id: String): Future[Int] = filterAndDelete(_.collectionId === id)
 
-    def getByIds(ids: Seq[String]): Future[Seq[NFT]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
+    def getByIds(ids: Seq[String]): Future[Seq[NFT]] = filter(_.id.inSet(ids))
 
     def deleteCollections(collectionIds: Seq[String]): Future[Int] = filterAndDelete(_.collectionId.inSet(collectionIds))
 
-    def getAllCollectionIds(nftIds: Seq[String]): Future[Seq[String]] = filter(_.id.inSet(nftIds)).map(_.map(_.collectionId))
+    def update(nft: NFT): Future[Unit] = updateById(nft)
+
+    def countNFTs(collectionId: String): Future[Int] = filterAndCount(_.collectionId === collectionId)
+
+    def markNFTMinted(id: String): Future[NFT] =
+      for {
+        nft <- tryGet(id)
+        _ <- update(nft.copy(isMinted = true))
+      } yield nft.copy(isMinted = true)
+
+    def getRandomNFTs(collectionId: String, n: Int, filterOut: Seq[String]): Future[Seq[String]] = filter(x => x.collectionId === collectionId && !x.id.inSet(filterOut)).map(x => util.Random.shuffle(x.map(_.id)).take(n))
   }
 }

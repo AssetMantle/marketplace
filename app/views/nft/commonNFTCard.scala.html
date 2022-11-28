@@ -1,76 +1,76 @@
 @import controllers.actions.LoginState
+@import helper.{form, _}
 @import views.html.base.commonStringValue
 @import views.html.base.form._
-@import helper.{form, _}
 
 @(collection: master.Collection, nft: master.NFT, liked: Option[Boolean], onClickFunction: JavaScript, draft: Boolean = false)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
-<link href="@utilities.PublicResource.getVersionedRoute("stylesheets/explorer.css")"/>
-@if(draft){
-<div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 draftNft">
-    <div class="card border-0 h-100" style="cursor: pointer;">
-}else{
-<div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3">
-    <div class="card border-0" style="cursor: pointer;">
-}
 
-        <div class="card-img rounded-0" onclick="@onClickFunction">
-            <img src="@nft.getS3Url"/>
+    @if(draft) {
+        <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 draftNft">
+            <div class="card border-0 h-100" style="cursor: pointer;">
+            } else {
+        <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3">
+            <div class="card border-0" style="cursor: pointer;">
+            }
+    <div class="card-img rounded-0" onclick="@onClickFunction">
+        <img src="@nft.getS3Url"/>
+    </div>
+    <div class="nft-detail p-3">
+        <div class="d-flex flex-row gap-2 nft-creator-detail">
+            <div class="creator-profile">
+                <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="34" height="34"/>
+            </div>
+            <div class="d-flex flex-column justify-content-between">
+                <span class="creator-name">
+                @commonStringValue(message = nft.name, id = utilities.IdGenerator.getRandomHexadecimal, length = 15)
+                </span>
+                <span class="creator-collection-name">@collection.name</span>
+            </div>
         </div>
-        <div class="nft-detail p-3">
-            <div class="d-flex flex-row gap-2 nft-creator-detail">
-                <div class="creator-profile">
-                    <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="34" height="34"/>
-                </div>
-                <div class="d-flex flex-column justify-content-between">
-                    <span class="creator-name">
-                    @commonStringValue(message = nft.name, id = utilities.IdGenerator.getRandomHexadecimal, length = 15)
-                    </span>
-                    <span class="creator-collection-name">@collection.name</span>
+        @if(draft) {
+            <div class="d-flex gap-2 justify-content-end pt-4">
+                <i class="bi bi-pencil iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.basicDetailsForm('@nft.collectionId', '@nft.id'))"></i>
+                <i class="bi bi-trash iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.deleteDraftForm('@nft.id', '@nft.getFileHash'))"></i>
+                <div id="deleteNftDraft_@nft.getFileHash" class="hidden">
+                @defining(views.nft.companion.DeleteDraft.form) { deleteDraftForm =>
+                    @form(routes.NFTController.deleteDraft()) {
+                        @CSRF.formField
+                        @commonInputText(deleteDraftForm, constants.FormField.NFT_ID, Symbol("value") -> nft.id, Symbol("readonly") -> "readonly")
+                    }
+                }
                 </div>
             </div>
-            @if(draft){
-                <div class="d-flex gap-2 justify-content-end pt-4">
-                    <i class="bi bi-pencil iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.basicDetailsForm('@nft.collectionId','@nft.fileName'))"></i>
-                    <i class="bi bi-trash iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.deleteDraftForm('@nft.fileName','@nft.getFileHash'))"></i>
-                    <div id="deleteNftDraft_@nft.getFileHash" class="hidden">
-                    @defining(views.nft.companion.DeleteDraft.form) { deleteDraftForm =>
-                        @form(routes.NFTController.deleteDraft()) {
-                            @CSRF.formField
-                            @commonInputText(deleteDraftForm, constants.FormField.NFT_FILE_NAME, Symbol("value") -> nft.fileName, Symbol("readonly") -> "readonly")
-                        }
-                    }
-                    </div>
+        } else {
+            <div class="d-flex justify-content-between">
+                <div class="d-flex flex-row gap-1 align-items-center mt-3">
+                    <div class=""><img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/></div>
+                    <div id="price_@nft.getFileHash" class="nft-mantle-price">--</div>
+                    <div class="nft-dollar-price">($--)</div>
                 </div>
-            }else{
-                <div class="d-flex justify-content-between">
-                    <div class="d-flex flex-row gap-1 align-items-center mt-3">
-                        <div class=""><img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/></div>
-                        <div class="nft-mantle-price">--</div>
-                        <div class="nft-dollar-price">($--)</div>
+                @if(loginState.nonEmpty) {
+                    <div class="d-flex align-items-center gap-1 mt-3">
+                        <div id="addToWishlistContainer_@nft.getFileHash" class="hidden">
+                        @views.html.nft.addToWishlist(nft)
+                        </div>
+                        <div id="deleteFromWishlistContainer_@nft.getFileHash" class="hidden">
+                        @views.html.nft.deleteFromWishlist(nft)
+                        </div>
+                        <span onclick="addRemoveWishlist(this, '@nft.getFileHash', '@Messages(constants.View.ADDED_TO_WISHLIST)', '@Messages(constants.View.REMOVED_FROM_WISHLIST)')">
+                        @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
+                        </span>
+                        <div class="nft-likes" data-id="@nft.id">00</div>
                     </div>
-                    @if(loginState.nonEmpty) {
-                        <div class="d-flex align-items-center gap-1 mt-3">
-                            <div id="addToWishlistContainer_@nft.getFileHash" class="hidden">
-                            @views.html.nft.addToWishlist(nft)
-                            </div>
-                            <div id="deleteFromWishlistContainer_@nft.getFileHash" class="hidden">
-                            @views.html.nft.deleteFromWishlist(nft)
-                            </div>
-                            <span onclick="addRemoveWishlist(this, '@nft.getFileHash', '@Messages(constants.View.ADDED_TO_WISHLIST)', '@Messages(constants.View.REMOVED_FROM_WISHLIST)')">
-                            @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
-                            </span>
-                            <div class="nft-likes" data-id="@nft.fileName">00</div>
-                        </div>
-                    } else {
-                        <div class="d-flex align-items-center gap-1 mt-3" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN_WITH_CALLBACK.get, s"'/collection/${collection.id}'"))">
-                            <span>
-                            @views.html.nft.commonCardWishlistButton()
-                            </span>
-                            <div class="nft-likes" data-id="@nft.fileName">00</div>
-                        </div>
-                    }
-                </div>
-            }
-        </div>
+                } else {
+                    <div class="d-flex align-items-center gap-1 mt-3" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN_WITH_CALLBACK.get, s"'/collection/${collection.id}'"))">
+                        <span>
+                        @views.html.nft.commonCardWishlistButton()
+                        </span>
+                        <div class="nft-likes" data-id="@nft.id">00</div>
+                    </div>
+                }
+            </div>
+        }
     </div>
 </div>
+</div>
+    <script>getNFTPrice('@nft.id')</script>
