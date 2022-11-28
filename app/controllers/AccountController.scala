@@ -174,8 +174,8 @@ class AccountController @Inject()(
                     _ <- deleteUnverifiedKey()
                   } yield PartialContent(views.html.account.showWalletMnemonics(username = signInData.username, address = wallet.address, partialMnemonics = wallet.mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
                 } else {
-                  implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = signInData.username, address = key.get.address, isCreator = account.isCreator, isVerifiedCreator = account.isVerifiedCreator))
-                  implicit val loginState: LoginState = LoginState(username = signInData.username, address = key.get.address, isCreator = account.isCreator, isVerifiedCreator = account.isVerifiedCreator)
+                  implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = signInData.username, address = key.get.address, accountType = account.accountType))
+                  implicit val loginState: LoginState = LoginState(username = signInData.username, address = key.get.address, accountType = account.accountType)
                   val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.upsert(id = loginState.username, token = signInData.pushNotificationToken)
                   val result = if (signInData.callbackUrl != "/") withUsernameToken.InternalRedirectOnSubmitForm(signInData.callbackUrl)
                   else withUsernameToken.Ok(views.html.collection.viewCollections())
@@ -222,8 +222,8 @@ class AccountController @Inject()(
             def updateKey(wallet: utilities.Wallet) = masterKeys.Service.updateOnMigration(key = key, password = migrateWalletToKeyData.password, privateKey = wallet.privateKey)
 
             def getResult(username: String, address: String) = {
-              implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = username, address = address, isCreator = account.isCreator, isVerifiedCreator = account.isVerifiedCreator))
-              implicit val loginState: LoginState = LoginState(username = username, address = address, isCreator = account.isCreator, isVerifiedCreator = account.isVerifiedCreator)
+              implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = username, address = address, accountType = account.accountType))
+              implicit val loginState: LoginState = LoginState(username = username, address = address, accountType = account.accountType)
               withUsernameToken.Ok(views.html.collection.viewCollections())
             }
 
@@ -340,7 +340,7 @@ class AccountController @Inject()(
           val changeActive = masterKeys.Service.changeActive(accountId = oldLoginState.username, oldAddress = oldLoginState.address, newAddress = changeKeyData.address)
 
           def getResult = {
-            implicit val loginState: LoginState = LoginState(username = oldLoginState.username, address = changeKeyData.address, isCreator = oldLoginState.isCreator, isVerifiedCreator = oldLoginState.isVerifiedCreator)
+            implicit val loginState: LoginState = LoginState(username = oldLoginState.username, address = changeKeyData.address, accountType = oldLoginState.accountType)
             withUsernameToken.Ok(views.html.setting.changeActiveKey())
           }
 

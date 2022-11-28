@@ -2,13 +2,14 @@ package service
 
 import models.analytics.{CollectionAnalysis, CollectionsAnalysis}
 import models.master.{Collection, NFTOwner}
-import models.{master, masterTransaction}
+import models.{blockchainTransaction, master, masterTransaction}
 import play.api.libs.json.Reads
 import play.api.{Configuration, Logger}
 
 import java.io.File
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.{Source => ScalaSource}
 
 @Singleton
@@ -23,6 +24,7 @@ class Starter @Inject()(
                          masterWishLists: master.WishLists,
                          masterTransactionNotifications: masterTransaction.Notifications,
                          utilitiesOperations: utilities.Operations,
+                         blockchainTransactionSendCoins: blockchainTransaction.SendCoins
                        )(implicit exec: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.STARTER_SERVICE
@@ -56,7 +58,7 @@ class Starter @Inject()(
       _ <- update(collections)
     } yield ()
       ).recover {
-      case exception: Exception =>
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
   }
 
@@ -79,7 +81,7 @@ class Starter @Inject()(
       _ <- updateAnalytics(collections)
     } yield ()
       ).recover {
-      case exception: Exception =>
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
   }
 
@@ -89,7 +91,7 @@ class Starter @Inject()(
     def updateNFTs(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
       val nftIds = masterNFTs.Service.getAllIdsForCollection(collection.id)
 
-      def update(nftIds: Seq[String]) = masterNFTOwners.Service.add(nftIds.map(x => NFTOwner(fileName = x, ownerId = collection.creatorId, creatorId = collection.creatorId, collectionId = collection.id, quantity = 1, saleId = None)))
+      def update(nftIds: Seq[String]) = masterNFTOwners.Service.add(nftIds.map(x => NFTOwner(nftId = x, ownerId = collection.creatorId, creatorId = collection.creatorId, collectionId = collection.id, quantity = 1, saleId = None)))
 
       (for {
         nftIds <- nftIds
@@ -100,25 +102,38 @@ class Starter @Inject()(
       }
     }
 
-    for {
+    (for {
       collections <- collections
       _ <- updateNFTs(collections)
     } yield ()
+      ).recover {
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+    }
   }
 
   private def correctNotifications() = {
     val incorrectNotifications = masterTransactionNotifications.Service.getClickableNotifications
 
     def update(incorrectNotifications: Seq[masterTransaction.Notification]) = utilitiesOperations.traverse(incorrectNotifications) { notification =>
-      if ((notification.jsRoute.getOrElse("").contains("CollectionController.viewCollection(") && !notification.jsRoute.getOrElse("").contains("CollectionController.viewCollection('")) || (notification.jsRoute.getOrElse("").contains("NFTController.viewNFT(") && !notification.jsRoute.getOrElse("").contains("NFTController.viewNFT('"))) {
-        val updatedRoute1 = notification.jsRoute.getOrElse("").split("\\(")
-        val updatedRoute2 = updatedRoute1.last.split("\\)")
-        val route = s"${updatedRoute1.head}('${updatedRoute2.head}')"
-        println(route)
-        masterTransactionNotifications.Service.update(notification.copy(jsRoute = Option(route)))
-      } else {
-        println("already corrected: " + notification.jsRoute.getOrElse(""))
-        Future()
+      val notif =
+        if (notification.jsRoute.getOrElse("").contains("CollectionController.viewCollection(") && !notification.jsRoute.getOrElse("").contains("CollectionController.viewCollection('")) {
+          val updatedRoute1 = notification.jsRoute.getOrElse("").split("\\(")
+          val updatedRoute2 = updatedRoute1.last.split("\\)")
+          val route = s"${updatedRoute1.head}('${updatedRoute2.head}')"
+          masterTransactionNotifications.Service.update(notification.copy(jsRoute = Option(route)))
+        } else if (notification.jsRoute.getOrElse("").contains("NFTController.viewNFT(") && !notification.jsRoute.getOrElse("").contains("NFTController.viewNFT('")) {
+          val updatedRoute1 = notification.jsRoute.getOrElse("").split("\\(")
+          val updatedRoute2 = updatedRoute1.last.split("\\.")
+          val route = s"${updatedRoute1.head}('${updatedRoute2.head}')"
+          masterTransactionNotifications.Service.update(notification.copy(jsRoute = Option(route)))
+        } else {
+          Future()
+        }
+      (for {
+        _ <- notif
+      } yield ()
+        ).recover {
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
       }
     }
 
@@ -127,19 +142,17 @@ class Starter @Inject()(
       _ <- update(incorrectNotifications)
     } yield ()
       ).recover {
-      case exception: Exception =>
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
   }
 
-  def start(): Future[Unit] = {
-
-    (for {
-      _ <- correctNotifications()
-      _ <- updateAccountType()
-      _ <- updateCollectionAnalysis()
-      _ <- addNFTOwners()
-    } yield ()
-      ).recover {
+  def start(): Unit = {
+    try {
+      Await.result(correctNotifications(), Duration.Inf)
+      Await.result(updateAccountType(), Duration.Inf)
+      Await.result(updateCollectionAnalysis(), Duration.Inf)
+      Await.result(addNFTOwners(), Duration.Inf)
+    } catch {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
   }

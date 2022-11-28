@@ -144,10 +144,13 @@ object Response {
   val SALE_EXPIRED = new Failure("SALE_EXPIRED")
   val NO_SALE_ON_NFT = new Failure("NO_SALE_ON_NFT")
   val NOT_NOTIFICATION_OWNER = new Failure("NOT_NOTIFICATION_OWNER")
+  val NFT_NOT_ON_SALE = new Failure("NFT_NOT_ON_SALE")
+  val HANDLE_MULTIPLE_NFT_QUANTITY_CASE = new Failure("HANDLE_MULTIPLE_NFT_QUANTITY_CASE")
+  val NFT_ALREADY_MINTED = new Failure("NFT_ALREADY_MINTED")
+  val MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED = new Failure("MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED")
 
-  class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
+  class Failure(private val response: String) {
     val message: String = PREFIX + FAILURE_PREFIX + response
-    val action: String = utilities.JsRoutes.getJsRouteString(actionController)
     val logMessage: String = LOG_PREFIX + response
 
     def throwBaseException(exception: Exception = null)(implicit module: String, logger: Logger) = throw new BaseException(this, exception)
@@ -157,17 +160,14 @@ object Response {
 
   class Warning(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + WARNING_PREFIX + response
-    val action: String = utilities.JsRoutes.getJsRouteString(actionController)
   }
 
-  class Success(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
+  class Success(private val response: String) {
     val message: String = Response.PREFIX + Response.SUCCESS_PREFIX + response
-    val action: String = utilities.JsRoutes.getJsRouteString(actionController)
   }
 
-  class Info(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
+  class Info(private val response: String) {
     val message: String = PREFIX + INFO_PREFIX + response
-    val action: String = utilities.JsRoutes.getJsRouteString(actionController)
   }
 
 }

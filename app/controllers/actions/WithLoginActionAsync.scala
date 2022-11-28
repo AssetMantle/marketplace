@@ -45,8 +45,8 @@ class WithLoginActionAsync @Inject()(
       address <- address
       currentSessionToken <- currentSessionToken
       (verify, account) <- verify(username, address, currentSessionToken)
-    } yield (verify, LoginState(username = username, address = address, isCreator = account.isCreator, isVerifiedCreator = account.isVerifiedCreator))).recover {
-      case _: BaseException => (false, LoginState(username = "", address = "", isCreator = false, isVerifiedCreator = false))
+    } yield (verify, LoginState(username = username, address = address, accountType = account.accountType))).recover {
+      case _: BaseException => (false, LoginState(username = "", address = "", accountType = ""))
     }
   }
 

@@ -11,7 +11,7 @@ object SetProperties {
   val form: Form[Data] = Form(
     mapping(
       constants.FormField.COLLECTION_ID.mapping,
-      constants.FormField.NFT_FILE_NAME.mapping,
+      constants.FormField.NFT_ID.mapping,
       constants.FormField.SAVE_NFT_DRAFT.mapping,
       constants.FormField.NFT_PROPERTIES.name -> seq(
         mapping(
@@ -23,7 +23,7 @@ object SetProperties {
 
   case class Property(name: String, value: String)
 
-  case class Data(collectionId: String, fileName: String, saveNFTDraft: Boolean, properties: Seq[Property]) {
+  case class Data(collectionId: String, nftId: String, saveNFTDraft: Boolean, properties: Seq[Property]) {
 
     def validate(collectionProperties: Seq[collectionProperty])(implicit logger: Logger, module: String): Boolean = {
       val collectionNameTypeMap = collectionProperties.map(x => x.name -> x.`type`).toMap

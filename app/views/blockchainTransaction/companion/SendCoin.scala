@@ -16,6 +16,6 @@ object SendCoin {
       constants.FormField.PASSWORD.mapping,
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.sendCoinConstraint))
 
-  case class Data(fromAddress: String, toAddress: String, sendCoinAmount: MicroNumber, gasAmount: Int, gasPrice: String, password: String)
+  case class Data(fromAddress: String, toAddress: String, sendCoinAmount: MicroNumber, gasAmount: Int, gasPrice: Double, password: String)
 
 }

@@ -8,6 +8,6 @@
 <div id="addToWishlist_@nft.getFileHash" class="hidden">
 @form(routes.WishlistController.add()) {
     @CSRF.formField
-    @commonInputText(AddOrRemove.form, constants.FormField.NFT_FILE_NAME, Symbol("value") -> nft.fileName, Symbol("readonly") -> true, Symbol("containerDivClass") -> "hidden")
+    @commonInputText(AddOrRemove.form, constants.FormField.NFT_ID, Symbol("value") -> nft.id, Symbol("readonly") -> true, Symbol("containerDivClass") -> "hidden")
 }
 </div>

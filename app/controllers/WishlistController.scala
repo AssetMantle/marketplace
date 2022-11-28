@@ -91,7 +91,7 @@ class WishlistController @Inject()(
           collection <- collection
           nftIds <- nftIds
           nfts <- getNFTs(nftIds)
-        } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts, nfts.map(_.fileName), Seq(), pageNumber))
+        } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts, nfts.map(_.id), Seq(), pageNumber))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

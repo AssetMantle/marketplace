@@ -9,13 +9,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 
-case class NFTTag(tagName: String, fileName: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
-
-  def getFileHash: String = utilities.FileOperations.getFileNameWithoutExtension(fileName)
-
+case class NFTTag(tagName: String, nftId: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
   def id1: String = tagName
 
-  def id2: String = fileName
+  def id2: String = nftId
 }
 
 object NFTTags {
@@ -26,11 +23,11 @@ object NFTTags {
 
   class NFTTagTable(tag: Tag) extends Table[NFTTag](tag, "NFTTag") with ModelTable2[String, String] {
 
-    def * = (tagName, fileName, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTTag.tupled, NFTTag.unapply)
+    def * = (tagName, nftId, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTTag.tupled, NFTTag.unapply)
 
     def tagName = column[String]("tagName", O.PrimaryKey)
 
-    def fileName = column[String]("fileName", O.PrimaryKey)
+    def nftId = column[String]("nftId", O.PrimaryKey)
 
     def createdBy = column[String]("createdBy")
 
@@ -42,7 +39,7 @@ object NFTTags {
 
     def id1 = tagName
 
-    def id2 = fileName
+    def id2 = nftId
   }
 
   val TableQuery = new TableQuery(tag => new NFTTagTable(tag))
@@ -50,8 +47,8 @@ object NFTTags {
 
 @Singleton
 class NFTTags @Inject()(
-                             protected val databaseConfigProvider: DatabaseConfigProvider
-                           )(implicit override val executionContext: ExecutionContext)
+                         protected val databaseConfigProvider: DatabaseConfigProvider
+                       )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl2[NFTTags.NFTTagTable, NFTTag, String, String](
     databaseConfigProvider,
     NFTTags.TableQuery,
@@ -62,13 +59,15 @@ class NFTTags @Inject()(
 
   object Service {
 
-    def add(tagName: String, fileName: String): Future[Unit] = create(NFTTag(tagName = tagName, fileName = fileName))
+    def add(tagName: String, nftId: String): Future[Unit] = create(NFTTag(tagName = tagName, nftId = nftId))
 
-    def getByTagName(tagName: String): Future[Seq[String]] = filter(_.tagName === tagName).map(_.map(_.fileName))
+    def add(nftTags: Seq[NFTTag]): Future[Unit] = create(nftTags)
 
-    def getByTagNames(tagNames: Seq[String]): Future[Seq[String]] = filter(_.tagName.inSet(tagNames)).map(_.map(_.fileName))
+    def getByTagName(tagName: String): Future[Seq[String]] = filter(_.tagName === tagName).map(_.map(_.nftId))
 
-    def getTagNamesForNFT(fileName: String): Future[Seq[String]] = filter(_.tagName === fileName).map(_.map(_.tagName))
+    def getByTagNames(tagNames: Seq[String]): Future[Seq[String]] = filter(_.tagName.inSet(tagNames)).map(_.map(_.nftId))
+
+    def getTagNamesForNFT(nftId: String): Future[Seq[String]] = filter(_.tagName === nftId).map(_.map(_.tagName))
 
   }
 }

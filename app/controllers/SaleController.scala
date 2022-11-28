@@ -3,12 +3,14 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
-import models.master.{Collection, NFTOwner, Sale}
-import models.{blockchain, master}
+import models.master._
+import models.{blockchain, blockchainTransaction, master}
+import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import utilities.MicroNumber
 import views.sale.companion._
 
 import javax.inject.{Inject, Singleton}
@@ -32,7 +34,10 @@ class SaleController @Inject()(
                                 masterNFTs: master.NFTs,
                                 masterNFTOwners: master.NFTOwners,
                                 masterSales: master.Sales,
+                                masterNFTProperties: master.NFTProperties,
                                 masterWhitelistMembers: master.WhitelistMembers,
+                                blockchainTransactionBuyAssetWithoutMints: blockchainTransaction.BuyAssetWithoutMints,
+                                blockchainTransactionBuyAndMintAssets: blockchainTransaction.BuyAndMintAssets,
                                 utilitiesNotification: utilities.Notification,
                                 utilitiesOperations: utilities.Operations,
                               )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -76,10 +81,9 @@ class SaleController @Inject()(
 
           def countNFts(currentOnSaleIds: Seq[String]) = masterNFTOwners.Service.countForOwnerNotOnSale(collectionId = createData.collectionId, currentOnSaleIds = currentOnSaleIds, ownerId = loginState.username)
 
-          def updateCreatorFee(collection: Collection) = if (collection.creatorFee != createData.creatorFee) masterCollections.Service.update(collection.copy(creatorFee = createData.creatorFee)) else Future()
-
           def addToSale(collection: Collection, countNFts: Int, currentOnSaleIds: Seq[String]) = {
             val errors = Seq(
+              if (!loginState.isGenesisCreator) Option(constants.Response.NOT_GENESIS_CREATOR) else None,
               if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
               if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
               if (createData.nftForSale > countNFts) Option(constants.Response.NOT_ENOUGH_NFTS_IN_COLLECTION) else None,
@@ -102,7 +106,6 @@ class SaleController @Inject()(
             whitelistMembers <- whitelistMembers
             currentOnSaleIds <- currentOnSaleIds(whitelistIds)
             countNFts <- countNFts(currentOnSaleIds)
-            _ <- updateCreatorFee(collection)
             _ <- addToSale(collection = collection, countNFts = countNFts, currentOnSaleIds = currentOnSaleIds)
             _ <- collectionsAnalysis.Utility.onCreateSale(collection.id)
           } yield {
@@ -137,37 +140,82 @@ class SaleController @Inject()(
     implicit request =>
       BuySaleNFT.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.sale.buySaleNFT(formWithErrors, saleId = formWithErrors.data.getOrElse(constants.FormField.SALE_ID.name, ""), nftId = formWithErrors.data.getOrElse(constants.FormField.NFT_FILE_NAME.name, ""))))
+          Future(BadRequest(views.html.sale.buySaleNFT(formWithErrors, saleId = formWithErrors.data.getOrElse(constants.FormField.SALE_ID.name, ""), nftId = formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, ""))))
         },
         buySaleNFTData => {
           val sale = masterSales.Service.tryGet(buySaleNFTData.saleId)
-          val nftOwner = masterNFTOwners.Service.tryGetByNFTAndSaleId(fileName = buySaleNFTData.fileName, saleId = buySaleNFTData.saleId)
+          val nftOwner = masterNFTOwners.Service.tryGetByNFTAndSaleId(nftId = buySaleNFTData.nftId, saleId = buySaleNFTData.saleId)
           val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = buySaleNFTData.password)
+          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
+          val nft = masterNFTs.Service.tryGet(buySaleNFTData.nftId)
+          val nftProperties = masterNFTProperties.Service.getForNFT(buySaleNFTData.nftId)
+          val countBuyerNFTsFromSale = blockchainTransactionBuyAssetWithoutMints.Service.countBuyerNFTsFromSale(buyerAccountId = loginState.username, saleId = buySaleNFTData.saleId)
+
+          def sellerKey(NFTOwner: NFTOwner) = masterKeys.Service.tryGetActive(NFTOwner.ownerId)
 
           def isWhitelistMember(sale: Sale) = masterWhitelistMembers.Service.isMember(whitelistId = sale.whitelistId, accountId = loginState.username)
 
-          def validateAndTransfer(nftOwner: NFTOwner, verifyPassword: Boolean, sale: Sale, isWhitelistMember: Boolean) = {
+          def validateAndTransfer(nftOwner: NFTOwner, verifyPassword: Boolean, sale: Sale, isWhitelistMember: Boolean, buyerKey: Key, sellerKey: Key, balance: MicroNumber, nft: NFT, nftProperties: Seq[NFTProperty], countBuyerNFTsFromSale: Int) = {
             val errors = Seq(
               if (nftOwner.ownerId == loginState.username) Option(constants.Response.CANNOT_SELL_TO_YOURSELF) else None,
               if (!isWhitelistMember) Option(constants.Response.NOT_MEMBER_OF_WHITELIST) else None,
               if (sale.startTimeEpoch > utilities.Date.currentEpoch) Option(constants.Response.SALE_NOT_STARTED) else None,
               if (utilities.Date.currentEpoch >= sale.endTimeEpoch) Option(constants.Response.SALE_EXPIRED) else None,
+              if (balance == MicroNumber.zero || balance <= sale.price) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (buySaleNFTData.mintNFT && (balance - (sale.price + constants.Blockchain.AssetPropertyRate * (nftProperties.length + constants.Collection.DefaultProperty.list.length)) <= MicroNumber.zero)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (countBuyerNFTsFromSale >= sale.maxMintPerAccount) Option(constants.Response.MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED) else None,
+              if (buySaleNFTData.mintNFT && nft.isMinted) Option(constants.Response.NFT_ALREADY_MINTED) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
             ).flatten
-            if (errors.nonEmpty) {
-              masterNFTOwners.Service.update(nftOwner.copy(ownerId = loginState.username))
+            if (errors.isEmpty) {
+              if (!buySaleNFTData.mintNFT) {
+                blockchainTransactionBuyAssetWithoutMints.Utility.transaction(
+                  buyerAccountId = loginState.username,
+                  sellerAccountId = sellerKey.accountId,
+                  saleId = sale.id,
+                  nftId = buySaleNFTData.nftId,
+                  fromAddress = buyerKey.address,
+                  toAddress = sellerKey.address,
+                  amount = sale.price,
+                  gasLimit = buySaleNFTData.gasAmount,
+                  gasPrice = buySaleNFTData.gasPrice,
+                  ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buySaleNFTData.password))
+                )
+              } else {
+                blockchainTransactionBuyAndMintAssets.Utility.transaction(
+                  buyerAccountId = loginState.username,
+                  sellerAccountId = sellerKey.accountId,
+                  fromId = loginState.getIdentityId,
+                  toId = loginState.getIdentityId,
+                  assetId = "",
+                  classificationId = "",
+                  saleId = sale.id,
+                  nftId = buySaleNFTData.nftId,
+                  fromAddress = buyerKey.address,
+                  toAddress = sellerKey.address,
+                  amount = sale.price,
+                  gasLimit = buySaleNFTData.gasAmount,
+                  gasPrice = buySaleNFTData.gasPrice,
+                  ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buySaleNFTData.password)),
+                )
+              }
             } else errors.head.throwFutureBaseException()
           }
 
           (for {
             sale <- sale
             nftOwner <- nftOwner
-            (verifyPassword, _) <- verifyPassword
+            nft <- nft
+            nftProperties <- nftProperties
+            sellerKey <- sellerKey(nftOwner)
+            (verifyPassword, buyerKey) <- verifyPassword
             isWhitelistMember <- isWhitelistMember(sale)
-            _ <- validateAndTransfer(nftOwner, verifyPassword, sale, isWhitelistMember)
-          } yield PartialContent(views.html.sale.createSuccessful())
+            balance <- balance
+            countBuyerNFTsFromSale <- countBuyerNFTsFromSale
+            blockchainTransaction <- validateAndTransfer(nftOwner = nftOwner, verifyPassword = verifyPassword, sale = sale, isWhitelistMember = isWhitelistMember, buyerKey = buyerKey, sellerKey = sellerKey, balance = balance, nft = nft, nftProperties = nftProperties, countBuyerNFTsFromSale = countBuyerNFTsFromSale)
+          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.sale.buySaleNFT(BuySaleNFT.form.withGlobalError(baseException.failure.message), saleId = buySaleNFTData.saleId, nftId = buySaleNFTData.fileName))
+            case baseException: BaseException => BadRequest(views.html.sale.buySaleNFT(BuySaleNFT.form.withGlobalError(baseException.failure.message), saleId = buySaleNFTData.saleId, nftId = buySaleNFTData.nftId))
           }
         }
       )

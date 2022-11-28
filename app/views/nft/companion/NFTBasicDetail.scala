@@ -10,9 +10,9 @@ object NFTBasicDetail {
       constants.FormField.NFT_NAME.mapping,
       constants.FormField.NFT_DESCRIPTION.mapping,
       constants.FormField.COLLECTION_ID.mapping,
-      constants.FormField.NFT_FILE_NAME.mapping,
+      constants.FormField.NFT_ID.mapping,
     )(Data.apply)(Data.unapply))
 
-  case class Data(name: String, description: String, collectionId: String, fileName: String)
+  case class Data(name: String, description: String, collectionId: String, nftId: String)
 
 }

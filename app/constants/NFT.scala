@@ -33,6 +33,8 @@ object NFT {
     }
   }
 
+  case class Property(name: String, `type`: String, `value`: String, meta: Boolean, mutable: Boolean)
+
   object Sale {
     val MaxSaleAmount: BigDecimal = BigDecimal("1000000000")
     val MaxCreatorFee: BigDecimal = BigDecimal("40")
