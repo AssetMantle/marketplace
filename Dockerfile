@@ -3,8 +3,8 @@ ARG BUILD_IMAGE=adoptopenjdk:11-jdk-hotspot
 ARG JRE_IMAGE=adoptopenjdk:11-jre-hotspot
 
 FROM $BUILD_IMAGE as build
-ARG SBT_VERSION=1.7.0
-SHELL [ "/bin/bash", "-cx" ]
+ARG SBT_VERSION=1.7.2
+SHELL [ "/bin/bash", "-cxe" ]
 WORKDIR /tmp
 RUN curl -sLo - https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${SBT_VERSION}.tgz | tar -xvzf -; \
   mv sbt/bin/* /usr/local/bin/; \
@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/root/.sbt \
   echo $APP_VERSION
 
 FROM $BUILD_IMAGE as extract
-SHELL [ "/bin/bash", "-cx" ]
+SHELL [ "/bin/bash", "-cxe" ]
 WORKDIR /app
 RUN --mount=type=cache,target=/var/lib/apt/cache \
   --mount=type=cache,target=/var/lib/cache \
