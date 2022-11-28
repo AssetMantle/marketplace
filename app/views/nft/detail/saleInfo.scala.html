@@ -18,7 +18,8 @@
             @if(loginState.fold("")(_.username) == sales.find(x => allWhitelistIds.contains(x.whitelistId)).fold("")(_.collectionId)) {
 
             }else{
-                <button class="mt-3 form-primary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, ""))">@Messages(constants.View.BUYNOW)</button>
+                <button class="mt-5 form-primary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, ""))">@Messages(constants.View.BUYNOW)</button>
+                <button class="mt-3 form-secondary-button" onclick="">@Messages(constants.View.BUY_MINT_NFT)</button>
             }
         } else {
             <div class="d-flex flex-column gap-1">
