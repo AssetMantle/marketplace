@@ -6,6 +6,11 @@
 @if(totalDrafts < constants.CommonConfig.MaxCollectionDrafts) {
     <div id="createCollectionForm">
     @commonForm(constants.Form.CREATE_COLLECTION, createForm) {
+        <div class="d-flex align-items-center mt-4">
+            <span class="me-0 ms-0 termsConditionMessage">
+                <a class="link" onclick="showHideModalScreen('#createCollectionTypeform', '#createCollectionForm')" style="text-transform: none !important; ">@Messages(constants.View.TYPE_FORM_LINK)</a>
+            </span>
+        </div>
         @commonInputText(createForm, constants.FormField.COLLECTION_NAME)
         @commonDescriptionText(createForm, constants.FormField.COLLECTION_DESCRIPTION)
         @commonToggleButton(createForm, constants.FormField.NSFW_COLLECTION)
@@ -21,12 +26,6 @@
                 @Messages(constants.View.CREATE_COLLECTION_TERMS_CONDITION_MESSAGE)
                 </label>
                 <a class="link" onclick="showHideModalScreen('#createCollectionTermsConditionModal', '#createCollectionForm')">@Messages(constants.View.TERMS_CONDITION_LABEL)</a>
-            </span>
-        </div>
-
-        <div class="d-flex align-items-center mt-4">
-            <span class="me-0 ms-0 termsConditionMessage">
-                <a class="link" onclick="showHideModalScreen('#createCollectionTypeform', '#createCollectionForm')" style="text-transform: none !important; ">@Messages(constants.View.TYPE_FORM_LINK)</a>
             </span>
         </div>
     }
