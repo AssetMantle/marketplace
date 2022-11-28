@@ -16,7 +16,14 @@ case class NFT(id: String, collectionId: String, name: String, description: Stri
 
   def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getNFTFileAwsKey(collectionId = this.collectionId, fileName = this.getFileName)
 
-  //  def getAllProperties(nftProperties: Seq[NFTProperty]) = constants.Collection.DefaultProperty.list.map(_.asNFTProperty())
+  def getDefaultProperties(classificationId: String): Seq[constants.NFT.Property] = Seq(
+    constants.NFT.Property(name = constants.Collection.DefaultProperty.NFT_NAME, `type` = constants.NFT.Data.STRING, `value` = this.name, meta = true, mutable = false),
+    constants.NFT.Property(name = constants.Collection.DefaultProperty.NFT_DESCRIPTION, `type` = constants.NFT.Data.STRING, `value` = this.description, meta = true, mutable = false),
+    constants.NFT.Property(name = constants.Collection.DefaultProperty.FILE_HASH, `type` = constants.NFT.Data.STRING, `value` = this.id, meta = true, mutable = false),
+    constants.NFT.Property(name = constants.Collection.DefaultProperty.CLASSIFICATION_ID, `type` = constants.NFT.Data.STRING, `value` = classificationId, meta = true, mutable = false),
+  )
+
+  def getAllProperties(classificationId: String, nftProperties: Seq[NFTProperty]): Seq[constants.NFT.Property] = this.getDefaultProperties(classificationId) ++ nftProperties.map(_.asProperty)
 }
 
 object NFTs {
@@ -92,6 +99,12 @@ class NFTs @Inject()(
     def update(nft: NFT): Future[Unit] = updateById(nft)
 
     def countNFTs(collectionId: String): Future[Int] = filterAndCount(_.collectionId === collectionId)
+
+    def markNFTMinted(id: String): Future[NFT] =
+      for {
+        nft <- tryGet(id)
+        _ <- update(nft.copy(isMinted = true))
+      } yield nft.copy(isMinted = true)
 
     def getRandomNFTs(collectionId: String, n: Int, filterOut: Seq[String]): Future[Seq[String]] = filter(x => x.collectionId === collectionId && !x.id.inSet(filterOut)).map(x => util.Random.shuffle(x.map(_.id)).take(n))
   }

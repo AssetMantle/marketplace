@@ -46,8 +46,6 @@ object Notifications {
 
     def read = column[Boolean]("read")
 
-    val a: Shape[_ <: FlatShapeLevel, Rep[Boolean], Boolean, _] = read.shape
-
     def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def createdBy = column[String]("createdBy")

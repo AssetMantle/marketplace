@@ -8,7 +8,7 @@
     @commonInputText(buySaleNFTForm, constants.FormField.SALE_ID, Symbol("value") -> saleId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> true)
     @commonInputText(buySaleNFTForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> true)
     @commonCheckbox(buySaleNFTForm, constants.FormField.MINT_NFT)
-    @commonInputInt(buySaleNFTForm, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultSendCoinGasAmount, Symbol("class") -> "hidden")
+    @commonInputInt(buySaleNFTForm, constants.FormField.GAS_AMOUNT, Symbol("value") -> (constants.Blockchain.DefaultSendCoinGasAmount + constants.Blockchain.DefaultMintAssetGasAmount), Symbol("class") -> "hidden")
     @commonSelectGas(buySaleNFTForm)
     @commonInputPassword(buySaleNFTForm, constants.FormField.PASSWORD)
 }

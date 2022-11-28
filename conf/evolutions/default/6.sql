@@ -7,10 +7,11 @@ CREATE TABLE IF NOT EXISTS ANALYTICS."CollectionAnalysis"
 (
     "id"                   VARCHAR NOT NULL,
     "totalNFTs"            BIGINT  NOT NULL,
+    "totalMinted"          BIGINT  NOT NULL,
     "totalSold"            BIGINT  NOT NULL,
     "totalTraded"          BIGINT  NOT NULL,
     "floorPrice"           NUMERIC NOT NULL,
-    "totalVolume"          NUMERIC NOT NULL,
+    "totalVolumeTraded"    NUMERIC NOT NULL,
     "bestOffer"            NUMERIC NOT NULL,
     "listed"               BIGINT  NOT NULL,
     "owners"               BIGINT  NOT NULL,
@@ -24,15 +25,42 @@ CREATE TABLE IF NOT EXISTS ANALYTICS."CollectionAnalysis"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."BuyAssetWithoutMint"
 (
-    "sellerAccountId"      VARCHAR NOT NULL,
     "buyerAccountId"       VARCHAR NOT NULL,
+    "sellerAccountId"      VARCHAR NOT NULL,
     "txHash"               VARCHAR NOT NULL,
     "txRawBytes"           BYTEA   NOT NULL,
-    "nftId"                VARCHAR NOT NULL,
-    "saleId"               VARCHAR NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "toAddress"            VARCHAR NOT NULL,
     "amount"               VARCHAR NOT NULL,
+    "nftId"                VARCHAR NOT NULL,
+    "saleId"               VARCHAR NOT NULL,
+    "broadcasted"          BOOLEAN NOT NULL,
+    "status"               BOOLEAN,
+    "memo"                 VARCHAR,
+    "log"                  VARCHAR,
+    "createdBy"            VARCHAR,
+    "createdOnMillisEpoch" BIGINT,
+    "updatedBy"            VARCHAR,
+    "updatedOnMillisEpoch" BIGINT,
+    PRIMARY KEY ("buyerAccountId", "sellerAccountId", "txHash"),
+    UNIQUE ("buyerAccountId", "sellerAccountId", "saleId", "txHash")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."BuyAndMint"
+(
+    "buyerAccountId"       VARCHAR NOT NULL,
+    "sellerAccountId"      VARCHAR NOT NULL,
+    "txHash"               VARCHAR NOT NULL,
+    "txRawBytes"           BYTEA   NOT NULL,
+    "fromAddress"          VARCHAR NOT NULL,
+    "toAddress"            VARCHAR NOT NULL,
+    "amount"               VARCHAR NOT NULL,
+    "fromId"               VARCHAR NOT NULL,
+    "toId"                 VARCHAR NOT NULL,
+    "classificationId"     VARCHAR NOT NULL,
+    "assetId"              VARCHAR NOT NULL,
+    "nftId"                VARCHAR NOT NULL,
+    "saleId"               VARCHAR NOT NULL,
     "broadcasted"          BOOLEAN NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
@@ -50,6 +78,10 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."Mint"
     "fromAccountId"        VARCHAR NOT NULL,
     "txHash"               VARCHAR NOT NULL,
     "txRawBytes"           BYTEA   NOT NULL,
+    "fromAddress"          VARCHAR NOT NULL,
+    "fromId"               VARCHAR NOT NULL,
+    "toId"                 VARCHAR NOT NULL,
+    "classificationId"     VARCHAR NOT NULL,
     "assetId"              VARCHAR NOT NULL,
     "nftId"                VARCHAR NOT NULL,
     "broadcasted"          BOOLEAN NOT NULL,
@@ -188,8 +220,6 @@ ALTER TABLE MASTER."NFTTag"
 
 ALTER TABLE MASTER."Collection"
     DROP COLUMN IF EXISTS "website";
-ALTER TABLE MASTER."Collection"
-    ADD COLUMN IF NOT EXISTS "creatorFee" NUMERIC NOT NULL DEFAULT 0.0;
 ALTER TABLE MASTER."NFT"
     DROP COLUMN IF EXISTS "properties";
 ALTER TABLE MASTER."NFT"
@@ -197,7 +227,7 @@ ALTER TABLE MASTER."NFT"
 ALTER TABLE MASTER."NFT"
     ADD COLUMN IF NOT EXISTS "isMinted" BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE MASTER."NFT"
-    ADD CONSTRAINT uniqueNFTIdCollectionId UNIQUE ("id", "collectionId");
+    ADD CONSTRAINT unique_NFTId_CollectionId UNIQUE ("id", "collectionId");
 
 ALTER TABLE ANALYTICS."CollectionAnalysis"
     ADD CONSTRAINT CollectionAnalysis_id FOREIGN KEY ("id") REFERENCES MASTER."Collection" ("id");

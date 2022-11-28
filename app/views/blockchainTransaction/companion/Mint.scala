@@ -11,8 +11,8 @@ object Mint {
       constants.FormField.GAS_AMOUNT.mapping,
       constants.FormField.GAS_PRICE.mapping,
       constants.FormField.PASSWORD.mapping,
-    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.mintConstraint))
+    )(Data.apply)(Data.unapply))
 
-  case class Data(nftId: String, gasAmount: Int, gasPrice: String, password: String)
+  case class Data(nftId: String, gasAmount: Int, gasPrice: Double, password: String)
 
 }

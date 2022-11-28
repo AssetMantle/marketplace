@@ -13,6 +13,7 @@ object Blockchain {
   val ChainId: String = CommonConfig.Blockchain.ChainId
   val StakingToken: String = CommonConfig.Blockchain.StakingToken
   val DefaultSendCoinGasAmount = 100000
+  val DefaultMintAssetGasAmount = 500000
   val DefaultHDPath: Seq[ChildNumber] = Seq(
     new ChildNumber(44, true),
     new ChildNumber(CoinType, true),
@@ -21,6 +22,10 @@ object Blockchain {
     new ChildNumber(0, false)
   )
   val AssetPropertyRate: MicroNumber = CommonConfig.Blockchain.AssetPropertyRate
+  val LowGasPrice: Double = CommonConfig.Blockchain.LowGasPrice
+  val MediumGasPrice: Double = CommonConfig.Blockchain.MediumGasPrice
+  val HighGasPrice: Double = CommonConfig.Blockchain.HighGasPrice
+
 
   object Account {
     val BASE = "/cosmos.auth.v1beta1.BaseAccount"

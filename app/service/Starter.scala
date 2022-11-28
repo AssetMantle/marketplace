@@ -8,7 +8,8 @@ import play.api.{Configuration, Logger}
 
 import java.io.File
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.{Source => ScalaSource}
 
 @Singleton
@@ -80,7 +81,7 @@ class Starter @Inject()(
       _ <- updateAnalytics(collections)
     } yield ()
       ).recover {
-      case exception: Exception =>
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
   }
 
@@ -97,14 +98,17 @@ class Starter @Inject()(
         _ <- update(nftIds)
       } yield ()
         ).recover {
-        case exception: Exception => logger.error(exception.getLocalizedMessage)
+        case exception: Exception =>
       }
     }
 
-    for {
+    (for {
       collections <- collections
       _ <- updateNFTs(collections)
     } yield ()
+      ).recover {
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+    }
   }
 
   private def correctNotifications() = {
@@ -116,23 +120,20 @@ class Starter @Inject()(
           val updatedRoute1 = notification.jsRoute.getOrElse("").split("\\(")
           val updatedRoute2 = updatedRoute1.last.split("\\)")
           val route = s"${updatedRoute1.head}('${updatedRoute2.head}')"
-          println(route)
           masterTransactionNotifications.Service.update(notification.copy(jsRoute = Option(route)))
         } else if (notification.jsRoute.getOrElse("").contains("NFTController.viewNFT(") && !notification.jsRoute.getOrElse("").contains("NFTController.viewNFT('")) {
           val updatedRoute1 = notification.jsRoute.getOrElse("").split("\\(")
           val updatedRoute2 = updatedRoute1.last.split("\\.")
           val route = s"${updatedRoute1.head}('${updatedRoute2.head}')"
-          println(route)
           masterTransactionNotifications.Service.update(notification.copy(jsRoute = Option(route)))
         } else {
-          println("already corrected: " + notification.jsRoute.getOrElse(""))
           Future()
         }
       (for {
         _ <- notif
       } yield ()
         ).recover {
-        case exception: Exception =>
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
       }
     }
 
@@ -145,14 +146,13 @@ class Starter @Inject()(
     }
   }
 
-  def start(): Future[Unit] = {
-    (for {
-      _ <- correctNotifications()
-      _ <- updateAccountType()
-      _ <- updateCollectionAnalysis()
-      _ <- addNFTOwners()
-    } yield ()
-      ).recover {
+  def start(): Unit = {
+    try {
+      Await.result(correctNotifications(), Duration.Inf)
+      Await.result(updateAccountType(), Duration.Inf)
+      Await.result(updateCollectionAnalysis(), Duration.Inf)
+      Await.result(addNFTOwners(), Duration.Inf)
+    } catch {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
   }

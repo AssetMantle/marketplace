@@ -15,6 +15,9 @@ case class NFTProperty(nftId: String, name: String, `type`: String, `value`: Str
   def id2: String = name
 
   def id3: String = `type`
+
+  def asProperty: constants.NFT.Property = constants.NFT.Property(name = this.name, `type` = this.`type`, `value` = this.`value`, meta = this.meta, mutable = this.mutable)
+
 }
 
 object NFTProperties {

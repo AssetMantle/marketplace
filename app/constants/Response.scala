@@ -146,6 +146,8 @@ object Response {
   val NOT_NOTIFICATION_OWNER = new Failure("NOT_NOTIFICATION_OWNER")
   val NFT_NOT_ON_SALE = new Failure("NFT_NOT_ON_SALE")
   val HANDLE_MULTIPLE_NFT_QUANTITY_CASE = new Failure("HANDLE_MULTIPLE_NFT_QUANTITY_CASE")
+  val NFT_ALREADY_MINTED = new Failure("NFT_ALREADY_MINTED")
+  val MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED = new Failure("MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED")
 
   class Failure(private val response: String) {
     val message: String = PREFIX + FAILURE_PREFIX + response

@@ -74,6 +74,8 @@ class NFTOwners @Inject()(
 
     def getByOwnerIdAndPageNumber(ownerId: String, pageNumber: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(x => x.ownerId === ownerId && x.ownerId =!= x.creatorId)(_.nftId).map(_.map(_.nftId))
 
+    def countByOwnerIdAndCollectionId(ownerId: String, collectionId: String): Future[Int] = filterAndCount(x => x.ownerId === ownerId && x.collectionId === collectionId)
+
     def update(NFTOwner: NFTOwner): Future[Unit] = updateById1AndId2(NFTOwner)
 
     def countForOwnerNotOnSale(collectionId: String, currentOnSaleIds: Seq[String], ownerId: String): Future[Int] = {
@@ -89,7 +91,7 @@ class NFTOwners @Inject()(
       } yield ()
     }
 
-    def delete(nftId: String, ownerId: String) = deleteById1AndId2(id1 = nftId, id2 = ownerId)
+    def delete(nftId: String, ownerId: String): Future[Int] = deleteById1AndId2(id1 = nftId, id2 = ownerId)
 
     def markNFTSold(nftId: String, saleId: String, sellerAccountId: String, buyerAccountId: String): Future[Unit] = {
       val nftOwner = tryGet(nftId = nftId, ownerId = sellerAccountId)

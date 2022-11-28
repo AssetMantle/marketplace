@@ -5,6 +5,7 @@ import cosmos.bank.v1beta1.Tx
 import cosmos.crypto.secp256k1.Keys
 import cosmos.tx.v1beta1.TxOuterClass
 import models.common.Coin
+import models.master.{NFT, NFTProperty}
 import org.bitcoinj.core.ECKey
 
 import scala.jdk.CollectionConverters.IterableHasAsJava
@@ -50,6 +51,16 @@ object BlockchainTransaction {
       .setToAddress(toAddress)
       .addAllAmount(amount.map(_.toProtoCoin).asJava)
       .build().toByteString)
+    .build()
+
+  def getMintMsgAsAny(fromAddress: String, fromId: String, toId: String, classificationId: String) : protoBufAny = protoBufAny.newBuilder()
+//    .setTypeUrl(constants.Blockchain.TransactionMessage.MINT)
+//    .setValue(Tx
+//      .MsgSend.newBuilder()
+//      .setFromAddress(fromAddress)
+//      .setToAddress(toAddress)
+//      .addAllAmount(amount.map(_.toProtoCoin).asJava)
+//      .build().toByteString)
     .build()
 
 }

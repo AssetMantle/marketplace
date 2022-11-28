@@ -44,4 +44,7 @@ object Notification {
   val SELLER_NFT_SALE_WITHOUT_MINT_FAILED: Notification = Notification("SELLER_NFT_SALE_WITHOUT_MINT_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val BUYER_NFT_SALE_WITHOUT_MINT_FAILED: Notification = Notification("BUYER_NFT_SALE_WITHOUT_MINT_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
+  val NFT_MINT_SUCCESSFUL: Notification = Notification("NFT_MINT_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
+  val NFT_MINT_FAILED: Notification = Notification("NFT_MINT_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
+
 }
