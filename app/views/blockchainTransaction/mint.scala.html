@@ -1,0 +1,13 @@
+@import views.blockchainTransaction.companion.Mint
+@import views.html.blockchainTransaction.commonSelectGas
+@import views.html.base.form._
+@import utilities.MicroNumber
+
+@(mintForm: Form[Mint.Data] = Mint.form, nftId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.SEND_COIN, mintForm) {
+    @commonInputText(mintForm, constants.FormField.NFT_ID, Symbol("value") -> nftId)
+    @commonInputInt(mintForm, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultMintAssetGasAmount, Symbol("class") -> "hidden")
+    @commonSelectGas(mintForm)
+    @commonInputPassword(mintForm, constants.FormField.PASSWORD)
+}

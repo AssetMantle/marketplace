@@ -7,7 +7,7 @@
 <div class="row m-0 p-0 ownedNFTPage">
     @if(nfts.nonEmpty) {
         @nfts.map { nft =>
-            @commonNFTCard(collection = collections.find(_.id == nft.collectionId).get, nft = nft, liked = Option(likedNFTs.exists(_.nftId == nft.fileName)), onClickFunction = JavaScript(s"viewNFT('${nft.fileName}')"))
+            @commonNFTCard(collection = collections.find(_.id == nft.collectionId).get, nft = nft, liked = Option(likedNFTs.exists(_.nftId == nft.id)), onClickFunction = JavaScript(s"viewNFT('${nft.id}')"))
         }
     } else {
         <div id="noOwnedNFTsPerPage" class="noNFT"></div>

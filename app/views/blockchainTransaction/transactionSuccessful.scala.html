@@ -1,10 +1,11 @@
 @import views.html.base.modal._
+@import models.Trait.BlockchainTransaction
 
-@(broadcasted: Boolean, status: Option[Boolean], txHash: String, log: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(blockchainTx: BlockchainTransaction)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@if(status.nonEmpty) {
-    @if(!status.get) {
-        @errorModal(heading = constants.View.BROADCASTING_BLOCKCHAIN_TRANSACTION_FAILURE_TITLE, subHeading = log)
+@if(blockchainTx.status.nonEmpty) {
+    @if(!blockchainTx.status.get) {
+        @errorModal(heading = constants.View.BROADCASTING_BLOCKCHAIN_TRANSACTION_FAILURE_TITLE, subHeading = blockchainTx.log.getOrElse(""))
         @* @log *@
     }
 } else {
@@ -13,7 +14,7 @@
         <div class="form-address-box-item">
                 <span class="address-box-label">@Messages(constants.View.HASH)</span>
                 <span class="address-box-text">
-                    <span class="username-data" data-value="@txHash">@txHash</span>
+                    <span class="username-data" data-value="@blockchainTx.txHash">@blockchainTx.txHash</span>
                     <span class="form-copy-icon" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copy.png")"/></span>
                     <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
                 </span>

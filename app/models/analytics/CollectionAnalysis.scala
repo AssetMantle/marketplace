@@ -5,25 +5,70 @@ import models.master._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
+import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class CollectionAnalysis(id: String, totalNFTs: Long, totalSold: Long, totalTraded: Long, floorPrice: BigDecimal, totalVolume: BigDecimal, bestOffer: BigDecimal, listed: Long, owners: Long, uniqueOwners: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] with Logging
+case class CollectionAnalysis(id: String, totalNFTs: Long, totalMinted: Long, totalSold: Long, totalTraded: Long, floorPrice: MicroNumber, totalVolumeTraded: MicroNumber, bestOffer: MicroNumber, listed: Long, owners: Long, uniqueOwners: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] with Logging {
+
+  def serialize: CollectionsAnalysis.CollectionAnalysisSerialized = CollectionsAnalysis.CollectionAnalysisSerialized(
+    id = this.id,
+    totalNFTs = this.totalNFTs,
+    totalMinted = this.totalMinted,
+    totalSold = this.totalSold,
+    totalTraded = this.totalTraded,
+    floorPrice = this.floorPrice.toBigDecimal,
+    totalVolumeTraded = this.totalVolumeTraded.toBigDecimal,
+    bestOffer = this.bestOffer.toBigDecimal,
+    listed = this.listed,
+    owners = this.owners,
+    uniqueOwners = this.uniqueOwners,
+    createdBy = this.createdBy,
+    createdOnMillisEpoch = this.createdOnMillisEpoch,
+    updatedBy = this.updatedBy,
+    updatedOnMillisEpoch = this.updatedOnMillisEpoch
+  )
+
+}
 
 object CollectionsAnalysis {
+
+  case class CollectionAnalysisSerialized(id: String, totalNFTs: Long, totalMinted: Long, totalSold: Long, totalTraded: Long, floorPrice: BigDecimal, totalVolumeTraded: BigDecimal, bestOffer: BigDecimal, listed: Long, owners: Long, uniqueOwners: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] with Logging {
+
+    def deserialize: CollectionAnalysis = CollectionAnalysis(
+      id = this.id,
+      totalNFTs = this.totalNFTs,
+      totalMinted = this.totalMinted,
+      totalSold = this.totalSold,
+      totalTraded = this.totalTraded,
+      floorPrice = MicroNumber(this.floorPrice),
+      totalVolumeTraded = MicroNumber(this.totalVolumeTraded),
+      bestOffer = MicroNumber(this.bestOffer),
+      listed = this.listed,
+      owners = this.owners,
+      uniqueOwners = this.uniqueOwners,
+      createdBy = this.createdBy,
+      createdOnMillisEpoch = this.createdOnMillisEpoch,
+      updatedBy = this.updatedBy,
+      updatedOnMillisEpoch = this.updatedOnMillisEpoch
+    )
+
+  }
 
   implicit val module: String = constants.Module.ANALYTICS_COLLECTION
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  class CollectionAnalysisTable(tag: Tag) extends Table[CollectionAnalysis](tag, "CollectionAnalysis") with ModelTable[String] {
+  class CollectionAnalysisTable(tag: Tag) extends Table[CollectionAnalysisSerialized](tag, "CollectionAnalysis") with ModelTable[String] {
 
-    def * = (id, totalNFTs, totalSold, totalTraded, floorPrice, totalVolume, bestOffer, listed, owners, uniqueOwners, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionAnalysis.tupled, CollectionAnalysis.unapply)
+    def * = (id, totalNFTs, totalMinted, totalSold, totalTraded, floorPrice, totalVolumeTraded, bestOffer, listed, owners, uniqueOwners, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionAnalysisSerialized.tupled, CollectionAnalysisSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def totalNFTs = column[Long]("totalNFTs")
+
+    def totalMinted = column[Long]("totalMinted")
 
     def totalSold = column[Long]("totalSold")
 
@@ -31,7 +76,7 @@ object CollectionsAnalysis {
 
     def floorPrice = column[BigDecimal]("floorPrice")
 
-    def totalVolume = column[BigDecimal]("totalVolume")
+    def totalVolumeTraded = column[BigDecimal]("totalVolumeTraded")
 
     def bestOffer = column[BigDecimal]("bestOffer")
 
@@ -60,7 +105,7 @@ class CollectionsAnalysis @Inject()(
                                      masterNFTs: NFTs,
                                      protected val databaseConfigProvider: DatabaseConfigProvider
                                    )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[CollectionsAnalysis.CollectionAnalysisTable, CollectionAnalysis, String](
+  extends GenericDaoImpl[CollectionsAnalysis.CollectionAnalysisTable, CollectionsAnalysis.CollectionAnalysisSerialized, String](
     databaseConfigProvider,
     CollectionsAnalysis.TableQuery,
     executionContext,
@@ -70,20 +115,18 @@ class CollectionsAnalysis @Inject()(
 
   object Service {
 
-    def add(collectionAnalysis: CollectionAnalysis): Future[String] = create(collectionAnalysis)
+    def add(collectionAnalysis: CollectionAnalysis): Future[String] = create(collectionAnalysis.serialize)
 
-    def add(collectionsAnalysis: Seq[CollectionAnalysis]): Future[Unit] = create(collectionsAnalysis)
+    def add(collectionsAnalysis: Seq[CollectionAnalysis]): Future[Unit] = create(collectionsAnalysis.map(_.serialize))
 
-    def tryGet(id: String): Future[CollectionAnalysis] = filterHead(_.id === id)
+    def tryGet(id: String): Future[CollectionAnalysis] = filterHead(_.id === id).map(_.deserialize)
 
-    def getForCollections(ids: Seq[String]): Future[Seq[CollectionAnalysis]] = filter(_.id.inSet(ids))
-
-    def update(collectionAnalysis: CollectionAnalysis): Future[Unit] = updateById(collectionAnalysis)
+    def update(collectionAnalysis: CollectionAnalysis): Future[Unit] = updateById(collectionAnalysis.serialize)
   }
 
   object Utility {
 
-    def onNewCollection(id: String): Future[String] = Service.add(CollectionAnalysis(id = id, totalNFTs = 0, totalSold = 0, totalTraded = 0, floorPrice = 0, totalVolume = 0, bestOffer = 0, listed = 0, owners = 0, uniqueOwners = 0))
+    def onNewCollection(id: String): Future[String] = Service.add(CollectionAnalysis(id = id, totalNFTs = 0, totalSold = 0, totalTraded = 0, floorPrice = 0, totalVolumeTraded = 0, bestOffer = 0, listed = 0, owners = 0, uniqueOwners = 0, totalMinted = 0))
 
     def onNewNFT(collectionId: String): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
@@ -103,12 +146,30 @@ class CollectionsAnalysis @Inject()(
       } yield ()
     }
 
-    def onSale(collectionId: String): Future[Unit] = {
+    def onSale(collectionId: String, price: MicroNumber): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
 
       for {
         collectionAnalysis <- collectionAnalysis
-        _ <- Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed - 1))
+        _ <- Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed - 1, totalTraded = collectionAnalysis.totalTraded, totalVolumeTraded = collectionAnalysis.totalVolumeTraded + price))
+      } yield ()
+    }
+
+    def onMint(collectionId: String): Future[Unit] = {
+      val collectionAnalysis = Service.tryGet(collectionId)
+
+      for {
+        collectionAnalysis <- collectionAnalysis
+        _ <- Service.update(collectionAnalysis.copy(totalMinted = collectionAnalysis.totalMinted + 1))
+      } yield ()
+    }
+
+    def onMintAndSale(collectionId: String, price: MicroNumber): Future[Unit] = {
+      val collectionAnalysis = Service.tryGet(collectionId)
+
+      for {
+        collectionAnalysis <- collectionAnalysis
+        _ <- Service.update(collectionAnalysis.copy(totalMinted = collectionAnalysis.totalMinted + 1, listed = collectionAnalysis.listed - 1, totalTraded = collectionAnalysis.totalTraded, totalVolumeTraded = collectionAnalysis.totalVolumeTraded + price))
       } yield ()
     }
 

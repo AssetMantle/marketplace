@@ -1,10 +1,10 @@
 package constants
 
 import play.api.data.Forms._
-import play.api.data.{FormError, Mapping}
 import play.api.data.format.Formats._
 import play.api.data.format.Formatter
 import play.api.data.validation.Constraints
+import play.api.data.{FormError, Mapping}
 import play.api.i18n.{Messages, MessagesProvider}
 import utilities.MicroNumber
 import utilities.NumericOperation.checkPrecision
@@ -63,7 +63,7 @@ object FormField {
   val COLLECTION_PROPERTY_DEFAULT_VALUE: StringFormField = StringFormField("COLLECTION_PROPERTY_DEFAULT_VALUE", 1, 30)
   val NFT_NAME: StringFormField = StringFormField("NFT_NAME", 3, 50)
   val NFT_DESCRIPTION: StringFormField = StringFormField("NFT_DESCRIPTION", 3, 256)
-  val NFT_FILE_NAME: StringFormField = StringFormField("NFT_FILE_NAME", 64, 255)
+  val NFT_ID: StringFormField = StringFormField("NFT_ID", 64, 64)
   val NFT_TAGS: StringFormField = StringFormField("NFT_TAGS", 0, (constants.NFT.Tags.MaximumLength + 1) * constants.NFT.Tags.MaximumAllowed)
   val NFT_PROPERTY_NAME: StringFormField = StringFormField("NFT_PROPERTY_NAME", 1, 30)
   val NFT_PROPERTY_VALUE: StringFormField = StringFormField("NFT_PROPERTY_VALUE", 1, 30)
@@ -80,6 +80,10 @@ object FormField {
   val WHITELIST_MAX_MEMBERS: IntFormField = IntFormField("WHITELIST_MAX_MEMBERS", 1, Int.MaxValue)
   val SALE_NFT_NUMBER: IntFormField = IntFormField("SALE_NFT_NUMBER", 1, Int.MaxValue)
   val SALE_MAX_MINT_PER_ACCOUNT: IntFormField = IntFormField("SALE_MAX_MINT_PER_ACCOUNT", 1, Int.MaxValue)
+
+
+  // DoubleFormField
+  val GAS_PRICE: DoubleFormField = DoubleFormField("GAS_PRICE", constants.Blockchain.LowGasPrice, constants.Blockchain.HighGasPrice)
 
   // EpochFormField
   val WHITELIST_INVITE_START_EPOCH: EpochFormField = EpochFormField("WHITELIST_INVITE_START_EPOCH", 1, Int.MaxValue)
@@ -100,9 +104,9 @@ object FormField {
   val COLLECTION_PROPERTY_HIDE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_HIDE")
   val CREATE_COLLECTION_TERMS_AND_CONDITION: BooleanFormField = BooleanFormField("CREATE_COLLECTION_TERMS_AND_CONDITION")
   val MARK_ALL_NOTIFICATION_READ: BooleanFormField = BooleanFormField("MARK_ALL_NOTIFICATION_READ")
+  val MINT_NFT: BooleanFormField = BooleanFormField("MINT_NFT")
 
   // SelectFormField
-  val GAS_PRICE: SelectFormField = SelectFormField("GAS_PRICE", Seq(constants.CommonConfig.Blockchain.LowGasPrice.toString, constants.CommonConfig.Blockchain.MediumGasPrice.toString, constants.CommonConfig.Blockchain.HighGasPrice.toString))
   val COLLECTION_CATEGORY: SelectFormField = SelectFormField("COLLECTION_CATEGORY", Seq(constants.Collection.Category.ART, constants.Collection.Category.PHOTOGRAPHY, constants.Collection.Category.MISCELLANEOUS))
   val COLLECTION_PROPERTY_TYPE: SelectFormField = SelectFormField("COLLECTION_PROPERTY_TYPE", Seq(constants.NFT.Data.STRING, constants.NFT.Data.DECIMAL, constants.NFT.Data.BOOLEAN))
 

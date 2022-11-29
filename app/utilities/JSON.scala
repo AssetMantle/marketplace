@@ -35,7 +35,7 @@ object JSON {
         case JsSuccess(value: T, _: JsPath) => value
         case jsError: JsError => logger.debug(response.json.toString())
           logger.error(jsError.toString)
-          throw new BaseException(new Failure(jsError.toString, null))
+          throw new BaseException(new Failure(jsError.toString))
       }
     }.recover {
       case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)

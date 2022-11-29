@@ -1,5 +1,7 @@
 package constants
 
+import models.master.NFTProperty
+
 object Collection {
 
   object File {
@@ -27,12 +29,6 @@ object Collection {
     val NFT_DESCRIPTION = "description"
     val FILE_HASH = "fileHash"
     val CLASSIFICATION_ID = "classificationId"
-
-    val IMMUTABLE = "IMMUTABLE"
-    val MUTABLE = "MUTABLE"
-    val NOT_REQUIRED = "NOT_REQUIRED"
-    val NON_META = "NON_META"
-    val META = "META"
 
     val list: Seq[String] = Seq(NFT_NAME, NFT_DESCRIPTION, FILE_HASH, CLASSIFICATION_ID)
 

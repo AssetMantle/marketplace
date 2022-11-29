@@ -3,7 +3,6 @@ package controllers.actions
 import controllers.logging.WithActionAsyncLogging
 import exceptions.BaseException
 import models.{master, masterTransaction}
-import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -46,7 +45,7 @@ class WithoutLoginActionAsync @Inject()(
 
         for {
           (verify, account) <- verify
-          result <- getResult(verify, LoginState(username, address, isCreator = account.isCreator, isVerifiedCreator = account.isVerifiedCreator))
+          result <- getResult(verify, LoginState(username = username, address = address, accountType = account.accountType))
         } yield result
       } else f(None)(request)
 
