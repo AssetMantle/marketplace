@@ -790,3 +790,21 @@ SALE_EXPIRED=Ended
 COLLECTION_CURRENT_PRICE_TITLE=Current Price
 COLLECTION_CURRENT_PRICE_SUBTITLE=(Incl. Creator Royalties)
 NFT_SALE_TITLE=Sales
+
+# NFT List
+LIST=List
+LIST_NFT_TITLE=List NFT
+LIST_NFT_PUBLIC_SALE=Public Sale
+LIST_NFT_PUBLIC_SALE_DESCRIPTION=MantlePlace offers a variety of public sale categories. Select this option if you would like to list your NFT in Pre-sale or MarketPlace.
+LIST_NFT_PRIVATE_SALE=Private Sale
+LIST_NFT_PRIVATE_SALE_DESCRIPTION=Select this option to open a Whitelist sale for your selected NFT. A few invited buyers will be able to participate in this private sale.
+PUBLIC_SALE_TITLE=Public Sale
+PUBLIC_PRE_SALE=Pre-Sale
+PUBLIC_PRE_SALE_DESCRIPTION=Pre-sales offers an early opportunity to market your collection before it is listed on MarketPlace. Select this option to open the collection exclusively.
+PUBLIC_MARKETPLACE_SALE=MarketPlace Sale
+PUBLIC_MARKETPLACE_SALE_DESCRIPTION=MarketPlace allows you to showcase your collections in a public forum. Choose this option to allow maximum public discovery of your collection.
+MARKETPLACE_SALE_MINT_NFT_TITLE=Mint NFT to continue
+MARKETPLACE_SALE_MINT_NFT_SUBTITLE=The MarketPlace requires minting selected the NFT before listing it. Please mint selected NFT to continue listing your NFT.
+MINT_BUTTON=Mint
+LIST_NFT_SUCCESS_TITLE=NFT Listed Successfully
+LIST_NFT_SUCCESS_SUBTITLE=The selected NFT has been listed successfully.

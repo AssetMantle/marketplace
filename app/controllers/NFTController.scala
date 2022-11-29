@@ -471,4 +471,15 @@ class NFTController @Inject()(
     }
   }
 
+  def listNFTForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.list.listNFT())
+  }
+
+  def publicSaleForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.list.publicSale())
+  }
+
+  def marketPlaceSale(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.list.marketPlaceSale())
+  }
 }

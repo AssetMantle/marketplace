@@ -19,6 +19,7 @@
             @if(loginState.isDefined && saleOffered && sale.isDefined) {
                 <button class="mt-5 form-primary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, s"'${sale.get.id}', '$nftId'"))">@Messages(constants.View.BUYNOW)</button>
             }
+            <button class="mt-3 form-secondary-button" onclick="getForm(jsRoutes.controllers.NFTController.listNFTForm())">@Messages(constants.View.LIST)</button>
         } else {
             @Messages(constants.View.NOT_ON_SALE)
         }

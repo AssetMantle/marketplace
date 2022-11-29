@@ -90,6 +90,9 @@ GET         /nftCollectionInfo                                controllers.NFTCon
 GET         /nftSaleInfo                                      controllers.NFTController.saleInfo(nftId: String)
 GET         /likesCounter                                     controllers.NFTController.likesCounter(nftId: String)
 GET         /nftPrice                                         controllers.NFTController.price(nftId: String)
+GET         /listNFT                                          controllers.NFTController.listNFTForm()
+GET         /publicSale                                       controllers.NFTController.publicSaleForm()
+GET         /marketPlaceSale                                  controllers.NFTController.marketPlaceSale()
 
 # Create NFT
 GET         /selectCollection                                 controllers.NFTController.selectCollection()
