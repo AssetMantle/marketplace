@@ -1,4 +1,6 @@
 @import controllers.actions.LoginState
+@import views.html.base.commonHorizontalSwitcher
+@import scala.collection.immutable.ListMap
 
 @(collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
@@ -17,6 +19,23 @@
             }
         </div>
     </div>
+
+    <div class="mb-0 item item-center centerContainer">
+        <div class="centerCard">
+            <div class="contentContainer">
+                @commonHorizontalSwitcher(
+                    ListMap(
+                        constants.View.COLLECTION_NFT -> (None, JavaScript(s"changeExploreStateOnSwitcher('${constants.View.COLLECTION_NFT}')")),
+                        constants.View.COLLECTION_OFFER -> (routes.javascript.CollectionController.collectionOffer, JavaScript(s"changeExploreStateOnSwitcher('${constants.View.COLLECTION_OFFER}')")),
+                    ),
+                    constants.View.COLLECTION_NFT,
+                    Symbol(constants.View.COLLECTION_NFT + "_PARAMETERS") -> s"'${collection.id}', 1",
+                    Symbol(constants.View.COLLECTION_OFFER + "_PARAMETERS") -> s"'${constants.View.COLLECTION_OFFER}', 1"
+                )
+            </div>
+        </div>
+    </div>
+
     <div class="profile-card">
         <div class="profiles-container">
             <div class="nft-list">

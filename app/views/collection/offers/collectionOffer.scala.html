@@ -1,0 +1,40 @@
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="contentBody">
+    <div class="contentHeader mx-4 pt-3">
+        <div class="headerTitle">@Messages(constants.View.COLLECTION_NFT_OFFERS_LIST_HEADER)</div>
+    </div>
+    <div class="container contentTableContainer p-0" id="collectionOffersList">
+        <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <div class="table-responsive">
+                    <table class="table contentTable">
+                        <thead>
+                            <tr>
+                                <th class="text-end tableFieldNo">@Messages(constants.View.COLLECTION_NFT_OFFERS_TABLE_TITLE_NO)</th>
+                                <th class="tableFieldNftName">@Messages(constants.View.COLLECTION_NFT_OFFERS_TABLE_TITLE_NAME)</th>
+                                <th class="text-end tableFieldPrice">@Messages(constants.View.COLLECTION_NFT_OFFERS_TABLE_TITLE_PRICE_RANGE)</th>
+                                <th class="tableFieldOffers">@Messages(constants.View.COLLECTION_NFT_OFFERS_TABLE_TITLE_NO_OF_OFFER)</th>
+                                <th class="tableFieldDuration">@Messages(constants.View.COLLECTION_NFT_OFFERS_DURATION_TITLE)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="collectionOffersListTableBody">
+
+                                <tr>
+                                    <td class="text-end tableFieldNo">1</td>
+                                    <td class="tableFieldNftName">@Messages(constants.View.COLLECTION_NFT_OFFERS_TABLE_TITLE_NAME)</td>
+                                    <td class="text-end tableFieldPrice">00-00</td>
+                                    <td class="text-center tableFieldOffers">0</td>
+                                    <td class="tableFieldDuration">
+                                        <span id="startTimeEpoch_">tes</span> -
+                                        <span id="endTimeEpoch_">test</span>
+                                    </td>
+                                </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

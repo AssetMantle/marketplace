@@ -770,6 +770,23 @@
           .tableFieldStatus{min-width: 100px;}
           .tableFieldDuration{min-width: 420px;}
         }
+        #collectionOffersList{
+          .tableFieldNo{min-width: 50px;}
+          .tableFieldNftName{min-width: 190px;max-width: 190px;}
+          .tableFieldPrice{min-width: 120px;}
+          .tableFieldOffers{min-width: 120px;}
+          .tableFieldDuration{min-width: 350px;}
+          tbody{
+            tr {
+              td{
+                &.tableFieldOffers{
+                  @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--dark));
+                  cursor: pointer;
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

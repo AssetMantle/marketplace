@@ -526,4 +526,8 @@ class CollectionController @Inject()(
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
   }
+
+  def collectionOffer(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.collection.offers.collectionOffer())
+  }
 }
