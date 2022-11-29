@@ -67,6 +67,7 @@ COPYRIGHT=MantlePlace © 2022 - All Rights Reserved
 CREATE_NEW_COLLECTION_MENU=Create new collection
 CREATE_NEW_NFT_MENU=Create new NFT
 NEW_LABEL=New
+BECOME_GENESIS_CREATOR_MENU=become genesis creator
 
 #//Sign Up
 FORM.SIGN_UP.TITLE=Sign Up

@@ -526,4 +526,9 @@ class CollectionController @Inject()(
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
   }
+
+  def genesisTypeForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.base.genesisTypeForm()))
+  }
 }
