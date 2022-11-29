@@ -167,8 +167,10 @@ function getNFTPrice(nftId) {
         async: true,
         statusCode: {
             200: function (data) {
-                $("#price_" + nftId.split(".")[0]).html(data);
-                getDollarPrice(data, nftId);
+                if(data !== "--") {
+                    $("#price_" + nftId.split(".")[0]).html(data);
+                    getDollarPrice(data, nftId);
+                }
             }
         }
     });

@@ -21,7 +21,7 @@
                 <button class="mt-3 form-secondary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, s"'${sale.get.id}', '$nftId', true"));">@Messages(constants.View.BUY_MINT_NFT)</button>
             }
         } else {
-            @Messages(constants.View.NOT_ON_SALE)
+            <div class="title">@Messages(constants.View.NOT_ON_SALE)</div>
         }
     </div>
 </div>
