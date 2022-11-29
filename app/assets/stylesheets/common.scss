@@ -902,6 +902,7 @@ body.modal-open{
 
 // Notification count
 #totalUnreadNotification{
+  display: none;
   background-color: var(--default);
   position: absolute;
   left: calc(100% - 12px);
