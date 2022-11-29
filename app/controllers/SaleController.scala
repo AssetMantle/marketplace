@@ -132,15 +132,15 @@ class SaleController @Inject()(
       )
   }
 
-  def buySaleNFTForm(saleId: String, nftId: String): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.sale.buySaleNFT(saleId = saleId, nftId = nftId))
+  def buySaleNFTForm(saleId: String, nftId: String, mintNft: Boolean): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.sale.buySaleNFT(saleId = saleId, nftId = nftId, mintNft = mintNft))
   }
 
   def buySaleNFT(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       BuySaleNFT.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.sale.buySaleNFT(formWithErrors, saleId = formWithErrors.data.getOrElse(constants.FormField.SALE_ID.name, ""), nftId = formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, ""))))
+          Future(BadRequest(views.html.sale.buySaleNFT(formWithErrors, saleId = formWithErrors.data.getOrElse(constants.FormField.SALE_ID.name, ""), nftId = formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name,""), mintNft = false)))
         },
         buySaleNFTData => {
           val sale = masterSales.Service.tryGet(buySaleNFTData.saleId)
@@ -215,7 +215,7 @@ class SaleController @Inject()(
             blockchainTransaction <- validateAndTransfer(nftOwner = nftOwner, verifyPassword = verifyPassword, sale = sale, isWhitelistMember = isWhitelistMember, buyerKey = buyerKey, sellerKey = sellerKey, balance = balance, nft = nft, nftProperties = nftProperties, countBuyerNFTsFromSale = countBuyerNFTsFromSale)
           } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.sale.buySaleNFT(BuySaleNFT.form.withGlobalError(baseException.failure.message), saleId = buySaleNFTData.saleId, nftId = buySaleNFTData.nftId))
+            case baseException: BaseException => BadRequest(views.html.sale.buySaleNFT(BuySaleNFT.form.withGlobalError(baseException.failure.message), saleId = buySaleNFTData.saleId, nftId = buySaleNFTData.nftId , mintNft = false))
           }
         }
       )

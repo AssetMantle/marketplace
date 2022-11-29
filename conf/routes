@@ -155,7 +155,7 @@ POST        /editWhitelist                                    controllers.Whitel
 
 GET         /createSale                                       controllers.SaleController.createCollectionSaleForm(whitelistId: Option[String], collectionId: Option[String])
 POST        /createSale                                       controllers.SaleController.createCollectionSale()
-GET         /buySaleNFT                                       controllers.SaleController.buySaleNFTForm(saleId: String,nftId: String)
+GET         /buySaleNFT                                       controllers.SaleController.buySaleNFTForm(saleId: String,nftId: String, mintNft: Boolean)
 POST        /buySaleNFT                                       controllers.SaleController.buySaleNFT()
 
 # Should be not changed it will be public

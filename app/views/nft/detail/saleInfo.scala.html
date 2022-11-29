@@ -17,7 +17,8 @@
                 <div id="salePrice" class="salePrice hidden">@sale.get.price.toString</div>
             </div>
             @if(loginState.isDefined && saleOffered && sale.isDefined) {
-                <button class="mt-5 form-primary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, s"'${sale.get.id}', '$nftId'"))">@Messages(constants.View.BUYNOW)</button>
+                <button class="mt-5 form-primary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, s"'${sale.get.id}', '$nftId', false"))">@Messages(constants.View.BUYNOW)</button>
+                <button class="mt-3 form-secondary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, s"'${sale.get.id}', '$nftId', true"));">@Messages(constants.View.BUY_MINT_NFT)</button>
             }
         } else {
             @Messages(constants.View.NOT_ON_SALE)
