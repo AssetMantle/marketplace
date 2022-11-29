@@ -45,7 +45,7 @@
                 <div class="d-flex flex-row gap-1 align-items-center mt-3">
                     <div class=""><img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/></div>
                     <div id="price_@nft.getFileHash" class="nft-mantle-price">--</div>
-                    <div class="nft-dollar-price">($--)</div>
+                    <div id="dollarPrice_@nft.getFileHash" class="nft-dollar-price">($--)</div>
                 </div>
                 @if(loginState.nonEmpty) {
                     <div class="d-flex align-items-center gap-1 mt-3">

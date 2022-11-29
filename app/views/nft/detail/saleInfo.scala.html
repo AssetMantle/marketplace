@@ -11,8 +11,8 @@
             <div class="priceHolder">
                 <div class="d-flex flex-row gap-1 align-items-center mt-3">
                     <img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/>
-                    <div id="nft-mantle-price" class="nft-mantle-price">--</div>
-                    <div id="nft-dollar-price" class="nft-dollar-price">($--)</div>
+                    <div id="price_@nftId" class="nft-mantle-price">--</div>
+                    <div id="dollarPrice_@nftId" class="nft-dollar-price">($--)</div>
                 </div>
                 <div id="salePrice" class="salePrice hidden">@sale.get.price.toString</div>
             </div>
@@ -25,3 +25,4 @@
     </div>
 </div>
 <script src="@routes.Assets.versioned("javascripts/nfts/saleInfo.js")"></script>
+<script>getNFTPrice('@nftId')</script>
