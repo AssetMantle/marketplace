@@ -1,0 +1,64 @@
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="modal-header mb-3">
+    <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.SINGLE_NFT_OFFER_TITLE)</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal();">
+                &times;
+    </button>
+</div>
+<p class="sub-heading" id="modalSubtitle">@Messages(constants.View.SINGLE_NFT_OFFER_SUBTITLE)</p>
+
+<div class="mb-0 item item-center centerContainer">
+    <div class="p-0 m-0 centerCard">
+        <div class="contentContainer">
+            <div class="p-0 m-0 contentBody">
+                <div class="container contentTableContainer" id="singleNFTOffersList">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="table-responsive">
+                                <table class="table contentTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-end tableFieldNo">@Messages(constants.View.SINGLE_NFT_OFFERS_TABLE_TITLE_NO)</th>
+                                            <th class="tableFieldNftName">@Messages(constants.View.SINGLE_NFT_OFFERS_TABLE_TITLE_NAME)</th>
+                                            <th class="text-end tableFieldPrice">@Messages(constants.View.SINGLE_NFT_OFFERS_TABLE_TITLE_PRICE)</th>
+                                            <th class="tableFieldFlorDifference">@Messages(constants.View.SINGLE_NFT_OFFERS_TABLE_TITLE_FLOR_DIFFERENCE)</th>
+                                            <th class="tableFieldDuration">@Messages(constants.View.SINGLE_NFT_OFFERS_TABLE_TITLE_DURATION)</th>
+                                            <td  class="text-end tableFieldAction"></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="singleNFTOffersListTableBody">
+                                        <tr>
+                                            <td class="text-end tableFieldNo">1</td>
+                                            <td class="tableFieldNftName">@Messages(constants.View.SINGLE_NFT_OFFERS_TABLE_TITLE_NAME)</td>
+                                            <td class="text-end tableFieldPrice">00</td>
+                                            <td class="tableFieldFlorDifference">00% above<br>floor</td>
+                                            <td class="tableFieldDuration">
+                                                <span id="startTimeEpoch_">00 Aug 0000
+                                                </span> -
+                                                <br>
+                                                <span id="endTimeEpoch_">00 Aug 0000</span>
+                                                <br>
+                                                (0 Days)
+                                            </td>
+                                            <td  class="text-end tableFieldAction">
+                                                <div class="d-flex gap-3">
+                                                    <div>
+                                                        <i class="bi bi-check-circle iconDefault iconMedium"></i>
+                                                    </div>
+                                                    <div>
+                                                        <i class="bi bi-x-lg iconDefault iconMedium"></i>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

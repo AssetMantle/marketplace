@@ -530,4 +530,8 @@ class CollectionController @Inject()(
   def collectionOffer(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.collection.offers.collectionOffer())
   }
+
+  def singleNFTOffer(): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.collection.offers.singleNFTOffer())
+  }
 }

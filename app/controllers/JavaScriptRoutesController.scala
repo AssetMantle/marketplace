@@ -53,6 +53,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.deleteDraft,
         routes.javascript.CollectionController.countAccountNFTsNotOnSale,
         routes.javascript.CollectionController.collectionOffer,
+        routes.javascript.CollectionController.singleNFTOffer,
 
         routes.javascript.WishlistController.wishlistSection,
         routes.javascript.WishlistController.collectionPerPage,

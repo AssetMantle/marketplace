@@ -787,6 +787,14 @@
             }
           }
         }
+        #singleNFTOffersList{
+          .tableFieldNo{min-width: 50px;}
+          .tableFieldNftName{min-width: 100px;max-width: 100px;}
+          .tableFieldPrice{min-width: 100px;}
+          .tableFieldFlorDifference{min-width: 125px;}
+          .tableFieldDuration{min-width: 100px;}
+          .tableFieldAction{min-width: 90px;}
+        }
       }
     }
   }
