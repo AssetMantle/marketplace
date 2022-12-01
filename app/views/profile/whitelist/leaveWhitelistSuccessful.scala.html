@@ -3,4 +3,3 @@
 @(whitelist: Whitelist)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @views.html.base.modal.successModal(heading = constants.View.LEAVE_WHITELIST_SUCCESS_TITLE, subHeading = Messages(constants.View.LEAVE_WHITELIST_SUCCESS_SUBTITLE, whitelist.name))
-<script>updateJoinedWhitelistContainer();</script>

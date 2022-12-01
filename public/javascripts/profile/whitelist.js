@@ -172,15 +172,11 @@ function setSaleStatus(saleId){
 }
 
 function updateJoinedWhitelistContainer(){
-    setTimeout(()=>{
-        $("#whitelistSectionContent").html("");
-        showWhitelistScreen('joined');
-    },2000);
+    $("#whitelistSectionContent").html("");
+    showWhitelistScreen('joined');
 }
 
 function updateCreatedWhitelistContainer(){
-    setTimeout(()=>{
-        $("#whitelistSectionContent").html("");
-        showWhitelistScreen('created');
-    },2000);
+    $("#whitelistSectionContent").html("");
+    showWhitelistScreen('created');
 }
