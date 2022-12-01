@@ -76,6 +76,21 @@
   .form-secondary-button{
     width: 100%;
   }
+  .mintedNftWeightage{
+    margin-top: 14px;
+    .progressBar {
+      background-color: var(--line-2);
+      border-radius: 10px;
+      span {
+        background-color: var(--default);
+        display: block;
+        height: 8px;
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+      }
+    }
+  }
 }
 .collectionContainer{
   width: 100%;
