@@ -514,20 +514,21 @@ profileContainer .item-sticky .profile-card{
     margin-top: 16px;
     margin-bottom: 16px;
 }
-.nft-list .card .creator-name{
+.nft-list .card .nft-name{
     font-family: var(--font-type-2);
     font-style: normal;
     font-weight: 700;
     font-size: 14px;
     text-transform: capitalize;
-    color: var(--default);
+    color: var(--gray);
+    line-height: 17px;
 }
 .nft-list .card .creator-collection-name{
     font-family: var(--font-type-1);
     font-style: normal;
     font-weight: 500;
     font-size: 12px;
-    color: var(--gray);
+    color: var(--default);
 }
 .nft-list .card .nft-mantle-price{
     font-family: var(--font-type-2);
