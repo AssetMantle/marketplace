@@ -8,10 +8,10 @@
             <div class="analysisValue">@collectionAnalysis.totalNFTs</div>
         </div>
         <div class="mt-3">
-            <div class="analysisTitle">@Messages(constants.View.MINTED_NFT_LABEL)</div>
+            <div class="analysisTitle">@Messages(constants.View.MINTED_NFT_LABEL,0,collectionAnalysis.totalNFTs)</div>
             <div class="mintedNftWeightage">
                 <div class="progressBar">
-                    <span data-totalNFT="40" data-mintedNFT="15" style="width:0;"></span>
+                    <span data-totalNFT="@collectionAnalysis.totalNFTs" data-mintedNFT="3" style="width:0;"></span>
                 </div>
             </div>
         </div>

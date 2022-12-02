@@ -1,36 +1,86 @@
 @(collection: master.Collection, onClickFunction: JavaScript)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<a onclick="@onClickFunction">
+<div class="collectionCardContainer">
     <div class="single-profile-card commonCollectionCard artCollection">
         <div class="profile-section">
-            <div id="collectionCoverImage_@collection.id">
-                <div class="hero-img">
-                @collection.getCoverFileURL.fold {
-                    <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
-                } { uri =>
-                    <img src="@uri">
-                }
+            <div onclick="@onClickFunction" class="collectionLink">
+                <div class="saleBadge">
+                    <div class="d-flex gap-2 align-items-center option live">
+                        <div class="statusDotWrapper">
+                            <div class="statusDotEmitter">
+                                <div class="statusDotWave"></div>
+                            </div>
+                        </div>
+                        <div class="statusMessage">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_LIVE)</div>
+                    </div>
+                </div>
+
+                <div id="collectionCoverImage_@collection.id">
+                    <div class="hero-img">
+                    @collection.getCoverFileURL.fold {
+                        <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
+                    } { uri =>
+                        <img src="@uri"/>
+                    }
+                    </div>
                 </div>
             </div>
             <div class="profile-detail">
                 <div id="collectionProfileImage_@collection.id">
                     <div class="profile-img">
-                    @collection.getProfileFileURL.fold {
-                        <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
-                    } { uri =>
-                        <img src="@uri">
-                    }
+                        <div onclick="@onClickFunction" class="collectionLink">
+                        @collection.getProfileFileURL.fold {
+                            <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
+                        } { uri =>
+                            <img src="@uri"/>
+                        }
+                        </div>
                     </div>
                 </div>
                 <div id="content">
-                    <h1>@collection.name</h1>
-                    <a href="/profile/@collection.creatorId">
-                        <p>
-                        @Seq("@", collection.creatorId).mkString
-                        </p>
-                    </a>
+                    <div class="d-flex justify-content-between collectionDetail">
+                        <div class="leftInfo">
+                            <div onclick="@onClickFunction" class="collectionLink">
+                                <h1>@collection.name</h1>
+                            </div>
+                            <a href="/profile/@collection.creatorId">
+                                <p>
+                                @Seq("@", collection.creatorId).mkString
+                                </p>
+                            </a>
+                        </div>
+                        <div class="rightInfo">
+                            <div class="d-flex flex-column gap-3">
+                                <div class="align-self-end collectionStatus">
+                                    <div class="d-flex statusOptions">
+                                        <div class="option option1 active">
+                                            <i class="bi bi-currency-dollar"></i>
+                                        </div>
+                                        <div class="option option2 active">
+                                            <i class="bi bi-tag"></i>
+                                        </div>
+                                        <div class="option option3 active">
+                                            <i class="bi bi-link-45deg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="collectionStats">
+                                    <div class="d-flex gap-3 collectionStatsContainer">
+                                        <div class="d-flex gap-2 justify-content-between collectionStatsBadge">
+                                            <div class="badgeLabel">@Messages(constants.View.COLLECTION_CARD_BADGE_LABEL_ASSETS)</div>
+                                            <div class="badgeValue">00</div>
+                                        </div>
+                                        <div class="d-flex gap-2 justify-content-between collectionStatsBadge">
+                                            <div class="badgeLabel">@Messages(constants.View.COLLECTION_CARD_BADGE_LABEL_PRICE)</div>
+                                            <div class="badgeValue">00</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</a>
+</div>
