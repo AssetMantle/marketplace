@@ -13,7 +13,7 @@
     <td id="startEpoch_@x.id" class="text-end tableFieldStartEpoch epochValue">@x.startEpoch</td>
     <td  id="endEpoch_@x.id" class="text-end tableFieldEndEpoch epochValue">@x.endEpoch</td>
     <td class="text-end tableFieldAction whitelistActionButton">
-        <div class="d-flex gap-3">
+        <div class="d-flex gap-3 justify-content-end">
             <div class="iconTooltip">
                 <span class="tooltipText">@Messages(constants.View.WHITELIST_ICON_MEMBERS)</span>
                 <div onclick="componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.listMembers('@x.id'));">

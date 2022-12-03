@@ -393,6 +393,34 @@ profileContainer .item-sticky .profile-card{
 
 
 /* Responsive */
+@media (min-width: 1500px) {
+    .collectionsPerPage.grid-view-filter .collectionPage{
+        display: flex;
+        flex-flow: row wrap;
+        gap: 0px 16px;
+    }
+    .collectionsPerPage.grid-view-filter .collectionPage .singleCollection {
+        width: calc(calc(100% - 32px) / 3);
+        background-color: var(--card-dark);
+        border-radius: 10px;
+        margin-top: 16px;
+        transition: 0.3s;
+        overflow: hidden;
+        text-align: center;
+    }
+    .profile-card .profiles-container .profile-list .list.grid-view-filter li:nth-child(-n + 2) {
+        margin-top: 0px;
+    }
+    .collectionsPerPage.grid-view-filter .collectionPage .singleCollection:nth-child(-n + 2){
+        margin-top: 0px;
+    }
+    .profile-card .profiles-container .profile-list .list.grid-view-filter li:nth-child(even){
+        margin-left: 0px;
+    }
+    .collectionsPerPage.grid-view-filter .collectionPage .singleCollection:nth-child(even){
+        margin-left: 0px;
+    }
+}
 @media (max-width: 1200px){
     .profile-card .profiles-container .card-header{
         flex-direction: column;
@@ -463,6 +491,8 @@ profileContainer .item-sticky .profile-card{
 @media (max-width: 426px) {
 
 }
+
+
 
 /* Bootstrap */
 .nftContainer .row [class^="col-"]{
@@ -628,6 +658,16 @@ profileContainer .item-sticky .profile-card{
     top:50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+@media (min-width: 1500px){
+    .nftContainer .profileCover{
+        height: 400px;
+    }
+    .nftContainer .profileCover img {
+        display: block;
+        max-width: 1240px;
+        max-height: 400px;
+    }
 }
 @media (max-width: 1400px){
     .nftContainer .profileCover{
