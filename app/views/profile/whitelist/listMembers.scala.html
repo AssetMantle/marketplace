@@ -19,6 +19,7 @@
         </div>
     </div>
 
+    @if(members.nonEmpty) {
     <div class="searchField d-flex">
         <i class="bi bi-search iconWhite iconSmall"></i>
         <input type="text" id="searchMemberField" onkeyup="searchMember()" placeholder="Search">
@@ -59,4 +60,9 @@
             }
         </ul>
     </div>
+    }else{
+        <div id="emptyMemberList" class="h-100 d-flex flex-column justify-content-center align-items-center emptyMemberList">
+            <div class="message">@Messages(constants.View.NO_MEMBERS_FOUND)</div>
+        </div>
+    }
 </div>

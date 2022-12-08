@@ -46,3 +46,13 @@ function loadFirstCollections(){
         setTimeout(loadMoreCollections, 1000);
     }
 }
+
+function setMintedNFTProgressBar(){
+    let progressBar = document.querySelector('.progressBar > span');
+    let totalNFTs = progressBar.getAttribute("data-totalNFT");
+    let mintedNFTs = progressBar.getAttribute("data-mintedNFT");
+    let progress = (mintedNFTs*100) / totalNFTs;
+    for(let i = 0; i < progress; i++) {
+        progressBar.style.width = i + '%';
+    }
+}

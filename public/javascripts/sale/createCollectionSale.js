@@ -30,3 +30,16 @@ function setSaleNFTValue(e) {
         $("#FORM_COLLECTION_SALE_SUBMIT").addClass("disable");
     }
 }
+
+if ($("#SELECT_WHITELIST_ID").val() !== "") {
+    let whitelistId = $("#SELECT_WHITELIST_ID").val();
+    let selectedWhitelist =  $(`#SELECT_WHITELIST_ID option[value=${whitelistId}]`).text();
+    console.log(selectedWhitelist);
+    $("#SELECT_WHITELIST_ID").closest("div").find(".custom-select-trigger").text(selectedWhitelist);
+}
+
+function setOwnedNFTs(){
+    let maxNFTs = $("#collectionOwnedNFTs").text();
+    $("#saleNFTNumber").val(maxNFTs);
+    $("#SALE_NFT_NUMBER").val(maxNFTs);
+}

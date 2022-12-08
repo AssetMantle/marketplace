@@ -6,10 +6,10 @@
 @(collection: master.Collection, nft: master.NFT, liked: Option[Boolean], onClickFunction: JavaScript, draft: Boolean = false)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
     @if(draft) {
-        <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 draftNft">
+        <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 col-xxl-3 mt-3 draftNft">
             <div class="card border-0 h-100" style="cursor: pointer;">
             } else {
-        <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3">
+        <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 col-xxl-3 mt-3">
             <div class="card border-0" style="cursor: pointer;">
             }
     <div class="card-img rounded-0" onclick="@onClickFunction">
@@ -21,7 +21,7 @@
                 <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="34" height="34"/>
             </div>
             <div class="d-flex flex-column justify-content-between">
-                <span class="creator-name">
+                <span class="nft-name">
                 @commonStringValue(message = nft.name, id = utilities.IdGenerator.getRandomHexadecimal, length = 15)
                 </span>
                 <span class="creator-collection-name">@collection.name</span>
@@ -45,7 +45,7 @@
                 <div class="d-flex flex-row gap-1 align-items-center mt-3">
                     <div class=""><img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/></div>
                     <div id="price_@nft.getFileHash" class="nft-mantle-price">--</div>
-                    <div class="nft-dollar-price">($--)</div>
+                    <div id="dollarPrice_@nft.getFileHash" class="nft-dollar-price">($--)</div>
                 </div>
                 @if(loginState.nonEmpty) {
                     <div class="d-flex align-items-center gap-1 mt-3">

@@ -888,3 +888,26 @@
   background-color: var(--default);
   border-radius: 5px;
 }
+
+// Hide Modal scrollbar
+body.modal-open{
+  padding-right: 0px !important;
+}
+#commonModal{
+  padding-right: 0px !important;
+}
+#commonModal::-webkit-scrollbar{
+  display: none;
+}
+
+// Notification count
+#totalUnreadNotification{
+  display: none;
+  background-color: var(--default);
+  position: absolute;
+  left: calc(100% - 12px);
+  top: 10px;
+  @include setFont(var(--font-type-2), normal, 400, 10px, 14px, var(--header-bg));
+  padding: 2px 4px;
+  border-radius: 5px;
+}

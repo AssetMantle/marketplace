@@ -1,7 +1,3 @@
-salePrice = $("#salePrice").text();
-saleMntlPrice = salePrice / microFactor;
-$("#nft-mantle-price").text(saleMntlPrice);
-
 route = jsRoutes.controllers.BlockchainTransactionController.gasTokenPrice();
 $.ajax({
     url: route.url,
@@ -9,8 +5,9 @@ $.ajax({
     async: true,
     statusCode: {
         200: function (data) {
-            currentMntlPrice = data;
-            $("#nft-dollar-price").text((saleMntlPrice * currentMntlPrice).toFixed(5) + "$");
+            let salePrice = $("#nftMantlePrice").text();
+            let currentMntlPrice = data;
+            $("#nftDollarPrice").text("$" + (salePrice * currentMntlPrice).toFixed(5));
         }
     }
 });
