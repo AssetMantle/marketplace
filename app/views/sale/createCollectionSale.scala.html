@@ -33,7 +33,6 @@
     }
     @commonInputMicroNumber(createSaleForm, constants.FormField.NFT_WHITELIST_SALE_PRICE)
     @commonInputInt(createSaleForm, constants.FormField.SALE_MAX_MINT_PER_ACCOUNT)
-    @commonInputBigDecimal(createSaleForm, constants.FormField.NFT_SALE_CREATOR_FEE)
     @commonInputEpochTIme(createSaleForm, constants.FormField.NFT_SALE_START_EPOCH, setCurrentTime = true)
     @commonInputEpochTIme(createSaleForm, constants.FormField.NFT_SALE_END_EPOCH, setCurrentTime = false)
 }

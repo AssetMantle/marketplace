@@ -177,5 +177,7 @@ GET         /sendCoin                                         controllers.Blockc
 POST        /sendCoin                                         controllers.BlockchainTransactionController.sendCoin()
 GET         /mint                                             controllers.BlockchainTransactionController.mintForm(nftId: String)
 POST        /mint                                             controllers.BlockchainTransactionController.mint()
+GET         /nub                                              controllers.BlockchainTransactionController.nubForm()
+POST        /nub                                              controllers.BlockchainTransactionController.nub()
 
 

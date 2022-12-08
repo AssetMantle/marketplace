@@ -24,6 +24,7 @@ object Form {
 
   val SEND_COIN: Form = Form("SEND_COIN", routes.javascript.BlockchainTransactionController.sendCoinForm, routes.BlockchainTransactionController.sendCoin())
   val MINT: Form = Form("MINT", routes.javascript.BlockchainTransactionController.mintForm, routes.BlockchainTransactionController.mint())
+  val NUB: Form = Form("NUB", routes.javascript.BlockchainTransactionController.nubForm, routes.BlockchainTransactionController.nub())
 
   val CREATE_COLLECTION: Form = Form("CREATE_COLLECTION", routes.javascript.CollectionController.createForm, routes.CollectionController.create())
   val EDIT_COLLECTION: Form = Form("EDIT_COLLECTION", routes.javascript.CollectionController.editForm, routes.CollectionController.edit())
