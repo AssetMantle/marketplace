@@ -107,6 +107,7 @@ function markAllAsRead(){
                 $(".notificationDetail.unread").each((index,item)=>{
                     $(item).removeClass("unread").addClass("read");
                 });
+                countUnread();
             },
             401: function () {
                 console.log("400 response");
