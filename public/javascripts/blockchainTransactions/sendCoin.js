@@ -21,7 +21,7 @@ $.ajax({
 function setOption(element, value) {
     $(".toggleOption").removeClass("active");
     $(element).addClass("active");
-    $('##GAS_PRICE').val(value);
+    $('#GAS_PRICE').val(value);
 }
 
 // Set Available Balance
