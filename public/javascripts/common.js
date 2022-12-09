@@ -153,7 +153,7 @@ function getDollarPrice(mntlPrice, nftId){
             200: function (data) {
                 let salePrice = mntlPrice;
                 let currentMntlPrice = data;
-                $("#dollarPrice_" + nftId.split(".")[0]).text("($" + (salePrice * currentMntlPrice).toFixed(5) + ")");
+                $("#dollarPrice_" + nftId.split(".")[0]).text("($" + (salePrice * currentMntlPrice).toFixed(2) + ")");
             }
         }
     });
