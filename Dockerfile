@@ -3,8 +3,8 @@ ARG BUILD_IMAGE=adoptopenjdk:11-jdk-hotspot
 ARG JRE_IMAGE=adoptopenjdk:11-jre-hotspot
 
 FROM $BUILD_IMAGE as build
-ARG SBT_VERSION=1.7.0
-SHELL [ "/bin/bash", "-cx" ]
+ARG SBT_VERSION=1.7.2
+SHELL [ "/bin/bash", "-cxe" ]
 WORKDIR /tmp
 RUN curl -sLo - https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${SBT_VERSION}.tgz | tar -xvzf -; \
   mv sbt/bin/* /usr/local/bin/; \
@@ -14,23 +14,16 @@ ENV JAVA_OPTS="-Xms4G -Xmx8G -Xss6M -XX:ReservedCodeCacheSize=256M -XX:+CMSClass
 ENV JVM_OPTS="-Xms4G -Xmx8G -Xss6M -XX:ReservedCodeCacheSize=256M -XX:+CMSClassUnloadingEnabled -XX:+UseG1GC"
 ENV SBT_OPTS="-Xms4G -Xmx8G -Xss6M -XX:ReservedCodeCacheSize=256M -XX:+CMSClassUnloadingEnabled -XX:+UseG1GC"
 ARG APP_VERSION
+ENV APP_VERSION=$APP_VERSION
 COPY . .
 RUN --mount=type=cache,target=/root/.sbt \
   --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/root/.ivy2 \
   sbt dist; \
-  echo ${APP_VERSION} >git_version; \
- cat git_version
-
-FROM $BUILD_IMAGE as version
-SHELL [ "/bin/bash", "-cx" ]
-ARG APP_VERSION
-WORKDIR /app
-RUN echo ${APP_VERSION} >git_version; \
- cat git_version
+  echo $APP_VERSION
 
 FROM $BUILD_IMAGE as extract
-SHELL [ "/bin/bash", "-cx" ]
+SHELL [ "/bin/bash", "-cxe" ]
 WORKDIR /app
 RUN --mount=type=cache,target=/var/lib/apt/cache \
   --mount=type=cache,target=/var/lib/cache \
@@ -53,6 +46,8 @@ ls -alt
 EOF
 
 FROM $JRE_IMAGE
+ARG APP_VERSION
+ENV APP_VERSION=$APP_VERSION
 LABEL org.opencontainers.image.title=mantleplace
 LABEL org.opencontainers.image.base.name=$JRE_IMAGE
 LABEL org.opencontainers.image.description=mantleplace
@@ -66,5 +61,4 @@ RUN --mount=type=cache,target=/var/lib/apt/cache \
   apt update; \
   apt install -y openssl libexpat1 libsasl2-2 libssl1.1 libsasl2-modules-db
 COPY --from=extract /app/mantleplace /mantleplace
-COPY --from=version /app/git_version /git_version
 ENTRYPOINT [ "/mantleplace/bin/mantleplace" ]

@@ -45,7 +45,7 @@
 
 @if(!maxReached) {
     <div class="d-flex justify-content-end horizontal-align">
-        @commonForm(constants.Form.ACCEPT_WHITELIST_INVITE, acceptForm, submitDisable = false, showCancel = true, closeButton = false, showSubtitle = false) {
+        @commonForm(constants.Form.ACCEPT_WHITELIST_INVITE, acceptForm, submitDisable = false, showCancel = true, closeButton = false, showSubtitle = false, callBackFunction = JavaScript(s"""updateJoinedWhitelistContainer()""")) {
             @commonInputText(acceptForm, constants.FormField.WHITELIST_ID, Symbol("value") -> whitelist.id, Symbol("readonly") -> true, Symbol("containerDivClass") -> "hidden")
         }
     </div>

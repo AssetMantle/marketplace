@@ -278,3 +278,10 @@ function activeButton() {
         $("#FORM_CREATE_COLLECTION_SUBMIT").addClass("disable");
     }
 }
+
+function updateExplorerContainer(creatorId){
+    if($(".createdCollectionsPerPage").length){
+        $('.createdCollectionsPerPage').contents(':not(.createCollectionContainer)').remove();
+        loadFirstCreatedCollections(creatorId);
+    }
+}

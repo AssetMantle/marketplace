@@ -8,8 +8,3 @@
 }else{
     @successModal(heading = constants.View.CREATE_NFT_SUCCESS_TITLE, subHeading = constants.View.CREATE_NFT_SUCCESS_SUBTITLE)
 }
-
-<script>
-    $('#nftsPerPage').html("");
-    loadFirstNFTBulk('nftsPerPage', jsRoutes.controllers.CollectionController.collectionNFTsPerPage('@nft.collectionId', 1));
-</script>
