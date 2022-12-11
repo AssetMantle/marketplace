@@ -2,6 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.result.WithUsernameToken
+import models.history.MasterSales
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -20,6 +21,8 @@ class IndexController @Inject()(
                                  withoutLoginAction: WithoutLoginAction,
                                  withUsernameToken: WithUsernameToken,
                                  starter: Starter,
+                                 // Do not delete, need to initialize object to start the scheduler
+                                 historyMasterSales: MasterSales,
                                  blockchainAccounts: models.blockchain.Accounts
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -41,4 +44,5 @@ class IndexController @Inject()(
   }
 
   starter.start()
+  historyMasterSales.Utility.start
 }

@@ -68,11 +68,11 @@
                                     <div class="d-flex gap-2 gap-md-3 collectionStatsContainer">
                                         <div class="d-flex gap-2 justify-content-between collectionStatsBadge">
                                             <div class="badgeLabel">@Messages(constants.View.COLLECTION_CARD_BADGE_LABEL_ASSETS)</div>
-                                            <div class="badgeValue">00</div>
+                                            <div id="counCollectionNFTs_@collection.id" class="badgeValue">0</div>
                                         </div>
                                         <div class="d-flex gap-2 justify-content-between collectionStatsBadge">
                                             <div class="badgeLabel">@Messages(constants.View.COLLECTION_CARD_BADGE_LABEL_PRICE)</div>
-                                            <div class="badgeValue">00</div>
+                                            <div id="collectionNFTsPrice_@collection.id" class="badgeValue">0</div>
                                         </div>
                                     </div>
                                 </div>
@@ -84,3 +84,4 @@
         </div>
     </div>
 </div>
+<script>countCollectionCardInfo('@collection.id')</script>
