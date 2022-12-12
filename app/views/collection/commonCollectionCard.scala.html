@@ -4,14 +4,36 @@
     <div class="single-profile-card commonCollectionCard artCollection">
         <div class="profile-section">
             <div onclick="@onClickFunction" class="collectionLink">
-                <div class="saleBadge">
-                    <div class="d-flex gap-2 align-items-center option live">
-                        <div class="statusDotWrapper">
-                            <div class="statusDotEmitter">
-                                <div class="statusDotWave"></div>
+                <div class="saleBadge" id="saleBadge_@collection.id">
+                    <div class="option live">
+                        <div class="d-flex gap-2 align-items-center">
+                            <div class="statusDotWrapper">
+                                <div class="statusDotEmitter">
+                                    <div class="statusDotWave"></div>
+                                </div>
                             </div>
+                            <div class="statusMessage" id="statusMessage_@collection.id">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_LIVE)</div>
                         </div>
-                        <div class="statusMessage">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_LIVE)</div>
+                    </div>
+                    <div class="option soldOut">
+                        <div class="d-flex gap-2 align-items-center">
+                            <div class="statusDotWrapper">
+                                <div class="statusDotEmitter">
+                                    <div class="statusDotWave"></div>
+                                </div>
+                            </div>
+                            <div class="statusMessage" id="statusMessage_@collection.id">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_SOLD_OUT)</div>
+                        </div>
+                    </div>
+                    <div class="option ended">
+                        <div class="d-flex gap-2 align-items-center">
+                            <div class="statusDotWrapper">
+                                <div class="statusDotEmitter">
+                                    <div class="statusDotWave"></div>
+                                </div>
+                            </div>
+                            <div class="statusMessage" id="statusMessage_@collection.id">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_ENDED)</div>
+                        </div>
                     </div>
                 </div>
 
