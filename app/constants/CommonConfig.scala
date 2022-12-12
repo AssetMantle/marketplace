@@ -5,7 +5,7 @@ import play.api.Configuration
 import play.api.i18n.Lang
 import utilities.MicroNumber
 
-import scala.concurrent.duration.{Duration, DurationInt, FiniteDuration, MILLISECONDS}
+import scala.concurrent.duration.{Duration, MILLISECONDS}
 
 object CommonConfig {
   private val config: Configuration = Configuration(ConfigFactory.load())
@@ -19,10 +19,9 @@ object CommonConfig {
 
   val SessionTokenTimeout: Int = config.get[Int]("play.http.session.token.timeout")
 
-  object Scheduler {
-    val InitialDelay: FiniteDuration = config.get[Int]("scheduler.initialDelay").millis
-    val FixedDelay: FiniteDuration = config.get[Int]("scheduler.fixedDelay").millis
-  }
+  def initialDelay: Int = config.get[Int]("scheduler.initialDelay")
+
+  def fixedDelay: Int = config.get[Int]("scheduler.fixedDelay")
 
   object Blockchain {
     case class IBCDenom(hash: String, name: String)

@@ -10,7 +10,7 @@ import utilities.MicroNumber
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class CollectionAnalysis(id: String, totalNFTs: Long, totalMinted: Long, totalSold: Long, totalTraded: Long, floorPrice: MicroNumber, totalVolumeTraded: MicroNumber, bestOffer: MicroNumber, listed: Long, owners: Long, uniqueOwners: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] with Logging {
+case class CollectionAnalysis(id: String, totalNFTs: Long, totalMinted: Long, totalSold: Long, totalTraded: Long, floorPrice: MicroNumber, salePrice: MicroNumber, totalVolumeTraded: MicroNumber, bestOffer: MicroNumber, listed: Long, owners: Long, uniqueOwners: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] with Logging {
 
   def serialize: CollectionsAnalysis.CollectionAnalysisSerialized = CollectionsAnalysis.CollectionAnalysisSerialized(
     id = this.id,
@@ -19,6 +19,7 @@ case class CollectionAnalysis(id: String, totalNFTs: Long, totalMinted: Long, to
     totalSold = this.totalSold,
     totalTraded = this.totalTraded,
     floorPrice = this.floorPrice.toBigDecimal,
+    salePrice = this.salePrice.toBigDecimal,
     totalVolumeTraded = this.totalVolumeTraded.toBigDecimal,
     bestOffer = this.bestOffer.toBigDecimal,
     listed = this.listed,
@@ -34,7 +35,7 @@ case class CollectionAnalysis(id: String, totalNFTs: Long, totalMinted: Long, to
 
 object CollectionsAnalysis {
 
-  case class CollectionAnalysisSerialized(id: String, totalNFTs: Long, totalMinted: Long, totalSold: Long, totalTraded: Long, floorPrice: BigDecimal, totalVolumeTraded: BigDecimal, bestOffer: BigDecimal, listed: Long, owners: Long, uniqueOwners: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] with Logging {
+  case class CollectionAnalysisSerialized(id: String, totalNFTs: Long, totalMinted: Long, totalSold: Long, totalTraded: Long, floorPrice: BigDecimal, salePrice: BigDecimal, totalVolumeTraded: BigDecimal, bestOffer: BigDecimal, listed: Long, owners: Long, uniqueOwners: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] with Logging {
 
     def deserialize: CollectionAnalysis = CollectionAnalysis(
       id = this.id,
@@ -43,6 +44,7 @@ object CollectionsAnalysis {
       totalSold = this.totalSold,
       totalTraded = this.totalTraded,
       floorPrice = MicroNumber(this.floorPrice),
+      salePrice = MicroNumber(this.salePrice),
       totalVolumeTraded = MicroNumber(this.totalVolumeTraded),
       bestOffer = MicroNumber(this.bestOffer),
       listed = this.listed,
@@ -62,7 +64,7 @@ object CollectionsAnalysis {
 
   class CollectionAnalysisTable(tag: Tag) extends Table[CollectionAnalysisSerialized](tag, "CollectionAnalysis") with ModelTable[String] {
 
-    def * = (id, totalNFTs, totalMinted, totalSold, totalTraded, floorPrice, totalVolumeTraded, bestOffer, listed, owners, uniqueOwners, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionAnalysisSerialized.tupled, CollectionAnalysisSerialized.unapply)
+    def * = (id, totalNFTs, totalMinted, totalSold, totalTraded, floorPrice, salePrice, totalVolumeTraded, bestOffer, listed, owners, uniqueOwners, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionAnalysisSerialized.tupled, CollectionAnalysisSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -75,6 +77,8 @@ object CollectionsAnalysis {
     def totalTraded = column[Long]("totalTraded")
 
     def floorPrice = column[BigDecimal]("floorPrice")
+
+    def salePrice = column[BigDecimal]("salePrice")
 
     def totalVolumeTraded = column[BigDecimal]("totalVolumeTraded")
 
@@ -126,7 +130,7 @@ class CollectionsAnalysis @Inject()(
 
   object Utility {
 
-    def onNewCollection(id: String): Future[String] = Service.add(CollectionAnalysis(id = id, totalNFTs = 0, totalSold = 0, totalTraded = 0, floorPrice = 0, totalVolumeTraded = 0, bestOffer = 0, listed = 0, owners = 0, uniqueOwners = 0, totalMinted = 0))
+    def onNewCollection(id: String): Future[String] = Service.add(CollectionAnalysis(id = id, totalNFTs = 0, totalSold = 0, totalTraded = 0, floorPrice = 0, salePrice = 0, totalVolumeTraded = 0, bestOffer = 0, listed = 0, owners = 0, uniqueOwners = 0, totalMinted = 0))
 
     def onNewNFT(collectionId: String): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
@@ -137,12 +141,12 @@ class CollectionsAnalysis @Inject()(
       } yield ()
     }
 
-    def onCreateSale(collectionId: String): Future[Unit] = {
+    def onCreateSale(collectionId: String, totalListed: Long, salePrice: MicroNumber): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
 
       for {
         collectionAnalysis <- collectionAnalysis
-        _ <- Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed + 1))
+        _ <- Service.update(collectionAnalysis.copy(listed = totalListed,salePrice = salePrice))
       } yield ()
     }
 

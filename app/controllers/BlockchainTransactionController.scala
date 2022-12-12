@@ -30,6 +30,7 @@ class BlockchainTransactionController @Inject()(
                                                  blockchainBalances: blockchain.Balances,
                                                  blockchainTransactionSendCoins: blockchainTransaction.SendCoins,
                                                  blockchainTransactionMints: blockchainTransaction.Mints,
+                                                 blockchainTransactionNubs: blockchainTransaction.Nubs,
                                                  masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                                  withUsernameToken: WithUsernameToken,
                                                  withLoginActionAsync: WithLoginActionAsync,
@@ -168,6 +169,50 @@ class BlockchainTransactionController @Inject()(
           } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.blockchainTransaction.mint(Mint.form.withGlobalError(baseException.failure.message), mintData.nftId))
+          }
+        }
+      )
+  }
+
+  def nubForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.blockchainTransaction.nub()))
+  }
+
+  def nub(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Nub.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.blockchainTransaction.nub(formWithErrors)))
+        },
+        nubData => {
+          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
+          val validateAndKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = nubData.password)
+
+          def validateAndBroadcast(balance: MicroNumber, validatePassword: Boolean, key: master.Key) = {
+            val errors = Seq(
+              if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (!validatePassword) Option(constants.Response.INVALID_PASSWORD) else None,
+            ).flatten
+            if (errors.isEmpty) {
+              blockchainTransactionNubs.Utility.transaction(
+                fromAccountId = loginState.username,
+                fromAddress = loginState.address,
+                gasLimit = nubData.gasAmount,
+                gasPrice = nubData.gasPrice,
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, nubData.password)),
+              )
+            } else errors.head.throwFutureBaseException()
+          }
+
+
+          (for {
+            balance <- balance
+            (validatePassword, key) <- validateAndKey
+            blockchainTransaction <- validateAndBroadcast(balance, validatePassword, key)
+          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.blockchainTransaction.nub(Nub.form.withGlobalError(baseException.failure.message)))
           }
         }
       )

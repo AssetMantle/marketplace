@@ -1,6 +1,7 @@
 package models.master
 
 import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.history
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -11,12 +12,21 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Sale(id: String, whitelistId: String, collectionId: String, numberOfNFTs: Long, maxMintPerAccount: Long, price: MicroNumber, denom: String, startTimeEpoch: Long, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
+  def getStatus(saleNotExists: Boolean): Int = {
+    val currentEpoch = System.currentTimeMillis() / 1000
+    if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch && saleNotExists) 2 // Sold out
+    else if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) 1 // Live
+    else if (currentEpoch >= this.endTimeEpoch) 3 // Expired
+    else 0 //
+  }
+
   def getStatus: String = {
     val currentEpoch = System.currentTimeMillis() / 1000
     if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.View.SALE_ONGOING
     else if (currentEpoch >= this.endTimeEpoch) constants.View.SALE_EXPIRED
     else constants.View.SALE_NOT_STARTED
   }
+
 
   def serialize(): Sales.SaleSerialized = Sales.SaleSerialized(
     id = this.id,
@@ -25,6 +35,21 @@ case class Sale(id: String, whitelistId: String, collectionId: String, numberOfN
     numberOfNFTs = this.numberOfNFTs,
     maxMintPerAccount = this.maxMintPerAccount,
     price = this.price.toBigDecimal,
+    denom = this.denom,
+    startTimeEpoch = this.startTimeEpoch,
+    endTimeEpoch = this.endTimeEpoch,
+    createdBy = this.createdBy,
+    createdOnMillisEpoch = this.createdOnMillisEpoch,
+    updatedBy = this.updatedBy,
+    updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+
+  def toHistory: history.MasterSale = history.MasterSale(
+    id = this.id,
+    whitelistId = this.whitelistId,
+    collectionId = this.collectionId,
+    numberOfNFTs = this.numberOfNFTs,
+    maxMintPerAccount = this.maxMintPerAccount,
+    price = this.price,
     denom = this.denom,
     startTimeEpoch = this.startTimeEpoch,
     endTimeEpoch = this.endTimeEpoch,
@@ -81,7 +106,6 @@ object Sales {
 
 @Singleton
 class Sales @Inject()(
-                       masterNFTs: NFTs,
                        protected val databaseConfigProvider: DatabaseConfigProvider
                      )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[Sales.SaleTable, Sales.SaleSerialized, String](
@@ -106,10 +130,19 @@ class Sales @Inject()(
 
     def tryGetWhitelistId(id: String): Future[String] = filterHead(_.id === id).map(_.whitelistId)
 
+    def getLiveSales: Future[Seq[String]] = {
+      val currentEpoch = utilities.Date.currentEpoch
+      filter(x => x.startTimeEpoch <= currentEpoch && x.endTimeEpoch > currentEpoch).map(_.map(_.id))
+    }
+
+    def getExpiredSales: Future[Seq[Sale]] = filter(_.endTimeEpoch <= utilities.Date.currentEpoch).map(_.map(_.deserialize))
+
     def getIdsCurrentOnSaleByWhitelistIds(whitelistIds: Seq[String]): Future[Seq[String]] = {
       val currentEpoch = utilities.Date.currentEpoch
       filter(x => x.whitelistId.inSet(whitelistIds) && x.endTimeEpoch > currentEpoch).map(_.map(_.id))
     }
+
+    def delete(saleId: String): Future[Int] = deleteById(saleId)
   }
 
 }

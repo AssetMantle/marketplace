@@ -5,7 +5,7 @@ import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
 import models.master.Collection
 import models.masterTransaction.NFTDraft
-import models.{master, masterTransaction}
+import models.{blockchainTransaction, master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -39,6 +39,7 @@ class NFTController @Inject()(
                                masterWhitelistMembers: master.WhitelistMembers,
                                masterCollectionFiles: master.CollectionFiles,
                                utilitiesNotification: utilities.Notification,
+                               blockchainTransactionBuyAssetWithoutMints: blockchainTransaction.BuyAssetWithoutMints,
                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -132,17 +133,26 @@ class NFTController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val saleId = if (loginState.isDefined) masterNFTOwners.Service.getSaleId(nftId) else Future(None)
+        val isMinted = masterNFTs.Service.tryGet(nftId).map(_.isMinted)
 
         def sale(saleId: String) = if (saleId != "") masterSales.Service.tryGet(saleId).map(Option(_)) else Future(None)
+
+        def checkAlreadySold(saleId: String) = if (saleId != "") blockchainTransactionBuyAssetWithoutMints.Service.checkAlreadySold(saleId = saleId, nftId = nftId) else Future(false)
 
         def saleOffered(whitelistId: String) = if (loginState.isDefined && whitelistId != "") masterWhitelistMembers.Service.isMember(whitelistId = whitelistId, accountId = loginState.get.username)
         else Future(false)
 
+        def mintable(isMinted: Boolean) = if (loginState.isDefined) masterNFTOwners.Service.checkExists(nftId = nftId, ownerId = loginState.get.username).map(x => !isMinted && x)
+        else Future(false)
+
         (for {
           saleId <- saleId
+          isMinted <- isMinted
           sale <- sale(saleId.getOrElse(""))
+          checkAlreadySold <- checkAlreadySold(saleId.getOrElse(""))
           saleOffered <- saleOffered(sale.fold("")(_.whitelistId))
-        } yield Ok(views.html.nft.detail.saleInfo(sale = sale, nftId = nftId, saleOffered = saleOffered, onSale = saleId.isDefined))
+          mintable <- mintable(isMinted)
+        } yield Ok(views.html.nft.detail.saleInfo(sale = sale, nftId = nftId, saleOffered = saleOffered, onSale = saleId.isDefined, mintable = mintable, checkAlreadySold = checkAlreadySold))
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }

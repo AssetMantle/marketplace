@@ -176,8 +176,7 @@ function validateForm(form) {
                 $("#" + fieldName).addClass("errorField");
             }
         }
-    )
-    ;
+    );
     return formValidationBoolean;
 }
 

@@ -3,7 +3,7 @@ package models.blockchainTransaction
 import exceptions.BaseException
 import models.Trait._
 import models.common.Coin
-import models.{blockchain, master}
+import models.{blockchain, history, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -18,6 +18,8 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 case class BuyAssetWithoutMint(buyerAccountId: String, sellerAccountId: String, txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: MicroNumber, nftId: String, saleId: String, broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
 
   def serialize(): BuyAssetWithoutMints.BuyAssetWithoutMintSerialized = BuyAssetWithoutMints.BuyAssetWithoutMintSerialized(sellerAccountId = this.sellerAccountId, buyerAccountId = this.buyerAccountId, txHash = this.txHash, txRawBytes = this.txRawBytes, nftId = this.nftId, saleId = this.saleId, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = this.amount.toBigDecimal, broadcasted = this.broadcasted, status = this.status, memo = this.memo, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+
+  def toHistory(): history.BTBuyAssetWithoutMint = history.BTBuyAssetWithoutMint(sellerAccountId = this.sellerAccountId, buyerAccountId = this.buyerAccountId, txHash = this.txHash, txRawBytes = this.txRawBytes, nftId = this.nftId, saleId = this.saleId, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = this.amount, broadcasted = this.broadcasted, status = this.status, memo = this.memo, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
 object BuyAssetWithoutMints {
@@ -132,6 +134,14 @@ class BuyAssetWithoutMints @Inject()(
       filterAndCount(x => x.buyerAccountId === buyerAccountId && x.status.? === nullStatus || x.status && x.saleId === saleId)
     }
 
+    def checkAlreadySold(saleId: String, nftId: String): Future[Boolean] = {
+      val nullStatus: Option[Boolean] = null
+      filterAndExists(x => x.saleId === saleId && x.nftId === nftId && (x.status.? === nullStatus || x.status))
+    }
+
+    def getAllBySaleId(saleId: String): Future[Seq[BuyAssetWithoutMint]] = filter(_.saleId === saleId).map(_.map(_.deserialize))
+
+    def deleteAllBySaleId(saleId: String): Future[Int] = filterAndDelete(_.saleId === saleId)
   }
 
   object Utility {
@@ -216,7 +226,7 @@ class BuyAssetWithoutMints @Inject()(
       }
     }
 
-    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.CommonConfig.Scheduler.InitialDelay, delay = constants.CommonConfig.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
+    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Scheduler.InitialDelay, delay = constants.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
 
   }
 

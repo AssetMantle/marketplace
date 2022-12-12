@@ -63,4 +63,14 @@ object BlockchainTransaction {
 //      .build().toByteString)
     .build()
 
+  def getNubMsgAsAny(fromAddress: String, fromId: String, toId: String, classificationId: String): protoBufAny = protoBufAny.newBuilder()
+    //    .setTypeUrl(constants.Blockchain.TransactionMessage.MINT)
+    //    .setValue(Tx
+    //      .MsgSend.newBuilder()
+    //      .setFromAddress(fromAddress)
+    //      .setToAddress(toAddress)
+    //      .addAllAmount(amount.map(_.toProtoCoin).asJava)
+    //      .build().toByteString)
+    .build()
+
 }
