@@ -158,7 +158,28 @@ class CollectionController @Inject()(
           collectionAnalysis <- collectionAnalysis
         } yield Ok(views.html.collection.details.collectionAnalysis(collectionAnalysis))
           ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
+  }
+
+  def commonCardInfo(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
+        val saleId = masterNFTOwners.Service.getSaleIdByCollectionId(id)
+        val checkSaleNotExists = masterNFTOwners.Service.checkSaleNotExists(id)
+
+        def saleStatus(saleId: String, checkSaleNotExists: Boolean) = if (saleId != "") masterSales.Service.tryGet(saleId).map(_.getStatus(checkSaleNotExists)) else Future(0)
+
+        (for {
+          collectionAnalysis <- collectionAnalysis
+          saleId <- saleId
+          checkSaleNotExists <- checkSaleNotExists
+          saleStatus <- saleStatus(saleId.getOrElse(""), checkSaleNotExists)
+        } yield Ok(s"${collectionAnalysis.totalNFTs.toString}|${collectionAnalysis.salePrice.toString}|${saleStatus}")
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
         }
     }
   }

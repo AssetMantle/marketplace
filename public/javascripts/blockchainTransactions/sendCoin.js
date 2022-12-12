@@ -17,13 +17,6 @@ $.ajax({
     }
 });
 
-// Gas Toggle Button
-function setOption(element, value) {
-    $(".toggleOption").removeClass("active");
-    $(element).addClass("active");
-    $('##GAS_PRICE').val(value);
-}
-
 // Set Available Balance
 function setAvailableBalance(targetFieldId, amount) {
     $("#" + targetFieldId).val(amount);

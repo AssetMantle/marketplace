@@ -148,6 +148,7 @@ object Response {
   val HANDLE_MULTIPLE_NFT_QUANTITY_CASE = new Failure("HANDLE_MULTIPLE_NFT_QUANTITY_CASE")
   val NFT_ALREADY_MINTED = new Failure("NFT_ALREADY_MINTED")
   val MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED = new Failure("MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED")
+  val NFT_ALREADY_SOLD = new Failure("NFT_ALREADY_SOLD")
 
   class Failure(private val response: String) {
     val message: String = PREFIX + FAILURE_PREFIX + response

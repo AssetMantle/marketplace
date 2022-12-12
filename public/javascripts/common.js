@@ -143,7 +143,7 @@ function truncate(message, fieldId, length) {
     $("#" + fieldId).html(newMessage);
 }
 
-function getDollarPrice(mntlPrice, nftId){
+function getDollarPrice(mntlPrice, nftId) {
     route = jsRoutes.controllers.BlockchainTransactionController.gasTokenPrice();
     $.ajax({
         url: route.url,
@@ -167,11 +167,38 @@ function getNFTPrice(nftId) {
         async: true,
         statusCode: {
             200: function (data) {
-                if(data !== "--") {
+                if (data !== "--") {
                     $("#price_" + nftId.split(".")[0]).html(data);
                     getDollarPrice(data, nftId);
                 }
             }
         }
     });
+}
+
+function countCollectionCardInfo(collectionId) {
+    let route = jsRoutes.controllers.CollectionController.commonCardInfo(collectionId);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                let totalNFTs = data.split("|");
+                console.log(totalNFTs)
+                $('#counCollectionNFTs_' + collectionId).html(totalNFTs[0]);
+                $('#collectionNFTsPrice_' + collectionId).html(totalNFTs[1]);
+            },
+            400: function (data) {
+                console.log(data.responseText)
+            }
+        }
+    });
+}
+
+// Gas Toggle Button
+function setGasOption(element, value) {
+    $(".toggleOption").removeClass("active");
+    $(element).addClass("active");
+    $('#GAS_PRICE').val(value);
 }

@@ -115,5 +115,17 @@ class TransactionComplete @Inject()(
     }
   }
 
+  def onNub(transaction: Transaction, fromAccountId: String): Future[Unit] = {
+    val a = Future()
+
+
+    (for {
+      _ <- a
+    } yield ()
+      ).recover {
+      case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+    }
+  }
+
 
 }

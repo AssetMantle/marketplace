@@ -2,6 +2,8 @@
 
 CREATE SCHEMA IF NOT EXISTS ANALYTICS
     AUTHORIZATION "mantlePlace";
+CREATE SCHEMA IF NOT EXISTS HISTORY
+    AUTHORIZATION "mantlePlace";
 
 CREATE TABLE IF NOT EXISTS ANALYTICS."CollectionAnalysis"
 (
@@ -11,6 +13,7 @@ CREATE TABLE IF NOT EXISTS ANALYTICS."CollectionAnalysis"
     "totalSold"            BIGINT  NOT NULL,
     "totalTraded"          BIGINT  NOT NULL,
     "floorPrice"           NUMERIC NOT NULL,
+    "salePrice"            NUMERIC NOT NULL,
     "totalVolumeTraded"    NUMERIC NOT NULL,
     "bestOffer"            NUMERIC NOT NULL,
     "listed"               BIGINT  NOT NULL,
@@ -21,6 +24,50 @@ CREATE TABLE IF NOT EXISTS ANALYTICS."CollectionAnalysis"
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
     PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS HISTORY."MasterSale"
+(
+    "id"                   VARCHAR NOT NULL,
+    "whitelistId"          VARCHAR NOT NULL,
+    "collectionId"         VARCHAR NOT NULL,
+    "numberOfNFTs"         BIGINT  NOT NULL,
+    "maxMintPerAccount"    BIGINT  NOT NULL,
+    "price"                NUMERIC NOT NULL,
+    "denom"                VARCHAR NOT NULL,
+    "startTimeEpoch"       BIGINT  NOT NULL,
+    "endTimeEpoch"         BIGINT  NOT NULL,
+    "createdBy"            VARCHAR,
+    "createdOnMillisEpoch" BIGINT,
+    "updatedBy"            VARCHAR,
+    "updatedOnMillisEpoch" BIGINT,
+    "deletedBy"            VARCHAR,
+    "deletedOnMillisEpoch" BIGINT,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS HISTORY."BlockchainTransactionBuyAssetWithoutMint"
+(
+    "buyerAccountId"       VARCHAR NOT NULL,
+    "sellerAccountId"      VARCHAR NOT NULL,
+    "txHash"               VARCHAR NOT NULL,
+    "txRawBytes"           BYTEA   NOT NULL,
+    "fromAddress"          VARCHAR NOT NULL,
+    "toAddress"            VARCHAR NOT NULL,
+    "amount"               VARCHAR NOT NULL,
+    "nftId"                VARCHAR NOT NULL,
+    "saleId"               VARCHAR NOT NULL,
+    "broadcasted"          BOOLEAN NOT NULL,
+    "status"               BOOLEAN,
+    "memo"                 VARCHAR,
+    "log"                  VARCHAR,
+    "createdBy"            VARCHAR,
+    "createdOnMillisEpoch" BIGINT,
+    "updatedBy"            VARCHAR,
+    "updatedOnMillisEpoch" BIGINT,
+    "deletedBy"            VARCHAR,
+    "deletedOnMillisEpoch" BIGINT,
+    PRIMARY KEY ("buyerAccountId", "sellerAccountId", "txHash")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."BuyAssetWithoutMint"
@@ -84,6 +131,23 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."Mint"
     "classificationId"     VARCHAR NOT NULL,
     "assetId"              VARCHAR NOT NULL,
     "nftId"                VARCHAR NOT NULL,
+    "broadcasted"          BOOLEAN NOT NULL,
+    "status"               BOOLEAN,
+    "memo"                 VARCHAR,
+    "log"                  VARCHAR,
+    "createdBy"            VARCHAR,
+    "createdOnMillisEpoch" BIGINT,
+    "updatedBy"            VARCHAR,
+    "updatedOnMillisEpoch" BIGINT,
+    PRIMARY KEY ("fromAccountId", "txHash")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."Nub"
+(
+    "fromAccountId"        VARCHAR NOT NULL,
+    "txHash"               VARCHAR NOT NULL,
+    "txRawBytes"           BYTEA   NOT NULL,
+    "fromAddress"          VARCHAR NOT NULL,
     "broadcasted"          BOOLEAN NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
@@ -244,6 +308,8 @@ ALTER TABLE BLOCKCHAIN_TRANSACTION."Mint"
     ADD CONSTRAINT Mint_nftId FOREIGN KEY ("nftId") REFERENCES MASTER."NFT" ("id");
 ALTER TABLE BLOCKCHAIN_TRANSACTION."Mint"
     ADD CONSTRAINT Mint_AccountId FOREIGN KEY ("fromAccountId") REFERENCES MASTER."Account" ("id");
+ALTER TABLE BLOCKCHAIN_TRANSACTION."Nub"
+    ADD CONSTRAINT Mint_AccountId FOREIGN KEY ("fromAccountId") REFERENCES MASTER."Account" ("id");
 
 ALTER TABLE MASTER."Sale"
     ADD CONSTRAINT Sale_collectionId FOREIGN KEY ("collectionId") REFERENCES MASTER."Collection" ("id");
@@ -258,11 +324,33 @@ ALTER TABLE MASTER."NFTOwner"
 ALTER TABLE MASTER."Sale"
     ADD CONSTRAINT Sale_WhitelistId FOREIGN KEY ("whitelistId") REFERENCES MASTER."Whitelist" ("id");
 
+CREATE OR REPLACE FUNCTION PUBLIC.INSERT_OR_UPDATE_HISTORY_EPOCH_LOG() RETURNS TRIGGER AS
+$$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        new."deletedOnMillisEpoch" = FLOOR(EXTRACT(EPOCH FROM NOW()) * 1000);;
+        new."deletedBy" = CURRENT_USER;;
+    END IF;;
+    RETURN NEW;;
+END;;
+$$ LANGUAGE PLPGSQL;
+
 CREATE TRIGGER COLLECTION_ANALYSIS_LOG
     BEFORE INSERT OR UPDATE
     ON ANALYTICS."CollectionAnalysis"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
+
+CREATE TRIGGER SALE_HISTORY_LOG
+    BEFORE INSERT OR UPDATE
+    ON HISTORY."MasterSale"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_HISTORY_EPOCH_LOG();
+CREATE TRIGGER BT_BUY_ASSET_WITHOUT_MINT_LOG
+    BEFORE INSERT OR UPDATE
+    ON HISTORY."BlockchainTransactionBuyAssetWithoutMint"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_HISTORY_EPOCH_LOG();
 
 CREATE TRIGGER BUY_ASSET_WITHOUT_MINT_LOG
     BEFORE INSERT OR UPDATE
@@ -272,6 +360,11 @@ EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 CREATE TRIGGER MINT_LOG
     BEFORE INSERT OR UPDATE
     ON BLOCKCHAIN_TRANSACTION."Mint"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
+CREATE TRIGGER NUB_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."Nub"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 
@@ -366,18 +459,27 @@ EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 # --- !Downs
 DROP TRIGGER IF EXISTS COLLECTION_ANALYSIS_LOG ON ANALYTICS."CollectionAnalysis" CASCADE;
 
+DROP TRIGGER IF EXISTS SALE_HISTORY_LOG ON HISTORY."MasterSale" CASCADE;
+DROP TRIGGER IF EXISTS BT_BUY_ASSET_WITHOUT_MINT_LOG ON HISTORY."BlockchainTransactionBuyAssetWithoutMint" CASCADE;
+
 DROP TRIGGER IF EXISTS BUY_ASSET_WITHOUT_MINT_LOG ON BLOCKCHAIN_TRANSACTION."BuyAssetWithoutMint" CASCADE;
 DROP TRIGGER IF EXISTS MINT_LOG ON BLOCKCHAIN_TRANSACTION."Mint" CASCADE;
+DROP TRIGGER IF EXISTS NUB_LOG ON BLOCKCHAIN_TRANSACTION."Nub" CASCADE;
 
 DROP TRIGGER IF EXISTS NFT_OWNER_LOG ON MASTER."NFTOwner" CASCADE;
 DROP TRIGGER IF EXISTS SALE_LOG ON MASTER."Sale" CASCADE;
 
 DROP TABLE IF EXISTS ANALYTICS."CollectionAnalysis" CASCADE;
 
+DROP TABLE IF EXISTS HISTORY."MasterSale" CASCADE;
+DROP TABLE IF EXISTS HISTORY."BlockchainTransactionBuyAssetWithoutMint" CASCADE;
+
 DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."BuyAssetWithoutMint" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."Mint" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."Nub" CASCADE;
 
 DROP TABLE IF EXISTS MASTER."NFTOwner" CASCADE;
 DROP TABLE IF EXISTS MASTER."Sale" CASCADE;
 
 DROP SCHEMA IF EXISTS ANALYTICS CASCADE;
+DROP SCHEMA IF EXISTS HISTORY CASCADE;
