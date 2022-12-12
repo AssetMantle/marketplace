@@ -10,7 +10,7 @@
     <div class="headerWithIcon">
         <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-1 my-3 headerTop">
-                <div class="title-icon back-button-icon" onclick="setCreatedWhitelistCurrentPage(0); componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.createdWhitelists());">
+                <div id="whitelistDetailBackButton" class="title-icon back-button-icon">
                     <i class="bi bi-chevron-left iconDefault"></i>
                 </div>
                 <h3 class="titleText">@whitelist.name</h3>
@@ -162,4 +162,5 @@
 </div>
 <script>
     setOffersStatus('@whitelist.startEpoch', '@whitelist.endEpoch');
+    setBackButton();
 </script>

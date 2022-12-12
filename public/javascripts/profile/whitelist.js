@@ -180,3 +180,11 @@ function updateCreatedWhitelistContainer(){
     $("#whitelistSectionContent").html("");
     showWhitelistScreen('created');
 }
+
+function setBackButton(){
+    if($(".contentContainer .contentTitle .title .titleLabel").text() === "Created"){
+        $("#whitelistDetailBackButton").attr("onclick","showWhitelistScreen('created')");
+    }else{
+        $("#whitelistDetailBackButton").attr("onclick","showWhitelistScreen('joined')");
+    }
+}

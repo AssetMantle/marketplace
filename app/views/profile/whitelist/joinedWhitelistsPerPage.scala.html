@@ -6,7 +6,9 @@
 @whitelists.zipWithIndex.map { case (whitelist, index) =>
 <tr>
     <td class="text-end tableFieldNo">@(lastIndex + index + 1)</td>
-    <td class="tableFieldName">@whitelist.name</td>
+    <td class="tableFieldName" style="cursor:pointer;" onclick="componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.detail('@whitelist.id'));">
+        @whitelist.name
+    </td>
     <td class="tableFieldStartEpoch">
         <span id="startEpoch_@whitelist.id">@whitelist.startEpoch</span>
     </td>
