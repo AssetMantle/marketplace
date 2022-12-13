@@ -42,7 +42,7 @@ function loadCollectionOnScroll() {
 
 function loadFirstCollections(){
     loadMoreCollections();
-    if($(document).height() > 1000){
+    if($(document).height() > 900){
         setTimeout(loadMoreCollections, 1000);
     }
 }
