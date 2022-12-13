@@ -452,6 +452,7 @@
     padding: 20px 20px 20px 20px;
     border-radius: 20px;
     .contentContainer{
+      border-radius: 0px;
       .header-with-icon{
         .form-top{
           .title-text{
@@ -495,6 +496,9 @@
         text-transform: capitalize;
         .title{
           @include setFont(var(--font-type-1), normal, 400, 16px, 19px, var(--gray));
+          padding: 2px 12px;
+          border-radius: 20px;
+          background-color: var(--card-dark);
         }
         .titleMenu{
           a{
@@ -530,7 +534,7 @@
           }
         }
         .contentTableContainer{
-          padding: 20px 32px 20px 32px;
+          padding: 20px 6px 20px 6px;
           .contentTable{
             border-collapse: collapse;
             width: 100%;
@@ -692,12 +696,12 @@
               //margin-bottom: 16px;
             }
           }
-          &#offersHistory{
+          &#offeredNFTsList{
             .contentTable{
               tbody{
                 display: inline-block;
-                max-height: 230px;
-                overflow-y: scroll;
+                max-height: 385px;
+                overflow-y: auto;
                 height: fit-content;
               }
             }
@@ -705,26 +709,26 @@
         }
         #createdWhitelists{
           .tableFieldNo{min-width: 50px;}
-          .tableFieldName{min-width: 100px;max-width: 100px;}
+          .tableFieldName{min-width: 130px;max-width: 130px;}
           .tableFieldDescription{ min-width: 150px;}
           .tableFieldStatus{min-width: 90px;}
           .tableFieldTotalMembers{min-width: 120px;}
-          .tableFieldMaxMembers{min-width: 110px;}
-          .tableFieldStartEpoch{min-width: 170px;}
-          .tableFieldEndEpoch{min-width: 170px;}
+          .tableFieldMaxMembers{min-width: 90px;}
+          .tableFieldStartEpoch{min-width: 180px;}
+          .tableFieldEndEpoch{min-width: 180px;}
           .tableFieldSale{min-width: 140px;}
-          .tableFieldAction{min-width: 105px;width:105px; i{cursor: pointer;}}
+          .tableFieldAction{min-width: 100%;width:100%;padding:20px !important; i{cursor: pointer;}}
         }
         #joinedWhitelist{
           .tableFieldNo{min-width: 50px;}
-          .tableFieldName{min-width: 150px;max-width: 150px;}
-          .tableFieldStartEpoch{min-width: 170px;}
-          .tableFieldEndEpoch{min-width: 170px;}
+          .tableFieldName{min-width: 180px;max-width: 180px;}
+          .tableFieldStartEpoch{min-width: 180px;}
+          .tableFieldEndEpoch{min-width: 180px;}
           .tableFieldStatus{min-width: 50px;}
           .tableFieldTotalMembers{min-width: 120px;}
-          .tableFieldMaxMembers{min-width: 120px;}
+          .tableFieldMaxMembers{min-width: 115px;}
           .tableFieldSale{min-width: 130px;}
-          .tableFieldAction{min-width: 100px;width:100px; i{cursor: pointer;}}
+          .tableFieldAction{min-width: 100%;width:100%;padding:20px !important; i{cursor: pointer;}}
         }
         #whitelistRequests,
         #offersHistory{
@@ -742,6 +746,29 @@
           .tableFieldOfferName{min-width: 200px;}
           .tableFieldPrice{min-width: 50px;}
           .tableFieldDuration{min-width: 280px;}
+        }
+        #offeredNFTsList{
+          .tableFieldNo{min-width: 50px;}
+          .tableFieldNftName{min-width: 180px;max-width: 180px;}
+          .tableFieldCollectionName{min-width: 180px;max-width: 180px;}
+          .tableFieldSaleStart{min-width: 195px;}
+          .tableFieldSaleEnd{min-width: 195px;}
+          tbody{
+            tr {
+              td{
+                &.tableFieldNftName{
+                  @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--dark));
+                  cursor: pointer;
+                }
+              }
+            }
+          }
+        }
+        #whitelistOffersList{
+          .tableFieldNo{min-width: 50px;}
+          .tableFieldName{min-width: 250px;max-width: 250px;}
+          .tableFieldStatus{min-width: 100px;}
+          .tableFieldDuration{min-width: 420px;}
         }
       }
     }
@@ -944,7 +971,12 @@
 .whitelistFieldMessage{
   @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
 }
-.emptyWishlist{
+.emptyCreated,
+.emptyWishlist,
+.emptyOfferList,
+.emptyOwnedList,
+.emptyMemberList,
+.emptyCollectionOnSaleList{
   background-color: var(--card-dark);
   width: 100%;
   border-radius: 10px;
@@ -952,6 +984,28 @@
   min-height: 500px;
   .message{
     @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+  }
+}
+
+.draftCollection{
+  position: relative;
+  &:before{
+    content: '';
+    width: 66px;
+    height: 26px;
+    position: absolute;
+    background-image: url("../images/icon/draftBadge.png");
+    background-size: cover;
+    left: 0;
+    top: 20px;
+    z-index: 99;
+  }
+  .draftOption{
+    position: absolute;
+    z-index: 99;
+    bottom: 12px;
+    right: 12px;
+    cursor: pointer;
   }
 }
 

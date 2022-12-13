@@ -2,23 +2,23 @@
 
 @(formData: Form[_])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonSelect(formData, constants.FormField.GAS_PRICE, Symbol("class") -> "hidden")
+@commonInputDouble(formData, constants.FormField.GAS_PRICE, Symbol("class") -> "hidden")
 <div class="mb-2 gasFeesLabel">@Messages(constants.View.BLOCKCHAIN_TRANSACTION_FEES)</div>
 <div id="gasPriceToggleButton" class="btn-group w-100 toggleBtn" role="group">
-    <span id="option1" type="button" class="btn p-2 toggleOption" onclick="setOption(this, 1)">
+    <span id="option1" type="button" class="btn p-2 toggleOption" onclick="setGasOption(this, @constants.Blockchain.LowGasPrice)">
         <div class="gasPricePriority">@Messages(constants.View.GAS_LOW)</div>
-        <div class="gasCharges">00</div>
-        <div class="gasChargesPrice">00</div>
+        <div id="gasCharges1" class="gasCharges">@constants.Blockchain.LowGasPrice</div>
+        <div id="gasChargesPrice1" class="gasChargesPrice">00</div>
     </span>
-    <span id="option2" type="button" class="btn p-2 active toggleOption" onclick="setOption(this, 2)">
+    <span id="option2" type="button" class="btn p-2 active toggleOption" onclick="setGasOption(this, @constants.Blockchain.MediumGasPrice)">
         <div class="gasPricePriority">@Messages(constants.View.GAS_MEDIUM)</div>
-        <div class="gasCharges">00</div>
-        <div class="gasChargesPrice">00</div>
+        <div id="gasCharges2" class="gasCharges">@constants.Blockchain.MediumGasPrice</div>
+        <div id="gasChargesPrice2" class="gasChargesPrice">00</div>
     </span>
-    <span id="option3" type="button" class="btn p-2 toggleOption" onclick="setOption(this, 3)">
+    <span id="option3" type="button" class="btn p-2 toggleOption" onclick="setGasOption(this, @constants.Blockchain.HighGasPrice)">
         <div class="gasPricePriority">@Messages(constants.View.GAS_HIGH)</div>
-        <div class="gasCharges">00</div>
-        <div class="gasChargesPrice">00</div>
+        <div id="gasCharges3" class="gasCharges">@constants.Blockchain.HighGasPrice</div>
+        <div id="gasChargesPrice3" class="gasChargesPrice">00</div>
     </span>
 </div>
-<script src="@routes.Assets.versioned("javascripts/blockchainTransactions/sendCoin.js")" type="text/javascript"></script>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/blockchainTransactions/sendCoin.js")" type="text/javascript"></script>

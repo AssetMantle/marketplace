@@ -1,0 +1,12 @@
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="header-with-icon mb-3">
+    <div class="d-flex align-items-center form-top">
+        <div class="title-text">@Messages(constants.View.CREATE_COLLECTION_TYPE_FORM_TITLE)</div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                    &times;
+        </button>
+    </div>
+</div>
+<script type="text/javascript" src="@utilities.PublicResource.getVersionedRoute("javascripts/typeFormEmbed.js")"></script>
+<iframe class="airtable-embed airtable-dynamic-height" src="https://airtable.com/embed/shrdCR3ZZIElFFDFA?backgroundColor=purple" frameborder="0" onmousewheel="" width="100%" height="400" style="background: transparent; border: 1px solid #ccc;"></iframe>

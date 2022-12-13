@@ -1,8 +1,9 @@
 @import views.setting.companion.AddUnmanagedKey
 @import views.html.base.form._
+@import views.html.base.buttons._
 
 @(unmanagedAddressForm: Form[AddUnmanagedKey.Data] = AddUnmanagedKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
+<link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/userProfile.css")"/>
 @commonForm(constants.Form.ADD_UNMANAGED_KEY, unmanagedAddressForm) {
     <div id="newUnmanagedAddressScreen" class="mb-0">
         <div class="modal-body">
@@ -24,7 +25,7 @@
             </div>
         </div>
         <div class="horizontal-align">
-            @views.html.base.buttons.commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideUnmanagedAddressModalScreen('#newUnmanagedAddressPasswordScreen', '#newUnmanagedAddressScreen')"),Symbol("id") -> "newUnmanagedAddressScreenBtn", Symbol("class") -> "disable")
+            @commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideUnmanagedAddressModalScreen('#newUnmanagedAddressPasswordScreen', '#newUnmanagedAddressScreen')"),Symbol("id") -> "newUnmanagedAddressScreenBtn", Symbol("class") -> "disable")
         </div>
     </div>
 
@@ -37,4 +38,4 @@
         </div>
     </div>
 }
-<script src="@routes.Assets.versioned("javascripts/settings/unmanagedAddress.js")" type="text/javascript"></script>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/settings/unmanagedAddress.js")" type="text/javascript"></script>

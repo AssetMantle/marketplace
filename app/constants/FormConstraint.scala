@@ -1,12 +1,13 @@
 package constants
 
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
-import utilities.MicroNumber
 import views.account.companion._
-import views.setting.companion._
-import views.collection.{companion => collection}
-import views.profile.whitelist.{companion => whitelist}
 import views.blockchainTransaction.companion._
+import views.collection.{companion => collection}
+import views.nft.companion._
+import views.profile.whitelist.{companion => whitelist}
+import views.sale.{companion => sale}
+import views.setting.companion._
 
 object FormConstraint {
   val passwordSymbols = "!@#$%^&*._-"
@@ -73,7 +74,6 @@ object FormConstraint {
       if (!sendCoin.fromAddress.startsWith("mantle") || sendCoin.fromAddress.length != 45) Option(ValidationError(constants.Response.INVALID_FROM_ADDRESS.message)) else None,
       if (!sendCoin.toAddress.startsWith("mantle") || sendCoin.toAddress.length != 45) Option(ValidationError(constants.Response.INVALID_TO_ADDRESS.message)) else None,
       if (sendCoin.fromAddress == sendCoin.toAddress) Option(ValidationError(constants.Response.FROM_AND_TO_ADDRESS_SAME.message)) else None,
-      if (sendCoin.gasPrice.toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_NUMBER_FORMAT.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })
@@ -81,7 +81,7 @@ object FormConstraint {
   val createWhitelistInviteConstraint: Constraint[whitelist.Create.Data] = Constraint("constraints.CreateWhitelist")({ createWhitelistData: whitelist.Create.Data =>
     val errors = Seq(
       if (createWhitelistData.startEpoch >= createWhitelistData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
-      if (createWhitelistData.startEpoch < (System.currentTimeMillis / 1000 - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
+      if (createWhitelistData.startEpoch < (utilities.Date.currentEpoch - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })
@@ -93,12 +93,49 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
+  val createCollectionConstraint: Constraint[collection.Create.Data] = Constraint("constraints.CreateCollection")({ createData: collection.Create.Data =>
+    val errors = Seq(
+      if (!createData.termsAccepted) Option(ValidationError(constants.Response.TERMS_AND_CONDITION_NOT_ACCEPTED.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val collectionPropertiesConstraint: Constraint[collection.DefineProperties.Property] = Constraint("constraints.DefinePropertiesProperty")({ propertyData: collection.DefineProperties.Property =>
+    val errors = Seq(
+      if (!constants.NFT.Data.TypesList.contains(propertyData.propertyType)) Option(ValidationError(constants.Response.NFT_PROPERTY_TYPE_NOT_FOUND.message)) else None,
+      if (propertyData.propertyType == constants.NFT.Data.BOOLEAN && propertyData.defaultValue.isDefined && !(propertyData.defaultValue.getOrElse("") == constants.NFT.Data.TRUE || propertyData.defaultValue.getOrElse("") == constants.NFT.Data.FALSE)) Option(ValidationError(constants.Response.INVALID_DEFAULT_VALUE.message)) else None,
+      if (propertyData.propertyType == constants.NFT.Data.DECIMAL && propertyData.defaultValue.isDefined && propertyData.defaultValue.getOrElse("0").toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_DEFAULT_VALUE.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
   val defineCollectionPropertiesConstraint: Constraint[collection.DefineProperties.Data] = Constraint("constraints.DefineCollectionPropertiesConstraint")({ definePropertiesData: collection.DefineProperties.Data =>
-    val definedPropertiesNames = definePropertiesData.properties.filter(_.name.isDefined).map(_.name.get.toLowerCase())
+    val definedPropertiesNames = definePropertiesData.properties.flatMap(_.name)
     val errors = Seq(
       if ((definedPropertiesNames.length + constants.Collection.DefaultProperty.list.length) > constants.Blockchain.MaximumProperties) Option(ValidationError(constants.Response.MAXIMUM_COLLECTION_PROPERTIES_EXCEEDED.message)) else None,
-      if (definedPropertiesNames.intersect(constants.Collection.DefaultProperty.list).nonEmpty) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES.message)) else None,
+      if (definedPropertiesNames.map(_.toLowerCase).intersect(constants.Collection.DefaultProperty.list.map(_.toLowerCase)).nonEmpty) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES.message)) else None,
       if (definedPropertiesNames.distinct.length != definedPropertiesNames.length) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DUPLICATE_PROPERTIES.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val nftTagsConstraint: Constraint[NFTTags.Data] = Constraint("constraints.NFTTagsConstraint")({ nftTagsData: NFTTags.Data =>
+    if (nftTagsData.tags != "") {
+      val tags = nftTagsData.tags.split(constants.NFT.Tags.Separator)
+      val errors = Seq(
+        if (tags.length > constants.NFT.Tags.MaximumAllowed) Option(ValidationError(constants.Response.MAXIMUM_NFT_TAGS_EXCEEDED.message)) else None,
+        if (tags.exists(x => x.length < constants.NFT.Tags.MinimumLength || x.length > constants.NFT.Tags.MaximumLength)) Option(ValidationError(constants.Response.INVALID_NFT_TAGS_LENGTH.message)) else None,
+        if (tags.distinct.length != tags.length) Option(ValidationError(constants.Response.REPEATED_NFT_TAGS.message)) else None,
+        if (tags.distinct.length != tags.length) Option(ValidationError(constants.Response.REPEATED_NFT_TAGS.message)) else None,
+      ).flatten
+      if (errors.isEmpty) Valid else Invalid(errors)
+    } else Valid
+  })
+
+  val createSale: Constraint[sale.CreateCollectionSale.Data] = Constraint("constraints.CreateCollectionSale")({ createCollectionSaleData: sale.CreateCollectionSale.Data =>
+    val errors = Seq(
+      if (createCollectionSaleData.startEpoch >= createCollectionSaleData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
+      if (createCollectionSaleData.startEpoch < (utilities.Date.currentEpoch - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })

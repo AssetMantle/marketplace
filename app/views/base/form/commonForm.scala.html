@@ -1,7 +1,7 @@
 @import helper._
 @import views.html.base.buttons._
 
-@(formTemplate: constants.Form, formData: Form[_], showBackButton: Boolean = false, closeButton: Boolean = true, showSubtitle: Boolean = true, showScreen: String = "", hideScreen: String = "", refreshOverlay: Boolean = false, submitDisable: Boolean = true, target: String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+@(formTemplate: constants.Form, formData: Form[_], showBackButton: Boolean = false, closeButton: Boolean = true, showCancel: Boolean = false, showSubtitle: Boolean = true, showScreen: String = "", hideScreen: String = "", refreshOverlay: Boolean = false, submitDisable: Boolean = true, target: String = "modal-content", customSubmit: JavaScript = JavaScript(""), runBeforeSubmit: JavaScript = JavaScript(""), callBackFunction: JavaScript = JavaScript(""))(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @form(action = formTemplate.post,
     Symbol("onkeypress") -> s"onKeyPress(event,'${refreshOverlay}',this, '${target}')",
@@ -26,9 +26,11 @@
         } else {
             <div class="modal-header mb-3">
                 <h5 class="modal-title" id="staticBackdropLabel">@Messages(formTemplate.title)</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
-                            &times;
-                </button>
+                @if(closeButton) {
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                                &times;
+                    </button>
+                }
             </div>
             @if(showSubtitle) {
                 <p class="sub-heading" id="modalSubtitle">@Messages(formTemplate.subTitle)</p>
@@ -37,7 +39,7 @@
     } else {
         @if(showBackButton) {
             <div class="modal-header mb-3">
-                <div class="title-icon back-button-icon" onclick="showHideModalScreen('@showScreen', '@hideScreen')">
+                <div class="title-icon back-button-icon" id="modalBackButton" onclick="showHideModalScreen('@showScreen', '@hideScreen')">
                     <i class="bi bi-chevron-left iconDefault"></i>
                 </div>
                 <h5 class="modal-title" id="staticBackdropLabel">@Messages(formTemplate.title)</h5>
@@ -50,9 +52,11 @@
         } else {
             <div class="modal-header mb-3">
                 <h5 class="modal-title" id="staticBackdropLabel">@Messages(formTemplate.title)</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
-                            &times;
-                </button>
+                @if(closeButton) {
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                                &times;
+                    </button>
+                }
             </div>
         }
     }
@@ -78,14 +82,17 @@
         @CSRF.formField
         @fieldset
         <div class="modal-footer">
+            @if(showCancel) {
+                @commonSecondaryButton(constants.View.CANCEL, JavaScript(s"""closeModal()"""))
+            }
             <div id="formSubmitButton">
             @if(customSubmit != JavaScript("")) {
                 @commonJavascriptButton(formTemplate.submit, customSubmit)
             } else {
                 @if(submitDisable) {
-                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${refreshOverlay}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace(".", "_"), Symbol("class") -> "disable")
+                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${refreshOverlay}', this, '${target}', ()=>{${callBackFunction}})"), Symbol("id") -> formTemplate.submit.replace(".", "_"), Symbol("class") -> "disable")
                 } else {
-                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${refreshOverlay}', this, '${target}')"), Symbol("id") -> formTemplate.submit.replace(".", "_"))
+                    @commonJavascriptButton(formTemplate.submit, JavaScript(s"$runBeforeSubmit;" + s"submitForm('${refreshOverlay}', this, '${target}', ()=>{${callBackFunction}})"), Symbol("id") -> formTemplate.submit.replace(".", "_"))
                 }
             }
             </div>

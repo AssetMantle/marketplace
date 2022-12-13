@@ -1,0 +1,27 @@
+@import controllers.actions.LoginState
+@import views.html.base.form._
+@import helper._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+<div class="notificationPopupContainer">
+    <div class="haveNotification">
+        <div id="markAllAsRead" class="hidden">
+            @defining(views.notification.companion.MarkNotificationsRead.form) { markAsReadForm =>
+                @form(routes.ProfileController.markNotificationsRead()) {
+                    @CSRF.formField
+                    @commonInputText(markAsReadForm, constants.FormField.NOTIFICATION_ID, Symbol("value") -> "", Symbol("readonly") -> "readonly")
+                    @commonToggleButton(markAsReadForm, constants.FormField.MARK_ALL_NOTIFICATION_READ, Symbol("value") -> "true", Symbol("checked") -> "checked", Symbol("style") -> "display:block;")
+                }
+            }
+        </div>
+        <div class="d-flex justify-content-between align-items-center headerContainer">
+            <div class="title">@Messages(constants.View.NOTIFICATION_POPUP_TITLE)</div>
+            <div class="titleLink" onclick="markAllAsRead()">@Messages(constants.View.NOTIFICATION_POPUP_MARK_ALL_AS_READ)</div>
+        </div>
+        <div class="separator"></div>
+        <div id="notificationList"></div>
+        <div class="loadOlderNotificationButton" onclick="loadMoreNotifications()">@Messages(constants.View.NOTIFICATION_POPUP_LOAD_MORE)</div>
+    </div>
+</div>
+<script>loadMoreNotifications();
+countUnread();</script>

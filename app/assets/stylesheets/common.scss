@@ -11,12 +11,12 @@
 .dropdown {
   display: inline-block;
   width: 100%;
-  z-index: 999;
+  //z-index: 999;
 
   .dropdownHead {
     @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
-    padding: 10px 12px;
-    border: 1px solid var(--inactive-gray);
+    padding: 7px 12px;
+    border: 1px solid var(--gray);
     border-radius: 8px;
     cursor: pointer;
     position: relative;
@@ -31,22 +31,25 @@
     }
 
     &::after {
-      content: "";
-      height: 20px;
-      width: 20px;
-      background-image: url("../images/icon/downArrowWhite.png");
-      background-size: 18px;
-      background-repeat: no-repeat;
       position: absolute;
-      right: 12px;
-      top: 12px;
-      transform-origin: center center;
-      transition: all .5s;
+      display: block;
+      content: '';
+      width: 10px;
+      height: 10px;
+      top: 50%;
+      right: 25px;
+      margin-top: -3px;
+      border-bottom: 1px solid var(--mantle-off-white);
+      border-right: 1px solid var(--mantle-off-white);
+      transform: rotate(45deg) translateY(-50%);
+      transition: all .4s ease-in-out;
+      transform-origin: 50% 0;
     }
 
     &.active::after {
-      top: 10px;
-      transform: rotate(180deg);
+      margin-top: 3px;
+      transform: rotate(-135deg) translateY(-50%);
+      border-color: var(--default);
     }
 
     .currentSelected {
@@ -82,7 +85,7 @@
         background: var(--card-color);
         line-height: 20px;
         position: relative;
-        z-index: 89;
+        z-index: 999;
 
         &:nth-last-child(1) {
           padding-bottom: 10px;
@@ -366,6 +369,7 @@
   cursor: pointer;
   .links {
     .menuItem {
+      height: 30px;
       list-style: none;
       position: relative;
       a{
@@ -426,7 +430,7 @@
       }
       &:hover {
         .subMenu {
-          top: 35px;
+          top: 41px;
           opacity: 1;
           visibility: visible;
         }
@@ -629,21 +633,190 @@
   }
 }
 
+// common Notification popup
+.right-menu .links li.menuItem .notificationPopup {
+  text-transform: none;
+  width: 396px;
+  position: absolute;
+  left: -260px;
+  top: 90px;
+  transform: translateX(-71px);
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  cursor: auto;
+
+  &::before {
+    content: '';
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid var(--popup-bg);
+    position: absolute;
+    top: -9px;
+    right: 35px;
+  }
+
+  &.active {
+    top: 70px;
+    opacity: 1;
+    visibility: visible;
+    //transition: all 0.3s ease;
+  }
+
+  .notificationPopupContainer {
+    background: var(--popup-bg);
+    border: 2px solid var(--popup-stroke);
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+
+    .separator {
+      height: 2px;
+      width: 100%;
+      background-color: #383838;
+      margin: 16px 0px;
+    }
+
+    .headerContainer {
+      line-height: 22px;
+      .title{
+        @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+      }
+      .titleLink{
+        @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
+        text-transform: capitalize;
+        cursor: pointer;
+      }
+    }
+
+    .emailContainer{
+      width: 100%;
+      line-height: 20px;
+      .emailInputField{
+        .emailNotificationLabel{
+          @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--gray));
+          text-transform: capitalize;
+        }
+        input[type="text"]{
+          @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+          height: 36px;
+          box-sizing: border-box;
+          display: block;
+          width: 100%;
+          border: 1px solid var(--inactive-gray);
+          padding: calc(var(--size-bezel) * 2) 12px;
+          background: transparent;
+          border-radius: var(--size-radius);
+          letter-spacing: 1px;
+          outline: none;
+          margin-top: 12px;
+          &:focus{
+            border-color: var(--dark);
+          }
+          &:not(:focus)
+          {
+            color: var(--inactive-gray);
+            border-color: var(--gray) !important;
+          }
+          &.errorField{
+            border: 1px solid var(--error) !important;
+          }
+        }
+        .emailNotificationButton{
+          @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
+          text-align: right;
+          text-transform: capitalize;
+          margin-top: 12px;
+        }
+      }
+    }
+    .notificationList{
+      .notificationListTitle{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--dark));
+        text-transform: capitalize;
+        margin-bottom: 12px;
+      }
+      .list{
+        .singleNotification{
+          .notificationIcon{
+            height: 40px;
+            width: 40px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background-color: var(--card-dark);
+            cursor: pointer;
+            &:hover{
+              background-color: var(--disable-yellow);
+            }
+            &.active{
+              background-color: var(--default);
+              i{
+                color:var(--card-dark);
+              }
+            }
+          }
+          .notificationDetail{
+            .title{
+              @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--default));
+              text-transform: capitalize;
+              word-break: break-word;
+              &.clickable{
+                cursor: pointer;
+              }
+            }
+            .description{
+              @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
+              word-break: break-word;
+            }
+            .dateTime{
+              @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));
+            }
+            &.read{
+              .notificationIcon{
+                background-color: var(--default);
+                i{
+                  color:var(--card-dark);
+                }
+              }
+            }
+          }
+          &.clickable{
+            cursor: pointer;
+          }
+        }
+      }
+
+    }
+    .loadOlderNotificationButton{
+      @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
+      text-align: right;
+      text-transform: capitalize;
+      margin-top: 32px;
+      cursor: pointer;
+    }
+  }
+}
 // Common Upload File
 .uploadFileContainer{
   width: 100%;
+  height: 100%;
   .uploadFileLabel{
     @include setFont(var(--font-type-2), normal, 600, 18px, 34px, var(--inactive-gray));
   }
   .uploadForm{
     border: 1px dashed var(--gray);
     border-radius: 6px;
-    min-height: 246px;
+    min-height: 374px;
+    max-height: 400px;
     height: 100%;
     align-items: center;
     justify-content: center;
     text-align: center;
     padding: 48px 48px 48px 48px;
+    display: flex;
+    align-items: center;
     .uploadBox{
       .uploadIcon{
         font-size: 40px;
@@ -663,17 +836,82 @@
       display: none;
       .fileName{
         @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+        word-break: break-word;
       }
+    }
+    .uploadCompletionMessage{
+      @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+      word-break: break-word;
+      display: flex;
+      justify-content: center;
     }
   }
   .modalInfoBlock{
     height: 100%;
+  }
+  .previewImageContainer{
+    height: 200px;
+    width: 150px;
+    img{
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      min-width: 100%;
+      min-height: 100%;
+      margin: auto;
+      object-fit: contain;
+      aspect-ratio: 1/1;
+    }
   }
 }
 
 // Common Tertiary Button
 .tertiaryButton{
   @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
+  background: radial-gradient(50% 50% at 50% 50%, #FFC640 47.4%, #F2AF13 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
   cursor: pointer;
   display: inline-block;
+}
+
+#notificationList{
+  height: 215px;
+  overflow-y: auto;
+}
+
+// New Feature Icon
+.newFeatureIcon{
+  position: absolute;
+  right: 0;
+  top: 10px;
+  @include setFont(var(--font-type-2), normal, 400, 10px, 14px, var(--header-bg));
+  padding: 2px 4px;
+  background-color: var(--default);
+  border-radius: 5px;
+}
+
+// Hide Modal scrollbar
+body.modal-open{
+  padding-right: 0px !important;
+}
+#commonModal{
+  padding-right: 0px !important;
+}
+#commonModal::-webkit-scrollbar{
+  display: none;
+}
+
+// Notification count
+#totalUnreadNotification{
+  display: none;
+  background-color: var(--default);
+  position: absolute;
+  left: calc(100% - 12px);
+  top: 10px;
+  @include setFont(var(--font-type-2), normal, 400, 10px, 14px, var(--header-bg));
+  padding: 2px 4px;
+  border-radius: 5px;
 }

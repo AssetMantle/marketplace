@@ -22,7 +22,8 @@
     font-family: var(--font-type-1);
     position: relative;
     display: flex;
-    max-width: calc(100% - 200px);
+    max-width: 100%;
+    padding: 0 24px;
     margin: 0 auto;
     height: 70px;
     align-items: center;
@@ -101,7 +102,8 @@ nav .content .links
     color:var(--mantle-off-white);
 }
 .submenu{
-    width: 180px !important;
+    width: 300px !important;
+    padding: 15px 30px !important;
 }
 .submenu .disable{
     color:var(--mantle-off-white);
@@ -237,11 +239,10 @@ nav .content .links
     position: absolute;
     background: var(--popup-bg);
     border: 2px solid var(--popup-stroke);
-    border-radius: 20px;
+    border-radius: 10px;
     top: 90px;
     z-index: -1;
-    left: 50%;
-    transform: translateX(-73px);
+    right: 0;
     padding: 15px 30px;
     opacity: 0;
     visibility: hidden;
@@ -461,6 +462,9 @@ nav .content .links
         padding: 0 20px 0 50px;
     }
 
+    .submenu{
+        padding: 0px !important;
+    }
 }
 
 @media screen and (max-width: 400px) {
@@ -659,11 +663,20 @@ nav .content .links
         color: #000000;
     }
 }
-#walletPopup.active + a i{
-        color: var(--default);
-}
-.right-menu .links > li:hover i {
+.popupContainer.active + a i{
     color: var(--default);
+}
+.right-menu .links .menuItem.menuIcon{
+    color: var(--default);
+}
+.right-menu .links > li:hover a > i {
+    color: var(--default);
+}
+.right-menu .menuItem.menuIcon .desktop-link{
+    padding: 27px 10px;
+}
+#userNotification .popupContainer.active + a i.bi-bell::before{
+    content: "\f189";
 }
 #userWallet .desktop-link{
     padding: 27px 10px;

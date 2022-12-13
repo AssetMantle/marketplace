@@ -2,13 +2,13 @@
 @import controllers.actions.LoginState
 @import views.html.base.buttons.commonPrimaryCallButton
 
-@(accountId: String, collections: Seq[master.Collection], collectionFiles: Seq[master.CollectionFile], totalCollections: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(accountId: String, collections: Seq[master.Collection], totalCollections: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 <div class="m-0 p-0 collectionPage wishlistCollectionsPerPage">
     @if(collections.nonEmpty) {
         @collections.map { collection =>
             <div class="mt-3 singleCollection singleWishlistCollection">
-                @commonCollectionCard(collection, JavaScript(s"viewWishListCollection('$accountId/WISHLIST/${collection.id}')"), collectionCoverFile = collectionFiles.find(x => x.id == collection.id && x.documentType == constants.Collection.File.COVER).map(_.fileName), collectionProfileFile = collectionFiles.find(x => x.id == collection.id && x.documentType == constants.Collection.File.PROFILE).map(_.fileName))
+                @commonCollectionCard(collection, JavaScript(s"viewWishListCollection('$accountId/WISHLIST/${collection.id}')"))
             </div>
         }
     } else {
@@ -23,5 +23,5 @@
         } else {}
     }
 </div>
-<script src="@routes.Assets.versioned("javascripts/profile/wishlist/collectionPerPage.js")" type="text/javascript"></script>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/profile/wishlist/collectionPerPage.js")" type="text/javascript"></script>
 <script>checkNoCollection()</script>

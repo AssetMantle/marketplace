@@ -1,8 +1,7 @@
 package constants
 
-import com.google.common.collect
-import com.google.common.collect.ImmutableList
 import org.bitcoinj.crypto.ChildNumber
+import utilities.MicroNumber
 
 object Blockchain {
   val AccountPrefix = "mantle"
@@ -14,6 +13,8 @@ object Blockchain {
   val ChainId: String = CommonConfig.Blockchain.ChainId
   val StakingToken: String = CommonConfig.Blockchain.StakingToken
   val DefaultSendCoinGasAmount = 100000
+  val DefaultMintAssetGasAmount = 500000
+  val DefaultNubGasAmount = 100000
   val DefaultHDPath: Seq[ChildNumber] = Seq(
     new ChildNumber(44, true),
     new ChildNumber(CoinType, true),
@@ -21,6 +22,11 @@ object Blockchain {
     new ChildNumber(0, false),
     new ChildNumber(0, false)
   )
+  val AssetPropertyRate: MicroNumber = CommonConfig.Blockchain.AssetPropertyRate
+  val LowGasPrice: Double = CommonConfig.Blockchain.LowGasPrice
+  val MediumGasPrice: Double = CommonConfig.Blockchain.MediumGasPrice
+  val HighGasPrice: Double = CommonConfig.Blockchain.HighGasPrice
+
 
   object Account {
     val BASE = "/cosmos.auth.v1beta1.BaseAccount"
@@ -30,11 +36,6 @@ object Blockchain {
     val PERIODIC_VESTING = "/cosmos.vesting.v1beta1.PeriodicVestingAccount"
   }
 
-  object ValidatorStatus {
-    val BONDED = "BOND_STATUS_BONDED"
-    val UNBONDED = "BOND_STATUS_UNBONDED"
-    val UNBONDING = "BOND_STATUS_UNBONDING"
-  }
 
   object Proposal {
     val PARAMETER_CHANGE = "/cosmos.params.v1beta1.ParameterChangeProposal"
@@ -42,15 +43,6 @@ object Blockchain {
     val COMMUNITY_POOL_SPEND = "/cosmos.distribution.v1beta1.CommunityPoolSpendProposal"
     val SOFTWARE_UPGRADE = "/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal"
     val CANCEL_SOFTWARE_UPGRADE = "/cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal"
-
-    object Status {
-      val UNSPECIFIED = "PROPOSAL_STATUS_UNSPECIFIED"
-      val DEPOSIT_PERIOD = "PROPOSAL_STATUS_DEPOSIT_PERIOD"
-      val VOTING_PERIOD = "PROPOSAL_STATUS_VOTING_PERIOD"
-      val PASSED = "PROPOSAL_STATUS_PASSED"
-      val REJECTED = "PROPOSAL_STATUS_REJECTED"
-      val FAILED = "PROPOSAL_STATUS_FAILED"
-    }
   }
 
   object PublicKey {

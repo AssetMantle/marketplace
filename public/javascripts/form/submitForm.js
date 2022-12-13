@@ -1,4 +1,8 @@
-function submitForm(refreshOverlay, source, targetID) {
+function emptyCallBack() {
+    console.log("emptyCallBack");
+}
+
+function submitForm(refreshOverlay, source, targetID, callback = emptyCallBack) {
     const target = '#' + targetID;
     const form = $(source).closest("form");
     if (validateForm(form)) {
@@ -23,17 +27,17 @@ function submitForm(refreshOverlay, source, targetID) {
                 },
                 200: function (data) {
                     replaceDocument(data);
+                    callback();
                 },
                 206: function (data) {
                     if (refreshOverlay === "true") {
                         $(".modalContainer").removeClass('active');
-                        // setTimeout(function(){
                         $(target).html(data);
                         $(".modalContainer").addClass('active');
-                        // },1000);
                     } else {
                         $(target).html(data);
                     }
+                    callback();
                 },
                 404: function (data) {
                     result.html(data.responseText);

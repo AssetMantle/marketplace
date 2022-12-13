@@ -29,24 +29,32 @@ function openCloseWalletScreen(e, elementID) {
     $(e).parent().closest(".walletPopupContainer").find(`#${elementID}`).toggleClass("open");
 }
 
-function changeActive(setAddress, oldAddress) {
-    let route = jsRoutes.controllers.AccountController.changeActiveKey(setAddress);
-    $.ajax({
-        url: route.url,
-        type: route.type,
-        async: true,
-        statusCode: {
-            200: function (data) {
-                $(setAddress).prop("checked", true);
-                $(oldAddress).prop("checked", false);
-            },
-            400: function (data) {
-            },
-            204: function (data) {
+function changeActive(setAddress) {
+    let oldAddress = $('.activeKey').attr("id");
+    if (oldAddress !== setAddress) {
+        let form = $('#changeActiveKeyForm');
+        $('#WALLET_ADDRESS').val(setAddress);
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: form.serialize(),
+            async: true,
+            statusCode: {
+                200: function (data) {
+                    $('#' + oldAddress).removeClass("activeKey");
+                    $('#' + setAddress).addClass("activeKey");
+                    $('#changeActiveKeyForm').html(data);
+                },
+                400: function (data) {
+                },
+                204: function (data) {
 
-            },
-        }
-    });
+                },
+            }
+        });
+    } else {
+        console.log("setting to same address");
+    }
 }
 
 function fetchBalances(walletAddresses) {
@@ -67,14 +75,13 @@ function fetchBalance(address) {
                 $("#walletBalance_" + address).html(data);
             },
             400: function (data) {
-                console.log(data.responseText)
                 $("#walletBalance_" + address).html(data.responseText);
             }
         }
     });
 }
 
-function updateKeyName(){
+function updateKeyName() {
     $('.walletInfoField').load(document.URL);
 }
 
@@ -93,4 +100,26 @@ function showHideSeed() {
         $(".closeEye").removeClass("hidden");
         $(".openEye").addClass("hidden");
     }
+}
+
+function fetchKeys() {
+    let route = jsRoutes.controllers.SettingController.walletPopupKeys();
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                $('#walletAddressList').html(data);
+            },
+            400: function (data) {
+            },
+            204: function (data) {
+
+            },
+            500: function (data) {
+                console.log(data.responseText)
+            }
+        }
+    });
 }

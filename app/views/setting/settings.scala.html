@@ -35,6 +35,9 @@
         <div class="containerTitle">@Messages(constants.View.PROFILE_WALLET_DETAIL_TITLE)</div>
             <!-- Single Address Start -->
 
+        <div id="changeActiveKeyFormContainer" class="hidden">
+        @views.html.setting.changeActiveKey()
+        </div>
         @keys.zipWithIndex.map { case (key, index) =>
         <div class="walletInfoField active">
             <div class="pe-2 mb-2 fieldLabel"><label for="walletAddress1">@key.name.getOrElse("")</label></div>
@@ -52,24 +55,24 @@
                         </div>
                         @if(key.encryptedPrivateKey.nonEmpty) {
                             @if(key.active) {
-                                <input type="radio" name="walletAddress" id='@key.address' checked/>
+                                <input type="radio" name="walletAddress" class='activeKey' id="@key.address" checked onclick="changeActive('@key.address')"/>
                             } else {
-                                <input type="radio" name="walletAddress" id='@key.address' onclick="changeActive('@key.address', '@keys.find(_.active).getOrElse("")')"/>
+                                <input type="radio" name="walletAddress" id="@key.address" onclick="changeActive('@key.address')"/>
                             }
-                        } else{
+                        } else {
                             <input type="radio" name="walletAddress" style="visibility: hidden;"/>
                         }
-                    <div class="me-3 iconContainer menuToolTip">
-                        <img src="@routes.Assets.versioned("images/icon/kebabMenuYellow.png")" class="ms-3" width="5px" height="20px"/>
-                        <span class="tooltiptext">
-                            <div class="menuOption">
-                                @if(key.partialMnemonics.isDefined) {
-                                    <div class="option" onclick="getForm(jsRoutes.controllers.SettingController.viewMnemonicsForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
-                                }
-                            <div class="option" onclick="getForm(jsRoutes.controllers.SettingController.changeKeyNameForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
-                                @if(!key.active) {
-                                    <div class="option" onclick="getForm(jsRoutes.controllers.SettingController.deleteKeyForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
-                                }
+                        <div class="me-3 iconContainer menuToolTip">
+                            <img src="@routes.Assets.versioned("images/icon/kebabMenuYellow.png")" class="ms-3" width="5px" height="20px"/>
+                            <span class="tooltiptext">
+                                <div class="menuOption">
+                                    @if(key.partialMnemonics.isDefined) {
+                                        <div class="option" onclick="getForm(jsRoutes.controllers.SettingController.viewMnemonicsForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_VIEW_MNEMONICS)</div>
+                                    }
+                                <div class="option" onclick="getForm(jsRoutes.controllers.SettingController.changeKeyNameForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_CHANGE_NAME)</div>
+                                    @if(!key.active) {
+                                        <div class="option" onclick="getForm(jsRoutes.controllers.SettingController.deleteKeyForm('@key.address'))">@Messages(constants.View.WALLET_ADDRESS_MENU_OPTION_DELETE_ACCOUNT)</div>
+                                    }
         </div>
         </span>
         </div>
@@ -88,7 +91,7 @@
         </div>
     </div>
 </div>
-<script src="@routes.Assets.versioned("javascripts/settings/settings.js")" type="text/javascript"></script>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/settings/settings.js")" type="text/javascript"></script>
 <script>
         fetchBalances('@keys.map(_.address).mkString(",")')
         checkAndPushState(jsRoutes.controllers.SettingController.viewSettings().url, '', "setting");

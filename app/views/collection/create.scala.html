@@ -1,14 +1,38 @@
-@import views.html.base.form._
 @import views.collection.companion.Create
+@import views.html.base.form._
 
-@(createForm: Form[Create.Data] = Create.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(createForm: Form[Create.Data] = Create.form, totalDrafts: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonForm(constants.Form.CREATE_COLLECTION, createForm) {
-    @commonInputText(createForm, constants.FormField.COLLECTION_NAME)
-    @commonDescriptionText(createForm, constants.FormField.COLLECTION_DESCRIPTION)
-    @commonToggleButton(createForm, constants.FormField.NSFW_COLLECTION)
-@*    @commonSelect(createForm, constants.FormField.COLLECTION_CATEGORY, Symbol("class") -> "custom-select sources", Symbol("placeholder") -> Messages(constants.View.ART))*@
-    @commonInputURL(createForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false)
-    @commonInputURL(createForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false)
-    @commonInputURL(createForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)
+@if(totalDrafts < constants.CommonConfig.MaxCollectionDrafts) {
+    <div id="createCollectionForm">
+    @commonForm(constants.Form.CREATE_COLLECTION, createForm) {
+        @commonInputText(createForm, constants.FormField.COLLECTION_NAME)
+        @commonDescriptionText(createForm, constants.FormField.COLLECTION_DESCRIPTION)
+        @commonToggleButton(createForm, constants.FormField.NSFW_COLLECTION)
+        @* @commonSelect(createForm, constants.FormField.COLLECTION_CATEGORY, Symbol("class") -> "custom-select sources", Symbol("placeholder") -> Messages(constants.View.ART))*@
+        @commonInputURL(createForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false)
+        @commonInputText(createForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false)
+        @commonInputText(createForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)
+
+        <div class="d-flex align-items-center mt-4">
+            @commonCheckbox(createForm, constants.FormField.CREATE_COLLECTION_TERMS_AND_CONDITION, Symbol("id") -> "termsCondition", Symbol("oninput") -> """activeButton()""")
+            <span class="termsConditionMessage">
+                <label for="termsCondition">
+                @Messages(constants.View.CREATE_COLLECTION_TERMS_CONDITION_MESSAGE)
+                </label>
+                <a class="link" onclick="showHideModalScreen('#createCollectionTermsConditionModal', '#createCollectionForm')">@Messages(constants.View.TERMS_CONDITION_LABEL)</a>
+            </span>
+        </div>
+    }
+    </div>
+
+    <div id="createCollectionTermsConditionModal" style="display: none;">
+    @views.html.collection.termsConditions()
+    </div>
+} else {
+    <div class="d-flex gap-3 align-items-center maxDraftLimitInfo">
+        <i class="bi bi-info-circle iconDefault iconLarge"></i>
+        @Messages(constants.View.MAX_DRAFT_COLLECTIONS_REACHED)
+    </div>
 }
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/collections/createCollection.js")"></script>

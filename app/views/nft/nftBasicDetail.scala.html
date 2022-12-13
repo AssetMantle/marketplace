@@ -1,0 +1,18 @@
+@import views.html.base.form._
+@import views.nft.companion.NFTBasicDetail
+@import models.masterTransaction.NFTDraft
+
+@(nftBasicDetailForm: Form[NFTBasicDetail.Data] = NFTBasicDetail.form, collectionId: String, nftId: String, optionalNFTDraft: Option[NFTDraft])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.NFT_BASIC_DETAIL, nftBasicDetailForm, submitDisable = !(optionalNFTDraft.isDefined && optionalNFTDraft.get.name.isDefined)) {
+    @if(optionalNFTDraft.isDefined && optionalNFTDraft.get.name.isDefined && optionalNFTDraft.get.description.isDefined) {
+        @commonInputText(nftBasicDetailForm, constants.FormField.NFT_NAME, Symbol("value") -> optionalNFTDraft.get.name.get)
+        @commonDescriptionText(nftBasicDetailForm, constants.FormField.NFT_DESCRIPTION, Symbol("value") -> optionalNFTDraft.get.description.get)
+    } else {
+        @commonInputText(nftBasicDetailForm, constants.FormField.NFT_NAME)
+        @commonDescriptionText(nftBasicDetailForm, constants.FormField.NFT_DESCRIPTION)
+    }
+    @commonInputText(nftBasicDetailForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> "readonly")
+    @commonInputText(nftBasicDetailForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> "readonly")
+}
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/createNft.js")"></script>

@@ -1,0 +1,24 @@
+@import models.masterTransaction.CollectionDraft
+@import views.html.base.modal._
+
+@(draft: CollectionDraft, savedAsDraft: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@if(savedAsDraft){
+    @successModal(heading = constants.View.CREATE_COLLECTION_DRAFT_SUCCESS_TITLE, subHeading = constants.View.CREATE_COLLECTION_DRAFT_SUCCESS_SUBTITLE)
+}else{
+    @successModal(heading = constants.View.CREATE_COLLECTION_SUCCESS_TITLE)
+    <div class="form-address-box">
+        <div class="form-address-box-item">
+            <span class="address-box-label">@Messages(constants.View.COLLECTION_LINK)</span>
+            <span class="address-box-text">
+                <span class="username-data" data-value="@constants.CommonConfig.WebAppUrl.concat(s"""/collection/${draft.id}""")">@constants.CommonConfig.WebAppUrl.concat(s"""/collection/${draft.id}""")</span>
+                <span class="form-copy-icon" onclick="copyToClipboard(this); showSnackbar('', '@Messages(constants.View.LINK_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');"><img src="@routes.Assets.versioned("images/icon/copy.png")"/></span>
+            </span>
+        </div>
+    </div>
+    <div class="horizontal-align">
+        <a href="@constants.CommonConfig.WebAppUrl.concat(s"""/collection/${draft.id}""")">
+            <button class="tertiaryButton" style="text-transform: none;">@Messages(constants.View.CREATE_COLLECTION_SUCCESS_TERTIARY_BUTTON)</button>
+        </a>
+    </div>
+}

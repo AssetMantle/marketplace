@@ -1,4 +1,5 @@
 @import views.account.companion.VerifyMnemonics
+@import views.html.base.buttons._
 
 @(walletMnemonicsForm: Form[VerifyMnemonics.Data] = VerifyMnemonics.form, username: String, address: String, partialMnemonics: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div id="walletMnemonics">
@@ -15,7 +16,7 @@
     </div>
     <div class="d-flex align-items-center justify-content-between mt-3 form-seed-box-list">
       @partialMnemonics.zipWithIndex.map { case (word, index) =>
-        @views.html.base.modal.seedInput(((index.toInt) + 1).toString, Symbol("phrase") -> word, Symbol("class") -> "disable")
+        @views.html.base.modal.seedInput((index + 1).toString, Symbol("phrase") -> word, Symbol("class") -> "disable")
       }
     </div>
     <div class="d-flex align-items-center gap-2 mt-3 form-information-message">
@@ -33,8 +34,8 @@
         </ul>
     </div>
     <div class="horizontal-align">
-        @views.html.base.buttons.commonSecondaryButton(constants.View.CANCEL, JavaScript(s"closeModal()"), Symbol("data-bs-dismiss") -> "modal", Symbol("aria-label") -> "Close")
-        @views.html.base.buttons.commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideModalScreen('#verificationForm', '#walletMnemonics')"))
+        @commonSecondaryButton(constants.View.CANCEL, JavaScript(s"closeModal()"), Symbol("data-bs-dismiss") -> "modal", Symbol("aria-label") -> "Close")
+        @commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideModalScreen('#verificationForm', '#walletMnemonics')"))
     </div>
 </div>
 

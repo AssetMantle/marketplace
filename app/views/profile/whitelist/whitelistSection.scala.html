@@ -1,42 +1,46 @@
 @import controllers.actions.LoginState
 
-@(isCreator: Boolean, whitelistsMade: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(whitelistsMade: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id="whitelistContainer">
     <div class="d-flex justify-content-between align-items-center mt-3 contentTitle">
-        <div class="d-flex gap-2 align-items-center title">
-            <div class="titleLabel"></div>
-            <div class="hoverMenu">
-                <ul class="d-flex flex-row gap-2 mb-0 links">
-                    <li class="menuItem">
-                        @if(isCreator || whitelistsMade > 0) {
-                            <a class="desktop-link" target="_blank">
-                                <i class="bi bi-chevron-down iconGray iconMedium"></i>
-                            </a>
-                        }
-                        <div class="subMenu">
-                            <div class="subMenuList">
-                                @if(isCreator || whitelistsMade > 0) {
-                                    <div class="subMenuItem">
-                                        <a onclick="showWhitelistScreen('created')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
-                                            <div class="subMenuItemLabel">@Messages(constants.View.CREATED_WHITELISTS)</div>
-                                        </a>
-                                    </div>
-                                }
-                                <div class="subMenuItem">
-                                    <a onclick="showWhitelistScreen('joined')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
-                                        <div class="subMenuItemLabel">@Messages(constants.View.JOINED_WHITELISTS)</div>
-                                    </a>
-                                </div>
+        @if(loginState.isCreator || whitelistsMade > 0) {
+            <div class="d-flex gap-2 align-items-center justify-content-between title" style="width: 110px;">
+            } else {
+            <div class="d-flex gap-2 align-items-center justify-content-between title">
+            }
+    <div class="titleLabel"></div>
+    <div class="hoverMenu">
+        <ul class="d-flex flex-row gap-2 mb-0 links">
+            <li class="menuItem">
+                @if(loginState.isCreator || whitelistsMade > 0) {
+                    <a class="desktop-link" target="_blank">
+                        <i class="bi bi-chevron-down iconGray iconSmall"></i>
+                    </a>
+                }
+                <div class="subMenu">
+                    <div class="subMenuList">
+                        @if(loginState.isCreator || whitelistsMade > 0) {
+                            <div class="subMenuItem">
+                                <a onclick="showWhitelistScreen('created')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
+                                    <div class="subMenuItemLabel">@Messages(constants.View.CREATED_WHITELISTS)</div>
+                                </a>
                             </div>
+                        }
+                        <div class="subMenuItem">
+                            <a onclick="showWhitelistScreen('joined')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
+                                <div class="subMenuItemLabel">@Messages(constants.View.JOINED_WHITELISTS)</div>
+                            </a>
                         </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        @if(isCreator) {
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    </div>
+        @if(loginState.isCreator) {
             <div class="titleMenu">
-                <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_COLLECTION.get, ""))" class="d-flex gap-2 align-items-center">
+                <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_WHITELIST.get, ""))" class="d-flex gap-2 align-items-center">
                     <i class="bi bi-plus-circle iconDefault iconMedium"></i>
                     @Messages(constants.View.CREATE_NEW_WHITELIST)
                 </a>
@@ -44,11 +48,11 @@
         }
     </div>
     <div id="whitelistSectionContent"></div>
-</div>
+    </div>
 
-<script src="@routes.Assets.versioned("javascripts/profile/whitelist.js")"></script>
-    @if(isCreator || whitelistsMade > 0) {
+    <script src="@utilities.PublicResource.getVersionedRoute("javascripts/profile/whitelist.js")"></script>
+    @if(loginState.isCreator || whitelistsMade > 0) {
         <script>showWhitelistScreen('created');</script>
     } else {
         <script>showWhitelistScreen('joined');</script>
-    }
+}

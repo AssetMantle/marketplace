@@ -70,7 +70,7 @@
   }
 }
 
-.right-menu .links li.user-wallet .walletPopup {
+.right-menu .links li.menuItem .walletPopup {
   text-transform: none;
   width: 312px;
   position: absolute;
@@ -358,7 +358,7 @@
   align-items: center;
   justify-content: center;
   position: fixed;
-  top: 0;
+  top: 70px;
   left: 0;
   width: 100%;
   height: 100%;

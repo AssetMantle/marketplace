@@ -1,5 +1,4 @@
 @import controllers.actions.LoginState
-@import views.html.base.buttons.commonPrimaryButton
 
 @(accountId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
@@ -24,6 +23,6 @@
     </div>
 </div>
 
-<script src="@routes.Assets.versioned("javascripts/profile/wishlist/loadMore.js")" type="text/javascript"></script>
-<script>componentResource("wishlistCollectionsPerPage", jsRoutes.controllers.WishlistController.collectionPerPage('@accountId', 1))</script>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/profile/wishlist/loadMore.js")" type="text/javascript"></script>
+<script>loadFirstWishlistCollections('@accountId');</script>
 <script> window.onscroll = function() { loadWishlistCollectionOnScroll('@accountId'); } </script>

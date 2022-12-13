@@ -9,3 +9,4 @@ firebaseConfig = {
 };
 
 addState = true
+const microFactor = 1000000;

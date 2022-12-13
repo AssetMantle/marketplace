@@ -1,44 +1,295 @@
-@import views.html.base.form._
+@import models.masterTransaction.CollectionDraft
 @import views.collection.companion.DefineProperties
-@import views.html.helper.repeatWithIndex
 @import views.html.base.buttons.commonTertiaryButton
+@import views.html.base.form._
+@import views.html.collection.commonPropertyBox
+@import views.html.helper.repeatWithIndex
+@import controllers.actions.LoginState
 
-@(definePropertiesForm: Form[DefineProperties.Data] = DefineProperties.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(definePropertiesForm: Form[DefineProperties.Data] = DefineProperties.form, collectionDraftId: String, collectionDraft: Option[CollectionDraft])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm, submitDisable = false) {
-    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> id, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
-    @defining(Option(constants.FormField.COLLECTION_PROPERTIES)) { implicit nestedFormField =>
-        <div class="propertyContainer">
-            @repeatWithIndex(definePropertiesForm(constants.FormField.COLLECTION_PROPERTIES.name), min = constants.Blockchain.MaximumProperties - constants.Collection.DefaultProperty.list.length) { (propertyField, index) =>
-                @defining(Option(propertyField)) { implicit sequentialFormField =>
-                    @if(index == 0) {
-                        <div id='@Seq(constants.View.COLLECTION_PROPERTY, index).mkString("_")' class="singlePropertyContainer active">
-                            <div class="d-flex gap-3">
-                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("required") -> false)
-                                @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources")
-                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_FIXED_VALUE, Symbol("required") -> false)
-                            </div>
-                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_REQUIRED)
-                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
-                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE_VALUE)
-                        </div>
-                    } else {
+    @commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm, submitDisable = false, showBackButton = true, callBackFunction = JavaScript(s"""updateExplorerContainer('${loginState.username}')""")) {
+        @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionDraftId, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
+        @commonCheckbox(definePropertiesForm, constants.FormField.SAVE_COLLECTION_DRAFT, Symbol("containerDivClass") -> "hidden")
+        <div id="basicInfoContainer" class="propertyInfoContainer">
+            <div class="singleProperty">
+                <div class="d-flex justify-content-between align-content-center propertyHeaderContainer">
+                    <div class="d-flex gap-3 align-content-center">
+                        <div class="propertyHeading">@Messages(constants.View.CREATE_COLLECTION_TITLE_BASIC_INFORMATION)</div>
+                        <i class="bi bi-chevron-down iconDefault dropdownIcon" onclick="openPropertyDetail(this)"></i>
+                    </div>
+                    <div class="propertyEdit">
+                        <i class="bi bi-pencil iconDefault" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.EDIT_COLLECTION.get, s"'${collectionDraftId}'"))"></i>
+                    </div>
+                </div>
+                <div class="propertyDetail">
+                    @commonPropertyBox(index = 1, label = constants.Collection.DefaultProperty.NFT_NAME, value = "", visibility = true, requirement = true)
+                    @commonPropertyBox(index = 2, label = constants.Collection.DefaultProperty.NFT_DESCRIPTION, value = "", visibility = true, requirement = true)
+                </div>
+                <div class="separator"></div>
+            </div>
+
+            <div class="singleProperty">
+                <div class="d-flex justify-content-between align-content-center propertyHeaderContainer">
+                    <div class="d-flex gap-3 align-content-center">
+                        <div class="propertyHeading">@Messages(constants.View.CREATE_COLLECTION_TITLE_ADVANCED_INFORMATION)</div>
+                        <i class="bi bi-chevron-down iconDefault dropdownIcon" onclick="openPropertyDetail(this)"></i>
+                    </div>
+                </div>
+                <div class="propertyDetail">
+                    @commonPropertyBox(index = 3, label = constants.Collection.DefaultProperty.FILE_HASH, value = "", visibility = true, requirement = true)
+                    @commonPropertyBox(index = 4, label = constants.Collection.DefaultProperty.CLASSIFICATION_ID, value = "", visibility = true, requirement = true)
+                </div>
+                <div class="separator"></div>
+            </div>
+
+            @defining(constants.Blockchain.MaximumProperties - constants.Collection.DefaultProperty.list.length) { totalProperties =>
+                <div id="totalProperties" class="hidden">@totalProperties</div>
+            @defining(Option(constants.FormField.COLLECTION_PROPERTIES)) { implicit nestedFormField =>
+                @repeatWithIndex(definePropertiesForm(constants.FormField.COLLECTION_PROPERTIES.name), min = totalProperties) { (propertyField, index) =>
+                    @defining(Option(propertyField)) { implicit sequentialFormField =>
                         <div id='@Seq(constants.View.COLLECTION_PROPERTY, index).mkString("_")' class="singlePropertyContainer" style="display: none;">
-                            <div class="d-flex gap-3">
-                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("required") -> false)
-                                @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources")
-                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_FIXED_VALUE, Symbol("required") -> false)
+                            <div class="propertyFormView active">
+                                <div class="d-flex justify-content-between align-items-center mb-4 addPropertyHeader">
+                                    <span class="title">@Messages(constants.View.PROPERTY_NUMBER, constants.Collection.DefaultProperty.list.length + 1 + index)</span>
+                                    <i class="bi bi-trash iconDefault" onclick="removeProperty(@index)"></i>
+                                </div>
+                                <div class="d-flex gap-4">
+                                @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length) {
+                                    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collectionDraft.get.properties(index).name, Symbol("required") -> false)
+                                    @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("value") -> collectionDraft.get.properties(index).`type`, Symbol("data-index") -> index, Symbol("class") -> "custom-select sources filledSelect")
+                                } else {
+                                    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("required") -> false)
+                                    @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("class") -> "custom-select sources", Symbol("value") -> constants.FormField.COLLECTION_PROPERTY_TYPE.options.head)
+                                }
+                                </div>
+                                <div class="propertyAdvancedDetail">
+                                    <div class="d-flex gap-2 align-content-center mt-3">
+                                        <div class="propertyHeading">@Messages(constants.View.PROPERTY_ADVANCED_OPTIONS)</div>
+                                        <i class="bi bi-chevron-down iconDefault iconSmall dropdownIcon" onclick="openPropertyAdvancedOption(this)"></i>
+                                    </div>
+                                    <div class="advancedDetailOption">
+                                        <div class="d-flex justify-content-between align-items-center singleOption">
+                                            <div class="d-flex gap-2 optionTitle">
+                                                <i class="bi bi-pencil iconDefault iconSmall me-1" style="transform: rotate(-90deg)"></i>
+                                                <span>@Messages(constants.View.ADVANCED_PROPERTY_MUTABILITY)</span>
+                                            </div>
+                                            <div class="options">
+                                                @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length && collectionDraft.get.properties(index).mutable) {
+                                                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE, Symbol("checked") -> "checked")
+                                                } else {
+                                                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center singleOption">
+                                            <div class="d-flex gap-2 optionTitle">
+                                                <i class="bi bi-eye iconDefault iconSmall me-1"></i>
+                                                <span>@Messages(constants.View.ADVANCED_PROPERTY_HIDE)</span>
+                                            </div>
+                                            <div class="options">
+                                                @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length && !collectionDraft.get.properties(index).meta) {
+                                                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE, Symbol("checked") -> "checked")
+                                                } else{
+                                                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE)
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="requirementOption">
+                                            <div class="d-flex justify-content-between align-items-center singleOption">
+                                                <div class="d-flex gap-2 optionTitle">
+                                                    <i class="bi bi-asterisk iconDefault iconSmall me-1"></i>
+                                                    <span>@Messages(constants.View.ADVANCED_PROPERTY_REQUIREMENT)</span>
+                                                </div>
+                                                <div class="options">
+                                                @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length && collectionDraft.get.properties(index).defaultValue.nonEmpty) {
+                                                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_SET_DEFAULT_VALUE, Symbol("checked") -> "checked")
+                                                }else{
+                                                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_SET_DEFAULT_VALUE)
+                                                }
+                                                </div>
+                                            </div>
+
+                                            @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length && collectionDraft.get.properties(index).defaultValue.nonEmpty){
+                                            <div class="optionInputField">
+                                                <div class="hidden">
+                                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_DEFAULT_VALUE, Symbol("required") -> false, Symbol("class") -> "fixedValueField", Symbol("value") -> collectionDraft.get.properties(index).defaultValue)
+                                                </div>
+                                                <div class="propertyTypeOption">
+                                                    @if(collectionDraft.get.properties(index).`type` == constants.NFT.Data.STRING) {
+                                                        <div class="propertyType string active">
+                                                            <div class="mb-0 commonInputInt w-100">
+                                                                <div class="fieldContainer">
+                                                                    <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+                                                                    <dd>
+                                                                        <input type="text" id="fieldValue_@index" name="fieldValue_@index" class="propertyTypeField am-input" onkeyup="setNonBooleanValue(@index, event)" value="@collectionDraft.get.properties(index).defaultValue"/>
+                                                                    </dd>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    @if(collectionDraft.get.properties(index).`type` == constants.NFT.Data.DECIMAL) {
+                                                        <div class="propertyType number active">
+                                                            <div class="mb-0 commonInputInt w-100">
+                                                                <div class="fieldContainer">
+                                                                    <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+                                                                    <dd>
+                                                                        <input type="number" id="fieldValue_@index" name="fieldValue_@index" class="propertyTypeField am-input" onkeyup="setNonBooleanValue(@index, event)" value="@collectionDraft.get.properties(index).defaultValue"/>
+                                                                    </dd>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    @if(collectionDraft.get.properties(index).`type` == constants.NFT.Data.BOOLEAN) {
+                                                        <div class="propertyType boolean active">
+                                                            <div class="mb-0 commonInputInt w-100">
+                                                                <div class="fieldContainer">
+                                                                    <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+                                                                    <dd class="mt-2">
+                                                                        <div class="dropdown" id="fieldValue_@index">
+                                                                            <input type="hidden" class="dp-input" value=""/>
+                                                                            <div class="dropdownHead" onclick="showOptions(this)">
+                                                                                <div class="currentSelected selectedBooleanType">@collectionDraft.get.properties(index).defaultValue</div>
+                                                                            </div>
+                                                                            <div class="dropdownBody">
+                                                                                <div class="dropdownBodyInner">
+                                                                                    <div class="propertyTypeField dropdownItem" value="true" onclick="setOption(this);
+                                                                                    setBooleanValue(@index, '@constants.NFT.Data.TRUE');">@Messages(constants.View.TRUE)</div>
+                                                                                    <div class="propertyTypeField dropdownItem" value="false" onclick="setOption(this);
+                                                                                    setBooleanValue(@index, '@constants.NFT.Data.FALSE');">@Messages(constants.View.FALSE)</div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </dd>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                            }else{
+                                                <div class="optionInputField" style="display: none;">
+                                                    <div class="hidden">
+                                                    @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_DEFAULT_VALUE, Symbol("required") -> false, Symbol("class") -> "fixedValueField")
+                                                    </div>
+                                                    <div class="propertyTypeOption">
+                                                        <div class="propertyType string active">
+                                                            <div class="mb-0 commonInputInt w-100">
+                                                                <div class="fieldContainer">
+                                                                    <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+                                                                    <dd>
+                                                                        <input type="text" id="fieldValue_@index" name="fieldValue_@index" class="propertyTypeField am-input" onkeyup="setNonBooleanValue(@index, event)"/>
+                                                                    </dd>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="propertyType number">
+                                                            <div class="mb-0 commonInputInt w-100">
+                                                                <div class="fieldContainer">
+                                                                    <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+                                                                    <dd>
+                                                                    @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length && collectionDraft.get.properties(index).defaultValue.nonEmpty) {
+                                                                        <input type="number" id="fieldValue_@index" name="fieldValue_@index" class="propertyTypeField am-input" onkeyup="setNonBooleanValue(@index, event)" value="@collectionDraft.get.properties(index).defaultValue"/>
+                                                                    }else{
+                                                                        <input type="number" id="fieldValue_@index" name="fieldValue_@index" class="propertyTypeField am-input" onkeyup="setNonBooleanValue(@index, event)"/>
+                                                                    }
+                                                                    </dd>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="propertyType boolean">
+                                                            <div class="mb-0 commonInputInt w-100">
+                                                                <div class="fieldContainer">
+                                                                    <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+                                                                    <dd class="mt-2">
+                                                                        <div class="dropdown" id="fieldValue_@index">
+                                                                            <input type="hidden" class="dp-input" value=""/>
+                                                                            <div class="dropdownHead" onclick="showOptions(this)">
+                                                                                <div class="currentSelected">@Messages(constants.View.NFT_PROPERTY_BOOLEAN_FIELD_LABEL)</div>
+                                                                            </div>
+                                                                            <div class="dropdownBody">
+                                                                                <div class="dropdownBodyInner">
+                                                                                    <div class="propertyTypeField dropdownItem" value="true" onclick="setOption(this);
+                                                                                    setBooleanValue(@index, '@constants.NFT.Data.TRUE');">@Messages(constants.View.TRUE)</div>
+                                                                                    <div class="propertyTypeField dropdownItem" value="false" onclick="setOption(this);
+                                                                                    setBooleanValue(@index, '@constants.NFT.Data.FALSE');">@Messages(constants.View.FALSE)</div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </dd>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="separator"></div>
                             </div>
-                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_REQUIRED)
-                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)
-                            @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE_VALUE)
-                            <button type="button" class="form-secondary-button" onclick="removeProperty(@index)">Delete</button>
+                            <div class="propertyCardView" style="display: none;">
+                                <div class="singleProperty">
+                                    <div class="propertyDetail">
+                                        <div class="propertyBox">
+                                            <div class="d-flex justify-content-between">
+                                                <div class="propertyTitle">@Messages(constants.View.PROPERTY_NUMBER, constants.Collection.DefaultProperty.list.length + 1 + index)</div>
+                                                <div class="d-flex gap-3">
+                                                    <i class="bi bi-pencil iconDefault" onclick="updateProperty(@index)"></i>
+                                                    <i class="bi bi-trash iconDefault" onclick="removeProperty(@index)"></i>
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-3 propertyBoxItem">
+                                                <span class="align-self-start propertyBoxItemLabel">@Messages(constants.View.PROPERTY_CARD_LABEL_NAME)</span>
+                                                <span class="align-self-start propertyBoxValue">
+                                                    <span class="propertyCardName"></span>
+                                                </span>
+                                            </div>
+
+                                            <div class="mt-3 propertyBoxItem">
+                                                <span class="align-self-start propertyBoxItemLabel">@Messages(constants.View.PROPERTY_CARD_LABEL_TYPE)</span>
+                                                <span class="align-self-start propertyBoxValue">
+                                                    <span class="propertyCardType"></span>
+                                                </span>
+                                            </div>
+
+                                            <div class="mt-3 propertyBoxItem">
+                                                <span class="align-self-start propertyBoxItemLabel">@Messages(constants.View.PROPERTY_CARD_LABEL_VALUE)</span>
+                                                <span class="align-self-start propertyBoxValue">
+                                                    <span class="propertyCardValue"></span>
+                                                </span>
+                                                <span class="d-flex gap-2 justify-content-end align-self-end">
+                                                    <div class="propertyIcon propertyIconMutability active"></div>
+                                                    <div class="propertyIcon propertyIconVisibility active"></div>
+                                                    <div class="propertyIcon propertyIconRequirement active"></div>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="separator"></div>
+                            </div>
                         </div>
                     }
                 }
             }
-        </div>
-    @commonTertiaryButton(name = constants.View.ADD_MORE_PROPERTIES, function = JavaScript(s"addProperty()"), icon = Option("bi-plus-circle"), iconFirst = Option(true), buttonId = Option("addMorePropertyButton"))
+                <div class="text-center">
+                @commonTertiaryButton(name = constants.View.ADD_MORE_PROPERTIES, function = JavaScript(s"addProperty()"), icon = Option("bi-plus-circle"), iconFirst = Option(true), buttonId = Option("addMorePropertyButton"))
+                </div>
+            </div>
     }
-}
-<script src="@routes.Assets.versioned("javascripts/collections/createCollection.js")"></script>
+
+        <div class="horizontal-align">
+            <div class="d-flex gap-3 align-items-center me-3 propertyModalButton">
+                <button class="form-secondary-button active" type="button" onclick="saveToDraft()">@Messages(constants.View.CREATE_COLLECTION_SAVE_DRAFT_BUTTON)</button>
+                <button class="form-primary-button active" type="button" onclick="submitButton();">@Messages(constants.View.CREATE_COLLECTION_NEXT_BUTTON)</button>
+            </div>
+        </div>
+    }
+    <script src="@utilities.PublicResource.getVersionedRoute("javascripts/collections/createCollection.js")"></script>
+    <script>
+        hideSubmitButton();
+        setDefinePropertyBackButton('@collectionDraftId');
+</script>

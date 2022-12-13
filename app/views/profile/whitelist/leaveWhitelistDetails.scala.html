@@ -1,7 +1,9 @@
 @import models.master.Whitelist
 @import views.html.base.buttons._
+@import views.html.base.form._
+@import views.profile.whitelist.companion.AcceptOrLeave
 
-@(whitelist: Whitelist)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(whitelist: Whitelist, leaveForm: Form[AcceptOrLeave.Data] = AcceptOrLeave.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="modal-header mb-0">
     <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.WHITELIST_LEAVE_TITLE)</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
@@ -29,6 +31,7 @@
     </div>
 </div>
 <div class="d-flex justify-content-end horizontal-align">
-    @commonSecondaryButton(constants.View.CLOSE_LEAVE_WHITELIST, JavaScript(s"""closeModal()"""))
-    @commonPrimaryButton(constants.View.LEAVE_WHITELIST, JavaScript(s"""getForm(jsRoutes.controllers.WhitelistController.leaveWhitelist('${whitelist.id}'), '#commonModal', '#modal-content', resetJoinedWhitelistPage)"""))
+    @commonForm(constants.Form.LEAVE_WHITELIST, leaveForm, submitDisable = false, showCancel = true, closeButton = false, showSubtitle = false, callBackFunction = JavaScript(s"""updateJoinedWhitelistContainer()""")) {
+        @commonInputText(leaveForm, constants.FormField.WHITELIST_ID, Symbol("value") -> whitelist.id, Symbol("readonly") -> true, Symbol("containerDivClass") -> "hidden")
+    }
 </div>

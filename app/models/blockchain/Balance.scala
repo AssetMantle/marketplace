@@ -1,17 +1,17 @@
 package models.blockchain
 
-import models.Trait.Logged
 import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
 import models.common.Coin
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
+import play.db.NamedDatabase
 import slick.jdbc.H2Profile.api._
+import utilities.MicroNumber
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.libs.json.Json
-import play.db.NamedDatabase
 
 case class Balance(address: String, coins: Seq[Coin], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
 
@@ -76,6 +76,6 @@ class Balances @Inject()(
 
     def get(address: String): Future[Option[Balance]] = getById(address).map(_.map(_.deserialize))
 
-    def getList(addresses: Seq[String]): Future[Seq[Balance]] = getByIds(addresses).map(_.map(_.deserialize))
+    def getTokenBalance(address: String, denom: String = constants.Blockchain.StakingToken): Future[MicroNumber] = getById(address).map(_.fold(MicroNumber.zero)(_.deserialize.coins.find(_.denom == denom).fold(MicroNumber.zero)(_.amount)))
   }
 }

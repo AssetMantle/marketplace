@@ -1,0 +1,28 @@
+@import controllers.actions.LoginState
+@import models.master.Collection
+@import views.html.base.commonStringValue
+
+@(nft: master.NFT, collection: Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+<div class="sticky-top item-sticky">
+    <div class="card rightInfoCard">
+        <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_COLLECTION_TITLE)</div>
+        <div class="d-flex gap-2 align-items-center badgeImageText" onclick="viewCollection('@collection.id')">
+            @collection.getProfileFileURL.fold {
+                <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
+            } { uri =>
+                <img src="@uri">
+            }
+            <div class="badgeText">
+                @commonStringValue(message = collection.name, id = utilities.IdGenerator.getRandomHexadecimal, length = 12, showToolTip = false)
+            </div>
+        </div>
+        <div class="separator"></div>
+        <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_CREATOR_TITLE)</div>
+        <div class="d-flex gap-2 align-items-center badgeImageText" onclick="viewProfile('@collection.creatorId/@constants.View.CREATED')">
+            <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
+            <div class="badgeText">
+            @commonStringValue(message = collection.creatorId, id = utilities.IdGenerator.getRandomHexadecimal, length = 12, showToolTip = false)
+            </div>
+        </div>
+    </div>
+</div>

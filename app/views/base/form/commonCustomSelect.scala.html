@@ -2,10 +2,11 @@
 @import helper._
 @import play.api.data.Field
 
-@(formData: Form[_], formField: CustomSelectFormField, options: Seq[String], arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialFormField: Option[Field] = None)
+@(formData: Form[_], formField: CustomSelectFormField, options: Map[String, String], arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialFormField: Option[Field] = None)
 
+@defining(utilities.IdGenerator.getRandomHexadecimal) { containerId =>
 <div id='@arguments.toMap.get(Symbol("containerDivID")).map(_.toString).getOrElse("")' class='@arguments.toMap.get(Symbol("containerDivClass")).map(_.toString).getOrElse("commonSelect")'>
-@defining(Seq(Symbol("_label") -> Messages(formField.name), Symbol("placeholder") -> Messages(formField.placeHolder), Symbol("class") -> "cmuk-input", Symbol("_default") -> Messages(formField.name))) { defaultArguments =>
+@defining(Seq(Symbol("_label") -> Messages(formField.name), Symbol("placeholder") -> Messages(formField.placeHolder), Symbol("class") -> "am-input", Symbol("_default") -> Messages(formField.name))) { defaultArguments =>
     @defining(
         sequentialFormField match {
             case Some(sequentialField: Field) => {
@@ -34,8 +35,12 @@
             }
         }
     ) { field =>
-        @select(if(arguments.toMap.get(Symbol("value")).map(_.toString).isDefined) field.copy(value = arguments.toMap.get(Symbol("value")).map(_.toString)) else field, for(option <- options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
-        <div id="fieldError_@formField.name" class="mt-2 commonError hidden">@formField.getFieldErrorMessage()</div>
+        <div id="@containerId">
+            @select(if(arguments.toMap.get(Symbol("value")).map(_.toString).isDefined) field.copy(value = arguments.toMap.get(Symbol("value")).map(_.toString)) else field, options.map(x => (x._1, Messages(x._2))).toSeq, defaultArguments ++ arguments: _*)
+            <div id="fieldError_@formField.name" class="mt-2 commonError hidden">@formField.getFieldErrorMessage()</div>
+        </div>
     }
 }
 </div>
+<script>customSelect('@containerId');</script>
+}

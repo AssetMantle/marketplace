@@ -1,15 +1,20 @@
 @import views.html.base.form._
+@import models.masterTransaction.CollectionDraft
 @import views.collection.companion.Edit
 
-@(editForm: Form[Edit.Data] = Edit.form, id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(editForm: Form[Edit.Data] = Edit.form, collectionDraft: Option[CollectionDraft])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonForm(constants.Form.EDIT_COLLECTION, editForm) {
-    @commonInputText(editForm, constants.FormField.COLLECTION_ID, Symbol("value") -> id, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
-    @commonInputText(editForm, constants.FormField.COLLECTION_NAME)
-    @commonDescriptionText(editForm, constants.FormField.COLLECTION_DESCRIPTION)
-    @commonToggleButton(editForm, constants.FormField.NSFW_COLLECTION)
+@commonForm(constants.Form.EDIT_COLLECTION, editForm, submitDisable = false) {
+    @commonInputText(editForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionDraft.fold("")(_.id), Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
+    @commonInputText(editForm, constants.FormField.COLLECTION_NAME, Symbol("value") -> collectionDraft.fold("")(_.name))
+    @commonDescriptionText(editForm, constants.FormField.COLLECTION_DESCRIPTION, Symbol("value") -> collectionDraft.fold("")(_.description))
+    @if(collectionDraft.fold("")(_.nsfw.toString) == "true"){
+        @commonToggleButton(editForm, constants.FormField.NSFW_COLLECTION, Symbol("value") -> collectionDraft.fold("")(_.nsfw.toString), Symbol("checked") -> "checked")
+    }else{
+        @commonToggleButton(editForm, constants.FormField.NSFW_COLLECTION, Symbol("value") -> collectionDraft.fold("")(_.nsfw.toString))
+    }
 @*    @commonSelect(editForm, constants.FormField.COLLECTION_CATEGORY, Symbol("class") -> "custom-select sources", Symbol("placeholder") -> Messages(constants.View.ART))*@
-    @commonInputURL(editForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false)
-    @commonInputURL(editForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false)
-    @commonInputURL(editForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)
+    @commonInputURL(editForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false, Symbol("value") -> collectionDraft.fold("")(_.getWebsite.getOrElse(""))))
+    @commonInputText(editForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false, Symbol("value") -> collectionDraft.fold("")(_.getTwitter.getOrElse(""))))
+    @commonInputText(editForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false, Symbol("value") -> collectionDraft.fold("")(_.getInstagram.getOrElse(""))))
 }

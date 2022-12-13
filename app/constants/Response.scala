@@ -99,6 +99,9 @@ object Response {
   val COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES = new Failure("COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES")
   val COLLECTION_PROPERTIES_CONTAINS_DUPLICATE_PROPERTIES = new Failure("COLLECTION_PROPERTIES_CONTAINS_DUPLICATE_PROPERTIES")
   val COLLECTION_PROPERTY_NOT_DEFINED = new Failure("COLLECTION_PROPERTY_NOT_DEFINED")
+  val INVALID_NFT_TAGS_LENGTH = new Failure("INVALID_NFT_TAGS_LENGTH")
+  val MAXIMUM_NFT_TAGS_EXCEEDED = new Failure("MAXIMUM_NFT_TAGS_EXCEEDED")
+  val REPEATED_NFT_TAGS = new Failure("REPEATED_NFT_TAGS")
 
   val UNKNOWN_TRANSACTION_MESSAGE = new Failure("UNKNOWN_TRANSACTION_MESSAGE")
   val ARITHMETIC_OPERATION_ON_DIFFERENT_COIN = new Failure("ARITHMETIC_OPERATION_ON_DIFFERENT_COIN")
@@ -115,14 +118,40 @@ object Response {
   val BALANCE_FETCH_FAILED = new Failure("BALANCE_FETCH_FAILED")
   val NO_COLLECTION_TO_CREATE_WHITELIST = new Failure("NO_COLLECTION_TO_CREATE_WHITELIST")
   val WHITELIST_MAX_MEMBERS_REACHED = new Failure("WHITELIST_MAX_MEMBERS_REACHED")
+  val NOT_WHITELIST_CREATOR = new Failure("NOT_WHITELIST_CREATOR")
   val NO_SUCH_DOCUMENT_TYPE_EXCEPTION = new Failure("NO_SUCH_DOCUMENT_TYPE_EXCEPTION")
   val NOT_COLLECTION_OWNER = new Failure("NOT_COLLECTION_OWNER")
+  val NOT_NFT_OWNER = new Failure("NOT_NFT_OWNER")
   val CLASSIFICATION_ALREADY_DEFINED = new Failure("CLASSIFICATION_ALREADY_DEFINED")
   val FILE_SIZE_EXCEED_LIMIT = new Failure("FILE_SIZE_EXCEED_LIMIT")
+  val INVALID_DOCUMENT_TYPE = new Failure("INVALID_DOCUMENT_TYPE")
+  val INVALID_DEFAULT_VALUE = new Failure("INVALID_DEFAULT_VALUE")
+  val NFT_PROPERTY_NOT_FOUND = new Failure("NFT_PROPERTY_NOT_FOUND")
+  val NFT_PROPERTY_NAME_NOT_FOUND = new Failure("NFT_PROPERTY_NAME_NOT_FOUND")
+  val NFT_PROPERTY_DESCRIPTION_NOT_FOUND = new Failure("NFT_PROPERTY_DESCRIPTION_NOT_FOUND")
+  val NFT_PROPERTY_TYPE_NOT_FOUND = new Failure("NFT_PROPERTY_TYPE_NOT_FOUND")
+  val INVALID_NFT_PROPERTY = new Failure("INVALID_NFT_PROPERTY")
+  val NOT_GENESIS_CREATOR = new Failure("NOT_GENESIS_CREATOR")
+  val COLLECTION_NOT_FOUND = new Failure("COLLECTION_NOT_FOUND")
+  val COLLECTION_NOT_PUBLIC = new Failure("COLLECTION_NOT_PUBLIC")
+  val SALE_NOT_STARTED_OR_EXPIRED = new Failure("SALE_NOT_STARTED_OR_EXPIRED")
+  val COLLECTION_ID_OR_WHITELIST_ID_DOES_NOT_EXIST = new Failure("COLLECTION_ID_OR_WHITELIST_ID_DOES_NOT_EXIST")
+  val NOT_ENOUGH_NFTS_IN_COLLECTION = new Failure("NOT_ENOUGH_NFTS_IN_COLLECTION")
+  val DIRECTORY_CREATION_FAILED = new Failure("DIRECTORY_CREATION_FAILED")
+  val CANNOT_SELL_TO_YOURSELF = new Failure("CANNOT_SELL_TO_YOURSELF")
+  val NOT_MEMBER_OF_WHITELIST = new Failure("NOT_MEMBER_OF_WHITELIST")
+  val SALE_NOT_STARTED = new Failure("SALE_NOT_STARTED")
+  val SALE_EXPIRED = new Failure("SALE_EXPIRED")
+  val NO_SALE_ON_NFT = new Failure("NO_SALE_ON_NFT")
+  val NOT_NOTIFICATION_OWNER = new Failure("NOT_NOTIFICATION_OWNER")
+  val NFT_NOT_ON_SALE = new Failure("NFT_NOT_ON_SALE")
+  val HANDLE_MULTIPLE_NFT_QUANTITY_CASE = new Failure("HANDLE_MULTIPLE_NFT_QUANTITY_CASE")
+  val NFT_ALREADY_MINTED = new Failure("NFT_ALREADY_MINTED")
+  val MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED = new Failure("MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED")
+  val NFT_ALREADY_SOLD = new Failure("NFT_ALREADY_SOLD")
 
-  class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
+  class Failure(private val response: String) {
     val message: String = PREFIX + FAILURE_PREFIX + response
-    val action: String = utilities.JsRoutes.getJsRouteString(actionController)
     val logMessage: String = LOG_PREFIX + response
 
     def throwBaseException(exception: Exception = null)(implicit module: String, logger: Logger) = throw new BaseException(this, exception)
@@ -132,17 +161,14 @@ object Response {
 
   class Warning(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + WARNING_PREFIX + response
-    val action: String = utilities.JsRoutes.getJsRouteString(actionController)
   }
 
-  class Success(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
+  class Success(private val response: String) {
     val message: String = Response.PREFIX + Response.SUCCESS_PREFIX + response
-    val action: String = utilities.JsRoutes.getJsRouteString(actionController)
   }
 
-  class Info(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
+  class Info(private val response: String) {
     val message: String = PREFIX + INFO_PREFIX + response
-    val action: String = utilities.JsRoutes.getJsRouteString(actionController)
   }
 
 }

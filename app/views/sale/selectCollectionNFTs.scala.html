@@ -1,0 +1,4 @@
+@import models.master.NFT
+@import controllers.actions.LoginState
+
+@(pageNumber: Int, nfts: Seq[NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])

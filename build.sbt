@@ -6,9 +6,9 @@ libraryDependencies ++= Seq(
   guice,
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
 )
-scalaVersion := "2.13.8"
+scalaVersion := "2.13.10"
 
-version := "0.1.4"
+version := sys.env.getOrElse("APP_VERSION", "dev")
 
 lazy val GatlingTest = config("gatling") extend Test
 
@@ -40,8 +40,8 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.4",
-  "org.json" % "json" % "20220320"
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.0",
+  "org.json" % "json" % "20220924"
 )
 
 libraryDependencies ++= Seq(
@@ -57,8 +57,8 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.amazonaws" % "aws-java-sdk-s3" % "1.12.315",
-  "com.amazonaws" % "aws-java-sdk" % "1.12.315"
+  "com.amazonaws" % "aws-java-sdk-s3" % "1.12.342",
+  "com.amazonaws" % "aws-java-sdk" % "1.12.343"
 )
 
-libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.21.7"
+libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.21.9"

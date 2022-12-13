@@ -1,29 +1,20 @@
 package constants
 
-import models.master.CollectionProperty
-import play.api.Logger
-
-import scala.concurrent.ExecutionContext
+import models.master.NFTProperty
 
 object Collection {
 
   object File {
     val PROFILE = "PROFILE"
     val COVER = "COVER"
+
+    val AllCollectionsPath: String = constants.CommonConfig.Files.CollectionPath + "/"
   }
 
   object SocialProfile {
     val WEBSITE = "WEBSITE"
     val TWITTER = "TWITTER"
     val INSTAGRAM = "INSTAGRAM"
-  }
-
-  def getFilePath(documentType: String)(implicit module: String, logger: Logger): String = {
-    documentType match {
-      case File.PROFILE => constants.CommonConfig.Files.CollectionPath + "/"
-      case File.COVER => constants.CommonConfig.Files.CollectionPath + "/"
-      case _ => constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION.throwBaseException()
-    }
   }
 
   object Category {
@@ -34,22 +25,12 @@ object Collection {
 
   object DefaultProperty {
     // Should be kept in lower case otherwise change in form constraints
-    val NAME = "name"
-    val DESCRIPTION = "description"
-    val CATEGORY = "category"
-    val NSFW = "nsfw"
+    val NFT_NAME = "name"
+    val NFT_DESCRIPTION = "description"
+    val FILE_HASH = "fileHash"
+    val CLASSIFICATION_ID = "classificationId"
 
-    val list: Seq[String] = Seq(NAME, DESCRIPTION, CATEGORY, NSFW)
+    val list: Seq[String] = Seq(NFT_NAME, NFT_DESCRIPTION, FILE_HASH, CLASSIFICATION_ID)
 
-    def getDefaultProperties(id: String): Seq[CollectionProperty] = list.map(x => CollectionProperty(id = id, propertyName = x, propertyType = PropertyData.Type.STRING, required = true, mutable = false, fixedValue = None, hideValue = false))
   }
-
-  object NFT {
-    object Data {
-      val STRING = "STRING"
-      val NUMBER = "NUMBER"
-      val BOOLEAN = "BOOLEAN"
-    }
-  }
-
 }

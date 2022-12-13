@@ -822,7 +822,7 @@ dl .info:after {
     text-transform: capitalize;
     color: var(--dark);
 }
-.cmuk-checkbox{
+.am-checkbox{
     -webkit-appearance: none;
     appearance: none;
     background-color: var(--popup-bg);
@@ -837,7 +837,7 @@ dl .info:after {
     place-content: center;
     cursor: pointer;
 }
-.cmuk-checkbox::before {
+.am-checkbox::before {
     content: "";
     width: 0.60em;
     height: 0.60em;
@@ -847,7 +847,7 @@ dl .info:after {
     transform-origin: bottom left;
     clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
 }
-.cmuk-checkbox:checked::before {
+.am-checkbox:checked::before {
     transform: scale(1);
 }
 .terms-condition-box{

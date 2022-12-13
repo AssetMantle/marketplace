@@ -29,16 +29,23 @@ function wishlistCounter(source, route) {
 
 updateWishlist();
 
-function wishlist(route, wishlistButton, snackBarMessage) {
+function wishlist(form, route, wishlistButton, snackBarMessage, NFTId, add) {
     $.ajax({
-        url: route.url,
-        type: route.type,
+        type: 'POST',
+        contentType: 'application/x-www-form-urlencoded',
+        url: form.attr('action'),
+        data: form.serialize(),
         async: true,
         statusCode: {
-            200: function () {
+            200: function (data) {
                 let parent = $(wishlistButton).parent();
                 let counter = parent.find(".nft-likes");
                 showSnackbar('', snackBarMessage, 'info');
+                if (add) {
+                    $('#addToWishlistContainer_' + NFTId).html(data);
+                } else {
+                    $('#deleteFromWishlistContainer_' + NFTId).html(data);
+                }
                 setTimeout(() => {
                     wishlistCounter(counter, jsRoutes.controllers.NFTController.likesCounter($(counter).attr("data-id")));
                 }, 5000);
@@ -54,12 +61,14 @@ function wishlist(route, wishlistButton, snackBarMessage) {
 }
 
 function addRemoveWishlist(element, NFTId, addMessage, removedMessage) {
-    let wishlistIcon = $(element).children(".addToWishlist");
+    let wishlistIcon = $(element).find(".addToWishlist");
     if (!$(wishlistIcon).hasClass("clicked")) {
-        wishlist(jsRoutes.controllers.NFTController.addToWishList(`${NFTId}`), element, addMessage);
+        const form = $("#addToWishlist_" + NFTId + " form")
+        wishlist(form, jsRoutes.controllers.WishlistController.add(), element, addMessage, NFTId, true);
         $(wishlistIcon).addClass("clicked");
     } else {
-        wishlist(jsRoutes.controllers.NFTController.deleteFromWishList(`${NFTId}`), element, removedMessage);
+        const form = $("#deleteFromWishlist_" + NFTId + " form")
+        wishlist(form, jsRoutes.controllers.WishlistController.delete(), element, removedMessage, NFTId, false);
         $(wishlistIcon).removeClass("clicked");
     }
 }

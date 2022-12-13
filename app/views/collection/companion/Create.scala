@@ -1,6 +1,6 @@
 package views.collection.companion
 
-import models.master.SocialProfile
+import models.common.Collection._
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
@@ -16,13 +16,14 @@ object Create {
       constants.FormField.COLLECTION_WEBSITE.optionalMapping,
       constants.FormField.COLLECTION_TWITTER.optionalMapping,
       constants.FormField.COLLECTION_INSTAGRAM.optionalMapping,
-    )(Data.apply)(Data.unapply))
+      constants.FormField.CREATE_COLLECTION_TERMS_AND_CONDITION.mapping,
+    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.createCollectionConstraint))
 
-  case class Data(name: String, description: String, nsfw: Boolean, website: Option[URL], twitter: Option[URL], instagram: Option[URL]) {
+  case class Data(name: String, description: String, nsfw: Boolean, website: Option[URL], twitter: Option[String], instagram: Option[String], termsAccepted: Boolean) {
     def getSocialProfiles: Seq[SocialProfile] = Seq(
       this.website.fold[Option[SocialProfile]](None)(x => Option(SocialProfile(name = constants.Collection.SocialProfile.WEBSITE, url = x.toString))),
-      this.twitter.fold[Option[SocialProfile]](None)(x => Option(SocialProfile(name = constants.Collection.SocialProfile.TWITTER, url = x.toString))),
-      this.instagram.fold[Option[SocialProfile]](None)(x => Option(SocialProfile(name = constants.Collection.SocialProfile.INSTAGRAM, url = x.toString)))
+      this.twitter.fold[Option[SocialProfile]](None)(x => Option(SocialProfile(name = constants.Collection.SocialProfile.TWITTER, url = x))),
+      this.instagram.fold[Option[SocialProfile]](None)(x => Option(SocialProfile(name = constants.Collection.SocialProfile.INSTAGRAM, url = x)))
     ).flatten
   }
 

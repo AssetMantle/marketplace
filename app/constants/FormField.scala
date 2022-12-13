@@ -1,22 +1,22 @@
 package constants
 
 import play.api.data.Forms._
-import play.api.data.{FormError, Mapping}
-import play.api.data.format.Formats.{bigDecimalFormat, doubleFormat}
+import play.api.data.format.Formats._
+import play.api.data.format.Formatter
 import play.api.data.validation.Constraints
+import play.api.data.{FormError, Mapping}
 import play.api.i18n.{Messages, MessagesProvider}
 import utilities.MicroNumber
 import utilities.NumericOperation.checkPrecision
 
 import java.net.URL
 import java.util.Date
-import play.api.data.format.Formatter
-import play.api.data.format.Formats._
 
 object FormField {
 
   private val PLACEHOLDER_PREFIX = "PLACEHOLDER."
   private val SELECT_ERROR_PREFIX = "SELECT_ERROR_PREFIX."
+  private val RADIO_BUTTON_ERROR_PREFIX = "RADIO_BUTTON_ERROR_PREFIX."
   private val DATE_ERROR_PREFIX = "DATE_ERROR_PREFIX."
   private val URL_ERROR_PREFIX = "URL_ERROR_PREFIX."
   private val NESTED_ERROR_PREFIX = "NESTED_ERROR_PREFIX."
@@ -60,18 +60,36 @@ object FormField {
   val COLLECTION_DESCRIPTION: StringFormField = StringFormField("COLLECTION_DESCRIPTION", 3, 256)
   val COLLECTION_ID: StringFormField = StringFormField("COLLECTION_ID", 16, 16)
   val COLLECTION_PROPERTY_NAME: StringFormField = StringFormField("COLLECTION_PROPERTY_NAME", 1, 30)
-  val COLLECTION_PROPERTY_FIXED_VALUE: StringFormField = StringFormField("COLLECTION_PROPERTY_FIXED_VALUE", 1, 30)
+  val COLLECTION_PROPERTY_DEFAULT_VALUE: StringFormField = StringFormField("COLLECTION_PROPERTY_DEFAULT_VALUE", 1, 30)
+  val NFT_NAME: StringFormField = StringFormField("NFT_NAME", 3, 50)
+  val NFT_DESCRIPTION: StringFormField = StringFormField("NFT_DESCRIPTION", 3, 256)
+  val NFT_ID: StringFormField = StringFormField("NFT_ID", 64, 64)
+  val NFT_TAGS: StringFormField = StringFormField("NFT_TAGS", 0, (constants.NFT.Tags.MaximumLength + 1) * constants.NFT.Tags.MaximumAllowed)
+  val NFT_PROPERTY_NAME: StringFormField = StringFormField("NFT_PROPERTY_NAME", 1, 30)
+  val NFT_PROPERTY_VALUE: StringFormField = StringFormField("NFT_PROPERTY_VALUE", 1, 30)
+  val COLLECTION_TWITTER: StringFormField = StringFormField("COLLECTION_TWITTER", 1, 15, RegularExpression.TWITTER_USERNAME)
+  val COLLECTION_INSTAGRAM: StringFormField = StringFormField("COLLECTION_INSTAGRAM", 1, 30, RegularExpression.INSTAGRAM_USERNAME)
+  val SALE_ID: StringFormField = StringFormField("SALE_ID", 16, 16)
+  val NOTIFICATION_ID: StringFormField = StringFormField("NOTIFICATION_ID", 16, 16)
 
   // UrlFormField
   val COLLECTION_WEBSITE: UrlFormField = UrlFormField("COLLECTION_WEBSITE")
-  val COLLECTION_TWITTER: UrlFormField = UrlFormField("COLLECTION_TWITTER")
-  val COLLECTION_INSTAGRAM: UrlFormField = UrlFormField("COLLECTION_INSTAGRAM")
 
   // IntFormField
   val GAS_AMOUNT: IntFormField = IntFormField("GAS_AMOUNT", 20000, 2000000)
   val WHITELIST_MAX_MEMBERS: IntFormField = IntFormField("WHITELIST_MAX_MEMBERS", 1, Int.MaxValue)
-  val WHITELIST_INVITE_START_EPOCH: IntFormField = IntFormField("WHITELIST_INVITE_START_EPOCH", 1, Int.MaxValue)
-  val WHITELIST_INVITE_END_EPOCH: IntFormField = IntFormField("WHITELIST_INVITE_END_EPOCH", 1, Int.MaxValue)
+  val SALE_NFT_NUMBER: IntFormField = IntFormField("SALE_NFT_NUMBER", 1, Int.MaxValue)
+  val SALE_MAX_MINT_PER_ACCOUNT: IntFormField = IntFormField("SALE_MAX_MINT_PER_ACCOUNT", 1, Int.MaxValue)
+
+
+  // DoubleFormField
+  val GAS_PRICE: DoubleFormField = DoubleFormField("GAS_PRICE", constants.Blockchain.LowGasPrice, constants.Blockchain.HighGasPrice)
+
+  // EpochFormField
+  val WHITELIST_INVITE_START_EPOCH: EpochFormField = EpochFormField("WHITELIST_INVITE_START_EPOCH", 1, Int.MaxValue)
+  val WHITELIST_INVITE_END_EPOCH: EpochFormField = EpochFormField("WHITELIST_INVITE_END_EPOCH", 1, Int.MaxValue)
+  val NFT_SALE_START_EPOCH: EpochFormField = EpochFormField("NFT_SALE_START_EPOCH", 1, Int.MaxValue)
+  val NFT_SALE_END_EPOCH: EpochFormField = EpochFormField("NFT_SALE_END_EPOCH", 1, Int.MaxValue)
 
   // BooleanFormField
   val RECEIVE_NOTIFICATIONS: BooleanFormField = BooleanFormField("RECEIVE_NOTIFICATIONS")
@@ -79,20 +97,35 @@ object FormField {
   val SIGNUP_TERMS_CONDITIONS: BooleanFormField = BooleanFormField("SIGNUP_TERMS_CONDITIONS")
   val MANAGED_KEY_DISCLAIMER: BooleanFormField = BooleanFormField("MANAGED_KEY_DISCLAIMER")
   val NSFW_COLLECTION: BooleanFormField = BooleanFormField("NSFW_COLLECTION")
-  val COLLECTION_PROPERTY_REQUIRED: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_REQUIRED")
+  val SAVE_COLLECTION_DRAFT: BooleanFormField = BooleanFormField("SAVE_COLLECTION_DRAFT")
+  val SAVE_NFT_DRAFT: BooleanFormField = BooleanFormField("SAVE_NFT_DRAFT")
   val COLLECTION_PROPERTY_MUTABLE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_MUTABLE")
-  val COLLECTION_PROPERTY_HIDE_VALUE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_HIDE_VALUE")
+  val COLLECTION_PROPERTY_SET_DEFAULT_VALUE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_SET_DEFAULT_VALUE")
+  val COLLECTION_PROPERTY_HIDE: BooleanFormField = BooleanFormField("COLLECTION_PROPERTY_HIDE")
+  val CREATE_COLLECTION_TERMS_AND_CONDITION: BooleanFormField = BooleanFormField("CREATE_COLLECTION_TERMS_AND_CONDITION")
+  val MARK_ALL_NOTIFICATION_READ: BooleanFormField = BooleanFormField("MARK_ALL_NOTIFICATION_READ")
+  val MINT_NFT: BooleanFormField = BooleanFormField("MINT_NFT")
 
   // SelectFormField
-  val GAS_PRICE: SelectFormField = SelectFormField("GAS_PRICE", Seq(constants.CommonConfig.Blockchain.LowGasPrice.toString, constants.CommonConfig.Blockchain.MediumGasPrice.toString, constants.CommonConfig.Blockchain.HighGasPrice.toString))
   val COLLECTION_CATEGORY: SelectFormField = SelectFormField("COLLECTION_CATEGORY", Seq(constants.Collection.Category.ART, constants.Collection.Category.PHOTOGRAPHY, constants.Collection.Category.MISCELLANEOUS))
-  val COLLECTION_PROPERTY_TYPE: SelectFormField = SelectFormField("COLLECTION_PROPERTY_TYPE", Seq(constants.Collection.NFT.Data.STRING, constants.Collection.NFT.Data.NUMBER, constants.Collection.NFT.Data.BOOLEAN))
+  val COLLECTION_PROPERTY_TYPE: SelectFormField = SelectFormField("COLLECTION_PROPERTY_TYPE", Seq(constants.NFT.Data.STRING, constants.NFT.Data.DECIMAL, constants.NFT.Data.BOOLEAN))
+
+  // CustomSelect
+  val SELECT_WHITELIST_ID: CustomSelectFormField = CustomSelectFormField("SELECT_WHITELIST_ID")
+  val SELECT_COLLECTION_ID: CustomSelectFormField = CustomSelectFormField("SELECT_COLLECTION_ID")
 
   // MicroNumberFormField
   val SEND_COIN_AMOUNT: MicroNumberFormField = MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.zero, MicroNumber(Int.MaxValue), 6)
+  val NFT_WHITELIST_SALE_PRICE: MicroNumberFormField = MicroNumberFormField("NFT_WHITELIST_SALE_PRICE", MicroNumber.zero, MicroNumber(Int.MaxValue))
 
   // NestedFormField
   val COLLECTION_PROPERTIES: NestedFormField = NestedFormField("COLLECTION_PROPERTIES")
+  val NFT_PROPERTIES: NestedFormField = NestedFormField("NFT_PROPERTIES")
+
+  // RadioFormField
+
+  // BigDecimalFormField
+  val NFT_SALE_CREATOR_FEE: BigDecimalFormField = BigDecimalFormField("NFT_SALE_CREATOR_FEE", 0.0, constants.NFT.Sale.MaxCreatorFee)
 
   case class StringFormField(name: String, minimumLength: Int, maximumLength: Int, regularExpression: RegularExpression = RegularExpression.ANY_STRING, errorMessage: String = "Regular expression validation failed!") {
     val placeHolder: String = PLACEHOLDER_PREFIX + name
@@ -109,6 +142,16 @@ object FormField {
     def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_LENGTH_ERROR, maximumLength)
 
     def getRegexErrorMessage()(implicit messagesProvider: MessagesProvider): String = regularExpression.getRegExErrorMessage()
+  }
+
+  case class RadioFormField(name: String, options: Seq[(String, String)], errorMessage: String = "Option not found") {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
+
+    def mapping: (String, Mapping[String]) = name -> text.verifying(constraint = field => options.map(_._1) contains field, error = errorMessage)
+
+    def optionalMapping: (String, Mapping[Option[String]]) = name -> optional(text.verifying(constraint = field => options.map(_._1) contains field, error = errorMessage))
+
+    def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(RADIO_BUTTON_ERROR_PREFIX + name)
   }
 
   case class SelectFormField(name: String, options: Seq[String], errorMessage: String = "Option not found") {
@@ -143,6 +186,21 @@ object FormField {
     def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_VALUE_ERROR, maximumValue)
 
     def getCustomFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(CUSTOM_FIELD_ERROR_PREFIX + name, minimumValue, maximumValue)
+
+  }
+
+  case class EpochFormField(name: String, minimum: Int, maximum: Int) {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
+
+    def mapping: (String, Mapping[Int]) = name -> number(min = minimum, max = maximum)
+
+    def optionalMapping: (String, Mapping[Option[Int]]) = name -> optional(number(min = minimum, max = maximum))
+
+    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_VALUE_ERROR, minimum)
+
+    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_VALUE_ERROR, maximum)
+
+    def getCustomFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(CUSTOM_FIELD_ERROR_PREFIX + name, minimum, maximum)
 
   }
 
@@ -191,7 +249,7 @@ object FormField {
   implicit object UrlFormatter extends Formatter[URL] {
     override val format: Option[(String, Nil.type)] = Some(("URL", Nil))
 
-    override def bind(key: String, data: Map[String, String]) = parsing(new URL(_), "Invalid URL", Nil)(key, data)
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], URL] = parsing(new URL(_), "Invalid URL", Nil)(key, data)
 
     override def unbind(key: String, value: URL): Map[String, String] = Map(key -> value.toString)
   }

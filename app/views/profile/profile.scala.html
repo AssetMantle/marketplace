@@ -10,21 +10,25 @@
             @if(optionalLoginState.isDefined && optionalLoginState.fold("")(_.username) == accountId) {
                 @commonHorizontalSwitcher(
                     ListMap(
+                        constants.View.OWNED -> (routes.javascript.NFTController.ownedSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.OWNED}')")),
                         constants.View.CREATED -> (routes.javascript.CollectionController.createdSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.CREATED}')")),
                         constants.View.WHITELIST -> (routes.javascript.WhitelistController.whitelistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WHITELIST}')")),
                         constants.View.WISHLIST -> (routes.javascript.WishlistController.wishlistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WISHLIST}')")),
                     ),
                     activeTab,
+                    Symbol(constants.View.OWNED + "_PARAMETERS") -> s"'${accountId}'",
                     Symbol(constants.View.CREATED + "_PARAMETERS") -> s"'${accountId}'",
                     Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
                 )
             } else {
                 @commonHorizontalSwitcher(
                     ListMap(
-                        constants.View.CREATED -> (routes.javascript.CollectionController.createdSection,  JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WHITELIST}')")),
+                        constants.View.OWNED -> (routes.javascript.NFTController.ownedSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.OWNED}')")),
+                        constants.View.CREATED -> (routes.javascript.CollectionController.createdSection,  JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.CREATED}')")),
                         constants.View.WISHLIST -> (routes.javascript.WishlistController.wishlistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WISHLIST}')")),
                     ),
                     activeTab,
+                    Symbol(constants.View.OWNED + "_PARAMETERS") -> s"'${accountId}'",
                     Symbol(constants.View.CREATED + "_PARAMETERS") -> s"'${accountId}'",
                     Symbol(constants.View.WISHLIST + "_PARAMETERS") -> s"'${accountId}'"
                 )
@@ -32,7 +36,3 @@
         </div>
     </div>
 </div>
-
-<script>
-        checkAndPushState(jsRoutes.controllers.ProfileController.viewProfile('@accountId', '@activeTab').url, ('@accountId'+ '/' + '@activeTab'), "profile");
-</script>

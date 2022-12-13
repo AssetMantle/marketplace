@@ -115,6 +115,10 @@ object Date {
 
   }
 
+  def currentEpoch: Long = System.currentTimeMillis() / 1000
+
+  def currentMillisEpoch: Long = System.currentTimeMillis()
+
   object RFC3339 {
 
     def apply(value: String): RFC3339 = if (isValidRFC3339(value)) new RFC3339(value) else throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
