@@ -40,5 +40,5 @@ function viewProfile(lastPart) {
     let activeTab = lastPart.split("/")[1];
     componentResource('leftContent', jsRoutes.controllers.ProfileController.profileInfoCard(accountId));
     componentResource('centerContent', jsRoutes.controllers.ProfileController.profile(accountId, activeTab));
-    componentResource('rightContent', jsRoutes.controllers.ProfileController.profileActivityCard(accountId));
+    componentResource('rightContent', jsRoutes.controllers.ProfileController.profileAnalysisCard(accountId));
 }
