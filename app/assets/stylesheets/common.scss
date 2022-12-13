@@ -31,22 +31,25 @@
     }
 
     &::after {
-      content: "";
-      height: 20px;
-      width: 20px;
-      background-image: url("../images/icon/downArrowWhite.png");
-      background-size: 18px;
-      background-repeat: no-repeat;
       position: absolute;
-      right: 12px;
-      top: 10px;
-      transform-origin: center center;
-      transition: all .5s;
+      display: block;
+      content: '';
+      width: 10px;
+      height: 10px;
+      top: 50%;
+      right: 25px;
+      margin-top: -3px;
+      border-bottom: 1px solid var(--mantle-off-white);
+      border-right: 1px solid var(--mantle-off-white);
+      transform: rotate(45deg) translateY(-50%);
+      transition: all .4s ease-in-out;
+      transform-origin: 50% 0;
     }
 
     &.active::after {
-      top: 6px;
-      transform: rotate(180deg);
+      margin-top: 3px;
+      transform: rotate(-135deg) translateY(-50%);
+      border-color: var(--default);
     }
 
     .currentSelected {
@@ -362,6 +365,7 @@
   cursor: pointer;
   .links {
     .menuItem {
+      height: 30px;
       list-style: none;
       position: relative;
       a{
@@ -422,7 +426,7 @@
       }
       &:hover {
         .subMenu {
-          top: 35px;
+          top: 41px;
           opacity: 1;
           visibility: visible;
         }
@@ -679,6 +683,7 @@
       .titleLink{
         @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
         text-transform: capitalize;
+        cursor: pointer;
       }
     }
 
@@ -737,12 +742,25 @@
             aspect-ratio: 1;
             border-radius: 50%;
             background-color: var(--card-dark);
+            cursor: pointer;
+            &:hover{
+              background-color: var(--disable-yellow);
+            }
+            &.active{
+              background-color: var(--default);
+              i{
+                color:var(--card-dark);
+              }
+            }
           }
           .notificationDetail{
             .title{
               @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--default));
               text-transform: capitalize;
               word-break: break-word;
+              &.clickable{
+                cursor: pointer;
+              }
             }
             .description{
               @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
@@ -751,6 +769,17 @@
             .dateTime{
               @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));
             }
+            &.read{
+              .notificationIcon{
+                background-color: var(--default);
+                i{
+                  color:var(--card-dark);
+                }
+              }
+            }
+          }
+          &.clickable{
+            cursor: pointer;
           }
         }
       }
@@ -857,5 +886,28 @@
   @include setFont(var(--font-type-2), normal, 400, 10px, 14px, var(--header-bg));
   padding: 2px 4px;
   background-color: var(--default);
+  border-radius: 5px;
+}
+
+// Hide Modal scrollbar
+body.modal-open{
+  padding-right: 0px !important;
+}
+#commonModal{
+  padding-right: 0px !important;
+}
+#commonModal::-webkit-scrollbar{
+  display: none;
+}
+
+// Notification count
+#totalUnreadNotification{
+  display: none;
+  background-color: var(--default);
+  position: absolute;
+  left: calc(100% - 12px);
+  top: 10px;
+  @include setFont(var(--font-type-2), normal, 400, 10px, 14px, var(--header-bg));
+  padding: 2px 4px;
   border-radius: 5px;
 }

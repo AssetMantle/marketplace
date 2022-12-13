@@ -17,6 +17,7 @@
         <meta http-equiv="Expires" content="0">
             <!-- Bootstrap -->
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/library/bootstrap.min.css")"/>
+        <script src="@routes.Assets.versioned("javascripts/library/jquery.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/library/bootstrap.bundle.min.js")" type="text/javascript"></script>
         <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/font/bootstrap-icons.css")"/>
             <!-- Fonts -->
@@ -31,30 +32,30 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/explorer.css")"/>
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/walletPopUp.css")"/>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/userProfile.css")"/>
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/library/daterangepicker.min.css")"/>
             <!-- Bootstrap Toaster -->
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/library/bootstrap-toaster.css")"/>
         <script src="@routes.Assets.versioned("javascripts/library/bootstrap-toaster.min.js")" type="text/javascript"></script>
             <!-- JS -->
-        <script src="@routes.Assets.versioned("javascripts/constants.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/constants.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/firebase/firebase.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/library/jquery.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/library/swiperBundle.min.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/common.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/switcher.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/componentResource.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/views/page.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/views/checkAndPushState.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/views/backButtonCapture.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/notification/common.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/common.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/switcher.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/componentResource.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/views/page.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/views/checkAndPushState.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/views/backButtonCapture.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/notification/common.js")" type="text/javascript"></script>
             <!-- LazyLoad -->
-        <script type="text/javascript" src="@routes.Assets.versioned("javascripts/library/lazyload.js")"></script>
+        <script type="text/javascript" src="@utilities.PublicResource.getVersionedRoute("javascripts/library/lazyload.js")"></script>
             <!-- Form -->
-        <script src="@routes.Assets.versioned("javascripts/form/getForm.js")"></script>
-        <script src="@routes.Assets.versioned("javascripts/form/closeForm.js")"></script>
-        <script src="@routes.Assets.versioned("javascripts/form/submitForm.js")"></script>
-        <script src="@routes.Assets.versioned("javascripts/form/validateForm.js")"></script>
-        <script src="@routes.Assets.versioned("javascripts/form/formField.js")"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/form/getForm.js")"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/form/closeForm.js")"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/form/submitForm.js")"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/form/validateForm.js")"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/form/formField.js")"></script>
             <!-- JSRoute -->
         <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" ></script>
             <!-- Date Range Picker -->
@@ -63,9 +64,9 @@
             <!-- Search Bar Autocomplete-->
         <script src="@routes.Assets.versioned("javascripts/library/bootstrap3-typeahead.min.js")" type="text/javascript"></script>
 
-        <script src="@routes.Assets.versioned("javascripts/custom.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/file/resumable.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/file/common.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/custom.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/file/resumable.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/file/common.js")" type="text/javascript"></script>
 
         <style>
                 img {
@@ -114,6 +115,12 @@
                                     <a class="d-flex flex-row align-items-center gap-3">
                                         <img src="@routes.Assets.versioned("images/icon/createNFT.svg")"/>
                                         <div class="profileMenuLabel">@Messages(constants.View.CREATE_NEW_NFT_MENU)</div>
+                                    </a>
+                                </li>
+                                <li onclick="getForm(jsRoutes.controllers.CollectionController.genesisTypeForm())">
+                                    <a class="d-flex flex-row align-items-center gap-3">
+                                        <i class="bi bi-palette iconDefault"></i>
+                                        <div class="profileMenuLabel">@Messages(constants.View.BECOME_GENESIS_CREATOR_MENU)</div>
                                     </a>
                                 </li>
                             </ul>
@@ -173,20 +180,25 @@
                 @optionalLoginState match {
                     case Some(loginState) => {
                         <ul class="d-flex flex-row gap-2 align-items-center mb-0 links">
-                            <li id="userNotification" class="menuItem menuIcon" onclick="showNotification();">
-                                <div id="notificationPopup" class="notificationPopup popupContainer"></div>
-                                <a class="desktop-link" target="_blank" onclick="componentResource('notificationPopup', jsRoutes.controllers.ProfileController.notificationPopup());">
+                            <li id="userNotification" class="menuItem menuIcon" onmouseover="showNotification();" onmouseleave="closeWallet();">
+                                <div id="notificationPopup" class="notificationPopup popupContainer">
+                                    @views.html.notification.commonNotificationPopup()(requestHeader, messagesProvider, loginState)
+                                </div>
+                                <a class="desktop-link" target="_blank">
+                                    <div id="totalUnreadNotification"></div>
                                     <i class="bi bi-bell iconWhite wallet"></i>
                                 </a>
                             </li>
-                            <li id="userWallet" class="menuItem menuIcon" onclick="showWallet();">
-                                <div id="walletPopup" class="walletPopup popupContainer"></div>
-                                <a class="desktop-link" target="_blank" onclick="componentResource('walletPopup', jsRoutes.controllers.SettingController.walletPopup());">
+                            <li id="userWallet" class="menuItem menuIcon" onmouseover="showWallet();" onmouseleave="closeWallet();">
+                                <div id="walletPopup" class="walletPopup popupContainer">
+                                    @views.html.base.commonWalletPopup()(requestHeader, messagesProvider, loginState)
+                                </div>
+                                <a class="desktop-link" href="@routes.ProfileController.viewProfile(loginState.username, constants.View.CREATED)">
                                     <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="35" height="35"/>
                                 </a>
                             </li>
                         </ul>
-                        <div id="walletBackDrop" onclick="closeWallet()"></div>
+                        <div id="walletBackDrop"></div>
                     }
                     case _ => {
                         <ul class="links">
@@ -211,8 +223,8 @@
             </div>
         </div>
 
-        <div class="container common-container">
-            <div class="row mx-3">
+        <div class="container-fluid common-container p-0">
+            <div class="row">
                 <div id="leftContent" class="col-12 col-md-3 col-lg-3 col-xl-2 mb-3"></div>
                 <div id="centerContent" class="col-12 col-md-6 col-lg-6 col-xl-8 mb-3"></div>
                 <div id="rightContent" class="col-12 col-md-3 col-lg-3 col-xl-2"></div>

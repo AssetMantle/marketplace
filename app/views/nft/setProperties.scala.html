@@ -4,11 +4,11 @@
 @import models.master.Collection
 @import views.html.nft.commonValueField
 
-@(setPropertiesForm: Form[SetProperties.Data] = SetProperties.form, collection: Collection, fileName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(setPropertiesForm: Form[SetProperties.Data] = SetProperties.form, collection: Collection, nftId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonForm(constants.Form.NFT_SET_PROPERTIES, setPropertiesForm) {
+@commonForm(constants.Form.NFT_SET_PROPERTIES, setPropertiesForm, showBackButton = true, callBackFunction = JavaScript(s"""updateNFTContainer('${collection.id}')""")) {
     @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collection.id, Symbol("containerDivClass") -> "hidden")
-    @commonInputText(setPropertiesForm, constants.FormField.NFT_FILE_NAME, Symbol("value") -> fileName, Symbol("containerDivClass") -> "hidden")
+    @commonInputText(setPropertiesForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden")
     @commonCheckbox(setPropertiesForm, constants.FormField.SAVE_NFT_DRAFT, Symbol("containerDivClass") -> "hidden")
     @defining(Option(constants.FormField.COLLECTION_PROPERTIES)) { implicit nestedFormField =>
         @repeatWithIndex(setPropertiesForm(constants.FormField.NFT_PROPERTIES.name), min = collection.properties.fold(0)(_.length)) { (propertyField, index) =>
@@ -32,7 +32,8 @@
         </div>
     </div>
 }
-<script src="@routes.Assets.versioned("javascripts/nfts/setProperties.js")"></script>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/setProperties.js")"></script>
 <script>
         hideSubmitButton();
+        setPropertyBackButton('@collection.id','@nftId');
 </script>

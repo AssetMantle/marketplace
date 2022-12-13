@@ -1,9 +1,7 @@
 package utilities
 
 import exceptions.BaseException
-import org.apache.commons.codec.binary.Hex
 import play.api.Logger
-import play.api.libs.Codecs.sha1
 import sun.nio.cs.ISO_8859_1
 
 import java.math.BigInteger
@@ -62,6 +60,8 @@ object Secrets {
   def sha256Hash(value: Array[Byte]): Array[Byte] = MessageDigest.getInstance("SHA-256").digest(value)
 
   def sha256HashString(value: String): String = java.lang.String.format("%064x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8))))
+
+  def sha256HashHexString(value: Array[Byte]): String = sha256Hash(value).map("%02x".format(_)).mkString.toUpperCase
 
   def base64URLDecodeToString(s: String): String = try {
     Base64.getUrlDecoder.decode(s.replace("+", "-").replace("/", "_")).map(_.toChar).mkString

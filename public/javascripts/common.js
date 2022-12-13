@@ -141,4 +141,75 @@ function showSnackbar(title, message, status) {
 function truncate(message, fieldId, length) {
     let newMessage = (message.length > length) ? message.slice(0, length - 1) + '&hellip;' : message;
     $("#" + fieldId).html(newMessage);
-};
+}
+
+function getDollarPrice(mntlPrice, nftId) {
+    route = jsRoutes.controllers.BlockchainTransactionController.gasTokenPrice();
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                let salePrice = mntlPrice;
+                let currentMntlPrice = data;
+                $("#dollarPrice_" + nftId.split(".")[0]).text("($" + (salePrice * currentMntlPrice).toFixed(2) + ")");
+            }
+        }
+    });
+}
+
+function getNFTPrice(nftId) {
+    let route = jsRoutes.controllers.NFTController.price(nftId);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                if (data !== "--") {
+                    $("#price_" + nftId.split(".")[0]).html(data);
+                    getDollarPrice(data, nftId);
+                }
+            }
+        }
+    });
+}
+
+function countCollectionCardInfo(collectionId) {
+    let route = jsRoutes.controllers.CollectionController.commonCardInfo(collectionId);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                let totalData = data.split("|");
+                $('#counCollectionNFTs_' + collectionId).html(totalData[0]);
+                $('#collectionNFTsPrice_' + collectionId).html(totalData[1]);
+                if(totalData[2] == 1){
+                    $("#saleBadge_" + collectionId + " .option").removeClass("active");
+                    $("#saleBadge_" + collectionId + " .live").addClass("active");
+                }else if(totalData[2] == 2){
+                    $("#saleBadge_" + collectionId + " .option").removeClass("active");
+                    $("#saleBadge_" + collectionId + " .soldOut").addClass("active");
+                }else if(totalData[2] == 3){
+                    $("#saleBadge_" + collectionId + " .option").removeClass("active");
+                    $("#saleBadge_" + collectionId + " .ended").addClass("active");
+                }else{
+                    $("#saleBadge_" + collectionId + " .option").removeClass("active");
+                }
+            },
+            400: function (data) {
+                console.log(data.responseText)
+            }
+        }
+    });
+}
+
+// Gas Toggle Button
+function setGasOption(element, value) {
+    $(".toggleOption").removeClass("active");
+    $(element).addClass("active");
+    $('#GAS_PRICE').val(value);
+}

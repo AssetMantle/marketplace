@@ -24,6 +24,10 @@ case class Account(id: String, passwordHash: Array[Byte], salt: Array[Byte], ite
     updatedBy = this.updatedBy,
     updatedOn = this.updatedOn,
     updatedOnTimeZone = this.updatedOnTimeZone)
+
+  def isCreator: Boolean = utilities.Account.isCreator(this.accountType)
+
+  def isVerifiedCreator: Boolean = utilities.Account.isVerifiedCreator(this.accountType)
 }
 
 object Accounts {
@@ -110,7 +114,7 @@ class Accounts @Inject()(
       } yield ()
     }
 
-    def updateAccount(account: Account): Future[Unit] = update(account.serialize())
+    def update(account: Account): Future[Unit] = updateById(account.serialize())
 
     //    def validateUsernamePasswordAndGetAccount(username: String, password: String): Future[(Boolean, Account)] = {
     //      val account = tryGetById(username)
@@ -119,11 +123,14 @@ class Accounts @Inject()(
     //      } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = account.passwordHash, salt = account.salt, iterations = account.iterations), account.deserialize)
     //    }
 
-    def updateAccountType(accountId: String, accountType: String): Future[Unit] = {
+    def updateAccountToCreator(accountId: String): Future[Unit] = {
       val account = tryGetById(accountId)
+
+      def update(account: Account) = if (!account.isCreator) updateById(account.copy(accountType = constants.Account.Type.CREATOR).serialize()) else Future()
+
       for {
         account <- account
-        _ <- update(account.copy(accountType = accountType))
+        _ <- update(account.deserialize)
       } yield ()
     }
 
@@ -135,13 +142,6 @@ class Accounts @Inject()(
 
     def getLanguage(id: String): Future[Lang] = get(id).map(x => x.fold(Lang("en"))(_.language))
 
-    def getAccountType(id: String): Future[String] = tryGetById(id).map(_.accountType)
-
-    def tryVerifyingAccountType(id: String, accountType: String): Future[Boolean] = getAccountType(id).map(_ == accountType)
-
     def checkAccountExists(username: String): Future[Boolean] = exists(username)
-
-    def getAllIncorrectLang(): Future[Seq[Account]] = filter(_.accountType === "en").map(_.map(_.deserialize))
-
   }
 }

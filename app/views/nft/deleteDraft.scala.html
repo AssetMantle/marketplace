@@ -1,4 +1,4 @@
-@(fileName: String, fileHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(nftId: String, fileHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="modal-header mb-3">
     <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.NFT_DRAFT_REMOVE_TITLE)</h5>
@@ -11,7 +11,7 @@
 <div class="form-body">
     <div class="horizontal-align">
         <button type="button" data-bs-dismiss="modal" aria-label="Close" class="form-secondary-button" onclick="closeModal();">@Messages(constants.View.CANCEL)</button>
-        <button class="form-primary-button" onclick="removeNftDraft('@fileName', '@fileHash','@Messages(constants.View.REMOVE_FROM_DRAFT)')">@Messages(constants.View.CONFIRM_BUTTON)</button>
+        <button class="form-primary-button" onclick="removeNftDraft('@nftId', '@fileHash','@Messages(constants.View.REMOVE_FROM_DRAFT)')">@Messages(constants.View.CONFIRM_BUTTON)</button>
     </div>
 </div>
-<script src="@routes.Assets.versioned("javascripts/nfts/draft.js")"></script>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/draft.js")"></script>

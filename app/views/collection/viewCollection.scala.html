@@ -4,10 +4,7 @@
 
 @views.html.base.common(constants.View.COLLECTION, failures, warnings, successes, infos)
 
-<div>
-    <script>
-        componentResource('leftContent', jsRoutes.controllers.CollectionController.info('@collection.id'));
-        componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs('@collection.id'));
+<script>
+        viewCollection('@collection.id');
         checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection('@collection.id').url, '@collection.id', "viewCollection");
-    </script>
-</div>
+</script>

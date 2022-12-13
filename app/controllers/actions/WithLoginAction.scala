@@ -3,11 +3,10 @@ package controllers.actions
 import controllers.logging.{WithActionAsyncLogging, WithMultipartFormActionAsyncLogging}
 import exceptions.BaseException
 import models.{master, masterTransaction}
-import org.joda.time.{DateTime, DateTimeZone}
+import play.api.Logger
 import play.api.i18n.I18nSupport
 import play.api.libs.Files.TemporaryFile
 import play.api.mvc._
-import play.api.{Configuration, Logger}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -17,6 +16,7 @@ class WithLoginAction @Inject()(
                                  messagesControllerComponents: MessagesControllerComponents,
                                  withActionAsyncLogging: WithActionAsyncLogging,
                                  withMultipartFormActionAsyncLogging: WithMultipartFormActionAsyncLogging,
+                                 masterAccounts: master.Accounts,
                                  masterKeys: master.Keys,
                                  masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -26,25 +26,27 @@ class WithLoginAction @Inject()(
   private def verifyAndGetLoginState(request: Request[_])(implicit logger: Logger) = {
     val username = Future(request.session.get(constants.Session.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
     val address = Future(request.session.get(constants.Session.ADDRESS).getOrElse(throw new BaseException(constants.Response.ADDRESS_NOT_FOUND)))
-    val token = Future(request.session.get(constants.Session.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
+    val currentSessionToken = Future(request.session.get(constants.Session.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
 
-    def verify(username: String, address: String, sessionToken: String) = {
-      val token = masterTransactionSessionTokens.Service.tryGet(username)
+    def verify(username: String, address: String, currentSessionToken: String) = {
+      val storedSessionToken = masterTransactionSessionTokens.Service.tryGet(username)
       val key = masterKeys.Service.tryGetActive(username)
+      val account = masterAccounts.Service.tryGet(username)
 
       for {
-        token <- token
+        storedSessionToken <- storedSessionToken
         key <- key
-      } yield key.accountId == username && key.address == address && token.sessionTokenHash == utilities.Secrets.sha256HashString(sessionToken) && (DateTime.now(DateTimeZone.UTC).getMillis - token.sessionTokenTime < constants.CommonConfig.SessionTokenTimeout)
+        account <- account
+      } yield (utilities.Session.verify(username = username, key = key, address = address, storedSessionToken = storedSessionToken, currentSessionToken = currentSessionToken), account)
     }
 
     (for {
       username <- username
       address <- address
-      token <- token
-      verify <- verify(username, address, token)
-    } yield (verify, LoginState(username = username, address = address))).recover {
-      case _: BaseException => (false, LoginState(username = "", address = ""))
+      currentSessionToken <- currentSessionToken
+      (verify, account) <- verify(username, address, currentSessionToken)
+    } yield (verify, LoginState(username = username, address = address, accountType = account.accountType))).recover {
+      case _: BaseException => (false, LoginState(username = "", address = "", accountType = ""))
     }
   }
 

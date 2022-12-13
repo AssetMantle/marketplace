@@ -6,14 +6,20 @@
 @(whitelist: Whitelist, members: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div class="whitelistMembersContainer">
-    <div class="modal-header mb-3">
-        <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.WHITELIST_MEMBER_TITLE)</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
-                    &times;
-        </button>
+    <div class="singleItemDetailContainer">
+        <div class="headerWithIcon">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-1 my-3 headerTop">
+                    <div class="title-icon back-button-icon" onclick="setCreatedWhitelistCurrentPage(0); componentResource('whitelistSectionContent', jsRoutes.controllers.WhitelistController.createdWhitelists());">
+                        <i class="bi bi-chevron-left iconDefault"></i>
+                    </div>
+                    <h3 class="titleText">@whitelist.name</h3>
+                </div>
+            </div>
+        </div>
     </div>
-    <p class="sub-heading" id="modalSubtitle">@Messages(constants.View.WHITELIST_MEMBER_SUBTITLE)</p>
 
+    @if(members.nonEmpty) {
     <div class="searchField d-flex">
         <i class="bi bi-search iconWhite iconSmall"></i>
         <input type="text" id="searchMemberField" onkeyup="searchMember()" placeholder="Search">
@@ -26,7 +32,7 @@
         </div>
         <ul id="memberList">
             @members.zipWithIndex.map { case (username, index) =>
-                <li>
+                <li id="whitelistUser_@index">
                     <div class="d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center gap-4">
                             <div class="memberIndex">@(index + 1)</div>
@@ -38,7 +44,7 @@
                             </div>
                         </div>
                         <div class="deleteIcon">
-                            <i class="bi bi-x iconDefault" onclick="removeWhitelistMember('@username', '@Messages(constants.View.REMOVE_FROM_WHITELIST)')"></i>
+                            <i class="bi bi-x iconDefault" onclick="removeWhitelistMember('@username', '@Messages(constants.View.REMOVE_FROM_WHITELIST)',@index)"></i>
                         </div>
                         <div id="removeWhitelistMember_@username" class="hidden">
                             @defining(views.profile.whitelist.companion.RemoveMember.form) { removeMemberForm =>
@@ -54,4 +60,9 @@
             }
         </ul>
     </div>
+    }else{
+        <div id="emptyMemberList" class="h-100 d-flex flex-column justify-content-center align-items-center emptyMemberList">
+            <div class="message">@Messages(constants.View.NO_MEMBERS_FOUND)</div>
+        </div>
+    }
 </div>

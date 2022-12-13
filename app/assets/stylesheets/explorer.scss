@@ -57,6 +57,40 @@
       text-transform: capitalize;
     }
   }
+  .analysisTitle{
+    @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+  }
+  .analysisValue{
+    @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+  }
+  .priceHolder{
+    .nft-mantle-price{
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--default));
+      margin-left: 4px;
+    }
+    .nft-dollar-price{
+      @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));
+    }
+  }
+  .form-primary-button,
+  .form-secondary-button{
+    width: 100%;
+  }
+  .mintedNftWeightage{
+    margin-top: 14px;
+    .progressBar {
+      background-color: var(--line-2);
+      border-radius: 10px;
+      span {
+        background-color: var(--default);
+        display: block;
+        height: 8px;
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+      }
+    }
+  }
   .nft-likes{
     color: var(--gray);
   }
@@ -602,5 +636,223 @@
         cursor: pointer;
       }
     }
+  }
+}
+
+// Content Detail
+.singleItemDetailContainer{
+  .headerWithIcon{
+    .headerTop{
+      margin-right: 12px;
+      .back-button-icon{
+        height: 40px;
+        width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        cursor: pointer;
+        &:hover {
+          background-color: var(--popup-stroke);
+        }
+      }
+      .titleText{
+        @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--mantle-off-white));
+      }
+    }
+    .sharableLink{
+      cursor: pointer;
+    }
+  }
+  .detailCard {
+    background-color: var(--card-dark);
+    border-radius: 10px;
+    .detailTitle {
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+      padding: 16px 24px;
+    }
+
+    .detailBody {
+      .fieldTitle {
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+      }
+
+      .fieldValue {
+        @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+
+        .tertiaryButton {
+          @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--dark));
+
+          i {
+            font-size: 12px !important;
+          }
+        }
+      }
+    }
+  }
+  .statusOptions{
+    .option{
+      display: none;
+      &.active{
+        display: block;
+      }
+    }
+    .statusBadge{
+      height: 12px;
+      width: 12px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      &.notStarted{
+        background-color: var(--disable);
+      }
+      &.started{
+        background-color: var(--connected);
+      }
+      &.ended{
+        background-color: var(--error);
+      }
+    }
+  }
+}
+
+// Collection Card
+.commonCollectionCard{
+  .profile-section{
+    .collectionLink{
+      .saleBadge{
+        position: relative;
+        .option{
+          background-color: var(--popup-bg);
+          border: 1px solid var(--default);
+          padding: 4px 8px;
+          border-radius: 8px;
+          position: absolute;
+          right: 16px;
+          top: 12px;
+          z-index: 99;
+          display: none;
+          .statusDotWrapper {
+            position: relative;
+            z-index: 0;
+            .statusDotEmitter {
+              position: relative;
+              margin: 0 auto;
+              width: 6px;
+              height: 6px;
+              border-radius: 99px;
+              .statusDotWave {
+                width: 6px;
+                height: 6px;
+                position: absolute;
+                top: 0;
+                left: 0;
+                border-radius: 9999px;
+                background-color: var(--connected);
+                opacity: 0;
+                z-index: -1;
+                pointer-events: none;
+              }
+            }
+          }
+          &.active{
+            display: inline-block;
+          }
+          &.live{
+            @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--mantle-off-white));
+            .statusDot{
+              background-color: var(--connected);
+            }
+            .statusDotEmitter {
+              background-color: var(--connected);
+              .statusDotWave {
+                animation: sonarWave 2s linear infinite;
+                @keyframes sonarWave {
+                  from {
+                    opacity: 0.4;
+                  }
+                  to {
+                    transform: scale(3);
+                    opacity: 0;
+                  }
+                }
+              }
+            }
+          }
+          &.ended{
+            @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--disable));
+            .statusDotEmitter {
+              background-color: var(--error);
+            }
+          }
+          &.soldOut{
+            @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--disable));
+            .statusDotWrapper {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+    .profile-detail{
+      .collectionDetail{
+        padding: 0 20px;
+        .leftInfo{
+          h1{
+            text-align: left;
+          }
+        }
+        .rightInfo{
+          .collectionStatus{
+            margin-top: -8px;
+            .statusOptions{
+              gap: 14px;
+              .option{
+                font-size: 20px;
+                color: var(--disable);
+                &.active{
+                  i{
+                    color: var(--default);
+                  }
+                }
+                &.option2{
+                  transform: rotate(90deg);
+                }
+                &.option3{
+                  i {
+                    font-size: 22px;
+                  }
+                }
+              }
+            }
+          }
+          .collectionStats{
+            .collectionStatsContainer {
+              margin: 0px 0px 12px 0px;
+
+              .collectionStatsBadge {
+                background-color: var(--popup-bg);
+                border-radius: 8px;
+                padding: 4px 6px;
+
+                .badgeLabel {
+                  @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--mantle-off-white));
+                }
+
+                .badgeValue {
+                  @include setFont(var(--font-type-1), normal, 500, 12px, 14px, var(--gray));
+                  text-align: right;
+                }
+              }
+              @media (max-width: 426px){
+                flex-direction: column;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .collectionLink{
+    cursor: pointer;
   }
 }

@@ -4,7 +4,8 @@ import controllers.actions._
 import controllers.result.WithUsernameToken
 import exceptions.BaseException
 import models.common.Coin
-import models.{master, masterTransaction}
+import models.master.{NFT, NFTProperty}
+import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.cache.Cached
@@ -24,8 +25,12 @@ class BlockchainTransactionController @Inject()(
                                                  withoutLoginAction: WithoutLoginAction,
                                                  masterAccounts: master.Accounts,
                                                  masterKeys: master.Keys,
-                                                 blockchainBalances: models.blockchain.Balances,
-                                                 blockchainTransactionSendCoins: models.blockchainTransaction.SendCoins,
+                                                 masterNFTs: master.NFTs,
+                                                 masterNFTProperties: master.NFTProperties,
+                                                 blockchainBalances: blockchain.Balances,
+                                                 blockchainTransactionSendCoins: blockchainTransaction.SendCoins,
+                                                 blockchainTransactionMints: blockchainTransaction.Mints,
+                                                 blockchainTransactionNubs: blockchainTransaction.Nubs,
                                                  masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                                  withUsernameToken: WithUsernameToken,
                                                  withLoginActionAsync: WithLoginActionAsync,
@@ -37,7 +42,7 @@ class BlockchainTransactionController @Inject()(
 
   implicit val callbackOnSessionTimeout: Call = routes.ProfileController.viewDefaultProfile()
 
-  def gasTokenPrice: EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def gasTokenPrice: EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val tokenPrice = masterTransactionTokenPrices.Service.tryGetLatestTokenPrice(constants.Blockchain.StakingToken)
@@ -46,6 +51,19 @@ class BlockchainTransactionController @Inject()(
         } yield Ok(tokenPrice.price.toString)
           ).recover {
           case _: BaseException => BadRequest
+        }
+    }
+  }
+
+  def balance(address: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val balance = blockchainBalances.Service.getTokenBalance(address)
+        (for {
+          balance <- balance
+        } yield Ok(balance.toString)
+          ).recover {
+          case _: BaseException => BadRequest("0")
         }
     }
   }
@@ -68,29 +86,33 @@ class BlockchainTransactionController @Inject()(
           Future(BadRequest(views.html.blockchainTransaction.sendCoin(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.FROM_ADDRESS.name, ""), formWithErrors.data.get(constants.FormField.SEND_COIN_AMOUNT.name).fold(MicroNumber.zero)(MicroNumber(_)))))
         },
         sendCoinData => {
-          val balance = blockchainBalances.Service.get(sendCoinData.fromAddress)
+          val balance = blockchainBalances.Service.getTokenBalance(sendCoinData.fromAddress)
           val validateAndKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = sendCoinData.fromAddress, password = sendCoinData.password)
 
-          def checkBalanceAndBroadcast(balance: Option[models.blockchain.Balance], validatePassword: Boolean, key: master.Key) = if (balance.fold(MicroNumber.zero)(_.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount)) == MicroNumber.zero) {
-            constants.Response.INSUFFICIENT_BALANCE.throwFutureBaseException()
-          } else if (!validatePassword) constants.Response.INVALID_PASSWORD.throwFutureBaseException()
-          else {
-            blockchainTransactionSendCoins.Utility.transaction(
-              accountId = loginState.username,
-              fromAddress = sendCoinData.fromAddress,
-              toAddress = sendCoinData.toAddress,
-              amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = sendCoinData.sendCoinAmount)),
-              gasLimit = sendCoinData.gasAmount,
-              gasPrice = sendCoinData.gasPrice.toDouble,
-              ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, sendCoinData.password)),
-            )
+          def validateAndBroadcast(balance: MicroNumber, validatePassword: Boolean, key: master.Key) = {
+            val errors = Seq(
+              if (balance == MicroNumber.zero || balance <= sendCoinData.sendCoinAmount) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (!validatePassword) Option(constants.Response.INVALID_PASSWORD) else None
+            ).flatten
+            if (errors.isEmpty) {
+              blockchainTransactionSendCoins.Utility.transaction(
+                accountId = loginState.username,
+                fromAddress = sendCoinData.fromAddress,
+                toAddress = sendCoinData.toAddress,
+                amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = sendCoinData.sendCoinAmount)),
+                gasLimit = sendCoinData.gasAmount,
+                gasPrice = sendCoinData.gasPrice,
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, sendCoinData.password)),
+                memo = None
+              )
+            } else errors.head.throwFutureBaseException()
           }
 
           (for {
             balance <- balance
             (validatePassword, key) <- validateAndKey
-            sendCoin <- checkBalanceAndBroadcast(balance, validatePassword, key)
-          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(broadcasted = sendCoin.broadcasted, status = sendCoin.status, txHash = sendCoin.txHash, log = sendCoin.log.getOrElse("")))
+            blockchainTransaction <- validateAndBroadcast(balance, validatePassword, key)
+          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.blockchainTransaction.sendCoin(SendCoin.form.withGlobalError(baseException.failure.message), sendCoinData.fromAddress, sendCoinData.sendCoinAmount))
           }
@@ -98,5 +120,102 @@ class BlockchainTransactionController @Inject()(
       )
   }
 
+  def mintForm(nftId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.blockchainTransaction.mint(nftId = nftId)))
+  }
+
+  def mint(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Mint.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.blockchainTransaction.mint(formWithErrors, nftId = formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, ""))))
+        },
+        mintData => {
+          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
+          val validateAndKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = mintData.password)
+          val nft = masterNFTs.Service.tryGet(mintData.nftId)
+          val nftProperties = masterNFTProperties.Service.getForNFT(mintData.nftId)
+
+          def validateAndBroadcast(balance: MicroNumber, validatePassword: Boolean, key: master.Key, nft: NFT, nftProperties: Seq[NFTProperty]) = {
+            val errors = Seq(
+              if (balance == MicroNumber.zero || balance <= (constants.Blockchain.AssetPropertyRate * (nftProperties.length + constants.Collection.DefaultProperty.list.length))) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (!validatePassword) Option(constants.Response.INVALID_PASSWORD) else None,
+              if (nft.isMinted) Option(constants.Response.NFT_ALREADY_MINTED) else None
+            ).flatten
+            if (errors.isEmpty) {
+              blockchainTransactionMints.Utility.transaction(
+                fromAccountId = loginState.username,
+                fromAddress = loginState.address,
+                fromId = loginState.getIdentityId,
+                toId = loginState.getIdentityId,
+                assetId = "",
+                classificationId = "",
+                nftId = nft.id,
+                gasLimit = mintData.gasAmount,
+                gasPrice = mintData.gasPrice,
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, mintData.password)),
+              )
+            } else errors.head.throwFutureBaseException()
+          }
+
+
+          (for {
+            balance <- balance
+            (validatePassword, key) <- validateAndKey
+            nft <- nft
+            nftProperties <- nftProperties
+            blockchainTransaction <- validateAndBroadcast(balance, validatePassword, key, nft, nftProperties)
+          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.blockchainTransaction.mint(Mint.form.withGlobalError(baseException.failure.message), mintData.nftId))
+          }
+        }
+      )
+  }
+
+  def nubForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.blockchainTransaction.nub()))
+  }
+
+  def nub(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Nub.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.blockchainTransaction.nub(formWithErrors)))
+        },
+        nubData => {
+          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
+          val validateAndKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = nubData.password)
+
+          def validateAndBroadcast(balance: MicroNumber, validatePassword: Boolean, key: master.Key) = {
+            val errors = Seq(
+              if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (!validatePassword) Option(constants.Response.INVALID_PASSWORD) else None,
+            ).flatten
+            if (errors.isEmpty) {
+              blockchainTransactionNubs.Utility.transaction(
+                fromAccountId = loginState.username,
+                fromAddress = loginState.address,
+                gasLimit = nubData.gasAmount,
+                gasPrice = nubData.gasPrice,
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, nubData.password)),
+              )
+            } else errors.head.throwFutureBaseException()
+          }
+
+
+          (for {
+            balance <- balance
+            (validatePassword, key) <- validateAndKey
+            blockchainTransaction <- validateAndBroadcast(balance, validatePassword, key)
+          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.blockchainTransaction.nub(Nub.form.withGlobalError(baseException.failure.message)))
+          }
+        }
+      )
+  }
 
 }

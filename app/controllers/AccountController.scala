@@ -140,7 +140,7 @@ class AccountController @Inject()(
                 backupUsed = false,
                 verified = wallet.get.verified)
 
-              def updateMasterAccount() = if (account.passwordHash.nonEmpty) masterAccounts.Service.updateAccount(account.copy(passwordHash = Array[Byte](), salt = Array[Byte](), iterations = 0)) else Future()
+              def updateMasterAccount() = if (account.passwordHash.nonEmpty) masterAccounts.Service.update(account.copy(passwordHash = Array[Byte](), salt = Array[Byte](), iterations = 0)) else Future()
 
               for {
                 _ <- addKey
@@ -167,15 +167,15 @@ class AccountController @Inject()(
                     backupUsed = false,
                     verified = None)
 
-                  def deleteUnverifiedKey() = masterKeys.Service.deleteKey(accountId = key.get.accountId, address = key.get.address)
+                  def deleteUnverifiedKey() = masterKeys.Service.delete(accountId = key.get.accountId, address = key.get.address)
 
                   for {
                     _ <- addKey
                     _ <- deleteUnverifiedKey()
                   } yield PartialContent(views.html.account.showWalletMnemonics(username = signInData.username, address = wallet.address, partialMnemonics = wallet.mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
                 } else {
-                  implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = signInData.username, address = key.get.address))
-                  implicit val loginState: LoginState = LoginState(username = signInData.username, address = key.get.address)
+                  implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = signInData.username, address = key.get.address, accountType = account.accountType))
+                  implicit val loginState: LoginState = LoginState(username = signInData.username, address = key.get.address, accountType = account.accountType)
                   val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.upsert(id = loginState.username, token = signInData.pushNotificationToken)
                   val result = if (signInData.callbackUrl != "/") withUsernameToken.InternalRedirectOnSubmitForm(signInData.callbackUrl)
                   else withUsernameToken.Ok(views.html.collection.viewCollections())
@@ -214,15 +214,16 @@ class AccountController @Inject()(
         },
         migrateWalletToKeyData => {
           val validateAndKey = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(migrateWalletToKeyData.username, password = migrateWalletToKeyData.password)
+          val account = masterAccounts.Service.tryGet(migrateWalletToKeyData.username)
 
-          def update(validated: Boolean, key: master.Key) = if (validated) {
+          def update(validated: Boolean, key: master.Key, account: master.Account) = if (validated) {
             val wallet = Future(utilities.Wallet.getWallet(key.partialMnemonics.get ++ Seq(migrateWalletToKeyData.seed1, migrateWalletToKeyData.seed2, migrateWalletToKeyData.seed3, migrateWalletToKeyData.seed4), hdPath = key.hdPath.getOrElse(constants.Response.HD_PATH_NOT_FOUND.throwBaseException())))
 
             def updateKey(wallet: utilities.Wallet) = masterKeys.Service.updateOnMigration(key = key, password = migrateWalletToKeyData.password, privateKey = wallet.privateKey)
 
             def getResult(username: String, address: String) = {
-              implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = username, address = address))
-              implicit val loginState: LoginState = LoginState(username = username, address = address)
+              implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = username, address = address, accountType = account.accountType))
+              implicit val loginState: LoginState = LoginState(username = username, address = address, accountType = account.accountType)
               withUsernameToken.Ok(views.html.collection.viewCollections())
             }
 
@@ -235,7 +236,8 @@ class AccountController @Inject()(
 
           (for {
             (validated, key) <- validateAndKey
-            result <- update(validated, key)
+            account <- account
+            result <- update(validated, key, account)
           } yield result
             ).recover {
             case baseException: BaseException => BadRequest(views.html.account.migrateWalletToKey(MigrateWalletToKey.form.withGlobalError(baseException.failure.message), migrateWalletToKeyData.username, migrateWalletToKeyData.walletAddress))
@@ -255,8 +257,8 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.account.signOut(formWithErrors)))
         },
         signOutData => {
-          val pushNotificationTokenDelete = if (!signOutData.receiveNotifications) masterTransactionPushNotificationTokens.Service.deleteByID(loginState.username) else Future()
-          val deleteSessionToken = masterTransactionSessionTokens.Service.deleteById(loginState.username)
+          val pushNotificationTokenDelete = if (!signOutData.receiveNotifications) masterTransactionPushNotificationTokens.Service.delete(loginState.username) else Future()
+          val deleteSessionToken = masterTransactionSessionTokens.Service.delete(loginState.username)
 
           (for {
             _ <- pushNotificationTokenDelete
@@ -315,7 +317,7 @@ class AccountController @Inject()(
         changePasswordData => {
           val changePassword = masterKeys.Service.changePassword(accountId = loginState.username, address = loginState.address, oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword)
 
-          def signOut = masterTransactionSessionTokens.Service.deleteById(loginState.username)
+          def signOut = masterTransactionSessionTokens.Service.delete(loginState.username)
 
           (for {
             _ <- changePassword
@@ -338,7 +340,7 @@ class AccountController @Inject()(
           val changeActive = masterKeys.Service.changeActive(accountId = oldLoginState.username, oldAddress = oldLoginState.address, newAddress = changeKeyData.address)
 
           def getResult = {
-            implicit val loginState: LoginState = LoginState(username = oldLoginState.username, address = changeKeyData.address)
+            implicit val loginState: LoginState = LoginState(username = oldLoginState.username, address = changeKeyData.address, accountType = oldLoginState.accountType)
             withUsernameToken.Ok(views.html.setting.changeActiveKey())
           }
 

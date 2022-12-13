@@ -1,0 +1,10 @@
+@import controllers.actions.LoginState
+
+@(nftId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+<div id="collectionInfo"></div>
+<div class="mt-3" id="saleInfo"></div>
+<script>
+        componentResource('collectionInfo', jsRoutes.controllers.NFTController.collectionInfo('@nftId'));
+        componentResource('saleInfo', jsRoutes.controllers.NFTController.saleInfo('@nftId'));
+</script>

@@ -227,7 +227,61 @@ $(".custom-select .custom-options .custom-option").on("click", function () {
 });
 
 $("select.filledSelect").each((index,element)=>{
-    let selectFieldValue = $(element).val().substr(0,1).toUpperCase()+$(element).val().substr(1).toLowerCase();
+    let selectedFieldValue = $(element).val();
+    if (selectedFieldValue === "DECIMAL"){
+        selectedFieldValue = "NUMBER";
+    }
+    let valueToShow = selectedFieldValue.substr(0,1).toUpperCase()+selectedFieldValue.substr(1).toLowerCase();
     let selectFieldIndex = $(element).attr("data-index");
-    $("#COLLECTION_PROPERTIES_" + selectFieldIndex + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text(selectFieldValue);
-})
+    $("#COLLECTION_PROPERTIES_" + selectFieldIndex + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text(valueToShow);
+});
+
+$(".selectedBooleanType").each((index,element)=>{
+    let selectedFieldValue = $(element).text();
+    let valueToShow = selectedFieldValue.substr(0,1).toUpperCase()+selectedFieldValue.substr(1).toLowerCase();
+    $(element).text(valueToShow);
+});
+
+function setDefinePropertyBackButton(collectionId){
+    $("#modalBackButton").attr("onclick", `getForm(jsRoutes.controllers.CollectionController.uploadCollectionDraftFilesForm('${collectionId}'))`);
+}
+
+flag1 = 0;
+flag2 = 0;
+$(document).ready(function () {
+    $('#FORM_CREATE_COLLECTION_SUBMIT').addClass("disable");
+});
+
+$("#COLLECTION_NAME").on("keyup",function(){
+    if($("#COLLECTION_NAME").val() !== ""){
+        flag1 = 1;
+    }else{
+        flag1 = 0;
+    }
+    activeButton();
+});
+
+$("#COLLECTION_DESCRIPTION").on("keyup",function(){
+    if($("#COLLECTION_DESCRIPTION").val() !== ""){
+        flag2 = 1;
+    }else{
+        flag2 = 0;
+    }
+    activeButton();
+});
+
+function activeButton() {
+    let termsCondition = document.getElementById("termsCondition");
+    if(flag1 !== 0 && flag2 !== 0 && termsCondition.checked === true){
+        $("#FORM_CREATE_COLLECTION_SUBMIT").removeClass("disable");
+    } else {
+        $("#FORM_CREATE_COLLECTION_SUBMIT").addClass("disable");
+    }
+}
+
+function updateExplorerContainer(creatorId){
+    if($(".createdCollectionsPerPage").length){
+        $('.createdCollectionsPerPage').contents(':not(.createCollectionContainer)').remove();
+        loadFirstCreatedCollections(creatorId);
+    }
+}

@@ -2,7 +2,7 @@ package models.masterTransaction
 
 import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import models.common.NFT._
-import models.master.{NFT, NFTProperty}
+import models.master.{NFT, NFTOwner, NFTProperty, NFTTag}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -11,19 +11,22 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class NFTDraft(fileName: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[Seq[BaseNFTProperty]], tagNames: Option[Seq[String]], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class NFTDraft(id: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[Seq[BaseNFTProperty]], tagNames: Option[Seq[String]], fileExtension: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def toNFT: NFT = NFT(fileName = fileName, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), properties = Seq(), ipfsLink = "", edition = None)
+  def toNFT(totalSupply: Int = 1): NFT = NFT(id = id, fileExtension = fileExtension, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), totalSupply = totalSupply, ipfsLink = "", edition = None, isMinted = false)
 
-  def getNFTProperties: Seq[NFTProperty] = this.properties.fold[Seq[NFTProperty]](Seq())(x => x.map(_.toNFTProperty(this.fileName)))
+  def toNFTOwner(ownerID: String, creatorId: String, saleId: Option[String], quantity: Int = 1): NFTOwner = NFTOwner(nftId = id, ownerId = ownerID, creatorId = creatorId, collectionId = collectionId, quantity = quantity, saleId = saleId)
 
-  def getFileHash: String = utilities.FileOperations.getFileNameWithoutExtension(fileName)
+  def getNFTProperties: Seq[NFTProperty] = this.properties.fold[Seq[NFTProperty]](Seq())(x => x.map(_.toNFTProperty(this.id)))
+
+  def getTags: Seq[NFTTag] = this.tagNames.fold[Seq[NFTTag]](Seq())(_.map(x => NFTTag(tagName = x, nftId = this.id)))
 
   def serialize(): NFTDrafts.NFTDraftSerialized = NFTDrafts.NFTDraftSerialized(
-    fileName = this.fileName,
+    id = this.id,
     collectionId = collectionId,
     name = this.name,
     description = this.description,
+    fileExtension = this.fileExtension,
     properties = this.properties.map(Json.toJson(_).toString()),
     tagNames = this.tagNames.map(Json.toJson(_).toString()),
     createdBy = this.createdBy,
@@ -38,19 +41,20 @@ object NFTDrafts {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class NFTDraftSerialized(fileName: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[String], tagNames: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize: NFTDraft = NFTDraft(fileName = fileName, collectionId = collectionId, name = name, description = description, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[BaseNFTProperty]](_)), tagNames = tagNames.map(utilities.JSON.convertJsonStringToObject[Seq[String]](_)), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class NFTDraftSerialized(id: String, collectionId: String, name: Option[String], description: Option[String], fileExtension: String, properties: Option[String], tagNames: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
+    def deserialize: NFTDraft = NFTDraft(id = id, collectionId = collectionId, name = name, description = description, fileExtension = fileExtension, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[BaseNFTProperty]](_)), tagNames = tagNames.map(utilities.JSON.convertJsonStringToObject[Seq[String]](_)), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
-    def id: String = fileName
   }
 
   class NFTDraftTable(tag: Tag) extends Table[NFTDraftSerialized](tag, "NFTDraft") with ModelTable[String] {
 
-    def * = (fileName, collectionId, name.?, description.?, properties.?, tagNames.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTDraftSerialized.tupled, NFTDraftSerialized.unapply)
+    def * = (id, collectionId, name.?, description.?, fileExtension, properties.?, tagNames.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTDraftSerialized.tupled, NFTDraftSerialized.unapply)
 
-    def fileName = column[String]("fileName", O.PrimaryKey)
+    def id = column[String]("id", O.PrimaryKey)
 
     def collectionId = column[String]("collectionId")
+
+    def fileExtension = column[String]("fileExtension")
 
     def name = column[String]("name")
 
@@ -68,7 +72,6 @@ object NFTDrafts {
 
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def id = fileName
   }
 
   lazy val TableQuery = new TableQuery(tag => new NFTDraftTable(tag))
@@ -89,9 +92,10 @@ class NFTDrafts @Inject()(
 
   object Service {
 
-    def add(fileName: String, collectionId: String): Future[String] = {
+    def add(id: String, fileExtension: String, collectionId: String): Future[String] = {
       val nft = NFTDraft(
-        fileName = fileName,
+        id = id,
+        fileExtension = fileExtension,
         collectionId = collectionId,
         name = None,
         description = None,
@@ -101,13 +105,13 @@ class NFTDrafts @Inject()(
       create(nft.serialize())
     }
 
-    def tryGet(nftId: String): Future[NFTDraft] = tryGetById(nftId).map(_.deserialize)
+    def tryGet(id: String): Future[NFTDraft] = tryGetById(id).map(_.deserialize)
 
     def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[NFTDraft]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.collectionId === collectionId)(_.createdOnMillisEpoch).map(_.map(_.deserialize))
 
     def getAllForCollection(collectionId: String): Future[Seq[NFTDraft]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize))
 
-    def get(nftId: String): Future[Option[NFTDraft]] = getById(nftId).map(_.map(_.deserialize))
+    def get(id: String): Future[Option[NFTDraft]] = getById(id).map(_.map(_.deserialize))
 
     def countAllForCollection(collectionId: String): Future[Int] = filterAndCount(_.collectionId === collectionId)
 
@@ -115,34 +119,34 @@ class NFTDrafts @Inject()(
 
     def deleteByCollectionId(id: String): Future[Int] = filterAndDelete(_.collectionId === id)
 
-    def deleteNFT(fileName: String): Future[Int] = filterAndDelete(_.fileName === fileName)
+    def deleteNFT(id: String): Future[Int] = filterAndDelete(_.id === id)
 
     def getByIds(ids: Seq[String]): Future[Seq[NFTDraft]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
 
-    def updateNameDescription(fileName: String, name: String, description: String): Future[NFTDraft] = {
-      val draft = tryGet(fileName)
+    def updateNameDescription(id: String, name: String, description: String): Future[NFTDraft] = {
+      val draft = tryGet(id)
       for {
         draft <- draft
-        _ <- update(draft.copy(name = Option(name), description = Option(description)).serialize())
+        _ <- updateById(draft.copy(name = Option(name), description = Option(description)).serialize())
       } yield draft.copy(name = Option(name), description = Option(description))
     }
 
-    def updateProperties(fileName: String, properties: Seq[BaseNFTProperty]): Future[NFTDraft] = {
-      val draft = tryGet(fileName)
+    def updateProperties(id: String, properties: Seq[BaseNFTProperty]): Future[NFTDraft] = {
+      val draft = tryGet(id)
       for {
         nftDraft <- draft
-        _ <- update(nftDraft.copy(properties = Option(properties)).serialize())
+        _ <- updateById(nftDraft.copy(properties = Option(properties)).serialize())
       } yield nftDraft.copy(properties = Option(properties))
     }
 
-    def updateTagNames(fileName: String, tagNames: Seq[String]): Future[Unit] = {
-      val draft = tryGet(fileName)
+    def updateTagNames(id: String, tagNames: Seq[String]): Future[Unit] = {
+      val draft = tryGet(id)
       for {
         draft <- draft
-        _ <- update(draft.copy(tagNames = Option(tagNames)).serialize())
+        _ <- updateById(draft.copy(tagNames = Option(tagNames)).serialize())
       } yield ()
     }
 
-    def deleteById(fileName: String): Future[Int] = delete(fileName)
+    def delete(id: String): Future[Int] = deleteById(id)
   }
 }

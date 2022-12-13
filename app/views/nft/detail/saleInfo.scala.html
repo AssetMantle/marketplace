@@ -1,0 +1,32 @@
+@import models.master.Sale
+@import controllers.actions.LoginState
+
+@(sale: Option[Sale], nftId: String, saleOffered: Boolean, onSale: Boolean, mintable: Boolean, checkAlreadySold: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+<div class="sticky-top item-sticky">
+    <div class="card rightInfoCard">
+        @if(onSale) {
+            <div class="title">@Messages(constants.View.COLLECTION_CURRENT_PRICE_TITLE)</div>
+            <div class="description mt-1">@Messages(constants.View.COLLECTION_CURRENT_PRICE_SUBTITLE)</div>
+            <div class="priceHolder">
+                <div class="d-flex flex-row gap-1 align-items-center mt-3">
+                    <img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/>
+                    <div id="price_@nftId" class="nft-mantle-price">--</div>
+                    <div id="dollarPrice_@nftId" class="nft-dollar-price">($--)</div>
+                </div>
+                <div id="salePrice" class="salePrice hidden">@sale.get.price.toString</div>
+            </div>
+            @if(loginState.isDefined && saleOffered && sale.isDefined && !checkAlreadySold) {
+                <button class="mt-5 form-primary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, s"'${sale.get.id}', '$nftId', false"))">@Messages(constants.View.BUYNOW)</button>
+@*                <button class="mt-3 form-secondary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, s"'${sale.get.id}', '$nftId', true"));">@Messages(constants.View.BUY_MINT_NFT)</button>*@
+            }
+            @if(mintable) {
+
+            }
+        } else {
+            <div class="title">@Messages(constants.View.NOT_ON_SALE)</div>
+        }
+    </div>
+</div>
+<script src="@routes.Assets.versioned("javascripts/nfts/saleInfo.js")"></script>
+<script>getNFTPrice('@nftId')</script>

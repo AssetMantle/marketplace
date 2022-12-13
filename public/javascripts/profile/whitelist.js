@@ -96,7 +96,7 @@ $(function () {
     $('[data-toggle="tooltip"]').tooltip();
 })
 
-function whitelistMember(form, route, snackBarMessage) {
+function whitelistMember(form, route, snackBarMessage, fieldIndex) {
     $.ajax({
         url: route.url,
         type: 'POST',
@@ -106,6 +106,7 @@ function whitelistMember(form, route, snackBarMessage) {
         statusCode: {
             200: function () {
                 showSnackbar('', snackBarMessage, 'info');
+                $("#whitelistUser_"+fieldIndex).remove();
             },
             401: function () {
                 console.log("400 response");
@@ -117,9 +118,9 @@ function whitelistMember(form, route, snackBarMessage) {
     });
 }
 
-function removeWhitelistMember(username, removedMessage){
+function removeWhitelistMember(username, removedMessage, index){
     const form = $("#removeWhitelistMember_" + username + " form");
-    whitelistMember(form, jsRoutes.controllers.WhitelistController.deleteMember(), removedMessage);
+    whitelistMember(form, jsRoutes.controllers.WhitelistController.deleteMember(), removedMessage, index);
 }
 
 function searchMember() {
@@ -135,5 +136,55 @@ function searchMember() {
         } else {
             memberList[i].style.display = "none";
         }
+    }
+}
+
+function setOffersStatus(startEpoch, endEpoch){
+    let currentEpoch = Date.now();
+    currentEpoch = Math.floor(currentEpoch / 1000);
+    if(currentEpoch > startEpoch && currentEpoch < endEpoch){
+        $(".statusOptions .option").removeClass("active");
+        $(".statusOptions .option.started").addClass("active");
+    }
+    else if(currentEpoch > startEpoch && currentEpoch > endEpoch){
+        $(".statusOptions .option").removeClass("active");
+        $(".statusOptions .option.ended").addClass("active");
+    }else{
+        $(".statusOptions .option").removeClass("active");
+        $(".statusOptions .option.notStarted").addClass("active");
+    }
+}
+
+function setSaleStatus(saleId){
+    let status = $("#"+saleId+" .status").text();
+    if(status === "Ongoing"){
+        $("#" + saleId + ".statusOptions .option").removeClass("active");
+        $("#" + saleId + ".statusOptions .option.started").addClass("active");
+    }
+    else if(status === "Ended"){
+        $("#" + saleId + ".statusOptions .option").removeClass("active");
+        $("#" + saleId + ".statusOptions .option.ended").addClass("active");
+    }
+    else{
+        $("#" + saleId + ".statusOptions .option").removeClass("active");
+        $("#" + saleId + ".statusOptions .option.notStarted").addClass("active");
+    }
+}
+
+function updateJoinedWhitelistContainer(){
+    $("#whitelistSectionContent").html("");
+    showWhitelistScreen('joined');
+}
+
+function updateCreatedWhitelistContainer(){
+    $("#whitelistSectionContent").html("");
+    showWhitelistScreen('created');
+}
+
+function setBackButton(){
+    if($(".contentContainer .contentTitle .title .titleLabel").text() === "Created"){
+        $("#whitelistDetailBackButton").attr("onclick","showWhitelistScreen('created')");
+    }else{
+        $("#whitelistDetailBackButton").attr("onclick","showWhitelistScreen('joined')");
     }
 }

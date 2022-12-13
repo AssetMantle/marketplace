@@ -25,6 +25,7 @@ class WhitelistController @Inject()(
                                      masterCollections: master.Collections,
                                      masterWhitelists: master.Whitelists,
                                      masterWhitelistMembers: master.WhitelistMembers,
+                                     masterSales: master.Sales,
                                    )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -33,23 +34,21 @@ class WhitelistController @Inject()(
 
   implicit val callbackOnSessionTimeout: Call = routes.ProfileController.viewDefaultProfile()
 
-  def whitelistSection(): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def whitelistSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
-        val isCreator = masterCollections.Service.isCreator(loginState.username)
         val whitelistsMade = masterWhitelists.Service.totalWhitelistsByOwner(loginState.username)
 
         (for {
-          isCreator <- isCreator
           whitelistsMade <- whitelistsMade
-        } yield Ok(views.html.profile.whitelist.whitelistSection(isCreator = isCreator, whitelistsMade = whitelistsMade))
+        } yield Ok(views.html.profile.whitelist.whitelistSection(whitelistsMade = whitelistsMade))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
     }
   }
 
-  def createdWhitelists(): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def createdWhitelists(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val whitelistsMade = masterWhitelists.Service.totalWhitelistsByOwner(loginState.username)
@@ -84,14 +83,11 @@ class WhitelistController @Inject()(
           Future(BadRequest(views.html.profile.whitelist.create(formWithErrors)))
         },
         createData => {
-          val isCreator = masterCollections.Service.isCreator(loginState.username)
-
-          def create(isCreator: Boolean) = if (isCreator) masterWhitelists.Service.addWhitelist(ownerId = loginState.username, name = createData.name, description = createData.description, maxMembers = createData.maxMembers, startEpoch = createData.startEpoch, endEpoch = createData.endEpoch)
+          val create = if (loginState.isCreator) masterWhitelists.Service.addWhitelist(ownerId = loginState.username, name = createData.name, description = createData.description, maxMembers = createData.maxMembers, startEpoch = createData.startEpoch, endEpoch = createData.endEpoch)
           else constants.Response.NO_COLLECTION_TO_CREATE_WHITELIST.throwFutureBaseException()
 
           (for {
-            isCreator <- isCreator
-            id <- create(isCreator)
+            id <- create
           } yield PartialContent(views.html.profile.whitelist.whitelistSuccessful(whitelistId = id))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.profile.whitelist.create(Create.form.withGlobalError(baseException.failure.message)))
@@ -127,7 +123,7 @@ class WhitelistController @Inject()(
       )
   }
 
-  def joinedWhitelists(): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def joinedWhitelists(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val totalWhitelistsJoined = masterWhitelistMembers.Service.totalJoined(loginState.username)
@@ -156,7 +152,7 @@ class WhitelistController @Inject()(
       }
   }
 
-  def whitelistTotalMembers(id: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def whitelistTotalMembers(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val whitelistsMemberCount = masterWhitelistMembers.Service.getWhitelistsMemberCount(id)
@@ -175,7 +171,7 @@ class WhitelistController @Inject()(
       Ok(views.html.profile.whitelist.viewAcceptInviteDetails(whitelistId = whitelistId))
   }
 
-  def acceptInviteDetails(whitelistId: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def acceptInviteDetails(whitelistId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val whitelist = masterWhitelists.Service.tryGet(whitelistId)
@@ -214,7 +210,7 @@ class WhitelistController @Inject()(
 
   }
 
-  def leaveWhitelistDetails(whitelistId: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def leaveWhitelistDetails(whitelistId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val whitelist = masterWhitelists.Service.tryGet(whitelistId)
@@ -236,7 +232,7 @@ class WhitelistController @Inject()(
         },
         leaveData => {
           val whitelist = masterWhitelists.Service.tryGet(leaveData.whitelistId)
-          val deleteMember = masterWhitelistMembers.Service.deleteMember(whitelistId = leaveData.whitelistId, accountId = loginState.username)
+          val deleteMember = masterWhitelistMembers.Service.delete(whitelistId = leaveData.whitelistId, accountId = loginState.username)
 
           (for {
             whitelist <- whitelist
@@ -249,7 +245,7 @@ class WhitelistController @Inject()(
       )
   }
 
-  def listMembers(whitelistId: String): EssentialAction = cached.apply(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def listMembers(whitelistId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
         val whitelist = masterWhitelists.Service.tryGet(whitelistId)
@@ -275,7 +271,7 @@ class WhitelistController @Inject()(
         deleteMemberData => {
           val whitelist = masterWhitelists.Service.tryGet(deleteMemberData.whitelistId)
 
-          def deleteMember(whitelist: Whitelist) = if (whitelist.ownerId == loginState.username) masterWhitelistMembers.Service.deleteMember(whitelistId = deleteMemberData.whitelistId, accountId = deleteMemberData.username)
+          def deleteMember(whitelist: Whitelist) = if (whitelist.ownerId == loginState.username) masterWhitelistMembers.Service.delete(whitelistId = deleteMemberData.whitelistId, accountId = deleteMemberData.username)
           else constants.Response.NOT_WHITELIST_CREATOR.throwFutureBaseException()
 
           (for {
@@ -288,5 +284,22 @@ class WhitelistController @Inject()(
         }
       )
   }
-}
 
+  def detail(whitelistId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val whitelist = masterWhitelists.Service.tryGet(whitelistId)
+        val members = masterWhitelistMembers.Service.getWhitelistsMemberCount(whitelistId)
+        val sales = masterSales.Service.getByWhitelistId(whitelistId)
+
+        (for {
+          whitelist <- whitelist
+          members <- members
+          sales <- sales
+        } yield Ok(views.html.profile.whitelist.whitelistDetail(whitelist = whitelist, totalMembers = members, sales = sales))
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
+  }
+}
