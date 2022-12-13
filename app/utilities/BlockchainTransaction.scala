@@ -5,7 +5,6 @@ import cosmos.bank.v1beta1.Tx
 import cosmos.crypto.secp256k1.Keys
 import cosmos.tx.v1beta1.TxOuterClass
 import models.common.Coin
-import models.master.{NFT, NFTProperty}
 import org.bitcoinj.core.ECKey
 
 import scala.jdk.CollectionConverters.IterableHasAsJava
@@ -41,6 +40,8 @@ object BlockchainTransaction {
     txRaw.toByteArray
   }
 
+  def memoGenerator(memoPrefix: String): String = s"$memoPrefix/${utilities.Secrets.sha256HashHexString(utilities.Wallet.ecdsaSign(memoPrefix.getBytes, ECKey.fromPrivate(constants.CommonConfig.MemoSignerWallet.privateKey)))}"
+
   def getFee(gasPrice: Double, gasLimit: Int): Coin = Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber((gasPrice * gasLimit) / MicroNumber.factor))
 
   def getSendCoinMsgAsAny(fromAddress: String, toAddress: String, amount: Seq[Coin]): protoBufAny = protoBufAny.newBuilder()
@@ -53,14 +54,14 @@ object BlockchainTransaction {
       .build().toByteString)
     .build()
 
-  def getMintMsgAsAny(fromAddress: String, fromId: String, toId: String, classificationId: String) : protoBufAny = protoBufAny.newBuilder()
-//    .setTypeUrl(constants.Blockchain.TransactionMessage.MINT)
-//    .setValue(Tx
-//      .MsgSend.newBuilder()
-//      .setFromAddress(fromAddress)
-//      .setToAddress(toAddress)
-//      .addAllAmount(amount.map(_.toProtoCoin).asJava)
-//      .build().toByteString)
+  def getMintMsgAsAny(fromAddress: String, fromId: String, toId: String, classificationId: String): protoBufAny = protoBufAny.newBuilder()
+    //    .setTypeUrl(constants.Blockchain.TransactionMessage.MINT)
+    //    .setValue(Tx
+    //      .MsgSend.newBuilder()
+    //      .setFromAddress(fromAddress)
+    //      .setToAddress(toAddress)
+    //      .addAllAmount(amount.map(_.toProtoCoin).asJava)
+    //      .build().toByteString)
     .build()
 
   def getNubMsgAsAny(fromAddress: String, fromId: String, toId: String, classificationId: String): protoBufAny = protoBufAny.newBuilder()

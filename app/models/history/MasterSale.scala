@@ -3,9 +3,8 @@ package models.history
 import akka.actor.Cancellable
 import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, HistoryLogging, ModelTable}
-import models.blockchainTransaction.BuyAssetWithoutMint
 import models.master.Sales
-import models.{blockchainTransaction, master}
+import models.{blockchainTransaction, master, masterTransaction}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -90,8 +89,8 @@ class MasterSales @Inject()(
                              sales: Sales,
                              utilitiesOperations: utilities.Operations,
                              masterNFTOwners: master.NFTOwners,
-                             blockchainTransactionBuyAssetWithoutMints: blockchainTransaction.BuyAssetWithoutMints,
-                             btBuyAssetWithoutMints: BTBuyAssetWithoutMints,
+                             masterTransactionBuyNFTTransactions: masterTransaction.BuyNFTTransactions,
+                             blockchainTransactionBuyNFTs: blockchainTransaction.BuyNFTs,
                              protected val databaseConfigProvider: DatabaseConfigProvider
                            )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[MasterSales.MasterSaleTable, MasterSales.MasterSaleSerialized, String](
@@ -127,22 +126,14 @@ class MasterSales @Inject()(
 
         def deleteExpiredSales(expiredSales: Seq[master.Sale]) = utilitiesOperations.traverse(expiredSales) { expiredSale =>
           val addToHistory = Service.add(expiredSale.toHistory)
-          val buyWithoutMintTxs = blockchainTransactionBuyAssetWithoutMints.Service.getAllBySaleId(expiredSale.id)
 
           def markSaleNull = masterNFTOwners.Service.markSaleNull(expiredSale.id)
-
-          def addTxToHistory(buyWithoutMintTxs: Seq[BuyAssetWithoutMint]) = btBuyAssetWithoutMints.Service.add(buyWithoutMintTxs.map(_.toHistory()))
-
-          def deleteTxs() = blockchainTransactionBuyAssetWithoutMints.Service.deleteAllBySaleId(expiredSale.id)
 
           def deleteSale() = sales.Service.delete(expiredSale.id)
 
           for {
             _ <- addToHistory
-            buyWithoutMintTxs <- buyWithoutMintTxs
-            _ <- addTxToHistory(buyWithoutMintTxs)
             _ <- markSaleNull
-            _ <- deleteTxs()
             _ <- deleteSale()
           } yield ()
 
