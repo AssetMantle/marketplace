@@ -28,14 +28,14 @@
                     <span onclick="addRemoveWishlist(this, '@nft.getFileHash', '@Messages(constants.View.ADDED_TO_WISHLIST)', '@Messages(constants.View.REMOVED_FROM_WISHLIST)')">
                     @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
                     </span>
-                    <div class="nft-likes" data-id="@nft.fileName">00</div>
+                    <div class="nft-likes" data-id="@nft.id">00</div>
                 </div>
             } else {
                 <div class="d-flex align-items-center gap-2" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN_WITH_CALLBACK.get, s"'/collection/${nft.collectionId}'"))">
                     <span>
                     @views.html.nft.commonCardWishlistButton()
                     </span>
-                    <div class="nft-likes" data-id="@nft.fileName">00</div>
+                    <div class="nft-likes" data-id="@nft.id">00</div>
                 </div>
             }
         </div>
