@@ -40,7 +40,7 @@ object BlockchainTransaction {
     txRaw.toByteArray
   }
 
-  def memoGenerator(memoPrefix: String): String = s"$memoPrefix/${utilities.Secrets.sha256HashHexString(utilities.Wallet.ecdsaSign(memoPrefix.getBytes, ECKey.fromPrivate(constants.CommonConfig.MemoSignerWallet.privateKey)))}"
+  def memoGenerator(memoPrefix: String): String = s"$memoPrefix/${utilities.Secrets.base64URLEncoder(utilities.Wallet.hashAndEcdsaSign(memoPrefix, ECKey.fromPrivate(constants.CommonConfig.MemoSignerWallet.privateKey)))}"
 
   def getFee(gasPrice: Double, gasLimit: Int): Coin = Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber((gasPrice * gasLimit) / MicroNumber.factor))
 

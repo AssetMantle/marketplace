@@ -31,8 +31,8 @@ class TransactionComplete @Inject()(
   private implicit val module: String = constants.Module.UTILITIES_SALE
 
   def onBuyNFT(transaction: Transaction, price: MicroNumber): Future[Unit] = if (transaction.status) {
-
     val buyNFTTx = masterTransactionBuyNFTTransactions.Service.tryGetByTxHash(transaction.hash)
+    val markMasterSuccess = masterTransactionBuyNFTTransactions.Service.markSuccess(transaction.hash)
 
     def transferNFTOwnership(buyNFTTx: BuyNFTTransaction) = masterNFTOwners.Service.markNFTSold(nftId = buyNFTTx.nftId, saleId = buyNFTTx.saleId, sellerAccountId = buyNFTTx.sellerAccountId, buyerAccountId = buyNFTTx.buyerAccountId)
 
@@ -48,6 +48,7 @@ class TransactionComplete @Inject()(
     (for {
       buyNFTTx <- buyNFTTx
       _ <- transferNFTOwnership(buyNFTTx)
+      _ <- markMasterSuccess
       nft <- nft(buyNFTTx)
       _ <- analysisUpdate(nft)
       _ <- sendNotifications(nft, buyNFTTx)

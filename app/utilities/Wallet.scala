@@ -15,7 +15,6 @@ import scodec.bits.ByteVector
 
 import java.nio.charset.StandardCharsets
 import java.security.{MessageDigest, Security}
-import java.util.Base64
 import scala.util.{Failure, Success}
 
 case class Wallet(address: String, hdPath: Seq[ChildNumber], publicKey: Array[Byte], privateKey: Array[Byte], mnemonics: Seq[String])
@@ -79,13 +78,15 @@ object Wallet {
   def getRandomWallet: Wallet = getWallet(Bip39.creatRandomMnemonics())
 
   def hashAndEcdsaSign(message: String, ecKey: ECKey): Array[Byte] = {
-    val ecdsaSignature = ecKey.sign(Sha256Hash.wrap(Sha256Hash.hash(message.getBytes(StandardCharsets.UTF_8))))
+    val ecdsaSignature = ecKey.sign(Sha256Hash.wrap(utilities.Secrets.sha256Hash(message.getBytes(StandardCharsets.UTF_8))))
     Utils.bigIntegerToBytes(ecdsaSignature.r, 32) ++ Utils.bigIntegerToBytes(ecdsaSignature.s, 32)
   }
 
-  def ecdsaSign(data: Array[Byte], ecKey: ECKey): Array[Byte] = {
+  def ecdsaSign(data: Array[Byte], ecKey: ECKey): Array[Byte] = try {
     val ecdsaSignature = ecKey.sign(Sha256Hash.wrap(data))
     Utils.bigIntegerToBytes(ecdsaSignature.r, 32) ++ Utils.bigIntegerToBytes(ecdsaSignature.s, 32)
+  } catch {
+    case exception: Exception => constants.Response.SIGNING_FAILED.throwBaseException(exception)
   }
 
 }

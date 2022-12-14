@@ -5,7 +5,7 @@ import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
 import models.master.Collection
 import models.masterTransaction.NFTDraft
-import models.{master, masterTransaction}
+import models.{blockchainTransaction, master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport

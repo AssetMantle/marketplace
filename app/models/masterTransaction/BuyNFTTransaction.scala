@@ -92,7 +92,7 @@ class BuyNFTTransactions @Inject()(
 
     def tryGetByTxHash(txHash: String): Future[BuyNFTTransaction] = filterHead(_.txHash === txHash)
 
-    def markSuccess(txHash: String): Future[Int] = customUpdate(BuyNFTTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true).asTry)
+    def markSuccess(txHash: String): Future[Int] = customUpdate(BuyNFTTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
   }
 
 }

@@ -153,7 +153,7 @@ function getDollarPrice(mntlPrice, nftId) {
             200: function (data) {
                 let salePrice = mntlPrice;
                 let currentMntlPrice = data;
-                $("#dollarPrice_" + nftId.split(".")[0]).text("($" + (salePrice * currentMntlPrice).toFixed(5) + ")");
+                $("#dollarPrice_" + nftId.split(".")[0]).text("($" + (salePrice * currentMntlPrice).toFixed(2) + ")");
             }
         }
     });
@@ -184,10 +184,21 @@ function countCollectionCardInfo(collectionId) {
         async: true,
         statusCode: {
             200: function (data) {
-                let totalNFTs = data.split("|");
-                console.log(totalNFTs)
-                $('#counCollectionNFTs_' + collectionId).html(totalNFTs[0]);
-                $('#collectionNFTsPrice_' + collectionId).html(totalNFTs[1]);
+                let totalData = data.split("|");
+                $('#counCollectionNFTs_' + collectionId).html(totalData[0]);
+                $('#collectionNFTsPrice_' + collectionId).html(totalData[1]);
+                if(totalData[2] == 1){
+                    $("#saleBadge_" + collectionId + " .option").removeClass("active");
+                    $("#saleBadge_" + collectionId + " .live").addClass("active");
+                }else if(totalData[2] == 2){
+                    $("#saleBadge_" + collectionId + " .option").removeClass("active");
+                    $("#saleBadge_" + collectionId + " .soldOut").addClass("active");
+                }else if(totalData[2] == 3){
+                    $("#saleBadge_" + collectionId + " .option").removeClass("active");
+                    $("#saleBadge_" + collectionId + " .ended").addClass("active");
+                }else{
+                    $("#saleBadge_" + collectionId + " .option").removeClass("active");
+                }
             },
             400: function (data) {
                 console.log(data.responseText)

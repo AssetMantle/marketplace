@@ -4,14 +4,36 @@
     <div class="single-profile-card commonCollectionCard artCollection">
         <div class="profile-section">
             <div onclick="@onClickFunction" class="collectionLink">
-                <div class="saleBadge">
-                    <div class="d-flex gap-2 align-items-center option live">
-                        <div class="statusDotWrapper">
-                            <div class="statusDotEmitter">
-                                <div class="statusDotWave"></div>
+                <div class="saleBadge" id="saleBadge_@collection.id">
+                    <div class="option live">
+                        <div class="d-flex gap-2 align-items-center">
+                            <div class="statusDotWrapper">
+                                <div class="statusDotEmitter">
+                                    <div class="statusDotWave"></div>
+                                </div>
                             </div>
+                            <div class="statusMessage" id="statusMessage_@collection.id">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_LIVE)</div>
                         </div>
-                        <div class="statusMessage">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_LIVE)</div>
+                    </div>
+                    <div class="option soldOut">
+                        <div class="d-flex gap-2 align-items-center">
+                            <div class="statusDotWrapper">
+                                <div class="statusDotEmitter">
+                                    <div class="statusDotWave"></div>
+                                </div>
+                            </div>
+                            <div class="statusMessage" id="statusMessage_@collection.id">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_SOLD_OUT)</div>
+                        </div>
+                    </div>
+                    <div class="option ended">
+                        <div class="d-flex gap-2 align-items-center">
+                            <div class="statusDotWrapper">
+                                <div class="statusDotEmitter">
+                                    <div class="statusDotWave"></div>
+                                </div>
+                            </div>
+                            <div class="statusMessage" id="statusMessage_@collection.id">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_ENDED)</div>
+                        </div>
                     </div>
                 </div>
 
@@ -53,15 +75,24 @@
                             <div class="d-flex flex-column gap-3">
                                 <div class="align-self-end collectionStatus">
                                     <div class="d-flex statusOptions">
-                                        <div class="option option1 active">
-                                            <i class="bi bi-currency-dollar"></i>
-                                        </div>
-                                        <div class="option option2 active">
-                                            <i class="bi bi-tag"></i>
-                                        </div>
-                                        <div class="option option3 active">
-                                            <i class="bi bi-link-45deg"></i>
-                                        </div>
+@*                                        <div class="iconTooltip">*@
+@*                                            <span class="tooltipText top">@Messages(constants.View.WHITELIST_ICON_LEAVE)</span>*@
+                                            <div class="option option1 active">
+                                                <i class="bi bi-currency-dollar"></i>
+                                            </div>
+@*                                        </div>*@
+@*                                        <div class="iconTooltip">*@
+@*                                            <span class="tooltipText top">@Messages(constants.View.WHITELIST_ICON_LEAVE)</span>*@
+                                            <div class="option option2 active">
+                                                <i class="bi bi-tag"></i>
+                                            </div>
+@*                                        </div>*@
+@*                                        <div class="iconTooltip">*@
+@*                                            <span class="tooltipText top">@Messages(constants.View.WHITELIST_ICON_LEAVE)</span>*@
+                                            <div class="option option3 active">
+                                                <i class="bi bi-link-45deg"></i>
+                                            </div>
+@*                                        </div>*@
                                     </div>
                                 </div>
                                 <div class="collectionStats">

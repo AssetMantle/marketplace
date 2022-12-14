@@ -1,14 +1,13 @@
 package models.master
 
 import models.Trait.{Entity2, GenericDaoImpl2, Logging, ModelTable2}
-import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.Random
 
 case class NFTOwner(nftId: String, ownerId: String, creatorId: String, collectionId: String, quantity: Long, saleId: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
   def id1: String = nftId
@@ -127,7 +126,7 @@ class NFTOwners @Inject()(
 
     def markSaleNull(saleId: String): Future[Int] = {
       val nullString: Option[String] = null
-      customUpdate(NFTOwners.TableQuery.filter(_.saleId === saleId).map(_.saleId.?).update(nullString).asTry)
+      customUpdate(NFTOwners.TableQuery.filter(_.saleId === saleId).map(_.saleId.?).update(nullString))
     }
 
     def tryGetByNFTAndSaleId(nftId: String, saleId: String): Future[NFTOwner] = filterHead(x => x.saleId === saleId && x.nftId === nftId)

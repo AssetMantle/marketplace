@@ -10,7 +10,7 @@ import slick.jdbc.JdbcProfile
 import slick.lifted.{CanBeQueryCondition, ColumnOrdered, Ordered}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 abstract class GenericDaoImpl3[
   T <: Table[E] with ModelTable3[PK1, PK2, PK3],
@@ -48,7 +48,7 @@ abstract class GenericDaoImpl3[
 
   def customQuery[C](query: StreamingProfileAction[C, _, _]) = db.run(query)
 
-  def customUpdate[R](updateQuery: DBIOAction[Try[R], NoStream, Effect.Write]): Future[R] = db.run(updateQuery).map {
+  def customUpdate[R](updateQuery: DBIOAction[R, NoStream, Effect.Write]): Future[R] = db.run(updateQuery.asTry).map {
     case Success(result) => result match {
       case 0 => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"))
       case _ => result
