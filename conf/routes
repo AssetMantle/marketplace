@@ -141,6 +141,9 @@ GET         /notificationPopup                                controllers.Profil
 GET         /loadMoreNotifications                            controllers.ProfileController.loadMoreNotifications(pageNumber: Int)
 GET         /countUnreadNotification                          controllers.ProfileController.countUnreadNotification()
 POST        /markNotificationsRead                            controllers.ProfileController.markNotificationsRead()
+GET         /profileInfoCard                                  controllers.ProfileController.profileInfoCard(accountId: String)
+GET         /profileActivityCard                              controllers.ProfileController.profileActivityCard(accountId: String)
+GET         /profileAnalysisCard                              controllers.ProfileController.profileAnalysisCard(accountId: String)
 
 GET         /whitelistSection                                 controllers.WhitelistController.whitelistSection()
 GET         /createdWhitelists                                controllers.WhitelistController.createdWhitelists()

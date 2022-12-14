@@ -85,10 +85,9 @@ function changeSelected(parent, selectedItem) {
 }
 
 // Address Shorter
-var addresses = document.querySelectorAll('.username-data');
-addresses.forEach(address => {
-    $(address).text($(address).text().substr(0, 8) + "..." + $(address).text().substr($(address).length - 8));
-});
+function addressShorter(message, fieldId, length){
+    $("#"+fieldId).text(message.substr(0, length) + "..." + message.substr($("#"+fieldId).length - length));
+}
 
 // Copy to Clipboard
 function copyToClipboard(e) {

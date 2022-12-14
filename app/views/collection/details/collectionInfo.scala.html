@@ -15,7 +15,7 @@
             }
             @if(collection.getTwitter.isDefined) {
                 <a href="@collection.getTwitter.getOrElse("#")" target="_blank">
-                    <i class="bi bi-twitter iconDefault icon"></i>
+                    <img src="@routes.Assets.versioned("images/icon/twitterYellow.png")" class="icon"/>
                 </a>
             }
             @if(collection.getInstagram.isDefined) {

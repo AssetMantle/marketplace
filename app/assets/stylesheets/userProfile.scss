@@ -1008,3 +1008,151 @@
     cursor: pointer;
   }
 }
+
+/* Left/Right Info Card  */
+.leftInfoCard,
+.rightInfoCard{
+  height: fit-content;
+  background-color: var(--card-color);
+  border-radius: 20px;
+  padding: 16px;
+  .title{
+    @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+    text-transform: capitalize;
+  }
+  .description{
+    @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+    margin-top: 20px;
+  }
+  .separator{
+    height: 2px;
+    width: calc(100% + 32px);
+    background-color: #383838;
+    margin: 16px -16px 16px;
+  }
+  a, .icon{
+    height: 22px;
+    width: 22px;
+  }
+  .profileHeader{
+    .profileImage{
+      img{
+        height: 40px;
+        width: 40px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+      }
+    }
+    .profileName{
+      @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+      margin-left: 12px;
+    }
+  }
+  .userAddressBox {
+    background-color: var(--card-dark);
+    border-radius: 8px;
+    line-height: 0;
+
+    .userAddressData {
+      @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+      word-break: break-word;
+    }
+
+    .copyIcon {
+      padding: 4px 0 0 0;
+      cursor: pointer;
+    }
+  }
+  .joinedDate{
+    @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--disable));
+  }
+  .profileDescription{
+    @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--inactive-gray));
+    margin-top: 12px;
+  }
+  .profileStatsBox{
+    background-color: var(--card-dark);
+    padding: 16px;
+    border-radius: 10px;
+    .statsTitle{
+      @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--gray));
+      word-break: break-word;
+    }
+    .statsValue{
+      @include setFont(var(--font-type-1), normal, 400, 28px, 34px, var(--mantle-off-white));
+    }
+  }
+}
+
+.rightInfoCard{
+  .title{
+    @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+    text-transform: none;
+  }
+  .notification{
+    .singleNotification{
+      .notificationTitle{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+        text-transform: capitalize;
+      }
+      .notificationImage{
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+      }
+      .notificationDescription{
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--inactive-gray));
+        word-break: break-word;
+      }
+      .notificationDateTime{
+        @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));
+        word-break: break-word;
+      }
+      .notificationLink{
+        margin-right: -10px;
+        word-break: break-word;
+      }
+      .transactionDetailLink{
+        @include setFont(var(--font-type-1), normal, 500, 12px, 14px, var(--text-medium));
+      }
+    }
+    .loadOlderButton{
+      @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
+      text-transform: capitalize;
+    }
+  }
+  .accordion{
+    --bs-accordion-bg: var(--card-color);
+    .accordion-item{
+      border: none;
+      .accordion-header{
+        .accordion-button{
+          @include setFont(var(--font-type-2), normal, 700, 12px, 14px, var(--mantle-off-white));
+          padding: 0px;
+          outline: none;
+          box-shadow: none;
+          &:not(.collapsed){
+            background-color: var(--card-color);
+          }
+          &::after{
+            background-image: url("../images/icon/downArrowYellow.png");
+            margin-top: 2px;
+          }
+        }
+      }
+      .accordion-body{
+        padding: 0px;
+        .activityImage{
+          width: 28px;
+          height: 28px;
+          aspect-ratio: 1;
+          border-radius: 8px;
+        }
+        .activityDetail{
+          @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--text-medium));
+          word-break: break-word;
+        }
+      }
+    }
+  }
+}
