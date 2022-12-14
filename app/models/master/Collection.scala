@@ -152,6 +152,8 @@ class Collections @Inject()(
       } yield ()
     }
 
+    def countCreated(accountId: String): Future[Int] = filterAndCount(_.creatorId === accountId)
+
 
   }
 }

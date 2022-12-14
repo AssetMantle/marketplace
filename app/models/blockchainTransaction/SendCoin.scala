@@ -123,16 +123,14 @@ class SendCoins @Inject()(
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount(fromAddress))
       val unconfirmedTxs = getUnconfirmedTxs.Service.get()
-      val memo = utilities.BlockchainTransaction.memoGenerator("SendCoin/" + accountId)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, unconfirmedTxHashes: Seq[String]) = {
-        val txRawBytes = utilities.BlockchainTransaction.getTxRawBytes(
+        val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = amount)),
           fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = gasLimit),
           gasLimit = gasLimit,
           account = bcAccount,
-          ecKey = ecKey,
-          memo = memo)
+          ecKey = ecKey)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
         for {

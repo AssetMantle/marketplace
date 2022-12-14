@@ -36,7 +36,7 @@ object BuyNFTTransactions {
 
     def saleId = column[String]("saleId")
 
-    def status = column[Boolean]("salstatuseId")
+    def status = column[Boolean]("status")
 
     def createdBy = column[String]("createdBy")
 

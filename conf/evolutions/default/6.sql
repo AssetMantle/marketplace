@@ -48,21 +48,19 @@ CREATE TABLE IF NOT EXISTS HISTORY."MasterSale"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."BuyNFT"
 (
-    "txHash"            VARCHAR NOT NULL,
-    "txRawBytes"        BYTEA   NOT NULL,
-    "fromAddress"       VARCHAR NOT NULL,
-    "toAddress"         VARCHAR NOT NULL,
-    "amount"            VARCHAR NOT NULL,
-    "broadcasted"       BOOLEAN NOT NULL,
-    "status"            BOOLEAN,
-    "memo"              VARCHAR,
-    "log"               VARCHAR,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
+    "txHash"               VARCHAR NOT NULL,
+    "txRawBytes"           BYTEA   NOT NULL,
+    "fromAddress"          VARCHAR NOT NULL,
+    "toAddress"            VARCHAR NOT NULL,
+    "amount"               VARCHAR NOT NULL,
+    "broadcasted"          BOOLEAN NOT NULL,
+    "status"               BOOLEAN,
+    "memo"                 VARCHAR,
+    "log"                  VARCHAR,
+    "createdBy"            VARCHAR,
+    "createdOnMillisEpoch" BIGINT,
+    "updatedBy"            VARCHAR,
+    "updatedOnMillisEpoch" BIGINT,
     PRIMARY KEY ("txHash")
 );
 

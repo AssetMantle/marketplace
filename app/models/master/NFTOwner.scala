@@ -129,6 +129,8 @@ class NFTOwners @Inject()(
       customUpdate(NFTOwners.TableQuery.filter(_.saleId === saleId).map(_.saleId.?).update(nullString))
     }
 
+    def countOwnedNFTs(accountId: String): Future[Int] = filterAndCount(x => x.ownerId === accountId && x.creatorId =!= accountId)
+
     def tryGetByNFTAndSaleId(nftId: String, saleId: String): Future[NFTOwner] = filterHead(x => x.saleId === saleId && x.nftId === nftId)
     //    https://scala-slick.org/doc/3.1.1/sql-to-slick.html#id21
     //    def getQuery = NFTOwners.TableQuery.filter(x => x.ownerId === "asd" && x.creatorId)

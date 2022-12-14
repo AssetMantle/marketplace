@@ -11,7 +11,7 @@ import scala.jdk.CollectionConverters.IterableHasAsJava
 
 object BlockchainTransaction {
 
-  def getTxRawBytes(messages: Seq[protoBufAny], fee: Coin, gasLimit: Int, account: models.blockchain.Account, ecKey: ECKey, memo: String): Array[Byte] = {
+  private def getTxRawBytes(messages: Seq[protoBufAny], fee: Coin, gasLimit: Int, account: models.blockchain.Account, ecKey: ECKey, memo: String): Array[Byte] = {
     val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(messages.asJava).setMemo(memo).build()
 
     val signerInfo = TxOuterClass.SignerInfo.newBuilder()
@@ -40,7 +40,25 @@ object BlockchainTransaction {
     txRaw.toByteArray
   }
 
-  def memoGenerator(memoPrefix: String): String = s"$memoPrefix/${utilities.Secrets.base64URLEncoder(utilities.Wallet.hashAndEcdsaSign(memoPrefix, ECKey.fromPrivate(constants.CommonConfig.MemoSignerWallet.privateKey)))}"
+  def getTxRawBytesWithSignedMemo(messages: Seq[protoBufAny], fee: Coin, gasLimit: Int, account: models.blockchain.Account, ecKey: ECKey): (Array[Byte], String) = {
+    val txRawBytesWithoutMemo = getTxRawBytes(
+      messages = messages,
+      fee = fee,
+      gasLimit = gasLimit,
+      account = account,
+      ecKey = ecKey,
+      memo = "")
+    val memo = utilities.Secrets.base64URLEncoder(utilities.Wallet.ecdsaSign(utilities.Secrets.sha256Hash(txRawBytesWithoutMemo), ECKey.fromPrivate(constants.CommonConfig.MemoSignerWallet.privateKey)))
+    (getTxRawBytes(
+      messages = messages,
+      fee = fee,
+      gasLimit = gasLimit,
+      account = account,
+      ecKey = ecKey,
+      memo = memo), memo)
+  }
+
+  def memoGenerator(memoPrefix: String): String = utilities.Secrets.base64URLEncoder(utilities.Wallet.hashAndEcdsaSign(memoPrefix, ECKey.fromPrivate(constants.CommonConfig.MemoSignerWallet.privateKey)))
 
   def getFee(gasPrice: Double, gasLimit: Int): Coin = Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber((gasPrice * gasLimit) / MicroNumber.factor))
 

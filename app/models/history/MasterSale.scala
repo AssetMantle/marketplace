@@ -3,6 +3,7 @@ package models.history
 import akka.actor.Cancellable
 import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, HistoryLogging, ModelTable}
+import models.analytics.CollectionsAnalysis
 import models.master.Sales
 import models.{blockchainTransaction, master, masterTransaction}
 import play.api.Logger
@@ -91,6 +92,7 @@ class MasterSales @Inject()(
                              masterNFTOwners: master.NFTOwners,
                              masterTransactionBuyNFTTransactions: masterTransaction.BuyNFTTransactions,
                              blockchainTransactionBuyNFTs: blockchainTransaction.BuyNFTs,
+                             collectionsAnalysis: CollectionsAnalysis,
                              protected val databaseConfigProvider: DatabaseConfigProvider
                            )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[MasterSales.MasterSaleTable, MasterSales.MasterSaleSerialized, String](
@@ -131,10 +133,13 @@ class MasterSales @Inject()(
 
           def deleteSale() = sales.Service.delete(expiredSale.id)
 
+          def updateAnalysis() = collectionsAnalysis.Utility.onSaleExpiry(expiredSale.collectionId)
+
           for {
             _ <- addToHistory
             _ <- markSaleNull
             _ <- deleteSale()
+            _ <- updateAnalysis()
           } yield ()
 
         }

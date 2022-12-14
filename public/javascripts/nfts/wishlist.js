@@ -19,9 +19,11 @@ function wishlistCounter(source, route) {
             200: function (data) {
                 $(source).text(data);
             },
-            401: function () {
+            401: function (data) {
+                console.log(data.responseText);
             },
-            500: function () {
+            500: function (data) {
+                console.log(data.responseText);
             }
         }
     });

@@ -21,10 +21,12 @@ class ProfileController @Inject()(
                                    withLoginActionAsync: WithLoginActionAsync,
                                    withoutLoginAction: WithoutLoginAction,
                                    masterAccounts: master.Accounts,
+                                   masterKeys: master.Keys,
                                    masterWhitelists: master.Whitelists,
                                    masterCollections: master.Collections,
                                    masterWhitelistMembers: master.WhitelistMembers,
                                    masterTransactionNotifications: masterTransaction.Notifications,
+                                   masterNFTOwners: master.NFTOwners,
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -100,21 +102,41 @@ class ProfileController @Inject()(
       }
   }
 
-  def profileInfoCard(accountId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      implicit val optionalLoginState: Option[LoginState] = Option(loginState)
-      Future(Ok(views.html.profile.profileInfoCard(loginState.username)))
+  def profileInfoCard(accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val key = masterKeys.Service.tryGetActive(accountId)
+        val account = masterAccounts.Service.tryGet(accountId)
+        (for {
+          key <- key
+          account <- account
+        } yield Ok(views.html.profile.profileInfoCard(accountId = accountId, address = key.address, createdOn = account.createdOn.fold(0L)(_.getTime)))
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
   }
 
-  def profileActivityCard(accountId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      implicit val optionalLoginState: Option[LoginState] = Option(loginState)
-      Future(Ok(views.html.profile.profileActivityCard(loginState.username)))
+  def profileActivityCard(accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.profileActivityCard(accountId)))
+    }
   }
 
-  def profileAnalysisCard(accountId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      implicit val optionalLoginState: Option[LoginState] = Option(loginState)
-      Future(Ok(views.html.profile.profileAnalysis(loginState.username)))
+
+  def profileAnalysisCard(accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val countOwnedNFTs = masterNFTOwners.Service.countOwnedNFTs(accountId)
+        val countCreated = masterCollections.Service.countCreated(accountId)
+        (for {
+          countOwnedNFTs <- countOwnedNFTs
+          countCreated <- countCreated
+        } yield Ok(views.html.profile.profileAnalysis(totalCollected = countOwnedNFTs, totalCollectionCreated = countCreated))
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
   }
 }
