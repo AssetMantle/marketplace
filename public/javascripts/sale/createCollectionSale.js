@@ -1,5 +1,4 @@
 function onCollectionSelect(collectionId, accountId) {
-    console.log("asdas")
     let route = jsRoutes.controllers.CollectionController.countAccountNFTsNotOnSale(collectionId, accountId);
     $.ajax({
         url: route.url,
