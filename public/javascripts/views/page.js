@@ -38,7 +38,7 @@ function viewSetting() {
 function viewProfile(lastPart) {
     let accountId = lastPart.split("/")[0];
     let activeTab = lastPart.split("/")[1];
+    componentResource('leftContent', jsRoutes.controllers.ProfileController.profileInfoCard(accountId));
     componentResource('centerContent', jsRoutes.controllers.ProfileController.profile(accountId, activeTab));
-    $('#leftContent').html('');
-    $('#rightContent').html('');
+    componentResource('rightContent', jsRoutes.controllers.ProfileController.profileAnalysisCard(accountId));
 }

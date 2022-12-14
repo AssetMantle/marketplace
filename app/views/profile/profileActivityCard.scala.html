@@ -1,0 +1,104 @@
+@import controllers.actions.LoginState
+
+@(accountId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+<div class="sticky-top item-sticky">
+    <div class="card rightInfoCard">
+        <div class="accordion accordion-flush" id="profileActivityAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="mantlePlaceActivityHeading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#mantlePlaceActivity" aria-expanded="false" aria-controls="mantlePlaceActivity">
+                        <i class="bi bi-clock me-1 iconDefault iconSmall"></i>
+                        @Messages(constants.View.PROFILE_ACTIVITY_TITLE_MANTLEPLACE_ACTIVITY)
+                    </button>
+                </h2>
+                <div class="separator"></div>
+                <div id="mantlePlaceActivity" class="accordion-collapse collapse" aria-labelledby="mantlePlaceActivityHeading" data-bs-parent="#profileActivityAccordion">
+                    <div class="accordion-body">
+                        <div class="mb-3 singleActivity">
+                            <div class="d-flex gap-2 align-items-center">
+                                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")" class="activityImage"/>
+                                <div class="activityDetail">@Messages(constants.View.PROFILE_ACTIVITY_DESCRIPTION)</div>
+                            </div>
+                        </div>
+                        <div class="mb-3 singleActivity">
+                            <div class="d-flex gap-2 align-items-center">
+                                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")" class="activityImage"/>
+                                <div class="activityDetail">@Messages(constants.View.PROFILE_ACTIVITY_DESCRIPTION)</div>
+                            </div>
+                        </div>
+                        <div class="mb-3 singleActivity">
+                            <div class="d-flex gap-2 align-items-center">
+                                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")" class="activityImage"/>
+                                <div class="activityDetail">@Messages(constants.View.PROFILE_ACTIVITY_DESCRIPTION)</div>
+                            </div>
+                        </div>
+                        <div class="separator"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                        <img src="@routes.Assets.versioned("images/icon/trendingYellow.png")" width="16px" class="me-1"/>
+                        @Messages(constants.View.PROFILE_ACTIVITY_TITLE_TRENDING_COLLECTIONS)
+                    </button>
+                </h2>
+                <div class="separator"></div>
+                <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#profileActivityAccordion">
+                    <div class="accordion-body">
+                        <div class="mb-3 singleActivity">
+                            <div class="d-flex gap-2 align-items-center">
+                                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")" class="activityImage"/>
+                                <div class="activityDetail">@Messages(constants.View.PROFILE_ACTIVITY_DESCRIPTION)</div>
+                            </div>
+                        </div>
+                        <div class="mb-3 singleActivity">
+                            <div class="d-flex gap-2 align-items-center">
+                                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")" class="activityImage"/>
+                                <div class="activityDetail">@Messages(constants.View.PROFILE_ACTIVITY_DESCRIPTION)</div>
+                            </div>
+                        </div>
+                        <div class="mb-3 singleActivity">
+                            <div class="d-flex gap-2 align-items-center">
+                                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")" class="activityImage"/>
+                                <div class="activityDetail">@Messages(constants.View.PROFILE_ACTIVITY_DESCRIPTION)</div>
+                            </div>
+                        </div>
+                        <div class="separator"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+                        <i class="bi bi-clock-history me-1 iconDefault iconSmall"></i>
+                        @Messages(constants.View.PROFILE_ACTIVITY_TITLE_RECENTLY_VIEWED)
+                    </button>
+                </h2>
+                <div id="flush-collapseThree" class="mt-3 accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#profileActivityAccordion">
+                    <div class="accordion-body">
+                        <div class="mb-3 singleActivity">
+                            <div class="d-flex gap-2 align-items-center">
+                                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")" class="activityImage"/>
+                                <div class="activityDetail">@Messages(constants.View.PROFILE_ACTIVITY_DESCRIPTION)</div>
+                            </div>
+                        </div>
+                        <div class="mb-3 singleActivity">
+                            <div class="d-flex gap-2 align-items-center">
+                                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")" class="activityImage"/>
+                                <div class="activityDetail">@Messages(constants.View.PROFILE_ACTIVITY_DESCRIPTION)</div>
+                            </div>
+                        </div>
+                        <div class="mb-3 singleActivity">
+                            <div class="d-flex gap-2 align-items-center">
+                                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")" class="activityImage"/>
+                                <div class="activityDetail">@Messages(constants.View.PROFILE_ACTIVITY_DESCRIPTION)</div>
+                            </div>
+                        </div>
+                        <div class="separator"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

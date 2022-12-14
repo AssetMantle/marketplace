@@ -99,4 +99,22 @@ class ProfileController @Inject()(
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
   }
+
+  def profileInfoCard(accountId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      implicit val optionalLoginState: Option[LoginState] = Option(loginState)
+      Future(Ok(views.html.profile.profileInfoCard(loginState.username)))
+  }
+
+  def profileActivityCard(accountId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      implicit val optionalLoginState: Option[LoginState] = Option(loginState)
+      Future(Ok(views.html.profile.profileActivityCard(loginState.username)))
+  }
+
+  def profileAnalysisCard(accountId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      implicit val optionalLoginState: Option[LoginState] = Option(loginState)
+      Future(Ok(views.html.profile.profileAnalysis(loginState.username)))
+  }
 }
