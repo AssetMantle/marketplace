@@ -1,0 +1,25 @@
+@import controllers.actions.LoginState
+@import views.html.base.commonAddressValue
+
+@(accountId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+<div class="sticky-top item-sticky">
+    <div class="card leftInfoCard">
+        <div class="d-flex align-items-center profileHeader">
+            <div class="profileImage">
+                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
+            </div>
+            <div class="profileName">@loginState.username</div>
+        </div>
+        <div class="row p-2 mx-0 mt-3 justify-content-between align-items-center userAddressBox">
+            <div class="col-10 p-0 userAddressData username-data" data-value="@loginState.address">
+                @commonAddressValue(message = loginState.address, id = utilities.IdGenerator.getRandomHexadecimal, length = 5)
+            </div>
+            <div class="col-2 text-end copyIcon" onclick="copyToClipboard(this);
+            showSnackbar('', '@Messages(constants.View.ADDRESS_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
+                <i id="openWalletMenu" class="bi bi-files iconDefault iconMedium"></i>
+            </div>
+        </div>
+        <div class="mt-2 joinedDate">@Messages(constants.View.PROFILE_JOINED_DATE_LABEL) April 2022</div>
+    </div>
+</div>

@@ -256,6 +256,10 @@
     color: var(--gray);
   }
 
+  &.iconGrayWhite{
+    color: var(--icon-white);
+  }
+
   &.iconLarge {
     font-size: 30px;
   }

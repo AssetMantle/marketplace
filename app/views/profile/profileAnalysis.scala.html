@@ -1,0 +1,30 @@
+@import controllers.actions.LoginState
+
+@(accountId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+<div class="sticky-top item-sticky">
+    <div class="card rightInfoCard">
+        <div class="d-flex flex-column gap-3">
+            <div class="profileStatsBox">
+                <div class="d-flex gap-2 align-items-center">
+                    <img src="@routes.Assets.versioned("images/icon/totalNFTWhite.png")" class="icon"/>
+                    <div class="statsTitle">@Messages(constants.View.PROFILE_STATS_TITLE_TOTAL_NFT)</div>
+                </div>
+                <div class="mt-1 statsValue">00</div>
+            </div>
+            <div class="profileStatsBox">
+                <div class="d-flex gap-2 align-items-center">
+                    <img src="@routes.Assets.versioned("images/icon/totalCollectionWhite.png")" class="icon"/>
+                    <div class="statsTitle">@Messages(constants.View.PROFILE_STATS_TITLE_TOTAL_COLLECTION)</div>
+                </div>
+                <div class="mt-1 statsValue">00</div>
+            </div>
+            <div class="profileStatsBox">
+                <div class="d-flex gap-2 align-items-center">
+                    <img src="@routes.Assets.versioned("images/icon/totalSalesWhite.png")" class="icon"/>
+                    <div class="statsTitle">@Messages(constants.View.PROFILE_STATS_TITLE_TOTAL_SALES)</div>
+                </div>
+                <div class="mt-1 statsValue">00</div>
+            </div>
+        </div>
+    </div>
+</div>

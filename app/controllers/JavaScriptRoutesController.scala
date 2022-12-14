@@ -111,6 +111,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.loadMoreNotifications,
         routes.javascript.ProfileController.markNotificationsRead,
         routes.javascript.ProfileController.countUnreadNotification,
+        routes.javascript.ProfileController.profileInfoCard,
+        routes.javascript.ProfileController.profileActivityCard,
+        routes.javascript.ProfileController.profileAnalysisCard,
 
         routes.javascript.SaleController.createCollectionSaleForm,
         routes.javascript.SaleController.buySaleNFTForm,

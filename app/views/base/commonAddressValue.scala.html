@@ -1,0 +1,8 @@
+@(message: String, id: String, length: Int)
+
+<span id="@id">
+@message
+</span>
+<script>
+        addressShorter('@message', '@id', @length);
+</script>
