@@ -63,7 +63,7 @@
                 } else {
                     <div class="d-flex align-items-center gap-1 mt-3" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN_WITH_CALLBACK.get, s"'/collection/${collection.id}'"))">
                         <span>
-                        @views.html.nft.commonCardWishlistButton()
+                        @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
                         </span>
                         <div class="nft-likes" data-id="@nft.id">00</div>
                     </div>

@@ -4,7 +4,7 @@ import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
 import models.master._
-import models.{blockchain, blockchainTransaction, master}
+import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.cache.Cached
@@ -36,8 +36,8 @@ class SaleController @Inject()(
                                 masterSales: master.Sales,
                                 masterNFTProperties: master.NFTProperties,
                                 masterWhitelistMembers: master.WhitelistMembers,
-                                blockchainTransactionBuyAssetWithoutMints: blockchainTransaction.BuyAssetWithoutMints,
-                                blockchainTransactionBuyAndMintAssets: blockchainTransaction.BuyAndMintAssets,
+                                masterTransactionBuyNFTTransactions: masterTransaction.BuyNFTTransactions,
+                                blockchainTransactionBuyNFTs: blockchainTransaction.BuyNFTs,
                                 utilitiesNotification: utilities.Notification,
                                 utilitiesOperations: utilities.Operations,
                               )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -149,8 +149,8 @@ class SaleController @Inject()(
           val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
           val nft = masterNFTs.Service.tryGet(buySaleNFTData.nftId)
           val nftProperties = masterNFTProperties.Service.getForNFT(buySaleNFTData.nftId)
-          val countBuyerNFTsFromSale = blockchainTransactionBuyAssetWithoutMints.Service.countBuyerNFTsFromSale(buyerAccountId = loginState.username, saleId = buySaleNFTData.saleId)
-          val checkAlreadySold = blockchainTransactionBuyAssetWithoutMints.Service.checkAlreadySold(saleId = buySaleNFTData.saleId, nftId = buySaleNFTData.nftId)
+          val countBuyerNFTsFromSale = masterTransactionBuyNFTTransactions.Service.countBuyerNFTsFromSale(buyerAccountId = loginState.username, saleId = buySaleNFTData.saleId)
+          val checkAlreadySold = masterTransactionBuyNFTTransactions.Service.checkAlreadySold(saleId = buySaleNFTData.saleId, nftId = buySaleNFTData.nftId)
 
           def sellerKey(NFTOwner: NFTOwner) = masterKeys.Service.tryGetActive(NFTOwner.ownerId)
 
@@ -171,7 +171,7 @@ class SaleController @Inject()(
               if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
             ).flatten
             if (errors.isEmpty) {
-              blockchainTransactionBuyAssetWithoutMints.Utility.transaction(
+              blockchainTransactionBuyNFTs.Utility.transaction(
                 buyerAccountId = loginState.username,
                 sellerAccountId = sellerKey.accountId,
                 saleId = sale.id,

@@ -3,7 +3,7 @@ package constants
 import com.typesafe.config.ConfigFactory
 import play.api.Configuration
 import play.api.i18n.Lang
-import utilities.MicroNumber
+import utilities.{MicroNumber, Wallet}
 
 import scala.concurrent.duration.{Duration, MILLISECONDS}
 
@@ -16,6 +16,7 @@ object CommonConfig {
   val PushNotificationURL: String = config.get[String]("webApp.pushNotification.url")
   val PushNotificationAuthorizationKey: String = config.get[String]("webApp.pushNotification.authorizationKey")
   val AppVersion: String = config.get[String]("app.version")
+  val MemoSignerWallet: Wallet = utilities.Wallet.getWallet(config.get[String]("blockchain.memoSignerMnemonics").split(" "))
 
   val SessionTokenTimeout: Int = config.get[Int]("play.http.session.token.timeout")
 

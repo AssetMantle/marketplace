@@ -1,5 +1,3 @@
-// Set Average Gas fees as Default
-$('#GAS_PRICE option:eq(2)').prop('selected', true);
 
 // Gas Price
 route = jsRoutes.controllers.BlockchainTransactionController.gasTokenPrice();

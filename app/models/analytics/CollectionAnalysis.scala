@@ -146,7 +146,7 @@ class CollectionsAnalysis @Inject()(
 
       for {
         collectionAnalysis <- collectionAnalysis
-        _ <- Service.update(collectionAnalysis.copy(listed = totalListed,salePrice = salePrice))
+        _ <- Service.update(collectionAnalysis.copy(listed = totalListed, salePrice = salePrice))
       } yield ()
     }
 
@@ -155,7 +155,7 @@ class CollectionsAnalysis @Inject()(
 
       for {
         collectionAnalysis <- collectionAnalysis
-        _ <- Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed - 1, totalTraded = collectionAnalysis.totalTraded, totalVolumeTraded = collectionAnalysis.totalVolumeTraded + price))
+        _ <- Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed - 1, totalTraded = collectionAnalysis.totalTraded + 1, totalSold = collectionAnalysis.totalSold + 1, totalVolumeTraded = collectionAnalysis.totalVolumeTraded + price))
       } yield ()
     }
 
@@ -174,6 +174,15 @@ class CollectionsAnalysis @Inject()(
       for {
         collectionAnalysis <- collectionAnalysis
         _ <- Service.update(collectionAnalysis.copy(totalMinted = collectionAnalysis.totalMinted + 1, listed = collectionAnalysis.listed - 1, totalTraded = collectionAnalysis.totalTraded, totalVolumeTraded = collectionAnalysis.totalVolumeTraded + price))
+      } yield ()
+    }
+
+    def onSaleExpiry(collectionId: String): Future[Unit] = {
+      val collectionAnalysis = Service.tryGet(collectionId)
+
+      for {
+        collectionAnalysis <- collectionAnalysis
+        _ <- Service.update(collectionAnalysis.copy(salePrice = MicroNumber.zero))
       } yield ()
     }
 

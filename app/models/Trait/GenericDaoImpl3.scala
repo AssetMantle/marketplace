@@ -48,6 +48,16 @@ abstract class GenericDaoImpl3[
 
   def customQuery[C](query: StreamingProfileAction[C, _, _]) = db.run(query)
 
+  def customUpdate[R](updateQuery: DBIOAction[R, NoStream, Effect.Write]): Future[R] = db.run(updateQuery.asTry).map {
+    case Success(result) => result match {
+      case 0 => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"))
+      case _ => result
+    }
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_INSERT_FAILED"), psqlException)
+    }
+  }
+
   def delete(id1: PK1, id2: PK2, id3: PK3): Future[Int] = db.run(tableQuery.filter(x => x.id1 === id1 && x.id2 === id2 && x.id3 === id3).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
