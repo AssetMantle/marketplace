@@ -20,6 +20,11 @@
                 <i id="openWalletMenu" class="bi bi-files iconDefault iconMedium"></i>
             </div>
         </div>
-        <div class="mt-2 joinedDate">@Messages(constants.View.PROFILE_JOINED_DATE_LABEL) @createdOn</div>
+        <div class="mt-2 joinedDate">@Messages(constants.View.PROFILE_JOINED_DATE_LABEL)
+            <span id="joinedTimeEpoch_@accountId">@createdOn</span>
+        </div>
     </div>
 </div>
+<script>
+    epochToDate('joinedTimeEpoch_@accountId');
+</script>

@@ -119,6 +119,13 @@ function epochToDateTime(elementId) {
     $("#" + elementId).text(dateTime.toLocaleDateString() + " " + dateTime.toLocaleTimeString());
 }
 
+function epochToDate(elementId) {
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    let epochVal = $("#" + elementId).text();
+    let dateTime = new Date(Number(epochVal));
+    $("#" + elementId).text(months[dateTime.getMonth()] + " " + dateTime.getFullYear());
+}
+
 function loadSwitcherContent(divID) {
     $('#' + divID).click();
 }
@@ -211,8 +218,4 @@ function setGasOption(element, value) {
     $(".toggleOption").removeClass("active");
     $(element).addClass("active");
     $('#GAS_PRICE').val(value);
-}
-
-function setDefaultGas() {
-
 }
