@@ -83,7 +83,10 @@ class BuyNFTTransactions @Inject()(
 
     def tryGetBySaleIdAndBuyerAccountId(buyerAccountId: String, saleId: String): Future[Seq[BuyNFTTransaction]] = filter(x => x.saleId === saleId && x.buyerAccountId === buyerAccountId)
 
-    def checkAlreadySold(nftId: String, saleId: String): Future[Boolean] = filterAndExists(x => x.nftId === nftId && x.saleId === saleId)
+    def checkAlreadySold(nftId: String, saleId: String): Future[Boolean] = {
+      val nullStatus: Option[Boolean] = null
+      filterAndExists(x => x.nftId === nftId && x.saleId === saleId && (x.status || x.status.? === nullStatus))
+    }
 
     def countBuyerNFTsFromSale(buyerAccountId: String, saleId: String): Future[Int] = {
       val nullStatus: Option[Boolean] = null
@@ -93,6 +96,8 @@ class BuyNFTTransactions @Inject()(
     def tryGetByTxHash(txHash: String): Future[BuyNFTTransaction] = filterHead(_.txHash === txHash)
 
     def markSuccess(txHash: String): Future[Int] = customUpdate(BuyNFTTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
+
+    def markFailed(txHash: String): Future[Int] = customUpdate(BuyNFTTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(false))
   }
 
 }

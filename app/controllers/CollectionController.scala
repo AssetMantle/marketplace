@@ -3,7 +3,7 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
-import models.master.Collection
+import models.master.{Collection, Sale}
 import models.masterTransaction.CollectionDraft
 import models.{master, masterTransaction}
 import play.api.Logger
@@ -167,16 +167,26 @@ class CollectionController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
-        val saleId = masterNFTOwners.Service.getSaleIdByCollectionId(id)
-        val checkSaleNotExists = masterNFTOwners.Service.checkSaleNotExists(id)
+        val sales = masterSales.Service.getAllSalesByCollectionId(id)
 
-        def saleStatus(saleId: String, checkSaleNotExists: Boolean) = if (saleId != "") masterSales.Service.tryGet(saleId).map(_.getStatus(checkSaleNotExists)) else Future(0)
+        def allSold(saleId: String) = masterNFTOwners.Service.checkAllSold(saleId)
+
+        def saleStatus(sales: Seq[Sale]) = if (sales.isEmpty) Future(0) else {
+          val activeSale = sales.sortBy(_.endTimeEpoch).find(x => {
+            val currentEpoch = utilities.Date.currentEpoch
+            currentEpoch >= x.startTimeEpoch && currentEpoch < x.endTimeEpoch
+          })
+          if (activeSale.isEmpty) Future(3) else {
+            for {
+              allSold <- allSold(activeSale.get.id)
+            } yield activeSale.get.getStatus(allSold)
+          }
+        }
 
         (for {
           collectionAnalysis <- collectionAnalysis
-          saleId <- saleId
-          checkSaleNotExists <- checkSaleNotExists
-          saleStatus <- saleStatus(saleId.getOrElse(""), checkSaleNotExists)
+          sales <- sales
+          saleStatus <- saleStatus(sales)
         } yield Ok(s"${collectionAnalysis.totalNFTs.toString}|${collectionAnalysis.salePrice.toString}|${saleStatus}")
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)

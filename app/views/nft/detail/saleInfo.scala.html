@@ -1,5 +1,5 @@
-@import models.master.Sale
 @import controllers.actions.LoginState
+@import models.master.Sale
 
 @(sale: Option[Sale], nftId: String, saleOffered: Boolean, onSale: Boolean, mintable: Boolean, checkAlreadySold: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
@@ -18,7 +18,7 @@
             </div>
             @if(loginState.isDefined && saleOffered && sale.isDefined && !checkAlreadySold) {
                 <button class="mt-5 form-primary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, s"'${sale.get.id}', '$nftId', false"))">@Messages(constants.View.BUYNOW)</button>
-@*                <button class="mt-3 form-secondary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, s"'${sale.get.id}', '$nftId', true"));">@Messages(constants.View.BUY_MINT_NFT)</button>*@
+                @* <button class="mt-3 form-secondary-button" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.BUY_NFT_SALE.get, s"'${sale.get.id}', '$nftId', true"));">@Messages(constants.View.BUY_MINT_NFT)</button>*@
             }
             @if(mintable) {
 
