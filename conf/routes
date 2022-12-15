@@ -106,8 +106,8 @@ GET         /setProperties                                    controllers.NFTCon
 POST        /setProperties                                    controllers.NFTController.setProperties()
 GET         /deleteNftDraft                                   controllers.NFTController.deleteDraftForm(nftId: String, fileHash: String)
 POST        /deleteNftDraft                                   controllers.NFTController.deleteDraft()
-GET         /ownedSection                                     controllers.NFTController.ownedSection(accountId: String)
-GET         /ownedNFTsPerPage                                 controllers.NFTController.ownedNFTsPerPage(accountId: String, pageNumber: Int)
+GET         /collectedSection                                 controllers.NFTController.collectedSection(accountId: String)
+GET         /collectedNFTsPerPage                             controllers.NFTController.collectedNFTsPerPage(accountId: String, pageNumber: Int)
 
 GET         /settings                                         controllers.SettingController.viewSettings()
 GET         /profileSettings                                  controllers.SettingController.settings()

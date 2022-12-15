@@ -10,8 +10,8 @@
             @commonNFTCard(collection = collections.find(_.id == nft.collectionId).get, nft = nft, liked = Option(likedNFTs.exists(_.nftId == nft.id)), onClickFunction = JavaScript(s"viewNFT('${nft.id}')"))
         }
     } else {
-        <div id="noOwnedNFTsPerPage" class="noNFT"></div>
-        <div id="noOwnedNFTFound" class="p-0 m-0">
+        <div id="noCollectedNFTsPerPage" class="noNFT"></div>
+        <div id="noCollectedNFTFound" class="p-0 m-0">
             <div id="noCollection" class="h-100 mt-3 d-flex flex-column justify-content-center align-items-center emptyOwnedList">
                 <div class="message">@Messages(constants.View.NO_COLLECTION_FOUND)</div>
             </div>

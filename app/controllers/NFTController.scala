@@ -434,14 +434,14 @@ class NFTController @Inject()(
   }
 
 
-  def ownedSection(accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectedSection(accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit optionalLoginState =>
       implicit request =>
-        Future(Ok(views.html.profile.owned.ownedSection(accountId)))
+        Future(Ok(views.html.profile.collected.collectedSection(accountId)))
     }
   }
 
-  def ownedNFTsPerPage(accountId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectedNFTsPerPage(accountId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit optionalLoginState =>
       implicit request =>
         val nftIds = masterNFTOwners.Service.getByOwnerIdAndPageNumber(accountId, pageNumber)
@@ -457,7 +457,7 @@ class NFTController @Inject()(
           nfts <- nfts(nftIds)
           collections <- collections(nfts.map(_.collectionId))
           wishLists <- wishLists(nfts.map(_.id))
-        } yield Ok(views.html.profile.owned.ownedNFTsPerPage(nfts, collections, wishLists))
+        } yield Ok(views.html.profile.collected.collectedNFTsPerPage(nfts, collections, wishLists))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

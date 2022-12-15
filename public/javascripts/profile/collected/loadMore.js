@@ -1,20 +1,20 @@
 window.onbeforeunload = function () {
-    if ($("#ownedNFTsPerPage").length !== 0) {
+    if ($("#collectedNFTsPerPage").length !== 0) {
         window.scrollTo(0, 0);
     }
 }
 document.onload = function () {
-    if ($("#ownedNFTsPerPage").length !== 0) {
+    if ($("#collectedNFTsPerPage").length !== 0) {
         window.scrollTo(0, 0);
     }
 }
 
-function loadMoreOwnedNFTs(accountId) {
+function loadMoreCollectedNFTs(accountId) {
     const loading = document.querySelector('.loading');
-    if ($("#noOwnedNFTsPerPage").length === 0) {
+    if ($("#noCollectedNFTsPerPage").length === 0) {
         let nextPageNumber = Math.ceil($(".ownedNFTPage").length + 1);
         console.log(nextPageNumber);
-        let route = jsRoutes.controllers.NFTController.ownedNFTsPerPage(accountId, nextPageNumber);
+        let route = jsRoutes.controllers.NFTController.collectedNFTsPerPage(accountId, nextPageNumber);
         $.ajax({
             url: route.url,
             type: route.type,
@@ -38,12 +38,12 @@ function loadMoreOwnedNFTs(accountId) {
 
 timeout = 0;
 
-function loadOwnedNFTsOnScroll(accountId) {
+function loadCollectedNFTsOnScroll(accountId) {
     clearTimeout(timeout);
     timeout = setTimeout(function () {
         if ($(window).scrollTop() >= ($(document).height() - $(window).height() - 100)) {
-            if ($("#noOwnedNFTsPerPage").length === 0) {
-                loadMoreOwnedNFTs(accountId);
+            if ($("#noCollectedNFTsPerPage").length === 0) {
+                loadMoreCollectedNFTs(accountId);
             }
         }
     }, 300);
@@ -52,8 +52,8 @@ function loadOwnedNFTsOnScroll(accountId) {
 function setEmptyContainer(){
     let nftCard = $(".singleNFTCard").length;
     if(nftCard !== 0){
-        $("#noOwnedNFTFound").hide();
+        $("#noCollectedNFTFound").hide();
     }else{
-        $("#noOwnedNFTFound").show();
+        $("#noCollectedNFTFound").show();
     }
 }

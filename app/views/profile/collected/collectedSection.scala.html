@@ -7,7 +7,7 @@
         <div class="profiles-container">
             <div class="nft-list">
                 <div class="nft-list-container m-0">
-                    <div id="ownedNFTsPerPage" class="row m-0 ownedNFTsPerPage">
+                    <div id="collectedNFTsPerPage" class="row m-0 ownedNFTsPerPage">
                     </div>
                 </div>
                     <!-- Loader -->
@@ -22,9 +22,9 @@
     </div>
 </div>
 <link href="@utilities.PublicResource.getVersionedRoute("stylesheets/explorer.css")"/>
-<script src="@utilities.PublicResource.getVersionedRoute("javascripts/profile/owned/loadMore.js")" type="text/javascript"></script>
-<script>loadMoreOwnedNFTs('@accountId');
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/profile/collected/loadMore.js")" type="text/javascript"></script>
+<script>loadMoreCollectedNFTs('@accountId');
 window.onscroll = function () {
-    loadOwnedNFTsOnScroll('@accountId');
+    loadCollectedNFTsOnScroll('@accountId');
 }
 </script>
