@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 
-@(accountId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(accountId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
         <div class="accordion accordion-flush" id="profileActivityAccordion">

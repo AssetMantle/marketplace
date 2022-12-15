@@ -1,6 +1,5 @@
 package models.masterTransaction
 
-import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -91,41 +90,16 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def update(notification: Notification): Future[Unit] = updateById(notification.serialize())
 
-
-    // TODO optimize by creating filterAndUpdate
     def markNotificationRead(notificationId: String, accountId: String): Future[Int] = {
-      val notification = tryGetById(notificationId)
-
-      def updateRead(notification: Notification) = if (notification.accountID.getOrElse("") == accountId) update(notification.copy(read = true))
-      else constants.Response.NOT_NOTIFICATION_OWNER.throwFutureBaseException()
-
+      val update = customUpdate(Notifications.TableQuery.filter(x => x.id === notificationId && x.accountID === accountId).map(_.read).update(true))
       for {
-        notification <- notification
-        _ <- updateRead(notification.deserialize())
+        _ <- update
         unread <- getNumberOfUnread(accountId)
       } yield unread
     }
 
     // TODO optimize by creating filterAndUpdate
-    def markAllRead(accountId: String): Future[Int] = {
-      val notifications = filter(x => x.accountID === accountId && !x.read)
-
-      def updateRead(notifications: Seq[Notification]) = utilitiesOperations.traverse(notifications) { notification =>
-        (for {
-          _ <- update(notification.copy(read = true))
-        } yield ()
-          ).recover {
-          case _: BaseException =>
-        }
-      }
-
-      for {
-        notifications <- notifications
-      } yield {
-        updateRead(notifications.map(_.deserialize()))
-        0
-      }
-    }
+    def markAllRead(accountId: String): Future[Int] = customUpdate(Notifications.TableQuery.filter(x => x.accountID === accountId && !x.read).map(_.read).update(true))
   }
 
 }

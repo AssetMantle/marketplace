@@ -85,8 +85,8 @@ function changeSelected(parent, selectedItem) {
 }
 
 // Address Shorter
-function addressShorter(message, fieldId, length){
-    $("#"+fieldId).text(message.substr(0, length) + "..." + message.substr($("#"+fieldId).length - length));
+function addressShorter(message, fieldId, length) {
+    $("#" + fieldId).text(message.substr(0, length) + "..." + message.substr($("#" + fieldId).length - length));
 }
 
 // Copy to Clipboard
@@ -186,16 +186,16 @@ function countCollectionCardInfo(collectionId) {
                 let totalData = data.split("|");
                 $('#counCollectionNFTs_' + collectionId).html(totalData[0]);
                 $('#collectionNFTsPrice_' + collectionId).html(totalData[1]);
-                if(totalData[2] == 1){
+                if (totalData[2] == 1) {
                     $("#saleBadge_" + collectionId + " .option").removeClass("active");
                     $("#saleBadge_" + collectionId + " .live").addClass("active");
-                }else if(totalData[2] == 2){
+                } else if (totalData[2] == 2) {
                     $("#saleBadge_" + collectionId + " .option").removeClass("active");
                     $("#saleBadge_" + collectionId + " .soldOut").addClass("active");
-                }else if(totalData[2] == 3){
+                } else if (totalData[2] == 3) {
                     $("#saleBadge_" + collectionId + " .option").removeClass("active");
                     $("#saleBadge_" + collectionId + " .ended").addClass("active");
-                }else{
+                } else {
                     $("#saleBadge_" + collectionId + " .option").removeClass("active");
                 }
             },
@@ -211,4 +211,8 @@ function setGasOption(element, value) {
     $(".toggleOption").removeClass("active");
     $(element).addClass("active");
     $('#GAS_PRICE').val(value);
+}
+
+function setDefaultGas() {
+
 }

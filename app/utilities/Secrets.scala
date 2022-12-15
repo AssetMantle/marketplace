@@ -61,7 +61,9 @@ object Secrets {
 
   def sha256HashString(value: String): String = java.lang.String.format("%064x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8))))
 
-  def sha256HashHexString(value: Array[Byte]): String = sha256Hash(value).map("%02x".format(_)).mkString.toUpperCase
+  def sha256HashHexString(value: Array[Byte]): String = byteArrayToString(sha256Hash(value))
+
+  def byteArrayToString(value: Array[Byte]): String = value.map("%02x".format(_)).mkString.toUpperCase
 
   def base64URLDecodeToString(s: String): String = try {
     Base64.getUrlDecoder.decode(s.replace("+", "-").replace("/", "_")).map(_.toChar).mkString
