@@ -793,7 +793,6 @@
       @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--dark));
       text-align: right;
       text-transform: capitalize;
-      margin-top: 32px;
       cursor: pointer;
     }
   }
@@ -879,6 +878,7 @@
 
 #notificationList{
   height: 215px;
+  //height: 188px;
   overflow-y: auto;
 }
 
