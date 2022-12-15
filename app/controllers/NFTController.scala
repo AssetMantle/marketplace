@@ -5,7 +5,7 @@ import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
 import models.master.Collection
 import models.masterTransaction.NFTDraft
-import models.{blockchainTransaction, master, masterTransaction}
+import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -116,13 +116,15 @@ class NFTController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val nft = masterNFTs.Service.tryGet(nftId)
+        val nftOwner = masterNFTOwners.Service.tryGetFirstOwner(nftId = nftId)
 
         def collection(collectionId: String) = masterCollections.Service.tryGet(collectionId)
 
         (for {
           nft <- nft
+          nftOwner <- nftOwner
           collection <- collection(nft.collectionId)
-        } yield Ok(views.html.nft.detail.collectionInfo(nft, collection))
+        } yield Ok(views.html.nft.detail.collectionInfo(nft, collection, nftOwner))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -132,7 +134,7 @@ class NFTController @Inject()(
   def saleInfo(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val saleId = if (loginState.isDefined) masterNFTOwners.Service.getSaleId(nftId) else Future(None)
+        val saleId = masterNFTOwners.Service.getSaleId(nftId)
         val isMinted = masterNFTs.Service.tryGet(nftId).map(_.isMinted)
 
         def sale(saleId: String) = if (saleId != "") masterSales.Service.tryGet(saleId).map(Option(_)) else Future(None)
@@ -432,7 +434,6 @@ class NFTController @Inject()(
         }
       )
   }
-
 
   def collectedSection(accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit optionalLoginState =>

@@ -58,16 +58,15 @@ class TransactionComplete @Inject()(
     }
   } else {
     val buyNFTTx = masterTransactionBuyNFTTransactions.Service.tryGetByTxHash(transaction.hash)
+    val markMasterFailed = masterTransactionBuyNFTTransactions.Service.markFailed(transaction.hash)
 
     def nft(buyNFTTx: BuyNFTTransaction) = masterNFTs.Service.tryGet(buyNFTTx.nftId)
 
-    def sendNotifications(nft: NFT, buyNFTTx: BuyNFTTransaction) = {
-      utilitiesNotification.send(buyNFTTx.sellerAccountId, constants.Notification.SELLER_BUY_NFT_FAILED, nft.name)(s"'${nft.id}'")
-      utilitiesNotification.send(buyNFTTx.buyerAccountId, constants.Notification.BUYER_BUY_NFT_FAILED, nft.name)(s"'${nft.id}'")
-    }
+    def sendNotifications(nft: NFT, buyNFTTx: BuyNFTTransaction) = utilitiesNotification.send(buyNFTTx.buyerAccountId, constants.Notification.BUYER_BUY_NFT_FAILED, nft.name)(s"'${nft.id}'")
 
     (for {
       buyNFTTx <- buyNFTTx
+      _ <- markMasterFailed
       nft <- nft(buyNFTTx)
       _ <- sendNotifications(nft, buyNFTTx)
     } yield ()
