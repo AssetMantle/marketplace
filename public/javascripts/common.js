@@ -186,6 +186,7 @@ function countCollectionCardInfo(collectionId) {
                 let totalData = data.split("|");
                 $('#counCollectionNFTs_' + collectionId).html(totalData[0]);
                 $('#collectionNFTsPrice_' + collectionId).html(totalData[1]);
+                console.log(totalData[2]);
                 if (totalData[2] == 1) {
                     $("#saleBadge_" + collectionId + " .option").removeClass("active");
                     $("#saleBadge_" + collectionId + " .live").addClass("active");

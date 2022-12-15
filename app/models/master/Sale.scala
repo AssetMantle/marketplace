@@ -12,9 +12,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Sale(id: String, whitelistId: String, collectionId: String, numberOfNFTs: Long, maxMintPerAccount: Long, price: MicroNumber, denom: String, startTimeEpoch: Long, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def getStatus(saleNotExists: Boolean): Int = {
+  def getStatus(allSold: Boolean): Int = {
     val currentEpoch = System.currentTimeMillis() / 1000
-    if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch && saleNotExists) 2 // Sold out
+    if (allSold && currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) 2 // Sold out
     else if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) 1 // Live
     else if (currentEpoch >= this.endTimeEpoch) 3 // Expired
     else 0 //
@@ -141,6 +141,8 @@ class Sales @Inject()(
       val currentEpoch = utilities.Date.currentEpoch
       filter(x => x.whitelistId.inSet(whitelistIds) && x.endTimeEpoch > currentEpoch).map(_.map(_.id))
     }
+
+    def getAllSalesByCollectionId(collectionId: String): Future[Seq[Sale]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize))
 
     def delete(saleId: String): Future[Int] = deleteById(saleId)
   }

@@ -1,8 +1,9 @@
 @import controllers.actions.LoginState
 @import models.master.Collection
 @import views.html.base.commonStringValue
+@import models.master.NFTOwner
 
-@(nft: master.NFT, collection: Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(nft: master.NFT, collection: Collection, nftOwner: NFTOwner)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
         <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_COLLECTION_TITLE)</div>
@@ -22,6 +23,14 @@
             <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
             <div class="badgeText">
             @commonStringValue(message = collection.creatorId, id = utilities.IdGenerator.getRandomHexadecimal, length = 8, showToolTip = false)
+            </div>
+        </div>
+        <div class="separator"></div>
+        <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_OWNER_TITLE)</div>
+        <div class="d-flex gap-2 align-items-center badgeImageText" onclick="viewProfile('@nftOwner.ownerId/@constants.View.COLLECTED')">
+            <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
+            <div class="badgeText">
+            @commonStringValue(message = nftOwner.ownerId, id = utilities.IdGenerator.getRandomHexadecimal, length = 8, showToolTip = false)
             </div>
         </div>
     </div>
