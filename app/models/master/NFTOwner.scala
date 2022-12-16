@@ -78,13 +78,14 @@ class NFTOwners @Inject()(
 
     def update(NFTOwner: NFTOwner): Future[Unit] = updateById1AndId2(NFTOwner)
 
-    def countForOwnerNotOnSale(collectionId: String, currentOnSaleIds: Seq[String], ownerId: String): Future[Int] = {
+    def countForCreatorNotOnSale(collectionId: String, creatorId: String): Future[Int] = {
       val nullSaleId: Option[String] = null
-      filterAndCount(x => x.collectionId === collectionId && x.ownerId === ownerId && (!x.saleId.inSet(currentOnSaleIds) || x.saleId.? === nullSaleId))
+      filterAndCount(x => x.collectionId === collectionId && x.creatorId === creatorId && x.ownerId === creatorId && x.saleId.? === nullSaleId)
     }
 
-    def addRandomNFTsToSale(collectionId: String, ownerId: String, nfts: Int, saleId: String, currentOnSaleIds: Seq[String]): Future[Unit] = {
-      val notOnSaleNFTs = filter(x => x.ownerId === ownerId && x.collectionId === collectionId && !x.saleId.inSet(currentOnSaleIds))
+    def addRandomNFTsToSale(collectionId: String, creatorId: String, nfts: Int, saleId: String): Future[Unit] = {
+      val nullString: Option[String] = null
+      val notOnSaleNFTs = filter(x => x.ownerId === creatorId && x.creatorId === creatorId && x.collectionId === collectionId && x.saleId === nullString)
       for {
         notOnSaleNFTs <- notOnSaleNFTs
         _ <- upsertMultiple(Random.shuffle(notOnSaleNFTs).take(nfts).map(_.copy(saleId = Option(saleId))))
@@ -112,6 +113,7 @@ class NFTOwners @Inject()(
     }
 
     def getSaleId(nftId: String): Future[Option[String]] = filterHead(_.nftId === nftId).map(_.saleId)
+
     def checkAllSold(saleId: String): Future[Boolean] = filterAndExists(_.saleId === saleId).map(!_)
 
     def tryGet(nftId: String, ownerId: String): Future[NFTOwner] = tryGetById1AndId2(id1 = nftId, id2 = ownerId)

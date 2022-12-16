@@ -74,14 +74,10 @@ class SaleController @Inject()(
         },
         createData => {
           val collection = masterCollections.Service.tryGet(id = createData.collectionId)
-          val whitelistIds = masterWhitelists.Service.getIdsByOwnerId(loginState.username)
           val whitelistMembers = masterWhitelistMembers.Service.getAllMembers(createData.whitelistId)
+          val countNFts = masterNFTOwners.Service.countForCreatorNotOnSale(collectionId = createData.collectionId, creatorId = loginState.username)
 
-          def currentOnSaleIds(whitelistIds: Seq[String]) = masterSales.Service.getIdsCurrentOnSaleByWhitelistIds(whitelistIds)
-
-          def countNFts(currentOnSaleIds: Seq[String]) = masterNFTOwners.Service.countForOwnerNotOnSale(collectionId = createData.collectionId, currentOnSaleIds = currentOnSaleIds, ownerId = loginState.username)
-
-          def addToSale(collection: Collection, countNFts: Int, currentOnSaleIds: Seq[String]) = {
+          def addToSale(collection: Collection, countNFts: Int) = {
             val errors = Seq(
               if (!loginState.isGenesisCreator) Option(constants.Response.NOT_GENESIS_CREATOR) else None,
               if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
@@ -91,7 +87,7 @@ class SaleController @Inject()(
             if (errors.isEmpty) {
               for {
                 saleId <- masterSales.Service.add(createData.toNewSale)
-                _ <- masterNFTOwners.Service.addRandomNFTsToSale(collectionId = collection.id, nfts = createData.nftForSale, ownerId = loginState.username, saleId = saleId, currentOnSaleIds = currentOnSaleIds)
+                _ <- masterNFTOwners.Service.addRandomNFTsToSale(collectionId = collection.id, nfts = createData.nftForSale, creatorId = loginState.username, saleId = saleId)
               } yield ()
             } else errors.head.throwFutureBaseException()
           }
@@ -102,11 +98,9 @@ class SaleController @Inject()(
 
           (for {
             collection <- collection
-            whitelistIds <- whitelistIds
             whitelistMembers <- whitelistMembers
-            currentOnSaleIds <- currentOnSaleIds(whitelistIds)
-            countNFts <- countNFts(currentOnSaleIds)
-            _ <- addToSale(collection = collection, countNFts = countNFts, currentOnSaleIds = currentOnSaleIds)
+            countNFts <- countNFts
+            _ <- addToSale(collection = collection, countNFts = countNFts)
             _ <- collectionsAnalysis.Utility.onCreateSale(collection.id, totalListed = createData.nftForSale, salePrice = createData.price)
           } yield {
             sendNotifications(whitelistMembers, collection.name)

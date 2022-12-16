@@ -10,6 +10,7 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import utilities.MicroNumber
 import views.base.companion.UploadFile
 import views.collection.companion._
 
@@ -187,7 +188,7 @@ class CollectionController @Inject()(
           collectionAnalysis <- collectionAnalysis
           sales <- sales
           saleStatus <- saleStatus(sales)
-        } yield Ok(s"${collectionAnalysis.totalNFTs.toString}|${collectionAnalysis.salePrice.toString}|${saleStatus}")
+        } yield Ok(s"${collectionAnalysis.totalNFTs.toString}|${sales.sortBy(_.price).headOption.fold(MicroNumber.zero)(_.price).toString}|${saleStatus}")
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }
@@ -449,19 +450,13 @@ class CollectionController @Inject()(
       )
   }
 
-  def countAccountNFTsNotOnSale(collectionId: String, accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def countCreatorNFTsNotOnSale(collectionId: String, accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val whitelistIds = masterWhitelists.Service.getAllByOwner(accountId)
-
-        def currentOnSaleIds(whitelistIds: Seq[String]) = masterSales.Service.getIdsCurrentOnSaleByWhitelistIds(whitelistIds)
-
-        def countNFts(currentOnSaleIds: Seq[String]) = masterNFTOwners.Service.countForOwnerNotOnSale(collectionId = collectionId, currentOnSaleIds = currentOnSaleIds, ownerId = accountId)
+        val countNFts = masterNFTOwners.Service.countForCreatorNotOnSale(collectionId = collectionId, creatorId = accountId)
 
         (for {
-          whitelistIds <- whitelistIds
-          currentOnSaleIds <- currentOnSaleIds(whitelistIds)
-          countNFts <- countNFts(currentOnSaleIds)
+          countNFts <- countNFts
         } yield Ok(countNFts.toString)
           ).recover {
           case _: BaseException => BadRequest("0")
