@@ -338,6 +338,10 @@ profileContainer .item-sticky .profile-card{
     top:50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    transition: all 0.5s ease-in-out;
+}
+.single-profile-card:hover .hero-img img{
+    transform: translate(-50%, -50%) scale(1.15);
 }
 @media (max-width: 992px){
     .single-profile-card .hero-img{
@@ -526,6 +530,10 @@ profileContainer .item-sticky .profile-card{
     margin: auto;
     object-fit: contain;
     aspect-ratio: 1/1;
+    transition: all .5s ease-in-out;
+}
+.nft-list .card:hover .card-img img{
+    transform: scale(1.15);
 }
 @media (min-width: 1200px) {
     .nft-list .card .card-img img{
