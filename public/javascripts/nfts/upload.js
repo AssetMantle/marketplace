@@ -8,13 +8,14 @@ function onSuccessfulUpload(fileHash) {
     setFileName();
 }
 
-function passCollectionId(id){
+function passCollectionId(id) {
     collectionId = id;
 }
 
-function setFileName(){
-    if(hashData !== "" && collectionId !== ""){
+function setFileName() {
+    if (hashData !== "" && collectionId !== "") {
+        const nftId = hashData.split(".")[0];
         $("#uploadNftNextButton").removeClass("disable");
-        $("#uploadNftNextButton").attr("onclick",`getForm(jsRoutes.controllers.NFTController.basicDetailsForm("${collectionId}","${hashData}"))`);
+        $("#uploadNftNextButton").attr("onclick", `getForm(jsRoutes.controllers.NFTController.basicDetailsForm("${collectionId}","${nftId}"))`);
     }
 }
