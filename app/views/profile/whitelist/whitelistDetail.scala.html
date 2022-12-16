@@ -32,7 +32,7 @@
             <div class="col">
                 <div class="d-flex gap-3 align-items-center field">
                     <div class="fieldTitle">@Messages(constants.View.WHITELIST_DETAIL_FIELD_TITLE_STATUS)</div>
-                    <div class="fieldValue">
+                    <div class="fieldValue" id="whitelistStatus_@whitelist.id">
                         <div class="statusOptions">
                             <div class="option notStarted active">
                                 <div class="d-flex gap-2 align-items-center">
@@ -116,7 +116,7 @@
                                         <td class="tableFieldStatus" id="saleStatus_@sale.collectionId">
                                           <div class="hidden status">@sale.getStatus</div>
                                             <div class="statusOptions">
-                                                <div class="option notStarted active">
+                                                <div class="option notStarted">
                                                     <div class="d-flex gap-2 align-items-center">
                                                         <div class="statusBadge notStarted"></div>
                                                         <span>@Messages(constants.View.WHITELIST_DETAIL_FIELD_VALUE_STATUS_NOT_STARTED)</span>
@@ -161,6 +161,6 @@
     }
 </div>
 <script>
-    setOffersStatus('@whitelist.startEpoch', '@whitelist.endEpoch');
+    setOffersStatus('whitelistStatus_@whitelist.id', '@whitelist.startEpoch', '@whitelist.endEpoch');
     setBackButton();
 </script>
