@@ -14,7 +14,7 @@
                 <img src="@uri">
             }
             <div class="badgeText">
-                @commonStringValue(message = collection.name, id = utilities.IdGenerator.getRandomHexadecimal, length = 8, showToolTip = false)
+                @commonStringValue(message = collection.name, id = utilities.IdGenerator.getRandomHexadecimal, length = 12, showToolTip = false)
             </div>
         </div>
         <div class="separator"></div>
@@ -22,7 +22,7 @@
         <div class="d-flex gap-2 align-items-center badgeImageText" onclick="viewProfile('@collection.creatorId/@constants.View.CREATED')">
             <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
             <div class="badgeText">
-            @commonStringValue(message = collection.creatorId, id = utilities.IdGenerator.getRandomHexadecimal, length = 8, showToolTip = false)
+            @commonStringValue(message = collection.creatorId, id = utilities.IdGenerator.getRandomHexadecimal, length = 12, showToolTip = false)
             </div>
         </div>
         <div class="separator"></div>
@@ -30,7 +30,7 @@
         <div class="d-flex gap-2 align-items-center badgeImageText" onclick="viewProfile('@nftOwner.ownerId/@constants.View.COLLECTED')">
             <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
             <div class="badgeText">
-            @commonStringValue(message = nftOwner.ownerId, id = utilities.IdGenerator.getRandomHexadecimal, length = 8, showToolTip = false)
+            @commonStringValue(message = nftOwner.ownerId, id = utilities.IdGenerator.getRandomHexadecimal, length = 12, showToolTip = false)
             </div>
         </div>
     </div>

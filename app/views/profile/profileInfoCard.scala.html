@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base.commonAddressValue
+@import views.html.base.commonStringValue
 
 @(accountId: String, address: String, createdOn: Long)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
@@ -7,9 +8,11 @@
     <div class="card leftInfoCard">
         <div class="d-flex align-items-center profileHeader">
             <div class="profileImage">
-                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
+                <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
             </div>
-            <div class="profileName">@accountId</div>
+            <div class="profileName">
+                @commonStringValue(message = accountId, id = utilities.IdGenerator.getRandomHexadecimal, length = 12)
+            </div>
         </div>
         <div class="row p-2 mx-0 mt-3 justify-content-between align-items-center userAddressBox">
             <div class="col-10 p-0 userAddressData username-data" data-value="@address">
