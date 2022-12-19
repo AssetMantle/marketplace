@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import models.master.{Sale, Whitelist}
 
-@(whitelist: Whitelist, totalMembers: Int, sales: Seq[Sale])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(whitelist: Whitelist, totalMembers: Int, sales: Seq[Sale], collectionOnSales: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div class="singleItemDetailContainer">
 
@@ -111,7 +111,7 @@
                                 @sales.zipWithIndex.map { case (sale, index) =>
                                     <tr>
                                         <td class="text-end tableFieldNo">@(index + 1)</td>
-                                        <td class="tableFieldName">@sale.collectionId</td>
+                                        <td onclick="viewCollection('@sale.collectionId')" class="tableFieldName">@collectionOnSales.getOrElse(sale.collectionId, sale.collectionId)</td>
                                         <td class="tableFieldStatus" id="saleStatus_@sale.collectionId">
                                           <div class="hidden status">@sale.getStatus</div>
                                             <div class="statusOptions">

@@ -291,12 +291,14 @@ class WhitelistController @Inject()(
         val whitelist = masterWhitelists.Service.tryGet(whitelistId)
         val members = masterWhitelistMembers.Service.getWhitelistsMemberCount(whitelistId)
         val sales = masterSales.Service.getByWhitelistId(whitelistId)
+        def collectionOnSales(collectionIds: Seq[String]) = masterCollections.Service.getCollectionNames(collectionIds)
 
         (for {
           whitelist <- whitelist
           members <- members
           sales <- sales
-        } yield Ok(views.html.profile.whitelist.whitelistDetail(whitelist = whitelist, totalMembers = members, sales = sales))
+          collectionOnSales <- collectionOnSales(sales.map(_.collectionId))
+        } yield Ok(views.html.profile.whitelist.whitelistDetail(whitelist = whitelist, totalMembers = members, sales = sales, collectionOnSales = collectionOnSales))
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }
