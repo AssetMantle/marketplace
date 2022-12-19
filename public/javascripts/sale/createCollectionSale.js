@@ -24,6 +24,9 @@ $("#SELECT_COLLECTION_ID_field .custom-option").on("click", function () {
 function setCreateSaleCollectionId(collectionId) {
     let userId = $(".loginUserName").text();
     onCollectionSelect(`${collectionId}`, `${userId}`);
+    let selectedCollectionId = $("#SELECT_COLLECTION_ID").val();
+    let selectedCollection =  $(`#SELECT_COLLECTION_ID option[value=${selectedCollectionId}]`).text();
+    $("#SELECT_COLLECTION_ID").closest("div").find(".custom-select-trigger").text(selectedCollection);
 }
 
 function setSaleNFTValue(e) {
@@ -38,7 +41,6 @@ function setSaleNFTValue(e) {
 if ($("#SELECT_WHITELIST_ID").val() !== "") {
     let whitelistId = $("#SELECT_WHITELIST_ID").val();
     let selectedWhitelist =  $(`#SELECT_WHITELIST_ID option[value=${whitelistId}]`).text();
-    console.log(selectedWhitelist);
     $("#SELECT_WHITELIST_ID").closest("div").find(".custom-select-trigger").text(selectedWhitelist);
 }
 
