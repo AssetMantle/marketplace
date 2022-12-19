@@ -154,6 +154,7 @@ class Collections @Inject()(
 
     def countCreated(accountId: String): Future[Int] = filterAndCount(_.creatorId === accountId)
 
+    def getCollectionNames(ids: Seq[String]): Future[Map[String, String]] = filter(_.id.inSet(ids)).map(_.map(x => x.id -> x.name).toMap)
 
   }
 }

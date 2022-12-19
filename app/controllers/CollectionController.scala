@@ -155,9 +155,11 @@ class CollectionController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
+        val collection = masterCollections.Service.tryGet(id)
         (for {
           collectionAnalysis <- collectionAnalysis
-        } yield Ok(views.html.collection.details.collectionAnalysis(collectionAnalysis))
+          collection <- collection
+        } yield Ok(views.html.collection.details.collectionAnalysis(collectionAnalysis, collection))
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }
