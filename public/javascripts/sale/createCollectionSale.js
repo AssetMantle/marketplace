@@ -21,6 +21,11 @@ $("#SELECT_COLLECTION_ID_field .custom-option").on("click", function () {
     onCollectionSelect(`${collectionId}`, `${userId}`);
 });
 
+function setCreateSaleCollectionId(collectionId) {
+    let userId = $(".loginUserName").text();
+    onCollectionSelect(`${collectionId}`, `${userId}`);
+}
+
 function setSaleNFTValue(e) {
     let fieldValue = e.target.value;
     let totalOwnedNFT = $("#collectionOwnedNFTs").text();

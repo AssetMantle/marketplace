@@ -37,3 +37,6 @@
     @commonInputEpochTIme(createSaleForm, constants.FormField.NFT_SALE_END_EPOCH, setCurrentTime = false)
 }
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/sale/createCollectionSale.js")" type="text/javascript"></script>
+    @if(collectionId.getOrElse("") != "") {
+        <script>setCreateSaleCollectionId('@collectionId.get')</script>
+    }
