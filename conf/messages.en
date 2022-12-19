@@ -608,7 +608,7 @@ URL_ERROR_PREFIX.COLLECTION_INSTAGRAM=Invalid instagram URL!
 DROP_FILE=Drop file here
 OR=Or
 BROWSE=Browse
-UPLOAD=Upload
+UPLOAD=Click to upload
 DECIMAL=Number
 
 #Notification popup
