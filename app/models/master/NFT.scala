@@ -106,6 +106,6 @@ class NFTs @Inject()(
         _ <- update(nft.copy(isMinted = true))
       } yield nft.copy(isMinted = true)
 
-    def getRandomNFTs(collectionId: String, n: Int, filterOut: Seq[String]): Future[Seq[String]] = filter(x => x.collectionId === collectionId && !x.id.inSet(filterOut)).map(x => util.Random.shuffle(x.map(_.id)).take(n))
+    def getRandomNFTs(collectionId: String, n: Int, filterOut: Seq[String]): Future[Seq[NFT]] = filter(x => x.collectionId === collectionId && !x.id.inSet(filterOut)).map(util.Random.shuffle(_).take(n))
   }
 }

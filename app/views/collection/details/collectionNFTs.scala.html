@@ -1,6 +1,8 @@
 @import controllers.actions.LoginState
+@import models.master.Sale
+@import models.master.NFT
 
-@(collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(collection: master.Collection, sales: Seq[Sale], randomNFTs: Seq[NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 <div class="item item-center nftContainer">
     <div class="profileCover">
@@ -17,28 +19,32 @@
             }
         </div>
     </div>
-    <div class="profile-card">
-        <div class="profiles-container">
-            <div class="nft-list">
-                <div class="nft-list-container">
-                    <div id="nftsPerPage" class="row m-0 nftsPerPage">
+    @if(sales.isEmpty) {
+        <div class="profile-card">
+            <div class="profiles-container">
+                <div class="nft-list">
+                    <div class="nft-list-container">
+                        <div id="nftsPerPage" class="row m-0 nftsPerPage">
+                        </div>
                     </div>
+                        <!-- Loader -->
+                    <div class="loading">
+                        <div class="ball"></div>
+                        <div class="ball"></div>
+                        <div class="ball"></div>
+                    </div>
+                        <!-- End -->
                 </div>
-                    <!-- Loader -->
-                <div class="loading">
-                    <div class="ball"></div>
-                    <div class="ball"></div>
-                    <div class="ball"></div>
-                </div>
-                    <!-- End -->
             </div>
         </div>
-    </div>
+        <link href="@utilities.PublicResource.getVersionedRoute("stylesheets/explorer.css")"/>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/loadMore.js")" type="text/javascript"></script>
+        <script>
+                loadFirstNFTs('@collection.id');
+                checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection('@collection.id').url, '@collection.id', "collection");
+                window.onscroll = function() { loadArtNftOnScroll('@{collection.id}'); }
+        </script>
+    } else {
+        <div id="collectionSaleNFTs"></div>
+    }
 </div>
-<link href="@utilities.PublicResource.getVersionedRoute("stylesheets/explorer.css")"/>
-<script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/loadMore.js")" type="text/javascript"></script>
-<script>
-        loadFirstNFTs('@collection.id');
-        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection('@collection.id').url, '@collection.id', "collection");
-        window.onscroll = function() { loadArtNftOnScroll('@{collection.id}'); }
-</script>

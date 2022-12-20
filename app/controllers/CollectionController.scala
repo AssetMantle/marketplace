@@ -106,10 +106,15 @@ class CollectionController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
+        val sales = masterSales.Service.getAllSalesByCollectionId(id)
+
+        def randomNFTs(sale: Boolean) = if (sale) masterNFTs.Service.getRandomNFTs(id, 5, Seq.empty) else Future(Seq())
 
         (for {
           collection <- collection
-        } yield Ok(views.html.collection.details.collectionNFTs(collection))
+          sales <- sales
+          randomNFTs <- randomNFTs(sales.nonEmpty)
+        } yield Ok(views.html.collection.details.collectionNFTs(collection, sales, randomNFTs))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
