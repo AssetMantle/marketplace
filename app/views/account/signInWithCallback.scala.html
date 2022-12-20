@@ -26,7 +26,7 @@
                                 <i class="bi bi-eye iconDefault"></i>
                             </span>
                         </div>
-                        @commonInputPassword(signInWithCallbackForm, constants.FormField.PASSWORD, 'id -> "signInPassword")
+                        @commonInputPassword(signInWithCallbackForm, constants.FormField.PASSWORD, Symbol("id") -> "signInPassword")
                         @commonFieldErrorMessage(id = "incorrectPasswordError", message = Messages(constants.View.INCORRECT_PASSWORD))
                         </div>
                     </div>
