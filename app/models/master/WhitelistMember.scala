@@ -90,9 +90,13 @@ class WhitelistMembers @Inject()(
 
     def getAllMembers(id: String): Future[Seq[String]] = filter(_.whitelistId === id).map(_.map(_.accountId))
 
+    def getAllMembers(ids: Seq[String]): Future[Seq[String]] = filter(_.whitelistId.inSet(ids)).map(_.map(_.accountId).distinct)
+
     def totalJoined(accountId: String): Future[Int] = filterAndCount(_.accountId === accountId)
 
     def isMember(whitelistId: String, accountId: String): Future[Boolean] = exists(id1 = whitelistId, id2 = accountId)
+
+    def isMember(whitelistIds: Seq[String], accountId: String): Future[Boolean] = filterAndExists(x => x.whitelistId.inSet(whitelistIds) && x.accountId === accountId)
 
     def deleteAllMembers(whitelistId: String): Future[Int] = filterAndDelete(_.whitelistId === whitelistId)
 

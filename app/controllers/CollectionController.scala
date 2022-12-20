@@ -36,6 +36,7 @@ class CollectionController @Inject()(
                                       masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                       masterCollectionFiles: master.CollectionFiles,
                                       masterWhitelists: master.Whitelists,
+                                      masterWhitelistMembers: master.WhitelistMembers,
                                       masterWishLists: master.WishLists,
                                       utilitiesNotification: utilities.Notification,
                                     )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -156,19 +157,30 @@ class CollectionController @Inject()(
     }
   }
 
-  def analysis(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
-        val collection = masterCollections.Service.tryGet(id)
-        (for {
-          collectionAnalysis <- collectionAnalysis
-          collection <- collection
-        } yield Ok(views.html.collection.details.collectionAnalysis(collectionAnalysis, collection))
-          ).recover {
-          case baseException: BaseException => BadRequest(baseException.failure.message)
-        }
-    }
+  def topRightCard(id: String): Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
+    implicit request =>
+      val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
+      val collection = masterCollections.Service.tryGet(id)
+
+      def getSalesInfo(collection: Collection) = if (optionalLoginState.isDefined) {
+        val sales = masterSales.Service.getAllSalesByCollectionId(id)
+
+        def isMember(whitelistIds: Seq[String]) = masterWhitelistMembers.Service.isMember(whitelistIds, optionalLoginState.get.username)
+
+        for {
+          sales <- sales
+          isMember <- isMember(sales.map(_.whitelistId))
+        } yield (sales, isMember)
+      } else Future(Seq(), false)
+
+      (for {
+        collectionAnalysis <- collectionAnalysis
+        collection <- collection
+        (sales, isMember) <- getSalesInfo(collection)
+      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis, collection, sales, isMember))
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
   }
 
   def commonCardInfo(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
@@ -187,7 +199,7 @@ class CollectionController @Inject()(
           if (activeSale.isEmpty) Future(3) else {
             for {
               allSold <- allSold(activeSale.get.id)
-            } yield activeSale.get.getStatus(allSold)
+            } yield activeSale.get.getStatus(allSold).id
           }
         }
 

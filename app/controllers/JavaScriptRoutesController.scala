@@ -35,7 +35,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.collectionNFTs,
         routes.javascript.CollectionController.collectionNFTsPerPage,
         routes.javascript.CollectionController.info,
-        routes.javascript.CollectionController.analysis,
+        routes.javascript.CollectionController.topRightCard,
         routes.javascript.CollectionController.commonCardInfo,
         routes.javascript.CollectionController.createdSection,
         routes.javascript.CollectionController.createdCollectionPerPage,

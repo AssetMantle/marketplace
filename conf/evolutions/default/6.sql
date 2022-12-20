@@ -101,17 +101,18 @@ CREATE TABLE IF NOT EXISTS MASTER."Sale"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."BuyNFTTransaction"
 (
-    "buyerAccountId"       VARCHAR NOT NULL,
-    "sellerAccountId"      VARCHAR NOT NULL,
     "txHash"               VARCHAR NOT NULL UNIQUE,
     "nftId"                VARCHAR NOT NULL,
+    "buyerAccountId"       VARCHAR NOT NULL,
+    "sellerAccountId"      VARCHAR NOT NULL,
     "saleId"               VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("buyerAccountId", "sellerAccountId", "txHash")
+    PRIMARY KEY ("txHash", "nftId"),
+    UNIQUE ("buyerAccountId", "sellerAccountId", "txHash", "nftId")
 );
 
 ALTER TABLE BLOCKCHAIN_TRANSACTION."SendCoin"
@@ -229,6 +230,12 @@ ALTER TABLE MASTER."NFTOwner"
 ALTER TABLE MASTER."Sale"
     ADD CONSTRAINT Sale_WhitelistId FOREIGN KEY ("whitelistId") REFERENCES MASTER."Whitelist" ("id");
 
+ALTER TABLE MASTER_TRANSACTION."BuyNFTTransaction"
+    ADD CONSTRAINT BuyNFTTransaction_BuyerAccountId FOREIGN KEY ("buyerAccountId") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."BuyNFTTransaction"
+    ADD CONSTRAINT BuyNFTTransaction_SellerAccountId FOREIGN KEY ("sellerAccountId") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."BuyNFTTransaction"
+    ADD CONSTRAINT BuyNFTTransaction_NFTId FOREIGN KEY ("nftId") REFERENCES MASTER."NFT" ("id");
 ALTER TABLE MASTER_TRANSACTION."BuyNFTTransaction"
     ADD CONSTRAINT BuyNFTTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."BuyNFT" ("txHash");
 

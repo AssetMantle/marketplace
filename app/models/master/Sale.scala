@@ -12,21 +12,20 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Sale(id: String, whitelistId: String, collectionId: String, numberOfNFTs: Long, maxMintPerAccount: Long, price: MicroNumber, denom: String, startTimeEpoch: Long, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def getStatus(allSold: Boolean): Int = {
+  def getStatus(allSold: Boolean): constants.Sale.Status = {
     val currentEpoch = System.currentTimeMillis() / 1000
-    if (allSold && currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) 2 // Sold out
-    else if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) 1 // Live
-    else if (currentEpoch >= this.endTimeEpoch) 3 // Expired
-    else 0 //
+    if (allSold && currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.Sale.SOLD_OUT // Sold out
+    else if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.Sale.LIVE // Live
+    else if (currentEpoch >= this.endTimeEpoch) constants.Sale.EXPIRED // Expired
+    else constants.Sale.NOT_STARTED //
   }
 
-  def getStatus: String = {
+  def getStatus: constants.Sale.Status = {
     val currentEpoch = System.currentTimeMillis() / 1000
-    if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.View.SALE_ONGOING
-    else if (currentEpoch >= this.endTimeEpoch) constants.View.SALE_EXPIRED
-    else constants.View.SALE_NOT_STARTED
+    if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.Sale.LIVE
+    else if (currentEpoch >= this.endTimeEpoch) constants.Sale.EXPIRED
+    else constants.Sale.NOT_STARTED
   }
-
 
   def serialize(): Sales.SaleSerialized = Sales.SaleSerialized(
     id = this.id,

@@ -80,6 +80,7 @@ object FormField {
   val WHITELIST_MAX_MEMBERS: IntFormField = IntFormField("WHITELIST_MAX_MEMBERS", 1, Int.MaxValue)
   val SALE_NFT_NUMBER: IntFormField = IntFormField("SALE_NFT_NUMBER", 1, Int.MaxValue)
   val SALE_MAX_MINT_PER_ACCOUNT: IntFormField = IntFormField("SALE_MAX_MINT_PER_ACCOUNT", 1, Int.MaxValue)
+  val SALE_BUY_NFT_NUMBER: IntFormField = IntFormField("SALE_BUY_NFT_NUMBER", 1, Int.MaxValue)
 
 
   // DoubleFormField

@@ -49,7 +49,7 @@ GET         /collectionsPerPage                               controllers.Collec
 GET         /collectionNFTs                                   controllers.CollectionController.collectionNFTs(id: String)
 GET         /collectionNFTsPerPage                            controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionInfo                                   controllers.CollectionController.info(id: String)
-GET         /collectionAnalysis                               controllers.CollectionController.analysis(id: String)
+GET         /collectionAnalysis                               controllers.CollectionController.topRightCard(id: String)
 GET         /commonCardInfo                                   controllers.CollectionController.commonCardInfo(id: String)
 GET         /created                                          controllers.CollectionController.createdSection(accountId: String)
 GET         /createdCollectionPerPage                         controllers.CollectionController.createdCollectionPerPage(accountId: String, pageNumber: Int)
@@ -160,7 +160,7 @@ POST        /editWhitelist                                    controllers.Whitel
 
 GET         /createSale                                       controllers.SaleController.createCollectionSaleForm(whitelistId: Option[String], collectionId: Option[String])
 POST        /createSale                                       controllers.SaleController.createCollectionSale()
-GET         /buySaleNFT                                       controllers.SaleController.buySaleNFTForm(saleId: String,nftId: String, mintNft: Boolean)
+GET         /buySaleNFT                                       controllers.SaleController.buySaleNFTForm(saleId: String, mintNft: Boolean)
 POST        /buySaleNFT                                       controllers.SaleController.buySaleNFT()
 
 # Should be not changed it will be public
