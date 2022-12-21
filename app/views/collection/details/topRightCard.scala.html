@@ -30,29 +30,78 @@
             }
         } else {
             @defining(sales.minBy(_.price)) { saleByMinimumPrice =>
-                <div class="d-flex flex-column gap-1">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="title">@Messages(constants.View.WHITELIST_SALE_TITLE)</div>
+                    @if(saleByMinimumPrice.getStatus.id == constants.Sale.LIVE.id) {
+                        <div class="liveBadge">@Messages(constants.View.SALE_LIVE_LABEL)</div>
+                    }
+                </div>
+                <div class="d-flex align-items-center gap-1 mt-4">
                     <div class="analysisTitle">@Messages(constants.View.COLLECTION_SALE_PRICE)</div>
-                    <div class="analysisValue">@saleByMinimumPrice.price.toString</div>
+                    <div class="analysisValue">@saleByMinimumPrice.price.toString @Messages(constants.View.NFT_SALE_TOKEN_UNITS)</div>
                 </div>
-                <div class="d-flex flex-column gap-1">
-                    <div class="analysisTitle">@Messages(constants.View.COLLECTION_MAXIMUM_MINT_PER_USER)</div>
-                    <div class="analysisValue">@saleByMinimumPrice.maxMintPerAccount</div>
+                <div class="d-flex flex-column gap-1 mt-3">
+                    <div class="analysisValue">@Messages(constants.View.COLLECTION_MAXIMUM_MINT_PER_USER, saleByMinimumPrice.maxMintPerAccount)</div>
                 </div>
-            @if(saleByMinimumPrice.getStatus.id == constants.Sale.NOT_STARTED.id) {
-                <div class="d-flex flex-column gap-1">
-                    <div class="analysisTitle">@Messages(constants.View.SALE_START_TIME)</div>
-                    <div class="analysisValue">@saleByMinimumPrice.startTimeEpoch</div>
-                </div>
-            } else {
-                @if(saleByMinimumPrice.getStatus.id == constants.Sale.SOLD_OUT.id) {
-
-                } else {
-                    <div class="d-flex flex-column gap-1">
-                        <div class="analysisTitle">@Messages(constants.View.SALE_ENDS_IN)</div>
-                        <div class="analysisValue">@saleByMinimumPrice.endTimeEpoch</div>
+                @if(saleByMinimumPrice.getStatus.id == constants.Sale.NOT_STARTED.id) {
+                    <div class="d-flex flex-column gap-1 mt-3">
+                        <div class="analysisTitle">@Messages(constants.View.SALE_START_TIME)</div>
+                        <div id="countdown" class="d-flex gap-2 mt-2 analysisValue">
+                            <div class="d-flex flex-column align-items-center gap-1">
+                                <span id="days"></span>
+                                <span class="analysisTitle">days</span>
+                            </div>
+                            <div class="d-flex flex-column align-items-center gap-1">
+                                <span id="hours"></span>
+                                <span class="analysisTitle">Hours</span>
+                            </div>
+                            <div class="d-flex flex-column align-items-center gap-1">
+                                <span id="minutes"></span>
+                                <span class="analysisTitle">Minutes</span>
+                            </div>
+                            <div class="d-flex flex-column align-items-center gap-1">
+                                <span id="seconds"></span>
+                                <span class="analysisTitle">Seconds</span>
+                            </div>
+                        </div>
                     </div>
+                    <script>setCounter(@saleByMinimumPrice.startTimeEpoch);</script>
+                } else {
+                    @if(saleByMinimumPrice.getStatus.id == constants.Sale.SOLD_OUT.id) {
+
+                    } else {
+                        <div class="d-flex flex-column gap-1 mt-3">
+                            <div class="analysisTitle">@Messages(constants.View.SALE_ENDS_IN)</div>
+                            <div id="countdown" class="d-flex gap-2 mt-2 analysisValue">
+                                <div class="d-flex flex-column align-items-center gap-1">
+                                    <span id="days"></span>
+                                    <span class="analysisTitle">days</span>
+                                </div>
+                                <div class="d-flex flex-column align-items-center gap-1">
+                                    <span id="hours"></span>
+                                    <span class="analysisTitle">Hours</span>
+                                </div>
+                                <div class="d-flex flex-column align-items-center gap-1">
+                                    <span id="minutes"></span>
+                                    <span class="analysisTitle">Minutes</span>
+                                </div>
+                                <div class="d-flex flex-column align-items-center gap-1">
+                                    <span id="seconds"></span>
+                                    <span class="analysisTitle">Seconds</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="separator"></div>
+                        <div class="mintNFTForm">
+                            <div class="label-container">
+                                <label for="numberToMint">@Messages(constants.View.NUMBER_TO_MINT)</label>
+                            </div>
+                            <input type="number" class="mt-2" id="numberToMint"/>
+                            @commonPrimaryButton(Messages(constants.View.MINT_BUTTON), JavaScript(s""), Symbol("class") -> "mt-4")
+                        </div>
+                        <script>setCounter(@saleByMinimumPrice.endTimeEpoch);</script>
+                    }
                 }
-            }
             }
 
         }
