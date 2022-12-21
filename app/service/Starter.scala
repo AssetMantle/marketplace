@@ -159,16 +159,17 @@ class Starter @Inject()(
 
   def start(): Future[Unit] = {
 
-    (for {
-      _ <- updateAccountType()
-      _ <- updateNFTProperties()
-      _ <- updateCollectionAwsFiles()
-      _ <- updateCollectionNFTAwsFiles()
-      _ <- updateSocialURLsAndCollectionFiles()
-    } yield ()
-      ).recover {
-      case exception: Exception => logger.error(exception.getLocalizedMessage)
-    }
+    //    (for {
+    //      _ <- updateAccountType()
+    //      _ <- updateNFTProperties()
+    //      _ <- updateCollectionAwsFiles()
+    //      _ <- updateCollectionNFTAwsFiles()
+    //      _ <- updateSocialURLsAndCollectionFiles()
+    //    } yield ()
+    //      ).recover {
+    //      case exception: Exception => logger.error(exception.getLocalizedMessage)
+    //    }
+    Future()
   }
 
 }
