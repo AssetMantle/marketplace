@@ -915,3 +915,71 @@ body.modal-open{
   padding: 2px 4px;
   border-radius: 5px;
 }
+
+// Collection NFTs on Sale
+.swiper-slide {
+  background-position: center;
+  background-size: cover;
+  width: 220px !important;
+  height: 300px !important;
+  box-shadow: 0 15px 50px rgba(0,0,0,.2);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+#collectionSaleNFTs{
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#collectionSaleNFTs .swiper-container
+{
+  width: 100%;
+  padding-top: 20px;
+  padding-bottom: 50px;
+  overflow: hidden;
+}
+.swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal, .swiper-pagination-custom, .swiper-pagination-fraction{
+  height: 40px;
+}
+#collectionSaleNFTs .swiper-slide img{
+  display: block;
+  width: 100%;
+}
+#collectionSaleNFTs .swiper-slide .imageContainer{
+  height: calc(100% / 1);
+  display: flex;
+  background-color: var(--card-dark);
+  overflow: hidden;
+  border-radius: 10px;
+}
+#collectionSaleNFTs .swiper-slide img{
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  margin: auto;
+  object-fit: contain;
+  aspect-ratio: 1/1;
+}
+#collectionSaleNFTs .swiper-3d .swiper-slide-shadow-left,
+#collectionSaleNFTs .swiper-3d .swiper-slide-shadow-right
+{
+  background-image: none !important;
+}
+#collectionSaleNFTs .swiper-button-next img,
+#collectionSaleNFTs .swiper-button-prev img{
+  width: 20px;
+}
+#collectionSaleNFTs .swiper-button-next,
+#collectionSaleNFTs .swiper-button-prev{
+  margin: -35px 25px;
+  z-index: 9999;
+}
+#collectionSaleNFTs .swiper-button-next::after,
+#collectionSaleNFTs .swiper-button-prev::after{
+  content: '';
+}

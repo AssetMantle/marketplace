@@ -42,9 +42,28 @@
         <script>
                 loadFirstNFTs('@collection.id');
                 checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection('@collection.id').url, '@collection.id', "collection");
-                window.onscroll = function() { loadArtNftOnScroll('@{collection.id}'); }
+                window.onscroll = function () {
+                    loadArtNftOnScroll('@{collection.id}');
+                }
         </script>
     } else {
-        <div id="collectionSaleNFTs"></div>
+        <link rel="stylesheet" type="text/css" href="@routes.Assets.versioned("stylesheets/library/swiper-bundle.min.css")"/>
+        <script src="@routes.Assets.versioned("javascripts/library/swiperBundle.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/library/cssScrollSnap.js")"></script>
+        <div id="collectionSaleNFTs">
+            <div class="swiper-container collectionNFTSwiper">
+                <div class="swiper-wrapper">
+                    @randomNFTs.map { randomNFT =>
+                        <div class="swiper-slide">
+                            <div class="imageContainer">
+                                <img src="@randomNFT.getS3Url"/>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+        <script src="@routes.Assets.versioned("javascripts/collections/nftOnSale.js")"></script>
     }
 </div>
