@@ -77,5 +77,5 @@ function setCounter(inputEpoch){
             if (distance < 0) {
                 clearInterval(x);
             }
-        }, 0)
+        }, 1000);
 }
