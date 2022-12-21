@@ -123,18 +123,19 @@ class CollectionController @Inject()(
   }
 
   def collectionNFTsPerPage(id: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
+    withoutLoginActionAsync { implicit optionalLoginState =>
       implicit request =>
         val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
         else masterCollections.Service.tryGet(id)
-        val likedNFTs = loginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollection(accountId = x.username, collectionId = id))
-        val nfts = masterNFTs.Service.getByPageNumber(id, pageNumber)
+        val likedNFTs = optionalLoginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollection(accountId = x.username, collectionId = id))
 
-        def nftDrafts(collection: Collection) = if (loginState.fold("")(_.username) == collection.creatorId) masterTransactionNFTDrafts.Service.getAllForCollection(id) else Future(Seq())
+        def getNFTs(creatorId: String) = if (optionalLoginState.fold("")(_.username) == creatorId || pageNumber == 1) masterNFTs.Service.getByPageNumber(id, pageNumber) else Future(Seq())
+
+        def nftDrafts(collection: Collection) = if (optionalLoginState.fold("")(_.username) == collection.creatorId) masterTransactionNFTDrafts.Service.getAllForCollection(id) else Future(Seq())
 
         (for {
           collection <- collection
-          nfts <- nfts
+          nfts <- getNFTs(collection.creatorId)
           nftDrafts <- nftDrafts(collection)
           likedNFTs <- likedNFTs
         } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts, likedNFTs, nftDrafts, pageNumber))
