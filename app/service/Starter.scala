@@ -173,12 +173,15 @@ class Starter @Inject()(
 
     def addNFTOwners(accountIds: Seq[String]) = masterNFTOwners.Service.add(accountIds.map(x => NFTOwner(nftId = nftId, ownerId = x, creatorId = creatorId, collectionId = collection.id, quantity = 1, saleId = None)))
 
+    def addAnalytics(accountIds: Seq[String]) = collectionsAnalysis.Service.add(CollectionAnalysis(id = collection.id, totalNFTs = 1, totalMinted = 0, totalSold = 0, totalTraded = 0, floorPrice = 0, salePrice = 0, totalVolumeTraded = 0, bestOffer = 0, listed = 0, owners = accountIds.length, uniqueOwners = accountIds.length))
+
     (for {
       allAccountIds <- allAccountIds
       _ <- addCollection()
       _ <- uploadToAws
       _ <- addNFT(allAccountIds)
       _ <- addNFTOwners(allAccountIds)
+      _ <- addAnalytics(allAccountIds)
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
