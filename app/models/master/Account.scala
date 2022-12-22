@@ -143,5 +143,7 @@ class Accounts @Inject()(
     def getLanguage(id: String): Future[Lang] = get(id).map(x => x.fold(Lang("en"))(_.language))
 
     def checkAccountExists(username: String): Future[Boolean] = exists(username)
+
+    def getAllIds: Future[Seq[String]] = getAll.map(_.map(_.id))
   }
 }
