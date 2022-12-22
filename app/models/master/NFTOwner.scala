@@ -118,7 +118,7 @@ class NFTOwners @Inject()(
 
     def tryGet(nftId: String, ownerId: String): Future[NFTOwner] = tryGetById1AndId2(id1 = nftId, id2 = ownerId)
 
-    def tryGetFirstOwner(nftId: String): Future[NFTOwner] = filterHead(_.id1 === nftId)
+    def getOwners(nftId: String): Future[Seq[NFTOwner]] = filter(_.id1 === nftId)
 
     def checkExists(nftId: String, ownerId: String): Future[Boolean] = exists(id1 = nftId, id2 = ownerId)
 

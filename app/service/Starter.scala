@@ -1,7 +1,8 @@
 package service
 
 import models.analytics.{CollectionAnalysis, CollectionsAnalysis}
-import models.master.{Collection, NFTOwner}
+import models.common.Collection.SocialProfile
+import models.master.{Collection, NFT, NFTOwner}
 import models.{blockchainTransaction, master, masterTransaction}
 import play.api.libs.json.Reads
 import play.api.{Configuration, Logger}
@@ -30,8 +31,6 @@ class Starter @Inject()(
   private implicit val module: String = constants.Module.STARTER_SERVICE
 
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private val uploadCollectionDraftFilePath = constants.CommonConfig.Files.CollectionPath + "/upload.json"
 
   def getListOfFiles(dir: String): List[String] = {
     val file = new File(dir)
@@ -146,12 +145,53 @@ class Starter @Inject()(
     }
   }
 
+  private def addChristmasNFT() = {
+    val collectionName = "Christmas"
+    val collectionDescription = "collectionDescription"
+    val filePath = constants.CommonConfig.Files.CollectionPath + "/christmas.gif"
+    val allAccountIds = masterAccounts.Service.getAllIds
+
+    val creatorId = "abhinav95"
+    val nftName = "X-Mas"
+    val nftDescription = "nftDescription"
+    val socialProfiles = Seq(
+      SocialProfile(name = constants.Collection.SocialProfile.WEBSITE, url = "https://assetmantle.one/"),
+      SocialProfile(name = constants.Collection.SocialProfile.TWITTER, url = "AssetMantle/"),
+      SocialProfile(name = constants.Collection.SocialProfile.INSTAGRAM, url = "assetmantle")
+    )
+    val collection = Collection(id = "D4C3FD5554AEDB64", creatorId = creatorId, classificationId = None, name = collectionName, description = collectionDescription, socialProfiles = socialProfiles, category = constants.Collection.Category.ART, nsfw = false, properties = None, profileFileName = None, coverFileName = None, public = true)
+    val nftId = utilities.FileOperations.getFileHash(filePath)
+    val fileExtension = "gif"
+    val newFileName = nftId + "." + fileExtension
+    val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collection.id, fileName = newFileName)
+
+    def addCollection() = masterCollections.Service.add(collection)
+
+    def uploadToAws = Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = filePath))
+
+    def addNFT(accountIds: Seq[String]) = masterNFTs.Service.add(NFT(id = nftId, collectionId = collection.id, name = nftName, description = nftDescription, totalSupply = accountIds.length, isMinted = false, fileExtension = fileExtension, ipfsLink = "", edition = None))
+
+    def addNFTOwners(accountIds: Seq[String]) = masterNFTOwners.Service.add(accountIds.map(x => NFTOwner(nftId = nftId, ownerId = x, creatorId = creatorId, collectionId = collection.id, quantity = 1, saleId = None)))
+
+    (for {
+      allAccountIds <- allAccountIds
+      _ <- addCollection()
+      _ <- uploadToAws
+      _ <- addNFT(allAccountIds)
+      _ <- addNFTOwners(allAccountIds)
+    } yield ()
+      ).recover {
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+    }
+  }
+
   def start(): Unit = {
     try {
       Await.result(correctNotifications(), Duration.Inf)
       Await.result(updateAccountType(), Duration.Inf)
       Await.result(updateCollectionAnalysis(), Duration.Inf)
       Await.result(addNFTOwners(), Duration.Inf)
+      Await.result(addChristmasNFT(), Duration.Inf)
     } catch {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
