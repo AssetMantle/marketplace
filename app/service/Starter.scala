@@ -175,6 +175,8 @@ class Starter @Inject()(
 
     def addAnalytics(accountIds: Seq[String]) = collectionsAnalysis.Service.add(CollectionAnalysis(id = collection.id, totalNFTs = 1, totalMinted = 0, totalSold = 0, totalTraded = 0, floorPrice = 0, salePrice = 0, totalVolumeTraded = 0, bestOffer = 0, listed = 0, owners = accountIds.length, uniqueOwners = accountIds.length))
 
+    def addNotification(allAccountIds: Seq[String]) = masterTransactionNotifications.Service.add(accountIDs = allAccountIds, notification = constants.Notification.NFT_GIFTED, nftName)(s"'${nftId}'")
+
     (for {
       allAccountIds <- allAccountIds
       _ <- addCollection()
@@ -182,6 +184,7 @@ class Starter @Inject()(
       _ <- addNFT(allAccountIds)
       _ <- addNFTOwners(allAccountIds)
       _ <- addAnalytics(allAccountIds)
+      _ <- addNotification(allAccountIds)
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)

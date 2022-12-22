@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Sale"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."BuyNFTTransaction"
 (
-    "txHash"               VARCHAR NOT NULL UNIQUE,
+    "txHash"               VARCHAR NOT NULL,
     "nftId"                VARCHAR NOT NULL,
     "buyerAccountId"       VARCHAR NOT NULL,
     "sellerAccountId"      VARCHAR NOT NULL,

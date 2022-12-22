@@ -24,6 +24,7 @@ class TransactionComplete @Inject()(
                                      masterWhitelistMembers: master.WhitelistMembers,
                                      masterTransactionBuyNFTTransactions: masterTransaction.BuyNFTTransactions,
                                      utilitiesNotification: utilities.Notification,
+                                     utilitiesOperations: utilities.Operations,
                                    )(implicit executionContext: ExecutionContext) {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -31,44 +32,43 @@ class TransactionComplete @Inject()(
   private implicit val module: String = constants.Module.UTILITIES_SALE
 
   def onBuyNFT(transaction: Transaction, price: MicroNumber): Future[Unit] = if (transaction.status) {
-    val buyNFTTx = masterTransactionBuyNFTTransactions.Service.tryGetByTxHash(transaction.hash)
+    val boughtNFTs = masterTransactionBuyNFTTransactions.Service.getByTxHash(transaction.hash)
     val markMasterSuccess = masterTransactionBuyNFTTransactions.Service.markSuccess(transaction.hash)
 
-    def transferNFTOwnership(buyNFTTx: BuyNFTTransaction) = masterNFTOwners.Service.markNFTSold(nftId = buyNFTTx.nftId, saleId = buyNFTTx.saleId, sellerAccountId = buyNFTTx.sellerAccountId, buyerAccountId = buyNFTTx.buyerAccountId)
+    def transferNFTOwnership(boughtNFTs: Seq[BuyNFTTransaction]) = utilitiesOperations.traverse(boughtNFTs){ boughtNFT =>
+      masterNFTOwners.Service.markNFTSold(nftId = boughtNFT.nftId, saleId = boughtNFT.saleId, sellerAccountId = boughtNFT.sellerAccountId, buyerAccountId = boughtNFT.buyerAccountId)
+    }
 
     def nft(buyNFTTx: BuyNFTTransaction) = masterNFTs.Service.tryGet(buyNFTTx.nftId)
 
     def analysisUpdate(nft: NFT) = collectionsAnalysis.Utility.onSale(collectionId = nft.collectionId, price = price)
 
-    def sendNotifications(nft: NFT, buyNFTTx: BuyNFTTransaction) = {
-      utilitiesNotification.send(buyNFTTx.sellerAccountId, constants.Notification.SELLER_BUY_NFT_SUCCESSFUL, nft.name)(s"'${nft.id}'")
-      utilitiesNotification.send(buyNFTTx.buyerAccountId, constants.Notification.BUYER_BUY_NFT_SUCCESSFUL, nft.name)(s"'${nft.id}'")
+    def sendNotifications(boughtNFT: BuyNFTTransaction, count: Int) = {
+      utilitiesNotification.send(boughtNFT.sellerAccountId, constants.Notification.SELLER_BUY_NFT_SUCCESSFUL, count.toString)("")
+      utilitiesNotification.send(boughtNFT.buyerAccountId, constants.Notification.BUYER_BUY_NFT_SUCCESSFUL, count.toString)(s"'${boughtNFT.buyerAccountId}', '${constants.View.COLLECTED}'")
     }
 
     (for {
-      buyNFTTx <- buyNFTTx
-      _ <- transferNFTOwnership(buyNFTTx)
+      boughtNFTs <- boughtNFTs
+      _ <- transferNFTOwnership(boughtNFTs)
       _ <- markMasterSuccess
-      nft <- nft(buyNFTTx)
+      nft <- nft(boughtNFTs.head)
       _ <- analysisUpdate(nft)
-      _ <- sendNotifications(nft, buyNFTTx)
+      _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
     } yield ()
       ).recover {
       case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
     }
   } else {
-    val buyNFTTx = masterTransactionBuyNFTTransactions.Service.tryGetByTxHash(transaction.hash)
+    val boughtNFTs = masterTransactionBuyNFTTransactions.Service.getByTxHash(transaction.hash)
     val markMasterFailed = masterTransactionBuyNFTTransactions.Service.markFailed(transaction.hash)
 
-    def nft(buyNFTTx: BuyNFTTransaction) = masterNFTs.Service.tryGet(buyNFTTx.nftId)
-
-    def sendNotifications(nft: NFT, buyNFTTx: BuyNFTTransaction) = utilitiesNotification.send(buyNFTTx.buyerAccountId, constants.Notification.BUYER_BUY_NFT_FAILED, nft.name)(s"'${nft.id}'")
+    def sendNotifications(buyNFTTx: BuyNFTTransaction, count: Int) = utilitiesNotification.send(buyNFTTx.buyerAccountId, constants.Notification.BUYER_BUY_NFT_FAILED, count.toString)("")
 
     (for {
-      buyNFTTx <- buyNFTTx
+      boughtNFTs <- boughtNFTs
       _ <- markMasterFailed
-      nft <- nft(buyNFTTx)
-      _ <- sendNotifications(nft, buyNFTTx)
+      _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
     } yield ()
       ).recover {
       case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")

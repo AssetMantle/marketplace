@@ -92,13 +92,7 @@
                             </div>
                         </div>
                         <div class="separator"></div>
-                        <div class="mintNFTForm">
-                            <div class="label-container">
-                                <label for="numberToMint">@Messages(constants.View.NUMBER_TO_MINT)</label>
-                            </div>
-                            <input type="number" class="mt-2" id="numberToMint"/>
-                            @commonPrimaryButton(Messages(constants.View.MINT_BUTTON), JavaScript(s""), Symbol("class") -> "mt-4")
-                        </div>
+                        @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SaleController.buySaleNFTForm('${saleByMinimumPrice.id}', false))"), Symbol("class") -> "mt-4")
                         <script>setCounter(@saleByMinimumPrice.endTimeEpoch);</script>
                     }
                 }
@@ -107,5 +101,4 @@
         }
     </div>
 </div>
-<script src="@routes.Assets.versioned("javascripts/collections/loadMore.js")"></script>
-<script>setMintedNFTProgressBar();</script>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/collections/topRightCard.js")"></script>

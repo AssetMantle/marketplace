@@ -97,7 +97,7 @@ class BuyNFTTransactions @Inject()(
       filterAndCount(x => x.buyerAccountId === buyerAccountId && x.saleId === saleId && (x.status.? === nullStatus || x.status))
     }
 
-    def tryGetByTxHash(txHash: String): Future[BuyNFTTransaction] = filterHead(_.txHash === txHash)
+    def getByTxHash(txHash: String): Future[Seq[BuyNFTTransaction]] = filter(_.txHash === txHash)
 
     def markSuccess(txHash: String): Future[Int] = customUpdate(BuyNFTTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
 
