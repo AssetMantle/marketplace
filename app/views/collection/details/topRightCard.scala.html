@@ -7,6 +7,7 @@
 
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/collections/topRightCard.js")"></script>
         @if(optionalLoginState.isEmpty || sales.isEmpty || !isMember) {
             <div class="d-flex flex-column gap-1">
                 <div class="analysisTitle">@Messages(constants.View.COLLECTION_TOTAL_NFT_TITLE)</div>
@@ -101,4 +102,3 @@
         }
     </div>
 </div>
-<script src="@utilities.PublicResource.getVersionedRoute("javascripts/collections/topRightCard.js")"></script>

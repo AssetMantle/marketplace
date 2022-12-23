@@ -164,7 +164,7 @@ class SaleController @Inject()(
               if (utilities.Date.currentEpoch >= sale.endTimeEpoch) Option(constants.Response.SALE_EXPIRED) else None,
               if (balance == MicroNumber.zero || balance <= (sale.price * buySaleNFTData.buyNFTs)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               //              if (buySaleNFTData.mintNFT && (balance - (sale.price + constants.Blockchain.AssetPropertyRate * (nftProperties.length + constants.Collection.DefaultProperty.list.length)) <= MicroNumber.zero)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
-              if ((countBuyerNFTsFromSale + buySaleNFTData.buyNFTs) >= sale.maxMintPerAccount) Option(constants.Response.MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED) else None,
+              if ((countBuyerNFTsFromSale + buySaleNFTData.buyNFTs) > sale.maxMintPerAccount) Option(constants.Response.MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED) else None,
               //              if (buySaleNFTData.mintNFT && nft.isMinted) Option(constants.Response.NFT_ALREADY_MINTED) else None,
               if (nfts.exists(_.isMinted)) Option(constants.Response.NFT_ALREADY_MINTED) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
