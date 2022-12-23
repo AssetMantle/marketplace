@@ -157,11 +157,11 @@ function setOffersStatus(whitelistId ,startEpoch, endEpoch){
 
 function setSaleStatus(saleId){
     let status = $("#"+saleId+" .status").text();
-    if(status === "SALE_ONGOING"){
+    if(status === "LIVE"){
         $("#" + saleId + " .statusOptions .option").removeClass("active");
         $("#" + saleId + " .statusOptions .option.started").addClass("active");
     }
-    else if(status === "SALE_EXPIRED"){
+    else if(status === "EXPIRED"){
         $("#" + saleId + " .statusOptions .option").removeClass("active");
         $("#" + saleId + " .statusOptions .option.ended").addClass("active");
     }

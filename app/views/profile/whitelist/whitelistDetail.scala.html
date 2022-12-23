@@ -33,7 +33,7 @@
                     <div class="fieldTitle">@Messages(constants.View.WHITELIST_DETAIL_FIELD_TITLE_STATUS)</div>
                     <div class="fieldValue" id="whitelistStatus_@whitelist.id">
                         <div class="statusOptions">
-                            <div class="option notStarted active">
+                            <div class="option notStarted">
                                 <div class="d-flex gap-2 align-items-center">
                                     <div class="statusBadge notStarted"></div>
                                     <span>@Messages(constants.View.WHITELIST_DETAIL_FIELD_VALUE_STATUS_NOT_STARTED)</span>
@@ -113,7 +113,7 @@
                                         <td class="text-end tableFieldNo">@(index + 1)</td>
                                         <td onclick="viewCollection('@sale.collectionId')" class="tableFieldName">@collectionOnSales.getOrElse(sale.collectionId, sale.collectionId)</td>
                                         <td class="tableFieldStatus" id="saleStatus_@sale.collectionId">
-                                          <div class="hidden status">@sale.getStatus</div>
+                                          <div class="hidden status">@sale.getStatus.value</div>
                                             <div class="statusOptions">
                                                 <div class="option notStarted">
                                                     <div class="d-flex gap-2 align-items-center">
@@ -160,6 +160,6 @@
     }
 </div>
 <script>
-        setOffersStatus('@whitelist.startEpoch', '@whitelist.endEpoch');
+        setOffersStatus('whitelistStatus_@whitelist.id', '@whitelist.startEpoch', '@whitelist.endEpoch');
         setBackButton();
 </script>
