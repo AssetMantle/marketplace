@@ -2,6 +2,7 @@ package constants
 
 import constants.Notification._
 import controllers.routes
+import org.apache.commons.logging.impl.NoOpLog
 import play.api.routing.JavaScriptReverseRoute
 
 case class Notification(name: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean, route: Option[JavaScriptReverseRoute] = None) {
@@ -37,11 +38,11 @@ object Notification {
 
   val COLLECTION_CREATED: Notification = Notification("COLLECTION_CREATED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.CollectionController.viewCollection))
   val NFT_CREATED: Notification = Notification("NFT_CREATED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
+  val NFT_GIFTED: Notification = Notification("NFT_GIFTED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
 
   val SALE_ON_WHITELIST: Notification = Notification("SALE_ON_WHITELIST", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ProfileController.viewProfile))
-  val SELLER_BUY_NFT_SUCCESSFUL: Notification = Notification("SELLER_BUY_NFT_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
-  val BUYER_BUY_NFT_SUCCESSFUL: Notification = Notification("BUYER_BUY_NFT_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
-  val SELLER_BUY_NFT_FAILED: Notification = Notification("SELLER_BUY_NFT_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val SELLER_BUY_NFT_SUCCESSFUL: Notification = Notification("SELLER_BUY_NFT_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
+  val BUYER_BUY_NFT_SUCCESSFUL: Notification = Notification("BUYER_BUY_NFT_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ProfileController.viewProfile))
   val BUYER_BUY_NFT_FAILED: Notification = Notification("BUYER_BUY_NFT_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val NFT_MINT_SUCCESSFUL: Notification = Notification("NFT_MINT_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))

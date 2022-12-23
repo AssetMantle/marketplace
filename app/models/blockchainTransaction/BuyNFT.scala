@@ -116,7 +116,7 @@ class BuyNFTs @Inject()(
 
   object Utility {
 
-    def transaction(buyerAccountId: String, sellerAccountId: String, nftId: String, saleId: String, fromAddress: String, toAddress: String, amount: MicroNumber, gasPrice: Double, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(buyerAccountId: String, sellerAccountId: String, nftIds: Seq[String], saleId: String, fromAddress: String, toAddress: String, amount: MicroNumber, gasPrice: Double, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount(fromAddress))
@@ -135,7 +135,7 @@ class BuyNFTs @Inject()(
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
               buyNFT <- Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), broadcasted = false, status = None, memo = Option(memo))
-              _ <- masterTransactionBuyNFTTransactions.Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = nftId, saleId = saleId)
+              _ <- masterTransactionBuyNFTTransactions.Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, saleId = saleId)
             } yield buyNFT
           }
           else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()

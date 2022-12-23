@@ -36,6 +36,7 @@ class CollectionController @Inject()(
                                       masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                       masterCollectionFiles: master.CollectionFiles,
                                       masterWhitelists: master.Whitelists,
+                                      masterWhitelistMembers: master.WhitelistMembers,
                                       masterWishLists: master.WishLists,
                                       utilitiesNotification: utilities.Notification,
                                     )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -106,10 +107,15 @@ class CollectionController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
+        val sales = masterSales.Service.getAllSalesByCollectionId(id)
+
+        def randomNFTs(sale: Boolean) = if (sale) masterNFTs.Service.getRandomNFTs(id, 5, Seq.empty) else Future(Seq())
 
         (for {
           collection <- collection
-        } yield Ok(views.html.collection.details.collectionNFTs(collection))
+          sales <- sales
+          randomNFTs <- randomNFTs(sales.nonEmpty)
+        } yield Ok(views.html.collection.details.collectionNFTs(collection, sales, randomNFTs))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -117,18 +123,19 @@ class CollectionController @Inject()(
   }
 
   def collectionNFTsPerPage(id: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
+    withoutLoginActionAsync { implicit optionalLoginState =>
       implicit request =>
         val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
         else masterCollections.Service.tryGet(id)
-        val likedNFTs = loginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollection(accountId = x.username, collectionId = id))
-        val nfts = masterNFTs.Service.getByPageNumber(id, pageNumber)
+        val likedNFTs = optionalLoginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollection(accountId = x.username, collectionId = id))
 
-        def nftDrafts(collection: Collection) = if (loginState.fold("")(_.username) == collection.creatorId) masterTransactionNFTDrafts.Service.getAllForCollection(id) else Future(Seq())
+        def getNFTs(creatorId: String) = if (optionalLoginState.fold("")(_.username) == creatorId || pageNumber == 1) masterNFTs.Service.getByPageNumber(id, pageNumber) else Future(Seq())
+
+        def nftDrafts(collection: Collection) = if (optionalLoginState.fold("")(_.username) == collection.creatorId) masterTransactionNFTDrafts.Service.getAllForCollection(id) else Future(Seq())
 
         (for {
           collection <- collection
-          nfts <- nfts
+          nfts <- getNFTs(collection.creatorId)
           nftDrafts <- nftDrafts(collection)
           likedNFTs <- likedNFTs
         } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts, likedNFTs, nftDrafts, pageNumber))
@@ -151,19 +158,30 @@ class CollectionController @Inject()(
     }
   }
 
-  def analysis(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
-        val collection = masterCollections.Service.tryGet(id)
-        (for {
-          collectionAnalysis <- collectionAnalysis
-          collection <- collection
-        } yield Ok(views.html.collection.details.collectionAnalysis(collectionAnalysis, collection))
-          ).recover {
-          case baseException: BaseException => BadRequest(baseException.failure.message)
-        }
-    }
+  def topRightCard(id: String): Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
+    implicit request =>
+      val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
+      val collection = masterCollections.Service.tryGet(id)
+
+      def getSalesInfo(collection: Collection) = if (optionalLoginState.isDefined) {
+        val sales = masterSales.Service.getAllSalesByCollectionId(id)
+
+        def isMember(whitelistIds: Seq[String]) = masterWhitelistMembers.Service.isMember(whitelistIds, optionalLoginState.get.username)
+
+        for {
+          sales <- sales
+          isMember <- isMember(sales.map(_.whitelistId))
+        } yield (sales, isMember)
+      } else Future(Seq(), false)
+
+      (for {
+        collectionAnalysis <- collectionAnalysis
+        collection <- collection
+        (sales, isMember) <- getSalesInfo(collection)
+      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis, collection, sales, isMember))
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
   }
 
   def commonCardInfo(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
@@ -182,7 +200,7 @@ class CollectionController @Inject()(
           if (activeSale.isEmpty) Future(3) else {
             for {
               allSold <- allSold(activeSale.get.id)
-            } yield activeSale.get.getStatus(allSold)
+            } yield activeSale.get.getStatus(allSold).id
           }
         }
 
@@ -336,14 +354,14 @@ class CollectionController @Inject()(
       val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id = id)
       val oldFilePath = utilities.Collection.getFilePath(id) + name
       val newFileName = utilities.FileOperations.getFileHash(oldFilePath) + "." + utilities.FileOperations.fileExtensionFromName(name)
-      val awsKey = utilities.Collection.getFileAwsKey(collectionId = id, fileName = newFileName)
+      val awsKey = utilities.Collection.getOthersFileAwsKey(collectionId = id, fileName = newFileName)
 
       def uploadToAws(collectionDraft: CollectionDraft) = if (collectionDraft.creatorId == loginState.username) {
         val uploadLatest = Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
 
         def deleteOldAws() = Future(documentType match {
-          case constants.Collection.File.PROFILE => collectionDraft.profileFileName.map(x => utilities.AmazonS3.deleteObject(utilities.Collection.getFileAwsKey(collectionId = id, fileName = x)))
-          case constants.Collection.File.COVER => collectionDraft.coverFileName.map(x => utilities.AmazonS3.deleteObject(utilities.Collection.getFileAwsKey(collectionId = id, fileName = x)))
+          case constants.Collection.File.PROFILE => collectionDraft.profileFileName.map(x => utilities.AmazonS3.deleteObject(utilities.Collection.getOthersFileAwsKey(collectionId = id, fileName = x)))
+          case constants.Collection.File.COVER => collectionDraft.coverFileName.map(x => utilities.AmazonS3.deleteObject(utilities.Collection.getOthersFileAwsKey(collectionId = id, fileName = x)))
           case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwBaseException()
         })
 
@@ -516,14 +534,14 @@ class CollectionController @Inject()(
       val collection = masterCollections.Service.tryGet(id = id)
       val oldFilePath = utilities.Collection.getFilePath(id) + name
       val newFileName = utilities.FileOperations.getFileHash(oldFilePath) + "." + utilities.FileOperations.fileExtensionFromName(name)
-      val awsKey = utilities.Collection.getFileAwsKey(collectionId = id, fileName = newFileName)
+      val awsKey = utilities.Collection.getOthersFileAwsKey(collectionId = id, fileName = newFileName)
 
       def uploadToAws(collection: Collection) = if (collection.creatorId == loginState.username) {
         val uploadLatest = Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
 
         def deleteOldAws() = Future(documentType match {
-          case constants.Collection.File.PROFILE => collection.profileFileName.map(x => utilities.AmazonS3.deleteObject(utilities.Collection.getFileAwsKey(collectionId = id, fileName = x)))
-          case constants.Collection.File.COVER => collection.coverFileName.map(x => utilities.AmazonS3.deleteObject(utilities.Collection.getFileAwsKey(collectionId = id, fileName = x)))
+          case constants.Collection.File.PROFILE => collection.profileFileName.map(x => utilities.AmazonS3.deleteObject(utilities.Collection.getOthersFileAwsKey(collectionId = id, fileName = x)))
+          case constants.Collection.File.COVER => collection.coverFileName.map(x => utilities.AmazonS3.deleteObject(utilities.Collection.getOthersFileAwsKey(collectionId = id, fileName = x)))
           case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwBaseException()
         })
 

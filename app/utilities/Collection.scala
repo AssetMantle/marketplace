@@ -9,7 +9,7 @@ object Collection {
 
   def getNFTFilePath(collectionId: String): String = utilities.FileOperations.checkAndCreateDirectory(constants.Collection.File.AllCollectionsPath + collectionId + nfts)
 
-  def getFileAwsKey(collectionId: String, fileName: String): String = collectionId + others + fileName
+  def getOthersFileAwsKey(collectionId: String, fileName: String): String = collectionId + others + fileName
 
   def getNFTFileAwsKey(collectionId: String, fileName: String): String = collectionId + nfts + fileName
 }

@@ -146,39 +146,51 @@ class Starter @Inject()(
   }
 
   private def addChristmasNFT() = {
-    val collectionName = "Christmas"
-    val collectionDescription = "collectionDescription"
-    val filePath = constants.CommonConfig.Files.CollectionPath + "/christmas.gif"
+    val collectionName = "MintE Memoirs"
+    val collectionDescription = "A collection to acknowledge and show appreciation to the Mantlers for being a part of the Mantle Community. A series of periodic NFT drops to commemorate milestones and celebrations."
+    val nftFilePath = constants.CommonConfig.Files.CollectionPath + "/christmas.gif"
+    val thumbnailFilePath = constants.CommonConfig.Files.CollectionPath + "/cover.png"
     val allAccountIds = masterAccounts.Service.getAllIds
 
-    val creatorId = "abhinav95"
-    val nftName = "X-Mas"
-    val nftDescription = "nftDescription"
+    val creatorId = "Mint.E"
+    val nftName = "Season Greetings"
+    val nftDescription = ""
     val socialProfiles = Seq(
       SocialProfile(name = constants.Collection.SocialProfile.WEBSITE, url = "https://assetmantle.one/"),
       SocialProfile(name = constants.Collection.SocialProfile.TWITTER, url = "AssetMantle/"),
       SocialProfile(name = constants.Collection.SocialProfile.INSTAGRAM, url = "assetmantle")
     )
-    val collection = Collection(id = "D4C3FD5554AEDB64", creatorId = creatorId, classificationId = None, name = collectionName, description = collectionDescription, socialProfiles = socialProfiles, category = constants.Collection.Category.ART, nsfw = false, properties = None, profileFileName = None, coverFileName = None, public = true)
-    val nftId = utilities.FileOperations.getFileHash(filePath)
+    val newCoverFileName =  utilities.FileOperations.getFileHash(thumbnailFilePath) + ".png"
+    val collection = Collection(id = "D4C3FD5554AEDB64", creatorId = creatorId, classificationId = None, name = collectionName, description = collectionDescription, socialProfiles = socialProfiles, category = constants.Collection.Category.ART, nsfw = false, properties = None, profileFileName = None, coverFileName = Option(newCoverFileName), public = false)
+    val nftId = utilities.FileOperations.getFileHash(nftFilePath)
     val fileExtension = "gif"
-    val newFileName = nftId + "." + fileExtension
-    val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collection.id, fileName = newFileName)
+    val newNFTFileName = nftId + "." + fileExtension
+    val nftAWSKey = utilities.Collection.getNFTFileAwsKey(collectionId = collection.id, fileName = newNFTFileName)
+    val coverAWSKey = utilities.Collection.getOthersFileAwsKey(collectionId = collection.id, fileName = newCoverFileName)
 
     def addCollection() = masterCollections.Service.add(collection)
 
-    def uploadToAws = Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = filePath))
+    def uploadNFTToAws = Future(utilities.AmazonS3.uploadFile(objectKey = nftAWSKey, filePath = nftFilePath))
+
+    def uploadCoverToAws = Future(utilities.AmazonS3.uploadFile(objectKey = coverAWSKey, filePath = thumbnailFilePath))
 
     def addNFT(accountIds: Seq[String]) = masterNFTs.Service.add(NFT(id = nftId, collectionId = collection.id, name = nftName, description = nftDescription, totalSupply = accountIds.length, isMinted = false, fileExtension = fileExtension, ipfsLink = "", edition = None))
 
     def addNFTOwners(accountIds: Seq[String]) = masterNFTOwners.Service.add(accountIds.map(x => NFTOwner(nftId = nftId, ownerId = x, creatorId = creatorId, collectionId = collection.id, quantity = 1, saleId = None)))
 
+    def addAnalytics(accountIds: Seq[String]) = collectionsAnalysis.Service.add(CollectionAnalysis(id = collection.id, totalNFTs = 1, totalMinted = 0, totalSold = 0, totalTraded = 0, floorPrice = 0, salePrice = 0, totalVolumeTraded = 0, bestOffer = 0, listed = 0, owners = accountIds.length, uniqueOwners = accountIds.length))
+
+    def addNotification(allAccountIds: Seq[String]) = masterTransactionNotifications.Service.add(accountIDs = allAccountIds, notification = constants.Notification.NFT_GIFTED, nftName)(s"'${nftId}'")
+
     (for {
       allAccountIds <- allAccountIds
       _ <- addCollection()
-      _ <- uploadToAws
+      _ <- uploadNFTToAws
+      _ <- uploadCoverToAws
       _ <- addNFT(allAccountIds)
       _ <- addNFTOwners(allAccountIds)
+      _ <- addAnalytics(allAccountIds)
+      _ <- addNotification(allAccountIds)
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)

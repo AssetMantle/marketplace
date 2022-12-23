@@ -8,12 +8,10 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class BuyNFTTransaction(buyerAccountId: String, sellerAccountId: String, txHash: String, nftId: String, saleId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity3[String, String, String] {
-  def id1: String = buyerAccountId
+case class BuyNFTTransaction(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, saleId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, String] {
+  def id1: String = txHash
 
-  def id2: String = sellerAccountId
-
-  def id3: String = txHash
+  def id2: String = nftId
 }
 
 object BuyNFTTransactions {
@@ -22,17 +20,17 @@ object BuyNFTTransactions {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_BUY_NFT_TRANSACTION
 
-  class BuyNFTTransactionTable(tag: Tag) extends Table[BuyNFTTransaction](tag, "BuyNFTTransaction") with ModelTable3[String, String, String] {
+  class BuyNFTTransactionTable(tag: Tag) extends Table[BuyNFTTransaction](tag, "BuyNFTTransaction") with ModelTable2[String, String] {
 
-    def * = (buyerAccountId, sellerAccountId, txHash, nftId, saleId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (BuyNFTTransaction.tupled, BuyNFTTransaction.unapply)
-
-    def buyerAccountId = column[String]("buyerAccountId", O.PrimaryKey)
-
-    def sellerAccountId = column[String]("sellerAccountId", O.PrimaryKey)
+    def * = (txHash, nftId, buyerAccountId, sellerAccountId, saleId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (BuyNFTTransaction.tupled, BuyNFTTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
-    def nftId = column[String]("nftId")
+    def nftId = column[String]("nftId", O.PrimaryKey)
+
+    def buyerAccountId = column[String]("buyerAccountId")
+
+    def sellerAccountId = column[String]("sellerAccountId")
 
     def saleId = column[String]("saleId")
 
@@ -46,11 +44,10 @@ object BuyNFTTransactions {
 
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def id1 = buyerAccountId
+    def id1 = txHash
 
-    def id2 = sellerAccountId
+    def id2 = nftId
 
-    def id3 = txHash
   }
 
   val TableQuery = new TableQuery(tag => new BuyNFTTransactionTable(tag))
@@ -67,7 +64,7 @@ class BuyNFTTransactions @Inject()(
                                     getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
                                     getAccount: queries.blockchain.GetAccount,
                                   )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl3[BuyNFTTransactions.BuyNFTTransactionTable, BuyNFTTransaction, String, String, String](
+  extends GenericDaoImpl2[BuyNFTTransactions.BuyNFTTransactionTable, BuyNFTTransaction, String, String](
     databaseConfigProvider,
     BuyNFTTransactions.TableQuery,
     executionContext,
@@ -81,6 +78,8 @@ class BuyNFTTransactions @Inject()(
 
     def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftId: String, saleId: String): Future[Unit] = create(BuyNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = nftId, saleId = saleId, status = None))
 
+    def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftIds: Seq[String], saleId: String): Future[Unit] = create(nftIds.map(x => BuyNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = x, saleId = saleId, status = None)))
+
     def tryGetBySaleIdAndBuyerAccountId(buyerAccountId: String, saleId: String): Future[Seq[BuyNFTTransaction]] = filter(x => x.saleId === saleId && x.buyerAccountId === buyerAccountId)
 
     def checkAlreadySold(nftId: String, saleId: String): Future[Boolean] = {
@@ -88,12 +87,17 @@ class BuyNFTTransactions @Inject()(
       filterAndExists(x => x.nftId === nftId && x.saleId === saleId && (x.status || x.status.? === nullStatus))
     }
 
+    def checkAlreadySold(nftIds: Seq[String], saleId: String): Future[Boolean] = {
+      val nullStatus: Option[Boolean] = null
+      filter(x => x.nftId.inSet(nftIds) && x.saleId === saleId && (x.status || x.status.? === nullStatus)).map(_.nonEmpty)
+    }
+
     def countBuyerNFTsFromSale(buyerAccountId: String, saleId: String): Future[Int] = {
       val nullStatus: Option[Boolean] = null
       filterAndCount(x => x.buyerAccountId === buyerAccountId && x.saleId === saleId && (x.status.? === nullStatus || x.status))
     }
 
-    def tryGetByTxHash(txHash: String): Future[BuyNFTTransaction] = filterHead(_.txHash === txHash)
+    def getByTxHash(txHash: String): Future[Seq[BuyNFTTransaction]] = filter(_.txHash === txHash)
 
     def markSuccess(txHash: String): Future[Int] = customUpdate(BuyNFTTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
 
