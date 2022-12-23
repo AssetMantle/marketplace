@@ -47,54 +47,24 @@
                 @if(saleByMinimumPrice.getStatus.id == constants.Sale.NOT_STARTED.id) {
                     <div class="d-flex flex-column gap-1 mt-3">
                         <div class="analysisTitle">@Messages(constants.View.SALE_START_TIME)</div>
-                        <div id="countdown" class="d-flex gap-2 mt-2 analysisValue">
-                            <div class="d-flex flex-column align-items-center gap-1">
-                                <span id="days"></span>
-                                <span class="analysisTitle">days</span>
-                            </div>
-                            <div class="d-flex flex-column align-items-center gap-1">
-                                <span id="hours"></span>
-                                <span class="analysisTitle">Hours</span>
-                            </div>
-                            <div class="d-flex flex-column align-items-center gap-1">
-                                <span id="minutes"></span>
-                                <span class="analysisTitle">Minutes</span>
-                            </div>
-                            <div class="d-flex flex-column align-items-center gap-1">
-                                <span id="seconds"></span>
-                                <span class="analysisTitle">Seconds</span>
-                            </div>
+                        <div id="countdown_@saleByMinimumPrice.startTimeEpoch" class="d-flex gap-2 analysisValue">
+                        @saleByMinimumPrice.startTimeEpoch
                         </div>
                     </div>
-                    <script>setCounter(@saleByMinimumPrice.startTimeEpoch);</script>
+                    <script>epochToDateTime('countdown_@saleByMinimumPrice.startTimeEpoch');</script>
                 } else {
                     @if(saleByMinimumPrice.getStatus.id == constants.Sale.SOLD_OUT.id) {
 
                     } else {
                         <div class="d-flex flex-column gap-1 mt-3">
                             <div class="analysisTitle">@Messages(constants.View.SALE_ENDS_IN)</div>
-                            <div id="countdown" class="d-flex gap-2 mt-2 analysisValue">
-                                <div class="d-flex flex-column align-items-center gap-1">
-                                    <span id="days"></span>
-                                    <span class="analysisTitle">days</span>
-                                </div>
-                                <div class="d-flex flex-column align-items-center gap-1">
-                                    <span id="hours"></span>
-                                    <span class="analysisTitle">Hours</span>
-                                </div>
-                                <div class="d-flex flex-column align-items-center gap-1">
-                                    <span id="minutes"></span>
-                                    <span class="analysisTitle">Minutes</span>
-                                </div>
-                                <div class="d-flex flex-column align-items-center gap-1">
-                                    <span id="seconds"></span>
-                                    <span class="analysisTitle">Seconds</span>
-                                </div>
+                            <div id="countdown_@saleByMinimumPrice.endTimeEpoch" class="d-flex gap-2 analysisValue">
+                                @saleByMinimumPrice.endTimeEpoch
                             </div>
                         </div>
+                        <script>epochToDateTime('countdown_@saleByMinimumPrice.endTimeEpoch');</script>
                         <div class="separator"></div>
                         @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SaleController.buySaleNFTForm('${saleByMinimumPrice.id}', false))"), Symbol("class") -> "mt-4")
-                        <script>setCounter(@saleByMinimumPrice.endTimeEpoch);</script>
                     }
                 }
             }
