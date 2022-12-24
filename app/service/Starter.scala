@@ -199,11 +199,11 @@ class Starter @Inject()(
 
   def start(): Unit = {
     try {
+      Await.result(addChristmasNFT(), Duration.Inf)
       Await.result(correctNotifications(), Duration.Inf)
       Await.result(updateAccountType(), Duration.Inf)
       Await.result(updateCollectionAnalysis(), Duration.Inf)
       Await.result(addNFTOwners(), Duration.Inf)
-      Await.result(addChristmasNFT(), Duration.Inf)
     } catch {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
