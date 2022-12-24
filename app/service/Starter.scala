@@ -160,7 +160,7 @@ class Starter @Inject()(
       SocialProfile(name = constants.Collection.SocialProfile.TWITTER, url = "AssetMantle/"),
       SocialProfile(name = constants.Collection.SocialProfile.INSTAGRAM, url = "assetmantle")
     )
-    val newCoverFileName =  utilities.FileOperations.getFileHash(thumbnailFilePath) + ".png"
+    val newCoverFileName = utilities.FileOperations.getFileHash(thumbnailFilePath) + ".png"
     val collection = Collection(id = "D4C3FD5554AEDB64", creatorId = creatorId, classificationId = None, name = collectionName, description = collectionDescription, socialProfiles = socialProfiles, category = constants.Collection.Category.ART, nsfw = false, properties = None, profileFileName = None, coverFileName = Option(newCoverFileName), public = false)
     val nftId = utilities.FileOperations.getFileHash(nftFilePath)
     val fileExtension = "gif"
@@ -193,17 +193,17 @@ class Starter @Inject()(
       _ <- addNotification(allAccountIds)
     } yield ()
       ).recover {
-      case exception: Exception => logger.error(exception.getLocalizedMessage)
+      case exception: Exception => throw exception
     }
   }
 
   def start(): Unit = {
     try {
+      Await.result(addChristmasNFT(), Duration.Inf)
       Await.result(correctNotifications(), Duration.Inf)
       Await.result(updateAccountType(), Duration.Inf)
       Await.result(updateCollectionAnalysis(), Duration.Inf)
       Await.result(addNFTOwners(), Duration.Inf)
-      Await.result(addChristmasNFT(), Duration.Inf)
     } catch {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
