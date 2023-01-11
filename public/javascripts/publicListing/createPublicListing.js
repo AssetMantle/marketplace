@@ -21,7 +21,7 @@ $("#SELECT_COLLECTION_ID_field .custom-option").on("click", function () {
     onCollectionSelect(`${collectionId}`, `${userId}`);
 });
 
-function setCreateSaleCollectionId(collectionId) {
+function setCreatePublicListingCollectionId(collectionId) {
     let userId = $(".loginUserName").text();
     onCollectionSelect(`${collectionId}`, `${userId}`);
     let selectedCollectionId = $("#SELECT_COLLECTION_ID").val();
@@ -29,23 +29,17 @@ function setCreateSaleCollectionId(collectionId) {
     $("#SELECT_COLLECTION_ID").closest("div").find(".custom-select-trigger").text(selectedCollection);
 }
 
-function setSaleNFTValue(e) {
+function setPublicListingNFTValue(e) {
     let fieldValue = e.target.value;
     let totalOwnedNFT = $("#collectionOwnedNFTs").text();
-    $(`#SALE_NFT_NUMBER`).val(fieldValue);
+    $(`#PUBLIC_LISTING_NFT_NUMBER`).val(fieldValue);
     if (fieldValue > totalOwnedNFT) {
-        $("#FORM_COLLECTION_SALE_SUBMIT").addClass("disable");
+        $("#FORM_PUBLIC_LISTING_SUBMIT").addClass("disable");
     }
-}
-
-if ($("#SELECT_WHITELIST_ID").val() !== "") {
-    let whitelistId = $("#SELECT_WHITELIST_ID").val();
-    let selectedWhitelist =  $(`#SELECT_WHITELIST_ID option[value=${whitelistId}]`).text();
-    $("#SELECT_WHITELIST_ID").closest("div").find(".custom-select-trigger").text(selectedWhitelist);
 }
 
 function setOwnedNFTs(){
     let maxNFTs = $("#collectionOwnedNFTs").text();
-    $("#saleNFTNumber").val(maxNFTs);
-    $("#SALE_NFT_NUMBER").val(maxNFTs);
+    $("#publicListingNFTNumber").val(maxNFTs);
+    $("#PUBLIC_LISTING_NFT_NUMBER").val(maxNFTs);
 }

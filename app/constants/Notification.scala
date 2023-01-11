@@ -2,7 +2,6 @@ package constants
 
 import constants.Notification._
 import controllers.routes
-import org.apache.commons.logging.impl.NoOpLog
 import play.api.routing.JavaScriptReverseRoute
 
 case class Notification(name: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean, route: Option[JavaScriptReverseRoute] = None) {

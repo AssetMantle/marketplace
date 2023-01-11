@@ -41,7 +41,7 @@ class TransactionComplete @Inject()(
 
     def nft(buyNFTTx: BuyNFTTransaction) = masterNFTs.Service.tryGet(buyNFTTx.nftId)
 
-    def analysisUpdate(nft: NFT) = collectionsAnalysis.Utility.onSale(collectionId = nft.collectionId, price = price)
+    def analysisUpdate(nft: NFT) = collectionsAnalysis.Utility.onSuccessfulSale(collectionId = nft.collectionId, price = price)
 
     def sendNotifications(boughtNFT: BuyNFTTransaction, count: Int) = {
       utilitiesNotification.send(boughtNFT.sellerAccountId, constants.Notification.SELLER_BUY_NFT_SUCCESSFUL, count.toString)("")

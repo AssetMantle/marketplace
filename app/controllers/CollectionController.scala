@@ -469,10 +469,10 @@ class CollectionController @Inject()(
       )
   }
 
-  def countCreatorNFTsNotOnSale(collectionId: String, accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def countForCreatorNotForSell(collectionId: String, accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val countNFts = masterNFTOwners.Service.countForCreatorNotOnSale(collectionId = collectionId, creatorId = accountId)
+        val countNFts = masterNFTOwners.Service.countForCreatorNotForSell(collectionId = collectionId, creatorId = accountId)
 
         (for {
           countNFts <- countNFts

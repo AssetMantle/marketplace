@@ -52,7 +52,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.definePropertiesForm,
         routes.javascript.CollectionController.deleteDraftForm,
         routes.javascript.CollectionController.deleteDraft,
-        routes.javascript.CollectionController.countCreatorNFTsNotOnSale,
+        routes.javascript.CollectionController.countForCreatorNotForSell,
         routes.javascript.CollectionController.genesisTypeForm,
 
         routes.javascript.WishlistController.wishlistSection,
@@ -114,6 +114,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.profileInfoCard,
         routes.javascript.ProfileController.profileActivityCard,
         routes.javascript.ProfileController.profileAnalysisCard,
+
+        routes.javascript.PublicListingController.createPublicListingForm,
 
         routes.javascript.SaleController.createCollectionSaleForm,
         routes.javascript.SaleController.buySaleNFTForm,

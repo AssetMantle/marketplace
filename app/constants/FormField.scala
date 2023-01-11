@@ -77,10 +77,12 @@ object FormField {
 
   // IntFormField
   val GAS_AMOUNT: IntFormField = IntFormField("GAS_AMOUNT", 20000, 2000000)
-  val WHITELIST_MAX_MEMBERS: IntFormField = IntFormField("WHITELIST_MAX_MEMBERS", 1, Int.MaxValue)
-  val SALE_NFT_NUMBER: IntFormField = IntFormField("SALE_NFT_NUMBER", 1, Int.MaxValue)
-  val SALE_MAX_MINT_PER_ACCOUNT: IntFormField = IntFormField("SALE_MAX_MINT_PER_ACCOUNT", 1, Int.MaxValue)
-  val SALE_BUY_NFT_NUMBER: IntFormField = IntFormField("SALE_BUY_NFT_NUMBER", 1, Int.MaxValue)
+  val WHITELIST_MAX_MEMBERS: IntFormField = IntFormField("WHITELIST_MAX_MEMBERS", 1, 100000)
+  val SALE_NFT_NUMBER: IntFormField = IntFormField("SALE_NFT_NUMBER", 1, 100000)
+  val PUBLIC_LISTING_NFT_NUMBER: IntFormField = IntFormField("PUBLIC_LISTING_NFT_NUMBER", 1, 100000)
+  val SALE_MAX_MINT_PER_ACCOUNT: IntFormField = IntFormField("SALE_MAX_MINT_PER_ACCOUNT", 1, 100000)
+  val PUBLIC_LISTING_MAX_MINT_PER_ACCOUNT: IntFormField = IntFormField("SALE_MAX_MINT_PER_ACCOUNT", 1, 100000)
+  val SALE_BUY_NFT_NUMBER: IntFormField = IntFormField("SALE_BUY_NFT_NUMBER", 1, 100000)
 
 
   // DoubleFormField
@@ -91,6 +93,8 @@ object FormField {
   val WHITELIST_INVITE_END_EPOCH: EpochFormField = EpochFormField("WHITELIST_INVITE_END_EPOCH", 1, Int.MaxValue)
   val NFT_SALE_START_EPOCH: EpochFormField = EpochFormField("NFT_SALE_START_EPOCH", 1, Int.MaxValue)
   val NFT_SALE_END_EPOCH: EpochFormField = EpochFormField("NFT_SALE_END_EPOCH", 1, Int.MaxValue)
+  val PUBLIC_LISTING_START_EPOCH: EpochFormField = EpochFormField("NFT_SALE_START_EPOCH", 1, Int.MaxValue)
+  val PUBLIC_LISTING_END_EPOCH: EpochFormField = EpochFormField("NFT_SALE_END_EPOCH", 1, Int.MaxValue)
 
   // BooleanFormField
   val RECEIVE_NOTIFICATIONS: BooleanFormField = BooleanFormField("RECEIVE_NOTIFICATIONS")
@@ -116,8 +120,9 @@ object FormField {
   val SELECT_COLLECTION_ID: CustomSelectFormField = CustomSelectFormField("SELECT_COLLECTION_ID")
 
   // MicroNumberFormField
-  val SEND_COIN_AMOUNT: MicroNumberFormField = MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.zero, MicroNumber(Int.MaxValue), 6)
-  val NFT_WHITELIST_SALE_PRICE: MicroNumberFormField = MicroNumberFormField("NFT_WHITELIST_SALE_PRICE", MicroNumber.zero, MicroNumber(Int.MaxValue))
+  val SEND_COIN_AMOUNT: MicroNumberFormField = MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.smallest, MicroNumber(Int.MaxValue), 6)
+  val NFT_WHITELIST_SALE_PRICE: MicroNumberFormField = MicroNumberFormField("NFT_WHITELIST_SALE_PRICE", MicroNumber.smallest, MicroNumber(Int.MaxValue))
+  val PUBLIC_LISTING_PRICE: MicroNumberFormField = MicroNumberFormField("PUBLIC_LISTING_PRICE", MicroNumber.smallest, MicroNumber(Int.MaxValue))
 
   // NestedFormField
   val COLLECTION_PROPERTIES: NestedFormField = NestedFormField("COLLECTION_PROPERTIES")

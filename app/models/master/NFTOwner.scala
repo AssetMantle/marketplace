@@ -9,7 +9,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
-case class NFTOwner(nftId: String, ownerId: String, creatorId: String, collectionId: String, quantity: Long, saleId: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
+case class NFTOwner(nftId: String, ownerId: String, creatorId: String, collectionId: String, quantity: Long, saleId: Option[String], publicListingId: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
   def id1: String = nftId
 
   def id2: String = ownerId
@@ -24,7 +24,7 @@ object NFTOwners {
 
   class NFTOwnerTable(tag: Tag) extends Table[NFTOwner](tag, "NFTOwner") with ModelTable2[String, String] {
 
-    def * = (nftId, ownerId, creatorId, collectionId, quantity, saleId.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTOwner.tupled, NFTOwner.unapply)
+    def * = (nftId, ownerId, creatorId, collectionId, quantity, saleId.?, publicListingId.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTOwner.tupled, NFTOwner.unapply)
 
     def nftId = column[String]("nftId", O.PrimaryKey)
 
@@ -37,6 +37,8 @@ object NFTOwners {
     def quantity = column[Long]("quantity")
 
     def saleId = column[String]("saleId")
+
+    def publicListingId = column[String]("publicListingId")
 
     def createdBy = column[String]("createdBy")
 
@@ -78,17 +80,26 @@ class NFTOwners @Inject()(
 
     def update(NFTOwner: NFTOwner): Future[Unit] = updateById1AndId2(NFTOwner)
 
-    def countForCreatorNotOnSale(collectionId: String, creatorId: String): Future[Int] = {
-      val nullSaleId: Option[String] = null
-      filterAndCount(x => x.collectionId === collectionId && x.creatorId === creatorId && x.ownerId === creatorId && x.saleId.? === nullSaleId)
+    def countForCreatorNotForSell(collectionId: String, creatorId: String): Future[Int] = {
+      val nullString: Option[String] = null
+      filterAndCount(x => x.collectionId === collectionId && x.creatorId === creatorId && x.ownerId === creatorId && x.saleId.? === nullString && x.publicListingId.? === nullString)
     }
 
-    def addRandomNFTsToSale(collectionId: String, creatorId: String, nfts: Int, saleId: String): Future[Unit] = {
+    def whitelistSaleRandomNFTs(collectionId: String, creatorId: String, nfts: Int, saleId: String): Future[Unit] = {
       val nullString: Option[String] = null
-      val notOnSaleNFTs = filter(x => x.ownerId === creatorId && x.creatorId === creatorId && x.collectionId === collectionId && x.saleId === nullString)
+      val notOnSaleNFTs = filter(x => x.ownerId === creatorId && x.creatorId === creatorId && x.collectionId === collectionId && x.saleId === nullString && x.publicListingId === nullString)
       for {
         notOnSaleNFTs <- notOnSaleNFTs
         _ <- upsertMultiple(Random.shuffle(notOnSaleNFTs).take(nfts).map(_.copy(saleId = Option(saleId))))
+      } yield ()
+    }
+
+    def publicListRandomNFTs(collectionId: String, creatorId: String, nfts: Int, publicListingId: String): Future[Unit] = {
+      val nullString: Option[String] = null
+      val notOnSaleNFTs = filter(x => x.ownerId === creatorId && x.creatorId === creatorId && x.collectionId === collectionId && x.saleId === nullString && x.publicListingId === nullString)
+      for {
+        notOnSaleNFTs <- notOnSaleNFTs
+        _ <- upsertMultiple(Random.shuffle(notOnSaleNFTs).take(nfts).map(_.copy(publicListingId = Option(publicListingId))))
       } yield ()
     }
 

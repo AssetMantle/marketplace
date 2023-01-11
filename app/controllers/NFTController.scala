@@ -380,7 +380,7 @@ class NFTController @Inject()(
               for {
                 nft <- add
                 _ <- addProperties()
-                _ <- addOwner(nftDraft.toNFTOwner(ownerID = collection.creatorId, creatorId = collection.creatorId, saleId = None))
+                _ <- addOwner(nftDraft.toNFTOwner(ownerID = collection.creatorId, creatorId = collection.creatorId))
                 _ <- addTags()
                 _ <- deleteDraft()
                 _ <- collectionsAnalysis.Utility.onNewNFT(collection.id)

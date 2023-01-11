@@ -1,3 +1,5 @@
+# --- !Ups
+
 ALTER TABLE MASTER."Account"
     ADD COLUMN IF NOT EXISTS "createdOnMillisEpoch" BIGINT DEFAULT null;
 ALTER TABLE MASTER."Account"
@@ -150,3 +152,43 @@ EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 
 DROP TRIGGER IF EXISTS COLLECTION_FILE_LOG ON MASTER."CollectionFile";
 DROP TABLE IF EXISTS MASTER."CollectionFile";
+
+CREATE TABLE IF NOT EXISTS MASTER."PublicListing"
+(
+    "id"                   VARCHAR NOT NULL,
+    "collectionId"         VARCHAR NOT NULL UNIQUE,
+    "numberOfNFTs"         BIGINT  NOT NULL,
+    "maxMintPerAccount"    BIGINT  NOT NULL,
+    "price"                NUMERIC NOT NULL,
+    "denom"                VARCHAR NOT NULL,
+    "startTimeEpoch"       BIGINT  NOT NULL,
+    "endTimeEpoch"         BIGINT  NOT NULL,
+    "createdBy"            VARCHAR,
+    "createdOnMillisEpoch" BIGINT,
+    "updatedBy"            VARCHAR,
+    "updatedOnMillisEpoch" BIGINT,
+    PRIMARY KEY ("id")
+);
+
+ALTER TABLE ANALYTICS."CollectionAnalysis"
+    ADD COLUMN IF NOT EXISTS "publicListingPrice" VARCHAR DEFAULT null;
+
+ALTER TABLE MASTER."NFTOwner"
+    ADD COLUMN IF NOT EXISTS "publicListingId" VARCHAR DEFAULT null;
+ALTER TABLE MASTER."NFTOwner"
+    ADD CONSTRAINT ONE_SELL_PER_NFT CHECK ( NUM_NONNULLS("saleId", "publicListingId") <= 1 );
+
+ALTER TABLE MASTER."PublicListing"
+    ADD CONSTRAINT PublicListing_Collection FOREIGN KEY ("collectionId") REFERENCES MASTER."Collection" ("id");
+
+CREATE TRIGGER PUBLIC_LISTING_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."PublicListing"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
+
+# --- !Downs
+
+DROP TRIGGER IF EXISTS PUBLIC_LISTING_LOG ON MASTER."PublicListing" CASCADE;
+
+DROP TABLE IF EXISTS MASTER."PublicListing" CASCADE;

@@ -75,7 +75,7 @@ class SaleController @Inject()(
         createData => {
           val collection = masterCollections.Service.tryGet(id = createData.collectionId)
           val whitelistMembers = masterWhitelistMembers.Service.getAllMembers(createData.whitelistId)
-          val countNFts = masterNFTOwners.Service.countForCreatorNotOnSale(collectionId = createData.collectionId, creatorId = loginState.username)
+          val countNFts = masterNFTOwners.Service.countForCreatorNotForSell(collectionId = createData.collectionId, creatorId = loginState.username)
           val saleExistOnCollection = masterSales.Service.getAllSalesByCollectionId(createData.collectionId).map(_.nonEmpty)
 
           def addToSale(collection: Collection, countNFts: Int, saleExistOnCollection: Boolean) = {
@@ -89,7 +89,7 @@ class SaleController @Inject()(
             if (errors.isEmpty) {
               for {
                 saleId <- masterSales.Service.add(createData.toNewSale)
-                _ <- masterNFTOwners.Service.addRandomNFTsToSale(collectionId = collection.id, nfts = createData.nftForSale, creatorId = loginState.username, saleId = saleId)
+                _ <- masterNFTOwners.Service.whitelistSaleRandomNFTs(collectionId = collection.id, nfts = createData.nftForSale, creatorId = loginState.username, saleId = saleId)
               } yield ()
             } else errors.head.throwFutureBaseException()
           }
