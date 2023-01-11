@@ -2,18 +2,16 @@ package models.master
 
 import models.Trait._
 import org.bitcoinj.core.ECKey
-
 import org.bitcoinj.crypto.ChildNumber
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import slick.jdbc.H2Profile.api._
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Key(accountId: String, address: String, hdPath: Option[Seq[ChildNumber]], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Array[Byte], partialMnemonics: Option[Seq[String]], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Key(accountId: String, address: String, hdPath: Option[Seq[ChildNumber]], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Array[Byte], partialMnemonics: Option[Seq[String]], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
   def serialize(): Keys.KeySerialized = Keys.KeySerialized(
     accountId = this.accountId,
     address = this.address,
@@ -29,11 +27,9 @@ case class Key(accountId: String, address: String, hdPath: Option[Seq[ChildNumbe
     backupUsed = this.backupUsed,
     verified = this.verified,
     createdBy = this.createdBy,
-    createdOn = this.createdOn,
-    createdOnTimeZone = this.createdOnTimeZone,
+    createdOnMillisEpoch = this.createdOnMillisEpoch,
     updatedBy = this.updatedBy,
-    updatedOn = this.updatedOn,
-    updatedOnTimeZone = this.updatedOnTimeZone)
+    updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 
   def getECKey(password: String): Option[ECKey] = if (this.encryptedPrivateKey.nonEmpty) Option(ECKey.fromPrivate(utilities.Secrets.decryptData(this.encryptedPrivateKey, password)))
   else None
@@ -45,7 +41,7 @@ object Keys {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class KeySerialized(accountId: String, address: String, hdPath: Option[String], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Array[Byte], partialMnemonics: Option[String], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity2[String, String] {
+  case class KeySerialized(accountId: String, address: String, hdPath: Option[String], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Array[Byte], partialMnemonics: Option[String], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity2[String, String] {
     def deserialize: Key = Key(
       accountId = accountId,
       address = address,
@@ -59,7 +55,7 @@ object Keys {
       retryCounter = retryCounter,
       active = active,
       backupUsed = backupUsed,
-      verified = verified, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+      verified = verified, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
     def id1: String = accountId
 
@@ -68,7 +64,7 @@ object Keys {
 
   class KeyTable(tag: Tag) extends Table[KeySerialized](tag, "Key") with ModelTable2[String, String] {
 
-    def * = (accountId, address, hdPath.?, passwordHash, salt, iterations, encryptedPrivateKey, partialMnemonics.?, name.?, retryCounter, active, backupUsed, verified.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (KeySerialized.tupled, KeySerialized.unapply)
+    def * = (accountId, address, hdPath.?, passwordHash, salt, iterations, encryptedPrivateKey, partialMnemonics.?, name.?, retryCounter, active, backupUsed, verified.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (KeySerialized.tupled, KeySerialized.unapply)
 
     def accountId = column[String]("accountId", O.PrimaryKey)
 
@@ -98,15 +94,11 @@ object Keys {
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
     override def id1 = accountId
 
@@ -323,6 +315,7 @@ class Keys @Inject()(
         _ <- validateAndUpdate(validated, key)
       } yield ()
     }
+
     def checkVerifiedKeyExists(accountId: String): Future[Boolean] = filter(x => x.accountId === accountId && x.verified).map(_.nonEmpty)
 
     def deleteUnverifiedKeys(accountId: String): Future[Int] = {

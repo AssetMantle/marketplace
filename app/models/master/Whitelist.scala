@@ -1,31 +1,14 @@
 package models.master
 
-import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
+import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Whitelist(id: String, ownerId: String, name: String, description: String, maxMembers: Int, startEpoch: Int, endEpoch: Int, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
-
-  def serialize(): Whitelists.WhitelistSerialized = Whitelists.WhitelistSerialized(
-    id = this.id,
-    ownerId = this.ownerId,
-    name = this.name,
-    description = this.description,
-    maxMembers = this.maxMembers,
-    startEpoch = this.startEpoch,
-    endEpoch = this.endEpoch,
-    createdBy = this.createdBy,
-    createdOn = this.createdOn,
-    createdOnTimeZone = this.createdOnTimeZone,
-    updatedBy = this.updatedBy,
-    updatedOn = this.updatedOn,
-    updatedOnTimeZone = this.updatedOnTimeZone)
-}
+case class Whitelist(id: String, ownerId: String, name: String, description: String, maxMembers: Int, startEpoch: Int, endEpoch: Int, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String]
 
 
 object Whitelists {
@@ -34,13 +17,9 @@ object Whitelists {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class WhitelistSerialized(id: String, ownerId: String, name: String, description: String, maxMembers: Int, startEpoch: Int, endEpoch: Int, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
-    def deserialize: Whitelist = Whitelist(id = id, ownerId = ownerId, name = name, description = description, maxMembers = maxMembers, startEpoch = startEpoch, endEpoch = endEpoch, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
-  }
+  class WhitelistTable(tag: Tag) extends Table[Whitelist](tag, "Whitelist") with ModelTable[String] {
 
-  class WhitelistTable(tag: Tag) extends Table[WhitelistSerialized](tag, "Whitelist") with ModelTable[String] {
-
-    def * = (id, ownerId, name, description, maxMembers, startEpoch, endEpoch, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (WhitelistSerialized.tupled, WhitelistSerialized.unapply)
+    def * = (id, ownerId, name, description, maxMembers, startEpoch, endEpoch, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Whitelist.tupled, Whitelist.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -58,15 +37,11 @@ object Whitelists {
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
   }
 
@@ -77,7 +52,7 @@ object Whitelists {
 class Whitelists @Inject()(
                             protected val databaseConfigProvider: DatabaseConfigProvider
                           )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Whitelists.WhitelistTable, Whitelists.WhitelistSerialized, String](
+  extends GenericDaoImpl[Whitelists.WhitelistTable, Whitelist, String](
     databaseConfigProvider,
     Whitelists.TableQuery,
     executionContext,
@@ -90,24 +65,24 @@ class Whitelists @Inject()(
 
     def addWhitelist(ownerId: String, name: String, description: String, maxMembers: Int, startEpoch: Int, endEpoch: Int): Future[String] = {
       val id = utilities.IdGenerator.getRandomHexadecimal
-      create(Whitelist(id = id, ownerId = ownerId, name = name, description = description, maxMembers = maxMembers, startEpoch = startEpoch, endEpoch = endEpoch).serialize())
+      create(Whitelist(id = id, ownerId = ownerId, name = name, description = description, maxMembers = maxMembers, startEpoch = startEpoch, endEpoch = endEpoch))
     }
 
     def edit(id: String, name: String, description: String, maxMembers: Int, startEpoch: Int, endEpoch: Int): Future[Unit] = {
       val whitelist = tryGet(id)
       for {
         whitelist <- whitelist
-        _ <- updateById(whitelist.copy(name = name, description = description, maxMembers = maxMembers, startEpoch = startEpoch, endEpoch = endEpoch).serialize())
+        _ <- updateById(whitelist.copy(name = name, description = description, maxMembers = maxMembers, startEpoch = startEpoch, endEpoch = endEpoch))
       } yield ()
     }
 
-    def tryGet(id: String): Future[Whitelist] = tryGetById(id).map(_.deserialize)
+    def tryGet(id: String): Future[Whitelist] = tryGetById(id)
 
-    def getByOwner(ownerId: String, pageNumber: Int): Future[Seq[Whitelist]] = filterAndSortWithPagination((pageNumber - 1) * constants.CommonConfig.Pagination.WhitelistPerPage, limit = constants.CommonConfig.Pagination.WhitelistPerPage)(_.ownerId === ownerId)(_.startEpoch).map(_.map(_.deserialize))
+    def getByOwner(ownerId: String, pageNumber: Int): Future[Seq[Whitelist]] = filterAndSortWithPagination((pageNumber - 1) * constants.CommonConfig.Pagination.WhitelistPerPage, limit = constants.CommonConfig.Pagination.WhitelistPerPage)(_.ownerId === ownerId)(_.startEpoch)
 
     def totalWhitelistsByOwner(ownerId: String): Future[Int] = filterAndCount(_.ownerId === ownerId)
 
-    def getByIds(whitelistIds: Seq[String]): Future[Seq[Whitelist]] = filter(_.id.inSet(whitelistIds)).map(_.map(_.deserialize))
+    def getByIds(whitelistIds: Seq[String]): Future[Seq[Whitelist]] = filter(_.id.inSet(whitelistIds))
 
     def getIdsByOwnerId(ownerId: String): Future[Seq[String]] = filter(_.ownerId === ownerId).map(_.map(_.id))
 

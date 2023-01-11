@@ -34,7 +34,6 @@ class CollectionController @Inject()(
                                       masterSales: master.Sales,
                                       masterNFTOwners: master.NFTOwners,
                                       masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
-                                      masterCollectionFiles: master.CollectionFiles,
                                       masterWhitelists: master.Whitelists,
                                       masterWhitelistMembers: master.WhitelistMembers,
                                       masterWishLists: master.WishLists,

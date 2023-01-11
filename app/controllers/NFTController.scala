@@ -37,7 +37,6 @@ class NFTController @Inject()(
                                masterWishLists: master.WishLists,
                                masterWhitelists: master.Whitelists,
                                masterWhitelistMembers: master.WhitelistMembers,
-                               masterCollectionFiles: master.CollectionFiles,
                                utilitiesNotification: utilities.Notification,
                                masterTransactionBuyNFTTransactions: masterTransaction.BuyNFTTransactions,
                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
