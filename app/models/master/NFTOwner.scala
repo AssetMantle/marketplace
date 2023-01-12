@@ -105,17 +105,39 @@ class NFTOwners @Inject()(
 
     def delete(nftId: String, ownerId: String): Future[Int] = deleteById1AndId2(id1 = nftId, id2 = ownerId)
 
-    def markNFTSold(nftId: String, saleId: String, sellerAccountId: String, buyerAccountId: String): Future[Unit] = {
+    def markNFTSoldFromSale(nftId: String, saleId: String, sellerAccountId: String, buyerAccountId: String): Future[Unit] = {
       val nftOwner = tryGet(nftId = nftId, ownerId = sellerAccountId)
 
       def verifyAndUpdate(nftOwner: NFTOwner) = if (nftOwner.saleId.getOrElse("") == saleId) {
         if (nftOwner.quantity == 1) {
+          val deleteOld = delete(nftId = nftOwner.nftId, ownerId = nftOwner.ownerId)
+          val addNew =  create(nftOwner.copy(saleId = None, ownerId = buyerAccountId))
           for {
-            _ <- delete(nftId = nftOwner.nftId, ownerId = nftOwner.ownerId)
-            _ <- create(nftOwner.copy(saleId = None, ownerId = buyerAccountId))
+            _ <- deleteOld
+            _ <- addNew
           } yield ()
         } else constants.Response.HANDLE_MULTIPLE_NFT_QUANTITY_CASE.throwFutureBaseException()
       } else constants.Response.NFT_NOT_ON_SALE.throwFutureBaseException()
+
+      for {
+        nftOwner <- nftOwner
+        _ <- verifyAndUpdate(nftOwner)
+      } yield ()
+    }
+
+    def markNFTSoldFromPublicListing(nftId: String, publicListingId: String, sellerAccountId: String, buyerAccountId: String): Future[Unit] = {
+      val nftOwner = tryGet(nftId = nftId, ownerId = sellerAccountId)
+
+      def verifyAndUpdate(nftOwner: NFTOwner) = if (nftOwner.publicListingId.getOrElse("") == publicListingId) {
+        if (nftOwner.quantity == 1) {
+          val deleteOld = delete(nftId = nftOwner.nftId, ownerId = nftOwner.ownerId)
+          val addNew = create(nftOwner.copy(publicListingId = None, ownerId = buyerAccountId))
+          for {
+            _ <- deleteOld
+            _ <- addNew
+          } yield ()
+        } else constants.Response.HANDLE_MULTIPLE_NFT_QUANTITY_CASE.throwFutureBaseException()
+      } else constants.Response.NFT_NOT_ON_PUBLIC_LISTING.throwFutureBaseException()
 
       for {
         nftOwner <- nftOwner
@@ -141,6 +163,11 @@ class NFTOwners @Inject()(
     def markSaleNull(saleId: String): Future[Int] = {
       val nullString: Option[String] = null
       customUpdate(NFTOwners.TableQuery.filter(_.saleId === saleId).map(_.saleId.?).update(nullString))
+    }
+
+    def markPublicListingNull(publicListingId: String): Future[Int] = {
+      val nullString: Option[String] = null
+      customUpdate(NFTOwners.TableQuery.filter(_.publicListingId === publicListingId).map(_.saleId.?).update(nullString))
     }
 
     def countOwnedNFTs(accountId: String): Future[Int] = filterAndCount(x => x.ownerId === accountId && x.creatorId =!= accountId)

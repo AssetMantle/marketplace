@@ -1,6 +1,7 @@
 package models.master
 
 import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.history
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -40,19 +41,19 @@ case class PublicListing(id: String, collectionId: String, numberOfNFTs: Long, m
     updatedBy = this.updatedBy,
     updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 
-  //  def toHistory: history.MasterPublicListing = history.MasterPublicListing(
-  //    id = this.id,
-  //    collectionId = this.collectionId,
-  //    numberOfNFTs = this.numberOfNFTs,
-  //    maxMintPerAccount = this.maxMintPerAccount,
-  //    price = this.price,
-  //    denom = this.denom,
-  //    startTimeEpoch = this.startTimeEpoch,
-  //    endTimeEpoch = this.endTimeEpoch,
-  //    createdBy = this.createdBy,
-  //    createdOnMillisEpoch = this.createdOnMillisEpoch,
-  //    updatedBy = this.updatedBy,
-  //    updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+  def toHistory: history.MasterPublicListing = history.MasterPublicListing(
+    id = this.id,
+    collectionId = this.collectionId,
+    numberOfNFTs = this.numberOfNFTs,
+    maxMintPerAccount = this.maxMintPerAccount,
+    price = this.price,
+    denom = this.denom,
+    startTimeEpoch = this.startTimeEpoch,
+    endTimeEpoch = this.endTimeEpoch,
+    createdBy = this.createdBy,
+    createdOnMillisEpoch = this.createdOnMillisEpoch,
+    updatedBy = this.updatedBy,
+    updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
 object PublicListings {

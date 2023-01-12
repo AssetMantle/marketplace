@@ -40,9 +40,12 @@ object Notification {
   val NFT_GIFTED: Notification = Notification("NFT_GIFTED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
 
   val SALE_ON_WHITELIST: Notification = Notification("SALE_ON_WHITELIST", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ProfileController.viewProfile))
-  val SELLER_BUY_NFT_SUCCESSFUL: Notification = Notification("SELLER_BUY_NFT_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
-  val BUYER_BUY_NFT_SUCCESSFUL: Notification = Notification("BUYER_BUY_NFT_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ProfileController.viewProfile))
+  val SELLER_BUY_NFT_SUCCESSFUL_FROM_SALE: Notification = Notification("SELLER_BUY_NFT_SUCCESSFUL_FROM_SALE", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
+  val BUYER_BUY_NFT_SUCCESSFUL_FROM_SALE: Notification = Notification("BUYER_BUY_NFT_SUCCESSFUL_FROM_SALE", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ProfileController.viewProfile))
   val BUYER_BUY_NFT_FAILED: Notification = Notification("BUYER_BUY_NFT_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
+
+  val SELLER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING: Notification = Notification("SELLER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
+  val BUYER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING: Notification = Notification("BUYER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ProfileController.viewProfile))
 
   val NFT_MINT_SUCCESSFUL: Notification = Notification("NFT_MINT_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
   val NFT_MINT_FAILED: Notification = Notification("NFT_MINT_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))

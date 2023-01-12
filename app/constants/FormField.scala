@@ -70,6 +70,7 @@ object FormField {
   val COLLECTION_TWITTER: StringFormField = StringFormField("COLLECTION_TWITTER", 1, 15, RegularExpression.TWITTER_USERNAME)
   val COLLECTION_INSTAGRAM: StringFormField = StringFormField("COLLECTION_INSTAGRAM", 1, 30, RegularExpression.INSTAGRAM_USERNAME)
   val SALE_ID: StringFormField = StringFormField("SALE_ID", 16, 16)
+  val PUBLIC_LISTING_ID: StringFormField = StringFormField("PUBLIC_LISTING_ID", 16, 16)
   val NOTIFICATION_ID: StringFormField = StringFormField("NOTIFICATION_ID", 16, 16)
 
   // UrlFormField
@@ -83,6 +84,7 @@ object FormField {
   val SALE_MAX_MINT_PER_ACCOUNT: IntFormField = IntFormField("SALE_MAX_MINT_PER_ACCOUNT", 1, 100000)
   val PUBLIC_LISTING_MAX_MINT_PER_ACCOUNT: IntFormField = IntFormField("SALE_MAX_MINT_PER_ACCOUNT", 1, 100000)
   val SALE_BUY_NFT_NUMBER: IntFormField = IntFormField("SALE_BUY_NFT_NUMBER", 1, 100000)
+  val PUBLIC_LISTING_BUY_NFT_NUMBER: IntFormField = IntFormField("PUBLIC_LISTING_BUY_NFT_NUMBER", 1, 100000)
 
 
   // DoubleFormField

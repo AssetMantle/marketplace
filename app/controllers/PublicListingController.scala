@@ -13,7 +13,7 @@ import views.publicListing.companion._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class PublicListingController @Inject()(
@@ -33,8 +33,6 @@ class PublicListingController @Inject()(
                                          masterNFTOwners: master.NFTOwners,
                                          masterNFTProperties: master.NFTProperties,
                                          masterWhitelistMembers: master.WhitelistMembers,
-                                         masterTransactionBuyNFTTransactions: masterTransaction.BuyNFTTransactions,
-                                         blockchainTransactionBuyNFTs: blockchainTransaction.BuyNFTs,
                                          utilitiesNotification: utilities.Notification,
                                          utilitiesOperations: utilities.Operations,
                                        )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -107,86 +105,86 @@ class PublicListingController @Inject()(
         }
       )
   }
-  //
-  //  def buySaleNFTForm(saleId: String, mintNft: Boolean): Action[AnyContent] = withoutLoginAction { implicit request =>
-  //    Ok(views.html.sale.buySaleNFT(saleId = saleId))
-  //  }
-  //
-  //  def buySaleNFT(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-  //    implicit request =>
-  //      BuySaleNFT.form.bindFromRequest().fold(
-  //        formWithErrors => {
-  //          Future(BadRequest(views.html.sale.buySaleNFT(formWithErrors, saleId = formWithErrors.data.getOrElse(constants.FormField.SALE_ID.name, ""))))
-  //        },
-  //        buySaleNFTData => {
-  //          val sale = masterSales.Service.tryGet(buySaleNFTData.saleId)
-  //          val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = buySaleNFTData.password)
-  //          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
-  //          val countBuyerNFTsFromSale = masterTransactionBuyNFTTransactions.Service.countBuyerNFTsFromSale(buyerAccountId = loginState.username, saleId = buySaleNFTData.saleId)
-  //
-  //          def collection(id: String) = masterCollections.Service.tryGet(id)
-  //
-  //          def nftOwners(collection: Collection) = masterNFTOwners.Service.getRandomNFTsBySaleId(saleId = buySaleNFTData.saleId, take = buySaleNFTData.buyNFTs, creatorId = collection.creatorId)
-  //
-  //          def checkAlreadySold(nftIds: Seq[String]) = masterTransactionBuyNFTTransactions.Service.checkAlreadySold(saleId = buySaleNFTData.saleId, nftIds = nftIds)
-  //
-  //          def nfts(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds)
-  //
-  //          //          def nftProperties(nftId: String) = masterNFTProperties.Service.getForNFT(nftId)
-  //
-  //          def sellerKey(ownerId: String) = masterKeys.Service.tryGetActive(ownerId)
-  //
-  //          def isWhitelistMember(sale: Sale) = masterWhitelistMembers.Service.isMember(whitelistId = sale.whitelistId, accountId = loginState.username)
-  //
-  //          def validateAndTransfer(nftOwners: Seq[NFTOwner], verifyPassword: Boolean, sale: Sale, isWhitelistMember: Boolean, buyerKey: Key, sellerKey: Key, balance: MicroNumber, nfts: Seq[NFT], countBuyerNFTsFromSale: Int, checkAlreadySold: Boolean) = {
-  //            val errors = Seq(
-  //              if (nftOwners.map(_.ownerId).distinct.contains(loginState.username)) Option(constants.Response.CANNOT_SELL_TO_YOURSELF) else None,
-  //              if (!isWhitelistMember) Option(constants.Response.NOT_MEMBER_OF_WHITELIST) else None,
-  //              if (sale.startTimeEpoch > utilities.Date.currentEpoch) Option(constants.Response.SALE_NOT_STARTED) else None,
-  //              if (utilities.Date.currentEpoch >= sale.endTimeEpoch) Option(constants.Response.SALE_EXPIRED) else None,
-  //              if (balance == MicroNumber.zero || balance <= (sale.price * buySaleNFTData.buyNFTs)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
-  //              //              if (buySaleNFTData.mintNFT && (balance - (sale.price + constants.Blockchain.AssetPropertyRate * (nftProperties.length + constants.Collection.DefaultProperty.list.length)) <= MicroNumber.zero)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
-  //              if ((countBuyerNFTsFromSale + buySaleNFTData.buyNFTs) > sale.maxMintPerAccount) Option(constants.Response.MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED) else None,
-  //              //              if (buySaleNFTData.mintNFT && nft.isMinted) Option(constants.Response.NFT_ALREADY_MINTED) else None,
-  //              if (nfts.exists(_.isMinted)) Option(constants.Response.NFT_ALREADY_MINTED) else None,
-  //              if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
-  //              if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
-  //            ).flatten
-  //            if (errors.isEmpty) {
-  //              blockchainTransactionBuyNFTs.Utility.transaction(
-  //                buyerAccountId = loginState.username,
-  //                sellerAccountId = sellerKey.accountId,
-  //                saleId = sale.id,
-  //                nftIds = nftOwners.map(_.nftId),
-  //                fromAddress = buyerKey.address,
-  //                toAddress = sellerKey.address,
-  //                amount = sale.price * buySaleNFTData.buyNFTs,
-  //                gasLimit = buySaleNFTData.gasAmount,
-  //                gasPrice = buySaleNFTData.gasPrice,
-  //                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buySaleNFTData.password))
-  //              )
-  //            } else errors.head.throwFutureBaseException()
-  //          }
-  //
-  //          (for {
-  //            sale <- sale
-  //            collection <- collection(sale.collectionId)
-  //            nftOwners <- nftOwners(collection)
-  //            nfts <- nfts(nftOwners.map(_.nftId))
-  //            //            nftProperties <- nftProperties(nftOwner.nftId)
-  //            sellerKey <- sellerKey(collection.creatorId)
-  //            (verifyPassword, buyerKey) <- verifyPassword
-  //            isWhitelistMember <- isWhitelistMember(sale)
-  //            balance <- balance
-  //            countBuyerNFTsFromSale <- countBuyerNFTsFromSale
-  //            checkAlreadySold <- checkAlreadySold(nftOwners.map(_.nftId))
-  //            blockchainTransaction <- validateAndTransfer(nftOwners = nftOwners, verifyPassword = verifyPassword, sale = sale, isWhitelistMember = isWhitelistMember, buyerKey = buyerKey, sellerKey = sellerKey, balance = balance, nfts = nfts, countBuyerNFTsFromSale = countBuyerNFTsFromSale, checkAlreadySold = checkAlreadySold)
-  //          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
-  //            ).recover {
-  //            case baseException: BaseException => BadRequest(views.html.sale.buySaleNFT(BuySaleNFT.form.withGlobalError(baseException.failure.message), saleId = buySaleNFTData.saleId))
-  //          }
-  //        }
-  //      )
-  //  }
+
+//  def buyNFTForm(publicListingID: String, mintNft: Boolean): Action[AnyContent] = withoutLoginAction { implicit request =>
+//    Ok(views.html.publicListing.buyNFT(publicListingID = publicListingID))
+//  }
+
+//  def buyNFT(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+//    implicit request =>
+//      BuyNFT.form.bindFromRequest().fold(
+//        formWithErrors => {
+//          Future(BadRequest(views.html.publicListing.buyNFT(formWithErrors, publicListingID = formWithErrors.data.getOrElse(constants.FormField.PUBLIC_LISTING_ID.name, ""))))
+//        },
+//        buyNFTData => {
+//          val publicListing = masterPublicListings.Service.tryGet(buyNFTData.publicListingID)
+//          val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = buyNFTData.password)
+//          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
+//          val countBuyerNFTsFromSale = masterTransactionBuyNFTTransactions.Service.countBuyerNFTsFromSale(buyerAccountId = loginState.username, saleId = buyNFTData.saleId)
+//
+//          def collection(id: String) = masterCollections.Service.tryGet(id)
+//
+//          def nftOwners(collection: Collection) = masterNFTOwners.Service.getRandomNFTsBySaleId(saleId = buyNFTData.saleId, take = buyNFTData.buyNFTs, creatorId = collection.creatorId)
+//
+//          def checkAlreadySold(nftIds: Seq[String]) = masterTransactionBuyNFTTransactions.Service.checkAlreadySold(saleId = buyNFTData.saleId, nftIds = nftIds)
+//
+//          def nfts(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds)
+//
+//          //          def nftProperties(nftId: String) = masterNFTProperties.Service.getForNFT(nftId)
+//
+//          def sellerKey(ownerId: String) = masterKeys.Service.tryGetActive(ownerId)
+//
+//          def isWhitelistMember(sale: Sale) = masterWhitelistMembers.Service.isMember(whitelistId = sale.whitelistId, accountId = loginState.username)
+//
+//          def validateAndTransfer(nftOwners: Seq[NFTOwner], verifyPassword: Boolean, sale: Sale, isWhitelistMember: Boolean, buyerKey: Key, sellerKey: Key, balance: MicroNumber, nfts: Seq[NFT], countBuyerNFTsFromSale: Int, checkAlreadySold: Boolean) = {
+//            val errors = Seq(
+//              if (nftOwners.map(_.ownerId).distinct.contains(loginState.username)) Option(constants.Response.CANNOT_SELL_TO_YOURSELF) else None,
+//              if (!isWhitelistMember) Option(constants.Response.NOT_MEMBER_OF_WHITELIST) else None,
+//              if (sale.startTimeEpoch > utilities.Date.currentEpoch) Option(constants.Response.SALE_NOT_STARTED) else None,
+//              if (utilities.Date.currentEpoch >= sale.endTimeEpoch) Option(constants.Response.SALE_EXPIRED) else None,
+//              if (balance == MicroNumber.zero || balance <= (sale.price * buyNFTData.buyNFTs)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+//              //              if (buyNFTData.mintNFT && (balance - (sale.price + constants.Blockchain.AssetPropertyRate * (nftProperties.length + constants.Collection.DefaultProperty.list.length)) <= MicroNumber.zero)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+//              if ((countBuyerNFTsFromSale + buyNFTData.buyNFTs) > sale.maxMintPerAccount) Option(constants.Response.MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED) else None,
+//              //              if (buyNFTData.mintNFT && nft.isMinted) Option(constants.Response.NFT_ALREADY_MINTED) else None,
+//              if (nfts.exists(_.isMinted)) Option(constants.Response.NFT_ALREADY_MINTED) else None,
+//              if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
+//              if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
+//            ).flatten
+//            if (errors.isEmpty) {
+//              blockchainTransactionBuyNFTs.Utility.transaction(
+//                buyerAccountId = loginState.username,
+//                sellerAccountId = sellerKey.accountId,
+//                saleId = sale.id,
+//                nftIds = nftOwners.map(_.nftId),
+//                fromAddress = buyerKey.address,
+//                toAddress = sellerKey.address,
+//                amount = sale.price * buyNFTData.buyNFTs,
+//                gasLimit = buyNFTData.gasAmount,
+//                gasPrice = buyNFTData.gasPrice,
+//                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buyNFTData.password))
+//              )
+//            } else errors.head.throwFutureBaseException()
+//          }
+//
+//          (for {
+//            sale <- sale
+//            collection <- collection(sale.collectionId)
+//            nftOwners <- nftOwners(collection)
+//            nfts <- nfts(nftOwners.map(_.nftId))
+//            //            nftProperties <- nftProperties(nftOwner.nftId)
+//            sellerKey <- sellerKey(collection.creatorId)
+//            (verifyPassword, buyerKey) <- verifyPassword
+//            isWhitelistMember <- isWhitelistMember(sale)
+//            balance <- balance
+//            countBuyerNFTsFromSale <- countBuyerNFTsFromSale
+//            checkAlreadySold <- checkAlreadySold(nftOwners.map(_.nftId))
+//            blockchainTransaction <- validateAndTransfer(nftOwners = nftOwners, verifyPassword = verifyPassword, sale = sale, isWhitelistMember = isWhitelistMember, buyerKey = buyerKey, sellerKey = sellerKey, balance = balance, nfts = nfts, countBuyerNFTsFromSale = countBuyerNFTsFromSale, checkAlreadySold = checkAlreadySold)
+//          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+//            ).recover {
+//            case baseException: BaseException => BadRequest(views.html.sale.buySaleNFT(BuySaleNFT.form.withGlobalError(baseException.failure.message), saleId = buyNFTData.saleId))
+//          }
+//        }
+//      )
+//  }
 
 }

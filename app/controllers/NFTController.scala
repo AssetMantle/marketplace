@@ -38,7 +38,7 @@ class NFTController @Inject()(
                                masterWhitelists: master.Whitelists,
                                masterWhitelistMembers: master.WhitelistMembers,
                                utilitiesNotification: utilities.Notification,
-                               masterTransactionBuyNFTTransactions: masterTransaction.BuyNFTTransactions,
+                               masterTransactionSaleNFTTransactions: masterTransaction.SaleNFTTransactions,
                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -138,7 +138,7 @@ class NFTController @Inject()(
 
         def sale(saleId: String) = if (saleId != "") masterSales.Service.tryGet(saleId).map(Option(_)) else Future(None)
 
-        def checkAlreadySold(saleId: String) = if (saleId != "") masterTransactionBuyNFTTransactions.Service.checkAlreadySold(saleId = saleId, nftId = nftId) else Future(false)
+        def checkAlreadySold(saleId: String) = if (saleId != "") masterTransactionSaleNFTTransactions.Service.checkAlreadySold(saleId = saleId, nftId = nftId) else Future(false)
 
         def saleOffered(whitelistId: String) = if (loginState.isDefined && whitelistId != "") masterWhitelistMembers.Service.isMember(whitelistId = whitelistId, accountId = loginState.get.username)
         else Future(false)

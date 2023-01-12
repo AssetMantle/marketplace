@@ -27,7 +27,7 @@
             @* </div>*@
             @if(optionalLoginState.isDefined && optionalLoginState.get.isGenesisCreator && optionalLoginState.get.username == collection.creatorId) {
                 <div class="separator"></div>
-                @commonPrimaryButton(constants.View.CREATE_COLLECTION_SALE, JavaScript(s"getForm(jsRoutes.controllers.SaleController.createCollectionSaleForm(undefined, '${collection.id}'))"))
+                @commonPrimaryButton(constants.View.CREATE_COLLECTION_SALE, JavaScript(s"getForm(jsRoutes.controllers.PublicListingController.createPublicListingForm('${collection.id}'))"))
             }
         } else {
             @defining(sales.minBy(_.price)) { saleByMinimumPrice =>

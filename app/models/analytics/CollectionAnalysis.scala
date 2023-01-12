@@ -163,7 +163,7 @@ class CollectionsAnalysis @Inject()(
       } yield ()
     }
 
-    def onSuccessfulSale(collectionId: String, price: MicroNumber): Future[Unit] = {
+    def onSuccessfulSell(collectionId: String, price: MicroNumber): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
 
       for {
@@ -196,6 +196,15 @@ class CollectionsAnalysis @Inject()(
       for {
         collectionAnalysis <- collectionAnalysis
         _ <- Service.update(collectionAnalysis.copy(salePrice = MicroNumber.zero))
+      } yield ()
+    }
+
+    def onPublicListingExpiry(collectionId: String): Future[Unit] = {
+      val collectionAnalysis = Service.tryGet(collectionId)
+
+      for {
+        collectionAnalysis <- collectionAnalysis
+        _ <- Service.update(collectionAnalysis.copy(publicListingPrice = MicroNumber.zero))
       } yield ()
     }
 
