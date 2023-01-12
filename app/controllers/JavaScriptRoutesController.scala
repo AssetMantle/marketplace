@@ -119,6 +119,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.SaleController.createCollectionSaleForm,
         routes.javascript.SaleController.buySaleNFTForm,
+        routes.javascript.SaleController.saleOption,
 
         routes.javascript.WhitelistController.whitelistSection,
         routes.javascript.WhitelistController.createdWhitelists,

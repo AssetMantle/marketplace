@@ -166,6 +166,8 @@ POST        /createSale                                       controllers.SaleCo
 GET         /buySaleNFT                                       controllers.SaleController.buySaleNFTForm(saleId: String, mintNft: Boolean)
 POST        /buySaleNFT                                       controllers.SaleController.buySaleNFT()
 
+GET         /saleOption                                       controllers.SaleController.saleOption(collectionId: String)
+
 # Should be not changed it will be public
 GET         /acceptWhitelistInvite/:whitelistId               controllers.WhitelistController.viewAcceptInviteDetails(whitelistId: String)
 GET         /whitelistInviteDetails                           controllers.WhitelistController.acceptInviteDetails(whitelistId: String)
