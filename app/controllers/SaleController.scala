@@ -210,8 +210,4 @@ class SaleController @Inject()(
       )
   }
 
-  def saleOption(collectionId: String): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.sale.saleOption(collectionId))
-  }
-
 }
