@@ -651,10 +651,10 @@
             }
           }
           &.propertyIconVisibility{
-            background-image: url("../images/icon/metaDisable.png");
+            background-image: url("../images/icon/nonMetaDisable.png");
             background-size: cover;
             &.active{
-              background-image: url("../images/icon/nonMetaDisable.png");
+              background-image: url("../images/icon/metaDisable.png");
             }
           }
           &.propertyIconRequirement{
