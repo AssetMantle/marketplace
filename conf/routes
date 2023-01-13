@@ -42,6 +42,7 @@ POST        /migrateWalletToKey                               controllers.Accoun
 POST        /changeActiveKey                                  controllers.AccountController.changeActiveKey()
 
 GET         /collections/:category                            controllers.CollectionController.viewCollections(category: String)
+GET         /publicListedCollections                          controllers.CollectionController.viewPublicListedCollections()
 GET         /collection/:id                                   controllers.CollectionController.viewCollection(id: String)
 GET         /collectionsSection                               controllers.CollectionController.collectionsSection(category: String)
 GET         /collectionList                                   controllers.CollectionController.collectionList(category: String)
@@ -137,7 +138,7 @@ GET         /walletBalance                                    controllers.Settin
 
 GET         /defaultProfile                                   controllers.ProfileController.viewDefaultProfile()
 GET         /profile/:accountId/:activeTab                    controllers.ProfileController.viewProfile(accountId: String, activeTab: String)
-GET         /profile/:accountId                               controllers.ProfileController.viewProfile(accountId: String, activeTab: String ?= "CREATED")
+GET         /profile/:accountId                               controllers.ProfileController.viewProfile(accountId: String, activeTab: String ?= "COLLECTED")
 GET         /profileSection                                   controllers.ProfileController.profile(accountId: String, activeTab: String)
 GET         /notificationPopup                                controllers.ProfileController.notificationPopup()
 GET         /loadMoreNotifications                            controllers.ProfileController.loadMoreNotifications(pageNumber: Int)

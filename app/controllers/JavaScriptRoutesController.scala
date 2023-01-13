@@ -28,6 +28,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.changeActiveKey,
 
         routes.javascript.CollectionController.viewCollections,
+        routes.javascript.CollectionController.viewPublicListedCollections,
         routes.javascript.CollectionController.viewCollection,
         routes.javascript.CollectionController.collectionsSection,
         routes.javascript.CollectionController.collectionList,
