@@ -158,7 +158,7 @@ class PublicListingController @Inject()(
               if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
             ).flatten
             if (errors.isEmpty) {
-              blockchainTransactionNFTPublicListings.Utility.transaction(
+              masterTransactionPublicListingNFTTransactions.Utility.transaction(
                 buyerAccountId = loginState.username,
                 sellerAccountId = sellerKey.accountId,
                 publicListingId = publicListing.id,

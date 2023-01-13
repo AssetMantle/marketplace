@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.result.WithUsernameToken
-import models.{blockchainTransaction, history}
+import models.{blockchainTransaction, history, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -26,6 +26,7 @@ class IndexController @Inject()(
                                  historyMasterPublicListings: history.MasterPublicListings,
                                  nftPublicListings: blockchainTransaction.NFTPublicListings,
                                  nftSales: blockchainTransaction.NFTSales,
+                                 publicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -49,4 +50,5 @@ class IndexController @Inject()(
   historyMasterSales.Utility.start
   historyMasterPublicListings.Utility.start
   nftPublicListings.Utility.start
+  publicListingNFTTransactions.Utility.start
 }

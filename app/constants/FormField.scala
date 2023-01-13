@@ -88,7 +88,7 @@ object FormField {
 
 
   // DoubleFormField
-  val GAS_PRICE: DoubleFormField = DoubleFormField("GAS_PRICE", constants.Blockchain.LowGasPrice, constants.Blockchain.HighGasPrice)
+  val GAS_PRICE: BigDecimalFormField = BigDecimalFormField("GAS_PRICE", constants.Blockchain.LowGasPrice, constants.Blockchain.HighGasPrice)
 
   // EpochFormField
   val WHITELIST_INVITE_START_EPOCH: EpochFormField = EpochFormField("WHITELIST_INVITE_START_EPOCH", 1, Int.MaxValue)
@@ -124,7 +124,7 @@ object FormField {
   // MicroNumberFormField
   val SEND_COIN_AMOUNT: MicroNumberFormField = MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.smallest, MicroNumber(Int.MaxValue), 6)
   val NFT_WHITELIST_SALE_PRICE: MicroNumberFormField = MicroNumberFormField("NFT_WHITELIST_SALE_PRICE", MicroNumber.smallest, MicroNumber(Int.MaxValue))
-  val PUBLIC_LISTING_PRICE: MicroNumberFormField = MicroNumberFormField("PUBLIC_LISTING_PRICE", MicroNumber.smallest, MicroNumber(Int.MaxValue))
+  val PUBLIC_LISTING_PRICE: MicroNumberFormField = MicroNumberFormField("PUBLIC_LISTING_PRICE", MicroNumber.smallest, MicroNumber(Int.MaxValue), 6)
 
   // NestedFormField
   val COLLECTION_PROPERTIES: NestedFormField = NestedFormField("COLLECTION_PROPERTIES")
@@ -222,19 +222,6 @@ object FormField {
     def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(DATE_ERROR_PREFIX + name)
   }
 
-  case class DoubleFormField(name: String, minimumValue: Double, maximumValue: Double) {
-    val placeHolder: String = PLACEHOLDER_PREFIX + name
-
-    def mapping: (String, Mapping[Double]) = name -> of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
-
-    def optionalMapping: (String, Mapping[Option[Double]]) = name -> optional(of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue)))
-
-    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_VALUE_ERROR, minimumValue)
-
-    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_VALUE_ERROR, maximumValue)
-
-  }
-
   case class BigDecimalFormField(name: String, minimumValue: BigDecimal, maximumValue: BigDecimal) {
     val placeHolder: String = PLACEHOLDER_PREFIX + name
 
@@ -275,9 +262,9 @@ object FormField {
   case class MicroNumberFormField(name: String, minimumValue: MicroNumber, maximumValue: MicroNumber, precision: Int = 2) {
     val placeHolder: String = PLACEHOLDER_PREFIX + name
 
-    def mapping: (String, Mapping[MicroNumber]) = name -> of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
+    def mapping: (String, Mapping[MicroNumber]) = name -> of(bigDecimalFormat).verifying(Constraints.max[BigDecimal](maximumValue.toBigDecimal), Constraints.min[BigDecimal](minimumValue.toBigDecimal)).verifying(constants.Response.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toBigDecimal)
 
-    def optionalMapping: (String, Mapping[Option[MicroNumber]]) = name -> optional(of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble))
+    def optionalMapping: (String, Mapping[Option[MicroNumber]]) = name -> optional(of(bigDecimalFormat).verifying(Constraints.max[BigDecimal](maximumValue.toBigDecimal), Constraints.min[BigDecimal](minimumValue.toBigDecimal)).verifying(constants.Response.MICRO_NUMBER_PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toBigDecimal))
 
     def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_VALUE_ERROR, minimumValue)
 

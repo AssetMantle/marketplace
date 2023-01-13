@@ -13,8 +13,6 @@ object UploadFile {
       "resumableFilename" -> nonEmptyText
     )(UploadFile.apply)(UploadFile.unapply))
 
-  case class UploadFile(resumableChunkNumber: Int, resumableChunkSize: Int, resumableTotalSize: Long, resumableIdentifier: String, resumableFilename: String) {
-    def totalChunks: Double = Math.ceil(resumableTotalSize.toDouble / resumableChunkSize.toDouble)
-  }
+  case class UploadFile(resumableChunkNumber: Int, resumableChunkSize: Int, resumableTotalSize: Long, resumableIdentifier: String, resumableFilename: String)
 
 }

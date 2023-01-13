@@ -163,7 +163,7 @@ class NFTOwners @Inject()(
 
     def markPublicListingNull(publicListingId: String): Future[Int] = {
       val nullString: Option[String] = null
-      customUpdate(NFTOwners.TableQuery.filter(_.publicListingId === publicListingId).map(_.saleId.?).update(nullString))
+      customUpdate(NFTOwners.TableQuery.filter(_.publicListingId === publicListingId).map(_.publicListingId.?).update(nullString))
     }
 
     def countOwnedNFTs(accountId: String): Future[Int] = filterAndCount(x => x.ownerId === accountId && x.creatorId =!= accountId)

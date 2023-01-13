@@ -13,5 +13,5 @@ object BuySaleNFT {
       constants.FormField.PASSWORD.mapping
     )(Data.apply)(Data.unapply))
 
-  case class Data(saleId: String, buyNFTs: Int, gasAmount: Int, gasPrice: Double, password: String)
+  case class Data(saleId: String, buyNFTs: Int, gasAmount: Int, gasPrice: BigDecimal, password: String)
 }
