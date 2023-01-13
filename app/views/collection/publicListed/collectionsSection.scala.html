@@ -2,7 +2,13 @@
 
 @(totalCollections: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
-<div class="earlyAccessBannerContainer"></div>
+<div class="earlyAccessBannerContainer">
+    <div class="messageContainer">
+        <div class="header">@Messages(constants.View.EARLY_ACCESS_BANNER_HEADER)</div>
+        <div class="subHeader">@Messages(constants.View.EARLY_ACCESS_BANNER_SUBHEADER)</div>
+    </div>
+    <img src="@routes.Assets.versioned("images/earlyAccessBanner.svg")"/>
+</div>
 <div class="item item-center centerContainer">
     <div class="centerCard">
         <div class="centerCardHeader">@Messages(constants.View.PUBLIC_LISTING_TITLE)</div>

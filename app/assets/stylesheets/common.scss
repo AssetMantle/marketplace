@@ -1086,8 +1086,26 @@ body.modal-open{
 .earlyAccessBannerContainer{
   height: 300px;
   width: 100%;
-  background-color: var(--card-dark);
   border-radius: 20px;
   position: relative;
   top: -30px;
+  overflow: hidden;
+  img{
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+  .messageContainer{
+    position: absolute;
+    bottom: 20px;
+    left: 24px;
+    .header{
+      @include setFont(var(--font-type-1), normal, 500, 28px, 34px, var(--mantle-off-white));
+      text-transform: capitalize;
+      margin-bottom: 12px;
+    }
+    .subHeader{
+      @include setFont(var(--font-type-2), normal, 400, 18px, 22px, var(--mantle-off-white));
+    }
+  }
 }
