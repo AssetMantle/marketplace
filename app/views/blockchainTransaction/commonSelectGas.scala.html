@@ -2,7 +2,7 @@
 
 @(formData: Form[_])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonInputDouble(formData, constants.FormField.GAS_PRICE, Symbol("class") -> "hidden", Symbol("value") -> constants.Blockchain.MediumGasPrice)
+@commonInputBigDecimal(formData, constants.FormField.GAS_PRICE, Symbol("class") -> "hidden", Symbol("value") -> constants.Blockchain.MediumGasPrice)
 <div class="mb-2 gasFeesLabel">@Messages(constants.View.BLOCKCHAIN_TRANSACTION_FEES)</div>
 <div id="gasPriceToggleButton" class="btn-group w-100 toggleBtn" role="group">
     <span id="option1" type="button" class="btn p-2 toggleOption" onclick="setGasOption(this, @constants.Blockchain.LowGasPrice)">

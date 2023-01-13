@@ -19,7 +19,11 @@ object NumericOperation {
     math.floor(value * s) / s
   }
 
-  def checkPrecision(precision: Int, value: String): Boolean = if (value.split("""\.""")(1).length <= precision) true else false
+  def checkPrecision(precision: Int, value: String): Boolean = {
+    if (value.split("""\.""").length > 1) {
+      if (value.split("""\.""")(1).length <= precision) true else false
+    } else true
+  }
 
   def formatNumber(number: MicroNumber, normalize: Boolean = true): String = if (normalize) formatNumber(number.toDouble) else formatNumber(number.value)
 

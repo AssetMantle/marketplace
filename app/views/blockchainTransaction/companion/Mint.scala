@@ -13,6 +13,6 @@ object Mint {
       constants.FormField.PASSWORD.mapping,
     )(Data.apply)(Data.unapply))
 
-  case class Data(nftId: String, gasAmount: Int, gasPrice: Double, password: String)
+  case class Data(nftId: String, gasAmount: Int, gasPrice: BigDecimal, password: String)
 
 }
