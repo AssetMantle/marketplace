@@ -10,7 +10,7 @@ import slick.jdbc.JdbcProfile
 import slick.lifted.{CanBeQueryCondition, ColumnOrdered, Ordered}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 abstract class GenericDaoImpl[
   T <: Table[E] with ModelTable[PK],
@@ -106,6 +106,8 @@ abstract class GenericDaoImpl[
   }
 
   def filterAndSortWithPagination[C1 <: Rep[_], C2 <: Rep[_]](offset: Int, limit: Int)(expr: T => C1)(sortExpr: T => C2)(implicit wt: CanBeQueryCondition[C1], ev: C2 => Ordered): Future[Seq[E]] = db.run(tableQuery.filter(expr).sortBy(sortExpr).drop(offset).take(limit).result)
+
+  def getAllAndSortWithPagination[C1 <: Rep[_], C2 <: Rep[_]](offset: Int, limit: Int)(sortExpr: T => C2)(implicit ev: C2 => Ordered): Future[Seq[E]] = db.run(tableQuery.sortBy(sortExpr).drop(offset).take(limit).result)
 
   def filterAndReverseSortWithPagination[C1 <: Rep[_], C2 <: Rep[_]](offset: Int, limit: Int)(expr: T => C1)(sortExpr: T => C2)(ev: C2 => Ordered)(implicit wt: CanBeQueryCondition[C1]): Future[Seq[E]] = db.run(tableQuery.filter(expr).sortBy(sortExpr)(ev).drop(offset).take(limit).result)
 
