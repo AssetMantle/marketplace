@@ -95,7 +95,7 @@ class PublicListingNFTTransactions @Inject()(
       filterAndCount(x => x.buyerAccountId === buyerAccountId && x.publicListingId === publicListingId && (x.status.? === nullStatus || x.status))
     }
 
-    def countBySuccessfulAndId(publicListingId: String): Future[Int] = {
+    def getTotalPublicListingSold(publicListingId: String): Future[Int] = {
       val nullStatus: Option[Boolean] = null
       filterAndCount(x => x.publicListingId === publicListingId && x.publicListingId === publicListingId && (x.status.? === nullStatus || x.status))
     }
