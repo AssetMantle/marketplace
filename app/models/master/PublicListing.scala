@@ -131,6 +131,10 @@ class PublicListings @Inject()(
     def getPublicListingByCollectionId(collectionId: String): Future[Option[PublicListing]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize).headOption)
 
     def delete(publicListingId: String): Future[Int] = deleteById(publicListingId)
+    
+    def total: Future[Int] = countTotal()
+
+    def getByPageNumber(pageNumber: Int): Future[Seq[PublicListing]] = getAllByPageNumber(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.endTimeEpoch).map(_.map(_.deserialize))
   }
 
 }
