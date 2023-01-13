@@ -3,7 +3,7 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
-import models.master.{Collection, Sale}
+import models.master.{Collection, PublicListing}
 import models.masterTransaction.CollectionDraft
 import models.{master, masterTransaction}
 import play.api.Logger
@@ -52,6 +52,13 @@ class CollectionController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         Future(Ok(views.html.collection.viewCollections(category)))
+    }
+  }
+
+  def viewPublicListedCollections(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.collection.viewPublicListedCollections()))
     }
   }
 
@@ -198,7 +205,7 @@ class CollectionController @Inject()(
       val collection = masterCollections.Service.tryGet(id)
       val publicListing = masterPublicListings.Service.getPublicListingByCollectionId(id)
 
-      def getTotalPublicListingSold(publicListingId: Option[String]): Future[Long] = if (publicListingId.isDefined) masterTransactionPublicListingNFTTransactions.Service.countBySuccessfulAndId(publicListingId.get).map(_.toLong) else Future(0L)
+      def getTotalPublicListingSold(publicListingId: Option[String]): Future[Long] = if (publicListingId.isDefined) masterTransactionPublicListingNFTTransactions.Service.getTotalPublicListingSold(publicListingId.get).map(_.toLong) else Future(0L)
 
       val getSalesInfo = if (optionalLoginState.isDefined) {
         val sales = masterSales.Service.getAllSalesByCollectionId(id)
@@ -227,27 +234,16 @@ class CollectionController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
-        val sales = masterSales.Service.getAllSalesByCollectionId(id)
+        val publicListing = masterPublicListings.Service.getPublicListingByCollectionId(id)
 
-        def allSold(saleId: String) = masterNFTOwners.Service.checkAllSold(saleId)
+        def publicListingStatus(publicListing: Option[PublicListing]) = if (publicListing.isDefined) masterTransactionPublicListingNFTTransactions.Service.getTotalPublicListingSold(publicListing.get.id).map(x => publicListing.get.getStatus(x).id) else Future(0)
 
-        def saleStatus(sales: Seq[Sale]) = if (sales.isEmpty) Future(0) else {
-          val activeSale = sales.sortBy(_.endTimeEpoch).find(x => {
-            val currentEpoch = utilities.Date.currentEpoch
-            currentEpoch >= x.startTimeEpoch && currentEpoch < x.endTimeEpoch
-          })
-          if (activeSale.isEmpty) Future(3) else {
-            for {
-              allSold <- allSold(activeSale.get.id)
-            } yield activeSale.get.getStatus(allSold).id
-          }
-        }
 
         (for {
           collectionAnalysis <- collectionAnalysis
-          sales <- sales
-          saleStatus <- saleStatus(sales)
-        } yield Ok(s"${collectionAnalysis.totalNFTs.toString}|${sales.sortBy(_.price).headOption.fold(MicroNumber.zero)(_.price).toString}|${saleStatus}")
+          publicListing <- publicListing
+          publicListingStatus <- publicListingStatus(publicListing)
+        } yield Ok(s"${collectionAnalysis.totalNFTs.toString}|${publicListing.fold(MicroNumber.zero)(_.price).toString}|${publicListingStatus}")
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }
