@@ -95,8 +95,8 @@ object FormField {
   val WHITELIST_INVITE_END_EPOCH: EpochFormField = EpochFormField("WHITELIST_INVITE_END_EPOCH", 1, Int.MaxValue)
   val NFT_SALE_START_EPOCH: EpochFormField = EpochFormField("NFT_SALE_START_EPOCH", 1, Int.MaxValue)
   val NFT_SALE_END_EPOCH: EpochFormField = EpochFormField("NFT_SALE_END_EPOCH", 1, Int.MaxValue)
-  val PUBLIC_LISTING_START_EPOCH: EpochFormField = EpochFormField("NFT_SALE_START_EPOCH", 1, Int.MaxValue)
-  val PUBLIC_LISTING_END_EPOCH: EpochFormField = EpochFormField("NFT_SALE_END_EPOCH", 1, Int.MaxValue)
+  val PUBLIC_LISTING_START_EPOCH: EpochFormField = EpochFormField("PUBLIC_LISTING_START_EPOCH", 1, Int.MaxValue)
+  val PUBLIC_LISTING_END_EPOCH: EpochFormField = EpochFormField("PUBLIC_LISTING_END_EPOCH", 1, Int.MaxValue)
 
   // BooleanFormField
   val RECEIVE_NOTIFICATIONS: BooleanFormField = BooleanFormField("RECEIVE_NOTIFICATIONS")
