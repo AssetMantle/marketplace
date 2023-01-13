@@ -96,7 +96,34 @@
                         </a>
                     </div>
                     <ul class="links">
-                        <li><a href="@routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)">@Messages(constants.View.EXPLORE)</a></li>
+                        <li>
+                            <a class="desktop-link">
+                                <span class="newFeatureIcon">@Messages(constants.View.NEW_LABEL)</span>
+                                @Messages(constants.View.EXPLORE)
+                            </a>
+                            <input type="checkbox" id="show-features">
+                            <label for="show-features">@Messages(constants.View.EXPLORE)</label>
+                            <ul class="submenu">
+                                <li>
+                                    <a class="d-flex flex-row align-items-center gap-3">
+                                        <i class="bi bi-folder-plus iconDefault"></i>
+                                        <div class="profileMenuLabel">@Messages(constants.View.LAUNCHPAD_MENU)</div>
+                                    </a>
+                                </li>
+                                <li onclick="getForm(jsRoutes.controllers.CollectionController.publicListedCollectionsSection())">
+                                    <a class="d-flex flex-row align-items-center gap-3">
+                                        <img src="@routes.Assets.versioned("images/icon/createNFT.svg")"/>
+                                        <div class="profileMenuLabel">@Messages(constants.View.EARLY_ACCESS_MENU)</div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="d-flex flex-row align-items-center gap-3" href="@routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)">
+                                        <i class="bi bi-palette iconDefault"></i>
+                                        <div class="profileMenuLabel">@Messages(constants.View.ALL_COLLECTION_MENU)</div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                         <li>
                             <a class="desktop-link">
                                 <span class="newFeatureIcon">@Messages(constants.View.NEW_LABEL)</span>
