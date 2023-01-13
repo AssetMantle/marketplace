@@ -95,6 +95,11 @@ class PublicListingNFTTransactions @Inject()(
       filterAndCount(x => x.buyerAccountId === buyerAccountId && x.publicListingId === publicListingId && (x.status.? === nullStatus || x.status))
     }
 
+    def countBySuccessfulAndId(publicListingId: String): Future[Int] = {
+      val nullStatus: Option[Boolean] = null
+      filterAndCount(x => x.publicListingId === publicListingId && x.publicListingId === publicListingId && (x.status.? === nullStatus || x.status))
+    }
+
     def getByTxHash(txHash: String): Future[Seq[PublicListingNFTTransaction]] = filter(_.txHash === txHash)
 
     def markSuccess(txHash: String): Future[Int] = customUpdate(PublicListingNFTTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))

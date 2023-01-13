@@ -12,19 +12,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class PublicListing(id: String, collectionId: String, numberOfNFTs: Long, maxMintPerAccount: Long, price: MicroNumber, denom: String, startTimeEpoch: Long, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def getStatus(allSold: Boolean): constants.PublicListing.Status = {
+  def getStatus(numberOfSold: Long): constants.PublicListing.Status = {
     val currentEpoch = System.currentTimeMillis() / 1000
-    if (allSold && currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.PublicListing.SOLD_OUT // Sold out
+    if (numberOfSold >= numberOfNFTs) constants.PublicListing.SOLD_OUT // Sold out
     else if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.PublicListing.LIVE // Live
     else if (currentEpoch >= this.endTimeEpoch) constants.PublicListing.EXPIRED // Expired
     else constants.PublicListing.NOT_STARTED //
-  }
-
-  def getStatus: constants.PublicListing.Status = {
-    val currentEpoch = System.currentTimeMillis() / 1000
-    if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.PublicListing.LIVE
-    else if (currentEpoch >= this.endTimeEpoch) constants.PublicListing.EXPIRED
-    else constants.PublicListing.NOT_STARTED
   }
 
   def serialize(): PublicListings.PublicListingSerialized = PublicListings.PublicListingSerialized(
@@ -131,7 +124,7 @@ class PublicListings @Inject()(
     def getPublicListingByCollectionId(collectionId: String): Future[Option[PublicListing]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize).headOption)
 
     def delete(publicListingId: String): Future[Int] = deleteById(publicListingId)
-    
+
     def total: Future[Int] = countTotal()
 
     def getByPageNumber(pageNumber: Int): Future[Seq[PublicListing]] = getAllByPageNumber(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.endTimeEpoch).map(_.map(_.deserialize))

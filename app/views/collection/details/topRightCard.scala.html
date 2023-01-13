@@ -3,7 +3,7 @@
 @import models.master.{Collection, PublicListing, Sale}
 @import views.html.base.buttons._
 
-@(collectionAnalysis: CollectionAnalysis, collection: Collection, sales: Seq[Sale], publicListing: Option[PublicListing], isMember: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+@(collectionAnalysis: CollectionAnalysis, collection: Collection, sales: Seq[Sale], publicListing: Option[PublicListing], isMember: Boolean, publicListingSold: Long)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
 
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
@@ -14,7 +14,7 @@
         @if(publicListing.isDefined) {
             <div class="d-flex justify-content-between align-items-center">
                 <div class="title">@Messages(constants.View.PUBLIC_LISTING_TITLE)</div>
-                @if(publicListing.get.getStatus.id == constants.Sale.LIVE.id) {
+                @if(publicListing.get.getStatus(publicListingSold).id == constants.PublicListing.LIVE.id) {
                     <div class="liveBadge">@Messages(constants.View.SALE_LIVE_LABEL)</div>
                 }
             </div>
@@ -25,7 +25,7 @@
             <div class="d-flex flex-column gap-1 mt-3">
                 <div class="analysisValue">@Messages(constants.View.COLLECTION_MAXIMUM_MINT_PER_USER, publicListing.get.maxMintPerAccount)</div>
             </div>
-            @if(publicListing.get.getStatus.id == constants.Sale.NOT_STARTED.id) {
+            @if(publicListing.get.getStatus(publicListingSold).id == constants.PublicListing.NOT_STARTED.id) {
                 <div class="d-flex flex-column gap-1 mt-3">
                     <div class="analysisTitle">@Messages(constants.View.SALE_START_TIME)</div>
                     <div id="countdown_@publicListing.get.startTimeEpoch" class="d-flex gap-2 analysisValue">
@@ -34,8 +34,9 @@
                 </div>
                 <script>epochToDateTime('countdown_@publicListing.get.startTimeEpoch');</script>
             } else {
-                @if(publicListing.get.getStatus.id == constants.Sale.SOLD_OUT.id) {
-
+                @println(publicListing.get.getStatus(publicListingSold).id)
+                @if(publicListing.get.getStatus(publicListingSold).id == constants.PublicListing.SOLD_OUT.id) {
+                    @Messages(constants.PublicListing.SOLD_OUT.value)
                 } else {
                     <div class="d-flex flex-column gap-1 mt-3">
                         <div class="analysisTitle">@Messages(constants.View.SALE_ENDS_IN)</div>
