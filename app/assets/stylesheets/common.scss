@@ -1081,3 +1081,13 @@ body.modal-open{
 .centerCardHeader {
   @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--default));
 }
+
+// Early access
+.earlyAccessBannerContainer{
+  height: 300px;
+  width: 100%;
+  background-color: var(--card-dark);
+  border-radius: 20px;
+  position: relative;
+  top: -30px;
+}
