@@ -70,7 +70,7 @@ class CollectionController @Inject()(
   def collectionsSection(category: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.collection.explore.collectionsSection(category)))
+        Future(Ok(views.html.collection.comingSoon.collectionsSection(category)))
     }
   }
 
@@ -81,9 +81,9 @@ class CollectionController @Inject()(
 
         (for {
           totalCollections <- totalCollections
-        } yield Ok(views.html.collection.explore.collectionList(category, totalCollections))
+        } yield Ok(views.html.collection.comingSoon.collectionList(category, totalCollections))
           ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
+          case baseException: BaseException => BadRequest(baseException.failure.message)
         }
     }
   }
@@ -96,7 +96,38 @@ class CollectionController @Inject()(
 
         (for {
           collections <- collections
-        } yield Ok(views.html.collection.explore.collectionsPerPage(collections))
+        } yield Ok(views.html.collection.comingSoon.collectionsPerPage(collections))
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
+  }
+
+  def publicListedCollectionsSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val totalCollections = masterPublicListings.Service.total
+        (for {
+          totalCollections <- totalCollections
+        } yield Ok(views.html.collection.publicListed.collectionsSection(totalCollections))
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
+  }
+
+  def publicListedCollectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val publicListings = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        else masterPublicListings.Service.getByPageNumber(pageNumber)
+
+        def collections(ids: Seq[String]) = masterCollections.Service.getCollections(ids)
+
+        (for {
+          publicListings <- publicListings
+          collections <- collections(publicListings.map(_.collectionId))
+        } yield Ok(views.html.collection.publicListed.collectionsPerPage(collections))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
