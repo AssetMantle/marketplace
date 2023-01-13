@@ -46,7 +46,7 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.account.signUp(formWithErrors)))
         },
         signUpData => {
-          val addAccount = masterAccounts.Service.upsertOnSignUp(username = signUpData.username, language = request.lang, accountType = constants.Account.Type.USER)
+          val addAccount = masterAccounts.Service.upsertOnSignUp(username = signUpData.username, lang = request.lang, accountType = constants.Account.Type.USER)
           val wallet = utilities.Wallet.getRandomWallet
           val deleteUnverifiedKeys = masterKeys.Service.deleteUnverifiedKeys(signUpData.username)
 

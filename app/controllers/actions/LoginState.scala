@@ -8,6 +8,8 @@ case class LoginState(username: String, address: String, accountType: String) {
 
   def isGenesisCreator: Boolean = this.accountType == constants.Account.Type.GENESIS_CREATOR
 
+  def isUser: Boolean = this.accountType == constants.Account.Type.USER
+
   // TODO
   def getIdentityId: String = ""
 

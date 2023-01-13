@@ -6,6 +6,7 @@ import views.blockchainTransaction.companion._
 import views.collection.{companion => collection}
 import views.nft.companion._
 import views.profile.whitelist.{companion => whitelist}
+import views.publicListing.{companion => publicListing}
 import views.sale.{companion => sale}
 import views.setting.companion._
 
@@ -136,6 +137,14 @@ object FormConstraint {
     val errors = Seq(
       if (createCollectionSaleData.startEpoch >= createCollectionSaleData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
       if (createCollectionSaleData.startEpoch < (utilities.Date.currentEpoch - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val createPublicListing: Constraint[publicListing.CreatePublicListing.Data] = Constraint("constraints.CreatePublicListing")({ createPublicListingData: publicListing.CreatePublicListing.Data =>
+    val errors = Seq(
+      if (createPublicListingData.startEpoch >= createPublicListingData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
+      if (createPublicListingData.startEpoch < (utilities.Date.currentEpoch - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })

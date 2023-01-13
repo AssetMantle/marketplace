@@ -147,7 +147,7 @@
                                         </label>
                                         <ul>
                                             <li>
-                                                <a href="@routes.ProfileController.viewProfile(loginState.username, constants.View.CREATED)" class="d-flex flex-row align-items-center gap-3">
+                                                <a href="@routes.ProfileController.viewProfile(loginState.username, constants.View.COLLECTED)" class="d-flex flex-row align-items-center gap-3">
                                                     <i class="bi bi-person iconDefault"></i>
                                                     <div class="profileMenuLabel">@Messages(constants.View.PROFILE)</div>
                                                 </a>
@@ -193,7 +193,7 @@
                                 <div id="walletPopup" class="walletPopup popupContainer">
                                     @views.html.base.commonWalletPopup()(requestHeader, messagesProvider, loginState)
                                 </div>
-                                <a class="desktop-link" href="@routes.ProfileController.viewProfile(loginState.username, constants.View.CREATED)">
+                                <a class="desktop-link" href="@routes.ProfileController.viewProfile(loginState.username, constants.View.COLLECTED)">
                                     <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="35" height="35"/>
                                 </a>
                             </li>

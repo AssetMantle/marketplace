@@ -38,7 +38,7 @@ class ProfileController @Inject()(
   def viewDefaultProfile(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       implicit val optionalLoginState: Option[LoginState] = Option(loginState)
-      Future(Ok(views.html.profile.viewProfile(loginState.username, constants.View.CREATED)))
+      Future(Ok(views.html.profile.viewProfile(loginState.username, constants.View.COLLECTED)))
   }
 
   def viewProfile(accountId: String, activeTab: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
@@ -110,7 +110,7 @@ class ProfileController @Inject()(
         (for {
           key <- key
           account <- account
-        } yield Ok(views.html.profile.profileInfoCard(accountId = accountId, address = key.address, createdOn = account.createdOn.fold(0L)(_.getTime)))
+        } yield Ok(views.html.profile.profileInfoCard(accountId = accountId, address = key.address, createdOn = account.createdOnMillisEpoch.getOrElse(0L)))
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }

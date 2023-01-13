@@ -4,8 +4,8 @@ import akka.actor.Cancellable
 import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, HistoryLogging, ModelTable}
 import models.analytics.CollectionsAnalysis
+import models.master
 import models.master.Sales
-import models.{blockchainTransaction, master, masterTransaction}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -90,8 +90,6 @@ class MasterSales @Inject()(
                              sales: Sales,
                              utilitiesOperations: utilities.Operations,
                              masterNFTOwners: master.NFTOwners,
-                             masterTransactionBuyNFTTransactions: masterTransaction.BuyNFTTransactions,
-                             blockchainTransactionBuyNFTs: blockchainTransaction.BuyNFTs,
                              collectionsAnalysis: CollectionsAnalysis,
                              protected val databaseConfigProvider: DatabaseConfigProvider
                            )(implicit override val executionContext: ExecutionContext)

@@ -37,9 +37,8 @@ class NFTController @Inject()(
                                masterWishLists: master.WishLists,
                                masterWhitelists: master.Whitelists,
                                masterWhitelistMembers: master.WhitelistMembers,
-                               masterCollectionFiles: master.CollectionFiles,
                                utilitiesNotification: utilities.Notification,
-                               masterTransactionBuyNFTTransactions: masterTransaction.BuyNFTTransactions,
+                               masterTransactionSaleNFTTransactions: masterTransaction.SaleNFTTransactions,
                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -139,7 +138,7 @@ class NFTController @Inject()(
 
         def sale(saleId: String) = if (saleId != "") masterSales.Service.tryGet(saleId).map(Option(_)) else Future(None)
 
-        def checkAlreadySold(saleId: String) = if (saleId != "") masterTransactionBuyNFTTransactions.Service.checkAlreadySold(saleId = saleId, nftId = nftId) else Future(false)
+        def checkAlreadySold(saleId: String) = if (saleId != "") masterTransactionSaleNFTTransactions.Service.checkAlreadySold(saleId = saleId, nftId = nftId) else Future(false)
 
         def saleOffered(whitelistId: String) = if (loginState.isDefined && whitelistId != "") masterWhitelistMembers.Service.isMember(whitelistId = whitelistId, accountId = loginState.get.username)
         else Future(false)
@@ -381,7 +380,7 @@ class NFTController @Inject()(
               for {
                 nft <- add
                 _ <- addProperties()
-                _ <- addOwner(nftDraft.toNFTOwner(ownerID = collection.creatorId, creatorId = collection.creatorId, saleId = None))
+                _ <- addOwner(nftDraft.toNFTOwner(ownerID = collection.creatorId, creatorId = collection.creatorId))
                 _ <- addTags()
                 _ <- deleteDraft()
                 _ <- collectionsAnalysis.Utility.onNewNFT(collection.id)

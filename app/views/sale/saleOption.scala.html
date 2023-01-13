@@ -1,0 +1,48 @@
+@import views.html.base.buttons._
+
+@(collectionId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/userProfile.css")"/>
+<div class="modal-header mb-3">
+    <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.LIST_NFT)</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                &times;
+    </button>
+</div>
+<div class="optionBoxContainer">
+    <div class="options">
+        <label class="option" for="publicSale" onclick="setNextButton('public')">
+            <input type="radio" name="saleType" id="publicSale" value="public" checked="checked"/>
+            <div class="optionContent">
+                <div class="optionDetails">
+                    <span>@Messages(constants.View.PUBLIC_SALE)</span>
+                    <p>@Messages(constants.View.PUBLIC_SALE_MESSAGE)</p>
+                </div>
+            </div>
+        </label>
+
+        <label class="option" for="privateSale" onclick="setNextButton('private')">
+            <input type="radio" id="privateSale" name="saleType" value="private"/>
+            <div class="optionContent">
+                <div class="optionDetails">
+                    <span>@Messages(constants.View.PRIVATE_SALE)</span>
+                    <p>@Messages(constants.View.PRIVATE_SALE_MESSAGE)</p>
+                </div>
+            </div>
+        </label>
+    </div>
+</div>
+<div class="mt-3 horizontal-align">
+@commonPrimaryButton(constants.View.NEXT, JavaScript(s""),Symbol("id") -> "nextBtn", Symbol("class") -> "disable")
+</div>
+
+<script>
+        setNextButton('public');
+        function setNextButton(addressType){
+            $("#nextBtn").removeClass("disable");
+            if(addressType === "public"){
+                $("#nextBtn").attr("onclick","getForm(jsRoutes.controllers.PublicListingController.createPublicListingForm('@collectionId'))")
+            }else{
+                $("#nextBtn").attr("onclick","getForm(jsRoutes.controllers.SaleController.createCollectionSaleForm(undefined, '@collectionId'))")
+            }
+        }
+</script>

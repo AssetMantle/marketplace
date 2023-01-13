@@ -1,16 +1,15 @@
 package models.master
 
-import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
+import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import slick.jdbc.H2Profile.api._
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Wallet(address: String, partialMnemonics: Seq[String], accountId: String, provisioned: Option[Boolean], verified: Option[Boolean], preference: Int, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Wallet(address: String, partialMnemonics: Seq[String], accountId: String, provisioned: Option[Boolean], verified: Option[Boolean], preference: Int, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
   def serialize(): Wallets.WalletSerialized = Wallets.WalletSerialized(
     address = this.address,
     partialMnemonics = Json.toJson(this.partialMnemonics).toString(),
@@ -19,11 +18,9 @@ case class Wallet(address: String, partialMnemonics: Seq[String], accountId: Str
     verified = this.verified,
     preference = this.preference,
     createdBy = this.createdBy,
-    createdOn = this.createdOn,
-    createdOnTimeZone = this.createdOnTimeZone,
+    createdOnMillisEpoch = this.createdOnMillisEpoch,
     updatedBy = this.updatedBy,
-    updatedOn = this.updatedOn,
-    updatedOnTimeZone = this.updatedOnTimeZone)
+    updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
 object Wallets {
@@ -32,15 +29,15 @@ object Wallets {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class WalletSerialized(address: String, partialMnemonics: String, accountId: String, provisioned: Option[Boolean], verified: Option[Boolean], preference: Int, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
-    def deserialize: Wallet = Wallet(address = address, partialMnemonics = utilities.JSON.convertJsonStringToObject[Seq[String]](partialMnemonics), accountId = accountId, provisioned = provisioned, verified = verified, preference = preference, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class WalletSerialized(address: String, partialMnemonics: String, accountId: String, provisioned: Option[Boolean], verified: Option[Boolean], preference: Int, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
+    def deserialize: Wallet = Wallet(address = address, partialMnemonics = utilities.JSON.convertJsonStringToObject[Seq[String]](partialMnemonics), accountId = accountId, provisioned = provisioned, verified = verified, preference = preference, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
     def id: String = address
   }
 
   class WalletTable(tag: Tag) extends Table[WalletSerialized](tag, "Wallet") with ModelTable[String] {
 
-    def * = (address, partialMnemonics, accountId, provisioned.?, verified.?, preference, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (WalletSerialized.tupled, WalletSerialized.unapply)
+    def * = (address, partialMnemonics, accountId, provisioned.?, verified.?, preference, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (WalletSerialized.tupled, WalletSerialized.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
@@ -56,15 +53,11 @@ object Wallets {
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
     override def id = address
   }

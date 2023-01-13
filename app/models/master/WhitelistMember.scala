@@ -1,25 +1,17 @@
 package models.master
 
-import models.Trait.{Entity2, GenericDaoImpl2, Logged, ModelTable2}
+import models.Trait.{Entity2, GenericDaoImpl2, Logging, ModelTable2}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class WhitelistMember(whitelistId: String, accountId: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class WhitelistMember(whitelistId: String, accountId: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, String] {
+  def id1: String = whitelistId
 
-  def serialize(): WhitelistMembers.WhitelistMemberSerialized = WhitelistMembers.WhitelistMemberSerialized(
-    whitelistId = this.whitelistId,
-    accountId = this.accountId,
-    createdBy = this.createdBy,
-    createdOn = this.createdOn,
-    createdOnTimeZone = this.createdOnTimeZone,
-    updatedBy = this.updatedBy,
-    updatedOn = this.updatedOn,
-    updatedOnTimeZone = this.updatedOnTimeZone)
+  def id2: String = accountId
 }
 
 
@@ -29,17 +21,9 @@ object WhitelistMembers {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class WhitelistMemberSerialized(whitelistId: String, accountId: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity2[String, String] {
-    def deserialize: WhitelistMember = WhitelistMember(whitelistId = whitelistId, accountId = accountId, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  class WhitelistMemberTable(tag: Tag) extends Table[WhitelistMember](tag, "WhitelistMember") with ModelTable2[String, String] {
 
-    def id1: String = whitelistId
-
-    def id2: String = accountId
-  }
-
-  class WhitelistMemberTable(tag: Tag) extends Table[WhitelistMemberSerialized](tag, "WhitelistMember") with ModelTable2[String, String] {
-
-    def * = (whitelistId, accountId, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (WhitelistMemberSerialized.tupled, WhitelistMemberSerialized.unapply)
+    def * = (whitelistId, accountId, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (WhitelistMember.tupled, WhitelistMember.unapply)
 
     def whitelistId = column[String]("whitelistId", O.PrimaryKey)
 
@@ -47,15 +31,11 @@ object WhitelistMembers {
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
     def id1 = whitelistId
 
@@ -69,7 +49,7 @@ object WhitelistMembers {
 class WhitelistMembers @Inject()(
                                   protected val databaseConfigProvider: DatabaseConfigProvider
                                 )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl2[WhitelistMembers.WhitelistMemberTable, WhitelistMembers.WhitelistMemberSerialized, String, String](
+  extends GenericDaoImpl2[WhitelistMembers.WhitelistMemberTable, WhitelistMember, String, String](
     databaseConfigProvider,
     WhitelistMembers.TableQuery,
     executionContext,
@@ -80,11 +60,11 @@ class WhitelistMembers @Inject()(
 
   object Service {
 
-    def add(whitelistId: String, accountId: String): Future[Unit] = create(WhitelistMember(whitelistId = whitelistId, accountId = accountId).serialize())
+    def add(whitelistId: String, accountId: String): Future[Unit] = create(WhitelistMember(whitelistId = whitelistId, accountId = accountId))
 
     def getAllForWhitelist(whitelistId: String): Future[Seq[String]] = filter(_.whitelistId === whitelistId).map(_.map(_.accountId))
 
-    def getAllForMember(accountId: String, pageNumber: Int, perPage: Int): Future[Seq[String]] = filterAndSortWithPagination((pageNumber - 1) * perPage, limit = perPage)(_.accountId === accountId)(_.createdOn).map(_.map(_.whitelistId))
+    def getAllForMember(accountId: String, pageNumber: Int, perPage: Int): Future[Seq[String]] = filterAndSortWithPagination((pageNumber - 1) * perPage, limit = perPage)(_.accountId === accountId)(_.createdOnMillisEpoch).map(_.map(_.whitelistId))
 
     def getAllForMember(accountId: String): Future[Seq[String]] = filter(_.accountId === accountId).map(_.map(_.whitelistId))
 

@@ -53,7 +53,7 @@ GET         /collectionAnalysis                               controllers.Collec
 GET         /commonCardInfo                                   controllers.CollectionController.commonCardInfo(id: String)
 GET         /created                                          controllers.CollectionController.createdSection(accountId: String)
 GET         /createdCollectionPerPage                         controllers.CollectionController.createdCollectionPerPage(accountId: String, pageNumber: Int)
-GET         /countCreatorNFTsNotOnSale                        controllers.CollectionController.countCreatorNFTsNotOnSale(collectionId: String, accountId: String)
+GET         /countForCreatorNotForSell                        controllers.CollectionController.countForCreatorNotForSell(collectionId: String, accountId: String)
 GET         /createCollection                                 controllers.CollectionController.createForm()
 POST        /createCollection                                 controllers.CollectionController.create()
 GET         /editCollection                                   controllers.CollectionController.editForm(id: String)
@@ -157,6 +157,11 @@ POST        /createWhitelist                                  controllers.Whitel
 
 GET         /editWhitelist                                    controllers.WhitelistController.editWhitelistForm(whitelistId: String)
 POST        /editWhitelist                                    controllers.WhitelistController.editWhitelist()
+
+GET         /createPublicListing                              controllers.PublicListingController.createPublicListingForm(collectionId: Option[String])
+POST        /createPublicListing                              controllers.PublicListingController.createPublicListing()
+GET         /buyPublicListingNFT                              controllers.PublicListingController.buyNFTForm(publicListingId: String, mintNft: Boolean)
+POST        /buyPublicListingNFT                              controllers.PublicListingController.buyNFT()
 
 GET         /createSale                                       controllers.SaleController.createCollectionSaleForm(whitelistId: Option[String], collectionId: Option[String])
 POST        /createSale                                       controllers.SaleController.createCollectionSale()

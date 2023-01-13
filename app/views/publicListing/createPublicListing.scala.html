@@ -1,0 +1,36 @@
+@import controllers.actions.LoginState
+@import views.html.base.form._
+@import views.publicListing.companion.CreatePublicListing
+
+@(createPublicListingForm: Form[CreatePublicListing.Data] = CreatePublicListing.form, collectionId: Option[String], collections: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonForm(constants.Form.PUBLIC_LISTING, createPublicListingForm) {
+    <div class="hidden loginUserName">@loginState.username</div>
+    @if(collectionId.getOrElse("") != "") {
+        @commonCustomSelect(createPublicListingForm, constants.FormField.SELECT_COLLECTION_ID, collections, Symbol("value") -> collectionId.get, Symbol("class") -> "custom-select sources filledSelect")
+    } else {
+        @commonCustomSelect(createPublicListingForm, constants.FormField.SELECT_COLLECTION_ID, collections, Symbol("class") -> "custom-select sources filledSelect")
+    }
+    <div class="hidden">
+        @commonInputInt(createPublicListingForm, constants.FormField.PUBLIC_LISTING_NFT_NUMBER)
+    </div>
+
+    <div class="mb-3 randomNFTSaleField">
+        <label for="publicListingNFTNumber" class="form-label">@Messages(constants.FormField.PUBLIC_LISTING_NFT_NUMBER.name)</label>
+        <div class="input-group mt-2">
+            <input type="number" id="publicListingNFTNumber" class="form-control" placeholder="@Messages(constants.View.PUBLIC_LISTING_NFT_PLACEHOLDER)" aria-label="Recipient's username" aria-describedby="basic-addon2" onkeyup="setPublicListingNFTValue(event)">
+            <span class="input-group-text gap-1" onclick="setOwnedNFTs()" style="cursor: pointer;">
+                <span id="collectionOwnedNFTs">0</span>
+                <span>@Messages(constants.View.MAX)</span>
+            </span>
+        </div>
+    </div>
+    @commonInputMicroNumber(createPublicListingForm, constants.FormField.PUBLIC_LISTING_PRICE)
+    @commonInputInt(createPublicListingForm, constants.FormField.PUBLIC_LISTING_MAX_MINT_PER_ACCOUNT)
+    @commonInputEpochTIme(createPublicListingForm, constants.FormField.PUBLIC_LISTING_START_EPOCH, setCurrentTime = true)
+    @commonInputEpochTIme(createPublicListingForm, constants.FormField.PUBLIC_LISTING_END_EPOCH, setCurrentTime = false)
+}
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/publicListing/createPublicListing.js")" type="text/javascript"></script>
+    @if(collectionId.getOrElse("") != "") {
+        <script>setCreatePublicListingCollectionId('@collectionId.get')</script>
+    }
