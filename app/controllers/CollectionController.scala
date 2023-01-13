@@ -30,6 +30,7 @@ class CollectionController @Inject()(
                                       masterAccounts: master.Accounts,
                                       masterCollections: master.Collections,
                                       masterTransactionCollectionDrafts: masterTransaction.CollectionDrafts,
+                                      masterTransactionPublicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
                                       masterNFTs: master.NFTs,
                                       masterSales: master.Sales,
                                       masterPublicListings: master.PublicListings,
@@ -197,6 +198,8 @@ class CollectionController @Inject()(
       val collection = masterCollections.Service.tryGet(id)
       val publicListing = masterPublicListings.Service.getPublicListingByCollectionId(id)
 
+      def getTotalPublicListingSold(publicListingId: Option[String]): Future[Long] = if (publicListingId.isDefined) masterTransactionPublicListingNFTTransactions.Service.countBySuccessfulAndId(publicListingId.get).map(_.toLong) else Future(0L)
+
       val getSalesInfo = if (optionalLoginState.isDefined) {
         val sales = masterSales.Service.getAllSalesByCollectionId(id)
 
@@ -212,8 +215,9 @@ class CollectionController @Inject()(
         collectionAnalysis <- collectionAnalysis
         collection <- collection
         publicListing <- publicListing
+        totalPublicListingSold <- getTotalPublicListingSold(publicListing.map(_.id))
         (sales, isMember) <- getSalesInfo
-      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis, collection, sales, publicListing, isMember))
+      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis = collectionAnalysis, collection = collection, sales = sales, publicListing = publicListing, isMember = isMember, publicListingSold = totalPublicListingSold))
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
