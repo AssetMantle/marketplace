@@ -745,15 +745,18 @@
             width: 40px;
             aspect-ratio: 1;
             border-radius: 50%;
-            background-color: var(--card-dark);
+            background-color: var(--default);
             cursor: pointer;
+            i{
+              color:var(--card-dark);
+            }
             &:hover{
               background-color: var(--disable-yellow);
             }
             &.active{
               background-color: var(--default);
               i{
-                color:var(--card-dark);
+                color:var(--mantle-off-white);
               }
             }
           }
@@ -775,9 +778,9 @@
             }
             &.read{
               .notificationIcon{
-                background-color: var(--default);
+                background-color: var(--card-dark);
                 i{
-                  color:var(--card-dark);
+                  color:var(--mantle-off-white);
                 }
               }
             }
