@@ -1015,6 +1015,7 @@ body.modal-open{
   }
 }
 
+// Dropdown Menu
 .dropDownContainer {
   position: relative;
   overflow: hidden;
@@ -1074,4 +1075,9 @@ body.modal-open{
       }
     }
   }
+}
+
+// Center container header
+.centerCardHeader {
+  @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--default));
 }
