@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
-@import models.master.Sale
+@import models.master.{Sale, PublicListing}
 @import models.master.NFT
 
-@(collection: master.Collection, sales: Seq[Sale], randomNFTs: Seq[NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(collection: master.Collection, sales: Seq[Sale], publicListing: Option[PublicListing], randomNFTs: Seq[NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 <div class="item item-center nftContainer">
     <div class="profileCover">
@@ -19,7 +19,7 @@
             }
         </div>
     </div>
-    @if(sales.isEmpty) {
+    @if(publicListing.isEmpty) {
         <div class="profile-card">
             <div class="profiles-container">
                 <div class="nft-list">

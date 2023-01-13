@@ -163,12 +163,12 @@ class CollectionsAnalysis @Inject()(
       } yield ()
     }
 
-    def onSuccessfulSell(collectionId: String, price: MicroNumber): Future[Unit] = {
+    def onSuccessfulSell(collectionId: String, price: MicroNumber, quantity: Int): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
 
       for {
         collectionAnalysis <- collectionAnalysis
-        _ <- Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed - 1, totalTraded = collectionAnalysis.totalTraded + 1, totalSold = collectionAnalysis.totalSold + 1, totalVolumeTraded = collectionAnalysis.totalVolumeTraded + price))
+        _ <- Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed - 1, totalTraded = collectionAnalysis.totalTraded + quantity, totalSold = collectionAnalysis.totalSold + quantity, totalVolumeTraded = collectionAnalysis.totalVolumeTraded + (price * quantity)))
       } yield ()
     }
 

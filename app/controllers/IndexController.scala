@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.result.WithUsernameToken
-import models.history.MasterSales
+import models.{blockchainTransaction, history}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -22,8 +22,10 @@ class IndexController @Inject()(
                                  withUsernameToken: WithUsernameToken,
                                  starter: Starter,
                                  // Do not delete, need to initialize object to start the scheduler
-                                 historyMasterSales: MasterSales,
-                                 blockchainAccounts: models.blockchain.Accounts
+                                 historyMasterSales: history.MasterSales,
+                                 historyMasterPublicListings: history.MasterPublicListings,
+                                 nftPublicListings: blockchainTransaction.NFTPublicListings,
+                                 nftSales: blockchainTransaction.NFTSales,
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -45,4 +47,6 @@ class IndexController @Inject()(
 
   starter.start()
   historyMasterSales.Utility.start
+  historyMasterPublicListings.Utility.start
+  nftPublicListings.Utility.start
 }

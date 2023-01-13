@@ -44,6 +44,7 @@ object Notification {
   val BUYER_BUY_NFT_SUCCESSFUL_FROM_SALE: Notification = Notification("BUYER_BUY_NFT_SUCCESSFUL_FROM_SALE", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ProfileController.viewProfile))
   val BUYER_BUY_NFT_FAILED: Notification = Notification("BUYER_BUY_NFT_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
+  val PUBLIC_LISTING_ON_COLLECTION: Notification = Notification("PUBLIC_LISTING_ON_COLLECTION", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ProfileController.viewProfile))
   val SELLER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING: Notification = Notification("SELLER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
   val BUYER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING: Notification = Notification("BUYER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ProfileController.viewProfile))
 

@@ -128,7 +128,7 @@ class PublicListings @Inject()(
 
     def getExpiredPublicListings: Future[Seq[PublicListing]] = filter(_.endTimeEpoch <= utilities.Date.currentEpoch).map(_.map(_.deserialize))
 
-    def getAllPublicListingsByCollectionId(collectionId: String): Future[Seq[PublicListing]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize))
+    def getPublicListingByCollectionId(collectionId: String): Future[Option[PublicListing]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize).headOption)
 
     def delete(publicListingId: String): Future[Int] = deleteById(publicListingId)
   }

@@ -37,13 +37,13 @@ class TransactionComplete @Inject()(
       val boughtNFTs = masterTransactionSaleNFTTransactions.Service.getByTxHash(transaction.hash)
       val markMasterSuccess = masterTransactionSaleNFTTransactions.Service.markSuccess(transaction.hash)
 
-      def transferNFTOwnership(boughtNFTs: Seq[SaleNFTTransaction]) = utilitiesOperations.traverse(boughtNFTs){ boughtNFT =>
+      def transferNFTOwnership(boughtNFTs: Seq[SaleNFTTransaction]) = utilitiesOperations.traverse(boughtNFTs) { boughtNFT =>
         masterNFTOwners.Service.markNFTSoldFromSale(nftId = boughtNFT.nftId, saleId = boughtNFT.saleId, sellerAccountId = boughtNFT.sellerAccountId, buyerAccountId = boughtNFT.buyerAccountId)
       }
 
       def nft(buyNFTTx: SaleNFTTransaction) = masterNFTs.Service.tryGet(buyNFTTx.nftId)
 
-      def analysisUpdate(nft: NFT) = collectionsAnalysis.Utility.onSuccessfulSell(collectionId = nft.collectionId, price = price)
+      def analysisUpdate(nft: NFT, quantity: Int) = collectionsAnalysis.Utility.onSuccessfulSell(collectionId = nft.collectionId, price = price, quantity = quantity)
 
       def sendNotifications(boughtNFT: SaleNFTTransaction, count: Int) = {
         utilitiesNotification.send(boughtNFT.sellerAccountId, constants.Notification.SELLER_BUY_NFT_SUCCESSFUL_FROM_SALE, count.toString)("")
@@ -55,7 +55,7 @@ class TransactionComplete @Inject()(
         _ <- transferNFTOwnership(boughtNFTs)
         _ <- markMasterSuccess
         nft <- nft(boughtNFTs.head)
-        _ <- analysisUpdate(nft)
+        _ <- analysisUpdate(nft, boughtNFTs.length)
         _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
       } yield ()
         ).recover {
@@ -80,43 +80,43 @@ class TransactionComplete @Inject()(
 
   def onNFTPublicListing(transaction: Transaction, price: MicroNumber): Future[Unit] = {
     if (transaction.status) {
-      val boughtNFT = masterTransactionPublicListingNFTTransactions.Service.tryGetByTxHash(transaction.hash)
+      val boughtNFTs = masterTransactionPublicListingNFTTransactions.Service.getByTxHash(transaction.hash)
       val markMasterSuccess = masterTransactionPublicListingNFTTransactions.Service.markSuccess(transaction.hash)
 
-      def transferNFTOwnership(boughtNFT: PublicListingNFTTransaction) = masterNFTOwners.Service.markNFTSoldFromPublicListing(nftId = boughtNFT.nftId, publicListingId = boughtNFT.publicListingId, sellerAccountId = boughtNFT.sellerAccountId, buyerAccountId = boughtNFT.buyerAccountId)
+      def transferNFTOwnership(boughtNFTs: Seq[PublicListingNFTTransaction]) = utilitiesOperations.traverse(boughtNFTs) { boughtNFT =>
+        masterNFTOwners.Service.markNFTSoldFromPublicListing(nftId = boughtNFT.nftId, publicListingId = boughtNFT.publicListingId, sellerAccountId = boughtNFT.sellerAccountId, buyerAccountId = boughtNFT.buyerAccountId)
+      }
 
       def nft(buyNFTTx: PublicListingNFTTransaction) = masterNFTs.Service.tryGet(buyNFTTx.nftId)
 
-      def analysisUpdate(nft: NFT) = collectionsAnalysis.Utility.onSuccessfulSell(collectionId = nft.collectionId, price = price)
+      def analysisUpdate(nft: NFT, quantity: Int) = collectionsAnalysis.Utility.onSuccessfulSell(collectionId = nft.collectionId, price = price, quantity = quantity)
 
-      def sendNotifications(boughtNFT: PublicListingNFTTransaction, name: String) = {
-        utilitiesNotification.send(boughtNFT.sellerAccountId, constants.Notification.SELLER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING, name)("")
-        utilitiesNotification.send(boughtNFT.buyerAccountId, constants.Notification.BUYER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING, name)(s"'${boughtNFT.buyerAccountId}', '${constants.View.COLLECTED}'")
+      def sendNotifications(boughtNFT: PublicListingNFTTransaction, count: Int) = {
+        utilitiesNotification.send(boughtNFT.sellerAccountId, constants.Notification.SELLER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING, count.toString)("")
+        utilitiesNotification.send(boughtNFT.buyerAccountId, constants.Notification.BUYER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING, count.toString)(s"'${boughtNFT.buyerAccountId}', '${constants.View.COLLECTED}'")
       }
 
       (for {
-        boughtNFT <- boughtNFT
-        _ <- transferNFTOwnership(boughtNFT)
+        boughtNFTs <- boughtNFTs
+        _ <- transferNFTOwnership(boughtNFTs)
         _ <- markMasterSuccess
-        nft <- nft(boughtNFT)
-        _ <- analysisUpdate(nft)
-        _ <- sendNotifications(boughtNFT, nft.name)
+        nft <- nft(boughtNFTs.head)
+        _ <- analysisUpdate(nft, boughtNFTs.length)
+        _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
       } yield ()
         ).recover {
         case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
       }
     } else {
-      val boughtNFT = masterTransactionPublicListingNFTTransactions.Service.tryGetByTxHash(transaction.hash)
+      val boughtNFTs = masterTransactionPublicListingNFTTransactions.Service.getByTxHash(transaction.hash)
       val markMasterFailed = masterTransactionPublicListingNFTTransactions.Service.markFailed(transaction.hash)
-      def nft(nftId: String) = masterNFTs.Service.tryGet(nftId)
 
-      def sendNotifications(buyNFTTx: PublicListingNFTTransaction, name: String) = utilitiesNotification.send(buyNFTTx.buyerAccountId, constants.Notification.BUYER_BUY_NFT_FAILED, name)("")
+      def sendNotifications(buyNFTTx: PublicListingNFTTransaction, count: Int) = utilitiesNotification.send(buyNFTTx.buyerAccountId, constants.Notification.BUYER_BUY_NFT_FAILED, count.toString)("")
 
       (for {
-        boughtNFT <- boughtNFT
+        boughtNFTs <- boughtNFTs
         _ <- markMasterFailed
-        nft <- nft(boughtNFT.nftId)
-        _ <- sendNotifications(boughtNFT, nft.name)
+        _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
       } yield ()
         ).recover {
         case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")

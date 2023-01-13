@@ -1,5 +1,6 @@
 package models.blockchainTransaction
 
+import akka.actor.Cancellable
 import exceptions.BaseException
 import models.Trait._
 import models.blockchain
@@ -116,7 +117,7 @@ class NFTPublicListings @Inject()(
 
   object Utility {
 
-    def transaction(buyerAccountId: String, sellerAccountId: String, nftId: String, publicListingId: String, fromAddress: String, toAddress: String, amount: MicroNumber, gasPrice: Double, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(buyerAccountId: String, sellerAccountId: String, nftIds: Seq[String], publicListingId: String, fromAddress: String, toAddress: String, amount: MicroNumber, gasPrice: Double, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount(fromAddress))
@@ -134,16 +135,16 @@ class NFTPublicListings @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              nftPublicListing <- Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), broadcasted = false, status = None, memo = Option(memo))
-              _ <- masterTransactionPublicListingNFTTransactions.Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = nftId, publicListingId = publicListingId)
-            } yield nftPublicListing
+              nftSale <- Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), broadcasted = false, status = None, memo = Option(memo))
+              _ <- masterTransactionPublicListingNFTTransactions.Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, publicListingId = publicListingId)
+            } yield nftSale
           }
           else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
         }
 
         for {
-          nftPublicListing <- checkAndAdd(unconfirmedTxHashes)
-        } yield nftPublicListing
+          nftSale <- checkAndAdd(unconfirmedTxHashes)
+        } yield nftSale
       }
 
       def broadcastTxAndUpdate(nftPublicListing: NFTPublicListing) = {
@@ -154,16 +155,16 @@ class NFTPublicListings @Inject()(
 
         for {
           (successResponse, errorResponse) <- broadcastTxSync.Service.get(nftPublicListing.getTxRawAsHexString)
-          updatedNFTPublicListing <- update(successResponse, errorResponse)
-        } yield updatedNFTPublicListing
+          updatedNFTSale <- update(successResponse, errorResponse)
+        } yield updatedNFTSale
       }
 
       for {
         bcAccount <- bcAccount
         unconfirmedTxs <- unconfirmedTxs
-        nftPublicListing <- checkMempoolAndAddTx(bcAccount, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedNFTPublicListing <- broadcastTxAndUpdate(nftPublicListing)
-      } yield updatedNFTPublicListing
+        nftSale <- checkMempoolAndAddTx(bcAccount, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        updatedNFTSale <- broadcastTxAndUpdate(nftSale)
+      } yield updatedNFTSale
     }
 
     private val txSchedulerRunnable = new Runnable {
@@ -198,7 +199,7 @@ class NFTPublicListings @Inject()(
       }
     }
 
-    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Scheduler.InitialDelay, delay = constants.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
+    def start: Cancellable = actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Scheduler.InitialDelay, delay = constants.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
 
   }
 

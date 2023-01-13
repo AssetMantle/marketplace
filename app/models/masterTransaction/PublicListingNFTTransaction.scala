@@ -56,14 +56,14 @@ object PublicListingNFTTransactions {
 
 @Singleton
 class PublicListingNFTTransactions @Inject()(
-                                    protected val databaseConfigProvider: DatabaseConfigProvider,
-                                    blockchainAccounts: models.blockchain.Accounts,
-                                    blockchainTransactions: models.blockchain.Transactions,
-                                    broadcastTxSync: transactions.blockchain.BroadcastTxSync,
-                                    utilitiesOperations: utilities.Operations,
-                                    getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
-                                    getAccount: queries.blockchain.GetAccount,
-                                  )(implicit override val executionContext: ExecutionContext)
+                                              protected val databaseConfigProvider: DatabaseConfigProvider,
+                                              blockchainAccounts: models.blockchain.Accounts,
+                                              blockchainTransactions: models.blockchain.Transactions,
+                                              broadcastTxSync: transactions.blockchain.BroadcastTxSync,
+                                              utilitiesOperations: utilities.Operations,
+                                              getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
+                                              getAccount: queries.blockchain.GetAccount,
+                                            )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl2[PublicListingNFTTransactions.PublicListingNFTTransactionTable, PublicListingNFTTransaction, String, String](
     databaseConfigProvider,
     PublicListingNFTTransactions.TableQuery,
@@ -76,7 +76,7 @@ class PublicListingNFTTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftId: String, publicListingId: String): Future[Unit] = create(PublicListingNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = nftId, publicListingId = publicListingId, status = None))
+    def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftIds: Seq[String], publicListingId: String): Future[Unit] = create(nftIds.map(x => PublicListingNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = x, publicListingId = publicListingId, status = None)))
 
     def tryGetByPublicListingIdAndBuyerAccountId(buyerAccountId: String, publicListingId: String): Future[Seq[PublicListingNFTTransaction]] = filter(x => x.publicListingId === publicListingId && x.buyerAccountId === buyerAccountId)
 
@@ -95,7 +95,7 @@ class PublicListingNFTTransactions @Inject()(
       filterAndCount(x => x.buyerAccountId === buyerAccountId && x.publicListingId === publicListingId && (x.status.? === nullStatus || x.status))
     }
 
-    def tryGetByTxHash(txHash: String): Future[PublicListingNFTTransaction] = filterHead(_.txHash === txHash)
+    def getByTxHash(txHash: String): Future[Seq[PublicListingNFTTransaction]] = filter(_.txHash === txHash)
 
     def markSuccess(txHash: String): Future[Int] = customUpdate(PublicListingNFTTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
 

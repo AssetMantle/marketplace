@@ -2,10 +2,10 @@
 @import views.publicListing.companion.BuyNFT
 @import views.html.blockchainTransaction.commonSelectGas
 
-@(buyNFTForm: Form[BuyNFT.Data] = BuyNFT.form, publicListingID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(buyNFTForm: Form[BuyNFT.Data] = BuyNFT.form, publicListingId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonForm(constants.Form.BUY_NFT_SALE, buyNFTForm) {
-    @commonInputText(buyNFTForm, constants.FormField.PUBLIC_LISTING_ID, Symbol("value") -> publicListingID, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> true)
+@commonForm(constants.Form.BUY_NFT_PUBLIC_LISTING, buyNFTForm) {
+    @commonInputText(buyNFTForm, constants.FormField.PUBLIC_LISTING_ID, Symbol("value") -> publicListingId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> true)
     @commonInputInt(buyNFTForm, constants.FormField.PUBLIC_LISTING_BUY_NFT_NUMBER)
     @commonInputInt(buyNFTForm, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultSendCoinGasAmount, Symbol("class") -> "hidden")
     @commonSelectGas(buyNFTForm)

@@ -116,6 +116,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.profileAnalysisCard,
 
         routes.javascript.PublicListingController.createPublicListingForm,
+        routes.javascript.PublicListingController.buyNFTForm,
 
         routes.javascript.SaleController.createCollectionSaleForm,
         routes.javascript.SaleController.buySaleNFTForm,

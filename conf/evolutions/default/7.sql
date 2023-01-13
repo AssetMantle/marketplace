@@ -213,7 +213,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."PublicListingNFTTransaction"
     "nftId"                VARCHAR NOT NULL,
     "buyerAccountId"       VARCHAR NOT NULL,
     "sellerAccountId"      VARCHAR NOT NULL,
-    "saleId"               VARCHAR NOT NULL,
+    "publicListingId"      VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
