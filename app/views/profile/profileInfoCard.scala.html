@@ -1,8 +1,7 @@
 @import controllers.actions.LoginState
-@import views.html.base.commonAddressValue
-@import views.html.base.commonStringValue
+@import views.html.base.{commonAddressValue, commonStringValue}
 
-@(accountId: String, address: String, createdOn: Long)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(accountId: String, address: String, accountType: String, createdOn: Long)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 <div class="sticky-top item-sticky">
     <div class="card leftInfoCard">
@@ -11,12 +10,12 @@
                 <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
             </div>
             <div class="profileName">
-                @commonStringValue(message = accountId, id = utilities.IdGenerator.getRandomHexadecimal, length = 12)
+            @commonStringValue(message = accountId, id = utilities.IdGenerator.getRandomHexadecimal, length = 12)
             </div>
         </div>
         <div class="row p-2 mx-0 mt-3 justify-content-between align-items-center userAddressBox">
             <div class="col-10 p-0 userAddressData username-data" data-value="@address">
-                @commonAddressValue(message = address, id = utilities.IdGenerator.getRandomHexadecimal, length = 5)
+            @commonAddressValue(message = address, id = utilities.IdGenerator.getRandomHexadecimal, length = 5)
             </div>
             <div class="col-2 text-end copyIcon" onclick="copyToClipboard(this);
             showSnackbar('', '@Messages(constants.View.ADDRESS_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
@@ -24,10 +23,16 @@
             </div>
         </div>
         <div class="mt-2 joinedDate">@Messages(constants.View.PROFILE_JOINED_DATE_LABEL)
-            <span id="joinedTimeEpoch_@accountId">@createdOn</span>
+        <span id="joinedTimeEpoch_@accountId">@createdOn</span>
         </div>
     </div>
 </div>
+    @if(accountType == constants.Account.Type.GENESIS_CREATOR) {
+
+    }
+    @if(accountType == constants.Account.Type.USER) {
+
+    }
 <script>
     epochToDate('joinedTimeEpoch_@accountId');
 </script>
