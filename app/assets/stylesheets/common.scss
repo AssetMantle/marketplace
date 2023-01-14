@@ -647,16 +647,6 @@
   transition: all 0.3s ease;
   cursor: auto;
 
-  &::before {
-    content: '';
-    border-left: 9px solid transparent;
-    border-right: 9px solid transparent;
-    border-bottom: 9px solid var(--popup-bg);
-    position: absolute;
-    top: -9px;
-    right: 35px;
-  }
-
   &.active {
     top: 70px;
     opacity: 1;
@@ -667,7 +657,7 @@
   .notificationPopupContainer {
     background: var(--popup-bg);
     border: 2px solid var(--popup-stroke);
-    border-radius: 20px;
+    border-radius: 0 0 20px 20px;
     padding: 32px;
     position: relative;
     overflow: hidden;
