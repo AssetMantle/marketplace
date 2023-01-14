@@ -1045,16 +1045,23 @@
   }
   .profileHeader{
     .profileImage{
+      position: relative;
       img{
-        height: 40px;
-        width: 40px;
+        height: 150px;
+        width: 150px;
         aspect-ratio: 1;
         border-radius: 50%;
+      }
+      img.accountTypeBadge{
+        height: 35px;
+        width: 35px;
+        position: absolute;
+        bottom: 18px;
+        right: 18px;
       }
     }
     .profileName{
       @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
-      margin-left: 12px;
     }
   }
   .userAddressBox {
