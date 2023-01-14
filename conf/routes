@@ -42,10 +42,13 @@ POST        /migrateWalletToKey                               controllers.Accoun
 POST        /changeActiveKey                                  controllers.AccountController.changeActiveKey()
 
 GET         /collections/:category                            controllers.CollectionController.viewCollections(category: String)
+GET         /publicListedCollections                          controllers.CollectionController.viewPublicListedCollections()
 GET         /collection/:id                                   controllers.CollectionController.viewCollection(id: String)
 GET         /collectionsSection                               controllers.CollectionController.collectionsSection(category: String)
 GET         /collectionList                                   controllers.CollectionController.collectionList(category: String)
-GET         /collectionsPerPage                               controllers.CollectionController.collectionsPerPage(category: String,pageNumber: Int)
+GET         /collectionsPerPage                               controllers.CollectionController.collectionsPerPage(category: String, pageNumber: Int)
+GET         /publicListedCollectionsSection                   controllers.CollectionController.publicListedCollectionsSection()
+GET         /publicListedCollectionsPerPage                   controllers.CollectionController.publicListedCollectionsPerPage(pageNumber: Int)
 GET         /collectionNFTs                                   controllers.CollectionController.collectionNFTs(id: String)
 GET         /collectionNFTsPerPage                            controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionInfo                                   controllers.CollectionController.info(id: String)
@@ -135,7 +138,7 @@ GET         /walletBalance                                    controllers.Settin
 
 GET         /defaultProfile                                   controllers.ProfileController.viewDefaultProfile()
 GET         /profile/:accountId/:activeTab                    controllers.ProfileController.viewProfile(accountId: String, activeTab: String)
-GET         /profile/:accountId                               controllers.ProfileController.viewProfile(accountId: String, activeTab: String ?= "CREATED")
+GET         /profile/:accountId                               controllers.ProfileController.viewProfile(accountId: String, activeTab: String ?= "COLLECTED")
 GET         /profileSection                                   controllers.ProfileController.profile(accountId: String, activeTab: String)
 GET         /notificationPopup                                controllers.ProfileController.notificationPopup()
 GET         /loadMoreNotifications                            controllers.ProfileController.loadMoreNotifications(pageNumber: Int)
@@ -160,6 +163,9 @@ POST        /editWhitelist                                    controllers.Whitel
 
 GET         /createPublicListing                              controllers.PublicListingController.createPublicListingForm(collectionId: Option[String])
 POST        /createPublicListing                              controllers.PublicListingController.createPublicListing()
+
+GET         /buyPublicListingNFT                              controllers.PublicListingController.buyNFTForm(publicListingId: String, mintNft: Boolean)
+POST        /buyPublicListingNFT                              controllers.PublicListingController.buyNFT()
 
 GET         /createSale                                       controllers.SaleController.createCollectionSaleForm(whitelistId: Option[String], collectionId: Option[String])
 POST        /createSale                                       controllers.SaleController.createCollectionSale()

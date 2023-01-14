@@ -1,0 +1,51 @@
+@import controllers.actions.LoginState
+
+@(totalCollections: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+<div class="earlyAccessBannerContainer">
+    <div class="messageContainer">
+        <div class="header">@Messages(constants.View.EARLY_ACCESS_BANNER_HEADER)</div>
+        <div class="subHeader">@Messages(constants.View.EARLY_ACCESS_BANNER_SUBHEADER)</div>
+    </div>
+    <img src="@routes.Assets.versioned("images/earlyAccessBanner.svg")"/>
+</div>
+<div class="item item-center centerContainer">
+    <div class="centerCard">
+        <div class="centerCardHeader">@Messages(constants.View.PUBLIC_LISTING_TITLE)</div>
+        <div class="contentContainer">
+            <script src="@utilities.PublicResource.getVersionedRoute("javascripts/collections/publicListed/loadMore.js")" type="text/javascript"></script>
+            @if(totalCollections > 0) {
+                <div class="mt-2 mb-0 item item-center collectionContainer">
+                    <div class="profile-card">
+                        <div class="profiles-container">
+
+                            <div class="profile-list">
+                                <div id="collectionsPerPage" class="w-100 list grid-view-filter collectionsPerPage"></div>
+                            </div>
+
+                            <div class="loadMoreElement show">
+                                    <!-- Loader -->
+                                <div class="loading">
+                                    <div class="ball"></div>
+                                    <div class="ball"></div>
+                                    <div class="ball"></div>
+                                </div>
+                                    <!-- End -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>loadFirstCollections();</script>
+            } else {
+                <div class="contentBody emptyBody">
+                    <div class="h-100 mt-3 d-flex flex-column justify-content-center align-items-center emptyList">
+                        <div class="message">@Messages(constants.View.COMING_SOON)</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+        window.onscroll = function() { loadCollectionOnScroll(); }
+</script>

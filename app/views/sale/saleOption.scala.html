@@ -10,7 +10,7 @@
 </div>
 <div class="optionBoxContainer">
     <div class="options">
-        <label class="option" for="publicSale" onclick="setNextButton('public', '@collectionId')">
+        <label class="option" for="publicSale" onclick="setNextButton('public')">
             <input type="radio" name="saleType" id="publicSale" value="public" checked="checked"/>
             <div class="optionContent">
                 <div class="optionDetails">
@@ -20,7 +20,7 @@
             </div>
         </label>
 
-        <label class="option" for="privateSale" onclick="setNextButton('private', '@collectionId')">
+        <label class="option" for="privateSale" onclick="setNextButton('private')">
             <input type="radio" id="privateSale" name="saleType" value="private"/>
             <div class="optionContent">
                 <div class="optionDetails">
@@ -35,5 +35,14 @@
 @commonPrimaryButton(constants.View.NEXT, JavaScript(s""),Symbol("id") -> "nextBtn", Symbol("class") -> "disable")
 </div>
 
-<script src="@routes.Assets.versioned("javascripts/sale/sale.js")"></script>
-<script> setNextButton('public', '@collectionId');</script>
+<script>
+        setNextButton('public');
+        function setNextButton(addressType){
+            $("#nextBtn").removeClass("disable");
+            if(addressType === "public"){
+                $("#nextBtn").attr("onclick","getForm(jsRoutes.controllers.PublicListingController.createPublicListingForm('@collectionId'))")
+            }else{
+                $("#nextBtn").attr("onclick","getForm(jsRoutes.controllers.SaleController.createCollectionSaleForm(undefined, '@collectionId'))")
+            }
+        }
+</script>

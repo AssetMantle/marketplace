@@ -12,6 +12,6 @@ object Nub {
       constants.FormField.PASSWORD.mapping,
     )(Data.apply)(Data.unapply))
 
-  case class Data(gasAmount: Int, gasPrice: Double, password: String)
+  case class Data(gasAmount: Int, gasPrice: BigDecimal, password: String)
 
 }

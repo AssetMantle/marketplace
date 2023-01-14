@@ -3,7 +3,7 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
-import models.master.{Collection, Sale}
+import models.master.{Collection, PublicListing}
 import models.masterTransaction.CollectionDraft
 import models.{master, masterTransaction}
 import play.api.Logger
@@ -30,8 +30,10 @@ class CollectionController @Inject()(
                                       masterAccounts: master.Accounts,
                                       masterCollections: master.Collections,
                                       masterTransactionCollectionDrafts: masterTransaction.CollectionDrafts,
+                                      masterTransactionPublicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
                                       masterNFTs: master.NFTs,
                                       masterSales: master.Sales,
+                                      masterPublicListings: master.PublicListings,
                                       masterNFTOwners: master.NFTOwners,
                                       masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                       masterWhitelists: master.Whitelists,
@@ -53,6 +55,13 @@ class CollectionController @Inject()(
     }
   }
 
+  def viewPublicListedCollections(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.collection.viewPublicListedCollections()))
+    }
+  }
+
   def viewCollection(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
@@ -69,7 +78,7 @@ class CollectionController @Inject()(
   def collectionsSection(category: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.collection.explore.collectionsSection(category)))
+        Future(Ok(views.html.collection.comingSoon.collectionsSection(category)))
     }
   }
 
@@ -80,9 +89,9 @@ class CollectionController @Inject()(
 
         (for {
           totalCollections <- totalCollections
-        } yield Ok(views.html.collection.explore.collectionList(category, totalCollections))
+        } yield Ok(views.html.collection.comingSoon.collectionList(category, totalCollections))
           ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
+          case baseException: BaseException => BadRequest(baseException.failure.message)
         }
     }
   }
@@ -95,7 +104,38 @@ class CollectionController @Inject()(
 
         (for {
           collections <- collections
-        } yield Ok(views.html.collection.explore.collectionsPerPage(collections))
+        } yield Ok(views.html.collection.comingSoon.collectionsPerPage(collections))
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
+  }
+
+  def publicListedCollectionsSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val totalCollections = masterPublicListings.Service.total
+        (for {
+          totalCollections <- totalCollections
+        } yield Ok(views.html.collection.publicListed.collectionsSection(totalCollections))
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
+  }
+
+  def publicListedCollectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val publicListings = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        else masterPublicListings.Service.getByPageNumber(pageNumber)
+
+        def collections(ids: Seq[String]) = masterCollections.Service.getCollections(ids)
+
+        (for {
+          publicListings <- publicListings
+          collections <- collections(publicListings.map(_.collectionId))
+        } yield Ok(views.html.collection.publicListed.collectionsPerPage(collections))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -107,14 +147,16 @@ class CollectionController @Inject()(
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
         val sales = masterSales.Service.getAllSalesByCollectionId(id)
+        val publicListing = masterPublicListings.Service.getPublicListingByCollectionId(id)
 
-        def randomNFTs(sale: Boolean) = if (sale) masterNFTs.Service.getRandomNFTs(id, 5, Seq.empty) else Future(Seq())
+        def randomNFTs(get: Boolean) = if (get) masterNFTs.Service.getRandomNFTs(id, 5, Seq.empty) else Future(Seq())
 
         (for {
           collection <- collection
           sales <- sales
-          randomNFTs <- randomNFTs(sales.nonEmpty)
-        } yield Ok(views.html.collection.details.collectionNFTs(collection, sales, randomNFTs))
+          publicListing <- publicListing
+          randomNFTs <- randomNFTs(sales.nonEmpty || publicListing.nonEmpty)
+        } yield Ok(views.html.collection.details.collectionNFTs(collection, sales, publicListing, randomNFTs))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -161,8 +203,11 @@ class CollectionController @Inject()(
     implicit request =>
       val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
       val collection = masterCollections.Service.tryGet(id)
+      val publicListing = masterPublicListings.Service.getPublicListingByCollectionId(id)
 
-      def getSalesInfo(collection: Collection) = if (optionalLoginState.isDefined) {
+      def getTotalPublicListingSold(publicListingId: Option[String]): Future[Long] = if (publicListingId.isDefined) masterTransactionPublicListingNFTTransactions.Service.getTotalPublicListingSold(publicListingId.get).map(_.toLong) else Future(0L)
+
+      val getSalesInfo = if (optionalLoginState.isDefined) {
         val sales = masterSales.Service.getAllSalesByCollectionId(id)
 
         def isMember(whitelistIds: Seq[String]) = masterWhitelistMembers.Service.isMember(whitelistIds, optionalLoginState.get.username)
@@ -176,8 +221,10 @@ class CollectionController @Inject()(
       (for {
         collectionAnalysis <- collectionAnalysis
         collection <- collection
-        (sales, isMember) <- getSalesInfo(collection)
-      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis, collection, sales, isMember))
+        publicListing <- publicListing
+        totalPublicListingSold <- getTotalPublicListingSold(publicListing.map(_.id))
+        (sales, isMember) <- getSalesInfo
+      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis = collectionAnalysis, collection = collection, sales = sales, publicListing = publicListing, isMember = isMember, publicListingSold = totalPublicListingSold))
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
@@ -187,27 +234,16 @@ class CollectionController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
-        val sales = masterSales.Service.getAllSalesByCollectionId(id)
+        val publicListing = masterPublicListings.Service.getPublicListingByCollectionId(id)
 
-        def allSold(saleId: String) = masterNFTOwners.Service.checkAllSold(saleId)
+        def publicListingStatus(publicListing: Option[PublicListing]) = if (publicListing.isDefined) masterTransactionPublicListingNFTTransactions.Service.getTotalPublicListingSold(publicListing.get.id).map(x => publicListing.get.getStatus(x).id) else Future(0)
 
-        def saleStatus(sales: Seq[Sale]) = if (sales.isEmpty) Future(0) else {
-          val activeSale = sales.sortBy(_.endTimeEpoch).find(x => {
-            val currentEpoch = utilities.Date.currentEpoch
-            currentEpoch >= x.startTimeEpoch && currentEpoch < x.endTimeEpoch
-          })
-          if (activeSale.isEmpty) Future(3) else {
-            for {
-              allSold <- allSold(activeSale.get.id)
-            } yield activeSale.get.getStatus(allSold).id
-          }
-        }
 
         (for {
           collectionAnalysis <- collectionAnalysis
-          sales <- sales
-          saleStatus <- saleStatus(sales)
-        } yield Ok(s"${collectionAnalysis.totalNFTs.toString}|${sales.sortBy(_.price).headOption.fold(MicroNumber.zero)(_.price).toString}|${saleStatus}")
+          publicListing <- publicListing
+          publicListingStatus <- publicListingStatus(publicListing)
+        } yield Ok(s"${collectionAnalysis.totalNFTs.toString}|${publicListing.fold(MicroNumber.zero)(_.price).toString}|${publicListingStatus}")
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }

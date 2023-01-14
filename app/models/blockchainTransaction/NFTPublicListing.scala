@@ -1,16 +1,13 @@
 package models.blockchainTransaction
 
+import akka.actor.Cancellable
 import exceptions.BaseException
 import models.Trait._
-import models.blockchain
 import models.common.Coin
-import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import slick.jdbc.H2Profile.api._
-import transactions.responses.blockchain.BroadcastTxSyncResponse
-import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
@@ -75,7 +72,6 @@ class NFTPublicListings @Inject()(
                                    protected val databaseConfigProvider: DatabaseConfigProvider,
                                    blockchainAccounts: models.blockchain.Accounts,
                                    blockchainTransactions: models.blockchain.Transactions,
-                                   masterTransactionPublicListingNFTTransactions: models.masterTransaction.PublicListingNFTTransactions,
                                    broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                    utilitiesOperations: utilities.Operations,
                                    utilitiesTransactionComplete: utilities.TransactionComplete,
@@ -109,87 +105,32 @@ class NFTPublicListings @Inject()(
       } yield nftPublicListing
     }
 
-    def getAllPendingStatus: Future[Seq[NFTPublicListing]] = filter(_.status.?.isEmpty).map(_.map(_.deserialize))
+    def markSuccess(txHashes: Seq[String]): Future[Int] = customUpdate(NFTPublicListings.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(true))
+
+    def markFailed(txHashes: Seq[String]): Future[Int] = customUpdate(NFTPublicListings.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(false))
+
+    def getAllPendingStatus: Future[Seq[NFTPublicListing]] = filter(x => x.broadcasted && x.status.?.isEmpty).map(_.map(_.deserialize))
 
     def fetchAll: Future[Seq[NFTPublicListing]] = getAll.map(_.map(_.deserialize))
   }
 
   object Utility {
 
-    def transaction(buyerAccountId: String, sellerAccountId: String, nftId: String, publicListingId: String, fromAddress: String, toAddress: String, amount: MicroNumber, gasPrice: Double, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
-      // TODO
-      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
-      val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount(fromAddress))
-      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
-
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, unconfirmedTxHashes: Seq[String]) = {
-        val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)))),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = gasLimit),
-          gasLimit = gasLimit,
-          account = bcAccount,
-          ecKey = ecKey)
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
-
-        def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              nftPublicListing <- Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), broadcasted = false, status = None, memo = Option(memo))
-              _ <- masterTransactionPublicListingNFTTransactions.Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = nftId, publicListingId = publicListingId)
-            } yield nftPublicListing
-          }
-          else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
-        }
-
-        for {
-          nftPublicListing <- checkAndAdd(unconfirmedTxHashes)
-        } yield nftPublicListing
-      }
-
-      def broadcastTxAndUpdate(nftPublicListing: NFTPublicListing) = {
-
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) Service.updateNFTPublicListing(nftPublicListing.copy(broadcasted = true, status = Option(false), log = Option(errorResponse.get.error.data)))
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) Service.updateNFTPublicListing(nftPublicListing.copy(broadcasted = true, status = Option(false), log = Option(successResponse.get.result.log)))
-        else Service.updateNFTPublicListing(nftPublicListing.copy(broadcasted = true))
-
-        for {
-          (successResponse, errorResponse) <- broadcastTxSync.Service.get(nftPublicListing.getTxRawAsHexString)
-          updatedNFTPublicListing <- update(successResponse, errorResponse)
-        } yield updatedNFTPublicListing
-      }
-
-      for {
-        bcAccount <- bcAccount
-        unconfirmedTxs <- unconfirmedTxs
-        nftPublicListing <- checkMempoolAndAddTx(bcAccount, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedNFTPublicListing <- broadcastTxAndUpdate(nftPublicListing)
-      } yield updatedNFTPublicListing
-    }
-
     private val txSchedulerRunnable = new Runnable {
       def run(): Unit = {
         val nftPublicListings = Service.getAllPendingStatus
 
-        def checkAndUpdate(nftPublicListings: Seq[NFTPublicListing]) = utilitiesOperations.traverse(nftPublicListings) { nftPublicListing =>
-          val transaction = blockchainTransactions.Service.get(nftPublicListing.txHash)
+        def getTransactions(hashes: Seq[String]) = blockchainTransactions.Service.getByHashes(hashes)
 
-          def update(transaction: Option[blockchain.Transaction]) = transaction.fold[Future[Option[NFTPublicListing]]](Future(None))(tx => Service.updateNFTPublicListing(nftPublicListing.copy(status = Option(tx.status), log = if (tx.rawLog != "") Option(tx.rawLog) else None)).map(Option(_)))
+        def markSuccess(hashes: Seq[String]) = if (hashes.nonEmpty) Service.markSuccess(hashes) else Future(0)
 
-          def onTxComplete(transaction: Option[blockchain.Transaction], price: MicroNumber) = if (transaction.isDefined) {
-            utilitiesTransactionComplete.onNFTPublicListing(transaction = transaction.get, price = price)
-          } else Future()
-
-          for {
-            transaction <- transaction
-            nftPublicListing <- update(transaction)
-            _ <- onTxComplete(transaction, nftPublicListing.fold(MicroNumber.zero)(_.amount.head.amount))
-          } yield nftPublicListing
-
-        }
+        def markFailed(hashes: Seq[String]) = if (hashes.nonEmpty) Service.markFailed(hashes) else Future(0)
 
         val forComplete = (for {
           nftPublicListings <- nftPublicListings
-          _ <- checkAndUpdate(nftPublicListings)
+          txs <- getTransactions(nftPublicListings.map(_.txHash))
+          _ <- markSuccess(txs.filter(_.status).map(_.hash))
+          _ <- markFailed(txs.filter(x => !x.status).map(_.hash))
         } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.failure.logMessage)
         }
@@ -198,7 +139,7 @@ class NFTPublicListings @Inject()(
       }
     }
 
-    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Scheduler.InitialDelay, delay = constants.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
+    def start: Cancellable = actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Scheduler.InitialDelay, delay = constants.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
 
   }
 

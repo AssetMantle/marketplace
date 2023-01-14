@@ -28,10 +28,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.changeActiveKey,
 
         routes.javascript.CollectionController.viewCollections,
+        routes.javascript.CollectionController.viewPublicListedCollections,
         routes.javascript.CollectionController.viewCollection,
         routes.javascript.CollectionController.collectionsSection,
         routes.javascript.CollectionController.collectionList,
         routes.javascript.CollectionController.collectionsPerPage,
+        routes.javascript.CollectionController.publicListedCollectionsSection,
+        routes.javascript.CollectionController.publicListedCollectionsPerPage,
         routes.javascript.CollectionController.collectionNFTs,
         routes.javascript.CollectionController.collectionNFTsPerPage,
         routes.javascript.CollectionController.info,
@@ -116,6 +119,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.profileAnalysisCard,
 
         routes.javascript.PublicListingController.createPublicListingForm,
+        routes.javascript.PublicListingController.buyNFTForm,
 
         routes.javascript.SaleController.createCollectionSaleForm,
         routes.javascript.SaleController.buySaleNFTForm,

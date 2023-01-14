@@ -118,7 +118,7 @@ class SendCoins @Inject()(
 
   object Utility {
 
-    def transaction(accountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: Double, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(accountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: BigDecimal, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount(fromAddress))

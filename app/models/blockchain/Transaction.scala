@@ -1,33 +1,18 @@
 package models.blockchain
 
-import exceptions.BaseException
-import models.Trait.{Entity, Logged, ModelTable}
+import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
 import models.common.Fee
 import models.common.TransactionMessages.StdMsg
-import org.postgresql.util.PSQLException
-import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.Json
-import play.api.{Configuration, Logger}
-import slick.jdbc.JdbcProfile
-import utilities.Date.RFC3339
-import models.Abstract.PublicKey
-import models.Trait.Logged
-import models.common.Account.Vesting.VestingParameters
-import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
+import play.db.NamedDatabase
 import slick.jdbc.H2Profile.api._
+import utilities.Date.RFC3339
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.libs.json.Json
-import play.db.NamedDatabase
-import java.sql.Timestamp
-import javax.inject.{Inject, Singleton}
-import scala.collection.immutable.ListMap
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 case class Transaction(hash: String, height: Int, code: Int, rawLog: String, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: RFC3339, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
 
@@ -117,6 +102,8 @@ class Transactions @Inject()(
     def get(hash: String): Future[Option[Transaction]] = getById(hash).map(_.map(_.deserialize))
 
     def getStatus(hash: String): Future[Option[Boolean]] = getById(hash).map(_.map(_.code == 0))
+
+    def getByHashes(hashes: Seq[String]): Future[Seq[Transaction]] = filter(_.hash.inSet(hashes)).map(_.map(_.deserialize))
 
   }
 }
