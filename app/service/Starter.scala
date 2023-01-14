@@ -68,7 +68,6 @@ class Starter @Inject()(
 
   implicit val NFTReads: Reads[NFT] = Json.reads[NFT]
 
-
   def verifyNFT(nft: NFT, uploadCollection: UploadCollection): Boolean = {
     val propertiesName = uploadCollection.classificationProperties.map(_.name)
     nft.properties.map(x => propertiesName.contains(x.name)).forall(identity) && nft.properties.length == uploadCollection.classificationProperties.length
@@ -155,7 +154,6 @@ class Starter @Inject()(
     } yield ()
   }
 
-
   def deleteCollections(): Future[Unit] = {
     val list = Seq("F15E9719C270B3F9", "CB9FFC37AB52AE1A", "C0D1BFC0E078E878", "B668A2AC9D071659", "A5645AA13D57E2B3")
     val deleteWishlist = masterWishLists.Service.deleteCollections(list)
@@ -172,7 +170,7 @@ class Starter @Inject()(
 
     def deleteNfts() = masterNFTs.Service.deleteCollections(list)
 
-    def deleteCollections() = masterCollections.Service.delete(list)
+    def deleteAllCollections() = masterCollections.Service.delete(list)
 
     for {
       nftIDs <- nftIDs
@@ -183,7 +181,14 @@ class Starter @Inject()(
       _ <- deleteAnalytics
       _ <- deleteNftOwners
       _ <- deleteNfts()
-      _ <- deleteCollections()
+      _ <- deleteAllCollections()
+    } yield ()
+  }
+
+  def fix(): Future[Unit] = {
+    val updateMinte = masterCollections.Service.setPropertiesToEmpty()
+    for {
+      _ <- updateMinte
     } yield ()
   }
 
@@ -196,6 +201,7 @@ class Starter @Inject()(
     try {
       Await.result(deleteCollections(), Duration.Inf)
       Await.result(uploadCollections(), Duration.Inf)
+      Await.result(fix(), Duration.Inf)
     } catch {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
