@@ -174,6 +174,8 @@ class NFTOwners @Inject()(
 
     def getRandomNFTsByPublicListingId(publicListingId: String, take: Int, creatorId: String): Future[Seq[NFTOwner]] = filter(x => x.publicListingId === publicListingId && x.ownerId === creatorId && x.creatorId === creatorId).map(x => util.Random.shuffle(x).take(take))
 
+    def deleteCollections(collectionIds: Seq[String]): Future[Int] = filterAndDelete(_.collectionId.inSet(collectionIds))
+
     def tryGetByNFTAndSaleId(nftId: String, saleId: String): Future[NFTOwner] = filterHead(x => x.saleId === saleId && x.nftId === nftId)
     //    https://scala-slick.org/doc/3.1.1/sql-to-slick.html#id21
     //    def getQuery = NFTOwners.TableQuery.filter(x => x.ownerId === "asd" && x.creatorId)

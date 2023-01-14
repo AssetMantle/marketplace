@@ -78,5 +78,7 @@ class NFTProperties @Inject()(
 
     def getForNFT(nftId: String): Future[Seq[NFTProperty]] = filter(_.nftId === nftId)
 
+    def deleteByNFTIds(nftIDs: Seq[String]): Future[Int] = filterAndDelete(_.nftId.inSet(nftIDs))
+
   }
 }

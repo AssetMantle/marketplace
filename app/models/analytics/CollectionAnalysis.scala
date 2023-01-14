@@ -130,6 +130,8 @@ class CollectionsAnalysis @Inject()(
     def tryGet(id: String): Future[CollectionAnalysis] = filterHead(_.id === id).map(_.deserialize)
 
     def update(collectionAnalysis: CollectionAnalysis): Future[Unit] = updateById(collectionAnalysis.serialize)
+
+    def delete(ids: Seq[String]): Future[Int] = filterAndDelete(_.id.inSet(ids))
   }
 
   object Utility {
