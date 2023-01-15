@@ -189,12 +189,11 @@ class PublicListingNFTTransactions @Inject()(
               val boughtNFTs = nftPublicListingTxs.filter(_.txHash == txHash)
               val markSuccess = Service.markSuccess(txHash)
               val publicListing = masterPublicListings.Service.tryGet(boughtNFTs.head.publicListingId)
+              val nft = masterNFTs.Service.tryGet(boughtNFTs.head.nftId)
 
               def transferNFTOwnership(boughtNFTs: Seq[PublicListingNFTTransaction]) = utilitiesOperations.traverse(boughtNFTs) { boughtNFT =>
                 masterNFTOwners.Service.markNFTSoldFromPublicListing(nftId = boughtNFT.nftId, publicListingId = boughtNFT.publicListingId, sellerAccountId = boughtNFT.sellerAccountId, buyerAccountId = boughtNFT.buyerAccountId)
               }
-
-              def nft(buyNFTTx: PublicListingNFTTransaction) = masterNFTs.Service.tryGet(buyNFTTx.nftId)
 
               def analysisUpdate(nft: NFT, quantity: Int, price: MicroNumber) = collectionsAnalysis.Utility.onSuccessfulSell(collectionId = nft.collectionId, price = price, quantity = quantity)
 
@@ -207,7 +206,7 @@ class PublicListingNFTTransactions @Inject()(
                 _ <- markSuccess
                 publicListing <- publicListing
                 _ <- transferNFTOwnership(boughtNFTs)
-                nft <- nft(boughtNFTs.head)
+                nft <- nft
                 _ <- analysisUpdate(nft, boughtNFTs.length, publicListing.price)
                 _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
               } yield ()

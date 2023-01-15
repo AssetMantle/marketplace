@@ -27,6 +27,7 @@ class IndexController @Inject()(
                                  nftPublicListings: blockchainTransaction.NFTPublicListings,
                                  nftSales: blockchainTransaction.NFTSales,
                                  publicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
+                                 saleNFTTransactions: masterTransaction.SaleNFTTransactions,
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -47,8 +48,12 @@ class IndexController @Inject()(
   }
 
   starter.start()
-  historyMasterSales.Utility.start
+
   historyMasterPublicListings.Utility.start
   nftPublicListings.Utility.start
   publicListingNFTTransactions.Utility.start
+
+  historyMasterSales.Utility.start
+  saleNFTTransactions.Utility.start
+  nftSales.Utility.start
 }
