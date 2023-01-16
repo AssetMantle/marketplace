@@ -103,6 +103,7 @@ object IPFS {
       val url = new URL(constants.CommonConfig.IPFS.DownloadEndPoint + "/" + fileUrl)
       val connection = url.openConnection().asInstanceOf[HttpsURLConnection]
       connection.setRequestMethod("GET")
+      connection.setRequestProperty("x-pinata-gateway-token", constants.CommonConfig.IPFS.DownloadAccessToken)
       var in = connection.getInputStream
       var out = new BufferedOutputStream(new FileOutputStream(downloadPath))
       val byteArray = LazyList.continually(in.read).takeWhile(_ != -1).map(_.toByte).toArray
