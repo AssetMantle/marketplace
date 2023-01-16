@@ -95,13 +95,6 @@ class PublicListingNFTTransactions @Inject()(
 
     def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftIds: Seq[String], publicListingId: String): Future[Unit] = create(nftIds.map(x => PublicListingNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = x, publicListingId = publicListingId, status = None)))
 
-    def tryGetByPublicListingIdAndBuyerAccountId(buyerAccountId: String, publicListingId: String): Future[Seq[PublicListingNFTTransaction]] = filter(x => x.publicListingId === publicListingId && x.buyerAccountId === buyerAccountId)
-
-    def checkAlreadySold(nftId: String, publicListingId: String): Future[Boolean] = {
-      val nullStatus: Option[Boolean] = null
-      filterAndExists(x => x.nftId === nftId && x.publicListingId === publicListingId && (x.status || x.status.? === nullStatus))
-    }
-
     def checkAlreadySold(nftIds: Seq[String], publicListingId: String): Future[Boolean] = {
       val nullStatus: Option[Boolean] = null
       filter(x => x.nftId.inSet(nftIds) && x.publicListingId === publicListingId && (x.status || x.status.? === nullStatus)).map(_.nonEmpty)

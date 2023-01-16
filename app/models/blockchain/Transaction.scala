@@ -103,7 +103,7 @@ class Transactions @Inject()(
 
     def getStatus(hash: String): Future[Option[Boolean]] = getById(hash).map(_.map(_.code == 0))
 
-    def getByHashes(hashes: Seq[String]): Future[Seq[Transaction]] = filter(_.hash.inSet(hashes)).map(_.map(_.deserialize))
+    def getByHashes(hashes: Seq[String]): Future[Seq[Transaction]] = if (hashes.nonEmpty) filter(_.hash.inSet(hashes)).map(_.map(_.deserialize)) else Future(Seq[Transaction]())
 
   }
 }
