@@ -882,5 +882,4 @@ PUBLIC_LISTING_TITLE=Early Access
 PUBLIC_LISTING_ON_COLLECTION=Public Listing
 NOTIFICATION.PUBLIC_LISTING_ON_COLLECTION.MESSAGE={0} up for early access.
 SOLD_OUT=Sold out
-EARLY_ACCESS_BANNER_HEADER=Early-Access | exclusive entry For Select members
-EARLY_ACCESS_BANNER_SUBHEADER=Special and private access for the Mantle collectors.
+EARLY_ACCESS_BANNER_HEADER=Early-Access
