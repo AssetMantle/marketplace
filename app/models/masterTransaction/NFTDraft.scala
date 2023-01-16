@@ -148,5 +148,7 @@ class NFTDrafts @Inject()(
     }
 
     def delete(id: String): Future[Int] = deleteById(id)
+
+    def deleteByCollectionIds(ids: Seq[String]): Future[Int] = filterAndDelete(_.collectionId.inSet(ids))
   }
 }
