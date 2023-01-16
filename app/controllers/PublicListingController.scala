@@ -72,7 +72,7 @@ class PublicListingController @Inject()(
           val countNFts = masterNFTOwners.Service.countForCreatorNotForSell(collectionId = createData.collectionId, creatorId = loginState.username)
 
           def addToPublicListing(collection: Collection, countNFts: Int, totalNFTs: Int) = {
-            val maxSellNumber: Int = if (totalNFTs <= 50) totalNFTs / 2 else totalNFTs / 10
+            val maxSellNumber: Int = if (totalNFTs <= 50) totalNFTs else totalNFTs / 10
             val errors = Seq(
               if (!loginState.isGenesisCreator) Option(constants.Response.NOT_GENESIS_CREATOR) else None,
               if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,

@@ -508,11 +508,11 @@ class CollectionController @Inject()(
   def countForCreatorNotForSell(collectionId: String, accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val countNFts = masterNFTOwners.Service.countForCreatorNotForSell(collectionId = collectionId, creatorId = accountId)
+        val countNFTs = masterNFTOwners.Service.countForCreatorNotForSell(collectionId = collectionId, creatorId = accountId)
 
         (for {
-          countNFts <- countNFts
-        } yield Ok(countNFts.toString)
+          countNFTs <- countNFTs
+        } yield Ok(if (countNFTs <= 50) countNFTs.toString else (countNFTs / 10).toString)
           ).recover {
           case _: BaseException => BadRequest("0")
         }
