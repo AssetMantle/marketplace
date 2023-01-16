@@ -47,8 +47,6 @@ class IndexController @Inject()(
     }
   }
 
-  starter.start()
-
   historyMasterPublicListings.Utility.start
   nftPublicListings.Utility.start
   publicListingNFTTransactions.Utility.start
@@ -56,4 +54,6 @@ class IndexController @Inject()(
   historyMasterSales.Utility.start
   saleNFTTransactions.Utility.start
   nftSales.Utility.start
+
+  starter.start()
 }

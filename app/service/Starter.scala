@@ -198,11 +198,12 @@ class Starter @Inject()(
 
   // Delete redundant nft tags
   def start(): Unit = {
-    try {
-      Await.result(deleteCollections(), Duration.Inf)
-      Await.result(uploadCollections(), Duration.Inf)
-      Await.result(fix(), Duration.Inf)
-    } catch {
+    (for {
+      _ <- deleteCollections()
+      _ <- uploadCollections()
+      _ <- fix()
+    } yield ()
+      ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
   }
