@@ -96,34 +96,29 @@
                         </a>
                     </div>
                     <ul class="links">
-                        <li class="exploreLink">
+                        <li>
                             <a class="desktop-link">
                                 <span class="newFeatureIcon">@Messages(constants.View.NEW_LABEL)</span>
                                 @Messages(constants.View.EXPLORE)
                             </a>
-                            <input type="checkbox" id="show-features">
-                            <label for="show-features">@Messages(constants.View.EXPLORE)</label>
+                            <input type="checkbox" id="show-features3">
+                            <label for="show-features3">@Messages(constants.View.EXPLORE)</label>
                             <ul class="submenu">
-                                <li>
-                                    <div class="dropDownContainer">
-                                        <div class="dropDownItem">
-                                            <button class="accordionMenu">
-                                                <i class="bi bi-folder-plus iconDefault"></i>
-                                                <h4>@Messages(constants.View.LAUNCHPAD_MENU)</h4>
-                                                <i class="bi bi-chevron-right iconDefault arrowIcon"></i>
-                                            </button>
-                                            <div class="panel">
-                                                <a class="d-flex flex-row align-items-center gap-3" href="@routes.CollectionController.viewPublicListedCollections()">
-                                                    <img src="@routes.Assets.versioned("images/icon/createNFT.svg")"/>
-                                                    <span class="profileMenuLabel">@Messages(constants.View.EARLY_ACCESS_MENU)</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <li class="mainMenuItem">
+                                    <a class="d-flex flex-row align-items-center gap-3">
+                                        <i class="bi bi-ui-radios-grid iconDefault"></i>
+                                        <div class="profileMenuLabel">@Messages(constants.View.LAUNCHPAD_MENU)</div>
+                                    </a>
+                                </li>
+                                <li class="submenuItem">
+                                    <a class="d-flex flex-row align-items-center gap-3" href="@routes.CollectionController.viewPublicListedCollections()">
+                                        <i class="bi bi-clock-history iconDefault"></i>
+                                        <div class="profileMenuLabel">@Messages(constants.View.EARLY_ACCESS_MENU)</div>
+                                    </a>
                                 </li>
                                 <li>
                                     <a class="d-flex flex-row align-items-center gap-3" href="@routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)">
-                                        <i class="bi bi-palette iconDefault"></i>
+                                        <i class="bi bi-folder2-open iconDefault"></i>
                                         <div class="profileMenuLabel">@Messages(constants.View.ALL_COLLECTION_MENU)</div>
                                     </a>
                                 </li>

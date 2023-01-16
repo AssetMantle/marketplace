@@ -70,13 +70,7 @@ object NFTPublicListings {
 @Singleton
 class NFTPublicListings @Inject()(
                                    protected val databaseConfigProvider: DatabaseConfigProvider,
-                                   blockchainAccounts: models.blockchain.Accounts,
                                    blockchainTransactions: models.blockchain.Transactions,
-                                   broadcastTxSync: transactions.blockchain.BroadcastTxSync,
-                                   utilitiesOperations: utilities.Operations,
-                                   utilitiesTransactionComplete: utilities.TransactionComplete,
-                                   getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
-                                   getAccount: queries.blockchain.GetAccount,
                                  )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[NFTPublicListings.NFTPublicListingTable, NFTPublicListings.NFTPublicListingSerialized, String](
     databaseConfigProvider,

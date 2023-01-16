@@ -110,7 +110,7 @@ class ProfileController @Inject()(
         (for {
           key <- key
           account <- account
-        } yield Ok(views.html.profile.profileInfoCard(accountId = accountId, address = key.address, createdOn = account.createdOnMillisEpoch.getOrElse(0L)))
+        } yield Ok(views.html.profile.profileInfoCard(accountId = accountId, address = key.address, accountType = account.accountType, createdOn = account.createdOnMillisEpoch.getOrElse(0L)))
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }

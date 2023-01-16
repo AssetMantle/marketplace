@@ -35,7 +35,13 @@ function viewSetting() {
     $('#leftContent').html('');
 }
 
-function viewProfile(lastPart) {
+function viewPublicListedCollections() {
+    componentResource('centerContent', jsRoutes.controllers.CollectionController.publicListedCollectionsSection());
+    $('#leftContent').html('');
+    $('#rightContent').html('');
+}
+
+function zxsviewProfile(lastPart) {
     let accountId = lastPart.split("/")[0];
     let activeTab = lastPart.split("/")[1];
     componentResource('leftContent', jsRoutes.controllers.ProfileController.profileInfoCard(accountId));

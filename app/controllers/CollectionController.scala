@@ -78,7 +78,7 @@ class CollectionController @Inject()(
   def collectionsSection(category: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.collection.comingSoon.collectionsSection(category)))
+        Future(Ok(views.html.collection.all.collectionsSection(category)))
     }
   }
 
@@ -89,7 +89,7 @@ class CollectionController @Inject()(
 
         (for {
           totalCollections <- totalCollections
-        } yield Ok(views.html.collection.comingSoon.collectionList(category, totalCollections))
+        } yield Ok(views.html.collection.all.collectionList(category, totalCollections))
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }
@@ -104,7 +104,7 @@ class CollectionController @Inject()(
 
         (for {
           collections <- collections
-        } yield Ok(views.html.collection.comingSoon.collectionsPerPage(collections))
+        } yield Ok(views.html.collection.all.collectionsPerPage(collections))
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }
@@ -508,11 +508,11 @@ class CollectionController @Inject()(
   def countForCreatorNotForSell(collectionId: String, accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val countNFts = masterNFTOwners.Service.countForCreatorNotForSell(collectionId = collectionId, creatorId = accountId)
+        val countNFTs = masterNFTOwners.Service.countForCreatorNotForSell(collectionId = collectionId, creatorId = accountId)
 
         (for {
-          countNFts <- countNFts
-        } yield Ok(countNFts.toString)
+          countNFTs <- countNFTs
+        } yield Ok(if (countNFTs <= 50) countNFTs.toString else (countNFTs / 10).toString)
           ).recover {
           case _: BaseException => BadRequest("0")
         }

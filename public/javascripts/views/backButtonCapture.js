@@ -22,6 +22,9 @@ window.addEventListener('popstate', e => {
         case "profile":
             viewProfile(lastPart);
             break;
+        case "publicListedCollections":
+            viewPublicListedCollections();
+            break;
         case "index":
             window.location = "/";
             break;

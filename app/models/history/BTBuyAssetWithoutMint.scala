@@ -94,8 +94,7 @@ class BTBuyAssetWithoutMints @Inject()(
                                         broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                         utilitiesOperations: utilities.Operations,
                                         getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
-                                        getAccount: queries.blockchain.GetAccount,
-                                        utilitiesTransactionComplete: utilities.TransactionComplete
+                                        getAccount: queries.blockchain.GetAccount
                                       )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl3[BTBuyAssetWithoutMints.BTBuyAssetWithoutMintTable, BTBuyAssetWithoutMints.BTBuyAssetWithoutMintSerialized, String, String, String](
     databaseConfigProvider,

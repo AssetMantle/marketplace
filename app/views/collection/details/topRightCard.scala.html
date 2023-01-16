@@ -12,7 +12,7 @@
             <div class="analysisValue">@collectionAnalysis.totalNFTs</div>
         </div>
         @if(publicListing.isDefined) {
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center mt-3">
                 <div class="title">@Messages(constants.View.PUBLIC_LISTING_TITLE)</div>
                 @if(publicListing.get.getStatus(publicListingSold).id == constants.PublicListing.LIVE.id) {
                     <div class="liveBadge">@Messages(constants.View.SALE_LIVE_LABEL)</div>

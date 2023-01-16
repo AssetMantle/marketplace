@@ -27,6 +27,7 @@ class IndexController @Inject()(
                                  nftPublicListings: blockchainTransaction.NFTPublicListings,
                                  nftSales: blockchainTransaction.NFTSales,
                                  publicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
+                                 saleNFTTransactions: masterTransaction.SaleNFTTransactions,
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -37,7 +38,7 @@ class IndexController @Inject()(
 
   def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.collection.viewCollections()))
+      Future(Ok(views.html.collection.viewPublicListedCollections()))
   }
 
   def sitemap: EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), Duration(7, DAYS)) {
@@ -47,8 +48,12 @@ class IndexController @Inject()(
   }
 
   starter.start()
-  historyMasterSales.Utility.start
+
   historyMasterPublicListings.Utility.start
   nftPublicListings.Utility.start
   publicListingNFTTransactions.Utility.start
+
+  historyMasterSales.Utility.start
+  saleNFTTransactions.Utility.start
+  nftSales.Utility.start
 }
