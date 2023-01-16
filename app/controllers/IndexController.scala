@@ -38,7 +38,7 @@ class IndexController @Inject()(
 
   def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.collection.viewCollections()))
+      Future(Ok(views.html.collection.viewPublicListedCollections()))
   }
 
   def sitemap: EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), Duration(7, DAYS)) {
