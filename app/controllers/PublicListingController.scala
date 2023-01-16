@@ -71,8 +71,8 @@ class PublicListingController @Inject()(
           val totalNFTs = masterNFTOwners.Service.countOwnedAndCreatedNFTsForCollection(accountId = loginState.username, collectionId = createData.collectionId)
           val countNFts = masterNFTOwners.Service.countForCreatorNotForSell(collectionId = createData.collectionId, creatorId = loginState.username)
 
-          def addToPublicListing(collection: Collection, countNFts: Int, totalNFTs: Int) = {
-            val maxSellNumber: Int = if (totalNFTs <= 50) totalNFTs / 2 else totalNFTs / 10
+          def addToPublicListing(countNFts: Int, collection: Collection, totalNFTs: Int) = {
+            val maxSellNumber: Int = if (totalNFTs <= 50) totalNFTs else totalNFTs / 10
             val errors = Seq(
               if (!loginState.isGenesisCreator) Option(constants.Response.NOT_GENESIS_CREATOR) else None,
               if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
@@ -94,7 +94,7 @@ class PublicListingController @Inject()(
             collection <- collection
             countNFts <- countNFts
             totalNFTs <- totalNFTs
-            _ <- addToPublicListing(collection = collection, countNFts = countNFts, totalNFTs = totalNFTs)
+            _ <- addToPublicListing(countNFts = countNFts, collection = collection, totalNFTs = totalNFTs)
             _ <- sendNotification(collection.name)
             _ <- collectionsAnalysis.Utility.onCreatePublicListing(collection.id, totalListed = createData.numberOfNFTs, listingPrice = createData.price)
           } yield PartialContent(views.html.publicListing.createSuccessful())
