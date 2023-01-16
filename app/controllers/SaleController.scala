@@ -175,7 +175,7 @@ class SaleController @Inject()(
               if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
             ).flatten
             if (errors.isEmpty) {
-              blockchainTransactionNFTSales.Utility.transaction(
+              masterTransactionSaleNFTTransactions.Utility.transaction(
                 buyerAccountId = loginState.username,
                 sellerAccountId = sellerKey.accountId,
                 saleId = sale.id,
