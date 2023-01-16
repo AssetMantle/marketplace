@@ -76,5 +76,6 @@ object CommonConfig {
     val JwtToken: String = config.get[String]("ipfs.jwtToken")
     val UploadEndPoint: String = config.get[String]("ipfs.uploadEndPoint")
     val DownloadEndPoint: String = config.get[String]("ipfs.downloadEndPoint")
+    val DownloadAccessToken: String = config.get[String]("ipfs.accessToken")
   }
 }
