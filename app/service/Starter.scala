@@ -197,7 +197,7 @@ class Starter @Inject()(
   // Set Mint.E properties to []
 
   // Delete redundant nft tags
-  def start(): Unit = {
+  def start(): Future[Unit] = {
     (for {
       _ <- deleteCollections()
       _ <- uploadCollections()
