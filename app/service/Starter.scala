@@ -2,6 +2,7 @@ package service
 
 import models.analytics.CollectionsAnalysis
 import models.common.{Collection => commonCollection}
+import models.master.Collection
 import models.{blockchainTransaction, master, masterTransaction}
 import play.api.libs.json.{Json, Reads}
 import play.api.{Configuration, Logger}
@@ -66,7 +67,15 @@ class Starter @Inject()(
 
   implicit val NFTReads: Reads[NFT] = Json.reads[NFT]
 
-  private def addNft(nftDetails: NFT, uploadCollection: UploadCollection, nftImageFileName: String) = {
+  def verifyNFT(nft: NFT, collection: Collection): Boolean = {
+    if (collection.properties.isEmpty && nft.properties.isEmpty) true
+    else {
+      val propertiesName = collection.properties.get.map(_.name)
+      nft.properties.map(x => propertiesName.contains(x.name)).forall(identity) && nft.properties.length == collection.properties.get.length
+    }
+  }
+
+  private def addNft(nftDetails: NFT, uploadCollection: UploadCollection, nftImageFileName: String, collection: Collection) = if (verifyNFT(nftDetails, collection)) {
     val nftImageFile = constants.CommonConfig.Files.CollectionPath + "/" + uploadCollection.imagePath + "/" + nftImageFileName
     println(nftImageFile)
     if (uploadCollection.downloadFromIPFS) {
@@ -91,6 +100,9 @@ class Starter @Inject()(
           ""
       }
     } else ""
+  } else {
+    logger.error("incorrect nft: " + nftDetails.name)
+    ""
   }
 
   def uploadCollections(): Future[Unit] = {
@@ -99,14 +111,16 @@ class Starter @Inject()(
     def addCollectionNFTs(uploadCollections: Seq[UploadCollection]) = utilitiesOperations.traverse(uploadCollections) { uploadCollection =>
       println("START:     " + uploadCollection.id)
       val jsonFiles = getListOfFiles(constants.CommonConfig.Files.CollectionPath + "/" + uploadCollection.jsonPath)
-      val addNFTs = utilitiesOperations.traverse(jsonFiles) { nftFile =>
+      val collection = masterCollections.Service.tryGet(uploadCollection.id)
+
+      def addNFTs(collection: Collection) = utilitiesOperations.traverse(jsonFiles) { nftFile =>
         val nftDetails = readFile[NFT](nftFile)
         val nftImageFileName = nftFile.split("\\.").head.split("\\/").last + "." + uploadCollection.nftFormat
         println(nftImageFileName)
         (for {
           nftDetails <- nftDetails
         } yield {
-          addNft(nftDetails, uploadCollection, nftImageFileName)
+          addNft(nftDetails, uploadCollection, nftImageFileName, collection)
           ""
         }
           ).recover {
@@ -116,7 +130,8 @@ class Starter @Inject()(
       }
 
       for {
-        _ <- addNFTs
+        collection <- collection
+        _ <- addNFTs(collection)
       } yield ()
     }
 
