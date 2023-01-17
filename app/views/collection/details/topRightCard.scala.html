@@ -34,7 +34,6 @@
                 </div>
                 <script>epochToDateTime('countdown_@publicListing.get.startTimeEpoch');</script>
             } else {
-                @println(publicListing.get.getStatus(publicListingSold).id)
                 @if(publicListing.get.getStatus(publicListingSold).id == constants.PublicListing.SOLD_OUT.id) {
                     <div class="d-flex flex-column gap-1 mt-3">
                         <div class="analysisValue">

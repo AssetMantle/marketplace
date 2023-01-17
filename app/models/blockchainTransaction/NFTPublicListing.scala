@@ -1,6 +1,6 @@
 package models.blockchainTransaction
 
-import akka.actor.Cancellable
+import constants.Scheduler
 import exceptions.BaseException
 import models.Trait._
 import models.common.Coin
@@ -110,8 +110,10 @@ class NFTPublicListings @Inject()(
 
   object Utility {
 
-    private val txSchedulerRunnable = new Runnable {
-      def run(): Unit = {
+    val scheduler: Scheduler = new Scheduler {
+      val name: String = constants.Scheduler.BLOCKCHAIN_TRANSACTION_NFT_PUBLIC_LISTING
+
+      def runner(): Unit = {
         val nftPublicListings = Service.getAllPendingStatus
 
         def getTransactions(hashes: Seq[String]) = blockchainTransactions.Service.getByHashes(hashes)
@@ -132,8 +134,6 @@ class NFTPublicListings @Inject()(
         Await.result(forComplete, Duration.Inf)
       }
     }
-
-    def start: Cancellable = actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Scheduler.InitialDelay, delay = constants.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
 
   }
 

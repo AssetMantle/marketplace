@@ -1,5 +1,6 @@
 package controllers
 
+import akka.actor.CoordinatedShutdown
 import controllers.actions._
 import controllers.result.WithUsernameToken
 import models.{blockchainTransaction, history, masterTransaction}
@@ -21,6 +22,7 @@ class IndexController @Inject()(
                                  withoutLoginAction: WithoutLoginAction,
                                  withUsernameToken: WithUsernameToken,
                                  starter: Starter,
+                                 coordinatedShutdown: CoordinatedShutdown,
                                  // Do not delete, need to initialize object to start the scheduler
                                  historyMasterSales: history.MasterSales,
                                  historyMasterPublicListings: history.MasterPublicListings,
@@ -47,13 +49,15 @@ class IndexController @Inject()(
     }
   }
 
-  historyMasterPublicListings.Utility.start
-  nftPublicListings.Utility.start
-  publicListingNFTTransactions.Utility.start
+  utilities.Scheduler.startAndSetSchedulers(
+    historyMasterPublicListings.Utility.scheduler,
+    nftPublicListings.Utility.scheduler,
+    publicListingNFTTransactions.Utility.scheduler,
+    historyMasterSales.Utility.scheduler,
+    saleNFTTransactions.Utility.scheduler,
+    nftSales.Utility.scheduler
+  )
 
-  historyMasterSales.Utility.start
-  saleNFTTransactions.Utility.start
-  nftSales.Utility.start
-
-  starter.start()
+  coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())
+  //    starter.start()
 }

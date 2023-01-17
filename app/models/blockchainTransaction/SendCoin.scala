@@ -1,5 +1,6 @@
 package models.blockchainTransaction
 
+import constants.Scheduler
 import exceptions.BaseException
 import models.Trait._
 import models.common.Coin
@@ -158,8 +159,11 @@ class SendCoins @Inject()(
       } yield updatedSendCoin
     }
 
-    private val txSchedulerRunnable = new Runnable {
-      def run(): Unit = {
+    val scheduler: Scheduler = new Scheduler {
+
+      val name: String = constants.Scheduler.BLOCKCHAIN_TRANSACTION_SEND_COIN
+
+      def runner(): Unit = {
         val sendCoins = Service.getAllPendingStatus
 
         def checkAndUpdate(sendCoins: Seq[SendCoin]) = utilitiesOperations.traverse(sendCoins) { sendCoin =>
@@ -184,8 +188,6 @@ class SendCoins @Inject()(
         Await.result(forComplete, Duration.Inf)
       }
     }
-
-    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Scheduler.InitialDelay, delay = constants.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
 
   }
 
