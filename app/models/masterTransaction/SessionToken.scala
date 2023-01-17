@@ -1,5 +1,6 @@
 package models.masterTransaction
 
+import constants.Scheduler
 import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
 import org.joda.time.{DateTime, DateTimeZone}
@@ -9,7 +10,7 @@ import slick.jdbc.H2Profile.api._
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.{Duration, DurationInt}
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 case class SessionToken(accountId: String, sessionTokenHash: String, sessionTokenTime: Long, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged with Entity[String] {
@@ -97,8 +98,10 @@ class SessionTokens @Inject()(
 
   }
 
-  private val runnable = new Runnable {
-    def run(): Unit = {
+  val scheduler: Scheduler = new Scheduler {
+    val name: String = constants.Scheduler.MASTER_TRANSACTION_SESSION_TOKEN
+
+    def runner(): Unit = {
       val ids = Service.getTimedOutIDs
 
       def deleteSessionTokens(ids: Seq[String]) = Service.deleteMultiple(ids)
@@ -112,6 +115,4 @@ class SessionTokens @Inject()(
       Await.result(forComplete, Duration.Inf)
     }
   }
-
-  actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.CommonConfig.SessionTokenTimeout.milliseconds, delay = constants.CommonConfig.SessionTokenTimeout.milliseconds)(runnable)(schedulerExecutionContext)
 }

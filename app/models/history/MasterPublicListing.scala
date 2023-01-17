@@ -1,6 +1,6 @@
 package models.history
 
-import akka.actor.Cancellable
+import constants.Scheduler
 import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, HistoryLogging, ModelTable}
 import models.analytics.CollectionsAnalysis
@@ -112,8 +112,10 @@ class MasterPublicListings @Inject()(
   object Utility {
     private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
-    private val historySchedulerRunnable = new Runnable {
-      def run(): Unit = {
+    val scheduler: Scheduler = new Scheduler {
+      val name: String = constants.Scheduler.HISTORY_MASTER_PUBLIC_LISTING
+
+      def runner(): Unit = {
         val expiredPublicListings = masterPublicListings.Service.getExpiredPublicListings
 
         def deleteExpiredPublicListings(expiredPublicListings: Seq[master.PublicListing]) = utilitiesOperations.traverse(expiredPublicListings) { expiredPublicListing =>
@@ -144,8 +146,6 @@ class MasterPublicListings @Inject()(
         Await.result(forComplete, Duration.Inf)
       }
     }
-
-    def start: Cancellable = actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Scheduler.InitialDelay, delay = constants.Scheduler.FixedDelay)(historySchedulerRunnable)(schedulerExecutionContext)
   }
 
 }

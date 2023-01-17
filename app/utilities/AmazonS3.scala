@@ -93,7 +93,7 @@ object AmazonS3 {
         request.setGeneralProgressListener(new ProgressListener() {
           @Override
           def progressChanged(progressEvent: ProgressEvent): Unit = {
-            System.out.println("Transferred bytes: " + progressEvent.getBytesTransferred)
+            println("Transferred bytes: " + progressEvent.getBytesTransferred)
           }
         })
       }

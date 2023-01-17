@@ -1,6 +1,6 @@
 package models.masterTransaction
 
-import akka.actor.Cancellable
+import constants.Scheduler
 import exceptions.BaseException
 import models.Trait._
 import models.blockchainTransaction.NFTSale
@@ -173,8 +173,10 @@ class SaleNFTTransactions @Inject()(
       } yield updatedNFTSale
     }
 
-    private val txSchedulerRunnable = new Runnable {
-      def run(): Unit = {
+    val scheduler: Scheduler = new Scheduler {
+      val name: String = constants.Scheduler.MASTER_TRANSACTION_NFT_SALE
+
+      def runner(): Unit = {
         val saleNFTTxS = Service.getAllPendingStatus
 
         def checkAndUpdate(saleNFTTxs: Seq[SaleNFTTransaction]) = utilitiesOperations.traverse(saleNFTTxs.map(_.txHash).distinct) { txHash =>
@@ -242,8 +244,5 @@ class SaleNFTTransactions @Inject()(
         Await.result(forComplete, Duration.Inf)
       }
     }
-
-    def start: Cancellable = actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Scheduler.InitialDelay, delay = constants.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
-
   }
 }
