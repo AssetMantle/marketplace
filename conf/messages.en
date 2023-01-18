@@ -249,6 +249,7 @@ COLLECTION_CARD_BADGE_LABEL_PRICE=Price
 COLLECTION_CARD_SALE_BADGE_LABEL_LIVE=Live
 COLLECTION_CARD_SALE_BADGE_LABEL_ENDED=Ended
 COLLECTION_CARD_SALE_BADGE_LABEL_SOLD_OUT=Sold Out
+NFT_SOLD_LABEL={0} of {1} NFTs Sold Out
 
 #//NFT
 NFT_CATEGORY_TITLE=Category:
@@ -806,9 +807,9 @@ RESPONSE.FAILURE.COLLECTION_NOT_PUBLIC=Collection is not public yet.
 
 
 # Collection Sale
-FORM.COLLECTION_SALE.TITLE=Collection Sale
-FORM.COLLECTION_SALE.SUBTITLE=
-FORM.COLLECTION_SALE.SUBMIT=Submit
+FORM.COLLECTION_SALE.TITLE=Launchpad
+FORM.COLLECTION_SALE.SUBTITLE=Sell your NFTs privately to a Whitelist
+FORM.COLLECTION_SALE.SUBMIT=Create Sale
 SALE_NFT_NUMBER=No of NFTs
 PLACEHOLDER.SALE_NFT_NUMBER=Random no of NFTs
 SALE_NFT_PLACEHOLDER=Random no of NFTs
@@ -868,12 +869,12 @@ PUBLIC_SALE=Public Sale
 PUBLIC_SALE_MESSAGE=MantlePlace offers a variety of public sale categories. Select this option if you would like to list your NFT in Pre-sale or MarketPlace.
 PRIVATE_SALE=Private Sale
 PRIVATE_SALE_MESSAGE=Select this option to open a Whitelist sale for your selected NFTs. A few invited buyers will be able to participate in this private sale.
-FORM.PUBLIC_LISTING.TITLE=List NFTs
-FORM.PUBLIC_LISTING.SUBTITLE=
+FORM.PUBLIC_LISTING.TITLE=Early Access
+FORM.PUBLIC_LISTING.SUBTITLE=Sell your NFTs publicly to anyone
 PUBLIC_LISTING_NFT_NUMBER=No of NFTs
 PUBLIC_LISTING_NFT_PLACEHOLDER=Random no of NFTs
 PUBLIC_LISTING_PRICE=Price (MNTL)
-FORM.PUBLIC_LISTING.SUBMIT=Submit
+FORM.PUBLIC_LISTING.SUBMIT=List NFTs
 PUBLIC_LISTING_SUCCESS_TITLE=NFTs Listed Successfully
 PUBLIC_LISTING_SUCCESS_SUBTITLE=All the selected NFTs in this collection have been listed successfully.
 RESPONSE.FAILURE.CANNOT_SELL_TO_YOURSELF=Cannot sell to yourself.

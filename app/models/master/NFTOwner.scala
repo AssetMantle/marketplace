@@ -110,9 +110,11 @@ class NFTOwners @Inject()(
 
       def verifyAndUpdate(nftOwner: NFTOwner) = if (nftOwner.saleId.getOrElse("") == saleId) {
         if (nftOwner.quantity == 1) {
+          val deleteOld = delete(nftId = nftOwner.nftId, ownerId = nftOwner.ownerId)
+          val addNew =  create(nftOwner.copy(saleId = None, ownerId = buyerAccountId))
           for {
-            _ <- delete(nftId = nftOwner.nftId, ownerId = nftOwner.ownerId)
-            _ <- create(nftOwner.copy(saleId = None, ownerId = buyerAccountId))
+            _ <- deleteOld
+            _ <- addNew
           } yield ()
         } else constants.Response.HANDLE_MULTIPLE_NFT_QUANTITY_CASE.throwFutureBaseException()
       } else constants.Response.NFT_NOT_ON_SALE.throwFutureBaseException()
