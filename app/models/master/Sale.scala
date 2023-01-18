@@ -144,6 +144,10 @@ class Sales @Inject()(
     def getSaleByCollectionId(collectionId: String): Future[Option[Sale]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize).headOption)
 
     def delete(saleId: String): Future[Int] = deleteById(saleId)
+
+    def total: Future[Int] = countTotal()
+
+    def getByPageNumber(pageNumber: Int): Future[Seq[Sale]] = getAllByPageNumber(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.endTimeEpoch).map(_.map(_.deserialize))
   }
 
 }

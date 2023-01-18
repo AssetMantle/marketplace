@@ -46,6 +46,12 @@ function viewPublicListedCollections() {
     $('#rightContent').html('');
 }
 
+function viewWhitelistSaleCollections() {
+    componentResource('centerContent', jsRoutes.controllers.CollectionController.whitelistSaleCollectionsSection());
+    $('#leftContent').html('');
+    $('#rightContent').html('');
+}
+
 function viewProfile(lastPart) {
     let accountId = lastPart.split("/")[0];
     let activeTab = lastPart.split("/")[1];

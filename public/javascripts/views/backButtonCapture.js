@@ -28,6 +28,9 @@ window.addEventListener('popstate', e => {
         case "publicListedCollections":
             viewPublicListedCollections();
             break;
+        case "whitelistSaleCollections":
+            viewWhitelistSaleCollections();
+            break;
         case "index":
             window.location = "/";
             break;

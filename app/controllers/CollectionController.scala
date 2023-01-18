@@ -63,6 +63,13 @@ class CollectionController @Inject()(
     }
   }
 
+  def viewWhitelistSaleCollections(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.collection.viewWhitelistSaleCollections()))
+    }
+  }
+
   def viewCollection(id: String, showPublicListing: Boolean): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
@@ -142,6 +149,38 @@ class CollectionController @Inject()(
         }
     }
   }
+
+  def whitelistSaleCollectionsSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val totalCollections = masterSales.Service.total
+        (for {
+          totalCollections <- totalCollections
+        } yield Ok(views.html.collection.whitelistSale.collectionsSection(totalCollections))
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
+  }
+
+  def whitelistSaleCollectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val sales = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        else masterSales.Service.getByPageNumber(pageNumber)
+
+        def collections(ids: Seq[String]) = masterCollections.Service.getCollections(ids)
+
+        (for {
+          sales <- sales
+          collections <- collections(sales.map(_.collectionId))
+        } yield Ok(views.html.collection.whitelistSale.collectionsPerPage(collections))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
 
   def collectionNFTs(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
