@@ -264,9 +264,9 @@ class AccountController @Inject()(
             _ <- pushNotificationTokenDelete
             _ <- deleteSessionToken
             _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.LOG_OUT)()
-          } yield Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
+          } yield Ok(views.html.index()).withNewSession
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index())
           }
         }
       )

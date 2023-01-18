@@ -141,7 +141,7 @@ class Sales @Inject()(
       filter(x => x.whitelistId.inSet(whitelistIds) && x.endTimeEpoch > currentEpoch).map(_.map(_.id))
     }
 
-    def getAllSalesByCollectionId(collectionId: String): Future[Seq[Sale]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize))
+    def getSaleByCollectionId(collectionId: String): Future[Option[Sale]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize).headOption)
 
     def delete(saleId: String): Future[Int] = deleteById(saleId)
   }

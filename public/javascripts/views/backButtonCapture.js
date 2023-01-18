@@ -7,8 +7,11 @@ window.addEventListener('popstate', e => {
         case "collections":
             viewCollections(lastPart);
             break;
-        case "collection":
-            viewCollection(lastPart);
+        case "collectionForPublicListing":
+            viewCollection(lastPart, true);
+            break;
+        case "collectionForWhitelistSale":
+            viewCollection(lastPart, false);
             break;
         case "wishListCollection":
             viewWishListCollection(lastPart);

@@ -107,7 +107,7 @@ class PublicListingNFTTransactions @Inject()(
 
     def getTotalPublicListingSold(publicListingId: String): Future[Int] = {
       val nullStatus: Option[Boolean] = null
-      filterAndCount(x => x.publicListingId === publicListingId && x.publicListingId === publicListingId && (x.status.? === nullStatus || x.status))
+      filterAndCount(x => x.publicListingId === publicListingId && (x.status.? === nullStatus || x.status))
     }
 
     def getByTxHash(txHash: String): Future[Seq[PublicListingNFTTransaction]] = filter(_.txHash === txHash)

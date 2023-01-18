@@ -23,13 +23,14 @@ class IndexController @Inject()(
                                  withUsernameToken: WithUsernameToken,
                                  starter: Starter,
                                  coordinatedShutdown: CoordinatedShutdown,
-                                 // Do not delete, need to initialize object to start the scheduler
                                  historyMasterSales: history.MasterSales,
                                  historyMasterPublicListings: history.MasterPublicListings,
                                  nftPublicListings: blockchainTransaction.NFTPublicListings,
+                                 sendCoins: blockchainTransaction.SendCoins,
                                  nftSales: blockchainTransaction.NFTSales,
                                  publicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
                                  saleNFTTransactions: masterTransaction.SaleNFTTransactions,
+                                 masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -49,13 +50,15 @@ class IndexController @Inject()(
     }
   }
 
-  utilities.Scheduler.startAndSetSchedulers(
+  utilities.Scheduler.startSchedulers(
     historyMasterPublicListings.Utility.scheduler,
     nftPublicListings.Utility.scheduler,
     publicListingNFTTransactions.Utility.scheduler,
     historyMasterSales.Utility.scheduler,
     saleNFTTransactions.Utility.scheduler,
-    nftSales.Utility.scheduler
+    nftSales.Utility.scheduler,
+    masterTransactionSessionTokens.Utility.scheduler,
+    sendCoins.Utility.scheduler
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())

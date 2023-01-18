@@ -26,7 +26,7 @@ class WithActionLogging @Inject()(messagesControllerComponents: MessagesControll
       case baseException: BaseException =>
         val endTime = System.currentTimeMillis()
         logger.info(messagesApi(constants.Log.Info.CONTROLLERS_RESPONSE, request.method, request.uri, remoteIp, request.session.get(constants.Session.USERNAME).getOrElse(constants.View.UNKNOWN), Results.InternalServerError.header.status, endTime - startTime))
-        Results.InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        Results.InternalServerError(views.html.index())
     }
 
   }

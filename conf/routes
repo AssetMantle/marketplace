@@ -43,7 +43,7 @@ POST        /changeActiveKey                                  controllers.Accoun
 
 GET         /collections/:category                            controllers.CollectionController.viewCollections(category: String)
 GET         /publicListedCollections                          controllers.CollectionController.viewPublicListedCollections()
-GET         /collection/:id                                   controllers.CollectionController.viewCollection(id: String)
+GET         /collection/:id                                   controllers.CollectionController.viewCollection(id: String, showPublicListing: Boolean ?= true)
 GET         /collectionsSection                               controllers.CollectionController.collectionsSection(category: String)
 GET         /collectionList                                   controllers.CollectionController.collectionList(category: String)
 GET         /collectionsPerPage                               controllers.CollectionController.collectionsPerPage(category: String, pageNumber: Int)
@@ -52,7 +52,7 @@ GET         /publicListedCollectionsPerPage                   controllers.Collec
 GET         /collectionNFTs                                   controllers.CollectionController.collectionNFTs(id: String)
 GET         /collectionNFTsPerPage                            controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionInfo                                   controllers.CollectionController.info(id: String)
-GET         /collectionAnalysis                               controllers.CollectionController.topRightCard(id: String)
+GET         /collectionAnalysis                               controllers.CollectionController.topRightCard(id: String, showPublicListing: Boolean ?= true)
 GET         /commonCardInfo                                   controllers.CollectionController.commonCardInfo(id: String)
 GET         /created                                          controllers.CollectionController.createdSection(accountId: String)
 GET         /createdCollectionPerPage                         controllers.CollectionController.createdCollectionPerPage(accountId: String, pageNumber: Int)

@@ -160,7 +160,6 @@ class SendCoins @Inject()(
     }
 
     val scheduler: Scheduler = new Scheduler {
-
       val name: String = constants.Scheduler.BLOCKCHAIN_TRANSACTION_SEND_COIN
 
       def runner(): Unit = {

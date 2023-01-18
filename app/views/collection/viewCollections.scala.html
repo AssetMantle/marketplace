@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
 
-@(section: String = constants.View.DEFAULT_COLLECTION_SECTION, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(section: String = constants.View.DEFAULT_COLLECTION_SECTION)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
-@views.html.base.common(constants.View.COLLECTIONS, failures, warnings, successes, infos)
+@views.html.base.common(constants.View.COLLECTIONS)
 <link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/explorer.css")"/>
 <script>
         componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsSection('@section'));

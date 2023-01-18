@@ -10,7 +10,7 @@ abstract class Scheduler extends Runnable {
 
   val name: String
 
-  def runner: Unit
+  def runner(): Unit
 
   final def run(): Unit = if (!utilities.Scheduler.getSignalReceived) this.runner
   else utilities.Scheduler.shutdownThread(this.name)
