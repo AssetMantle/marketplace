@@ -118,3 +118,7 @@
         @* </div>*@
     </div>
 </div>
+<div class="hidden" id="saleOptionModal">
+    @views.html.sale.saleOption(s"${collection.id}")
+</div>
+<script src="@routes.Assets.versioned("javascripts/sale/sale.js")"></script>

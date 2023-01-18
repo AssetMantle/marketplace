@@ -163,6 +163,7 @@ POST        /editWhitelist                                    controllers.Whitel
 
 GET         /createPublicListing                              controllers.PublicListingController.createPublicListingForm(collectionId: Option[String])
 POST        /createPublicListing                              controllers.PublicListingController.createPublicListing()
+
 GET         /buyPublicListingNFT                              controllers.PublicListingController.buyNFTForm(publicListingId: String, mintNft: Boolean)
 POST        /buyPublicListingNFT                              controllers.PublicListingController.buyNFT()
 
