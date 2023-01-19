@@ -131,9 +131,17 @@
             }
         }
         @if(optionalLoginState.isDefined && !(publicListing.isDefined || sale.isDefined)) {
-            @if(optionalLoginState.get.isGenesisCreator && optionalLoginState.get.username == collection.creatorId && publicListing.isEmpty) {
+            @if(optionalLoginState.get.isGenesisCreator && optionalLoginState.get.username == collection.creatorId) {
                 <div class="separator"></div>
-                @commonPrimaryButton(constants.View.CREATE_COLLECTION_SALE, JavaScript(s"saleOptions()"))
+                @if(publicListing.isEmpty && sale.isEmpty) {
+                    @commonPrimaryButton(constants.View.CREATE_COLLECTION_SALE, JavaScript(s"saleOptions()"))
+                }
+                @if(publicListing.isEmpty && sale.isDefined) {
+                    @commonPrimaryButton(constants.Form.CREATE_PUBLIC_LISTING.button, JavaScript(s"getForm(jsRoutes.controllers.PublicListingController.createPublicListingForm('${collection.id}'))"))
+                }
+                @if(publicListing.isDefined && sale.isEmpty) {
+                    @commonPrimaryButton(constants.Form.CREATE_WHITELIST_SALE.button, JavaScript(s"getForm(jsRoutes.controllers.SaleController.createCollectionSaleForm(undefined, '${collection.id}'))"))
+                }
             }
         }
     </div>

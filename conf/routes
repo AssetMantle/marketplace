@@ -95,7 +95,6 @@ GET         /nftDetailViewLeftCards                           controllers.NFTCon
 GET         /nftInfo                                          controllers.NFTController.info(nftId: String)
 GET         /nftDetailViewRightCards                          controllers.NFTController.detailViewRightCards(nftId: String)
 GET         /nftCollectionInfo                                controllers.NFTController.collectionInfo(nftId: String)
-GET         /nftSaleInfo                                      controllers.NFTController.saleInfo(nftId: String)
 GET         /likesCounter                                     controllers.NFTController.likesCounter(nftId: String)
 GET         /nftPrice                                         controllers.NFTController.price(nftId: String)
 
@@ -166,6 +165,8 @@ POST        /editWhitelist                                    controllers.Whitel
 
 GET         /createPublicListing                              controllers.PublicListingController.createPublicListingForm(collectionId: Option[String])
 POST        /createPublicListing                              controllers.PublicListingController.createPublicListing()
+GET         /editPublicListing                                controllers.PublicListingController.editForm(publicListingId: String)
+POST        /editPublicListing                                controllers.PublicListingController.edit()
 
 GET         /buyPublicListingNFT                              controllers.PublicListingController.buyNFTForm(publicListingId: String, mintNft: Boolean)
 POST        /buyPublicListingNFT                              controllers.PublicListingController.buyNFT()

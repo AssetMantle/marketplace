@@ -76,7 +76,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.detailViewRightCards,
         routes.javascript.NFTController.info,
         routes.javascript.NFTController.collectionInfo,
-        routes.javascript.NFTController.saleInfo,
         routes.javascript.NFTController.likesCounter,
         routes.javascript.NFTController.selectCollection,
         routes.javascript.NFTController.uploadNFTFileForm,
@@ -123,6 +122,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.PublicListingController.createPublicListingForm,
         routes.javascript.PublicListingController.buyNFTForm,
+        routes.javascript.PublicListingController.editForm,
 
         routes.javascript.SaleController.createCollectionSaleForm,
         routes.javascript.SaleController.buySaleNFTForm,

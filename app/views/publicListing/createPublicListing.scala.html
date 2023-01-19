@@ -4,7 +4,7 @@
 
 @(createPublicListingForm: Form[CreatePublicListing.Data] = CreatePublicListing.form, collectionId: Option[String], collections: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonForm(constants.Form.PUBLIC_LISTING, createPublicListingForm) {
+@commonForm(constants.Form.CREATE_PUBLIC_LISTING, createPublicListingForm) {
     <div class="hidden loginUserName">@loginState.username</div>
     @if(collectionId.getOrElse("") != "") {
         @commonCustomSelect(createPublicListingForm, constants.FormField.SELECT_COLLECTION_ID, collections, Symbol("value") -> collectionId.get, Symbol("class") -> "custom-select sources filledSelect")
