@@ -4,7 +4,7 @@ function setSoldNFTProgressBar(){
     let soldNFTs = progressBar.getAttribute("data-soldNFT");
     let progress = (soldNFTs*100) / totalNFTs;
     let soldPercentage = document.querySelector(".analysisTitle .analysisPercentage")
-    soldPercentage.textContent = "("+progress+"%)";
+    soldPercentage.textContent = "("+progress.toFixed(2)+"%)";
     for(let i = 0; i < progress; i++) {
         progressBar.style.width = i + '%';
     }
