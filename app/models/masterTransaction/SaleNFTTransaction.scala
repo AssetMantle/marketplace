@@ -120,6 +120,11 @@ class SaleNFTTransactions @Inject()(
     def markFailed(txHash: String): Future[Int] = customUpdate(SaleNFTTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(false))
 
     def getAllPendingStatus: Future[Seq[SaleNFTTransaction]] = filter(_.status.?.isEmpty)
+
+    def getTotalWhitelistSaleSold(saleId: String): Future[Int] = {
+      val nullStatus: Option[Boolean] = null
+      filterAndCount(x => x.saleId === saleId && (x.status.? === nullStatus || x.status))
+    }
   }
 
   object Utility {

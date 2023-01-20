@@ -43,16 +43,19 @@ POST        /changeActiveKey                                  controllers.Accoun
 
 GET         /collections/:category                            controllers.CollectionController.viewCollections(category: String)
 GET         /publicListedCollections                          controllers.CollectionController.viewPublicListedCollections()
-GET         /collection/:id                                   controllers.CollectionController.viewCollection(id: String)
+GET         /whitelistSaleCollections                         controllers.CollectionController.viewWhitelistSaleCollections()
+GET         /collection/:id                                   controllers.CollectionController.viewCollection(id: String, showPublicListing: Boolean ?= true)
 GET         /collectionsSection                               controllers.CollectionController.collectionsSection(category: String)
 GET         /collectionList                                   controllers.CollectionController.collectionList(category: String)
 GET         /collectionsPerPage                               controllers.CollectionController.collectionsPerPage(category: String, pageNumber: Int)
 GET         /publicListedCollectionsSection                   controllers.CollectionController.publicListedCollectionsSection()
 GET         /publicListedCollectionsPerPage                   controllers.CollectionController.publicListedCollectionsPerPage(pageNumber: Int)
+GET         /whitelistSaleCollectionsSection                  controllers.CollectionController.whitelistSaleCollectionsSection()
+GET         /whitelistSaleCollectionsPerPage                  controllers.CollectionController.whitelistSaleCollectionsPerPage(pageNumber: Int)
 GET         /collectionNFTs                                   controllers.CollectionController.collectionNFTs(id: String)
 GET         /collectionNFTsPerPage                            controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionInfo                                   controllers.CollectionController.info(id: String)
-GET         /collectionAnalysis                               controllers.CollectionController.topRightCard(id: String)
+GET         /collectionAnalysis                               controllers.CollectionController.topRightCard(id: String, showPublicListing: Boolean ?= true)
 GET         /commonCardInfo                                   controllers.CollectionController.commonCardInfo(id: String)
 GET         /created                                          controllers.CollectionController.createdSection(accountId: String)
 GET         /createdCollectionPerPage                         controllers.CollectionController.createdCollectionPerPage(accountId: String, pageNumber: Int)
@@ -92,7 +95,6 @@ GET         /nftDetailViewLeftCards                           controllers.NFTCon
 GET         /nftInfo                                          controllers.NFTController.info(nftId: String)
 GET         /nftDetailViewRightCards                          controllers.NFTController.detailViewRightCards(nftId: String)
 GET         /nftCollectionInfo                                controllers.NFTController.collectionInfo(nftId: String)
-GET         /nftSaleInfo                                      controllers.NFTController.saleInfo(nftId: String)
 GET         /likesCounter                                     controllers.NFTController.likesCounter(nftId: String)
 GET         /nftPrice                                         controllers.NFTController.price(nftId: String)
 
@@ -163,6 +165,8 @@ POST        /editWhitelist                                    controllers.Whitel
 
 GET         /createPublicListing                              controllers.PublicListingController.createPublicListingForm(collectionId: Option[String])
 POST        /createPublicListing                              controllers.PublicListingController.createPublicListing()
+GET         /editPublicListing                                controllers.PublicListingController.editForm(publicListingId: String)
+POST        /editPublicListing                                controllers.PublicListingController.edit()
 
 GET         /buyPublicListingNFT                              controllers.PublicListingController.buyNFTForm(publicListingId: String, mintNft: Boolean)
 POST        /buyPublicListingNFT                              controllers.PublicListingController.buyNFT()

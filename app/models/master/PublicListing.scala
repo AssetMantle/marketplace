@@ -108,7 +108,7 @@ class PublicListings @Inject()(
 
     def add(publicListing: PublicListing): Future[String] = create(publicListing.serialize())
 
-    def add(publicListings: Seq[PublicListing]): Future[Unit] = create(publicListings.map(_.serialize()))
+    def update(publicListing: PublicListing): Future[Unit] = updateById(publicListing.serialize())
 
     def tryGet(id: String): Future[PublicListing] = filterHead(_.id === id).map(_.deserialize)
 

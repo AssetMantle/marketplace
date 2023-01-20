@@ -31,7 +31,7 @@ object Scheduler {
     Future(Done.done())
   }
 
-  def startAndSetSchedulers(schedulers: Scheduler*)(implicit executionContext: ExecutionContext): Unit = schedulers.foreach(x => SchedulersCancellable += (x.name -> x.start()))
+  def startSchedulers(schedulers: Scheduler*)(implicit executionContext: ExecutionContext): Unit = schedulers.foreach(x => SchedulersCancellable += (x.name -> x.start()))
 
 
 }

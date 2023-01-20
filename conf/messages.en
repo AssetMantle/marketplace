@@ -1,5 +1,5 @@
 MANTLE_PLACE=MantlePlace
-APP_VERSION=v0.1.7-alpha
+APP_VERSION=v0.1.8-alpha
 NFT_MARKET=NFT Market
 HOME=Home
 EXPLORE=Explore
@@ -807,9 +807,9 @@ RESPONSE.FAILURE.COLLECTION_NOT_PUBLIC=Collection is not public yet.
 
 
 # Collection Sale
-FORM.COLLECTION_SALE.TITLE=Collection Sale
-FORM.COLLECTION_SALE.SUBTITLE=
-FORM.COLLECTION_SALE.SUBMIT=Submit
+FORM.CREATE_WHITELIST_SALE.TITLE=Launchpad
+FORM.CREATE_WHITELIST_SALE.SUBTITLE=Sell your NFTs privately to a Whitelist
+FORM.CREATE_WHITELIST_SALE.SUBMIT=Create Sale
 SALE_NFT_NUMBER=No of NFTs
 PLACEHOLDER.SALE_NFT_NUMBER=Random no of NFTs
 SALE_NFT_PLACEHOLDER=Random no of NFTs
@@ -869,14 +869,17 @@ PUBLIC_SALE=Public Sale
 PUBLIC_SALE_MESSAGE=MantlePlace offers a variety of public sale categories. Select this option if you would like to list your NFT in Pre-sale or MarketPlace.
 PRIVATE_SALE=Private Sale
 PRIVATE_SALE_MESSAGE=Select this option to open a Whitelist sale for your selected NFTs. A few invited buyers will be able to participate in this private sale.
-FORM.PUBLIC_LISTING.TITLE=List NFTs
-FORM.PUBLIC_LISTING.SUBTITLE=
+FORM.CREATE_PUBLIC_LISTING.TITLE=Early Access
+FORM.CREATE_PUBLIC_LISTING.SUBTITLE=Sell your NFTs publicly to anyone
+FORM.EDIT_PUBLIC_LISTING.TITLE=Edit Early Access
+FORM.EDIT_PUBLIC_LISTING.SUBTITLE=Sell your NFTs publicly to anyone
 PUBLIC_LISTING_NFT_NUMBER=No of NFTs
 PUBLIC_LISTING_NFT_PLACEHOLDER=Random no of NFTs
 PUBLIC_LISTING_PRICE=Price (MNTL)
-FORM.PUBLIC_LISTING.SUBMIT=Submit
-PUBLIC_LISTING_SUCCESS_TITLE=NFTs Listed Successfully
-PUBLIC_LISTING_SUCCESS_SUBTITLE=All the selected NFTs in this collection have been listed successfully.
+FORM.CREATE_PUBLIC_LISTING.SUBMIT=List NFTs
+FORM.EDIT_PUBLIC_LISTING.SUBMIT=Update
+CREATE_PUBLIC_LISTING_SUCCESS_TITLE=NFTs Listed Successfully
+CREATE_PUBLIC_LISTING_SUCCESS_SUBTITLE=All the selected NFTs in this collection have been listed successfully.
 RESPONSE.FAILURE.CANNOT_SELL_TO_YOURSELF=Cannot sell to yourself.
 RESPONSE.FAILURE.CANNOT_SELL_MORE_THAN_ALLOWED_LIMIT=Cannot sell more than allowed limit. (10% of total if more than 50 NFTs in collection)
 PUBLIC_LISTING_TITLE=Early Access

@@ -52,7 +52,7 @@ class WithoutLoginActionAsync @Inject()(
       (for {
         result <- verifyAndGetResult(username = username, address = address, currentSessionToken = currentSessionToken)
       } yield result).recover {
-        case baseException: BaseException => Results.InternalServerError(views.html.index(failures = Seq(baseException.failure))).withNewSession
+        case baseException: BaseException => Results.InternalServerError(views.html.index()).withNewSession
       }
     }
   }

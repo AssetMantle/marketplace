@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
 
-@(accountId: String, activeTab: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(accountId: String, activeTab: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
-@views.html.base.common(constants.View.PROFILE, failures, warnings, successes, infos)
+@views.html.base.common(constants.View.PROFILE)
 <link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/userProfile.css")"/>
 <script>
         componentResource('leftContent', jsRoutes.controllers.ProfileController.profileInfoCard('@accountId'));

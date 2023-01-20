@@ -1,4 +1,4 @@
 @import controllers.actions.LoginState
 
-@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState] = None)
-@views.html.collection.viewPublicListedCollections(failures, warnings, successes, infos)
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState] = None)
+@views.html.collection.viewPublicListedCollections()

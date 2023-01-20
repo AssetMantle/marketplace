@@ -2,7 +2,7 @@
 @import models.master.{Sale, PublicListing}
 @import models.master.NFT
 
-@(collection: master.Collection, sales: Seq[Sale], publicListing: Option[PublicListing], randomNFTs: Seq[NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(collection: master.Collection, sale: Option[Sale], publicListing: Option[PublicListing], randomNFTs: Seq[NFT])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 <div class="item item-center nftContainer">
     <div class="profileCover">
@@ -19,7 +19,7 @@
             }
         </div>
     </div>
-    @if(publicListing.isEmpty) {
+    @if(publicListing.isEmpty && sale.isEmpty) {
         <div class="profile-card">
             <div class="profiles-container">
                 <div class="nft-list">
@@ -76,4 +76,3 @@
         <script src="@routes.Assets.versioned("javascripts/collections/nftOnSale.js")"></script>
     }
 </div>
-    <script>checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection('@collection.id').url, '@collection.id', "collection");</script>

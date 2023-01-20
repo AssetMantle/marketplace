@@ -7,8 +7,11 @@ window.addEventListener('popstate', e => {
         case "collections":
             viewCollections(lastPart);
             break;
-        case "collection":
-            viewCollection(lastPart);
+        case "collectionForPublicListing":
+            viewCollection(lastPart, true);
+            break;
+        case "collectionForWhitelistSale":
+            viewCollection(lastPart, false);
             break;
         case "wishListCollection":
             viewWishListCollection(lastPart);
@@ -24,6 +27,9 @@ window.addEventListener('popstate', e => {
             break;
         case "publicListedCollections":
             viewPublicListedCollections();
+            break;
+        case "whitelistSaleCollections":
+            viewWhitelistSaleCollections();
             break;
         case "index":
             window.location = "/";

@@ -72,6 +72,6 @@ function updateNFTContainer(collectionId){
     if($("#nftsPerPage").length){
         $('#nftsPerPage').html("");
         loadFirstNFTBulk('nftsPerPage', jsRoutes.controllers.CollectionController.collectionNFTsPerPage(collectionId, 1));
-        componentResource('rightContent', jsRoutes.controllers.CollectionController.topRightCard(collectionId));
+        componentResource('rightContent', jsRoutes.controllers.CollectionController.topRightCard(collectionId, true));
     }
 }
