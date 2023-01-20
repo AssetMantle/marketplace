@@ -27,18 +27,18 @@ function checkUsernameAvailable(source, usernameAvailableCheckBoxID) {
                             usernameAvailableCheckBox[0].checked = true;
                             $("#checkIcon").fadeIn();
                             $("#usernameAvailableError").hide(300);
-                            $("#signUpUsername:focus").css("border-color", "var(--dark)");
+                            // $("#signUpUsername:focus").css("border-color", "var(--dark)");
                         },
                         204: function () {
                             usernameAvailableCheckBox[0].checked = false;
                             $("#checkIcon").fadeOut();
                             $("#usernameAvailableError").show(300);
-                            $("#signUpUsername").css("border-color", "var(--error)");
+                            // $("#signUpUsername").css("border-color", "var(--error)");
                         },
                     }
                 });
             } else {
-                $("#checkIcon").hide();
+                // $("#checkIcon").hide();
             }
         }, 1500);
     }

@@ -28,4 +28,15 @@ EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 ALTER TABLE MASTER."Sale"
     ADD CONSTRAINT uniqueCollectionId UNIQUE ("collectionId");
 
+ALTER TABLE MASTER."Account"
+    ADD COLUMN IF NOT EXISTS "lowercaseId" VARCHAR NOT NULL DEFAULT '';
+UPDATE MASTER."Account"
+SET "lowercaseId" = LOWER("id")
+WHERE "lowercaseId" = '';
+ALTER TABLE MASTER."Key"
+    ADD COLUMN IF NOT EXISTS "lowercaseId" VARCHAR NOT NULL DEFAULT '';
+UPDATE MASTER."Key"
+SET "lowercaseId" = LOWER("accountId")
+WHERE "lowercaseId" = '';
+
 # --- !Downs
