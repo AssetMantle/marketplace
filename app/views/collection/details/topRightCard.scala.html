@@ -26,8 +26,9 @@
                 }
                 @if(sale.isDefined) {
                     @topRightSale(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale.get, isMember = isMember, whitelistSaleSold = whitelistSaleSold)
-                    @if(sale.isEmpty) {
-                        @commonPrimaryButton(constants.Form.CREATE_WHITELIST_SALE.button, JavaScript(s"getForm(jsRoutes.controllers.SaleController.createCollectionSaleForm(undefined, '${collection.id}'))"))
+                    @if(publicListing.isEmpty) {
+                        <div class="separator"></div>
+                        @commonPrimaryButton(constants.Form.CREATE_PUBLIC_LISTING.button, JavaScript(s"getForm(jsRoutes.controllers.PublicListingController.createPublicListingForm('${collection.id}'))"))
                     }
                 }
             } else {
