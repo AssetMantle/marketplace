@@ -45,7 +45,7 @@ class NFTController @Inject()(
 
   private implicit val module: String = constants.Module.NFT_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)
+  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
 
   def viewNFT(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>

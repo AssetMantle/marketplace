@@ -46,7 +46,7 @@ class SaleController @Inject()(
 
   private implicit val module: String = constants.Module.SALE_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)
+  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
 
   def createCollectionSaleForm(whitelistId: Option[String], collectionId: Option[String]): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>

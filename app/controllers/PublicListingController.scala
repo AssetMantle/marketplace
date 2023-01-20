@@ -44,7 +44,7 @@ class PublicListingController @Inject()(
 
   private implicit val module: String = constants.Module.PUBLIC_LISTING_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)
+  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
 
   def createPublicListingForm(collectionId: Option[String]): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>

@@ -47,12 +47,12 @@ class CollectionController @Inject()(
 
   private implicit val module: String = constants.Module.COLLECTION_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)
+  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
 
-  def viewCollections(category: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollections(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.collection.viewCollections(category)))
+        Future(Ok(views.html.collection.viewCollections()))
     }
   }
 
@@ -83,32 +83,32 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionsSection(category: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionsSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.collection.all.collectionsSection(category)))
+        Future(Ok(views.html.collection.all.collectionsSection()))
     }
   }
 
-  def collectionList(category: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionList(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val totalCollections = masterCollections.Service.total(category)
+        val totalCollections = masterCollections.Service.totalByCategory(constants.Collection.Category.ART)
 
         (for {
           totalCollections <- totalCollections
-        } yield Ok(views.html.collection.all.collectionList(category, totalCollections))
+        } yield Ok(views.html.collection.all.collectionList(totalCollections))
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }
     }
   }
 
-  def collectionsPerPage(category: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
-        else masterCollections.Service.getByPageNumber(category, pageNumber)
+        else masterCollections.Service.getByPageNumber(constants.Collection.Category.ART, pageNumber)
 
         (for {
           collections <- collections
