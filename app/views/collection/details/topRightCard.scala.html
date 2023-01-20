@@ -4,7 +4,7 @@
 @import views.html.base.buttons._
 @import views.html.collection.details._
 
-@(collectionAnalysis: CollectionAnalysis, collection: Collection, sale: Option[Sale], publicListing: Option[PublicListing], isMember: Boolean, publicListingSold: Long, whitelistSaleSold: Long)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+@(collectionAnalysis: CollectionAnalysis, collection: Collection, sale: Option[Sale], publicListing: Option[PublicListing], isMember: Boolean, publicListingSold: Long, whitelistSaleSold: Long, showPublicListing: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
 
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
@@ -12,22 +12,33 @@
             <div class="analysisTitle">@Messages(constants.View.COLLECTION_TOTAL_NFT_TITLE)</div>
             <div class="analysisValue">@collectionAnalysis.totalNFTs</div>
         </div>
+        <div class="separator"></div>
         @if(optionalLoginState.isDefined) {
-            @if(publicListing.isDefined) {
-                @topRightPublicListing(collectionAnalysis = collectionAnalysis, collection = collection, publicListing = publicListing.get, publicListingSold = publicListingSold)
-            }
-            @if(sale.isDefined) {
-                @topRightSale(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale.get, isMember = isMember, whitelistSaleSold = whitelistSaleSold)
-            }
             @if(optionalLoginState.get.username == collection.creatorId) {
                 @if(publicListing.isEmpty && sale.isEmpty) {
                     @commonPrimaryButton(constants.View.CREATE_COLLECTION_SALE, JavaScript(s"saleOptions()"))
                 }
-                @if(publicListing.isEmpty && sale.isDefined) {
-                    @commonPrimaryButton(constants.Form.CREATE_PUBLIC_LISTING.button, JavaScript(s"getForm(jsRoutes.controllers.PublicListingController.createPublicListingForm('${collection.id}'))"))
+                @if(publicListing.isDefined) {
+                    @topRightPublicListing(collectionAnalysis = collectionAnalysis, collection = collection, publicListing = publicListing.get, publicListingSold = publicListingSold)
+                    @if(sale.isEmpty) {
+                        @commonPrimaryButton(constants.Form.CREATE_WHITELIST_SALE.button, JavaScript(s"getForm(jsRoutes.controllers.SaleController.createCollectionSaleForm(undefined, '${collection.id}'))"))
+                    }
                 }
-                @if(publicListing.isDefined && sale.isEmpty) {
-                    @commonPrimaryButton(constants.Form.CREATE_WHITELIST_SALE.button, JavaScript(s"getForm(jsRoutes.controllers.SaleController.createCollectionSaleForm(undefined, '${collection.id}'))"))
+                @if(sale.isDefined) {
+                    @topRightSale(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale.get, isMember = isMember, whitelistSaleSold = whitelistSaleSold)
+                    @if(sale.isEmpty) {
+                        @commonPrimaryButton(constants.Form.CREATE_WHITELIST_SALE.button, JavaScript(s"getForm(jsRoutes.controllers.SaleController.createCollectionSaleForm(undefined, '${collection.id}'))"))
+                    }
+                }
+            } else {
+                @if(showPublicListing) {
+                    @if(publicListing.isDefined) {
+                        @topRightPublicListing(collectionAnalysis = collectionAnalysis, collection = collection, publicListing = publicListing.get, publicListingSold = publicListingSold)
+                    }
+                } else {
+                    @if(sale.isDefined) {
+                        @topRightSale(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale.get, isMember = isMember, whitelistSaleSold = whitelistSaleSold)
+                    }
                 }
             }
         } else {

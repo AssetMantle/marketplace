@@ -243,14 +243,14 @@ class CollectionController @Inject()(
     implicit request =>
       val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
       val collection = masterCollections.Service.tryGet(id)
-      val publicListing = if (showPublicListing) masterPublicListings.Service.getPublicListingByCollectionId(id) else Future(None)
+      val publicListing = masterPublicListings.Service.getPublicListingByCollectionId(id)
 
       def getTotalPublicListingSold(publicListingId: Option[String]): Future[Long] = if (publicListingId.isDefined) masterTransactionPublicListingNFTTransactions.Service.getTotalPublicListingSold(publicListingId.get).map(_.toLong) else Future(0L)
 
       def getTotalWhitelistSaleSold(saleId: Option[String]): Future[Long] = if (saleId.isDefined) masterTransactionSaleNFTTransactions.Service.getTotalWhitelistSaleSold(saleId.get).map(_.toLong) else Future(0L)
 
       val getSalesInfo = if (optionalLoginState.isDefined) {
-        val sale = if (!showPublicListing) masterSales.Service.getSaleByCollectionId(id) else Future(None)
+        val sale = masterSales.Service.getSaleByCollectionId(id)
 
         def isMember(whitelistId: Option[String]) = if (whitelistId.isDefined) masterWhitelistMembers.Service.isMember(whitelistId.get, optionalLoginState.get.username) else Future(false)
 
@@ -267,7 +267,7 @@ class CollectionController @Inject()(
         totalPublicListingSold <- getTotalPublicListingSold(publicListing.map(_.id))
         (sale, isMember) <- getSalesInfo
         totalWhitelistSaleSold <- getTotalWhitelistSaleSold(sale.map(_.id))
-      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale, publicListing = publicListing, isMember = isMember, publicListingSold = totalPublicListingSold, whitelistSaleSold = totalWhitelistSaleSold))
+      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale, publicListing = publicListing, isMember = isMember, publicListingSold = totalPublicListingSold, whitelistSaleSold = totalWhitelistSaleSold, showPublicListing = showPublicListing))
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
