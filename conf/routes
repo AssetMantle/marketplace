@@ -41,13 +41,13 @@ POST        /migrateWalletToKey                               controllers.Accoun
 
 POST        /changeActiveKey                                  controllers.AccountController.changeActiveKey()
 
-GET         /collections/:category                            controllers.CollectionController.viewCollections(category: String)
+GET         /collections                                      controllers.CollectionController.viewCollections()
 GET         /publicListedCollections                          controllers.CollectionController.viewPublicListedCollections()
 GET         /whitelistSaleCollections                         controllers.CollectionController.viewWhitelistSaleCollections()
 GET         /collection/:id                                   controllers.CollectionController.viewCollection(id: String, showPublicListing: Boolean ?= true)
-GET         /collectionsSection                               controllers.CollectionController.collectionsSection(category: String)
-GET         /collectionList                                   controllers.CollectionController.collectionList(category: String)
-GET         /collectionsPerPage                               controllers.CollectionController.collectionsPerPage(category: String, pageNumber: Int)
+GET         /collectionsSection                               controllers.CollectionController.collectionsSection()
+GET         /collectionList                                   controllers.CollectionController.collectionList()
+GET         /collectionsPerPage                               controllers.CollectionController.collectionsPerPage(pageNumber: Int)
 GET         /publicListedCollectionsSection                   controllers.CollectionController.publicListedCollectionsSection()
 GET         /publicListedCollectionsPerPage                   controllers.CollectionController.publicListedCollectionsPerPage(pageNumber: Int)
 GET         /whitelistSaleCollectionsSection                  controllers.CollectionController.whitelistSaleCollectionsSection()

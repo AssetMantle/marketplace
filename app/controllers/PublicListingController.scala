@@ -44,7 +44,7 @@ class PublicListingController @Inject()(
 
   private implicit val module: String = constants.Module.PUBLIC_LISTING_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)
+  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
 
   def createPublicListingForm(collectionId: Option[String]): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
@@ -232,8 +232,8 @@ class PublicListingController @Inject()(
                 fromAddress = buyerKey.address,
                 toAddress = sellerKey.address,
                 amount = publicListing.price * buyNFTData.buyNFTs,
-                gasLimit = buyNFTData.gasAmount,
-                gasPrice = buyNFTData.gasPrice,
+                gasLimit = constants.Blockchain.DefaultSendCoinGasAmount,
+                gasPrice = constants.Blockchain.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buyNFTData.password))
               )
             } else errors.head.throwFutureBaseException()

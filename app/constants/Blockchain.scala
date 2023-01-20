@@ -15,6 +15,7 @@ object Blockchain {
   val DefaultSendCoinGasAmount = 100000
   val DefaultMintAssetGasAmount = 500000
   val DefaultNubGasAmount = 100000
+  val DefaultGasPrice: BigDecimal = 0
   val DefaultHDPath: Seq[ChildNumber] = Seq(
     new ChildNumber(44, true),
     new ChildNumber(CoinType, true),
