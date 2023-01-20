@@ -8,10 +8,8 @@ object BuySaleNFT {
     mapping(
       constants.FormField.SALE_ID.mapping,
       constants.FormField.SALE_BUY_NFT_NUMBER.mapping,
-      constants.FormField.GAS_AMOUNT.mapping,
-      constants.FormField.GAS_PRICE.mapping,
       constants.FormField.PASSWORD.mapping
     )(Data.apply)(Data.unapply))
 
-  case class Data(saleId: String, buyNFTs: Int, gasAmount: Int, gasPrice: BigDecimal, password: String)
+  case class Data(saleId: String, buyNFTs: Int, password: String)
 }

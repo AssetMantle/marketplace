@@ -97,8 +97,8 @@ class BlockchainTransactionController @Inject()(
                 fromAddress = sendCoinData.fromAddress,
                 toAddress = sendCoinData.toAddress,
                 amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = sendCoinData.sendCoinAmount)),
-                gasLimit = sendCoinData.gasAmount,
-                gasPrice = sendCoinData.gasPrice,
+                gasLimit = constants.Blockchain.DefaultSendCoinGasAmount,
+                gasPrice = constants.Blockchain.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, sendCoinData.password)),
               )
             } else errors.head.throwFutureBaseException()

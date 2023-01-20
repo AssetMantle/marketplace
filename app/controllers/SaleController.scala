@@ -182,8 +182,8 @@ class SaleController @Inject()(
                 fromAddress = buyerKey.address,
                 toAddress = sellerKey.address,
                 amount = sale.price * buySaleNFTData.buyNFTs,
-                gasLimit = buySaleNFTData.gasAmount,
-                gasPrice = buySaleNFTData.gasPrice,
+                gasLimit = constants.Blockchain.DefaultSendCoinGasAmount,
+                gasPrice = constants.Blockchain.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buySaleNFTData.password))
               )
             } else errors.head.throwFutureBaseException()
