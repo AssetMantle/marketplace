@@ -1,7 +1,7 @@
 @import views.account.companion.VerifyMnemonics
 @import views.html.base.form._
 
-@(walletMnemonicsForm: Form[VerifyMnemonics.Data] = VerifyMnemonics.form, username: String, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(walletMnemonicsForm: Form[VerifyMnemonics.Data] = VerifyMnemonics.form, username: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div>
     @commonForm(constants.Form.VERIFY_WALLET_MNEMONICS, walletMnemonicsForm, refreshOverlay = true, showScreen = "#walletMnemonics", hideScreen = "#verificationForm") {
@@ -10,7 +10,7 @@
             <div class="inputField">
                 <div class="inputFieldBody">
                     <div class="usernameAvailability">
-                    @commonInputText(walletMnemonicsForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly")
+                    @commonInputText(walletMnemonicsForm, constants.FormField.CONFIRM_USERNAME, Symbol("value") -> username, Symbol("readonly") -> "readonly")
                     </div>
                 </div>
             </div>
@@ -20,7 +20,7 @@
             <div class="inputField">
                 <div class="inputFieldBody">
                     <div class="usernameAvailability">
-                    @commonInputText(walletMnemonicsForm, constants.FormField.CONFIRM_USERNAME, Symbol("value") -> username, Symbol("readonly") -> "readonly")
+                    @commonInputText(walletMnemonicsForm, constants.FormField.WALLET_ADDRESS)
                     </div>
                 </div>
             </div>

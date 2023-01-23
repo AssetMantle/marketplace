@@ -49,7 +49,7 @@ class AccountController @Inject()(
           val checkVerifiedKeyExists = masterKeys.Service.checkVerifiedKeyExists(signUpData.username)
           val wallet = utilities.Wallet.getRandomWallet
 
-          def addMasterAccount(checkVerifiedKeyExists: Boolean) =  if (!checkVerifiedKeyExists) {
+          def addMasterAccount(checkVerifiedKeyExists: Boolean) = if (!checkVerifiedKeyExists) {
             val addAccount = masterAccounts.Service.upsertOnSignUp(username = signUpData.username, lang = request.lang, accountType = constants.Account.Type.USER)
             val deleteUnverifiedKeys = masterKeys.Service.deleteUnverifiedKeys(signUpData.username)
 
@@ -90,7 +90,7 @@ class AccountController @Inject()(
     implicit request =>
       VerifyMnemonics.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.account.verifyWalletMnemonics(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CONFIRM_USERNAME.name, ""), formWithErrors.data.getOrElse(constants.FormField.WALLET_ADDRESS.name, ""))))
+          Future(BadRequest(views.html.account.verifyWalletMnemonics(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CONFIRM_USERNAME.name, ""))))
         },
         walletMnemonicsData => {
           val key = masterKeys.Service.tryGetActive(walletMnemonicsData.username)
@@ -112,7 +112,7 @@ class AccountController @Inject()(
             result <- updateAndGetResult(key)
           } yield result
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.account.verifyWalletMnemonics(walletMnemonicsForm = VerifyMnemonics.form.withGlobalError(baseException.failure.message), username = walletMnemonicsData.username, address = walletMnemonicsData.walletAddress))
+            case baseException: BaseException => BadRequest(views.html.account.verifyWalletMnemonics(walletMnemonicsForm = VerifyMnemonics.form.withGlobalError(baseException.failure.message), username = walletMnemonicsData.username))
           }
         }
       )
