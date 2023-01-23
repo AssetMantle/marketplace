@@ -5,7 +5,6 @@
 
 @(fundWallet: Form[FundWallet.Data] = FundWallet.form, fromAddress: String, toAddress: String, balance: MicroNumber)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-
 <div id="txFields">
     <div class="modal-header mb-3">
         <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.FUND_WALLET_TITLE)</h5>
@@ -15,7 +14,6 @@
     </div>
     <div id="formBody">
         @commonInputText(fundWallet, constants.FormField.FROM_KEPLR_ADDRESS, Symbol("value") -> fromAddress, Symbol("readonly") -> true)
-
         @commonInputText(fundWallet, constants.FormField.TO_ADDRESS, Symbol("value") -> toAddress, Symbol("readonly") -> true)
         <div class="sendCoinAmountField">
             <div id="availableBalance" class="availableBalance" onclick="setAvailableBalance('@constants.FormField.SEND_COIN_AMOUNT.name', @balance)">@Messages(constants.View.SEND_COIN_AVAILABLE_BALANCE, balance)</div>
@@ -38,7 +36,7 @@
         <div class="form-address-box-item">
             <span class="address-box-label">@Messages(constants.View.HASH)</span>
             <span class="address-box-text">
-                <span class="username-data" id="txResponseHash">mantle1zhd888w6zsh7hr3kesdkk3crw0hcam2c3vcxdj</span>
+                <span class="username-data" id="txResponseHash"></span>
                 <span class="form-copy-icon" onclick="copyToClipboard(this)"><img src="@routes.Assets.versioned("images/icon/copy.png")"/></span>
                 <span class="form-copy-message">@Messages(constants.View.TOOLTIP_COPIED)</span>
             </span>
@@ -47,7 +45,21 @@
 </div>
 
 <div id="keplrError" class="hidden">
-    @errorModal(heading = constants.View.FUND_WALLET_KEPLR_ERROR_TITLE, subHeading = "")
-@*    <div id="keplrErrorMessage"></div>*@
+    <div class="header-success">
+        <div class="d-flex">
+            <div class="text-center form-success-icon">
+                <img class="checkmark" src="@routes.Assets.versioned("images/icon/errorIcon.png")" height="80px" width="80px" style="margin-left: 20px;"/>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                        &times;
+            </button>
+        </div>
+        <div class="form-body">
+            <div class="mt-4 text-center">
+                <div class="form-success-message-heading">@Messages(constants.View.FUND_WALLET_KEPLR_ERROR_TITLE)</div>
+                <div id="keplrErrorMessage" class="mt-2 form-success-message-sub-text"></div>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/blockchainTransactions/sendCoin.js")" type="text/javascript"></script>

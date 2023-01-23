@@ -1,6 +1,6 @@
 chainConfig = {
     rpc: "http://localhost:26657",
-    lcd: "http://localhost:9000",
+    lcd: "http://localhost:1317",
     chainID: "test",
     chainName: "AssetMantle",
     keplrSet: false,

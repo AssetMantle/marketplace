@@ -3,11 +3,11 @@ function processTxResponse(response) {
     const success = (response.code === 0);
     $('#txFields').hide();
     if (success) {
-        $('#txSuccessful').show();
+        $('#txSuccessful').attr("class","");
     } else {
-        $('#txFailed').show();
+        $('#txFailed').attr("class","");
     }
-    $('#txResponse').show();
+    $('#txResponse').attr("class","");
     $('#txResponseHash').html(response.transactionHash);
     $('#txResponseHash').attr("data-value",response.transactionHash);
 }
@@ -15,8 +15,8 @@ function processTxResponse(response) {
 function processKeplrError(e) {
     console.log(e);
     $('#txFields').hide();
-    $('#keplrError .form-success-message-sub-text').text(e);
-    $('#keplrError').show();
+    $("#keplrErrorMessage").html(e);
+    $('#keplrError').attr("class","");
 }
 
 function SendMsg(fromAddress, toAddress, amount, denom) {
@@ -37,8 +37,7 @@ async function fundWallet() {
     try {
         await initializeKeplr();
         const wallet = await getKeplrWallet();
-        // getForm(jsRoutes.controllers.BlockchainTransactionController.fundWalletForm(wallet[1]));
-        getForm(jsRoutes.controllers.BlockchainTransactionController.fundWalletForm("mantle1zhd888w6zsh7hr3kesdkk3crw0hcam2c3vcxdj"));
+        getForm(jsRoutes.controllers.BlockchainTransactionController.fundWalletForm(wallet[1]));
     } catch (e) {
         console.log(e)
     }
