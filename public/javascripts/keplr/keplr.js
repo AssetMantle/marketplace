@@ -2,19 +2,18 @@ chainConfig = {
     rpc: "http://localhost:26657",
     lcd: "http://localhost:1317",
     chainID: "test",
-    chainName: "AssetMantle",
+    chainName: "AssetMantle Testnet",
     keplrSet: false,
     stakingDenom: "umntl",
     maxGas: 100000,
     MicroFactor: 1000000,
 }
 
-function setKeplrConfigParameters(chaiName, rpc, lcd, chainID, stakingDenom) {
+function setKeplrConfigParameters(chaiName, rpc, lcd, chainID) {
     chainConfig.chainName = chaiName
     chainConfig.rpc = rpc;
     chainConfig.lcd = lcd;
     chainConfig.chainID = chainID;
-    chainConfig.stakingDenom = stakingDenom;
 }
 
 async function initializeKeplr() {
