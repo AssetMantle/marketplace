@@ -27,6 +27,8 @@ object CommonConfig {
   object Blockchain {
     case class IBCDenom(hash: String, name: String)
 
+    def name: String = config.get[String]("blockchain.name")
+
     def ChainId: String = config.get[String]("blockchain.chainId")
 
     def StakingToken: String = config.get[String]("blockchain.stakingToken")

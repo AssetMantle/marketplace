@@ -21,9 +21,9 @@ class GetUnconfirmedTxs @Inject()()(implicit wsClient: WSClient, configuration: 
 
   private val path2 = "/unconfirmed_txs?limit="
 
-  private val url1 = constants.CommonConfig.Blockchain.RPCEndPoint + path1
+  private val url1 = constants.Blockchain.RPCEndPoint + path1
 
-  private val url2 = constants.CommonConfig.Blockchain.RPCEndPoint + path2
+  private val url2 = constants.Blockchain.RPCEndPoint + path2
 
   private def action(): Future[UnconfirmedTxsResponse.Response] = utilities.JSON.getResponseFromJson[UnconfirmedTxsResponse.Response](wsClient.url(url1).get)
 
