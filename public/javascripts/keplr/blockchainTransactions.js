@@ -3,20 +3,20 @@ function processTxResponse(response) {
     const success = (response.code === 0);
     $('#txFields').hide();
     if (success) {
-        $('#txSuccessful').attr("class","");
+        $('#txSuccessful').attr("class", "");
     } else {
-        $('#txFailed').attr("class","");
+        $('#txFailed').attr("class", "");
     }
-    $('#txResponse').attr("class","");
+    $('#txResponse').attr("class", "");
     $('#txResponseHash').html(response.transactionHash);
-    $('#txResponseHash').attr("data-value",response.transactionHash);
+    $('#txResponseHash').attr("data-value", response.transactionHash);
 }
 
 function processKeplrError(e) {
     console.log(e);
     $('#txFields').hide();
     $("#keplrErrorMessage").html(e);
-    $('#keplrError').attr("class","");
+    $('#keplrError').attr("class", "");
 }
 
 function SendMsg(fromAddress, toAddress, amount, denom) {
