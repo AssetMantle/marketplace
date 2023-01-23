@@ -2,7 +2,6 @@ function processTxResponse(response) {
     console.log(response);
     const success = (response.code === 0);
     $('#txFields').hide();
-    $('#keplrFormSubmitButton').hide();
     if (success) {
         $('#txSuccessful').show();
     } else {
@@ -10,13 +9,13 @@ function processTxResponse(response) {
     }
     $('#txResponse').show();
     $('#txResponseHash').html(response.transactionHash);
+    $('#txResponseHash').attr("data-value",response.transactionHash);
 }
 
 function processKeplrError(e) {
     console.log(e);
     $('#txFields').hide();
-    $('#keplrFormSubmitButton').hide();
-    $('#keplrErrorMessage').html(e);
+    $('#keplrError .form-success-message-sub-text').text(e);
     $('#keplrError').show();
 }
 
@@ -38,7 +37,8 @@ async function fundWallet() {
     try {
         await initializeKeplr();
         const wallet = await getKeplrWallet();
-        getForm(jsRoutes.controllers.BlockchainTransactionController.fundWalletForm(wallet[1]));
+        // getForm(jsRoutes.controllers.BlockchainTransactionController.fundWalletForm(wallet[1]));
+        getForm(jsRoutes.controllers.BlockchainTransactionController.fundWalletForm("mantle1zhd888w6zsh7hr3kesdkk3crw0hcam2c3vcxdj"));
     } catch (e) {
         console.log(e)
     }

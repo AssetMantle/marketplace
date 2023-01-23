@@ -118,12 +118,14 @@ class BlockchainTransactionController @Inject()(
 
   def fundWalletForm(fromAddress: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val balance = blockchainBalances.Service.get(fromAddress)
+//      val balance = blockchainBalances.Service.get(fromAddress)
+      val balance = "6900"
       val activeKey = masterKeys.Service.tryGetActive(loginState.username)
       (for {
-        balance <- balance
+//        balance <- balance
         activeKey <- activeKey
-      } yield Ok(views.html.blockchainTransaction.fundWallet(fromAddress = fromAddress, toAddress = activeKey.address, balance = balance.fold(MicroNumber.zero)(_.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount))))
+//      } yield Ok(views.html.blockchainTransaction.fundWallet(fromAddress = fromAddress, toAddress = activeKey.address, balance = balance.fold(MicroNumber.zero)(_.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount))))
+      } yield Ok(views.html.blockchainTransaction.fundWallet(fromAddress = fromAddress, toAddress = activeKey.address, balance = balance))
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
