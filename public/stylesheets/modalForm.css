@@ -550,12 +550,6 @@
     line-height: 17px;
     color: var(--inactive-gray);
 }
-#formBody dd input[type=number]::-webkit-inner-spin-button,
-#formBody dd input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
 #formBody dd input[type=text],
 #formBody dd input[type=password],
 #formBody dd input[type=number],
@@ -610,12 +604,6 @@
 #formBody dd select.errorField,
 #formBody dd textarea.errorField{
     border: 1px solid var(--error) !important;
-}
-#formBody dd input[type=number]::-webkit-inner-spin-button,
-#formBody dd input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
 }
 #formBody dd select{
     padding: 0px;
