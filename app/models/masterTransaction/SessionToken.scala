@@ -59,8 +59,6 @@ class SessionTokens @Inject()(
     SessionTokens.logger
   ) {
 
-  private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
-
   object Service {
 
     def refresh(id: String): Future[String] = {

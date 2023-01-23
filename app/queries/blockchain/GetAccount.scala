@@ -18,7 +18,7 @@ class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private val path = "/cosmos/auth/v1beta1/accounts/"
 
-  private val url = constants.CommonConfig.Blockchain.RestEndPoint + path
+  private val url = constants.Blockchain.RestEndPoint + path
 
   private def action(address: String): Future[AccountResponse.Response] = utilities.JSON.getResponseFromJson[AccountResponse.Response](wsClient.url(url + address).get)
 
