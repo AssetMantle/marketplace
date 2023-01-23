@@ -894,17 +894,5 @@
     &::placeholder {
       color: var(--inactive-gray);
     }
-
-    &::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-    }
-
-    &::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-    }
   }
 }
