@@ -104,9 +104,9 @@ async function setChain() {
         },
         coinType: 118,
         gasPriceStep: {
-            low: 0.01,
-            average: 0.025,
-            high: 0.03,
+            low: 0.0,
+            average: 0.001,
+            high: 0.01,
         },
     });
 
