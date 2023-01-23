@@ -16,7 +16,7 @@ class GetTransaction @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val url = constants.CommonConfig.Blockchain.RestEndPoint + "/cosmos/tx/v1beta1/txs/"
+  private val url = constants.Blockchain.RestEndPoint + "/cosmos/tx/v1beta1/txs/"
 
   private def action(txHash: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + txHash).get)
 

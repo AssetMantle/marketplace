@@ -110,7 +110,6 @@ class MasterPublicListings @Inject()(
   }
 
   object Utility {
-    private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
     val scheduler: Scheduler = new Scheduler {
       val name: String = constants.Scheduler.HISTORY_MASTER_PUBLIC_LISTING

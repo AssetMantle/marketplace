@@ -93,8 +93,6 @@ class SendCoins @Inject()(
     SendCoins.logger
   ) {
 
-  private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
-
   object Service {
 
     def add(accountId: String, txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String]): Future[SendCoin] = {
