@@ -5,7 +5,7 @@ chainConfig = {
     chainName: "AssetMantle",
     keplrSet: false,
     stakingDenom: "umntl",
-    maxGas: 250000,
+    maxGas: 100000,
     MicroFactor: 1000000,
 }
 
