@@ -1,8 +1,4 @@
 function checkAndPushState(route, parameter, stateName) {
-    console.log("---------")
-    console.log(route)
-    console.log(parameter)
-    console.log(stateName)
     if (addState === true) {
         if (route === "" && parameter === "") {
             window.history.pushState(stateName, "assetMantle", "/");

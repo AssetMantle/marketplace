@@ -19,7 +19,7 @@ class BroadcastTxSync @Inject()()(implicit wsClient: WSClient, configuration: Co
 
   private val path = "/broadcast_tx_sync?tx=0x"
 
-  private val url = constants.CommonConfig.Blockchain.RPCEndPoint + path
+  private val url = constants.Blockchain.RPCEndPoint + path
 
   private def action(txRawHex: String) = utilities.JSON.getResponseFromJson[BroadcastTxSyncResponse.Response, BroadcastTxSyncResponse.ErrorResponse](wsClient.url(url + txRawHex).get)
 
