@@ -62,5 +62,5 @@ class IndexController @Inject()(
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())
-  //    starter.start()
+  starter.start()
 }
