@@ -1,20 +1,37 @@
 @import utilities.MicroNumber
 @import views.blockchainTransaction.companion.FundWallet
 @import views.html.base.form._
+@import views.html.base.modal._
 
 @(fundWallet: Form[FundWallet.Data] = FundWallet.form, fromAddress: String, toAddress: String, balance: MicroNumber)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div id="txFields">
-    @commonInputText(fundWallet, constants.FormField.FROM_KEPLR_ADDRESS, Symbol("value") -> fromAddress, Symbol("readonly") -> true)
-    @commonInputText(fundWallet, constants.FormField.TO_ADDRESS, Symbol("value") -> toAddress, Symbol("readonly") -> true)
-<div class="sendCoinAmountField">
-    <div id="availableBalance" class="availableBalance" onclick="setAvailableBalance('@constants.FormField.SEND_COIN_AMOUNT.name', @balance)">@Messages(constants.View.SEND_COIN_AVAILABLE_BALANCE, balance)</div>
-    @commonInputMicroNumber(fundWallet, constants.FormField.SEND_COIN_AMOUNT)
+    <div class="modal-header mb-3">
+        <h5 class="modal-title" id="staticBackdropLabel">@Messages(constants.View.FUND_WALLET_TITLE)</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                    &times;
+        </button>
+    </div>
+    <div id="formBody">
+        @commonInputText(fundWallet, constants.FormField.FROM_KEPLR_ADDRESS, Symbol("value") -> fromAddress, Symbol("readonly") -> true)
+        @commonInputText(fundWallet, constants.FormField.TO_ADDRESS, Symbol("value") -> toAddress, Symbol("readonly") -> true)
+        <div class="sendCoinAmountField">
+            <div id="availableBalance" class="availableBalance" onclick="setAvailableBalance('@constants.FormField.SEND_COIN_AMOUNT.name', @balance)">@Messages(constants.View.SEND_COIN_AVAILABLE_BALANCE, balance)</div>
+            @commonInputMicroNumber(fundWallet, constants.FormField.SEND_COIN_AMOUNT)
+        </div>
+        <div class="horizontal-align">
+            <button id="keplrFormSubmitButton" onclick="onFundWalletSubmit('@fromAddress', '@toAddress', '@constants.Blockchain.StakingToken')">@Messages(constants.Form.FUND_WALLET.button)</button>
+        </div>
+    </div>
 </div>
-</div>
-<button id="keplrFormSubmitButton" onclick="onFundWalletSubmit('@fromAddress', '@toAddress', '@constants.Blockchain.StakingToken')">@Messages(constants.Form.FUND_WALLET.button)</button>
 
 <div id="txResponse" class="hidden">
+    <div id="txSuccessful" class="hidden">
+        @successModal(heading = constants.View.FUND_WALLET_SUCCESS_TITLE)
+    </div>
+    <div id="txFailed" class="hidden">
+        @errorModal(heading = constants.View.FUND_WALLET_FAILED_TITLE)
+    </div>
     <div class="form-address-box">
         <div class="form-address-box-item">
             <span class="address-box-label">@Messages(constants.View.HASH)</span>
@@ -26,7 +43,23 @@
         </div>
     </div>
 </div>
+
 <div id="keplrError" class="hidden">
-    <div id="keplrErrorMessage"></div>
+    <div class="header-success">
+        <div class="d-flex">
+            <div class="text-center form-success-icon">
+                <img class="checkmark" src="@routes.Assets.versioned("images/icon/errorIcon.png")" height="80px" width="80px" style="margin-left: 20px;"/>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                        &times;
+            </button>
+        </div>
+        <div class="form-body">
+            <div class="mt-4 text-center">
+                <div class="form-success-message-heading">@Messages(constants.View.FUND_WALLET_KEPLR_ERROR_TITLE)</div>
+                <div id="keplrErrorMessage" class="mt-2 form-success-message-sub-text"></div>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/blockchainTransactions/sendCoin.js")" type="text/javascript"></script>

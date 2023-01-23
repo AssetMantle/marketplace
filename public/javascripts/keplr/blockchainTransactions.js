@@ -2,22 +2,21 @@ function processTxResponse(response) {
     console.log(response);
     const success = (response.code === 0);
     $('#txFields').hide();
-    $('#keplrFormSubmitButton').hide();
     if (success) {
-        $('#txSuccessful').show();
+        $('#txSuccessful').attr("class","");
     } else {
-        $('#txFailed').show();
+        $('#txFailed').attr("class","");
     }
-    $('#txResponse').show();
+    $('#txResponse').attr("class","");
     $('#txResponseHash').html(response.transactionHash);
+    $('#txResponseHash').attr("data-value",response.transactionHash);
 }
 
 function processKeplrError(e) {
     console.log(e);
     $('#txFields').hide();
-    $('#keplrFormSubmitButton').hide();
-    $('#keplrErrorMessage').html(e);
-    $('#keplrError').show();
+    $("#keplrErrorMessage").html(e);
+    $('#keplrError').attr("class","");
 }
 
 function SendMsg(fromAddress, toAddress, amount, denom) {
