@@ -751,6 +751,7 @@
             }
           }
           .notificationDetail{
+            cursor: pointer;
             .title{
               @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--default));
               text-transform: capitalize;
