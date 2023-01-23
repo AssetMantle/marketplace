@@ -157,5 +157,7 @@ class Collections @Inject()(
     def getCollectionNames(ids: Seq[String]): Future[Map[String, String]] = filter(_.id.inSet(ids)).map(_.map(x => x.id -> x.name).toMap)
 
     def delete(ids: Seq[String]): Future[Int] = filterAndDelete(_.id.inSet(ids))
+
+    def getAllPublic: Future[Seq[Collection]] = filter(_.public).map(_.map(_.deserialize))
   }
 }

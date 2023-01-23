@@ -230,10 +230,61 @@ class Starter @Inject()(
     } yield ()
   }
 
+  def validateAll(): Future[Unit] = {
+    val collections = masterCollections.Service.getAllPublic
+
+    def verify(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
+      val allNFTIds = masterNFTs.Service.getAllIdsForCollection(collection.id)
+      var count = 0
+
+      def verifyNFT(allNFTIds: Seq[String]) = utilitiesOperations.traverse(allNFTIds) { nftId =>
+        val nftProperties = masterNFTProperties.Service.getForNFT(nftId)
+        for {
+          nftProperties <- nftProperties
+        } yield {
+          var cause = ""
+          val valid = if (collection.properties.isEmpty && nftProperties.isEmpty) true
+          else {
+            val collectionPropertiesName = collection.properties.get.map(_.name)
+            val nftPropertiesName = nftProperties.map(_.name)
+            val a = nftPropertiesName.map(x => collectionPropertiesName.contains(x)).forall(identity)
+            if (!a) cause = "collectionPropertiesName not contain nftPropertiesName, "
+            val b = nftProperties.length == collectionPropertiesName.length
+            if (!b) cause = cause + "length does not match, "
+            val c = collectionPropertiesName.map(x => nftPropertiesName.contains(x)).forall(identity)
+            if (!c) cause = cause + "nftPropertiesName not contain collectionPropertiesName "
+            a && b && c
+          }
+          if (!valid) {
+            println("### invalid nft: " + nftId + " , collection: " + collection.id)
+            println(nftProperties.map(_.name).mkString(","))
+            count = count + 1
+          }
+        }
+      }
+
+      for {
+        allNFTIds <- allNFTIds
+        _ <- verifyNFT(allNFTIds)
+      } yield {
+        if (count > 0) {
+          println("***@@@ " + collection.id + ", count: " + count.toString)
+          println(collection.properties.get.map(_.name))
+        }
+      }
+    }
+
+    for {
+      collections <- collections
+      _ <- verify(collections)
+    } yield ()
+  }
+
   // Delete redundant nft tags
   def start(): Future[Unit] = {
     (for {
       _ <- uploadCollections()
+      _ <- validateAll()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
