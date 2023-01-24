@@ -99,7 +99,7 @@ class MasterPublicListings @Inject()(
 
   object Service {
 
-    def add(masterPublicListing: MasterPublicListing): Future[String] = create(masterPublicListing.serialize())
+    def insertOrUpdate(masterPublicListing: MasterPublicListing): Future[Unit] = upsert(masterPublicListing.serialize())
 
     def add(masterPublicListings: Seq[MasterPublicListing]): Future[Unit] = create(masterPublicListings.map(_.serialize()))
 
@@ -118,7 +118,7 @@ class MasterPublicListings @Inject()(
         val expiredPublicListings = masterPublicListings.Service.getExpiredPublicListings
 
         def deleteExpiredPublicListings(expiredPublicListings: Seq[master.PublicListing]) = utilitiesOperations.traverse(expiredPublicListings) { expiredPublicListing =>
-          val addToHistory = Service.add(expiredPublicListing.toHistory)
+          val addToHistory = Service.insertOrUpdate(expiredPublicListing.toHistory)
 
           def markPublicListingNull = masterNFTOwners.Service.markPublicListingNull(expiredPublicListing.id)
 
