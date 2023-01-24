@@ -193,5 +193,3 @@ GET         /gasTokenPrice                                    controllers.Blockc
 GET         /addressBalance                                   controllers.BlockchainTransactionController.balance(address: String)
 GET         /sendCoin                                         controllers.BlockchainTransactionController.sendCoinForm(fromAddress: String)
 POST        /sendCoin                                         controllers.BlockchainTransactionController.sendCoin()
-GET         /fundWallet                                       controllers.BlockchainTransactionController.fundWalletForm(fromAddress: String)
-

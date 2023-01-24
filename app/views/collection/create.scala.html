@@ -1,7 +1,8 @@
 @import views.collection.companion.Create
 @import views.html.base.form._
+@import controllers.actions.LoginState
 
-@(createForm: Form[Create.Data] = Create.form, totalDrafts: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(createForm: Form[Create.Data] = Create.form, totalDrafts: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @if(totalDrafts < constants.CommonConfig.MaxCollectionDrafts) {
     <div id="createCollectionForm">
@@ -23,11 +24,23 @@
                 <a class="link" onclick="showHideModalScreen('#createCollectionTermsConditionModal', '#createCollectionForm')">@Messages(constants.View.TERMS_CONDITION_LABEL)</a>
             </span>
         </div>
+        <div class="d-flex align-items-center mt-4">
+            @commonCheckbox(createForm, constants.FormField.CREATE_COLLECTION_MOU, Symbol("id") -> "mou", Symbol("oninput") -> """activeButton()""")
+            <span class="termsConditionMessage">
+                <label for="mou">
+                @Messages(constants.View.CREATE_COLLECTION_MOU_MESSAGE)
+                </label>
+                <a class="link" onclick="showHideModalScreen('#createCollectionMoU', '#createCollectionForm')">@Messages(constants.View.MOU_LABEL)</a>
+            </span>
+        </div>
     }
     </div>
 
     <div id="createCollectionTermsConditionModal" style="display: none;">
     @views.html.collection.termsConditions()
+    </div>
+    <div id="createCollectionMoU" style="display: none;">
+    @views.html.collection.mou(creatorId = loginState.username)
     </div>
 } else {
     <div class="d-flex gap-3 align-items-center maxDraftLimitInfo">
