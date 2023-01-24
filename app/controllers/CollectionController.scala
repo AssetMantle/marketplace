@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
-import models.analytics.CollectionsAnalysis
+import models.analytics.{CollectionAnalysis, CollectionsAnalysis}
 import models.master.{Collection, PublicListing}
 import models.masterTransaction.CollectionDraft
 import models.{master, masterTransaction}
@@ -552,10 +552,17 @@ class CollectionController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val countNFTs = masterNFTOwners.Service.countForCreatorNotForSell(collectionId = collectionId, creatorId = accountId)
+        val collectionAnalysis = collectionsAnalysis.Service.tryGet(collectionId)
+
+        def maxSellAllowed(collectionAnalysis: CollectionAnalysis) = if (collectionAnalysis.totalNFTs <= 50) collectionAnalysis.totalNFTs else (collectionAnalysis.totalNFTs / 10)
 
         (for {
           countNFTs <- countNFTs
-        } yield Ok(if (countNFTs <= 50) countNFTs.toString else (countNFTs / 10).toString)
+          collectionAnalysis <- collectionAnalysis
+        } yield {
+          val maxSellOnLeft = if (countNFTs <= 50) countNFTs else (countNFTs / 10)
+          Ok(maxSellAllowed(collectionAnalysis).min(maxSellOnLeft).toString)
+        }
           ).recover {
           case _: BaseException => BadRequest("0")
         }

@@ -118,14 +118,15 @@ class PublicListingController @Inject()(
 
   def editForm(publicListingId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val publicListing = masterPublicListings.Service.tryGet(publicListingId)
-
-      (for {
-        publicListing <- publicListing
-      } yield Ok(views.html.publicListing.edit(publicListing = publicListing))
-        ).recover {
-        case baseException: BaseException => BadRequest(baseException.failure.message)
-      }
+      //      val publicListing = masterPublicListings.Service.tryGet(publicListingId)
+      //
+      //      (for {
+      //        publicListing <- publicListing
+      //      } yield Ok(views.html.publicListing.edit(publicListing = publicListing))
+      //        ).recover {
+      //        case baseException: BaseException => BadRequest(baseException.failure.message)
+      //      }
+      Future(BadRequest)
   }
 
   def edit(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>

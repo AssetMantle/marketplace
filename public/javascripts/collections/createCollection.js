@@ -272,7 +272,8 @@ $("#COLLECTION_DESCRIPTION").on("keyup",function(){
 
 function activeButton() {
     let termsCondition = document.getElementById("termsCondition");
-    if(flag1 !== 0 && flag2 !== 0 && termsCondition.checked === true){
+    let mou = document.getElementById("mou");
+    if(flag1 !== 0 && flag2 !== 0 && termsCondition.checked === true && mou.checked === true){
         $("#FORM_CREATE_COLLECTION_SUBMIT").removeClass("disable");
     } else {
         $("#FORM_CREATE_COLLECTION_SUBMIT").addClass("disable");
