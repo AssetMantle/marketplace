@@ -26,7 +26,7 @@
         </div>
     </div>
     <div class="d-flex justify-content-around text-center mt-3 buttons">
-        <a href="https://wallet.assetmantle.one" target="_blank"><button class="primaryButton">@Messages(constants.View.FUND_WALLET)</button>
+        <button class="primaryButton"><a href="https://wallet.assetmantle.one" target="_blank">@Messages(constants.View.FUND_WALLET)</a></button>
         @commonFormButton(constants.Form.SEND_COIN, Symbol("parameters") -> s"'${loginState.address}'", Symbol("class") -> "secondaryButton")
     </div>
     <div class="separator"></div>
