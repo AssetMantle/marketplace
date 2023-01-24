@@ -1,0 +1,9 @@
+@import controllers.actions.LoginState
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+@views.html.base.common(constants.View.COLLECTIONS)
+<link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/explorer.css")"/>
+<script>
+        componentResource('centerContent', jsRoutes.controllers.CollectionController.whitelistSaleCollectionsSection());
+</script>

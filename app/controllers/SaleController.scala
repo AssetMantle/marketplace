@@ -14,7 +14,8 @@ import utilities.MicroNumber
 import views.sale.companion._
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class SaleController @Inject()(
@@ -45,19 +46,18 @@ class SaleController @Inject()(
 
   private implicit val module: String = constants.Module.SALE_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)
+  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
 
   def createCollectionSaleForm(whitelistId: Option[String], collectionId: Option[String]): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      //      val whitelists = masterWhitelists.Service.getIdNameMapForOwner(loginState.username)
-      //      val collections = masterCollections.Service.getByCreator(loginState.username)
-      //
-      //      for {
-      //        whitelists <- whitelists
-      //        collections <- collections
-      //      } yield if ((whitelistId.isDefined && whitelists.exists(_._1 == whitelistId.get)) || (collectionId.isDefined && collections.exists(_._1 == collectionId.get))) Ok(views.html.sale.createCollectionSale(collections = collections.map(x => x._1 -> x._2).toMap, collectionId = collectionId, whitelistId = whitelistId, whitelists = whitelists))
-      //      else BadRequest(constants.Response.COLLECTION_ID_OR_WHITELIST_ID_DOES_NOT_EXIST.message)
-      Future(BadRequest)
+      val whitelists = masterWhitelists.Service.getIdNameMapForOwner(loginState.username)
+      val collections = masterCollections.Service.getByCreator(loginState.username)
+
+      for {
+        whitelists <- whitelists
+        collections <- collections
+      } yield if ((whitelistId.isDefined && whitelists.exists(_._1 == whitelistId.get)) || (collectionId.isDefined && collections.exists(_._1 == collectionId.get))) Ok(views.html.sale.createCollectionSale(collections = collections.map(x => x._1 -> x._2).toMap, collectionId = collectionId, whitelistId = whitelistId, whitelists = whitelists))
+      else BadRequest(constants.Response.COLLECTION_ID_OR_WHITELIST_ID_DOES_NOT_EXIST.message)
   }
 
   def createCollectionSale(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -73,59 +73,62 @@ class SaleController @Inject()(
           } yield BadRequest(views.html.sale.createCollectionSale(formWithErrors, whitelists = whitelists, whitelistId = formWithErrors.data.get(constants.FormField.SELECT_WHITELIST_ID.name), collectionId = formWithErrors.data.get(constants.FormField.SELECT_COLLECTION_ID.name), collections = collections.map(x => x._1 -> x._1).toMap))
         },
         createData => {
-          //          val collection = masterCollections.Service.tryGet(id = createData.collectionId)
-          //          val whitelistMembers = masterWhitelistMembers.Service.getAllMembers(createData.whitelistId)
-          //          val countNFts = masterNFTOwners.Service.countForCreatorNotForSell(collectionId = createData.collectionId, creatorId = loginState.username)
-          //          val saleExistOnCollection = masterSales.Service.getAllSalesByCollectionId(createData.collectionId).map(_.nonEmpty)
-          //
-          //          def addToSale(collection: Collection, countNFts: Int, saleExistOnCollection: Boolean) = {
-          //            val errors = Seq(
-          //              if (!loginState.isGenesisCreator) Option(constants.Response.NOT_GENESIS_CREATOR) else None,
-          //              if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
-          //              if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
-          //              if (saleExistOnCollection) Option(constants.Response.CANNOT_CREATE_MORE_THAN_ONE_SALE) else None,
-          //              if (createData.nftForSale > countNFts) Option(constants.Response.NOT_ENOUGH_NFTS_IN_COLLECTION) else None,
-          //            ).flatten
-          //            if (errors.isEmpty) {
-          //              for {
-          //                saleId <- masterSales.Service.add(createData.toNewSale)
-          //                _ <- masterNFTOwners.Service.whitelistSaleRandomNFTs(collectionId = collection.id, nfts = createData.nftForSale, creatorId = loginState.username, saleId = saleId)
-          //              } yield ()
-          //            } else errors.head.throwFutureBaseException()
-          //          }
-          //
-          //          def sendNotifications(whitelistMembers: Seq[String], collectionName: String): Unit = whitelistMembers.foreach { member =>
-          //            utilitiesNotification.send(accountID = member, constants.Notification.SALE_ON_WHITELIST, collectionName)(s"'$member', '${constants.View.WHITELIST}'")
-          //          }
-          //
-          //          (for {
-          //            collection <- collection
-          //            whitelistMembers <- whitelistMembers
-          //            countNFts <- countNFts
-          //            saleExistOnCollection <- saleExistOnCollection
-          //            _ <- addToSale(collection = collection, countNFts = countNFts, saleExistOnCollection = saleExistOnCollection)
-          //            _ <- collectionsAnalysis.Utility.onCreateSale(collection.id, totalListed = createData.nftForSale, salePrice = createData.price)
-          //          } yield {
-          //            sendNotifications(whitelistMembers, collection.name)
-          //            PartialContent(views.html.sale.createSuccessful())
-          //          }
-          //            ).recover {
-          //            case baseException: BaseException => {
-          //              try {
-          //                val collections = masterCollections.Service.getByCreator(loginState.username)
-          //                val whitelists = masterWhitelists.Service.getIdNameMapForOwner(loginState.username)
-          //
-          //                val result = for {
-          //                  whitelists <- whitelists
-          //                  collections <- collections
-          //                } yield BadRequest(views.html.sale.createCollectionSale(CreateCollectionSale.form.withGlobalError(baseException.failure.message), collectionId = Option(createData.collectionId), whitelists = whitelists, whitelistId = Option(createData.whitelistId), collections = collections.map(x => x._1 -> x._2).toMap))
-          //                Await.result(result, Duration.Inf)
-          //              } catch {
-          //                case baseException: BaseException => BadRequest(views.html.sale.createCollectionSale(CreateCollectionSale.form.withGlobalError(baseException.failure.message), collections = Map(), collectionId = Option(createData.collectionId), whitelistId = Option(createData.whitelistId), whitelists = Map()))
-          //              }
-          //            }
-          //          }
-          Future(BadRequest)
+          val collection = masterCollections.Service.tryGet(id = createData.collectionId)
+          val whitelistMembers = masterWhitelistMembers.Service.getAllMembers(createData.whitelistId)
+          val totalNFTs = masterNFTOwners.Service.countOwnedAndCreatedNFTsForCollection(accountId = loginState.username, collectionId = createData.collectionId)
+          val countNFts = masterNFTOwners.Service.countForCreatorNotForSell(collectionId = createData.collectionId, creatorId = loginState.username)
+          val saleExistOnCollection = masterSales.Service.getSaleByCollectionId(createData.collectionId).map(_.nonEmpty)
+
+          def addToSale(collection: Collection, countNFts: Int, saleExistOnCollection: Boolean, totalNFTs: Int) = {
+            val maxSellNumber: Int = if (totalNFTs <= 50) totalNFTs else totalNFTs / 10
+            val errors = Seq(
+              if (!loginState.isGenesisCreator) Option(constants.Response.NOT_GENESIS_CREATOR) else None,
+              if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
+              if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
+              if (saleExistOnCollection) Option(constants.Response.CANNOT_CREATE_MORE_THAN_ONE_SALE) else None,
+              if (createData.nftForSale > maxSellNumber) Option(constants.Response.CANNOT_SELL_MORE_THAN_ALLOWED_LIMIT) else None,
+              if (createData.nftForSale > countNFts) Option(constants.Response.NOT_ENOUGH_NFTS_IN_COLLECTION) else None,
+            ).flatten
+            if (errors.isEmpty) {
+              for {
+                saleId <- masterSales.Service.add(createData.toNewSale)
+                _ <- masterNFTOwners.Service.whitelistSaleRandomNFTs(collectionId = collection.id, nfts = createData.nftForSale, creatorId = loginState.username, saleId = saleId)
+              } yield ()
+            } else errors.head.throwFutureBaseException()
+          }
+
+          def sendNotifications(whitelistMembers: Seq[String], collectionName: String): Unit = whitelistMembers.foreach { member =>
+            utilitiesNotification.send(accountID = member, constants.Notification.SALE_ON_WHITELIST, collectionName)(s"'$member', '${constants.View.WHITELIST}'")
+          }
+
+          (for {
+            collection <- collection
+            whitelistMembers <- whitelistMembers
+            countNFts <- countNFts
+            saleExistOnCollection <- saleExistOnCollection
+            totalNFTs <- totalNFTs
+            _ <- addToSale(collection = collection, countNFts = countNFts, saleExistOnCollection = saleExistOnCollection, totalNFTs = totalNFTs)
+            _ <- collectionsAnalysis.Utility.onCreateSale(collection.id, totalListed = createData.nftForSale, salePrice = createData.price)
+          } yield {
+            sendNotifications(whitelistMembers, collection.name)
+            PartialContent(views.html.sale.createSuccessful())
+          }
+            ).recover {
+            case baseException: BaseException => {
+              try {
+                val collections = masterCollections.Service.getByCreator(loginState.username)
+                val whitelists = masterWhitelists.Service.getIdNameMapForOwner(loginState.username)
+
+                val result = for {
+                  whitelists <- whitelists
+                  collections <- collections
+                } yield BadRequest(views.html.sale.createCollectionSale(CreateCollectionSale.form.withGlobalError(baseException.failure.message), collectionId = Option(createData.collectionId), whitelists = whitelists, whitelistId = Option(createData.whitelistId), collections = collections.map(x => x._1 -> x._2).toMap))
+                Await.result(result, Duration.Inf)
+              } catch {
+                case baseException: BaseException => BadRequest(views.html.sale.createCollectionSale(CreateCollectionSale.form.withGlobalError(baseException.failure.message), collections = Map(), collectionId = Option(createData.collectionId), whitelistId = Option(createData.whitelistId), whitelists = Map()))
+              }
+            }
+          }
         }
       )
   }
@@ -183,8 +186,8 @@ class SaleController @Inject()(
                 fromAddress = buyerKey.address,
                 toAddress = sellerKey.address,
                 amount = sale.price * buySaleNFTData.buyNFTs,
-                gasLimit = buySaleNFTData.gasAmount,
-                gasPrice = buySaleNFTData.gasPrice,
+                gasLimit = constants.Blockchain.DefaultSendCoinGasAmount,
+                gasPrice = constants.Blockchain.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buySaleNFTData.password))
               )
             } else errors.head.throwFutureBaseException()

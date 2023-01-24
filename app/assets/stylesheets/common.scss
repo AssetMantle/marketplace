@@ -751,6 +751,7 @@
             }
           }
           .notificationDetail{
+            cursor: pointer;
             .title{
               @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--default));
               text-transform: capitalize;
@@ -1001,68 +1002,6 @@ body.modal-open{
       margin: auto;
       object-fit: contain;
       aspect-ratio: 1/1;
-    }
-  }
-}
-
-// Dropdown Menu
-.dropDownContainer {
-  position: relative;
-  overflow: hidden;
-  .dropDownItem {
-    position: relative;
-    transition: 0.3s ease-out;
-    .panel {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out;
-      a {
-        @include setFont(var(--font-type-1), normal, 500, 14px, 30px, var(--mantle-off-white));
-        text-transform: capitalize;
-        padding: 12px 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: block;
-        &:hover {
-          font-weight: bold;
-        }
-      }
-    }
-    button.accordionMenu {
-      background-color: transparent;
-      text-transform: capitalize;
-      cursor: pointer;
-      width: 100%;
-      transition: max-height 0.3s ease-out;
-      text-align: left;
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      grid-gap: 16px;
-      border:none;
-      padding: 12px 10px;
-      h4 {
-        @include setFont(var(--font-type-1), normal, 500, 14px, 30px, var(--mantle-off-white));
-        display: inline-block;
-      }
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.08);
-      }
-      .arrowIcon {
-        transition: 0.3s ease-out;
-        transform: rotate(0deg);
-      }
-    }
-    &.active {
-      button.accordionMenu {
-        background-color: rgba(0, 0, 0, 0.164);
-        .arrowIcon {
-          transform: rotate(90deg);
-        }
-        &:hover {
-          background-color: rgba(0, 0, 0, 0.32);
-        }
-      }
     }
   }
 }

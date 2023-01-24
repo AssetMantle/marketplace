@@ -790,16 +790,6 @@
     &::placeholder{
       color: var(--inactive-gray);
     }
-    &::-webkit-inner-spin-button{
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-    }
-    &::-webkit-outer-spin-button{
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-    }
   }
   .input-group-text{
     @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--default));

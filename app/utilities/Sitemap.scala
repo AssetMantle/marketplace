@@ -19,7 +19,9 @@ object Sitemap {
 
   val allElements: Seq[Sitemap] = Seq(
     Sitemap(routes.IndexController.index(), 1.0),
-    Sitemap(routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION), 0.8)
+    Sitemap(routes.CollectionController.viewPublicListedCollections(), 0.95),
+    Sitemap(routes.CollectionController.viewCollections(), 0.9),
+    Sitemap(routes.CollectionController.viewWhitelistSaleCollections(), 0.85)
   )
 
 

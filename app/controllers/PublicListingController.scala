@@ -44,7 +44,7 @@ class PublicListingController @Inject()(
 
   private implicit val module: String = constants.Module.PUBLIC_LISTING_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)
+  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
 
   def createPublicListingForm(collectionId: Option[String]): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
@@ -116,6 +116,73 @@ class PublicListingController @Inject()(
       )
   }
 
+  def editForm(publicListingId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      //      val publicListing = masterPublicListings.Service.tryGet(publicListingId)
+      //
+      //      (for {
+      //        publicListing <- publicListing
+      //      } yield Ok(views.html.publicListing.edit(publicListing = publicListing))
+      //        ).recover {
+      //        case baseException: BaseException => BadRequest(baseException.failure.message)
+      //      }
+      Future(BadRequest)
+  }
+
+  def edit(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      EditPublicListing.form.bindFromRequest().fold(
+        formWithErrors => {
+          val publicListing = masterPublicListings.Service.tryGet(formWithErrors.data.getOrElse(constants.FormField.PUBLIC_LISTING_ID.name, ""))
+
+          for {
+            publicListing <- publicListing
+          } yield BadRequest(views.html.publicListing.edit(formWithErrors, publicListing))
+        },
+        editData => {
+          val publicListing = masterPublicListings.Service.tryGet(editData.publicListingId)
+
+          def collection(id: String) = masterCollections.Service.tryGet(id = id)
+
+          def editPublicListing(collection: Collection, publicListing: PublicListing) = {
+            val errors = Seq(
+              if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
+              if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
+            ).flatten
+            if (errors.isEmpty) {
+              for {
+                _ <- masterPublicListings.Service.update(publicListing.copy(maxMintPerAccount = editData.maxMintPerAccount, startTimeEpoch = editData.startEpoch, endTimeEpoch = editData.endEpoch, price = editData.price))
+              } yield ()
+            } else errors.head.throwFutureBaseException()
+          }
+
+          def sendNotification(collection: Collection) = utilitiesNotification.send(loginState.username, notification = constants.Notification.PUBLIC_LISTING_ON_COLLECTION, collection.name)(s"'${collection.id}'")
+
+          (for {
+            publicListing <- publicListing
+            collection <- collection(publicListing.collectionId)
+            _ <- editPublicListing(collection = collection, publicListing)
+            _ <- sendNotification(collection)
+            _ <- collectionsAnalysis.Utility.onEditPublicListing(collection.id, listingPrice = editData.price)
+          } yield PartialContent(views.html.publicListing.editSuccessful())
+            ).recover {
+            case baseException: BaseException => {
+              try {
+                val publicListing = masterPublicListings.Service.tryGet(editData.publicListingId)
+
+                val result = for {
+                  publicListing <- publicListing
+                } yield BadRequest(views.html.publicListing.edit(EditPublicListing.form.withGlobalError(baseException.failure.message), publicListing))
+                Await.result(result, Duration.Inf)
+              } catch {
+                case baseException: BaseException => BadRequest(baseException.failure.message)
+              }
+            }
+          }
+        }
+      )
+  }
+
   def buyNFTForm(publicListingId: String, mintNft: Boolean): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.publicListing.buyNFT(publicListingId = publicListingId))
   }
@@ -166,8 +233,8 @@ class PublicListingController @Inject()(
                 fromAddress = buyerKey.address,
                 toAddress = sellerKey.address,
                 amount = publicListing.price * buyNFTData.buyNFTs,
-                gasLimit = buyNFTData.gasAmount,
-                gasPrice = buyNFTData.gasPrice,
+                gasLimit = constants.Blockchain.DefaultSendCoinGasAmount,
+                gasPrice = constants.Blockchain.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buyNFTData.password))
               )
             } else errors.head.throwFutureBaseException()

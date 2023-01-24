@@ -1,6 +1,6 @@
 package models.masterTransaction
 
-import akka.actor.Cancellable
+import constants.Scheduler
 import exceptions.BaseException
 import models.Trait._
 import models.blockchainTransaction.NFTSale
@@ -88,8 +88,6 @@ class SaleNFTTransactions @Inject()(
     SaleNFTTransactions.logger
   ) {
 
-  private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
-
   object Service {
 
     def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftId: String, saleId: String): Future[Unit] = create(SaleNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = nftId, saleId = saleId, status = None))
@@ -120,6 +118,11 @@ class SaleNFTTransactions @Inject()(
     def markFailed(txHash: String): Future[Int] = customUpdate(SaleNFTTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(false))
 
     def getAllPendingStatus: Future[Seq[SaleNFTTransaction]] = filter(_.status.?.isEmpty)
+
+    def getTotalWhitelistSaleSold(saleId: String): Future[Int] = {
+      val nullStatus: Option[Boolean] = null
+      filterAndCount(x => x.saleId === saleId && (x.status.? === nullStatus || x.status))
+    }
   }
 
   object Utility {
@@ -173,8 +176,10 @@ class SaleNFTTransactions @Inject()(
       } yield updatedNFTSale
     }
 
-    private val txSchedulerRunnable = new Runnable {
-      def run(): Unit = {
+    val scheduler: Scheduler = new Scheduler {
+      val name: String = constants.Scheduler.MASTER_TRANSACTION_NFT_SALE
+
+      def runner(): Unit = {
         val saleNFTTxS = Service.getAllPendingStatus
 
         def checkAndUpdate(saleNFTTxs: Seq[SaleNFTTransaction]) = utilitiesOperations.traverse(saleNFTTxs.map(_.txHash).distinct) { txHash =>
@@ -242,8 +247,5 @@ class SaleNFTTransactions @Inject()(
         Await.result(forComplete, Duration.Inf)
       }
     }
-
-    def start: Cancellable = actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Scheduler.InitialDelay, delay = constants.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
-
   }
 }

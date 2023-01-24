@@ -2,8 +2,9 @@
 @import models.analytics.CollectionAnalysis
 @import models.master.{Collection, PublicListing, Sale}
 @import views.html.base.buttons._
+@import views.html.collection.details._
 
-@(collectionAnalysis: CollectionAnalysis, collection: Collection, sales: Seq[Sale], publicListing: Option[PublicListing], isMember: Boolean, publicListingSold: Long)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+@(collectionAnalysis: CollectionAnalysis, collection: Collection, sale: Option[Sale], publicListing: Option[PublicListing], isMember: Boolean, publicListingSold: Long, whitelistSaleSold: Long, showPublicListing: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
 
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
@@ -11,111 +12,45 @@
             <div class="analysisTitle">@Messages(constants.View.COLLECTION_TOTAL_NFT_TITLE)</div>
             <div class="analysisValue">@collectionAnalysis.totalNFTs</div>
         </div>
-        @if(publicListing.isDefined) {
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <div class="title">@Messages(constants.View.PUBLIC_LISTING_TITLE)</div>
-                @if(publicListing.get.getStatus(publicListingSold).id == constants.PublicListing.LIVE.id) {
-                    <div class="liveBadge">@Messages(constants.View.SALE_LIVE_LABEL)</div>
+        <div class="separator"></div>
+        @if(optionalLoginState.isDefined) {
+            @if(optionalLoginState.get.username == collection.creatorId) {
+                @if(publicListing.isEmpty && sale.isEmpty) {
+                    @commonPrimaryButton(constants.View.CREATE_COLLECTION_SALE, JavaScript(s"saleOptions()"))
                 }
-            </div>
-            <div class="d-flex align-items-center gap-1 mt-4">
-                <div class="analysisTitle">@Messages(constants.View.COLLECTION_SALE_PRICE)</div>
-                <div class="analysisValue">@publicListing.get.price.toString @Messages(constants.View.NFT_SALE_TOKEN_UNITS)</div>
-            </div>
-            <div class="d-flex flex-column gap-1 mt-3">
-                <div class="analysisValue">@Messages(constants.View.COLLECTION_MAXIMUM_MINT_PER_USER, publicListing.get.maxMintPerAccount)</div>
-            </div>
-            @if(publicListing.get.getStatus(publicListingSold).id == constants.PublicListing.NOT_STARTED.id) {
-                <div class="d-flex flex-column gap-1 mt-3">
-                    <div class="analysisTitle">@Messages(constants.View.SALE_START_TIME)</div>
-                    <div id="countdown_@publicListing.get.startTimeEpoch" class="d-flex gap-2 analysisValue">
-                    @publicListing.get.startTimeEpoch
-                    </div>
-                </div>
-                <script>epochToDateTime('countdown_@publicListing.get.startTimeEpoch');</script>
+                @if(publicListing.isDefined) {
+                    @topRightPublicListing(collectionAnalysis = collectionAnalysis, collection = collection, publicListing = publicListing.get, publicListingSold = publicListingSold)
+                    @if(sale.isEmpty) {
+                        @commonPrimaryButton(constants.Form.CREATE_WHITELIST_SALE.button, JavaScript(s"getForm(jsRoutes.controllers.SaleController.createCollectionSaleForm(undefined, '${collection.id}'))"))
+                    }
+                }
+                @if(sale.isDefined) {
+                    @topRightSale(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale.get, isMember = isMember, whitelistSaleSold = whitelistSaleSold)
+                    @if(publicListing.isEmpty) {
+                        <div class="separator"></div>
+                        @commonPrimaryButton(constants.Form.CREATE_PUBLIC_LISTING.button, JavaScript(s"getForm(jsRoutes.controllers.PublicListingController.createPublicListingForm('${collection.id}'))"))
+                    }
+                }
             } else {
-                @println(publicListing.get.getStatus(publicListingSold).id)
-                @if(publicListing.get.getStatus(publicListingSold).id == constants.PublicListing.SOLD_OUT.id) {
-                    <div class="d-flex flex-column gap-1 mt-3">
-                        <div class="analysisValue">
-                        @Messages(constants.PublicListing.SOLD_OUT.value)
-                        </div>
-                    </div>
+                @if(showPublicListing) {
+                    @if(publicListing.isDefined) {
+                        @topRightPublicListing(collectionAnalysis = collectionAnalysis, collection = collection, publicListing = publicListing.get, publicListingSold = publicListingSold)
+                    }
                 } else {
-                    <div class="d-flex flex-column gap-1 mt-3">
-                        <div class="analysisTitle">@Messages(constants.View.SALE_ENDS_IN)</div>
-                        <div id="countdown_@publicListing.get.endTimeEpoch" class="d-flex gap-2 analysisValue">
-                        @publicListing.get.endTimeEpoch
-                        </div>
-                    </div>
-                    <script>epochToDateTime('countdown_@publicListing.get.endTimeEpoch');</script>
-                    <div class="separator"></div>
-                    @if(optionalLoginState.isDefined) {
-                        @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.PublicListingController.buyNFTForm('${publicListing.get.id}', false))"), Symbol("class") -> "mt-4")
-                    } else  {
-                        @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.AccountController.signInWithCallbackForm('/collection/${collection.id}'))"), Symbol("class") -> "mt-4")
+                    @if(sale.isDefined) {
+                        @topRightSale(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale.get, isMember = isMember, whitelistSaleSold = whitelistSaleSold)
                     }
                 }
             }
-        }
-        @if(optionalLoginState.isDefined) {
-            @if(optionalLoginState.get.isGenesisCreator && optionalLoginState.get.username == collection.creatorId && publicListing.isEmpty) {
-                <div class="separator"></div>
-                @commonPrimaryButton(constants.View.CREATE_COLLECTION_SALE, JavaScript(s"getForm(jsRoutes.controllers.PublicListingController.createPublicListingForm('${collection.id}'))"))
-            } else {
-@*                @if(isMember) {*@
-                    @* @defining(sales.minBy(_.price)) { saleByMinimumPrice =>*@
-                    @* <div class="d-flex justify-content-between align-items-center">*@
-                    @* <div class="title">@Messages(constants.View.WHITELIST_SALE_TITLE)</div>*@
-                    @* @if(saleByMinimumPrice.getStatus.id == constants.Sale.LIVE.id) {*@
-                    @* <div class="liveBadge">@Messages(constants.View.SALE_LIVE_LABEL)</div>*@
-                    @* }*@
-                    @* </div>*@
-                    @* <div class="d-flex align-items-center gap-1 mt-4">*@
-                    @* <div class="analysisTitle">@Messages(constants.View.COLLECTION_SALE_PRICE)</div>*@
-                    @* <div class="analysisValue">@saleByMinimumPrice.price.toString @Messages(constants.View.NFT_SALE_TOKEN_UNITS)</div>*@
-                    @* </div>*@
-                    @* <div class="d-flex flex-column gap-1 mt-3">*@
-                    @* <div class="analysisValue">@Messages(constants.View.COLLECTION_MAXIMUM_MINT_PER_USER, saleByMinimumPrice.maxMintPerAccount)</div>*@
-                    @* </div>*@
-                    @* @if(saleByMinimumPrice.getStatus.id == constants.Sale.NOT_STARTED.id) {*@
-                    @* <div class="d-flex flex-column gap-1 mt-3">*@
-                    @* <div class="analysisTitle">@Messages(constants.View.SALE_START_TIME)</div>*@
-                    @* <div id="countdown_@saleByMinimumPrice.startTimeEpoch" class="d-flex gap-2 analysisValue">*@
-                    @* @saleByMinimumPrice.startTimeEpoch*@
-                    @* </div>*@
-                    @* </div>*@
-                    @* <script>epochToDateTime('countdown_@saleByMinimumPrice.startTimeEpoch');</script>*@
-                    @* } else {*@
-                    @* @if(saleByMinimumPrice.getStatus.id == constants.Sale.SOLD_OUT.id) {*@
-
-                    @* } else {*@
-                    @* <div class="d-flex flex-column gap-1 mt-3">*@
-                    @* <div class="analysisTitle">@Messages(constants.View.SALE_ENDS_IN)</div>*@
-                    @* <div id="countdown_@saleByMinimumPrice.endTimeEpoch" class="d-flex gap-2 analysisValue">*@
-                    @* @saleByMinimumPrice.endTimeEpoch*@
-                    @* </div>*@
-                    @* </div>*@
-                    @* <script>epochToDateTime('countdown_@saleByMinimumPrice.endTimeEpoch');</script>*@
-                    @* <div class="separator"></div>*@
-                    @* @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SaleController.buySaleNFTForm('${saleByMinimumPrice.id}', false))"), Symbol("class") -> "mt-4")*@
-                    @* }*@
-                    @* }*@
-                    @* }*@
-                }
+        } else {
+            @if(publicListing.isDefined) {
+                @topRightPublicListing(collectionAnalysis = collectionAnalysis, collection = collection, publicListing = publicListing.get, publicListingSold = publicListingSold)
             }
-@*        }*@
-        @* <div class="mt-3">*@
-        @* <div class="analysisTitle">@Messages(constants.View.MINTED_NFT_LABEL,0,topRightCard.totalNFTs)</div>*@
-        @* <div class="mintedNftWeightage">*@
-        @* <div class="progressBar">*@
-        @* <span data-totalNFT="@topRightCard.totalNFTs" data-mintedNFT="1" style="width:0;"></span>*@
-        @* </div>*@
-        @* </div>*@
-        @* </div>*@
-        @* <div class="d-flex flex-column gap-1">*@
-        @* <div class="analysisTitle">@Messages(constants.View.COLLECTION_OWNER_TITLE)</div>*@
-        @* <div class="analysisValue">@topRightCard.owners</div>*@
-        @* </div>*@
+        }
+
     </div>
 </div>
+<div class="hidden" id="saleOptionModal">
+    @views.html.sale.saleOption(s"${collection.id}")
+</div>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/sale/sale.js")"></script>

@@ -149,4 +149,12 @@ object FormConstraint {
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })
+
+  val editPublicListing: Constraint[publicListing.EditPublicListing.Data] = Constraint("constraints.EditPublicListing")({ editPublicListingData: publicListing.EditPublicListing.Data =>
+    val errors = Seq(
+      if (editPublicListingData.startEpoch >= editPublicListingData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
+      if (editPublicListingData.startEpoch < (utilities.Date.currentEpoch - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
 }

@@ -65,7 +65,7 @@ class BlockchainTransactionController @Inject()(
     }
   }
 
-  def sendCoinForm(fromAddress: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def sendCoinForm(fromAddress: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val balance = blockchainBalances.Service.get(fromAddress)
       (for {
@@ -97,8 +97,8 @@ class BlockchainTransactionController @Inject()(
                 fromAddress = sendCoinData.fromAddress,
                 toAddress = sendCoinData.toAddress,
                 amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = sendCoinData.sendCoinAmount)),
-                gasLimit = sendCoinData.gasAmount,
-                gasPrice = sendCoinData.gasPrice,
+                gasLimit = constants.Blockchain.DefaultSendCoinGasAmount,
+                gasPrice = constants.Blockchain.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, sendCoinData.password)),
               )
             } else errors.head.throwFutureBaseException()
@@ -115,5 +115,4 @@ class BlockchainTransactionController @Inject()(
         }
       )
   }
-
 }

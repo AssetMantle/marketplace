@@ -1,6 +1,6 @@
 package models.blockchainTransaction
 
-import akka.actor.Cancellable
+import constants.Scheduler
 import exceptions.BaseException
 import models.Trait._
 import models.common.Coin
@@ -80,8 +80,6 @@ class NFTSales @Inject()(
     NFTSales.logger
   ) {
 
-  private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
-
   object Service {
 
     def add(txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String]): Future[NFTSale] = {
@@ -109,8 +107,10 @@ class NFTSales @Inject()(
 
   object Utility {
 
-    private val txSchedulerRunnable = new Runnable {
-      def run(): Unit = {
+    val scheduler: Scheduler = new Scheduler {
+      val name: String = constants.Scheduler.BLOCKCHAIN_TRANSACTION_NFT_SALE
+
+      def runner(): Unit = {
         val nftSales = Service.getAllPendingStatus
 
         def getTransactions(hashes: Seq[String]) = blockchainTransactions.Service.getByHashes(hashes)
@@ -131,9 +131,6 @@ class NFTSales @Inject()(
         Await.result(forComplete, Duration.Inf)
       }
     }
-
-    def start: Cancellable = actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Scheduler.InitialDelay, delay = constants.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
-
   }
 
 }

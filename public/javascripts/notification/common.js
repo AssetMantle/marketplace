@@ -22,7 +22,7 @@ function convertMillisEpochToLocal(id) {
     element.text(dateTime.toLocaleDateString() + " " + dateTime.toLocaleTimeString());
 }
 
-function onNotificationClick(route) {
+function onNotificationClick(notificationId, route = "") {
     if (route !== "") {
         $.ajax({
             url: route.url,
@@ -42,6 +42,7 @@ function onNotificationClick(route) {
             }
         });
     }
+    markAsRead(notificationId);
 }
 
 function countUnread() {
@@ -81,6 +82,7 @@ function markAsRead(notificationId) {
             statusCode: {
                 200: function () {
                     element.removeClass("unread").addClass("read");
+                    countUnread();
                 },
                 401: function () {
                     console.log("400 response");

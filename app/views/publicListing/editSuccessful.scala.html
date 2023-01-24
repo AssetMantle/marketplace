@@ -1,0 +1,6 @@
+@import controllers.actions.LoginState
+@import views.html.base.modal._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@successModal(heading = constants.View.EDIT_PUBLIC_LISTING_SUCCESS_TITLE, subHeading = constants.View.EDIT_PUBLIC_LISTING_SUCCESS_SUBTITLE)

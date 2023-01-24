@@ -4,10 +4,15 @@ function viewCollections(section) {
     $('#rightContent').html('');
 }
 
-function viewCollection(collectionId) {
+function viewCollection(collectionId, showPublicListing = true) {
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs(collectionId));
-    componentResource('rightContent', jsRoutes.controllers.CollectionController.topRightCard(collectionId));
+    componentResource('rightContent', jsRoutes.controllers.CollectionController.topRightCard(collectionId, showPublicListing));
+    if (showPublicListing) {
+        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection(collectionId, showPublicListing).url, collectionId, "collectionForPublicListing");
+    } else {
+        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection(collectionId, showPublicListing).url, collectionId, "collectionForWhitelistSale");
+    }
 }
 
 function viewWishListCollection(lastPart) {
@@ -41,7 +46,13 @@ function viewPublicListedCollections() {
     $('#rightContent').html('');
 }
 
-function zxsviewProfile(lastPart) {
+function viewWhitelistSaleCollections() {
+    componentResource('centerContent', jsRoutes.controllers.CollectionController.whitelistSaleCollectionsSection());
+    $('#leftContent').html('');
+    $('#rightContent').html('');
+}
+
+function viewProfile(lastPart) {
     let accountId = lastPart.split("/")[0];
     let activeTab = lastPart.split("/")[1];
     componentResource('leftContent', jsRoutes.controllers.ProfileController.profileInfoCard(accountId));

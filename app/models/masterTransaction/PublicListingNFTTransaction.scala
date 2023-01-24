@@ -1,6 +1,6 @@
 package models.masterTransaction
 
-import akka.actor.Cancellable
+import constants.Scheduler
 import exceptions.BaseException
 import models.Trait._
 import models.blockchainTransaction.NFTPublicListing
@@ -89,8 +89,6 @@ class PublicListingNFTTransactions @Inject()(
     PublicListingNFTTransactions.logger
   ) {
 
-  private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
-
   object Service {
 
     def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftIds: Seq[String], publicListingId: String): Future[Unit] = create(nftIds.map(x => PublicListingNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = x, publicListingId = publicListingId, status = None)))
@@ -107,7 +105,7 @@ class PublicListingNFTTransactions @Inject()(
 
     def getTotalPublicListingSold(publicListingId: String): Future[Int] = {
       val nullStatus: Option[Boolean] = null
-      filterAndCount(x => x.publicListingId === publicListingId && x.publicListingId === publicListingId && (x.status.? === nullStatus || x.status))
+      filterAndCount(x => x.publicListingId === publicListingId && (x.status.? === nullStatus || x.status))
     }
 
     def getByTxHash(txHash: String): Future[Seq[PublicListingNFTTransaction]] = filter(_.txHash === txHash)
@@ -170,8 +168,10 @@ class PublicListingNFTTransactions @Inject()(
       } yield updatedNFTSale
     }
 
-    private val txSchedulerRunnable = new Runnable {
-      def run(): Unit = {
+    val scheduler: Scheduler = new Scheduler {
+      val name: String = constants.Scheduler.MASTER_TRANSACTION_NFT_PUBLIC_LISTING
+
+      def runner(): Unit = {
         val nftPublicListingTxs = Service.getAllPendingStatus
 
         def checkAndUpdate(nftPublicListingTxs: Seq[PublicListingNFTTransaction]) = utilitiesOperations.traverse(nftPublicListingTxs.map(_.txHash).distinct) { txHash =>
@@ -240,9 +240,6 @@ class PublicListingNFTTransactions @Inject()(
         Await.result(forComplete, Duration.Inf)
       }
     }
-
-    def start: Cancellable = actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Scheduler.InitialDelay, delay = constants.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
-
   }
 
 }

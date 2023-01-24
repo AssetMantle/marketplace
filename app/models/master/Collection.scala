@@ -128,7 +128,7 @@ class Collections @Inject()(
 
     def totalCreated(creatorId: String): Future[Int] = filterAndCount(_.creatorId === creatorId)
 
-    def total(category: String): Future[Int] = filterAndCount(_.category === category)
+    def totalByCategory(category: String): Future[Int] = filterAndCount(_.category === category)
 
     def getByCreatorAndPage(creatorId: String, pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.creatorId === creatorId)(_.createdOnMillisEpoch).map(_.map(_.deserialize))
 

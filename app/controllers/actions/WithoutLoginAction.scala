@@ -19,7 +19,7 @@ class WithoutLoginAction @Inject()(messagesControllerComponents: MessagesControl
       try {
         f(request)
       } catch {
-        case baseException: BaseException => Results.InternalServerError(views.html.index(failures = Seq(baseException.failure))).withNewSession
+        case baseException: BaseException => Results.InternalServerError(views.html.index()).withNewSession
       }
     }
   }

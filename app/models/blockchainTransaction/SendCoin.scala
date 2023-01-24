@@ -1,5 +1,6 @@
 package models.blockchainTransaction
 
+import constants.Scheduler
 import exceptions.BaseException
 import models.Trait._
 import models.common.Coin
@@ -92,8 +93,6 @@ class SendCoins @Inject()(
     SendCoins.logger
   ) {
 
-  private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
-
   object Service {
 
     def add(accountId: String, txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String]): Future[SendCoin] = {
@@ -158,8 +157,10 @@ class SendCoins @Inject()(
       } yield updatedSendCoin
     }
 
-    private val txSchedulerRunnable = new Runnable {
-      def run(): Unit = {
+    val scheduler: Scheduler = new Scheduler {
+      val name: String = constants.Scheduler.BLOCKCHAIN_TRANSACTION_SEND_COIN
+
+      def runner(): Unit = {
         val sendCoins = Service.getAllPendingStatus
 
         def checkAndUpdate(sendCoins: Seq[SendCoin]) = utilitiesOperations.traverse(sendCoins) { sendCoin =>
@@ -184,8 +185,6 @@ class SendCoins @Inject()(
         Await.result(forComplete, Duration.Inf)
       }
     }
-
-    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Scheduler.InitialDelay, delay = constants.Scheduler.FixedDelay)(txSchedulerRunnable)(schedulerExecutionContext)
 
   }
 

@@ -46,9 +46,18 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.account.signUp(formWithErrors)))
         },
         signUpData => {
-          val addAccount = masterAccounts.Service.upsertOnSignUp(username = signUpData.username, lang = request.lang, accountType = constants.Account.Type.USER)
+          val checkVerifiedKeyExists = masterKeys.Service.checkVerifiedKeyExists(signUpData.username)
           val wallet = utilities.Wallet.getRandomWallet
-          val deleteUnverifiedKeys = masterKeys.Service.deleteUnverifiedKeys(signUpData.username)
+
+          def addMasterAccount(checkVerifiedKeyExists: Boolean) = if (!checkVerifiedKeyExists) {
+            val addAccount = masterAccounts.Service.upsertOnSignUp(username = signUpData.username, lang = request.lang, accountType = constants.Account.Type.USER)
+            val deleteUnverifiedKeys = masterKeys.Service.deleteUnverifiedKeys(signUpData.username)
+
+            for {
+              _ <- addAccount
+              _ <- deleteUnverifiedKeys
+            } yield ()
+          } else constants.Response.USERNAME_UNAVAILABLE.throwFutureBaseException()
 
           def addKey() = masterKeys.Service.addOnSignUp(
             accountId = signUpData.username,
@@ -62,8 +71,8 @@ class AccountController @Inject()(
             verified = None)
 
           (for {
-            _ <- addAccount
-            _ <- deleteUnverifiedKeys
+            checkVerifiedKeyExists <- checkVerifiedKeyExists
+            _ <- addMasterAccount(checkVerifiedKeyExists)
             _ <- addKey()
           } yield PartialContent(views.html.account.showWalletMnemonics(username = signUpData.username, address = wallet.address, partialMnemonics = wallet.mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
             ).recover {
@@ -81,7 +90,7 @@ class AccountController @Inject()(
     implicit request =>
       VerifyMnemonics.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.account.verifyWalletMnemonics(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CONFIRM_USERNAME.name, ""), formWithErrors.data.getOrElse(constants.FormField.WALLET_ADDRESS.name, ""))))
+          Future(BadRequest(views.html.account.verifyWalletMnemonics(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CONFIRM_USERNAME.name, ""))))
         },
         walletMnemonicsData => {
           val key = masterKeys.Service.tryGetActive(walletMnemonicsData.username)
@@ -103,7 +112,7 @@ class AccountController @Inject()(
             result <- updateAndGetResult(key)
           } yield result
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.account.verifyWalletMnemonics(walletMnemonicsForm = VerifyMnemonics.form.withGlobalError(baseException.failure.message), username = walletMnemonicsData.username, address = walletMnemonicsData.walletAddress))
+            case baseException: BaseException => BadRequest(views.html.account.verifyWalletMnemonics(walletMnemonicsForm = VerifyMnemonics.form.withGlobalError(baseException.failure.message), username = walletMnemonicsData.username))
           }
         }
       )
@@ -264,9 +273,9 @@ class AccountController @Inject()(
             _ <- pushNotificationTokenDelete
             _ <- deleteSessionToken
             _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.LOG_OUT)()
-          } yield Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
+          } yield Ok(views.html.index()).withNewSession
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index())
           }
         }
       )

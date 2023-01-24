@@ -1,18 +1,18 @@
 package models.masterTransaction
 
+import constants.Scheduler
 import exceptions.BaseException
-import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
+import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.{Duration, DurationInt}
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class SessionToken(accountId: String, sessionTokenHash: String, sessionTokenTime: Long, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged with Entity[String] {
+case class SessionToken(accountId: String, sessionTokenHash: String, sessionTokenTime: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
   def id: String = accountId
 }
 
@@ -24,7 +24,7 @@ object SessionTokens {
 
   class SessionTokenTable(tag: Tag) extends Table[SessionToken](tag, "SessionToken") with ModelTable[String] {
 
-    def * = (accountId, sessionTokenHash, sessionTokenTime, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SessionToken.tupled, SessionToken.unapply)
+    def * = (accountId, sessionTokenHash, sessionTokenTime, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SessionToken.tupled, SessionToken.unapply)
 
     def accountId = column[String]("accountId", O.PrimaryKey)
 
@@ -34,15 +34,11 @@ object SessionTokens {
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
     override def id = accountId
   }
@@ -62,8 +58,6 @@ class SessionTokens @Inject()(
     SessionTokens.module,
     SessionTokens.logger
   ) {
-
-  private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   object Service {
 
@@ -97,21 +91,23 @@ class SessionTokens @Inject()(
 
   }
 
-  private val runnable = new Runnable {
-    def run(): Unit = {
-      val ids = Service.getTimedOutIDs
+  object Utility {
+    val scheduler: Scheduler = new Scheduler {
+      val name: String = constants.Scheduler.MASTER_TRANSACTION_SESSION_TOKEN
 
-      def deleteSessionTokens(ids: Seq[String]) = Service.deleteMultiple(ids)
+      def runner(): Unit = {
+        val ids = Service.getTimedOutIDs
 
-      val forComplete = (for {
-        ids <- ids
-        _ <- deleteSessionTokens(ids)
-      } yield ()).recover {
-        case baseException: BaseException => logger.error(baseException.failure.message)
+        def deleteSessionTokens(ids: Seq[String]) = Service.deleteMultiple(ids)
+
+        val forComplete = (for {
+          ids <- ids
+          _ <- deleteSessionTokens(ids)
+        } yield ()).recover {
+          case baseException: BaseException => logger.error(baseException.failure.message)
+        }
+        Await.result(forComplete, Duration.Inf)
       }
-      Await.result(forComplete, Duration.Inf)
     }
   }
-
-  actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.CommonConfig.SessionTokenTimeout.milliseconds, delay = constants.CommonConfig.SessionTokenTimeout.milliseconds)(runnable)(schedulerExecutionContext)
 }

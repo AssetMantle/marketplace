@@ -1,5 +1,6 @@
 package controllers
 
+import akka.actor.CoordinatedShutdown
 import controllers.actions._
 import controllers.result.WithUsernameToken
 import models.{blockchainTransaction, history, masterTransaction}
@@ -21,24 +22,26 @@ class IndexController @Inject()(
                                  withoutLoginAction: WithoutLoginAction,
                                  withUsernameToken: WithUsernameToken,
                                  starter: Starter,
-                                 // Do not delete, need to initialize object to start the scheduler
+                                 coordinatedShutdown: CoordinatedShutdown,
                                  historyMasterSales: history.MasterSales,
                                  historyMasterPublicListings: history.MasterPublicListings,
                                  nftPublicListings: blockchainTransaction.NFTPublicListings,
+                                 sendCoins: blockchainTransaction.SendCoins,
                                  nftSales: blockchainTransaction.NFTSales,
                                  publicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
                                  saleNFTTransactions: masterTransaction.SaleNFTTransactions,
+                                 masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.INDEX_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)
+  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
 
   def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.collection.viewPublicListedCollections()))
+      Future(Ok(views.html.index()))
   }
 
   def sitemap: EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), Duration(7, DAYS)) {
@@ -47,13 +50,17 @@ class IndexController @Inject()(
     }
   }
 
-  historyMasterPublicListings.Utility.start
-  nftPublicListings.Utility.start
-  publicListingNFTTransactions.Utility.start
+  utilities.Scheduler.startSchedulers(
+    historyMasterPublicListings.Utility.scheduler,
+    nftPublicListings.Utility.scheduler,
+    publicListingNFTTransactions.Utility.scheduler,
+    historyMasterSales.Utility.scheduler,
+    saleNFTTransactions.Utility.scheduler,
+    nftSales.Utility.scheduler,
+    masterTransactionSessionTokens.Utility.scheduler,
+    sendCoins.Utility.scheduler
+  )
 
-  historyMasterSales.Utility.start
-  saleNFTTransactions.Utility.start
-  nftSales.Utility.start
-
-//  starter.start()
+  coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())
+  //    starter.start()
 }

@@ -10,10 +10,9 @@ document.onload = function () {
 }
 
 function loadMoreCollections() {
-    let activeTab = $('.active').attr('id').slice(0, -4);
     if ($(".noCollection").length === 0) {
-        let route = jsRoutes.controllers.CollectionController.collectionsPerPage(activeTab, $(".collectionPage").length + 1);
-        let loadMore = $("#collectionsPerPage_" + activeTab);
+        let route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1);
+        let loadMore = $("#collectionsPerPage");
         $.ajax({
             url: route.url,
             type: route.type,
@@ -40,19 +39,9 @@ function loadCollectionOnScroll() {
     }, 300);
 }
 
-function loadFirstCollections(){
+function loadFirstCollections() {
     loadMoreCollections();
-    if($(document).height() > 900){
+    if ($(document).height() > 900) {
         setTimeout(loadMoreCollections, 1000);
-    }
-}
-
-function setMintedNFTProgressBar(){
-    let progressBar = document.querySelector('.progressBar > span');
-    let totalNFTs = progressBar.getAttribute("data-totalNFT");
-    let mintedNFTs = progressBar.getAttribute("data-mintedNFT");
-    let progress = (mintedNFTs*100) / totalNFTs;
-    for(let i = 0; i < progress; i++) {
-        progressBar.style.width = i + '%';
     }
 }

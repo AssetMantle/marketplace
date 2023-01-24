@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 
-@(category: String, totalCollections: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(totalCollections: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 @if(totalCollections > 0) {
     <div class="mt-2 mb-0 item item-center collectionContainer">
@@ -8,7 +8,7 @@
             <div class="profiles-container">
 
                 <div class="profile-list">
-                    <div id="collectionsPerPage_@category" class="w-100 list grid-view-filter collectionsPerPage"></div>
+                    <div id="collectionsPerPage" class="w-100 list grid-view-filter collectionsPerPage"></div>
                 </div>
 
                 <div class="loadMoreElement show">

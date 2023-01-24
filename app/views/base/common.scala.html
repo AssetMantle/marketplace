@@ -1,9 +1,16 @@
 @import controllers.actions.LoginState
 
-@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+@(title: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <script async src="@utilities.PublicResource.getVersionedRoute("javascripts/library/googleAnalytic.js")"></script>
+        <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-8GXYHCBVG6');
+        </script>
         <link href="@routes.Assets.versioned("images/favicon.ico")" rel="icon"/>
         <metaList charset="utf-8"></metaList>
         <metaList http-equiv="x-ua-compatible" content="ie=edge"></metaList>
@@ -97,36 +104,24 @@
                     </div>
                     <ul class="links">
                         <li>
-                            <a class="desktop-link">
-                                <span class="newFeatureIcon">@Messages(constants.View.NEW_LABEL)</span>
-                                @Messages(constants.View.EXPLORE)
+                            <a href="@routes.CollectionController.viewCollections()">
+                            @Messages(constants.View.EXPLORE)
                             </a>
-                            <input type="checkbox" id="show-features3">
-                            <label for="show-features3">@Messages(constants.View.EXPLORE)</label>
-                            <ul class="submenu">
-                                <li class="mainMenuItem">
-                                    <a class="d-flex flex-row align-items-center gap-3">
-                                        <i class="bi bi-ui-radios-grid iconDefault"></i>
-                                        <div class="profileMenuLabel">@Messages(constants.View.LAUNCHPAD_MENU)</div>
-                                    </a>
-                                </li>
-                                <li class="submenuItem">
-                                    <a class="d-flex flex-row align-items-center gap-3" href="@routes.CollectionController.viewPublicListedCollections()">
-                                        <i class="bi bi-clock-history iconDefault"></i>
-                                        <div class="profileMenuLabel">@Messages(constants.View.EARLY_ACCESS_MENU)</div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="d-flex flex-row align-items-center gap-3" href="@routes.CollectionController.viewCollections(constants.View.DEFAULT_COLLECTION_SECTION)">
-                                        <i class="bi bi-folder2-open iconDefault"></i>
-                                        <div class="profileMenuLabel">@Messages(constants.View.ALL_COLLECTION_MENU)</div>
-                                    </a>
-                                </li>
-                            </ul>
+                        </li>
+                        <li>
+                            <a href="@routes.CollectionController.viewPublicListedCollections()">
+                                <span class="newFeatureIcon">@Messages(constants.View.NEW_LABEL)</span>
+                                @Messages(constants.View.EARLY_ACCESS_MENU)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="@routes.CollectionController.viewWhitelistSaleCollections()">
+                            @Messages(constants.View.LAUNCHPAD_MENU)
+                            </a>
                         </li>
                         <li>
                             <a class="desktop-link">
-                                @Messages(constants.View.CREATE)
+                            @Messages(constants.View.CREATE)
                             </a>
                             <input type="checkbox" id="show-features2">
                             <label for="show-features2">@Messages(constants.View.CREATE)</label>
@@ -208,7 +203,7 @@
                         <ul class="d-flex flex-row gap-2 align-items-center mb-0 links">
                             <li id="userNotification" class="menuItem menuIcon" onmouseover="showNotification();" onmouseleave="closeWallet();">
                                 <div id="notificationPopup" class="notificationPopup popupContainer">
-                                    @views.html.notification.commonNotificationPopup()(requestHeader, messagesProvider, loginState)
+                                @views.html.notification.commonNotificationPopup()(requestHeader, messagesProvider, loginState)
                                 </div>
                                 <a class="desktop-link" target="_blank">
                                     <div id="totalUnreadNotification"></div>
@@ -217,7 +212,7 @@
                             </li>
                             <li id="userWallet" class="menuItem menuIcon" onmouseover="showWallet();" onmouseleave="closeWallet();">
                                 <div id="walletPopup" class="walletPopup popupContainer">
-                                    @views.html.base.commonWalletPopup()(requestHeader, messagesProvider, loginState)
+                                @views.html.base.commonWalletPopup()(requestHeader, messagesProvider, loginState)
                                 </div>
                                 <a class="desktop-link" href="@routes.ProfileController.viewProfile(loginState.username, constants.View.COLLECTED)">
                                     <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="35" height="35"/>
@@ -257,6 +252,16 @@
             </div>
         </div>
     </body>
-    <script src="@routes.Assets.versioned("javascripts/menu.js")"></script>
+    @if(constants.CommonConfig.WebAppUrl == "https://staging.marketplace.assetmantle.one") {
+        <script>
+                setKeplrConfigParameters('@constants.Blockchain.Name', '@constants.Blockchain.RPCEndPoint', '@constants.Blockchain.RestEndPoint', '@constants.Blockchain.ChainId')
+        </script>
+    }
+    @if(constants.CommonConfig.WebAppUrl == "https://marketplace.assetmantle.one") {
+        <script>
+                setKeplrConfigParameters('@constants.Blockchain.Name', "https://rpc.assetmantle.one", "https://rest.assetmantle.one", '@constants.Blockchain.ChainId')
+        </script>
+    }
+    <script>setKeplrConfigParameters('@constants.Blockchain.Name', '@constants.Blockchain.RPCEndPoint', '@constants.Blockchain.RestEndPoint', '@constants.Blockchain.ChainId', '@constants.Blockchain.StakingToken')</script>
 </html>
 
