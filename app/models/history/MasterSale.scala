@@ -103,7 +103,7 @@ class MasterSales @Inject()(
 
   object Service {
 
-    def add(masterSale: MasterSale): Future[String] = create(masterSale.serialize())
+    def insertOrUpdate(masterSale: MasterSale): Future[Unit] = upsert(masterSale.serialize())
 
     def add(masterSales: Seq[MasterSale]): Future[Unit] = create(masterSales.map(_.serialize()))
 
@@ -126,7 +126,7 @@ class MasterSales @Inject()(
         val expiredSales = sales.Service.getExpiredSales
 
         def deleteExpiredSales(expiredSales: Seq[master.Sale]) = utilitiesOperations.traverse(expiredSales) { expiredSale =>
-          val addToHistory = Service.add(expiredSale.toHistory)
+          val addToHistory = Service.insertOrUpdate(expiredSale.toHistory)
 
           def markSaleNull = masterNFTOwners.Service.markSaleNull(expiredSale.id)
 
