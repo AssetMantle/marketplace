@@ -55,5 +55,5 @@ class IndexController @Inject()(
   saleNFTTransactions.Utility.start
   nftSales.Utility.start
 
-  starter.start()
+//  starter.start()
 }
