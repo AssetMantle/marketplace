@@ -783,13 +783,13 @@
             }
           }
           &.ended{
-            @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--disable));
+            @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--default));
             .statusDotEmitter {
               background-color: var(--error);
             }
           }
           &.soldOut{
-            @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--disable));
+            @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--default));
             .statusDotWrapper {
               display: none;
             }
