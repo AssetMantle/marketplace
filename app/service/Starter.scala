@@ -86,8 +86,21 @@ class Starter @Inject()(
   def verifyNFT(nft: NFT, collection: Collection): Boolean = {
     if (collection.properties.isEmpty && nft.properties.isEmpty) true
     else {
-      val propertiesName = collection.properties.get.map(_.name)
-      nft.properties.map(x => propertiesName.contains(x.name)).forall(identity) && nft.properties.length == collection.properties.get.length
+      val collectionPropertiesNames = collection.properties.get.map(_.name)
+      val nftPropertiesNames = nft.properties.map(_.name)
+      val a = nftPropertiesNames.map(x => collectionPropertiesNames.contains(x)).forall(identity)
+      val b = nft.properties.length == collection.properties.get.length
+      val c = collectionPropertiesNames.map(x => nftPropertiesNames.contains(x)).forall(identity)
+      val d = nft.properties.map(x => {
+        val e = collection.properties.get.find(_.name == x.name)
+        e.fold(false)(y => {
+          if (y.`type` == constants.NFT.Data.DECIMAL) Try(BigDecimal(x.`value`)).isSuccess
+          else if (y.`type` == constants.NFT.Data.BOOLEAN) (x.`value` == constants.NFT.Data.SMALL_TRUE || x.`value` == constants.NFT.Data.TRUE || x.`value` == constants.NFT.Data.SMALL_FALSE || x.`value` == constants.NFT.Data.FALSE)
+          else if (y.`type` == constants.NFT.Data.STRING) true
+          else false
+        })
+      }).forall(identity)
+      a && b && c && d
     }
   }
 
