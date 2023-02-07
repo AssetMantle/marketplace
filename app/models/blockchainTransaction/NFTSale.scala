@@ -80,8 +80,6 @@ class NFTSales @Inject()(
     NFTSales.logger
   ) {
 
-  private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
-
   object Service {
 
     def add(txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String]): Future[NFTSale] = {
@@ -101,9 +99,9 @@ class NFTSales @Inject()(
 
     def getAllPendingStatus: Future[Seq[NFTSale]] = filter(_.status.?.isEmpty).map(_.map(_.deserialize))
 
-    def markSuccess(txHashes: Seq[String]): Future[Int] = customUpdate(NFTPublicListings.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(true))
+    def markSuccess(txHashes: Seq[String]): Future[Int] = customUpdate(NFTSales.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(true))
 
-    def markFailed(txHashes: Seq[String]): Future[Int] = customUpdate(NFTPublicListings.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(false))
+    def markFailed(txHashes: Seq[String]): Future[Int] = customUpdate(NFTSales.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(false))
 
   }
 

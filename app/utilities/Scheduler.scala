@@ -21,7 +21,8 @@ object Scheduler {
   def shutdownThread(name: String): Unit = {
     val cancellable = SchedulersCancellable.get(name)
     if (cancellable.isDefined) {
-      if (cancellable.get.cancel()) logger.info("Successfully shutdown thread: " + name) else logger.error("Failed to shutdown thread: " + name)
+      val keysList = SchedulersCancellable.keys.toSeq
+      if (cancellable.get.cancel()) logger.info(s"Successfully shutdown thread (${keysList.indexOf(name) + 1}/${keysList.length}): $name") else logger.error("Failed to shutdown thread: " + name)
     } else logger.error("Thread not found: " + name)
   }
 
@@ -32,6 +33,5 @@ object Scheduler {
   }
 
   def startSchedulers(schedulers: Scheduler*)(implicit executionContext: ExecutionContext): Unit = schedulers.foreach(x => SchedulersCancellable += (x.name -> x.start()))
-
 
 }

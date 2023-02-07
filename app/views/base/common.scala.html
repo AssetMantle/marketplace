@@ -4,6 +4,13 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <script async src="@utilities.PublicResource.getVersionedRoute("javascripts/library/googleAnalytic.js")"></script>
+        <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-8GXYHCBVG6');
+        </script>
         <link href="@routes.Assets.versioned("images/favicon.ico")" rel="icon"/>
         <metaList charset="utf-8"></metaList>
         <metaList http-equiv="x-ua-compatible" content="ie=edge"></metaList>
@@ -109,12 +116,12 @@
                         </li>
                         <li>
                             <a href="@routes.CollectionController.viewWhitelistSaleCollections()">
-                                @Messages(constants.View.LAUNCHPAD_MENU)
+                            @Messages(constants.View.LAUNCHPAD_MENU)
                             </a>
                         </li>
                         <li>
                             <a class="desktop-link">
-                                @Messages(constants.View.CREATE)
+                            @Messages(constants.View.CREATE)
                             </a>
                             <input type="checkbox" id="show-features2">
                             <label for="show-features2">@Messages(constants.View.CREATE)</label>
@@ -139,16 +146,6 @@
                                 </li>
                             </ul>
                         </li>
-                        <li>
-                            <a class="desktop-link">@Messages(constants.View.SUPPORT)</a>
-                            <input type="checkbox" id="show-features3">
-                            <label for="show-features3">@Messages(constants.View.SUPPORT)</label>
-                            <ul>
-                                <li>
-                                    <div class="disable">@Messages(constants.View.COMING_SOON)</div>
-                                </li>
-                            </ul>
-                        </li>
                         @optionalLoginState match {
                             case Some(loginState) => {
                                 <div class="hiddenMenu">
@@ -161,9 +158,17 @@
                                         </label>
                                         <ul>
                                             <li>
+                                                <div>
+                                                    <div class="d-flex justify-content-around text-center p-3 buttons">
+                                                        <a href="https://wallet.assetmantle.one" target="_blank" class="p-0"><button class="secondaryButton">@Messages(constants.View.FUND_WALLET)</button></a>
+                                                        @views.html.base.buttons.commonFormButton(constants.Form.SEND_COIN, Symbol("parameters") -> s"'${loginState.address}'", Symbol("class") -> "primaryButton")
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
                                                 <a href="@routes.ProfileController.viewProfile(loginState.username, constants.View.COLLECTED)" class="d-flex flex-row align-items-center gap-3">
                                                     <i class="bi bi-person iconDefault"></i>
-                                                    <div class="profileMenuLabel">@Messages(constants.View.PROFILE)</div>
+                                                    <div class="profileMenuLabel">@Messages(constants.View.NFT_WALLET)</div>
                                                 </a>
                                             </li>
                                             <li>
@@ -196,7 +201,7 @@
                         <ul class="d-flex flex-row gap-2 align-items-center mb-0 links">
                             <li id="userNotification" class="menuItem menuIcon" onmouseover="showNotification();" onmouseleave="closeWallet();">
                                 <div id="notificationPopup" class="notificationPopup popupContainer">
-                                    @views.html.notification.commonNotificationPopup()(requestHeader, messagesProvider, loginState)
+                                @views.html.notification.commonNotificationPopup()(requestHeader, messagesProvider, loginState)
                                 </div>
                                 <a class="desktop-link" target="_blank">
                                     <div id="totalUnreadNotification"></div>
@@ -205,7 +210,7 @@
                             </li>
                             <li id="userWallet" class="menuItem menuIcon" onmouseover="showWallet();" onmouseleave="closeWallet();">
                                 <div id="walletPopup" class="walletPopup popupContainer">
-                                    @views.html.base.commonWalletPopup()(requestHeader, messagesProvider, loginState)
+                                @views.html.base.commonWalletPopup()(requestHeader, messagesProvider, loginState)
                                 </div>
                                 <a class="desktop-link" href="@routes.ProfileController.viewProfile(loginState.username, constants.View.COLLECTED)">
                                     <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="35" height="35"/>
@@ -234,6 +239,9 @@
             <div class="modal-dialog modal-dialog-centered modal-md" role="document">
                 <div class="modal-content" id="modal-content">
                 </div>
+                <div id="modalSpinner">
+                    <span class="spinner"></span>
+                </div>
             </div>
         </div>
 
@@ -245,6 +253,16 @@
             </div>
         </div>
     </body>
-    <script src="@routes.Assets.versioned("javascripts/menu.js")"></script>
+    @if(constants.CommonConfig.WebAppUrl == "https://staging.marketplace.assetmantle.one") {
+        <script>
+                setKeplrConfigParameters('@constants.Blockchain.Name', '@constants.Blockchain.RPCEndPoint', '@constants.Blockchain.RestEndPoint', '@constants.Blockchain.ChainId')
+        </script>
+    }
+    @if(constants.CommonConfig.WebAppUrl == "https://marketplace.assetmantle.one") {
+        <script>
+                setKeplrConfigParameters('@constants.Blockchain.Name', "https://rpc.assetmantle.one", "https://rest.assetmantle.one", '@constants.Blockchain.ChainId')
+        </script>
+    }
+    <script>setKeplrConfigParameters('@constants.Blockchain.Name', '@constants.Blockchain.RPCEndPoint', '@constants.Blockchain.RestEndPoint', '@constants.Blockchain.ChainId', '@constants.Blockchain.StakingToken')</script>
 </html>
 

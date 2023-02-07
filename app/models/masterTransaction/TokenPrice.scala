@@ -1,21 +1,14 @@
 package models.masterTransaction
 
-import akka.actor.ActorSystem
-import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import slick.jdbc.H2Profile.api._
-import play.api.db.slick.DatabaseConfigProvider
-import play.api.{Configuration, Logger}
 import play.db.NamedDatabase
-import slick.jdbc.JdbcProfile
+import slick.jdbc.H2Profile.api._
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 case class TokenPrice(serial: Int = 0, denom: String, price: Double, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged with Entity[Int] {
   def id: Int = serial

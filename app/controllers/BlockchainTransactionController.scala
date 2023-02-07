@@ -65,7 +65,7 @@ class BlockchainTransactionController @Inject()(
     }
   }
 
-  def sendCoinForm(fromAddress: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def sendCoinForm(fromAddress: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val balance = blockchainBalances.Service.get(fromAddress)
       (for {
@@ -115,5 +115,4 @@ class BlockchainTransactionController @Inject()(
         }
       )
   }
-
 }

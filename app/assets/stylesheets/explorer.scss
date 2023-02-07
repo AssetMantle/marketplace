@@ -94,7 +94,7 @@
   .nft-likes{
     color: var(--gray);
   }
-  .liveBadge{
+  .badge{
     @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--default));
     text-transform: uppercase;
   }
@@ -783,13 +783,13 @@
             }
           }
           &.ended{
-            @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--disable));
+            @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--default));
             .statusDotEmitter {
               background-color: var(--error);
             }
           }
           &.soldOut{
-            @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--disable));
+            @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--default));
             .statusDotWrapper {
               display: none;
             }
@@ -893,18 +893,6 @@
 
     &::placeholder {
       color: var(--inactive-gray);
-    }
-
-    &::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-    }
-
-    &::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
     }
   }
 }

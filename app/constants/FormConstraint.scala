@@ -97,6 +97,7 @@ object FormConstraint {
   val createCollectionConstraint: Constraint[collection.Create.Data] = Constraint("constraints.CreateCollection")({ createData: collection.Create.Data =>
     val errors = Seq(
       if (!createData.termsAccepted) Option(ValidationError(constants.Response.TERMS_AND_CONDITION_NOT_ACCEPTED.message)) else None,
+      if (!createData.mou) Option(ValidationError(constants.Response.MOU_NOT_ACCEPTED.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })

@@ -26,7 +26,7 @@
         </div>
     </div>
     <div class="d-flex justify-content-around text-center mt-3 buttons">
-        <a href="https://app.osmosis.zone/?from=USDC&to=MNTL" target="_blank"><button class="secondaryButton">@Messages(constants.View.BUY_MORE)</button></a>
+        <a href="https://wallet.assetmantle.one" target="_blank"><button class="secondaryButton">@Messages(constants.View.FUND_WALLET)</button></a>
         @commonFormButton(constants.Form.SEND_COIN, Symbol("parameters") -> s"'${loginState.address}'", Symbol("class") -> "primaryButton")
     </div>
     <div class="separator"></div>
@@ -36,7 +36,7 @@
             <div class="menuItem">
                 <a href="@routes.ProfileController.viewProfile(loginState.username, constants.View.COLLECTED)" class="d-flex gap-3">
                     <i class="bi bi-person iconDefault icon"></i>
-                    <div class="profileMenuLabel">@Messages(constants.View.PROFILE)</div>
+                    <div class="profileMenuLabel">@Messages(constants.View.NFT_WALLET)</div>
                 </a>
             </div>
             <div class="innerSeparator"></div>

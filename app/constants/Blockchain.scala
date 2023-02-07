@@ -28,6 +28,10 @@ object Blockchain {
   val MediumGasPrice: Double = CommonConfig.Blockchain.MediumGasPrice
   val HighGasPrice: Double = CommonConfig.Blockchain.HighGasPrice
 
+  val Name: String = CommonConfig.Blockchain.name
+  val RestEndPoint: String = CommonConfig.Blockchain.RestEndPoint
+  val RPCEndPoint: String = CommonConfig.Blockchain.RPCEndPoint
+
 
   object Account {
     val BASE = "/cosmos.auth.v1beta1.BaseAccount"

@@ -751,6 +751,7 @@
             }
           }
           .notificationDetail{
+            cursor: pointer;
             .title{
               @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--default));
               text-transform: capitalize;
@@ -892,6 +893,41 @@ body.modal-open{
 }
 #commonModal{
   padding-right: 0px !important;
+  #modalSpinner{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 32px 32px 32px 0px;
+    background-color: #21211E;
+    border-radius: 10px;
+    border: 2px solid #282826;
+    height: fit-content;
+    width: 100%;
+    display: none;
+    }
+    .spinner{
+      position: relative;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: inline-block;
+      border-top: 3px solid var(--dark);
+      border-right: 3px solid transparent;
+      -webkit-animation: rotation 1s linear infinite;
+      animation: rotation 1s linear infinite;
+      @-webkit-keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+    }
+  }
 }
 #commonModal::-webkit-scrollbar{
   display: none;
@@ -1001,68 +1037,6 @@ body.modal-open{
       margin: auto;
       object-fit: contain;
       aspect-ratio: 1/1;
-    }
-  }
-}
-
-// Dropdown Menu
-.dropDownContainer {
-  position: relative;
-  overflow: hidden;
-  .dropDownItem {
-    position: relative;
-    transition: 0.3s ease-out;
-    .panel {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out;
-      a {
-        @include setFont(var(--font-type-1), normal, 500, 14px, 30px, var(--mantle-off-white));
-        text-transform: capitalize;
-        padding: 12px 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: block;
-        &:hover {
-          font-weight: bold;
-        }
-      }
-    }
-    button.accordionMenu {
-      background-color: transparent;
-      text-transform: capitalize;
-      cursor: pointer;
-      width: 100%;
-      transition: max-height 0.3s ease-out;
-      text-align: left;
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      grid-gap: 16px;
-      border:none;
-      padding: 12px 10px;
-      h4 {
-        @include setFont(var(--font-type-1), normal, 500, 14px, 30px, var(--mantle-off-white));
-        display: inline-block;
-      }
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.08);
-      }
-      .arrowIcon {
-        transition: 0.3s ease-out;
-        transform: rotate(0deg);
-      }
-    }
-    &.active {
-      button.accordionMenu {
-        background-color: rgba(0, 0, 0, 0.164);
-        .arrowIcon {
-          transform: rotate(90deg);
-        }
-        &:hover {
-          background-color: rgba(0, 0, 0, 0.32);
-        }
-      }
     }
   }
 }

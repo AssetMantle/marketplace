@@ -6,7 +6,7 @@
 
 
     @if(loginState.fold("")(_.username) == collection.creatorId && pageNumber == 1) {
-        <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 col-xxl-3 mt-3 createNFTCard" onclick="getForm(jsRoutes.controllers.NFTController.uploadNFTFileForm('@collection.id'))">
+        <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 createNFTCard" onclick="getForm(jsRoutes.controllers.NFTController.uploadNFTFileForm('@collection.id'))">
             <div class="card border-0 h-100 d-flex justify-content-between" style="cursor: pointer;">
                 <div class="createNFTBadge">
                     <img src="@routes.Assets.versioned("images/icon/createBadge.png")"/>
