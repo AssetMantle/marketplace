@@ -73,6 +73,7 @@ class SaleNFTTransactions @Inject()(
                                      utilitiesOperations: utilities.Operations,
                                      getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
                                      getAccount: queries.blockchain.GetAccount,
+                                     getAbciInfo: queries.blockchain.GetABCIInfo,
                                      masterNFTOwners: master.NFTOwners,
                                      collectionsAnalysis: analytics.CollectionsAnalysis,
                                      masterNFTs: master.NFTs,
@@ -123,28 +124,32 @@ class SaleNFTTransactions @Inject()(
       val nullStatus: Option[Boolean] = null
       filterAndCount(x => x.saleId === saleId && (x.status.? === nullStatus || x.status))
     }
+
+    def checkAnyPendingTx(saleIDs: Seq[String]): Future[Seq[String]] = customQuery(SaleNFTTransactions.TableQuery.filter(_.saleId.inSet(saleIDs)).map(_.saleId).distinct.result)
   }
 
   object Utility {
     def transaction(buyerAccountId: String, sellerAccountId: String, nftIds: Seq[String], saleId: String, fromAddress: String, toAddress: String, amount: MicroNumber, gasPrice: BigDecimal, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
+      val abciInfo = getAbciInfo.Service.get
       val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount(fromAddress))
       val unconfirmedTxs = getUnconfirmedTxs.Service.get()
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, unconfirmedTxHashes: Seq[String]) = {
+      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Long, unconfirmedTxHashes: Seq[String]) = {
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)))),
           fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = gasLimit),
           gasLimit = gasLimit,
           account = bcAccount,
-          ecKey = ecKey)
+          ecKey = ecKey,
+          timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              nftSale <- blockchainTransactionNFTSales.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), broadcasted = false, status = None, memo = Option(memo))
+              nftSale <- blockchainTransactionNFTSales.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), status = None, memo = Option(memo))
               _ <- Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, saleId = saleId)
             } yield nftSale
           }
@@ -158,20 +163,23 @@ class SaleNFTTransactions @Inject()(
 
       def broadcastTxAndUpdate(nftSale: NFTSale) = {
 
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionNFTSales.Service.updateNFTSale(nftSale.copy(broadcasted = true, status = Option(false), log = Option(errorResponse.get.error.data)))
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionNFTSales.Service.updateNFTSale(nftSale.copy(broadcasted = true, status = Option(false), log = Option(successResponse.get.result.log)))
-        else blockchainTransactionNFTSales.Service.updateNFTSale(nftSale.copy(broadcasted = true))
+        val broadcastTx = broadcastTxSync.Service.get(nftSale.getTxRawAsHexString)
+
+        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionNFTSales.Service.updateNFTSale(nftSale.copy(status = Option(false), log = Option(errorResponse.get.error.data)))
+        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionNFTSales.Service.updateNFTSale(nftSale.copy(status = Option(false), log = Option(successResponse.get.result.log)))
+        else Future(nftSale)
 
         for {
-          (successResponse, errorResponse) <- broadcastTxSync.Service.get(nftSale.getTxRawAsHexString)
+          (successResponse, errorResponse) <- broadcastTx
           updatedNFTSale <- update(successResponse, errorResponse)
         } yield updatedNFTSale
       }
 
       for {
+        abciInfo <- abciInfo
         bcAccount <- bcAccount
         unconfirmedTxs <- unconfirmedTxs
-        nftSale <- checkMempoolAndAddTx(bcAccount, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        nftSale <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toLong, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
         updatedNFTSale <- broadcastTxAndUpdate(nftSale)
       } yield updatedNFTSale
     }

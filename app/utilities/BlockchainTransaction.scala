@@ -11,8 +11,8 @@ import scala.jdk.CollectionConverters.IterableHasAsJava
 
 object BlockchainTransaction {
 
-  private def getTxRawBytes(messages: Seq[protoBufAny], fee: Coin, gasLimit: Int, account: models.blockchain.Account, ecKey: ECKey, memo: String): Array[Byte] = {
-    val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(messages.asJava).setMemo(memo).build()
+  private def getTxRawBytes(messages: Seq[protoBufAny], fee: Coin, gasLimit: Int, account: models.blockchain.Account, ecKey: ECKey, memo: String, timeoutHeight: Long): Array[Byte] = {
+    val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(messages.asJava).setMemo(memo).setTimeoutHeight(timeoutHeight).build()
 
     val signerInfo = TxOuterClass.SignerInfo.newBuilder()
       .setSequence(account.sequence)
@@ -40,14 +40,15 @@ object BlockchainTransaction {
     txRaw.toByteArray
   }
 
-  def getTxRawBytesWithSignedMemo(messages: Seq[protoBufAny], fee: Coin, gasLimit: Int, account: models.blockchain.Account, ecKey: ECKey): (Array[Byte], String) = {
+  def getTxRawBytesWithSignedMemo(messages: Seq[protoBufAny], fee: Coin, gasLimit: Int, account: models.blockchain.Account, ecKey: ECKey, timeoutHeight: Long): (Array[Byte], String) = {
     val txRawBytesWithoutMemo = getTxRawBytes(
       messages = messages,
       fee = fee,
       gasLimit = gasLimit,
       account = account,
       ecKey = ecKey,
-      memo = "")
+      memo = "",
+      timeoutHeight = timeoutHeight)
     val memo = utilities.Secrets.base64URLEncoder(utilities.Wallet.ecdsaSign(utilities.Secrets.sha256Hash(txRawBytesWithoutMemo), ECKey.fromPrivate(constants.CommonConfig.MemoSignerWallet.privateKey)))
     (getTxRawBytes(
       messages = messages,
@@ -55,7 +56,8 @@ object BlockchainTransaction {
       gasLimit = gasLimit,
       account = account,
       ecKey = ecKey,
-      memo = memo), memo)
+      memo = memo,
+      timeoutHeight = timeoutHeight), memo)
   }
 
   def memoGenerator(memoPrefix: String): String = utilities.Secrets.base64URLEncoder(utilities.Wallet.hashAndEcdsaSign(memoPrefix, ECKey.fromPrivate(constants.CommonConfig.MemoSignerWallet.privateKey)))

@@ -4,7 +4,7 @@ import constants.Scheduler
 import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, HistoryLogging, ModelTable}
 import models.analytics.CollectionsAnalysis
-import models.master
+import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -87,6 +87,7 @@ class MasterPublicListings @Inject()(
                                       utilitiesOperations: utilities.Operations,
                                       masterNFTOwners: master.NFTOwners,
                                       collectionsAnalysis: CollectionsAnalysis,
+                                      masterTransactionPublicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
                                       protected val databaseConfigProvider: DatabaseConfigProvider
                                     )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[MasterPublicListings.MasterPublicListingTable, MasterPublicListings.MasterPublicListingSerialized, String](
@@ -115,16 +116,18 @@ class MasterPublicListings @Inject()(
       val name: String = constants.Scheduler.HISTORY_MASTER_PUBLIC_LISTING
 
       def runner(): Unit = {
-        val expiredPublicListings = masterPublicListings.Service.getExpiredPublicListings
+        val deletePublicListings = masterPublicListings.Service.getForDeletion
 
-        def deleteExpiredPublicListings(expiredPublicListings: Seq[master.PublicListing]) = utilitiesOperations.traverse(expiredPublicListings) { expiredPublicListing =>
-          val addToHistory = Service.insertOrUpdate(expiredPublicListing.toHistory)
+        def publicListingsWithPendingTx(ids: Seq[String]) = masterTransactionPublicListingNFTTransactions.Service.checkAnyPendingTx(ids)
 
-          def markPublicListingNull = masterNFTOwners.Service.markPublicListingNull(expiredPublicListing.id)
+        def deleteExpiredPublicListings(deletePublicListings: Seq[master.PublicListing]) = utilitiesOperations.traverse(deletePublicListings) { publicListing =>
+          val addToHistory = Service.insertOrUpdate(publicListing.toHistory)
 
-          def deletePublicListing() = masterPublicListings.Service.delete(expiredPublicListing.id)
+          def markPublicListingNull = masterNFTOwners.Service.markPublicListingNull(publicListing.id)
 
-          def updateAnalysis() = collectionsAnalysis.Utility.onPublicListingExpiry(expiredPublicListing.collectionId)
+          def deletePublicListing() = masterPublicListings.Service.delete(publicListing.id)
+
+          def updateAnalysis() = collectionsAnalysis.Utility.onPublicListingExpiry(publicListing.collectionId)
 
           for {
             _ <- addToHistory
@@ -136,8 +139,9 @@ class MasterPublicListings @Inject()(
         }
 
         val forComplete = (for {
-          expiredPublicListings <- expiredPublicListings
-          _ <- deleteExpiredPublicListings(expiredPublicListings)
+          deletePublicListings <- deletePublicListings
+          publicListingsWithPendingTx <- publicListingsWithPendingTx(deletePublicListings.map(_.id))
+          _ <- deleteExpiredPublicListings(deletePublicListings.filterNot(x => publicListingsWithPendingTx.contains(x.id)))
         } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.failure.logMessage)
         }

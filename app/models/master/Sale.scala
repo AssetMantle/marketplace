@@ -16,14 +16,14 @@ case class Sale(id: String, whitelistId: String, collectionId: String, numberOfN
     val currentEpoch = System.currentTimeMillis() / 1000
     if (allSold && currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.Sale.SOLD_OUT // Sold out
     else if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.Sale.LIVE // Live
-    else if (currentEpoch >= this.endTimeEpoch) constants.Sale.EXPIRED // Expired
+    else if (currentEpoch >= this.endTimeEpoch) constants.Sale.ENDED // Expired
     else constants.Sale.NOT_STARTED //
   }
 
   def getStatus: constants.Sale.Status = {
     val currentEpoch = System.currentTimeMillis() / 1000
     if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.Sale.LIVE
-    else if (currentEpoch >= this.endTimeEpoch) constants.Sale.EXPIRED
+    else if (currentEpoch >= this.endTimeEpoch) constants.Sale.ENDED
     else constants.Sale.NOT_STARTED
   }
 
@@ -134,7 +134,7 @@ class Sales @Inject()(
       filter(x => x.startTimeEpoch <= currentEpoch && x.endTimeEpoch > currentEpoch).map(_.map(_.id))
     }
 
-    def getExpiredSales: Future[Seq[Sale]] = filter(_.endTimeEpoch <= utilities.Date.currentEpoch).map(_.map(_.deserialize))
+    def getForDeletion: Future[Seq[Sale]] = filter(_.endTimeEpoch <= (utilities.Date.currentEpoch - constants.Date.DaySeconds)).map(_.map(_.deserialize))
 
     def getIdsCurrentOnSaleByWhitelistIds(whitelistIds: Seq[String]): Future[Seq[String]] = {
       val currentEpoch = utilities.Date.currentEpoch
