@@ -1,6 +1,7 @@
 package service
 
 import models.analytics.CollectionsAnalysis
+import models.common.Collection.SocialProfile
 import models.common.{Collection => commonCollection}
 import models.master.Collection
 import models.{blockchainTransaction, master, masterTransaction}
@@ -141,15 +142,73 @@ class Starter @Inject()(
     } yield ()
   }
 
+  def addValentineNFTs(): Future[Unit] = {
+    val socialProfiles = Seq(
+      SocialProfile(name = constants.Collection.SocialProfile.WEBSITE, url = "https://assetmantle.one/"),
+      SocialProfile(name = constants.Collection.SocialProfile.INSTAGRAM, url = "assetmantle"),
+      SocialProfile(name = constants.Collection.SocialProfile.TWITTER, url = "AssetMantle")
+    )
+    val creatorID = "Mint.E"
+    case class ValentineNFT(fileName: String, name: String, description: String, format: String)
+    val nfts = Seq(
+      ValentineNFT(fileName = "1.jpeg", name = "name1", description = "description1", format = "jpeg"),
+      ValentineNFT(fileName = "2.jpeg", name = "name2", description = "description2", format = "jpeg"),
+      ValentineNFT(fileName = "3.jpeg", name = "name3", description = "description3", format = "jpeg"),
+      ValentineNFT(fileName = "4.jpeg", name = "name4", description = "description4", format = "jpeg"),
+      ValentineNFT(fileName = "5.jpeg", name = "name5", description = "description5", format = "jpeg"),
+      ValentineNFT(fileName = "6.jpeg", name = "name6", description = "description6", format = "jpeg"),
+      ValentineNFT(fileName = "7.jpeg", name = "name7", description = "description7", format = "jpeg"),
+      ValentineNFT(fileName = "8.jpeg", name = "name8", description = "description8", format = "jpeg"),
+      ValentineNFT(fileName = "9.jpeg", name = "name9", description = "description9", format = "jpeg"),
+    )
+    val allUsernames = masterAccounts.Service.getAllUsernames
+    var allocatedUsernames: Seq[String] = Seq()
+    var nftsDistributed = 0
+
+    def getCollection = masterCollections.Service.tryGet("D4C3FD5554AEDB64")
+
+    def uploadNFTs(allUsernames: Seq[String], collection: Collection): Unit = nfts.foreach { valentineNFT =>
+      println(valentineNFT.name)
+      println(allUsernames.length)
+      val nftImageFile = constants.CommonConfig.Files.CollectionPath + "/" + valentineNFT.fileName
+      val fileHash = utilities.FileOperations.getFileHash(nftImageFile)
+      val newFileName = fileHash + "." + valentineNFT.format
+      val allocateTo = if (nftsDistributed == 8) {
+        allUsernames.diff(allocatedUsernames)
+      } else {
+        util.Random.shuffle(allUsernames.diff(allocatedUsernames)).take(allUsernames.length / nfts.length)
+      }
+      println(allocateTo.length)
+      println(allocatedUsernames.intersect(allocateTo).length)
+      allocatedUsernames = allocatedUsernames ++ allocateTo
+      println(allocatedUsernames.length)
+      try {
+        val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collection.id, fileName = newFileName)
+        utilities.AmazonS3.uploadFile(awsKey, nftImageFile)
+        Await.result(masterNFTs.Service.add(master.NFT(id = fileHash, collectionId = collection.id, name = valentineNFT.name, description = valentineNFT.description, totalSupply = allocateTo.length, isMinted = false, fileExtension = valentineNFT.format, ipfsLink = "", edition = None)), Duration.Inf)
+        Await.result(masterNFTOwners.Service.add(allocateTo.map(x => master.NFTOwner(nftId = fileHash, ownerId = x, creatorId = creatorID, collectionId = collection.id, quantity = 1, saleId = None, publicListingId = None))), Duration.Inf)
+        Await.result(collectionsAnalysis.Utility.onNewNFT(collection.id), Duration.Inf)
+        nftsDistributed = nftsDistributed + 1
+        println(valentineNFT.name + " done")
+      } catch {
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
+      }
+    }
+
+    for {
+      allUsernames <- allUsernames
+      collection <- getCollection
+    } yield uploadNFTs(allUsernames, collection)
+  }
+
   // Delete redundant nft tags
   def start(): Future[Unit] = {
-    //    (for {
-    //      _ <- uploadCollections()
-    //    } yield ()
-    //      ).recover {
-    //      case exception: Exception => logger.error(exception.getLocalizedMessage)
-    //    }
-    Future()
+    (for {
+      _ <- addValentineNFTs()
+    } yield ()
+      ).recover {
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+    }
   }
 
 }
