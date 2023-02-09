@@ -62,3 +62,5 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.21.12"
+
+libraryDependencies += "com.typesafe" % "config" % "1.4.2"
