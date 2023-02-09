@@ -28,6 +28,7 @@ class IndexController @Inject()(
                                  nftPublicListings: blockchainTransaction.NFTPublicListings,
                                  sendCoins: blockchainTransaction.SendCoins,
                                  nftSales: blockchainTransaction.NFTSales,
+                                 masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                  publicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
                                  saleNFTTransactions: masterTransaction.SaleNFTTransactions,
                                  masterTransactionSessionTokens: masterTransaction.SessionTokens,
@@ -58,7 +59,8 @@ class IndexController @Inject()(
     saleNFTTransactions.Utility.scheduler,
     nftSales.Utility.scheduler,
     masterTransactionSessionTokens.Utility.scheduler,
-    sendCoins.Utility.scheduler
+    sendCoins.Utility.scheduler,
+    masterTransactionTokenPrices.Utility.scheduler
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())

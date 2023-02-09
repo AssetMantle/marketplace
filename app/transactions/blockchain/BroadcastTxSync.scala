@@ -17,15 +17,14 @@ class BroadcastTxSync @Inject()()(implicit wsClient: WSClient, configuration: Co
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val path = "/broadcast_tx_sync?tx=0x"
-
-  private val url = constants.Blockchain.RPCEndPoint + path
+  private val url = constants.Blockchain.RPCEndPoint + "/broadcast_tx_sync?tx=0x"
 
   private def action(txRawHex: String) = utilities.JSON.getResponseFromJson[BroadcastTxSyncResponse.Response, BroadcastTxSyncResponse.ErrorResponse](wsClient.url(url + txRawHex).get)
 
   object Service {
     def get(txRawHex: String): Future[(Option[BroadcastTxSyncResponse.Response], Option[BroadcastTxSyncResponse.ErrorResponse])] = action(txRawHex).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case baseException: BaseException => throw baseException
     }
   }
 

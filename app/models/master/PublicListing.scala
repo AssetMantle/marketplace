@@ -16,7 +16,7 @@ case class PublicListing(id: String, collectionId: String, numberOfNFTs: Long, m
     val currentEpoch = System.currentTimeMillis() / 1000
     if (numberOfSold >= numberOfNFTs) constants.PublicListing.SOLD_OUT // Sold out
     else if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.PublicListing.LIVE // Live
-    else if (currentEpoch >= this.endTimeEpoch) constants.PublicListing.EXPIRED // Expired
+    else if (currentEpoch >= this.endTimeEpoch) constants.PublicListing.ENDED // Expired
     else constants.PublicListing.NOT_STARTED //
   }
 
@@ -119,7 +119,7 @@ class PublicListings @Inject()(
       filter(x => x.startTimeEpoch <= currentEpoch && x.endTimeEpoch > currentEpoch).map(_.map(_.id))
     }
 
-    def getExpiredPublicListings: Future[Seq[PublicListing]] = filter(_.endTimeEpoch <= utilities.Date.currentEpoch).map(_.map(_.deserialize))
+    def getForDeletion: Future[Seq[PublicListing]] = filter(_.endTimeEpoch <= (utilities.Date.currentEpoch - constants.Date.DaySeconds)).map(_.map(_.deserialize))
 
     def getPublicListingByCollectionId(collectionId: String): Future[Option[PublicListing]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize).headOption)
 

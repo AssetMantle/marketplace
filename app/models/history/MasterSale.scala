@@ -4,8 +4,8 @@ import constants.Scheduler
 import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, HistoryLogging, ModelTable}
 import models.analytics.CollectionsAnalysis
-import models.master
 import models.master.Sales
+import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -91,6 +91,7 @@ class MasterSales @Inject()(
                              utilitiesOperations: utilities.Operations,
                              masterNFTOwners: master.NFTOwners,
                              collectionsAnalysis: CollectionsAnalysis,
+                             SaleNFTTransactions: masterTransaction.SaleNFTTransactions,
                              protected val databaseConfigProvider: DatabaseConfigProvider
                            )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[MasterSales.MasterSaleTable, MasterSales.MasterSaleSerialized, String](
@@ -123,16 +124,18 @@ class MasterSales @Inject()(
       val name: String = constants.Scheduler.HISTORY_MASTER_SALE
 
       def runner(): Unit = {
-        val expiredSales = sales.Service.getExpiredSales
+        val deleteSales = sales.Service.getForDeletion
 
-        def deleteExpiredSales(expiredSales: Seq[master.Sale]) = utilitiesOperations.traverse(expiredSales) { expiredSale =>
-          val addToHistory = Service.insertOrUpdate(expiredSale.toHistory)
+        def salesWithPendingTx(ids: Seq[String]) = SaleNFTTransactions.Service.checkAnyPendingTx(ids)
 
-          def markSaleNull = masterNFTOwners.Service.markSaleNull(expiredSale.id)
+        def deleteExpiredSales(deleteSales: Seq[master.Sale]) = utilitiesOperations.traverse(deleteSales) { sale =>
+          val addToHistory = Service.insertOrUpdate(sale.toHistory)
 
-          def deleteSale() = sales.Service.delete(expiredSale.id)
+          def markSaleNull = masterNFTOwners.Service.markSaleNull(sale.id)
 
-          def updateAnalysis() = collectionsAnalysis.Utility.onSaleExpiry(expiredSale.collectionId)
+          def deleteSale() = sales.Service.delete(sale.id)
+
+          def updateAnalysis() = collectionsAnalysis.Utility.onSaleExpiry(sale.collectionId)
 
           for {
             _ <- addToHistory
@@ -144,8 +147,9 @@ class MasterSales @Inject()(
         }
 
         val forComplete = (for {
-          expiredSales <- expiredSales
-          _ <- deleteExpiredSales(expiredSales)
+          deleteSales <- deleteSales
+          salesWithPendingTx <- salesWithPendingTx(deleteSales.map(_.id))
+          _ <- deleteExpiredSales(deleteSales.filterNot(x => salesWithPendingTx.contains(x.id)))
         } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.failure.logMessage)
         }

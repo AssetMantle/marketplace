@@ -3,6 +3,7 @@ package models.blockchainTransaction
 import constants.Scheduler
 import exceptions.BaseException
 import models.Trait._
+import models.blockchain.Transaction
 import models.common.Coin
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -13,9 +14,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class NFTSale(txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
+case class NFTSale(txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
 
-  def serialize(): NFTSales.NFTSaleSerialized = NFTSales.NFTSaleSerialized(txHash = this.txHash, txRawBytes = this.txRawBytes, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, broadcasted = this.broadcasted, status = this.status, memo = this.memo, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+  def serialize(): NFTSales.NFTSaleSerialized = NFTSales.NFTSaleSerialized(txHash = this.txHash, txRawBytes = this.txRawBytes, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, status = this.status, memo = this.memo, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
 object NFTSales {
@@ -24,15 +25,15 @@ object NFTSales {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_NFT_SALE
 
-  case class NFTSaleSerialized(txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: String, broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize: NFTSale = NFTSale(txHash = txHash, txRawBytes = this.txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), broadcasted = broadcasted, status = status, memo = memo, log = log, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class NFTSaleSerialized(txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: String, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
+    def deserialize: NFTSale = NFTSale(txHash = txHash, txRawBytes = this.txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), status = status, memo = memo, log = log, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
     def id: String = txHash
   }
 
   class NFTSaleTable(tag: Tag) extends Table[NFTSaleSerialized](tag, "NFTSale") with ModelTable[String] {
 
-    def * = (txHash, txRawBytes, fromAddress, toAddress, amount, broadcasted, status.?, memo.?, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTSaleSerialized.tupled, NFTSaleSerialized.unapply)
+    def * = (txHash, txRawBytes, fromAddress, toAddress, amount, status.?, memo.?, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTSaleSerialized.tupled, NFTSaleSerialized.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
@@ -43,8 +44,6 @@ object NFTSales {
     def toAddress = column[String]("toAddress")
 
     def amount = column[String]("amount")
-
-    def broadcasted = column[Boolean]("broadcasted")
 
     def status = column[Boolean]("status")
 
@@ -82,8 +81,8 @@ class NFTSales @Inject()(
 
   object Service {
 
-    def add(txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String]): Future[NFTSale] = {
-      val nftSale = NFTSale(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = amount, broadcasted = broadcasted, status = status, log = None, memo = memo)
+    def add(txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], memo: Option[String]): Future[NFTSale] = {
+      val nftSale = NFTSale(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = amount, status = status, log = None, memo = memo)
       for {
         _ <- create(nftSale.serialize())
       } yield nftSale
@@ -103,6 +102,8 @@ class NFTSales @Inject()(
 
     def markFailed(txHashes: Seq[String]): Future[Int] = customUpdate(NFTSales.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(false))
 
+    def markFailedWithLog(txHashes: Seq[String], log: String): Future[Int] = customUpdate(NFTSales.TableQuery.filter(_.txHash.inSet(txHashes)).map(x => (x.status, x.log)).update((false, log)))
+
   }
 
   object Utility {
@@ -119,11 +120,22 @@ class NFTSales @Inject()(
 
         def markFailed(hashes: Seq[String]) = if (hashes.nonEmpty) Service.markFailed(hashes) else Future(0)
 
+        def markFailedTimedOut(nftSales: Seq[NFTSale], allTxs: Seq[Transaction]) = if (nftSales.nonEmpty) {
+          val currentMillis = utilities.Date.currentMillisEpoch
+          val notFoundTxs = nftSales.map(_.txHash).diff(allTxs.map(_.hash))
+          // 3 days given in case explorer/indexer has stopped
+          // TODO Can be optimised by fetching latest block height and comparing with current time,
+          //  given the tx is done with suitable timeoutHeight
+          val notFoundHashes = nftSales.filter(x => notFoundTxs.contains(x.txHash) && (currentMillis - x.createdOnMillisEpoch.getOrElse(currentMillis)) > constants.Date.ThreeDayMilliSeconds).map(_.txHash)
+          if (notFoundHashes.nonEmpty) Service.markFailedWithLog(notFoundHashes, constants.Response.TRANSACTION_NOT_FOUND.logMessage) else Future(0)
+        } else Future(0)
+
         val forComplete = (for {
           nftSales <- nftSales
           txs <- getTransactions(nftSales.map(_.txHash))
           _ <- markSuccess(txs.filter(_.status).map(_.hash))
-          _ <- markFailed(txs.filter(x => !x.status).map(_.hash))
+          _ <- markFailed(txs.filter(!_.status).map(_.hash))
+          _ <- markFailedTimedOut(nftSales, txs)
         } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.failure.logMessage)
         }

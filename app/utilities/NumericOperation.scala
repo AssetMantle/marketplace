@@ -28,7 +28,7 @@ object NumericOperation {
   def formatNumber(number: MicroNumber, normalize: Boolean = true): String = if (normalize) formatNumber(number.toDouble) else formatNumber(number.value)
 
   def formatNumber(number: Double): String = try {
-    NumberFormat.getNumberInstance().format(number)
+    NumberFormat.getNumberInstance().format(Math.floor(number * 100) / 100)
   } catch {
     case _: Exception => number.toString
   }
