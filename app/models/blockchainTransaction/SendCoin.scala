@@ -3,6 +3,7 @@ package models.blockchainTransaction
 import constants.Scheduler
 import exceptions.BaseException
 import models.Trait._
+import models.blockchain.Transaction
 import models.common.Coin
 import org.bitcoinj.core.ECKey
 import play.api.Logger
@@ -15,9 +16,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class SendCoin(accountId: String, txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
+case class SendCoin(accountId: String, txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
 
-  def serialize(): SendCoins.SendCoinSerialized = SendCoins.SendCoinSerialized(accountId = this.accountId, txHash = this.txHash, txRawBytes = this.txRawBytes, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, broadcasted = this.broadcasted, status = this.status, memo = this.memo, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+  def serialize(): SendCoins.SendCoinSerialized = SendCoins.SendCoinSerialized(accountId = this.accountId, txHash = this.txHash, txRawBytes = this.txRawBytes, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, status = this.status, memo = this.memo, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
 object SendCoins {
@@ -26,8 +27,8 @@ object SendCoins {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_COIN
 
-  case class SendCoinSerialized(accountId: String, txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: String, broadcasted: Boolean, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity2[String, String] {
-    def deserialize: SendCoin = SendCoin(accountId = accountId, txHash = txHash, txRawBytes = this.txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), broadcasted = broadcasted, status = status, memo = memo, log = log, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class SendCoinSerialized(accountId: String, txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: String, status: Option[Boolean], memo: Option[String], log: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity2[String, String] {
+    def deserialize: SendCoin = SendCoin(accountId = accountId, txHash = txHash, txRawBytes = this.txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), status = status, memo = memo, log = log, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
     def id1: String = accountId
 
@@ -36,7 +37,7 @@ object SendCoins {
 
   class SendCoinTable(tag: Tag) extends Table[SendCoinSerialized](tag, "SendCoin") with ModelTable2[String, String] {
 
-    def * = (accountId, txHash, txRawBytes, fromAddress, toAddress, amount, broadcasted, status.?, memo.?, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SendCoinSerialized.tupled, SendCoinSerialized.unapply)
+    def * = (accountId, txHash, txRawBytes, fromAddress, toAddress, amount, status.?, memo.?, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SendCoinSerialized.tupled, SendCoinSerialized.unapply)
 
     def accountId = column[String]("accountId", O.PrimaryKey)
 
@@ -49,8 +50,6 @@ object SendCoins {
     def toAddress = column[String]("toAddress")
 
     def amount = column[String]("amount")
-
-    def broadcasted = column[Boolean]("broadcasted")
 
     def status = column[Boolean]("status")
 
@@ -84,6 +83,7 @@ class SendCoins @Inject()(
                            utilitiesOperations: utilities.Operations,
                            getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
                            getAccount: queries.blockchain.GetAccount,
+                           getAbciInfo: queries.blockchain.GetABCIInfo,
                          )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl2[SendCoins.SendCoinTable, SendCoins.SendCoinSerialized, String, String](
     databaseConfigProvider,
@@ -95,8 +95,8 @@ class SendCoins @Inject()(
 
   object Service {
 
-    def add(accountId: String, txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], broadcasted: Boolean, status: Option[Boolean], memo: Option[String]): Future[SendCoin] = {
-      val sendCoin = SendCoin(accountId = accountId, txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = amount, broadcasted = broadcasted, status = status, log = None, memo = memo)
+    def add(accountId: String, txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], memo: Option[String]): Future[SendCoin] = {
+      val sendCoin = SendCoin(accountId = accountId, txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = amount, status = status, log = None, memo = memo)
       for {
         _ <- create(sendCoin.serialize())
       } yield sendCoin
@@ -112,7 +112,11 @@ class SendCoins @Inject()(
 
     def getAllPendingStatus: Future[Seq[SendCoin]] = filter(_.status.?.isEmpty).map(_.map(_.deserialize))
 
-    def fetchAll: Future[Seq[SendCoin]] = getAll.map(_.map(_.deserialize))
+    def markSuccess(txHashes: Seq[String]): Future[Int] = customUpdate(SendCoins.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(true))
+
+    def markFailed(txHashes: Seq[String]): Future[Int] = customUpdate(SendCoins.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(false))
+
+    def markFailedWithLog(txHashes: Seq[String], log: String): Future[Int] = customUpdate(SendCoins.TableQuery.filter(_.txHash.inSet(txHashes)).map(x => (x.status, x.log)).update((false, log)))
   }
 
   object Utility {
@@ -120,39 +124,45 @@ class SendCoins @Inject()(
     def transaction(accountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: BigDecimal, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
+      val abciInfo = getAbciInfo.Service.get
       val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount(fromAddress))
       val unconfirmedTxs = getUnconfirmedTxs.Service.get()
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, unconfirmedTxHashes: Seq[String]) = {
+      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Long, unconfirmedTxHashes: Seq[String]) = {
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = amount)),
           fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = gasLimit),
           gasLimit = gasLimit,
           account = bcAccount,
-          ecKey = ecKey)
+          ecKey = ecKey,
+          timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
+        )
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
         for {
-          sendCoin <- if (!unconfirmedTxHashes.contains(txHash)) Service.add(accountId = accountId, txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = amount, broadcasted = false, status = None, memo = Option(memo)) else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          sendCoin <- if (!unconfirmedTxHashes.contains(txHash)) Service.add(accountId = accountId, txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = amount, status = None, memo = Option(memo)) else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
         } yield sendCoin
       }
 
       def broadcastTxAndUpdate(sendCoin: SendCoin) = {
 
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) Service.updateSendCoin(sendCoin.copy(broadcasted = true, status = Option(false), log = Option(errorResponse.get.error.data)))
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) Service.updateSendCoin(sendCoin.copy(broadcasted = true, status = Option(false), log = Option(successResponse.get.result.log)))
-        else Service.updateSendCoin(sendCoin.copy(broadcasted = true))
+        val broadcastTx = broadcastTxSync.Service.get(sendCoin.getTxRawAsHexString)
+
+        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) Service.updateSendCoin(sendCoin.copy(status = Option(false), log = Option(errorResponse.get.error.data)))
+        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) Service.updateSendCoin(sendCoin.copy(status = Option(false), log = Option(successResponse.get.result.log)))
+        else Future(sendCoin)
 
         for {
-          (successResponse, errorResponse) <- broadcastTxSync.Service.get(sendCoin.getTxRawAsHexString)
+          (successResponse, errorResponse) <- broadcastTx
           updatedSendCoin <- update(successResponse, errorResponse)
         } yield updatedSendCoin
       }
 
       for {
+        abciInfo <- abciInfo
         bcAccount <- bcAccount
         unconfirmedTxs <- unconfirmedTxs
-        sendCoin <- checkMempoolAndAddTx(bcAccount, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        sendCoin <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toLong, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
         updatedSendCoin <- broadcastTxAndUpdate(sendCoin)
       } yield updatedSendCoin
     }
@@ -163,21 +173,28 @@ class SendCoins @Inject()(
       def runner(): Unit = {
         val sendCoins = Service.getAllPendingStatus
 
-        def checkAndUpdate(sendCoins: Seq[SendCoin]) = utilitiesOperations.traverse(sendCoins) { sendCoin =>
-          val transaction = blockchainTransactions.Service.get(sendCoin.txHash)
+        def transactions(hashes: Seq[String]) = blockchainTransactions.Service.getByHashes(hashes)
 
-          def update(transaction: Option[models.blockchain.Transaction]) = transaction.fold[Future[Option[SendCoin]]](Future(None))(tx => Service.updateSendCoin(sendCoin.copy(status = Option(tx.status), log = if (tx.rawLog != "") Option(tx.rawLog) else None)).map(Option(_)))
+        def markSuccess(hashes: Seq[String]) = if (hashes.nonEmpty) Service.markSuccess(hashes) else Future(0)
 
-          for {
-            transaction <- transaction
-            _ <- update(transaction)
-          } yield ()
+        def markFailed(hashes: Seq[String]) = if (hashes.nonEmpty) Service.markFailed(hashes) else Future(0)
 
-        }
+        def markFailedTimedOut(sendCoins: Seq[SendCoin], allTxs: Seq[Transaction]) = if (sendCoins.nonEmpty) {
+          val currentMillis = utilities.Date.currentMillisEpoch
+          val notFoundTxs = sendCoins.map(_.txHash).diff(allTxs.map(_.hash))
+          // 3 days given in case explorer/indexer has stopped
+          // TODO Can be optimised by fetching latest block height and comparing with current time,
+          //  given the tx is done with suitable timeoutHeight
+          val notFoundHashes = sendCoins.filter(x => notFoundTxs.contains(x.txHash) && (currentMillis - x.createdOnMillisEpoch.getOrElse(currentMillis)) > constants.Date.ThreeDayMilliSeconds).map(_.txHash)
+          if (notFoundHashes.nonEmpty) Service.markFailedWithLog(notFoundHashes, constants.Response.TRANSACTION_NOT_FOUND.logMessage) else Future(0)
+        } else Future(0)
 
         val forComplete = (for {
           sendCoins <- sendCoins
-          _ <- checkAndUpdate(sendCoins)
+          transactions <- transactions(sendCoins.map(_.txHash))
+          _ <- markSuccess(transactions.filter(_.status).map(_.hash))
+          _ <- markFailed(transactions.filter(!_.status).map(_.hash))
+          _ <- markFailedTimedOut(sendCoins, transactions)
         } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.failure.logMessage)
         }

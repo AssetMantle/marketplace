@@ -30,6 +30,7 @@ class CollectionController @Inject()(
                                       masterAccounts: master.Accounts,
                                       masterCollections: master.Collections,
                                       masterTransactionCollectionDrafts: masterTransaction.CollectionDrafts,
+                                      masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                       masterTransactionPublicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
                                       masterTransactionSaleNFTTransactions: masterTransaction.SaleNFTTransactions,
                                       masterNFTs: master.NFTs,
@@ -249,16 +250,16 @@ class CollectionController @Inject()(
 
       def getTotalWhitelistSaleSold(saleId: Option[String]): Future[Long] = if (saleId.isDefined) masterTransactionSaleNFTTransactions.Service.getTotalWhitelistSaleSold(saleId.get).map(_.toLong) else Future(0L)
 
-      val getSalesInfo = if (optionalLoginState.isDefined) {
+      val getSalesInfo = {
         val sale = masterSales.Service.getSaleByCollectionId(id)
 
-        def isMember(whitelistId: Option[String]) = if (whitelistId.isDefined) masterWhitelistMembers.Service.isMember(whitelistId.get, optionalLoginState.get.username) else Future(false)
+        def isMember(whitelistId: Option[String]) = if (optionalLoginState.isDefined && whitelistId.isDefined) masterWhitelistMembers.Service.isMember(whitelistId.get, optionalLoginState.get.username) else Future(false)
 
         for {
           sale <- sale
           isMember <- isMember(sale.map(_.whitelistId))
         } yield (sale, isMember)
-      } else Future(None, false)
+      }
 
       (for {
         collectionAnalysis <- collectionAnalysis
@@ -267,7 +268,7 @@ class CollectionController @Inject()(
         totalPublicListingSold <- getTotalPublicListingSold(publicListing.map(_.id))
         (sale, isMember) <- getSalesInfo
         totalWhitelistSaleSold <- getTotalWhitelistSaleSold(sale.map(_.id))
-      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale, publicListing = publicListing, isMember = isMember, publicListingSold = totalPublicListingSold, whitelistSaleSold = totalWhitelistSaleSold, showPublicListing = showPublicListing))
+      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale, publicListing = publicListing, isMember = isMember, publicListingSold = totalPublicListingSold, whitelistSaleSold = totalWhitelistSaleSold, showPublicListing = showPublicListing, tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice))
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
@@ -278,6 +279,7 @@ class CollectionController @Inject()(
       implicit request =>
         val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
         val publicListing = masterPublicListings.Service.getPublicListingByCollectionId(id)
+        val price = masterTransactionTokenPrices.Service.getLatestPrice
 
         def publicListingStatus(publicListing: Option[PublicListing]) = if (publicListing.isDefined) masterTransactionPublicListingNFTTransactions.Service.getTotalPublicListingSold(publicListing.get.id).map(x => publicListing.get.getStatus(x).id) else Future(0)
 
@@ -286,7 +288,7 @@ class CollectionController @Inject()(
           collectionAnalysis <- collectionAnalysis
           publicListing <- publicListing
           publicListingStatus <- publicListingStatus(publicListing)
-        } yield Ok(s"${collectionAnalysis.totalNFTs.toString}|${publicListing.fold(MicroNumber.zero)(_.price).toString}|${publicListingStatus}")
+        } yield Ok(s"${collectionAnalysis.totalNFTs.toString}|${publicListing.fold(MicroNumber.zero)(_.price).toString} (${utilities.NumericOperation.formatNumber(publicListing.fold(MicroNumber.zero)(_.price).toDouble * price)} $$)|${publicListingStatus}")
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }

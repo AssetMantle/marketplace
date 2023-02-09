@@ -14,10 +14,12 @@ function submitForm(refreshOverlay, source, targetID, callback = emptyCallBack) 
             data: form.serialize(),
             async: true,
             beforeSend: function () {
-                $(target+ " #modalSpinner").show();
+                $("#modalSpinner").show();
+                $(target).hide();
             },
             complete: function () {
-                $(target+ " #modalSpinner").hide();
+                $("#modalSpinner").hide();
+                $(target).show();
             },
             statusCode: {
                 400: function (data) {

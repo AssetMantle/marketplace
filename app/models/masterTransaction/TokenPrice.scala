@@ -1,5 +1,7 @@
 package models.masterTransaction
 
+import constants.Scheduler
+import exceptions.BaseException
 import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -8,7 +10,8 @@ import slick.jdbc.H2Profile.api._
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.{Duration, FiniteDuration, SECONDS}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 case class TokenPrice(serial: Int = 0, denom: String, price: Double, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged with Entity[Int] {
   def id: Int = serial
@@ -62,7 +65,40 @@ class TokenPrices @Inject()(
 
   object Service {
 
+    private var latestPrice: Double = 0.0
+
+    def getLatestPrice: Double = latestPrice
+
+    def setLatestPrice(): Future[Unit] = {
+      val tokenPrice = tryGetLatestTokenPrice(constants.Blockchain.StakingToken)
+
+      for {
+        tokenPrice <- tokenPrice
+      } yield latestPrice = tokenPrice.price
+    }
+
     def tryGetLatestTokenPrice(denom: String): Future[TokenPrice] = filterAndSortWithOrderHead(_.denom === denom)(_.serial.desc)
+
+  }
+
+  object Utility {
+
+    val scheduler: Scheduler = new Scheduler {
+      val name: String = constants.Scheduler.MASTER_TRANSACTION_TOKEN_PRICE
+
+      override val fixedDelay: FiniteDuration = FiniteDuration(constants.Date.HourSeconds, SECONDS)
+
+      def runner(): Unit = {
+        val setPrice = Service.setLatestPrice()
+
+        val forComplete = (for {
+          _ <- setPrice
+        } yield ()).recover {
+          case baseException: BaseException => logger.error(baseException.failure.message)
+        }
+        Await.result(forComplete, Duration.Inf)
+      }
+    }
 
   }
 

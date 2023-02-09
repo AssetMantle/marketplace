@@ -40,15 +40,8 @@ class BlockchainTransactionController @Inject()(
   implicit val callbackOnSessionTimeout: Call = routes.ProfileController.viewDefaultProfile()
 
   def gasTokenPrice: EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val tokenPrice = masterTransactionTokenPrices.Service.tryGetLatestTokenPrice(constants.Blockchain.StakingToken)
-        (for {
-          tokenPrice <- tokenPrice
-        } yield Ok(tokenPrice.price.toString)
-          ).recover {
-          case _: BaseException => BadRequest
-        }
+    withoutLoginAction { implicit request =>
+      Ok(utilities.NumericOperation.formatNumber(masterTransactionTokenPrices.Service.getLatestPrice))
     }
   }
 

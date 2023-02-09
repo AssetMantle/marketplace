@@ -4,7 +4,7 @@
 @import views.html.base.buttons._
 @import views.html.collection.details._
 
-@(collectionAnalysis: CollectionAnalysis, collection: Collection, sale: Option[Sale], publicListing: Option[PublicListing], isMember: Boolean, publicListingSold: Long, whitelistSaleSold: Long, showPublicListing: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+@(collectionAnalysis: CollectionAnalysis, collection: Collection, sale: Option[Sale], publicListing: Option[PublicListing], isMember: Boolean, publicListingSold: Long, whitelistSaleSold: Long, showPublicListing: Boolean, tokenPrice: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
 
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
@@ -19,13 +19,13 @@
                     @commonPrimaryButton(constants.View.CREATE_COLLECTION_SALE, JavaScript(s"saleOptions()"))
                 }
                 @if(publicListing.isDefined) {
-                    @topRightPublicListing(collectionAnalysis = collectionAnalysis, collection = collection, publicListing = publicListing.get, publicListingSold = publicListingSold)
+                    @topRightPublicListing(collectionAnalysis = collectionAnalysis, collection = collection, publicListing = publicListing.get, publicListingSold = publicListingSold, tokenPrice = tokenPrice)
                     @if(sale.isEmpty) {
                         @commonPrimaryButton(constants.Form.CREATE_WHITELIST_SALE.button, JavaScript(s"getForm(jsRoutes.controllers.SaleController.createCollectionSaleForm(undefined, '${collection.id}'))"))
                     }
                 }
                 @if(sale.isDefined) {
-                    @topRightSale(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale.get, isMember = isMember, whitelistSaleSold = whitelistSaleSold)
+                    @topRightSale(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale.get, isMember = isMember, whitelistSaleSold = whitelistSaleSold, tokenPrice = tokenPrice)
                     @if(publicListing.isEmpty) {
                         <div class="separator"></div>
                         @commonPrimaryButton(constants.Form.CREATE_PUBLIC_LISTING.button, JavaScript(s"getForm(jsRoutes.controllers.PublicListingController.createPublicListingForm('${collection.id}'))"))
@@ -34,17 +34,24 @@
             } else {
                 @if(showPublicListing) {
                     @if(publicListing.isDefined) {
-                        @topRightPublicListing(collectionAnalysis = collectionAnalysis, collection = collection, publicListing = publicListing.get, publicListingSold = publicListingSold)
+                        @topRightPublicListing(collectionAnalysis = collectionAnalysis, collection = collection, publicListing = publicListing.get, publicListingSold = publicListingSold, tokenPrice = tokenPrice)
                     }
                 } else {
                     @if(sale.isDefined) {
-                        @topRightSale(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale.get, isMember = isMember, whitelistSaleSold = whitelistSaleSold)
+                        @topRightSale(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale.get, isMember = isMember, whitelistSaleSold = whitelistSaleSold, tokenPrice = tokenPrice)
                     }
                 }
             }
         } else {
-            @if(publicListing.isDefined) {
-                @topRightPublicListing(collectionAnalysis = collectionAnalysis, collection = collection, publicListing = publicListing.get, publicListingSold = publicListingSold)
+            @if(showPublicListing) {
+                @if(publicListing.isDefined) {
+                    @topRightPublicListing(collectionAnalysis = collectionAnalysis, collection = collection, publicListing = publicListing.get, publicListingSold = publicListingSold, tokenPrice = tokenPrice)
+                }
+            } else {
+                @if(sale.isDefined) {
+                    @println(sale.get)
+                    @topRightSale(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale.get, isMember = isMember, whitelistSaleSold = whitelistSaleSold, tokenPrice = tokenPrice)
+                }
             }
         }
 

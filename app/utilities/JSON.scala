@@ -2,7 +2,6 @@ package utilities
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
-import constants.Response.Failure
 import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json._
@@ -33,15 +32,16 @@ object JSON {
     response.map { response =>
       Json.fromJson[T](response.json) match {
         case JsSuccess(value: T, _: JsPath) => value
-        case jsError: JsError => logger.debug(response.json.toString())
+        case jsError: JsError => logger.error(response.json.toString())
           logger.error(jsError.toString)
-          throw new BaseException(new Failure(jsError.toString))
+          constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
       }
     }.recover {
       case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
         constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
       case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
         constants.Response.JSON_MAPPING_EXCEPTION.throwBaseException(jsonMappingException)
+      case baseException: BaseException => throw baseException
     }
   }
 
@@ -49,14 +49,8 @@ object JSON {
     wsResponse.map { response =>
       Json.fromJson[T1](response.json) match {
         case JsSuccess(value: T1, _: JsPath) => (Option(value), None)
-        case mainError: JsError => logger.debug(response.json.toString())
-          logger.error(mainError.toString)
-          val errorResponse = Json.fromJson[T2](response.json) match {
-            case JsSuccess(value: T2, _: JsPath) => (None, Option(value))
-            case error: JsError => logger.debug(response.json.toString())
-              logger.error(error.toString)
-              constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
-          }
+        case error: JsError => logger.error(response.json.toString())
+          logger.error(error.toString)
           constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
       }
     }
@@ -65,6 +59,7 @@ object JSON {
       constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
     case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
       constants.Response.JSON_MAPPING_EXCEPTION.throwBaseException(jsonMappingException)
+    case baseException: BaseException => throw baseException
   }
 
 }
