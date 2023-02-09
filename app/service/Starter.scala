@@ -182,16 +182,19 @@ class Starter @Inject()(
       println(allocatedUsernames.intersect(allocateTo).length)
       allocatedUsernames = allocatedUsernames ++ allocateTo
       println(allocatedUsernames.length)
-      try {
-        val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collection.id, fileName = newFileName)
-        utilities.AmazonS3.uploadFile(awsKey, nftImageFile)
-        Await.result(masterNFTs.Service.add(master.NFT(id = fileHash, collectionId = collection.id, name = valentineNFT.name, description = valentineNFT.description, totalSupply = allocateTo.length, isMinted = false, fileExtension = valentineNFT.format, ipfsLink = "", edition = None)), Duration.Inf)
-        Await.result(masterNFTOwners.Service.add(allocateTo.map(x => master.NFTOwner(nftId = fileHash, ownerId = x, creatorId = creatorID, collectionId = collection.id, quantity = 1, saleId = None, publicListingId = None))), Duration.Inf)
-        Await.result(collectionsAnalysis.Utility.onNewNFT(collection.id), Duration.Inf)
-        nftsDistributed = nftsDistributed + 1
-        println(valentineNFT.name + " done")
-      } catch {
-        case exception: Exception => logger.error(exception.getLocalizedMessage)
+      val exists = Await.result(masterNFTs.Service.checkExists(fileHash), Duration.Inf)
+      if (!exists) {
+        try {
+          val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collection.id, fileName = newFileName)
+          utilities.AmazonS3.uploadFile(awsKey, nftImageFile)
+          Await.result(masterNFTs.Service.add(master.NFT(id = fileHash, collectionId = collection.id, name = valentineNFT.name, description = valentineNFT.description, totalSupply = allocateTo.length, isMinted = false, fileExtension = valentineNFT.format, ipfsLink = "", edition = None)), Duration.Inf)
+          Await.result(masterNFTOwners.Service.add(allocateTo.map(x => master.NFTOwner(nftId = fileHash, ownerId = x, creatorId = creatorID, collectionId = collection.id, quantity = 1, saleId = None, publicListingId = None))), Duration.Inf)
+          Await.result(collectionsAnalysis.Utility.onNewNFT(collection.id), Duration.Inf)
+          nftsDistributed = nftsDistributed + 1
+          println(valentineNFT.name + " done")
+        } catch {
+          case exception: Exception => logger.error(exception.getLocalizedMessage)
+        }
       }
     }
 
