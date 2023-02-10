@@ -1,4 +1,4 @@
-@(collection: master.Collection, onClickFunction: JavaScript)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(collection: master.Collection, onClickFunction: JavaScript, showPublicListingPrice: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="collectionCardContainer">
     <div class="single-profile-card commonCollectionCard artCollection">
@@ -115,4 +115,4 @@
         </div>
     </div>
 </div>
-<script>countCollectionCardInfo('@collection.id')</script>
+<script>commonCollectionCardInfo('@collection.id', @showPublicListingPrice)</script>

@@ -10,7 +10,6 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import utilities.MicroNumber
 import views.base.companion.UploadFile
 import views.collection.companion._
 
@@ -274,21 +273,30 @@ class CollectionController @Inject()(
       }
   }
 
-  def commonCardInfo(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def commonCardInfo(id: String, publicListingPrice: Boolean): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
         val publicListing = masterPublicListings.Service.getPublicListingByCollectionId(id)
-        val price = masterTransactionTokenPrices.Service.getLatestPrice
+        val sale = masterSales.Service.getSalesByCollectionId(id)
+        val tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice
 
         def publicListingStatus(publicListing: Option[PublicListing]) = if (publicListing.isDefined) masterTransactionPublicListingNFTTransactions.Service.getTotalPublicListingSold(publicListing.get.id).map(x => publicListing.get.getStatus(x).id) else Future(0)
-
 
         (for {
           collectionAnalysis <- collectionAnalysis
           publicListing <- publicListing
+          sale <- sale
           publicListingStatus <- publicListingStatus(publicListing)
-        } yield Ok(s"${collectionAnalysis.totalNFTs.toString}|${publicListing.fold(MicroNumber.zero)(_.price).toString} (${utilities.NumericOperation.formatNumber(publicListing.fold(MicroNumber.zero)(_.price).toDouble * price)} $$)|${publicListingStatus}")
+        } yield {
+          if (publicListing.isEmpty && sale.isEmpty) {
+            Ok(s"${collectionAnalysis.totalNFTs.toString}|N/A|0")
+          } else if (publicListingPrice) {
+            Ok(s"${collectionAnalysis.totalNFTs.toString}|${publicListing.fold("N/A")(x => s"${x.price.toString} (${utilities.NumericOperation.formatNumber(x.price.toDouble * tokenPrice)} $$)")}|${publicListingStatus}")
+          } else {
+            Ok(s"${collectionAnalysis.totalNFTs.toString}|${sale.fold("N/A")(x => s"${x.price.toString} (${utilities.NumericOperation.formatNumber(x.price.toDouble * tokenPrice)} $$)")}|${sale.fold(0)(_.getStatus.id)}")
+          }
+        }
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }
