@@ -173,7 +173,7 @@ class Starter @Inject()(
       val nftImageFile = constants.CommonConfig.Files.CollectionPath + "/" + valentineNFT.fileName
       val fileHash = utilities.FileOperations.getFileHash(nftImageFile)
       val newFileName = fileHash + "." + valentineNFT.format
-      val allocateTo = if (nftsDistributed == 8) {
+      val allocateTo = if (nftsDistributed == nfts.length - 1) {
         allUsernames.diff(allocatedUsernames)
       } else {
         util.Random.shuffle(allUsernames.diff(allocatedUsernames)).take(allUsernames.length / nfts.length)
