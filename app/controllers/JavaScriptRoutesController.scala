@@ -61,6 +61,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.countForCreatorNotForSell,
         routes.javascript.CollectionController.genesisTypeForm,
 
+        routes.javascript.CollectedController.collectedSection,
+        routes.javascript.CollectedController.collectionPerPage,
+        routes.javascript.CollectedController.viewCollectionNFTs,
+        routes.javascript.CollectedController.collectionNFTs,
+        routes.javascript.CollectedController.collectionNFTsPerPage,
+        routes.javascript.CollectedController.commonCardInfo,
+
         routes.javascript.WishlistController.wishlistSection,
         routes.javascript.WishlistController.collectionPerPage,
         routes.javascript.WishlistController.viewCollectionNFTs,
@@ -86,8 +93,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.tagsForm,
         routes.javascript.NFTController.deleteDraftForm,
         routes.javascript.NFTController.deleteDraft,
-        routes.javascript.NFTController.collectedSection,
-        routes.javascript.NFTController.collectedNFTsPerPage,
         routes.javascript.NFTController.price,
 
         routes.javascript.SettingController.viewSettings,
