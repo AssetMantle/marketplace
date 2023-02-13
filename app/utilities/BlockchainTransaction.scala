@@ -11,8 +11,8 @@ import scala.jdk.CollectionConverters.IterableHasAsJava
 
 object BlockchainTransaction {
 
-  private def getTxRawBytes(messages: Seq[protoBufAny], fee: Coin, gasLimit: Int, account: models.blockchain.Account, ecKey: ECKey, memo: String, timeoutHeight: Long): Array[Byte] = {
-    val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(messages.asJava).setMemo(memo).setTimeoutHeight(timeoutHeight).build()
+  private def getTxRawBytes(messages: Seq[protoBufAny], fee: Coin, gasLimit: Int, account: models.blockchain.Account, ecKey: ECKey, memo: String, timeoutHeight: Int): Array[Byte] = {
+    val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(messages.asJava).setMemo(memo).setTimeoutHeight(timeoutHeight.toLong).build()
 
     val signerInfo = TxOuterClass.SignerInfo.newBuilder()
       .setSequence(account.sequence)
@@ -40,7 +40,7 @@ object BlockchainTransaction {
     txRaw.toByteArray
   }
 
-  def getTxRawBytesWithSignedMemo(messages: Seq[protoBufAny], fee: Coin, gasLimit: Int, account: models.blockchain.Account, ecKey: ECKey, timeoutHeight: Long): (Array[Byte], String) = {
+  def getTxRawBytesWithSignedMemo(messages: Seq[protoBufAny], fee: Coin, gasLimit: Int, account: models.blockchain.Account, ecKey: ECKey, timeoutHeight: Int): (Array[Byte], String) = {
     val txRawBytesWithoutMemo = getTxRawBytes(
       messages = messages,
       fee = fee,
