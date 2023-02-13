@@ -47,6 +47,13 @@ abstract class GenericDaoImpl2[
 
   def customQuery[C](query: StreamingProfileAction[C, _, _]) = db.run(query)
 
+  def customQuery[C](query: DBIOAction[C, _, _]): Future[C] = db.run(query.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"), noSuchElementException)
+    }
+  }
+
   def customUpdate[R](updateQuery: DBIOAction[R, NoStream, Effect.Write]): Future[R] = db.run(updateQuery.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
