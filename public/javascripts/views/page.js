@@ -20,7 +20,7 @@ function viewCollectedCollection(lastPart) {
     let collectionId = lastPart.split("/")[2];
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.CollectedController.collectionNFTs(accountId, collectionId));
-    $('#rightContent').html('');
+    componentResource('rightContent', jsRoutes.controllers.CollectedController.topRightCard(collectionId, accountId));
 }
 
 

@@ -1,0 +1,12 @@
+@import controllers.actions.LoginState
+
+@(totalOwned: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+
+<div class="sticky-top item-sticky">
+    <div class="card rightInfoCard">
+        <div class="d-flex flex-column gap-1">
+            <div class="analysisTitle">@Messages(constants.View.COLLECTED_COLLECTION_TOTAL_NFT_OWNED)</div>
+            <div class="analysisValue">@totalOwned</div>
+        </div>
+    </div>
+</div>

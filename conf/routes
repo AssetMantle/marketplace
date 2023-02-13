@@ -85,7 +85,8 @@ GET         /collectedCollectionPerPage                        controllers.Colle
 GET         /collectedCollectionNFTs                           controllers.CollectedController.collectionNFTs(accountId: String, collectionId: String)
 GET         /profile/:accountId/COLLECTED/:collectionId        controllers.CollectedController.viewCollectionNFTs(accountId: String, collectionId: String)
 GET         /collectedNFTsPerPage                              controllers.CollectedController.collectionNFTsPerPage(accountId: String, collectionId: String, pageNumber: Int)
-GET         /collectedCardInfo                                 controllers.CollectedController.commonCardInfo(id: String, accountID: String)
+GET         /collectedCardInfo                                 controllers.CollectedController.commonCardInfo(collectionID: String, accountID: String)
+GET         /collectedCollectionTopRightCard                   controllers.CollectedController.topRightCard(collectionID: String, accountID: String)
 
 GET         /wishlistSection                                   controllers.WishlistController.wishlistSection(accountId: String)
 GET         /wishListCollectionPerPage                         controllers.WishlistController.collectionPerPage(accountId: String, pageNumber: Int)
