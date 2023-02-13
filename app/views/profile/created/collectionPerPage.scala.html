@@ -22,12 +22,12 @@
                     </div>
                 </div>
             </div>
-            @commonCollectionCard(draft.toCollection(), JavaScript(s"getForm(jsRoutes.controllers.CollectionController.editForm('${draft.id}'))"))
+            @commonCollectionCard(draft.toCollection(), JavaScript(s"getForm(jsRoutes.controllers.CollectionController.editForm('${draft.id}'))"), showPublicListingPrice = true)
         </div>
     }
     @collections.map { collection =>
         <div class="mt-3 singleCollection singleCreatedCollection">
-            @commonCollectionCard(collection, JavaScript(s"viewCollection('${collection.id}', true)"))
+            @commonCollectionCard(collection, JavaScript(s"viewCollection('${collection.id}', true)"), showPublicListingPrice = true)
         </div>
     }
 } else {

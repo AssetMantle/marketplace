@@ -9,12 +9,11 @@ document.onload = function () {
     }
 }
 
-function loadMoreCollectedNFTs(accountId) {
+function loadMoreCollections(accountId) {
     const loading = document.querySelector('.loading');
-    if ($("#noCollectedNFTsPerPage").length === 0) {
-        let nextPageNumber = Math.ceil($(".ownedNFTPage").length + 1);
-        console.log(nextPageNumber);
-        let route = jsRoutes.controllers.NFTController.collectedNFTsPerPage(accountId, nextPageNumber);
+    if ($("#noCollectedCollectionsPerPage").length === 0) {
+        let route = jsRoutes.controllers.CollectedController.collectionPerPage(accountId, ($(".collectedCollectionsPerPage").length + 1));
+        console.log(route.url)
         $.ajax({
             url: route.url,
             type: route.type,
@@ -27,33 +26,33 @@ function loadMoreCollectedNFTs(accountId) {
             },
             statusCode: {
                 200: function (data) {
-                    $('.ownedNFTsPerPage').append(data);
+                    $("#collectedCollectionsPerPage").append(data);
                 }
             }
         });
     } else {
-        $(".ownedNFTsPerPage:last").css("margin-top", "0px");
+        $(".collectionPage.collectedCollectionsPerPage:last").css("margin-top", "0px");
     }
 }
 
 timeout = 0;
 
-function loadCollectedNFTsOnScroll(accountId) {
+function loadCollectedCollectionOnScroll(accountId) {
     clearTimeout(timeout);
     timeout = setTimeout(function () {
         if ($(window).scrollTop() >= ($(document).height() - $(window).height() - 100)) {
-            if ($("#noCollectedNFTsPerPage").length === 0) {
-                loadMoreCollectedNFTs(accountId);
+            if ($("#noCollectedCollectionsPerPage").length === 0) {
+                loadMoreCollections(accountId);
             }
         }
     }, 300);
 }
 
-function setEmptyContainer(){
-    let nftCard = $(".singleNFTCard").length;
-    if(nftCard !== 0){
-        $("#noCollectedNFTFound").hide();
-    }else{
-        $("#noCollectedNFTFound").show();
+function loadFirstCollectedCollections(accountId){
+    componentResource('collectedCollectionsPerPage', jsRoutes.controllers.CollectedController.collectionPerPage(`${accountId}`, 1));
+    if($(document).height() > 1000) {
+        setTimeout(() => {
+            loadCollectedCollectionOnScroll(`${accountId}`)
+        }, 1000);
     }
 }

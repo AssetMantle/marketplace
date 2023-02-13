@@ -10,7 +10,7 @@
             @if(optionalLoginState.isDefined && optionalLoginState.fold("")(_.username) == accountId) {
                 @commonHorizontalSwitcher(
                     ListMap(
-                        constants.View.COLLECTED -> (routes.javascript.NFTController.collectedSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.COLLECTED}')")),
+                        constants.View.COLLECTED -> (routes.javascript.CollectedController.collectedSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.COLLECTED}')")),
                         constants.View.CREATED -> (routes.javascript.CollectionController.createdSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.CREATED}')")),
                         constants.View.WHITELIST -> (routes.javascript.WhitelistController.whitelistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WHITELIST}')")),
                         constants.View.WISHLIST -> (routes.javascript.WishlistController.wishlistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WISHLIST}')")),
@@ -23,7 +23,7 @@
             } else {
                 @commonHorizontalSwitcher(
                     ListMap(
-                        constants.View.COLLECTED -> (routes.javascript.NFTController.collectedSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.COLLECTED}')")),
+                        constants.View.COLLECTED -> (routes.javascript.CollectedController.collectedSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.COLLECTED}')")),
                         constants.View.CREATED -> (routes.javascript.CollectionController.createdSection,  JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.CREATED}')")),
                         constants.View.WISHLIST -> (routes.javascript.WishlistController.wishlistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WISHLIST}')")),
                     ),

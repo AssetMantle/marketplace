@@ -3,7 +3,7 @@ package controllers
 import akka.actor.CoordinatedShutdown
 import controllers.actions._
 import controllers.result.WithUsernameToken
-import models.{blockchainTransaction, history, masterTransaction}
+import models.{blockchain, blockchainTransaction, history, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -22,6 +22,7 @@ class IndexController @Inject()(
                                  withoutLoginAction: WithoutLoginAction,
                                  withUsernameToken: WithUsernameToken,
                                  starter: Starter,
+                                 blockchainBlocks: blockchain.Blocks,
                                  coordinatedShutdown: CoordinatedShutdown,
                                  historyMasterSales: history.MasterSales,
                                  historyMasterPublicListings: history.MasterPublicListings,
@@ -60,7 +61,8 @@ class IndexController @Inject()(
     nftSales.Utility.scheduler,
     masterTransactionSessionTokens.Utility.scheduler,
     sendCoins.Utility.scheduler,
-    masterTransactionTokenPrices.Utility.scheduler
+    masterTransactionTokenPrices.Utility.scheduler,
+    blockchainBlocks.Utility.scheduler
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())

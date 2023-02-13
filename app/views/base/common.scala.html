@@ -253,16 +253,5 @@
             </div>
         </div>
     </body>
-    @if(constants.CommonConfig.WebAppUrl == "https://staging.marketplace.assetmantle.one") {
-        <script>
-                setKeplrConfigParameters('@constants.Blockchain.Name', '@constants.Blockchain.RPCEndPoint', '@constants.Blockchain.RestEndPoint', '@constants.Blockchain.ChainId')
-        </script>
-    }
-    @if(constants.CommonConfig.WebAppUrl == "https://marketplace.assetmantle.one") {
-        <script>
-                setKeplrConfigParameters('@constants.Blockchain.Name', "https://rpc.assetmantle.one", "https://rest.assetmantle.one", '@constants.Blockchain.ChainId')
-        </script>
-    }
-    <script>setKeplrConfigParameters('@constants.Blockchain.Name', '@constants.Blockchain.RPCEndPoint', '@constants.Blockchain.RestEndPoint', '@constants.Blockchain.ChainId', '@constants.Blockchain.StakingToken')</script>
 </html>
 

@@ -182,8 +182,8 @@ function getNFTPrice(nftId) {
     });
 }
 
-function countCollectionCardInfo(collectionId) {
-    let route = jsRoutes.controllers.CollectionController.commonCardInfo(collectionId);
+function commonCollectionCardInfo(collectionId, showPublicListingPrice) {
+    let route = jsRoutes.controllers.CollectionController.commonCardInfo(collectionId, showPublicListingPrice);
     $.ajax({
         url: route.url,
         type: route.type,
