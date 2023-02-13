@@ -82,7 +82,7 @@ class Starter @Inject()(
 
   implicit val NFTPropertyReads: Reads[NFTProperty] = Json.reads[NFTProperty]
 
-  case class UploadCollection(id: String, creatorId: String, name: String, description: String, jsonPath: String, downloadFromIPFS: Boolean, imagePath: String, nftFormat: String, twitter: String, instagram: String, website: String, profileImagePath: Option[String], coverImagePath: Option[String], addCollection: Boolean, updateNFTs: Boolean, classificationProperties: Seq[CollectionProperty], deleteOld: Boolean)
+  case class UploadCollection(id: String, creatorId: String, name: String, description: String, jsonPath: String, downloadFromIPFS: Boolean, imagePath: String, nftFormat: String, twitter: String, instagram: String, website: String, profileImagePath: Option[String], coverImagePath: Option[String], addCollection: Boolean, updateNFTs: Boolean, classificationProperties: Seq[CollectionProperty])
 
   case class NFT(name: String, description: String, image: String, properties: Seq[NFTProperty])
 
@@ -114,7 +114,7 @@ class Starter @Inject()(
   private def addNft(originalNFT: NFT, uploadCollection: UploadCollection, nftImageFileName: String, collection: Collection) = {
     val classificationPropertiesNames = uploadCollection.classificationProperties.map(_.name)
     val originalNFTPropertiesNames = originalNFT.properties.map(_.name)
-    val nftDetails = if (uploadCollection.id == "D378FA9E41C0B639") {
+    val nftDetails = if (uploadCollection.id == "C5FD79BDDDCB75C4") {
       originalNFT.copy(properties = originalNFT.properties.filter(x => classificationPropertiesNames.contains(x.name)) ++ uploadCollection.classificationProperties.filterNot(x => originalNFTPropertiesNames.contains(x.name)).map(_.toNFTProperty))
     } else originalNFT
     val valid = verifyNFT(nftDetails, collection)
@@ -156,7 +156,6 @@ class Starter @Inject()(
 
     def addCollections(uploadCollections: Seq[UploadCollection]) = utilitiesOperations.traverse(uploadCollections) { uploadCollection =>
       if (uploadCollection.addCollection) {
-        val delete = if (uploadCollection.deleteOld) deleteCollection(uploadCollection.id) else Future()
         val coverFileName = if (uploadCollection.coverImagePath.isDefined) {
           val coverFileName = utilities.FileOperations.getFileHash(constants.CommonConfig.Files.CollectionPath + "/" + uploadCollection.coverImagePath.get) + "." + uploadCollection.nftFormat
           val coverAwsKey = utilities.Collection.getOthersFileAwsKey(collectionId = uploadCollection.id, fileName = coverFileName)
@@ -183,7 +182,6 @@ class Starter @Inject()(
         def analysis = collectionsAnalysis.Utility.onNewCollection(uploadCollection.id)
 
         for {
-          _ <- delete
           _ <- add
           _ <- analysis
         } yield ()
@@ -224,38 +222,6 @@ class Starter @Inject()(
       uploadCollections <- uploadCollections
       _ <- addCollections(uploadCollections)
       _ <- addCollectionNFTs(uploadCollections)
-    } yield ()
-  }
-
-  def deleteCollection(collectionId: String): Future[Unit] = {
-    println("deleting: " + collectionId)
-    val list = Seq(collectionId)
-    val deleteWishlist = masterWishLists.Service.deleteCollections(list)
-    val nftIDs = masterNFTs.Service.getAllIdsForCollections(list)
-
-    val deleteAnalytics = collectionsAnalysis.Service.delete(list)
-    val deleteNftOwners = masterNFTOwners.Service.deleteCollections(list)
-
-    val deleteNFTDraft = masterTransactionNFTDrafts.Service.deleteByCollectionIds(list)
-
-    def deleteNFTProperties(nftIDs: Seq[String]) = masterNFTProperties.Service.deleteByNFTIds(nftIDs)
-
-    def deleteNFTTags(nftIDs: Seq[String]) = masterNFTTags.Service.deleteByNFTIds(nftIDs)
-
-    def deleteNfts() = masterNFTs.Service.deleteCollections(list)
-
-    def deleteAllCollections() = masterCollections.Service.delete(list)
-
-    for {
-      nftIDs <- nftIDs
-      _ <- deleteWishlist
-      _ <- deleteNFTProperties(nftIDs)
-      _ <- deleteNFTTags(nftIDs)
-      _ <- deleteNFTDraft
-      _ <- deleteAnalytics
-      _ <- deleteNftOwners
-      _ <- deleteNfts()
-      _ <- deleteAllCollections()
     } yield ()
   }
 
