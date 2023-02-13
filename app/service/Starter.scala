@@ -114,8 +114,9 @@ class Starter @Inject()(
   private def addNft(originalNFT: NFT, uploadCollection: UploadCollection, nftImageFileName: String, collection: Collection) = {
     val classificationPropertiesNames = uploadCollection.classificationProperties.map(_.name)
     val originalNFTPropertiesNames = originalNFT.properties.map(_.name)
-    val nftDetails = originalNFT.copy(properties = originalNFT.properties.filter(x => classificationPropertiesNames.contains(x.name)) ++ uploadCollection.classificationProperties.filterNot(x => originalNFTPropertiesNames.contains(x.name)).map(_.toNFTProperty))
-    println(nftDetails.properties.length == uploadCollection.classificationProperties.length)
+    val nftDetails = if (uploadCollection.id == "D378FA9E41C0B639") {
+      originalNFT.copy(properties = originalNFT.properties.filter(x => classificationPropertiesNames.contains(x.name)) ++ uploadCollection.classificationProperties.filterNot(x => originalNFTPropertiesNames.contains(x.name)).map(_.toNFTProperty))
+    } else originalNFT
     val valid = verifyNFT(nftDetails, collection)
     println(valid)
     if (valid) {
@@ -145,7 +146,7 @@ class Starter @Inject()(
       } else ""
       utilities.FileOperations.deleteFile(nftImageFile)
     } else {
-      logger.error("incorrect nft: " + nftDetails.name)
+      logger.error("incorrect nft: " + nftDetails.name + " (" + uploadCollection.name + ")")
       ""
     }
   }
@@ -311,7 +312,7 @@ class Starter @Inject()(
   // Delete redundant nft tags
   def start(): Future[Unit] = {
     (for {
-//      _ <- uploadCollections()
+      _ <- uploadCollections()
       _ <- validateAll()
     } yield ()
       ).recover {
