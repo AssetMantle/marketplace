@@ -111,7 +111,7 @@ class NFTOwners @Inject()(
       def verifyAndUpdate(nftOwner: NFTOwner) = if (nftOwner.saleId.getOrElse("") == saleId) {
         if (nftOwner.quantity == 1) {
           val deleteOld = delete(nftId = nftOwner.nftId, ownerId = nftOwner.ownerId)
-          val addNew =  create(nftOwner.copy(saleId = None, ownerId = buyerAccountId))
+          val addNew = create(nftOwner.copy(saleId = None, ownerId = buyerAccountId))
           for {
             _ <- deleteOld
             _ <- addNew
@@ -145,18 +145,11 @@ class NFTOwners @Inject()(
 
     def getSaleId(nftId: String): Future[Option[String]] = filterHead(_.nftId === nftId).map(_.saleId)
 
-    def checkAllSold(saleId: String): Future[Boolean] = filterAndExists(_.saleId === saleId).map(!_)
-
     def tryGet(nftId: String, ownerId: String): Future[NFTOwner] = tryGetById1AndId2(id1 = nftId, id2 = ownerId)
 
     def getOwners(nftId: String): Future[Seq[NFTOwner]] = filter(_.id1 === nftId)
 
     def checkExists(nftId: String, ownerId: String): Future[Boolean] = exists(id1 = nftId, id2 = ownerId)
-
-    def checkSaleNotExists(collectionId: String): Future[Boolean] = {
-      val nullStatus: Option[String] = null
-      filterAndExists(x => x.collectionId === collectionId && x.saleId.? === nullStatus)
-    }
 
     def markSaleNull(saleId: String): Future[Int] = {
       val nullString: Option[String] = null
@@ -170,6 +163,8 @@ class NFTOwners @Inject()(
 
     def countOwnedNFTs(accountId: String): Future[Int] = filterAndCount(x => x.ownerId === accountId && x.creatorId =!= accountId)
 
+    def countCollectionOwnedNFTs(accountId: String, collectionID: String): Future[Int] = filterAndCount(x => x.ownerId === accountId && x.creatorId =!= accountId && x.collectionId === collectionID)
+
     def countOwnedAndCreatedNFTsForCollection(accountId: String, collectionId: String): Future[Int] = filterAndCount(x => x.ownerId === accountId && x.creatorId === accountId && x.collectionId === collectionId)
 
     def getRandomNFTsBySaleId(saleId: String, take: Int, creatorId: String): Future[Seq[NFTOwner]] = filter(x => x.saleId === saleId && x.ownerId === creatorId && x.creatorId === creatorId).map(x => util.Random.shuffle(x).take(take))
@@ -177,6 +172,10 @@ class NFTOwners @Inject()(
     def getRandomNFTsByPublicListingId(publicListingId: String, take: Int, creatorId: String): Future[Seq[NFTOwner]] = filter(x => x.publicListingId === publicListingId && x.ownerId === creatorId && x.creatorId === creatorId).map(x => util.Random.shuffle(x).take(take))
 
     def deleteCollections(collectionIds: Seq[String]): Future[Int] = filterAndDelete(_.collectionId.inSet(collectionIds))
+
+    def getCollectedCollection(accountId: String): Future[Seq[String]] = filter(x => x.ownerId === accountId && x.creatorId =!= accountId).map(_.map(_.collectionId).distinct)
+
+    def getByCollectionAndPageNumber(accountId: String, collectionId: String, pageNumber: Int, perPage: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * perPage, limit = perPage)(x => x.ownerId === accountId && x.creatorId =!= accountId && x.collectionId === collectionId)(_.updatedOnMillisEpoch).map(_.map(_.nftId))
 
     def tryGetByNFTAndSaleId(nftId: String, saleId: String): Future[NFTOwner] = filterHead(x => x.saleId === saleId && x.nftId === nftId)
     //    https://scala-slick.org/doc/3.1.1/sql-to-slick.html#id21
