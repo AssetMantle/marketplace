@@ -276,20 +276,19 @@ class Starter @Inject()(
   }
 
   def addValentineNFTs(): Future[Unit] = {
-    val creatorID = "Mint.E"
     case class ValentineNFT(fileName: String, name: String, description: String, format: String)
     val nfts = Seq(
-      ValentineNFT(fileName = "1.gif", name = "name1", description = "description1", format = "gif"),
-      ValentineNFT(fileName = "2.gif", name = "name2", description = "description2", format = "gif"),
-      ValentineNFT(fileName = "3.gif", name = "name3", description = "description3", format = "gif"),
-      ValentineNFT(fileName = "4.gif", name = "name4", description = "description4", format = "gif"),
-      ValentineNFT(fileName = "5.gif", name = "name5", description = "description5", format = "gif"),
-      ValentineNFT(fileName = "6.gif", name = "name6", description = "description6", format = "gif"),
-      ValentineNFT(fileName = "7.gif", name = "name7", description = "description7", format = "gif"),
-      ValentineNFT(fileName = "8.gif", name = "name8", description = "description8", format = "gif"),
-      ValentineNFT(fileName = "9.gif", name = "name9", description = "description9", format = "gif"),
-      ValentineNFT(fileName = "10.gif", name = "name9", description = "description10", format = "gif"),
-      ValentineNFT(fileName = "11.gif", name = "name9", description = "description11", format = "gif"),
+      ValentineNFT(fileName = "1.gif", name = "name1", description = "", format = "gif"),
+      ValentineNFT(fileName = "2.gif", name = "name2", description = "", format = "gif"),
+      ValentineNFT(fileName = "3.gif", name = "name3", description = "", format = "gif"),
+      ValentineNFT(fileName = "4.gif", name = "name4", description = "", format = "gif"),
+      ValentineNFT(fileName = "5.gif", name = "name5", description = "", format = "gif"),
+      ValentineNFT(fileName = "6.gif", name = "name6", description = "", format = "gif"),
+      ValentineNFT(fileName = "7.gif", name = "name7", description = "", format = "gif"),
+      ValentineNFT(fileName = "8.gif", name = "name8", description = "", format = "gif"),
+      ValentineNFT(fileName = "9.gif", name = "name9", description = "", format = "gif"),
+      ValentineNFT(fileName = "10.gif", name = "name9", description = "", format = "gif"),
+      ValentineNFT(fileName = "11.gif", name = "name9", description = "", format = "gif"),
     )
     val allUsernames = masterAccounts.Service.getAllUsernames
     var allocatedUsernames: Seq[String] = Seq()
@@ -318,7 +317,7 @@ class Starter @Inject()(
           val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collection.id, fileName = newFileName)
           utilities.AmazonS3.uploadFile(awsKey, nftImageFile)
           Await.result(masterNFTs.Service.add(master.NFT(id = fileHash, collectionId = collection.id, name = valentineNFT.name, description = valentineNFT.description, totalSupply = allocateTo.length, isMinted = false, fileExtension = valentineNFT.format, ipfsLink = "", edition = None)), Duration.Inf)
-          Await.result(masterNFTOwners.Service.add(allocateTo.map(x => master.NFTOwner(nftId = fileHash, ownerId = x, creatorId = creatorID, collectionId = collection.id, quantity = 1, saleId = None, publicListingId = None))), Duration.Inf)
+          Await.result(masterNFTOwners.Service.add(allocateTo.map(x => master.NFTOwner(nftId = fileHash, ownerId = x, creatorId = collection.creatorId, collectionId = collection.id, quantity = 1, saleId = None, publicListingId = None))), Duration.Inf)
           Await.result(collectionsAnalysis.Utility.onNewNFT(collection.id), Duration.Inf)
           nftsDistributed = nftsDistributed + 1
           println(valentineNFT.name + " done")
