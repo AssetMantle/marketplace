@@ -122,5 +122,7 @@ class Accounts @Inject()(
 
     def get(username: String): Future[Option[Account]] = getById(username)
 
+    def getAllUsernames: Future[Seq[String]] = getAll.map(_.map(_.id))
+
   }
 }
