@@ -404,36 +404,6 @@ class NFTController @Inject()(
       )
   }
 
-  def collectedSection(accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit optionalLoginState =>
-      implicit request =>
-        Future(Ok(views.html.profile.collected.collectedSection(accountId)))
-    }
-  }
-
-  def collectedNFTsPerPage(accountId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit optionalLoginState =>
-      implicit request =>
-        val nftIds = masterNFTOwners.Service.getByOwnerIdAndPageNumber(accountId, pageNumber)
-
-        def nfts(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds)
-
-        def collections(collectionIds: Seq[String]) = masterCollections.Service.getCollections(collectionIds)
-
-        def wishLists(nftIds: Seq[String]) = masterWishLists.Service.get(accountId = accountId, nftIds = nftIds)
-
-        (for {
-          nftIds <- nftIds
-          nfts <- nfts(nftIds)
-          collections <- collections(nfts.map(_.collectionId))
-          wishLists <- wishLists(nfts.map(_.id))
-        } yield Ok(views.html.profile.collected.collectedNFTsPerPage(nfts, collections, wishLists))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
   def price(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req, cacheWithUsername = false), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit optionalLoginState =>
       implicit request =>

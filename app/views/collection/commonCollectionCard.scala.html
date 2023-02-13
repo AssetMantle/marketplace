@@ -1,41 +1,43 @@
-@(collection: master.Collection, onClickFunction: JavaScript, showPublicListingPrice: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(collection: master.Collection, onClickFunction: JavaScript, showPublicListingPrice: Boolean, showSaleStatus: Boolean = true)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="collectionCardContainer">
     <div class="single-profile-card commonCollectionCard artCollection">
         <div class="profile-section">
             <div onclick="@onClickFunction" class="collectionLink">
-                <div class="saleBadge" id="saleBadge_@collection.id">
-                    <div class="option live">
-                        <div class="d-flex gap-2 align-items-center">
-                            <div class="statusDotWrapper">
-                                <div class="statusDotEmitter">
-                                    <div class="statusDotWave"></div>
+                @if(showSaleStatus) {
+                    <div class="saleBadge" id="saleBadge_@collection.id">
+                        <div class="option live">
+                            <div class="d-flex gap-2 align-items-center">
+                                <div class="statusDotWrapper">
+                                    <div class="statusDotEmitter">
+                                        <div class="statusDotWave"></div>
+                                    </div>
                                 </div>
+                                <div class="statusMessage" id="statusMessage_@collection.id">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_LIVE)</div>
                             </div>
-                            <div class="statusMessage" id="statusMessage_@collection.id">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_LIVE)</div>
+                        </div>
+                        <div class="option soldOut">
+                            <div class="d-flex gap-2 align-items-center">
+                                <div class="statusDotWrapper">
+                                    <div class="statusDotEmitter">
+                                        <div class="statusDotWave"></div>
+                                    </div>
+                                </div>
+                                <div class="statusMessage" id="statusMessage_@collection.id">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_SOLD_OUT)</div>
+                            </div>
+                        </div>
+                        <div class="option ended">
+                            <div class="d-flex gap-2 align-items-center">
+                                <div class="statusDotWrapper">
+                                    <div class="statusDotEmitter">
+                                        <div class="statusDotWave"></div>
+                                    </div>
+                                </div>
+                                <div class="statusMessage" id="statusMessage_@collection.id">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_ENDED)</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="option soldOut">
-                        <div class="d-flex gap-2 align-items-center">
-                            <div class="statusDotWrapper">
-                                <div class="statusDotEmitter">
-                                    <div class="statusDotWave"></div>
-                                </div>
-                            </div>
-                            <div class="statusMessage" id="statusMessage_@collection.id">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_SOLD_OUT)</div>
-                        </div>
-                    </div>
-                    <div class="option ended">
-                        <div class="d-flex gap-2 align-items-center">
-                            <div class="statusDotWrapper">
-                                <div class="statusDotEmitter">
-                                    <div class="statusDotWave"></div>
-                                </div>
-                            </div>
-                            <div class="statusMessage" id="statusMessage_@collection.id">@Messages(constants.View.COLLECTION_CARD_SALE_BADGE_LABEL_ENDED)</div>
-                        </div>
-                    </div>
-                </div>
+                }
 
                 <div id="collectionCoverImage_@collection.id">
                     <div class="hero-img">
@@ -60,16 +62,30 @@
                     </div>
                 </div>
                 <div id="content">
-                    <div class="d-flex justify-content-between align-items-end collectionDetail">
+                    <div class="collectionDetail">
                         <div class="leftInfo">
                             <div onclick="@onClickFunction" class="collectionLink">
                                 <h1>@collection.name</h1>
                             </div>
-                            <a href="/profile/@collection.creatorId">
-                                <p>
-                                @Seq("@", collection.creatorId).mkString
-                                </p>
-                            </a>
+                            <div class="d-flex justify-content-between">
+                                <a href="/profile/@collection.creatorId">
+                                    <p>
+                                    @Seq("@", collection.creatorId).mkString
+                                    </p>
+                                </a>
+                                <div class="collectionStats">
+                                    <div class="d-flex gap-2 gap-md-3 collectionStatsContainer">
+                                        <div class="d-flex gap-2 justify-content-between collectionStatsBadge">
+                                            <div class="badgeLabel">@Messages(constants.View.COLLECTION_CARD_BADGE_LABEL_ASSETS)</div>
+                                            <div id="counCollectionNFTs_@collection.id" class="badgeValue">0</div>
+                                        </div>
+                                        <div class="d-flex gap-2 justify-content-between collectionStatsBadge">
+                                            <div class="badgeLabel">@Messages(constants.View.COLLECTION_CARD_BADGE_LABEL_PRICE)</div>
+                                            <div id="collectionNFTsPrice_@collection.id" class="badgeValue">0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="rightInfo">
                             <div class="d-flex flex-column gap-3">
@@ -95,18 +111,6 @@
 @*                                        </div>*@
 @*                                    </div>*@
 @*                                </div>*@
-                                <div class="collectionStats">
-                                    <div class="d-flex gap-2 gap-md-3 collectionStatsContainer">
-                                        <div class="d-flex gap-2 justify-content-between collectionStatsBadge">
-                                            <div class="badgeLabel">@Messages(constants.View.COLLECTION_CARD_BADGE_LABEL_ASSETS)</div>
-                                            <div id="counCollectionNFTs_@collection.id" class="badgeValue">0</div>
-                                        </div>
-                                        <div class="d-flex gap-2 justify-content-between collectionStatsBadge">
-                                            <div class="badgeLabel">@Messages(constants.View.COLLECTION_CARD_BADGE_LABEL_PRICE)</div>
-                                            <div id="collectionNFTsPrice_@collection.id" class="badgeValue">0</div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -115,4 +119,6 @@
         </div>
     </div>
 </div>
-<script>commonCollectionCardInfo('@collection.id', @showPublicListingPrice)</script>
+@if(showSaleStatus){
+    <script>commonCollectionCardInfo('@collection.id', @showPublicListingPrice)</script>
+}
