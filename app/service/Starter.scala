@@ -333,9 +333,63 @@ class Starter @Inject()(
     } yield uploadNFTs(allUsernames, collection)
   }
 
+  def fixCosmoZombie(): Future[Unit] = {
+    val classificationProperties = Seq(
+      CollectionProperty(name = "Background", `type` = constants.NFT.Data.STRING, value = ""),
+      CollectionProperty(name = "profession", `type` = constants.NFT.Data.STRING, value = ""),
+      CollectionProperty(name = "Eye", `type` = constants.NFT.Data.STRING, value = ""),
+      CollectionProperty(name = "Face", `type` = constants.NFT.Data.STRING, value = ""),
+      CollectionProperty(name = "Hat", `type` = constants.NFT.Data.STRING, value = ""),
+      CollectionProperty(name = "Clothes", `type` = constants.NFT.Data.STRING, value = ""),
+    )
+    val collection = masterCollections.Service.tryGet("C395A2ECE13B3B03")
+    val allNFTIDs = masterNFTs.Service.getAllIdsForCollection("C395A2ECE13B3B03")
+    val dirtyProperty = masterNFTProperties.Service.tryGet(nftId = "a3a7a5d9c66f55029b54ef893dac8fb2b5c8f26fde2b633986076439f0f8438a", name = "T-shirt")
+
+    def updateDirtyProperty(dirtyProperty: models.master.NFTProperty) = {
+      val add = masterNFTProperties.Service.add(dirtyProperty.copy(name = "Clothes"))
+
+      def delete = masterNFTProperties.Service.deleteProperty(nftId = "a3a7a5d9c66f55029b54ef893dac8fb2b5c8f26fde2b633986076439f0f8438a", name = "T-shirt")
+
+      for {
+        _ <- add
+        _ <- delete
+      } yield ()
+    }
+
+    def updateCollection(collection: Collection) = masterCollections.Service.update(collection.copy(properties = Option(classificationProperties.map(_.toProperty))))
+
+    def fixAllProperties(allNFTIDs: Seq[String]) = utilitiesOperations.traverse(allNFTIDs){nftID =>
+      val properties = masterNFTProperties.Service.getForNFT(nftID)
+
+      def add(properties: Seq[models.master.NFTProperty]) = {
+        if (properties.map(_.name).contains("Hat")) {
+          masterNFTProperties.Service.add(properties.head.copy(name = "Clothes", `value` = ""))
+        } else {
+          masterNFTProperties.Service.add(properties.head.copy(name = "Hat", `value` = ""))
+        }
+      }
+
+      for {
+        properties <- properties
+        _ <- add(properties)
+      } yield ()
+    }
+
+    for {
+      collection <- collection
+      allNFTIDs <- allNFTIDs
+      dirtyProperty <- dirtyProperty
+      _ <- updateDirtyProperty(dirtyProperty)
+      _ <- updateCollection(collection)
+      _ <- fixAllProperties(allNFTIDs)
+    } yield ()
+  }
+
   // Delete redundant nft tags
   def start(): Future[Unit] = {
     (for {
+      _ <- fixCosmoZombie()
       _ <- addValentineNFTs()
       _ <- uploadCollections()
       _ <- validateAll()
