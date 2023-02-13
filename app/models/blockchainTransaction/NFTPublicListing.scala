@@ -3,6 +3,7 @@ package models.blockchainTransaction
 import constants.Scheduler
 import exceptions.BaseException
 import models.Trait._
+import models.blockchain
 import models.blockchain.Transaction
 import models.common.Coin
 import play.api.Logger
@@ -72,6 +73,7 @@ object NFTPublicListings {
 class NFTPublicListings @Inject()(
                                    protected val databaseConfigProvider: DatabaseConfigProvider,
                                    blockchainTransactions: models.blockchain.Transactions,
+                                   blockchainBlocks: blockchain.Blocks,
                                  )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[NFTPublicListings.NFTPublicListingTable, NFTPublicListings.NFTPublicListingSerialized, String](
     databaseConfigProvider,
@@ -123,13 +125,9 @@ class NFTPublicListings @Inject()(
         def markFailed(hashes: Seq[String]) = if (hashes.nonEmpty) Service.markFailed(hashes) else Future(0)
 
         def markFailedTimedOut(nftPublicListings: Seq[NFTPublicListing], allTxs: Seq[Transaction]) = if (nftPublicListings.nonEmpty) {
-          val currentMillis = utilities.Date.currentMillisEpoch
-          val notFoundTxs = nftPublicListings.map(_.txHash).diff(allTxs.map(_.hash))
-          // 3 days given in case explorer/indexer has stopped
-          // TODO Can be optimised by fetching latest block height and comparing with current time,
-          //  given the tx is done with suitable timeoutHeight
-          val notFoundHashes = nftPublicListings.filter(x => notFoundTxs.contains(x.txHash) && (currentMillis - x.createdOnMillisEpoch.getOrElse(currentMillis)) > constants.Date.ThreeDayMilliSeconds).map(_.txHash)
-          if (notFoundHashes.nonEmpty) Service.markFailedWithLog(notFoundHashes, constants.Response.TRANSACTION_NOT_FOUND.logMessage) else Future(0)
+          val notFoundTxHashes = nftPublicListings.map(_.txHash).diff(allTxs.map(_.hash))
+          val timedoutFailedTxs = nftPublicListings.filter(x => notFoundTxHashes.contains(x.txHash) && x.timeoutHeight > 0 && x.timeoutHeight > blockchainBlocks.Service.getLatestHeight).map(_.txHash)
+          if (timedoutFailedTxs.nonEmpty) Service.markFailedWithLog(timedoutFailedTxs, constants.Response.TRANSACTION_NOT_FOUND.logMessage) else Future(0)
         } else Future(0)
 
         val forComplete = (for {

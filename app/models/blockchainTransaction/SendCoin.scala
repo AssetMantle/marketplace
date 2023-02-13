@@ -3,6 +3,7 @@ package models.blockchainTransaction
 import constants.Scheduler
 import exceptions.BaseException
 import models.Trait._
+import models.blockchain
 import models.blockchain.Transaction
 import models.common.Coin
 import org.bitcoinj.core.ECKey
@@ -86,6 +87,7 @@ class SendCoins @Inject()(
                            getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
                            getAccount: queries.blockchain.GetAccount,
                            getAbciInfo: queries.blockchain.GetABCIInfo,
+                           blockchainBlocks: blockchain.Blocks,
                          )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl2[SendCoins.SendCoinTable, SendCoins.SendCoinSerialized, String, String](
     databaseConfigProvider,
@@ -183,13 +185,9 @@ class SendCoins @Inject()(
         def markFailed(hashes: Seq[String]) = if (hashes.nonEmpty) Service.markFailed(hashes) else Future(0)
 
         def markFailedTimedOut(sendCoins: Seq[SendCoin], allTxs: Seq[Transaction]) = if (sendCoins.nonEmpty) {
-          val currentMillis = utilities.Date.currentMillisEpoch
-          val notFoundTxs = sendCoins.map(_.txHash).diff(allTxs.map(_.hash))
-          // 3 days given in case explorer/indexer has stopped
-          // TODO Can be optimised by fetching latest block height and comparing with current time,
-          //  given the tx is done with suitable timeoutHeight
-          val notFoundHashes = sendCoins.filter(x => notFoundTxs.contains(x.txHash) && (currentMillis - x.createdOnMillisEpoch.getOrElse(currentMillis)) > constants.Date.ThreeDayMilliSeconds).map(_.txHash)
-          if (notFoundHashes.nonEmpty) Service.markFailedWithLog(notFoundHashes, constants.Response.TRANSACTION_NOT_FOUND.logMessage) else Future(0)
+          val notFoundTxHashes = sendCoins.map(_.txHash).diff(allTxs.map(_.hash))
+          val timedoutFailedTxs = sendCoins.filter(x => notFoundTxHashes.contains(x.txHash) && x.timeoutHeight > 0 && x.timeoutHeight > blockchainBlocks.Service.getLatestHeight).map(_.txHash)
+          if (timedoutFailedTxs.nonEmpty) Service.markFailedWithLog(timedoutFailedTxs, constants.Response.TRANSACTION_NOT_FOUND.logMessage) else Future(0)
         } else Future(0)
 
         val forComplete = (for {
