@@ -60,16 +60,30 @@
                     </div>
                 </div>
                 <div id="content">
-                    <div class="d-flex justify-content-between align-items-end collectionDetail">
+                    <div class="collectionDetail">
                         <div class="leftInfo">
                             <div onclick="@onClickFunction" class="collectionLink">
                                 <h1>@collection.name</h1>
                             </div>
-                            <a href="/profile/@collection.creatorId">
-                                <p>
-                                @Seq("@", collection.creatorId).mkString
-                                </p>
-                            </a>
+                            <div class="d-flex justify-content-between">
+                                <a href="/profile/@collection.creatorId">
+                                    <p>
+                                    @Seq("@", collection.creatorId).mkString
+                                    </p>
+                                </a>
+                                <div class="collectionStats">
+                                    <div class="d-flex gap-2 gap-md-3 collectionStatsContainer">
+                                        <div class="d-flex gap-2 justify-content-between collectionStatsBadge">
+                                            <div class="badgeLabel">@Messages(constants.View.COLLECTION_CARD_BADGE_LABEL_ASSETS)</div>
+                                            <div id="counCollectionNFTs_@collection.id" class="badgeValue">0</div>
+                                        </div>
+                                        <div class="d-flex gap-2 justify-content-between collectionStatsBadge">
+                                            <div class="badgeLabel">@Messages(constants.View.COLLECTION_CARD_BADGE_LABEL_PRICE)</div>
+                                            <div id="collectionNFTsPrice_@collection.id" class="badgeValue">0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="rightInfo">
                             <div class="d-flex flex-column gap-3">
@@ -95,18 +109,6 @@
 @*                                        </div>*@
 @*                                    </div>*@
 @*                                </div>*@
-                                <div class="collectionStats">
-                                    <div class="d-flex gap-2 gap-md-3 collectionStatsContainer">
-                                        <div class="d-flex gap-2 justify-content-between collectionStatsBadge">
-                                            <div class="badgeLabel">@Messages(constants.View.COLLECTION_CARD_BADGE_LABEL_ASSETS)</div>
-                                            <div id="counCollectionNFTs_@collection.id" class="badgeValue">0</div>
-                                        </div>
-                                        <div class="d-flex gap-2 justify-content-between collectionStatsBadge">
-                                            <div class="badgeLabel">@Messages(constants.View.COLLECTION_CARD_BADGE_LABEL_PRICE)</div>
-                                            <div id="collectionNFTsPrice_@collection.id" class="badgeValue">0</div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>

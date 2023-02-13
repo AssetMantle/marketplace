@@ -804,6 +804,31 @@
           h1{
             text-align: left;
           }
+          .collectionStats{
+            .collectionStatsContainer {
+              margin: 0px 0px 12px 0px;
+
+              .collectionStatsBadge {
+                background-color: var(--popup-bg);
+                border-radius: 8px;
+                padding: 4px 6px;
+
+                .badgeLabel {
+                  @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--mantle-off-white));
+                  white-space: nowrap;
+                }
+
+                .badgeValue {
+                  @include setFont(var(--font-type-1), normal, 500, 12px, 14px, var(--gray));
+                  text-align: right;
+                  white-space: nowrap;
+                }
+              }
+              @media (max-width: 426px){
+                flex-direction: column;
+              }
+            }
+          }
         }
         .rightInfo{
           .collectionStatus{
@@ -829,29 +854,7 @@
               }
             }
           }
-          .collectionStats{
-            .collectionStatsContainer {
-              margin: 0px 0px 12px 0px;
 
-              .collectionStatsBadge {
-                background-color: var(--popup-bg);
-                border-radius: 8px;
-                padding: 4px 6px;
-
-                .badgeLabel {
-                  @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--mantle-off-white));
-                }
-
-                .badgeValue {
-                  @include setFont(var(--font-type-1), normal, 500, 12px, 14px, var(--gray));
-                  text-align: right;
-                }
-              }
-              @media (max-width: 426px){
-                flex-direction: column;
-              }
-            }
-          }
         }
       }
     }
