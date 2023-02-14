@@ -126,7 +126,7 @@ class NFTPublicListings @Inject()(
 
         def markFailedTimedOut(nftPublicListings: Seq[NFTPublicListing], allTxs: Seq[Transaction]) = if (nftPublicListings.nonEmpty) {
           val notFoundTxHashes = nftPublicListings.map(_.txHash).diff(allTxs.map(_.hash))
-          val timedoutFailedTxs = nftPublicListings.filter(x => notFoundTxHashes.contains(x.txHash) && x.timeoutHeight > 0 && x.timeoutHeight > blockchainBlocks.Service.getLatestHeight).map(_.txHash)
+          val timedoutFailedTxs = nftPublicListings.filter(x => notFoundTxHashes.contains(x.txHash) && x.timeoutHeight > 0 && blockchainBlocks.Service.getLatestHeight > x.timeoutHeight).map(_.txHash)
           if (timedoutFailedTxs.nonEmpty) Service.markFailedWithLog(timedoutFailedTxs, constants.Response.TRANSACTION_NOT_FOUND.logMessage) else Future(0)
         } else Future(0)
 

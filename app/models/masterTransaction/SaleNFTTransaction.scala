@@ -125,7 +125,7 @@ class SaleNFTTransactions @Inject()(
       filterAndCount(x => x.saleId === saleId && (x.status.? === nullStatus || x.status))
     }
 
-    def checkAnyPendingTx(saleIDs: Seq[String]): Future[Seq[String]] = customQuery(SaleNFTTransactions.TableQuery.filter(_.saleId.inSet(saleIDs)).map(_.saleId).distinct.result)
+    def checkAnyPendingTx(saleIDs: Seq[String]): Future[Seq[String]] = customQuery(SaleNFTTransactions.TableQuery.filter(x => x.saleId.inSet(saleIDs) && x.status.?.isEmpty).map(_.saleId).distinct.result)
   }
 
   object Utility {

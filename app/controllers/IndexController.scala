@@ -43,6 +43,7 @@ class IndexController @Inject()(
 
   def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
+      println(blockchainBlocks.Service.getLatestHeight)
       Future(Ok(views.html.index()))
   }
 
