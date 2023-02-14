@@ -158,6 +158,6 @@ class Collections @Inject()(
 
     def delete(ids: Seq[String]): Future[Int] = filterAndDelete(_.id.inSet(ids))
 
-    def setPropertiesToEmpty() = customUpdate(Collections.TableQuery.filter(_.id === "D4C3FD5554AEDB64").map(_.properties).update("[]"))
+    def getAllPublic: Future[Seq[Collection]] = filter(_.public).map(_.map(_.deserialize))
   }
 }

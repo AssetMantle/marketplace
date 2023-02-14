@@ -30,7 +30,7 @@
             </ul>
         </div>
         <div class="d-flex flex-row flex-wrap gap-3 propertyList">
-        @nftProperties.map { property =>
+        @nftProperties.filter(_.`value` != "").map { property =>
             <div class="singleProperty">
                 <div class="propertyName">@property.name</div>
                 <div class="mt-2 propertyValue">
