@@ -278,17 +278,17 @@ class Starter @Inject()(
   def addValentineNFTs(): Future[Unit] = {
     case class ValentineNFT(fileName: String, name: String, description: String, format: String)
     val nfts = Seq(
-      ValentineNFT(fileName = "1.gif", name = "MintE", description = "", format = "gif"),
-      ValentineNFT(fileName = "2.gif", name = "MintE & Cosmos", description = "", format = "gif"),
-      ValentineNFT(fileName = "3.gif", name = "MintE & Persistence", description = "", format = "gif"),
-      ValentineNFT(fileName = "4.gif", name = "MintE & Axelar", description = "", format = "gif"),
-      ValentineNFT(fileName = "5.gif", name = "MintE & Injective", description = "", format = "gif"),
-      ValentineNFT(fileName = "6.gif", name = "MintE & OKC", description = "", format = "gif"),
-      ValentineNFT(fileName = "7.gif", name = "MintE & Juno", description = "", format = "gif"),
-      ValentineNFT(fileName = "8.gif", name = "MintE & Evmos", description = "", format = "gif"),
-      ValentineNFT(fileName = "9.gif", name = "MintE & Gravity Bridge", description = "", format = "gif"),
-      ValentineNFT(fileName = "10.gif", name = "MintE & Comdex", description = "", format = "gif"),
-      ValentineNFT(fileName = "11.gif", name = "MintE & Osmosis", description = "", format = "gif"),
+      ValentineNFT(fileName = "1.gif", name = "MNTL", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
+      ValentineNFT(fileName = "2.gif", name = "Cosmos", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
+      ValentineNFT(fileName = "3.gif", name = "Persistence", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
+      ValentineNFT(fileName = "4.gif", name = "Axelar", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
+      ValentineNFT(fileName = "5.gif", name = "Injective", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
+      ValentineNFT(fileName = "6.gif", name = "OKC", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
+      ValentineNFT(fileName = "7.gif", name = "Juno", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
+      ValentineNFT(fileName = "8.gif", name = "Evmos", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
+      ValentineNFT(fileName = "9.gif", name = "Gravity Bridge", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
+      ValentineNFT(fileName = "10.gif", name = "Comdex", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
+      ValentineNFT(fileName = "11.gif", name = "Osmosis", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
     )
     val allUsernames = masterAccounts.Service.getAllUsernames
     var allocatedUsernames: Seq[String] = Seq()
