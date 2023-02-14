@@ -359,7 +359,7 @@ class Starter @Inject()(
 
     def updateCollection(collection: Collection) = masterCollections.Service.update(collection.copy(properties = Option(classificationProperties.map(_.toProperty))))
 
-    def fixAllProperties(allNFTIDs: Seq[String]) = utilitiesOperations.traverse(allNFTIDs){nftID =>
+    def fixAllProperties(allNFTIDs: Seq[String]) = utilitiesOperations.traverse(allNFTIDs) { nftID =>
       val properties = masterNFTProperties.Service.getForNFT(nftID)
 
       def add(properties: Seq[models.master.NFTProperty]) = {
@@ -386,9 +386,47 @@ class Starter @Inject()(
     } yield ()
   }
 
+  def deleteOldCollections(): Future[Seq[Unit]] = {
+    val list = Seq("BE3188DFA0D7118C", "E98FA5E59F40D280", "D378FA9E41C0B639")
+    utilitiesOperations.traverse(list) { id => deleteCollection(id) }
+  }
+
+  private def deleteCollection(collectionId: String): Future[Unit] = {
+    println("deleting: " + collectionId)
+    val list = Seq(collectionId)
+    val deleteWishlist = masterWishLists.Service.deleteCollections(list)
+    val nftIDs = masterNFTs.Service.getAllIdsForCollections(list)
+
+    val deleteAnalytics = collectionsAnalysis.Service.delete(list)
+    val deleteNftOwners = masterNFTOwners.Service.deleteCollections(list)
+
+    val deleteNFTDraft = masterTransactionNFTDrafts.Service.deleteByCollectionIds(list)
+
+    def deleteNFTProperties(nftIDs: Seq[String]) = masterNFTProperties.Service.deleteByNFTIds(nftIDs)
+
+    def deleteNFTTags(nftIDs: Seq[String]) = masterNFTTags.Service.deleteByNFTIds(nftIDs)
+
+    def deleteNfts() = masterNFTs.Service.deleteCollections(list)
+
+    def deleteAllCollections() = masterCollections.Service.delete(list)
+
+    for {
+      nftIDs <- nftIDs
+      _ <- deleteWishlist
+      _ <- deleteNFTProperties(nftIDs)
+      _ <- deleteNFTTags(nftIDs)
+      _ <- deleteNFTDraft
+      _ <- deleteAnalytics
+      _ <- deleteNftOwners
+      _ <- deleteNfts()
+      _ <- deleteAllCollections()
+    } yield ()
+  }
+
   // Delete redundant nft tags
   def start(): Future[Unit] = {
     (for {
+      _ <- deleteOldCollections()
       _ <- fixCosmoZombie()
       _ <- addValentineNFTs()
       _ <- uploadCollections()

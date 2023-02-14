@@ -14,7 +14,7 @@ abstract class Scheduler extends Runnable {
 
   def runner(): Unit
 
-  final def run(): Unit = if (!utilities.Scheduler.getSignalReceived) this.runner
+  final def run(): Unit = if (!utilities.Scheduler.getSignalReceived) this.runner()
   else utilities.Scheduler.shutdownThread(this.name)
 
   def start()(implicit schedulerExecutionContext: ExecutionContext, logger: Logger): Cancellable = {
