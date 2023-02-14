@@ -186,7 +186,7 @@ class SendCoins @Inject()(
 
         def markFailedTimedOut(sendCoins: Seq[SendCoin], allTxs: Seq[Transaction]) = if (sendCoins.nonEmpty) {
           val notFoundTxHashes = sendCoins.map(_.txHash).diff(allTxs.map(_.hash))
-          val timedoutFailedTxs = sendCoins.filter(x => notFoundTxHashes.contains(x.txHash) && x.timeoutHeight > 0 && x.timeoutHeight > blockchainBlocks.Service.getLatestHeight).map(_.txHash)
+          val timedoutFailedTxs = sendCoins.filter(x => notFoundTxHashes.contains(x.txHash) && x.timeoutHeight > 0 && blockchainBlocks.Service.getLatestHeight > x.timeoutHeight).map(_.txHash)
           if (timedoutFailedTxs.nonEmpty) Service.markFailedWithLog(timedoutFailedTxs, constants.Response.TRANSACTION_NOT_FOUND.logMessage) else Future(0)
         } else Future(0)
 

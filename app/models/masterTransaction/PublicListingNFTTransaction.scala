@@ -117,7 +117,7 @@ class PublicListingNFTTransactions @Inject()(
 
     def getAllPendingStatus: Future[Seq[PublicListingNFTTransaction]] = filter(_.status.?.isEmpty)
 
-    def checkAnyPendingTx(publicListingIDs: Seq[String]): Future[Seq[String]] = customQuery(PublicListingNFTTransactions.TableQuery.filter(_.publicListingId.inSet(publicListingIDs)).map(_.publicListingId).distinct.result)
+    def checkAnyPendingTx(publicListingIDs: Seq[String]): Future[Seq[String]] = customQuery(PublicListingNFTTransactions.TableQuery.filter(x => x.publicListingId.inSet(publicListingIDs) && x.status.?.isEmpty).map(_.publicListingId).distinct.result)
   }
 
   object Utility {

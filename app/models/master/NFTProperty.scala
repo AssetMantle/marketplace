@@ -22,7 +22,7 @@ case class NFTProperty(nftId: String, name: String, `type`: String, `value`: Str
 
 object NFTProperties {
 
-  implicit val module: String = constants.Module.MASTER_NFT_TAG
+  implicit val module: String = constants.Module.MASTER_NFT_PROPERTY
 
   implicit val logger: Logger = Logger(this.getClass)
 
