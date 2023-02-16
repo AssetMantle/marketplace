@@ -121,7 +121,7 @@ class MasterSales @Inject()(
   object Utility {
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = constants.Scheduler.HISTORY_MASTER_SALE
+      val name: String = MasterSales.module
 
       def runner(): Unit = {
         val deleteSales = sales.Service.getForDeletion

@@ -9,7 +9,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
-case class NFTOwner(nftId: String, ownerId: String, creatorId: String, collectionId: String, quantity: Long, saleId: Option[String], publicListingId: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
+case class NFTOwner(nftId: String, ownerId: String, creatorId: String, collectionId: String, quantity: Long, saleId: Option[String], publicListingId: Option[String], secondaryMarketId: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
   def id1: String = nftId
 
   def id2: String = ownerId
@@ -24,7 +24,7 @@ object NFTOwners {
 
   class NFTOwnerTable(tag: Tag) extends Table[NFTOwner](tag, "NFTOwner") with ModelTable2[String, String] {
 
-    def * = (nftId, ownerId, creatorId, collectionId, quantity, saleId.?, publicListingId.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTOwner.tupled, NFTOwner.unapply)
+    def * = (nftId, ownerId, creatorId, collectionId, quantity, saleId.?, publicListingId.?, secondaryMarketId.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTOwner.tupled, NFTOwner.unapply)
 
     def nftId = column[String]("nftId", O.PrimaryKey)
 
@@ -39,6 +39,8 @@ object NFTOwners {
     def saleId = column[String]("saleId")
 
     def publicListingId = column[String]("publicListingId")
+
+    def secondaryMarketId = column[String]("secondaryMarketId")
 
     def createdBy = column[String]("createdBy")
 
@@ -159,6 +161,11 @@ class NFTOwners @Inject()(
     def markPublicListingNull(publicListingId: String): Future[Int] = {
       val nullString: Option[String] = null
       customUpdate(NFTOwners.TableQuery.filter(_.publicListingId === publicListingId).map(_.publicListingId.?).update(nullString))
+    }
+
+    def markSecondaryMarketNull(secondaryMarketId: String): Future[Int] = {
+      val nullString: Option[String] = null
+      customUpdate(NFTOwners.TableQuery.filter(_.secondaryMarketId === secondaryMarketId).map(_.secondaryMarketId.?).update(nullString))
     }
 
     def countOwnedNFTs(accountId: String): Future[Int] = filterAndCount(x => x.ownerId === accountId && x.creatorId =!= accountId)

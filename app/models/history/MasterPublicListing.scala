@@ -113,7 +113,7 @@ class MasterPublicListings @Inject()(
   object Utility {
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = constants.Scheduler.HISTORY_MASTER_PUBLIC_LISTING
+      val name: String = MasterPublicListings.module
 
       def runner(): Unit = {
         val deletePublicListings = masterPublicListings.Service.getForDeletion

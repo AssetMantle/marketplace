@@ -84,7 +84,7 @@ class TokenPrices @Inject()(
   object Utility {
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = constants.Scheduler.MASTER_TRANSACTION_TOKEN_PRICE
+      val name: String = TokenPrices.module
 
       override val fixedDelay: FiniteDuration = FiniteDuration(constants.Date.HourSeconds, SECONDS)
 

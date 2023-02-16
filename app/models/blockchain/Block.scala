@@ -77,7 +77,7 @@ class Blocks @Inject()(
   object Utility {
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = constants.Scheduler.BLOCKCHAIN_BLOCK
+      val name: String = Blocks.module
 
       def runner(): Unit = {
         val setHeight = Service.setLatestHeight()

@@ -113,7 +113,7 @@ class NFTPublicListings @Inject()(
   object Utility {
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = constants.Scheduler.BLOCKCHAIN_TRANSACTION_NFT_PUBLIC_LISTING
+      val name: String = NFTPublicListings.module
 
       def runner(): Unit = {
         val nftPublicListings = Service.getAllPendingStatus

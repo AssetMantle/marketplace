@@ -93,7 +93,7 @@ class SessionTokens @Inject()(
 
   object Utility {
     val scheduler: Scheduler = new Scheduler {
-      val name: String = constants.Scheduler.MASTER_TRANSACTION_SESSION_TOKEN
+      val name: String = SessionTokens.module
 
       def runner(): Unit = {
         val ids = Service.getTimedOutIDs

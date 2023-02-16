@@ -28,7 +28,7 @@ object PublicListingNFTTransactions {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_SALE_NFT_TRANSACTION
+  private implicit val module: String = constants.Module.MASTER_TRANSACTION_PUBLIC_LISTING_NFT_TRANSACTION
 
   class PublicListingNFTTransactionTable(tag: Tag) extends Table[PublicListingNFTTransaction](tag, "PublicListingNFTTransaction") with ModelTable2[String, String] {
 
@@ -177,7 +177,7 @@ class PublicListingNFTTransactions @Inject()(
     }
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = constants.Scheduler.MASTER_TRANSACTION_NFT_PUBLIC_LISTING
+      val name: String = PublicListingNFTTransactions.module
 
       def runner(): Unit = {
         val nftPublicListingTxs = Service.getAllPendingStatus

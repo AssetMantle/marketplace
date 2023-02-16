@@ -186,7 +186,7 @@ class SaleNFTTransactions @Inject()(
     }
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = constants.Scheduler.MASTER_TRANSACTION_NFT_SALE
+      val name: String = SaleNFTTransactions.module
 
       def runner(): Unit = {
         val saleNFTTxS = Service.getAllPendingStatus
