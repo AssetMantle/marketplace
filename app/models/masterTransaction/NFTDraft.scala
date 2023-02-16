@@ -15,7 +15,7 @@ case class NFTDraft(id: String, collectionId: String, name: Option[String], desc
 
   def toNFT(totalSupply: Int = 1): NFT = NFT(id = id, fileExtension = fileExtension, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), totalSupply = totalSupply, ipfsLink = "", edition = None, isMinted = false)
 
-  def toNFTOwner(ownerID: String, creatorId: String, quantity: Int = 1): NFTOwner = NFTOwner(nftId = id, ownerId = ownerID, creatorId = creatorId, collectionId = collectionId, quantity = quantity, saleId = None, publicListingId = None)
+  def toNFTOwner(ownerID: String, creatorId: String, quantity: Int = 1): NFTOwner = NFTOwner(nftId = id, ownerId = ownerID, creatorId = creatorId, collectionId = collectionId, quantity = quantity, saleId = None, publicListingId = None, secondaryMarketId = None)
 
   def getNFTProperties: Seq[NFTProperty] = this.properties.fold[Seq[NFTProperty]](Seq())(x => x.map(_.toNFTProperty(this.id)))
 
