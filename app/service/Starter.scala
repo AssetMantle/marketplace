@@ -275,122 +275,6 @@ class Starter @Inject()(
     } yield ()
   }
 
-  def addValentineNFTs(): Future[Unit] = {
-    case class ValentineNFT(fileName: String, name: String, description: String, format: String)
-    val nfts = Seq(
-      ValentineNFT(fileName = "1.gif", name = "MNTL", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
-      ValentineNFT(fileName = "2.gif", name = "Cosmos", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
-      ValentineNFT(fileName = "3.gif", name = "Persistence", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
-      ValentineNFT(fileName = "4.gif", name = "Axelar", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
-      ValentineNFT(fileName = "5.gif", name = "Injective", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
-      ValentineNFT(fileName = "6.gif", name = "OKC", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
-      ValentineNFT(fileName = "7.gif", name = "Juno", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
-      ValentineNFT(fileName = "8.gif", name = "Evmos", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
-      ValentineNFT(fileName = "9.gif", name = "Gravity Bridge", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
-      ValentineNFT(fileName = "10.gif", name = "Comdex", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
-      ValentineNFT(fileName = "11.gif", name = "Osmosis", description = "MintE's Valentine Date in Cosmos-Verse", format = "gif"),
-    )
-    val allUsernames = masterAccounts.Service.getAllUsernames
-    var allocatedUsernames: Seq[String] = Seq()
-    var nftsDistributed = 0
-
-    def getCollection = masterCollections.Service.tryGet("D4C3FD5554AEDB64")
-
-    def uploadNFTs(allUsernames: Seq[String], collection: Collection): Unit = nfts.foreach { valentineNFT =>
-      println(valentineNFT.name)
-      println(allUsernames.length)
-      val nftImageFile = constants.CommonConfig.Files.CollectionPath + "/" + valentineNFT.fileName
-      val fileHash = utilities.FileOperations.getFileHash(nftImageFile)
-      val newFileName = fileHash + "." + valentineNFT.format
-      val allocateTo = if (nftsDistributed == nfts.length - 1) {
-        allUsernames.diff(allocatedUsernames)
-      } else {
-        util.Random.shuffle(allUsernames.diff(allocatedUsernames)).take(allUsernames.length / nfts.length)
-      }
-      println(allocateTo.length)
-      println(allocatedUsernames.intersect(allocateTo).length)
-      allocatedUsernames = allocatedUsernames ++ allocateTo
-      println(allocatedUsernames.length)
-      val exists = Await.result(masterNFTs.Service.checkExists(fileHash), Duration.Inf)
-      if (!exists) {
-        try {
-          val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collection.id, fileName = newFileName)
-          utilities.AmazonS3.uploadFile(awsKey, nftImageFile)
-          Await.result(masterNFTs.Service.add(master.NFT(id = fileHash, collectionId = collection.id, name = valentineNFT.name, description = valentineNFT.description, totalSupply = allocateTo.length, isMinted = false, fileExtension = valentineNFT.format, ipfsLink = "", edition = None)), Duration.Inf)
-          Await.result(masterNFTOwners.Service.add(allocateTo.map(x => master.NFTOwner(nftId = fileHash, ownerId = x, creatorId = collection.creatorId, collectionId = collection.id, quantity = 1, saleId = None, publicListingId = None))), Duration.Inf)
-          Await.result(collectionsAnalysis.Utility.onNewNFT(collection.id), Duration.Inf)
-          nftsDistributed = nftsDistributed + 1
-          println(valentineNFT.name + " done")
-        } catch {
-          case exception: Exception => logger.error(exception.getLocalizedMessage)
-        }
-      }
-    }
-
-    for {
-      allUsernames <- allUsernames
-      collection <- getCollection
-    } yield uploadNFTs(allUsernames, collection)
-  }
-
-  def fixCosmoZombie(): Future[Unit] = {
-    val classificationProperties = Seq(
-      CollectionProperty(name = "Background", `type` = constants.NFT.Data.STRING, value = ""),
-      CollectionProperty(name = "profession", `type` = constants.NFT.Data.STRING, value = ""),
-      CollectionProperty(name = "Eye", `type` = constants.NFT.Data.STRING, value = ""),
-      CollectionProperty(name = "Face", `type` = constants.NFT.Data.STRING, value = ""),
-      CollectionProperty(name = "Hat", `type` = constants.NFT.Data.STRING, value = ""),
-      CollectionProperty(name = "Clothes", `type` = constants.NFT.Data.STRING, value = ""),
-    )
-    val collection = masterCollections.Service.tryGet("C395A2ECE13B3B03")
-    val allNFTIDs = masterNFTs.Service.getAllIdsForCollection("C395A2ECE13B3B03")
-    val dirtyProperty = masterNFTProperties.Service.tryGet(nftId = "a3a7a5d9c66f55029b54ef893dac8fb2b5c8f26fde2b633986076439f0f8438a", name = "T-shirt")
-
-    def updateDirtyProperty(dirtyProperty: models.master.NFTProperty) = {
-      val add = masterNFTProperties.Service.add(dirtyProperty.copy(name = "Clothes"))
-
-      def delete = masterNFTProperties.Service.deleteProperty(nftId = "a3a7a5d9c66f55029b54ef893dac8fb2b5c8f26fde2b633986076439f0f8438a", name = "T-shirt")
-
-      for {
-        _ <- add
-        _ <- delete
-      } yield ()
-    }
-
-    def updateCollection(collection: Collection) = masterCollections.Service.update(collection.copy(properties = Option(classificationProperties.map(_.toProperty))))
-
-    def fixAllProperties(allNFTIDs: Seq[String]) = utilitiesOperations.traverse(allNFTIDs) { nftID =>
-      val properties = masterNFTProperties.Service.getForNFT(nftID)
-
-      def add(properties: Seq[models.master.NFTProperty]) = {
-        if (properties.map(_.name).contains("Hat")) {
-          masterNFTProperties.Service.add(properties.head.copy(name = "Clothes", `value` = ""))
-        } else {
-          masterNFTProperties.Service.add(properties.head.copy(name = "Hat", `value` = ""))
-        }
-      }
-
-      for {
-        properties <- properties
-        _ <- add(properties)
-      } yield ()
-    }
-
-    for {
-      collection <- collection
-      allNFTIDs <- allNFTIDs
-      dirtyProperty <- dirtyProperty
-      _ <- updateDirtyProperty(dirtyProperty)
-      _ <- updateCollection(collection)
-      _ <- fixAllProperties(allNFTIDs)
-    } yield ()
-  }
-
-  def deleteOldCollections(): Future[Seq[Unit]] = {
-    val list = Seq("BE3188DFA0D7118C", "E98FA5E59F40D280", "D378FA9E41C0B639")
-    utilitiesOperations.traverse(list) { id => deleteCollection(id) }
-  }
-
   private def deleteCollection(collectionId: String): Future[Unit] = {
     println("deleting: " + collectionId)
     val list = Seq(collectionId)
@@ -426,11 +310,7 @@ class Starter @Inject()(
   // Delete redundant nft tags
   def start(): Future[Unit] = {
     (for {
-      _ <- deleteOldCollections()
-      _ <- fixCosmoZombie()
-      _ <- addValentineNFTs()
       _ <- uploadCollections()
-      _ <- validateAll()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
