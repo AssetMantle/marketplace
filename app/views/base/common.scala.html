@@ -109,13 +109,18 @@
                             </a>
                         </li>
                         <li>
-                            <a href="@routes.CollectionController.viewPublicListedCollections()">
+                            <a href="@routes.SecondaryMarketController.viewSecondaryMarket()">
+                            @Messages(constants.View.MARKET)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="@routes.PublicListingController.viewPublicListedCollections()">
                                 <span class="newFeatureIcon">@Messages(constants.View.NEW_LABEL)</span>
                                 @Messages(constants.View.EARLY_ACCESS_MENU)
                             </a>
                         </li>
                         <li>
-                            <a href="@routes.CollectionController.viewWhitelistSaleCollections()">
+                            <a href="@routes.SaleController.viewWhitelistSaleCollections()">
                             @Messages(constants.View.LAUNCHPAD_MENU)
                             </a>
                         </li>

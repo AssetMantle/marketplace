@@ -310,7 +310,7 @@ class Starter @Inject()(
   // Delete redundant nft tags
   def start(): Future[Unit] = {
     (for {
-      _ <- uploadCollections()
+      _ <- validateAll()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)

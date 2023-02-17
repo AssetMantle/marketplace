@@ -65,6 +65,7 @@ object FormField {
   val NFT_NAME: StringFormField = StringFormField("NFT_NAME", 3, 50)
   val NFT_DESCRIPTION: StringFormField = StringFormField("NFT_DESCRIPTION", 3, 256)
   val NFT_ID: StringFormField = StringFormField("NFT_ID", 64, 64)
+  val NFT_ID_LIST: StringFormField = StringFormField("NFT_ID_LIST", 64, 6500)
   val NFT_TAGS: StringFormField = StringFormField("NFT_TAGS", 0, (constants.NFT.Tags.MaximumLength + 1) * constants.NFT.Tags.MaximumAllowed)
   val NFT_PROPERTY_NAME: StringFormField = StringFormField("NFT_PROPERTY_NAME", 1, 30)
   val NFT_PROPERTY_VALUE: StringFormField = StringFormField("NFT_PROPERTY_VALUE", 1, 30)
@@ -86,7 +87,7 @@ object FormField {
   val PUBLIC_LISTING_MAX_MINT_PER_ACCOUNT: IntFormField = IntFormField("SALE_MAX_MINT_PER_ACCOUNT", 1, 100000)
   val SALE_BUY_NFT_NUMBER: IntFormField = IntFormField("SALE_BUY_NFT_NUMBER", 1, 100000)
   val PUBLIC_LISTING_BUY_NFT_NUMBER: IntFormField = IntFormField("PUBLIC_LISTING_BUY_NFT_NUMBER", 1, 100000)
-
+  val SECONDARY_MARKET_SELL_NFT_NUMBER: IntFormField = IntFormField("SECONDARY_MARKET_SELL_NFT_NUMBER", 1, 1000)
 
   // DoubleFormField
   val GAS_PRICE: BigDecimalFormField = BigDecimalFormField("GAS_PRICE", constants.Blockchain.LowGasPrice, constants.Blockchain.HighGasPrice)
@@ -98,6 +99,7 @@ object FormField {
   val NFT_SALE_END_EPOCH: EpochFormField = EpochFormField("NFT_SALE_END_EPOCH", 1, Int.MaxValue)
   val PUBLIC_LISTING_START_EPOCH: EpochFormField = EpochFormField("PUBLIC_LISTING_START_EPOCH", 1, Int.MaxValue)
   val PUBLIC_LISTING_END_EPOCH: EpochFormField = EpochFormField("PUBLIC_LISTING_END_EPOCH", 1, Int.MaxValue)
+  val SECONDARY_MARKET_END_EPOCH: EpochFormField = EpochFormField("SECONDARY_MARKET_END_EPOCH", 1, Int.MaxValue)
 
   // BooleanFormField
   val RECEIVE_NOTIFICATIONS: BooleanFormField = BooleanFormField("RECEIVE_NOTIFICATIONS")
@@ -114,6 +116,7 @@ object FormField {
   val CREATE_COLLECTION_MOU: BooleanFormField = BooleanFormField("CREATE_COLLECTION_MOU")
   val MARK_ALL_NOTIFICATION_READ: BooleanFormField = BooleanFormField("MARK_ALL_NOTIFICATION_READ")
   val MINT_NFT: BooleanFormField = BooleanFormField("MINT_NFT")
+  val SECONDARY_MARKET_SELL_ALL: BooleanFormField = BooleanFormField("SECONDARY_MARKET_SELL_ALL")
 
   // SelectFormField
   val COLLECTION_CATEGORY: SelectFormField = SelectFormField("COLLECTION_CATEGORY", Seq(constants.Collection.Category.ART, constants.Collection.Category.PHOTOGRAPHY, constants.Collection.Category.MISCELLANEOUS))
@@ -125,8 +128,9 @@ object FormField {
 
   // MicroNumberFormField
   val SEND_COIN_AMOUNT: MicroNumberFormField = MicroNumberFormField("SEND_COIN_AMOUNT", MicroNumber.smallest, MicroNumber(Int.MaxValue), 6)
-  val NFT_WHITELIST_SALE_PRICE: MicroNumberFormField = MicroNumberFormField("NFT_WHITELIST_SALE_PRICE", MicroNumber.smallest, MicroNumber(Int.MaxValue))
+  val NFT_WHITELIST_SALE_PRICE: MicroNumberFormField = MicroNumberFormField("NFT_WHITELIST_SALE_PRICE", MicroNumber.smallest, MicroNumber(Int.MaxValue), 6)
   val PUBLIC_LISTING_PRICE: MicroNumberFormField = MicroNumberFormField("PUBLIC_LISTING_PRICE", MicroNumber.smallest, MicroNumber(Int.MaxValue), 6)
+  val SECONDARY_MARKET_PRICE: MicroNumberFormField = MicroNumberFormField("SECONDARY_MARKET_PRICE", MicroNumber.smallest, MicroNumber(Int.MaxValue), 6)
 
   // NestedFormField
   val COLLECTION_PROPERTIES: NestedFormField = NestedFormField("COLLECTION_PROPERTIES")

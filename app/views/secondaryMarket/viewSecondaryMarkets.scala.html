@@ -2,8 +2,8 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
-@views.html.base.common(constants.View.COLLECTIONS)
+@views.html.base.common(constants.View.MARKET)
 <link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/explorer.css")"/>
 <script>
-        componentResource('centerContent', jsRoutes.controllers.CollectionController.whitelistSaleCollectionsSection());
+        componentResource('centerContent', jsRoutes.controllers.SecondaryMarketController.secondaryMarketCollectionsSection());
 </script>

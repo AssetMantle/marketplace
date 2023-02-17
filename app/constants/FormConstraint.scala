@@ -8,6 +8,7 @@ import views.nft.companion._
 import views.profile.whitelist.{companion => whitelist}
 import views.publicListing.{companion => publicListing}
 import views.sale.{companion => sale}
+import views.secondaryMarket.{companion => secondaryMarket}
 import views.setting.companion._
 
 object FormConstraint {
@@ -154,6 +155,13 @@ object FormConstraint {
     val errors = Seq(
       if (editPublicListingData.startEpoch >= editPublicListingData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
       if (editPublicListingData.startEpoch < (utilities.Date.currentEpoch - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
+    ).flatten
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val createSecondaryMarket: Constraint[secondaryMarket.CreateSecondaryMarket.Data] = Constraint("constraints.CreateSecondaryMarket")({ createSecondaryMarket: secondaryMarket.CreateSecondaryMarket.Data =>
+    val errors = Seq(
+      if (createSecondaryMarket.endEpoch > (utilities.Date.currentEpoch + 180 * constants.Date.DaySeconds)) Option(ValidationError(constants.Response.SECONDARY_MARKET_END_EPOCH_EXCEEDS_LIMIT.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })

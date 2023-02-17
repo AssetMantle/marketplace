@@ -44,7 +44,45 @@ class PublicListingController @Inject()(
 
   private implicit val module: String = constants.Module.PUBLIC_LISTING_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
+  implicit val callbackOnSessionTimeout: Call = routes.PublicListingController.viewPublicListedCollections()
+
+  def viewPublicListedCollections(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.publicListing.viewPublicListedCollections()))
+    }
+  }
+
+  def publicListedCollectionsSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val totalCollections = masterPublicListings.Service.total
+        (for {
+          totalCollections <- totalCollections
+        } yield Ok(views.html.publicListing.collectionsSection(totalCollections))
+          ).recover {
+          case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
+  }
+
+  def publicListedCollectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val publicListings = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        else masterPublicListings.Service.getByPageNumber(pageNumber)
+
+        def collections(ids: Seq[String]) = masterCollections.Service.getCollections(ids)
+
+        (for {
+          publicListings <- publicListings
+          collections <- collections(publicListings.map(_.collectionId))
+        } yield Ok(views.html.publicListing.collectionsPerPage(collections))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
 
   def createPublicListingForm(collectionId: Option[String]): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>

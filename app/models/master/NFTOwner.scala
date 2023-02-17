@@ -78,18 +78,26 @@ class NFTOwners @Inject()(
 
     def getByOwnerIdAndPageNumber(ownerId: String, pageNumber: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(x => x.ownerId === ownerId && x.ownerId =!= x.creatorId)(_.nftId).map(_.map(_.nftId))
 
-    def countByOwnerIdAndCollectionId(ownerId: String, collectionId: String): Future[Int] = filterAndCount(x => x.ownerId === ownerId && x.collectionId === collectionId)
-
     def update(NFTOwner: NFTOwner): Future[Unit] = updateById1AndId2(NFTOwner)
+
+    def countForOwnerNotForSell(collectionId: String, ownerId: String): Future[Int] = {
+      val nullString: Option[String] = null
+      filterAndCount(x => x.collectionId === collectionId && x.ownerId === ownerId && x.saleId.? === nullString && x.publicListingId.? === nullString && x.secondaryMarketId.? === nullString)
+    }
+
+    def getForOwnerNotForSell(collectionId: String, ownerId: String): Future[Seq[NFTOwner]] = {
+      val nullString: Option[String] = null
+      filter(x => x.collectionId === collectionId && x.ownerId === ownerId && x.saleId.? === nullString && x.publicListingId.? === nullString && x.secondaryMarketId.? === nullString)
+    }
 
     def countForCreatorNotForSell(collectionId: String, creatorId: String): Future[Int] = {
       val nullString: Option[String] = null
-      filterAndCount(x => x.collectionId === collectionId && x.creatorId === creatorId && x.ownerId === creatorId && x.saleId.? === nullString && x.publicListingId.? === nullString)
+      filterAndCount(x => x.collectionId === collectionId && x.creatorId === creatorId && x.ownerId === creatorId && x.saleId.? === nullString && x.publicListingId.? === nullString && x.secondaryMarketId.? === nullString)
     }
 
     def whitelistSaleRandomNFTs(collectionId: String, creatorId: String, nfts: Int, saleId: String): Future[Unit] = {
       val nullString: Option[String] = null
-      val notOnSaleNFTs = filter(x => x.ownerId === creatorId && x.creatorId === creatorId && x.collectionId === collectionId && x.saleId === nullString && x.publicListingId === nullString)
+      val notOnSaleNFTs = filter(x => x.ownerId === creatorId && x.creatorId === creatorId && x.collectionId === collectionId && x.saleId === nullString && x.publicListingId === nullString && x.secondaryMarketId === nullString)
       for {
         notOnSaleNFTs <- notOnSaleNFTs
         _ <- upsertMultiple(Random.shuffle(notOnSaleNFTs).take(nfts).map(_.copy(saleId = Option(saleId))))
@@ -98,12 +106,16 @@ class NFTOwners @Inject()(
 
     def publicListRandomNFTs(collectionId: String, creatorId: String, nfts: Int, publicListingId: String): Future[Unit] = {
       val nullString: Option[String] = null
-      val notOnSaleNFTs = filter(x => x.ownerId === creatorId && x.creatorId === creatorId && x.collectionId === collectionId && x.saleId === nullString && x.publicListingId === nullString)
+      val notOnSaleNFTs = filter(x => x.ownerId === creatorId && x.creatorId === creatorId && x.collectionId === collectionId && x.saleId === nullString && x.publicListingId === nullString && x.secondaryMarketId === nullString)
       for {
         notOnSaleNFTs <- notOnSaleNFTs
         _ <- upsertMultiple(Random.shuffle(notOnSaleNFTs).take(nfts).map(_.copy(publicListingId = Option(publicListingId))))
       } yield ()
     }
+
+    def listNFTOnSecondaryMarket(NFTOwner: NFTOwner, secondaryMarketID: String): Future[Unit] = if (NFTOwner.secondaryMarketId.isEmpty && NFTOwner.publicListingId.isEmpty && NFTOwner.saleId.isEmpty) {
+      update(NFTOwner.copy(secondaryMarketId = Option(secondaryMarketID)))
+    } else constants.Response.NFT_ALREADY_ON_SALE.throwBaseException()
 
     def delete(nftId: String, ownerId: String): Future[Int] = deleteById1AndId2(id1 = nftId, id2 = ownerId)
 

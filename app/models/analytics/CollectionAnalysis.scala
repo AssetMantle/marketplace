@@ -165,6 +165,21 @@ class CollectionsAnalysis @Inject()(
       } yield ()
     }
 
+    def onCreateSecondaryMarket(collectionId: String, totalListed: Int, listingPrice: MicroNumber): Future[Unit] = {
+      val collectionAnalysis = Service.tryGet(collectionId)
+
+      def update(collectionAnalysis: CollectionAnalysis) = {
+        val oldFloorPrice = Seq(collectionAnalysis.salePrice, collectionAnalysis.publicListingPrice, collectionAnalysis.floorPrice).min
+        val newFloorPrice = if (oldFloorPrice > MicroNumber.zero) Seq(listingPrice, oldFloorPrice).min else listingPrice
+        Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed + totalListed, floorPrice = newFloorPrice))
+      }
+
+      for {
+        collectionAnalysis <- collectionAnalysis
+        _ <- update(collectionAnalysis)
+      } yield ()
+    }
+
     def onEditPublicListing(collectionId: String, listingPrice: MicroNumber): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
 

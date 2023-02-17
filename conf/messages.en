@@ -1,6 +1,7 @@
 MANTLE_PLACE=MantlePlace
 APP_VERSION=v0.1.10-alpha
 NFT_MARKET=NFT Market
+MARKET=Market
 HOME=Home
 EXPLORE=Explore
 CREATE=Create

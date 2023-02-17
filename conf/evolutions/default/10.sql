@@ -21,7 +21,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SecondaryMarketTransfer"
 CREATE TABLE IF NOT EXISTS HISTORY."MasterSecondaryMarket"
 (
     "id"                   VARCHAR NOT NULL,
-    "nftId"                VARCHAR NOT NULL,
     "collectionId"         VARCHAR NOT NULL,
     "price"                NUMERIC NOT NULL,
     "denom"                VARCHAR NOT NULL,
@@ -38,7 +37,6 @@ CREATE TABLE IF NOT EXISTS HISTORY."MasterSecondaryMarket"
 CREATE TABLE IF NOT EXISTS MASTER."SecondaryMarket"
 (
     "id"                   VARCHAR NOT NULL,
-    "nftId"                VARCHAR NOT NULL,
     "collectionId"         VARCHAR NOT NULL,
     "price"                NUMERIC NOT NULL,
     "denom"                VARCHAR NOT NULL,
@@ -62,8 +60,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."secondaryMarketTransferTransactio
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "nftId"),
-    UNIQUE ("buyerAccountId", "sellerAccountId", "txHash", "nftId")
+    PRIMARY KEY ("txHash")
 );
 
 ALTER TABLE MASTER."NFTOwner"
@@ -71,8 +68,6 @@ ALTER TABLE MASTER."NFTOwner"
 ALTER TABLE MASTER."NFTOwner"
     ADD CONSTRAINT NFTOwner_SecondaryMarket FOREIGN KEY ("secondaryMarketId") REFERENCES MASTER."SecondaryMarket" ("id");
 
-ALTER TABLE MASTER."SecondaryMarket"
-    ADD CONSTRAINT SecondaryMarket_NFTId FOREIGN KEY ("nftId") REFERENCES MASTER."NFT" ("id");
 ALTER TABLE MASTER."SecondaryMarket"
     ADD CONSTRAINT SecondaryMarket_collectionId FOREIGN KEY ("collectionId") REFERENCES MASTER."Collection" ("id");
 

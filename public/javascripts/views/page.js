@@ -51,13 +51,13 @@ function viewSetting() {
 }
 
 function viewPublicListedCollections() {
-    componentResource('centerContent', jsRoutes.controllers.CollectionController.publicListedCollectionsSection());
+    componentResource('centerContent', jsRoutes.controllers.PublicListingController.publicListedCollectionsSection());
     $('#leftContent').html('');
     $('#rightContent').html('');
 }
 
 function viewWhitelistSaleCollections() {
-    componentResource('centerContent', jsRoutes.controllers.CollectionController.whitelistSaleCollectionsSection());
+    componentResource('centerContent', jsRoutes.controllers.SaleController.whitelistSaleCollectionsSection());
     $('#leftContent').html('');
     $('#rightContent').html('');
 }

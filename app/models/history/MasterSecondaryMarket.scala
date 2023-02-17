@@ -14,11 +14,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class MasterSecondaryMarket(id: String, nftId: String, collectionId: String, price: MicroNumber, denom: String, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends HistoryLogging {
+case class MasterSecondaryMarket(id: String, collectionId: String, price: MicroNumber, denom: String, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends HistoryLogging {
 
   def serialize(): MasterSecondaryMarkets.MasterSecondaryMarketSerialized = MasterSecondaryMarkets.MasterSecondaryMarketSerialized(
     id = this.id,
-    nftId = this.nftId,
     collectionId = this.collectionId,
     price = this.price.toBigDecimal,
     denom = this.denom,
@@ -38,18 +37,16 @@ object MasterSecondaryMarkets {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class MasterSecondaryMarketSerialized(id: String, nftId: String, collectionId: String, price: BigDecimal, denom: String, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
+  case class MasterSecondaryMarketSerialized(id: String, collectionId: String, price: BigDecimal, denom: String, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
-    def deserialize: MasterSecondaryMarket = MasterSecondaryMarket(id = id, nftId = nftId, collectionId = collectionId, price = MicroNumber(price), denom = denom, endTimeEpoch = endTimeEpoch, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch, deletedBy = this.deletedBy, deletedOnMillisEpoch = this.deletedOnMillisEpoch)
+    def deserialize: MasterSecondaryMarket = MasterSecondaryMarket(id = id, collectionId = collectionId, price = MicroNumber(price), denom = denom, endTimeEpoch = endTimeEpoch, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch, deletedBy = this.deletedBy, deletedOnMillisEpoch = this.deletedOnMillisEpoch)
   }
 
   class MasterSecondaryMarketTable(tag: Tag) extends Table[MasterSecondaryMarketSerialized](tag, "MasterSecondaryMarket") with ModelTable[String] {
 
-    def * = (id, nftId, collectionId, price, denom, endTimeEpoch, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?, deletedBy.?, deletedOnMillisEpoch.?) <> (MasterSecondaryMarketSerialized.tupled, MasterSecondaryMarketSerialized.unapply)
+    def * = (id, collectionId, price, denom, endTimeEpoch, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?, deletedBy.?, deletedOnMillisEpoch.?) <> (MasterSecondaryMarketSerialized.tupled, MasterSecondaryMarketSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
-
-    def nftId = column[String]("nftId")
 
     def collectionId = column[String]("collectionId")
 

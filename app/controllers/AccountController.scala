@@ -126,7 +126,7 @@ class AccountController @Inject()(
     implicit request =>
       SignInWithCallback.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.account.signInWithCallback(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CALLBACK_URL.name, routes.CollectionController.viewPublicListedCollections().url))))
+          Future(BadRequest(views.html.account.signInWithCallback(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CALLBACK_URL.name, routes.PublicListingController.viewPublicListedCollections().url))))
         },
         signInData => {
           val masterAccount = masterAccounts.Service.tryGet(signInData.username)
@@ -187,7 +187,7 @@ class AccountController @Inject()(
                   implicit val loginState: LoginState = LoginState(username = signInData.username, address = key.get.address, accountType = account.accountType)
                   val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.upsert(id = loginState.username, token = signInData.pushNotificationToken)
                   val result = if (signInData.callbackUrl != "/") withUsernameToken.InternalRedirectOnSubmitForm(signInData.callbackUrl)
-                  else withUsernameToken.Ok(views.html.collection.viewPublicListedCollections())
+                  else withUsernameToken.Ok(views.html.publicListing.viewPublicListedCollections())
                   for {
                     _ <- pushNotificationTokenUpdate
                     result <- result
@@ -233,7 +233,7 @@ class AccountController @Inject()(
             def getResult(username: String, address: String) = {
               implicit val optionalLoginState: Option[LoginState] = Option(LoginState(username = username, address = address, accountType = account.accountType))
               implicit val loginState: LoginState = LoginState(username = username, address = address, accountType = account.accountType)
-              withUsernameToken.Ok(views.html.collection.viewPublicListedCollections())
+              withUsernameToken.Ok(views.html.publicListing.viewPublicListedCollections())
             }
 
             for {

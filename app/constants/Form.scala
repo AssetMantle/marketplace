@@ -53,4 +53,6 @@ object Form {
   val EDIT_PUBLIC_LISTING: Form = Form("EDIT_PUBLIC_LISTING", routes.javascript.PublicListingController.editForm, routes.PublicListingController.edit())
   val BUY_NFT_PUBLIC_LISTING: Form = Form("BUY_NFT_PUBLIC_LISTING", routes.javascript.PublicListingController.buyNFTForm, routes.PublicListingController.buyNFT())
 
+  val CREATE_SECONDARY_MARKET: Form = Form("CREATE_SECONDARY_MARKET", routes.javascript.SecondaryMarketController.createForm, routes.SecondaryMarketController.create())
+
 }

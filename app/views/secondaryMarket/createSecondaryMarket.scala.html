@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import views.html.base.form._
+@import views.secondaryMarket.companion.CreateSecondaryMarket
+
+@(createSecondaryMarketForm: Form[CreateSecondaryMarket.Data] = CreateSecondaryMarket.form, nftId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonForm(constants.Form.CREATE_SECONDARY_MARKET, createSecondaryMarketForm) {
+    @commonInputText(createSecondaryMarketForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden")
+    @commonInputMicroNumber(createSecondaryMarketForm, constants.FormField.SECONDARY_MARKET_PRICE)
+    @commonInputEpochTIme(createSecondaryMarketForm, constants.FormField.SECONDARY_MARKET_END_EPOCH, setCurrentTime = false)
+}

@@ -19,7 +19,7 @@
             <div id="noCollection" class="h-100 mt-3 d-flex flex-column justify-content-center align-items-center emptyWishlist">
                 <div class="message">@Messages(constants.View.NO_NFTS_COLLECTED)</div>
                 <div class="d-flex justify-content-center horizontal-align">
-                @commonPrimaryCallButton(constants.View.BUYNOW, routes.CollectionController.viewPublicListedCollections())
+                @commonPrimaryCallButton(constants.View.BUYNOW, routes.PublicListingController.viewPublicListedCollections())
                 </div>
             </div>
         } else {}
