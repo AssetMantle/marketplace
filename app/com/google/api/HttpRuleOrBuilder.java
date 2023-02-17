@@ -10,20 +10,22 @@ public interface HttpRuleOrBuilder extends
   /**
    * <pre>
    * Selects methods to which this rule applies.
+   *
    * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
    * </pre>
    *
-   * <code>string selector = 1;</code>
+   * <code>string selector = 1 [json_name = "selector"];</code>
    * @return The selector.
    */
   java.lang.String getSelector();
   /**
    * <pre>
    * Selects methods to which this rule applies.
+   *
    * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
    * </pre>
    *
-   * <code>string selector = 1;</code>
+   * <code>string selector = 1 [json_name = "selector"];</code>
    * @return The bytes for selector.
    */
   com.google.protobuf.ByteString
@@ -34,7 +36,7 @@ public interface HttpRuleOrBuilder extends
    * Used for listing and getting information about resources.
    * </pre>
    *
-   * <code>string get = 2;</code>
+   * <code>string get = 2 [json_name = "get"];</code>
    * @return Whether the get field is set.
    */
   boolean hasGet();
@@ -43,7 +45,7 @@ public interface HttpRuleOrBuilder extends
    * Used for listing and getting information about resources.
    * </pre>
    *
-   * <code>string get = 2;</code>
+   * <code>string get = 2 [json_name = "get"];</code>
    * @return The get.
    */
   java.lang.String getGet();
@@ -52,7 +54,7 @@ public interface HttpRuleOrBuilder extends
    * Used for listing and getting information about resources.
    * </pre>
    *
-   * <code>string get = 2;</code>
+   * <code>string get = 2 [json_name = "get"];</code>
    * @return The bytes for get.
    */
   com.google.protobuf.ByteString
@@ -63,7 +65,7 @@ public interface HttpRuleOrBuilder extends
    * Used for updating a resource.
    * </pre>
    *
-   * <code>string put = 3;</code>
+   * <code>string put = 3 [json_name = "put"];</code>
    * @return Whether the put field is set.
    */
   boolean hasPut();
@@ -72,7 +74,7 @@ public interface HttpRuleOrBuilder extends
    * Used for updating a resource.
    * </pre>
    *
-   * <code>string put = 3;</code>
+   * <code>string put = 3 [json_name = "put"];</code>
    * @return The put.
    */
   java.lang.String getPut();
@@ -81,7 +83,7 @@ public interface HttpRuleOrBuilder extends
    * Used for updating a resource.
    * </pre>
    *
-   * <code>string put = 3;</code>
+   * <code>string put = 3 [json_name = "put"];</code>
    * @return The bytes for put.
    */
   com.google.protobuf.ByteString
@@ -92,7 +94,7 @@ public interface HttpRuleOrBuilder extends
    * Used for creating a resource.
    * </pre>
    *
-   * <code>string post = 4;</code>
+   * <code>string post = 4 [json_name = "post"];</code>
    * @return Whether the post field is set.
    */
   boolean hasPost();
@@ -101,7 +103,7 @@ public interface HttpRuleOrBuilder extends
    * Used for creating a resource.
    * </pre>
    *
-   * <code>string post = 4;</code>
+   * <code>string post = 4 [json_name = "post"];</code>
    * @return The post.
    */
   java.lang.String getPost();
@@ -110,7 +112,7 @@ public interface HttpRuleOrBuilder extends
    * Used for creating a resource.
    * </pre>
    *
-   * <code>string post = 4;</code>
+   * <code>string post = 4 [json_name = "post"];</code>
    * @return The bytes for post.
    */
   com.google.protobuf.ByteString
@@ -121,7 +123,7 @@ public interface HttpRuleOrBuilder extends
    * Used for deleting a resource.
    * </pre>
    *
-   * <code>string delete = 5;</code>
+   * <code>string delete = 5 [json_name = "delete"];</code>
    * @return Whether the delete field is set.
    */
   boolean hasDelete();
@@ -130,7 +132,7 @@ public interface HttpRuleOrBuilder extends
    * Used for deleting a resource.
    * </pre>
    *
-   * <code>string delete = 5;</code>
+   * <code>string delete = 5 [json_name = "delete"];</code>
    * @return The delete.
    */
   java.lang.String getDelete();
@@ -139,7 +141,7 @@ public interface HttpRuleOrBuilder extends
    * Used for deleting a resource.
    * </pre>
    *
-   * <code>string delete = 5;</code>
+   * <code>string delete = 5 [json_name = "delete"];</code>
    * @return The bytes for delete.
    */
   com.google.protobuf.ByteString
@@ -150,7 +152,7 @@ public interface HttpRuleOrBuilder extends
    * Used for updating a resource.
    * </pre>
    *
-   * <code>string patch = 6;</code>
+   * <code>string patch = 6 [json_name = "patch"];</code>
    * @return Whether the patch field is set.
    */
   boolean hasPatch();
@@ -159,7 +161,7 @@ public interface HttpRuleOrBuilder extends
    * Used for updating a resource.
    * </pre>
    *
-   * <code>string patch = 6;</code>
+   * <code>string patch = 6 [json_name = "patch"];</code>
    * @return The patch.
    */
   java.lang.String getPatch();
@@ -168,7 +170,7 @@ public interface HttpRuleOrBuilder extends
    * Used for updating a resource.
    * </pre>
    *
-   * <code>string patch = 6;</code>
+   * <code>string patch = 6 [json_name = "patch"];</code>
    * @return The bytes for patch.
    */
   com.google.protobuf.ByteString
@@ -182,7 +184,7 @@ public interface HttpRuleOrBuilder extends
    * for services that provide content to Web (HTML) clients.
    * </pre>
    *
-   * <code>.google.api.CustomHttpPattern custom = 8;</code>
+   * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
    * @return Whether the custom field is set.
    */
   boolean hasCustom();
@@ -194,7 +196,7 @@ public interface HttpRuleOrBuilder extends
    * for services that provide content to Web (HTML) clients.
    * </pre>
    *
-   * <code>.google.api.CustomHttpPattern custom = 8;</code>
+   * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
    * @return The custom.
    */
   com.google.api.CustomHttpPattern getCustom();
@@ -206,7 +208,7 @@ public interface HttpRuleOrBuilder extends
    * for services that provide content to Web (HTML) clients.
    * </pre>
    *
-   * <code>.google.api.CustomHttpPattern custom = 8;</code>
+   * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
    */
   com.google.api.CustomHttpPatternOrBuilder getCustomOrBuilder();
 
@@ -218,7 +220,7 @@ public interface HttpRuleOrBuilder extends
    * present at the top-level of request message type.
    * </pre>
    *
-   * <code>string body = 7;</code>
+   * <code>string body = 7 [json_name = "body"];</code>
    * @return The body.
    */
   java.lang.String getBody();
@@ -230,7 +232,7 @@ public interface HttpRuleOrBuilder extends
    * present at the top-level of request message type.
    * </pre>
    *
-   * <code>string body = 7;</code>
+   * <code>string body = 7 [json_name = "body"];</code>
    * @return The bytes for body.
    */
   com.google.protobuf.ByteString
@@ -243,7 +245,7 @@ public interface HttpRuleOrBuilder extends
    * not set, the response message will be used as HTTP body of response.
    * </pre>
    *
-   * <code>string response_body = 12;</code>
+   * <code>string response_body = 12 [json_name = "responseBody"];</code>
    * @return The responseBody.
    */
   java.lang.String getResponseBody();
@@ -254,7 +256,7 @@ public interface HttpRuleOrBuilder extends
    * not set, the response message will be used as HTTP body of response.
    * </pre>
    *
-   * <code>string response_body = 12;</code>
+   * <code>string response_body = 12 [json_name = "responseBody"];</code>
    * @return The bytes for responseBody.
    */
   com.google.protobuf.ByteString
@@ -267,7 +269,7 @@ public interface HttpRuleOrBuilder extends
    * the nesting may only be one level deep).
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+   * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
    */
   java.util.List<com.google.api.HttpRule> 
       getAdditionalBindingsList();
@@ -278,7 +280,7 @@ public interface HttpRuleOrBuilder extends
    * the nesting may only be one level deep).
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+   * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
    */
   com.google.api.HttpRule getAdditionalBindings(int index);
   /**
@@ -288,7 +290,7 @@ public interface HttpRuleOrBuilder extends
    * the nesting may only be one level deep).
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+   * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
    */
   int getAdditionalBindingsCount();
   /**
@@ -298,7 +300,7 @@ public interface HttpRuleOrBuilder extends
    * the nesting may only be one level deep).
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+   * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
    */
   java.util.List<? extends com.google.api.HttpRuleOrBuilder> 
       getAdditionalBindingsOrBuilderList();
@@ -309,10 +311,10 @@ public interface HttpRuleOrBuilder extends
    * the nesting may only be one level deep).
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+   * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
    */
   com.google.api.HttpRuleOrBuilder getAdditionalBindingsOrBuilder(
       int index);
 
-  public com.google.api.HttpRule.PatternCase getPatternCase();
+  com.google.api.HttpRule.PatternCase getPatternCase();
 }

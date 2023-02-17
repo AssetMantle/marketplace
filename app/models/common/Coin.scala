@@ -1,6 +1,6 @@
 package models.common
 
-import cosmos.base.v1beta1.CoinOuterClass
+import com.cosmos.base.v1beta1.{Coin => protoCoin}
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Json, Reads, Writes}
@@ -41,7 +41,7 @@ case class Coin(denom: String, amount: MicroNumber) {
     } else result
   }
 
-  def toProtoCoin: CoinOuterClass.Coin = CoinOuterClass.Coin.newBuilder().setDenom(this.denom).setAmount(this.amount.toMicroString).build()
+  def toProtoCoin: protoCoin = protoCoin.newBuilder().setDenom(this.denom).setAmount(this.amount.toMicroString).build()
 }
 
 object Coin {

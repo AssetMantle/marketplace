@@ -32,66 +32,6 @@ private static final long serialVersionUID = 0L;
     return new Http();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
-  private Http(
-      com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    this();
-    if (extensionRegistry == null) {
-      throw new java.lang.NullPointerException();
-    }
-    int mutable_bitField0_ = 0;
-    com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-        com.google.protobuf.UnknownFieldSet.newBuilder();
-    try {
-      boolean done = false;
-      while (!done) {
-        int tag = input.readTag();
-        switch (tag) {
-          case 0:
-            done = true;
-            break;
-          case 10: {
-            if (!((mutable_bitField0_ & 0x00000001) != 0)) {
-              rules_ = new java.util.ArrayList<com.google.api.HttpRule>();
-              mutable_bitField0_ |= 0x00000001;
-            }
-            rules_.add(
-                input.readMessage(com.google.api.HttpRule.parser(), extensionRegistry));
-            break;
-          }
-          case 16: {
-
-            fullyDecodeReservedExpansion_ = input.readBool();
-            break;
-          }
-          default: {
-            if (!parseUnknownField(
-                input, unknownFields, extensionRegistry, tag)) {
-              done = true;
-            }
-            break;
-          }
-        }
-      }
-    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
-    } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e).setUnfinishedMessage(this);
-    } finally {
-      if (((mutable_bitField0_ & 0x00000001) != 0)) {
-        rules_ = java.util.Collections.unmodifiableList(rules_);
-      }
-      this.unknownFields = unknownFields.build();
-      makeExtensionsImmutable();
-    }
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.google.api.HttpProto.internal_static_google_api_Http_descriptor;
@@ -106,14 +46,16 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int RULES_FIELD_NUMBER = 1;
+  @SuppressWarnings("serial")
   private java.util.List<com.google.api.HttpRule> rules_;
   /**
    * <pre>
    * A list of HTTP configuration rules that apply to individual API methods.
+   *
    * **NOTE:** All service configuration rules follow "last one wins" order.
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule rules = 1;</code>
+   * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
    */
   @java.lang.Override
   public java.util.List<com.google.api.HttpRule> getRulesList() {
@@ -122,10 +64,11 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * A list of HTTP configuration rules that apply to individual API methods.
+   *
    * **NOTE:** All service configuration rules follow "last one wins" order.
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule rules = 1;</code>
+   * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
    */
   @java.lang.Override
   public java.util.List<? extends com.google.api.HttpRuleOrBuilder> 
@@ -135,10 +78,11 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * A list of HTTP configuration rules that apply to individual API methods.
+   *
    * **NOTE:** All service configuration rules follow "last one wins" order.
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule rules = 1;</code>
+   * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
    */
   @java.lang.Override
   public int getRulesCount() {
@@ -147,10 +91,11 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * A list of HTTP configuration rules that apply to individual API methods.
+   *
    * **NOTE:** All service configuration rules follow "last one wins" order.
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule rules = 1;</code>
+   * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
    */
   @java.lang.Override
   public com.google.api.HttpRule getRules(int index) {
@@ -159,10 +104,11 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * A list of HTTP configuration rules that apply to individual API methods.
+   *
    * **NOTE:** All service configuration rules follow "last one wins" order.
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule rules = 1;</code>
+   * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
    */
   @java.lang.Override
   public com.google.api.HttpRuleOrBuilder getRulesOrBuilder(
@@ -171,17 +117,18 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int FULLY_DECODE_RESERVED_EXPANSION_FIELD_NUMBER = 2;
-  private boolean fullyDecodeReservedExpansion_;
+  private boolean fullyDecodeReservedExpansion_ = false;
   /**
    * <pre>
    * When set to true, URL path parmeters will be fully URI-decoded except in
    * cases of single segment matches in reserved expansion, where "%2F" will be
    * left encoded.
+   *
    * The default behavior is to not decode RFC 6570 reserved characters in multi
    * segment matches.
    * </pre>
    *
-   * <code>bool fully_decode_reserved_expansion = 2;</code>
+   * <code>bool fully_decode_reserved_expansion = 2 [json_name = "fullyDecodeReservedExpansion"];</code>
    * @return The fullyDecodeReservedExpansion.
    */
   @java.lang.Override
@@ -209,7 +156,7 @@ private static final long serialVersionUID = 0L;
     if (fullyDecodeReservedExpansion_ != false) {
       output.writeBool(2, fullyDecodeReservedExpansion_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
   @java.lang.Override
@@ -226,7 +173,7 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(2, fullyDecodeReservedExpansion_);
     }
-    size += unknownFields.getSerializedSize();
+    size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
   }
@@ -245,7 +192,7 @@ private static final long serialVersionUID = 0L;
         .equals(other.getRulesList())) return false;
     if (getFullyDecodeReservedExpansion()
         != other.getFullyDecodeReservedExpansion()) return false;
-    if (!unknownFields.equals(other.unknownFields)) return false;
+    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
 
@@ -263,7 +210,7 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + FULLY_DECODE_RESERVED_EXPANSION_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getFullyDecodeReservedExpansion());
-    hash = (29 * hash) + unknownFields.hashCode();
+    hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
@@ -386,31 +333,26 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.google.api.Http.newBuilder()
     private Builder() {
-      maybeForceBuilderInitialization();
+
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-      maybeForceBuilderInitialization();
-    }
-    private void maybeForceBuilderInitialization() {
-      if (com.google.protobuf.GeneratedMessageV3
-              .alwaysUseFieldBuilders) {
-        getRulesFieldBuilder();
-      }
+
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      bitField0_ = 0;
       if (rulesBuilder_ == null) {
         rules_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000001);
       } else {
+        rules_ = null;
         rulesBuilder_.clear();
       }
+      bitField0_ = (bitField0_ & ~0x00000001);
       fullyDecodeReservedExpansion_ = false;
-
       return this;
     }
 
@@ -437,7 +379,13 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.api.Http buildPartial() {
       com.google.api.Http result = new com.google.api.Http(this);
-      int from_bitField0_ = bitField0_;
+      buildPartialRepeatedFields(result);
+      if (bitField0_ != 0) { buildPartial0(result); }
+      onBuilt();
+      return result;
+    }
+
+    private void buildPartialRepeatedFields(com.google.api.Http result) {
       if (rulesBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0)) {
           rules_ = java.util.Collections.unmodifiableList(rules_);
@@ -447,9 +395,13 @@ private static final long serialVersionUID = 0L;
       } else {
         result.rules_ = rulesBuilder_.build();
       }
-      result.fullyDecodeReservedExpansion_ = fullyDecodeReservedExpansion_;
-      onBuilt();
-      return result;
+    }
+
+    private void buildPartial0(com.google.api.Http result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.fullyDecodeReservedExpansion_ = fullyDecodeReservedExpansion_;
+      }
     }
 
     @java.lang.Override
@@ -525,7 +477,7 @@ private static final long serialVersionUID = 0L;
       if (other.getFullyDecodeReservedExpansion() != false) {
         setFullyDecodeReservedExpansion(other.getFullyDecodeReservedExpansion());
       }
-      this.mergeUnknownFields(other.unknownFields);
+      this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
     }
@@ -540,17 +492,48 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      com.google.api.Http parsedMessage = null;
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       try {
-        parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              com.google.api.HttpRule m =
+                  input.readMessage(
+                      com.google.api.HttpRule.parser(),
+                      extensionRegistry);
+              if (rulesBuilder_ == null) {
+                ensureRulesIsMutable();
+                rules_.add(m);
+              } else {
+                rulesBuilder_.addMessage(m);
+              }
+              break;
+            } // case 10
+            case 16: {
+              fullyDecodeReservedExpansion_ = input.readBool();
+              bitField0_ |= 0x00000002;
+              break;
+            } // case 16
+            default: {
+              if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                done = true; // was an endgroup tag
+              }
+              break;
+            } // default:
+          } // switch (tag)
+        } // while (!done)
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (com.google.api.Http) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
-        if (parsedMessage != null) {
-          mergeFrom(parsedMessage);
-        }
-      }
+        onChanged();
+      } // finally
       return this;
     }
     private int bitField0_;
@@ -570,10 +553,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public java.util.List<com.google.api.HttpRule> getRulesList() {
       if (rulesBuilder_ == null) {
@@ -585,10 +569,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public int getRulesCount() {
       if (rulesBuilder_ == null) {
@@ -600,10 +585,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public com.google.api.HttpRule getRules(int index) {
       if (rulesBuilder_ == null) {
@@ -615,10 +601,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public Builder setRules(
         int index, com.google.api.HttpRule value) {
@@ -637,10 +624,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public Builder setRules(
         int index, com.google.api.HttpRule.Builder builderForValue) {
@@ -656,10 +644,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public Builder addRules(com.google.api.HttpRule value) {
       if (rulesBuilder_ == null) {
@@ -677,10 +666,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public Builder addRules(
         int index, com.google.api.HttpRule value) {
@@ -699,10 +689,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public Builder addRules(
         com.google.api.HttpRule.Builder builderForValue) {
@@ -718,10 +709,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public Builder addRules(
         int index, com.google.api.HttpRule.Builder builderForValue) {
@@ -737,10 +729,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public Builder addAllRules(
         java.lang.Iterable<? extends com.google.api.HttpRule> values) {
@@ -757,10 +750,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public Builder clearRules() {
       if (rulesBuilder_ == null) {
@@ -775,10 +769,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public Builder removeRules(int index) {
       if (rulesBuilder_ == null) {
@@ -793,10 +788,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public com.google.api.HttpRule.Builder getRulesBuilder(
         int index) {
@@ -805,10 +801,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public com.google.api.HttpRuleOrBuilder getRulesOrBuilder(
         int index) {
@@ -820,10 +817,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public java.util.List<? extends com.google.api.HttpRuleOrBuilder> 
          getRulesOrBuilderList() {
@@ -836,10 +834,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public com.google.api.HttpRule.Builder addRulesBuilder() {
       return getRulesFieldBuilder().addBuilder(
@@ -848,10 +847,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public com.google.api.HttpRule.Builder addRulesBuilder(
         int index) {
@@ -861,10 +861,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * A list of HTTP configuration rules that apply to individual API methods.
+     *
      * **NOTE:** All service configuration rules follow "last one wins" order.
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule rules = 1;</code>
+     * <code>repeated .google.api.HttpRule rules = 1 [json_name = "rules"];</code>
      */
     public java.util.List<com.google.api.HttpRule.Builder> 
          getRulesBuilderList() {
@@ -891,11 +892,12 @@ private static final long serialVersionUID = 0L;
      * When set to true, URL path parmeters will be fully URI-decoded except in
      * cases of single segment matches in reserved expansion, where "%2F" will be
      * left encoded.
+     *
      * The default behavior is to not decode RFC 6570 reserved characters in multi
      * segment matches.
      * </pre>
      *
-     * <code>bool fully_decode_reserved_expansion = 2;</code>
+     * <code>bool fully_decode_reserved_expansion = 2 [json_name = "fullyDecodeReservedExpansion"];</code>
      * @return The fullyDecodeReservedExpansion.
      */
     @java.lang.Override
@@ -907,17 +909,19 @@ private static final long serialVersionUID = 0L;
      * When set to true, URL path parmeters will be fully URI-decoded except in
      * cases of single segment matches in reserved expansion, where "%2F" will be
      * left encoded.
+     *
      * The default behavior is to not decode RFC 6570 reserved characters in multi
      * segment matches.
      * </pre>
      *
-     * <code>bool fully_decode_reserved_expansion = 2;</code>
+     * <code>bool fully_decode_reserved_expansion = 2 [json_name = "fullyDecodeReservedExpansion"];</code>
      * @param value The fullyDecodeReservedExpansion to set.
      * @return This builder for chaining.
      */
     public Builder setFullyDecodeReservedExpansion(boolean value) {
-      
+
       fullyDecodeReservedExpansion_ = value;
+      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
@@ -926,15 +930,16 @@ private static final long serialVersionUID = 0L;
      * When set to true, URL path parmeters will be fully URI-decoded except in
      * cases of single segment matches in reserved expansion, where "%2F" will be
      * left encoded.
+     *
      * The default behavior is to not decode RFC 6570 reserved characters in multi
      * segment matches.
      * </pre>
      *
-     * <code>bool fully_decode_reserved_expansion = 2;</code>
+     * <code>bool fully_decode_reserved_expansion = 2 [json_name = "fullyDecodeReservedExpansion"];</code>
      * @return This builder for chaining.
      */
     public Builder clearFullyDecodeReservedExpansion() {
-      
+      bitField0_ = (bitField0_ & ~0x00000002);
       fullyDecodeReservedExpansion_ = false;
       onChanged();
       return this;
@@ -972,7 +977,18 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new Http(input, extensionRegistry);
+      Builder builder = newBuilder();
+      try {
+        builder.mergeFrom(input, extensionRegistry);
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(builder.buildPartial());
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(e)
+            .setUnfinishedMessage(builder.buildPartial());
+      }
+      return builder.buildPartial();
     }
   };
 

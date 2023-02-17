@@ -11,10 +11,13 @@ package com.google.api;
  * HTTP request body. The mapping is typically specified as an
  * `google.api.http` annotation on the RPC method,
  * see "google/api/annotations.proto" for details.
+ *
  * The mapping consists of a field specifying the path template and
  * method kind.  The path template can refer to fields in the request
  * message, as in the example below which describes a REST GET
  * operation on a resource collection of messages:
+ *
+ *
  *     service Messaging {
  *       rpc GetMessage(GetMessageRequest) returns (Message) {
  *         option (google.api.http).get = "/v1/messages/{message_id}/{sub.subfield}";
@@ -30,23 +33,31 @@ package com.google.api;
  *     message Message {
  *       string text = 1; // content of the resource
  *     }
+ *
  * The same http annotation can alternatively be expressed inside the
  * `GRPC API Configuration` YAML file.
+ *
  *     http:
  *       rules:
  *         - selector: &lt;proto_package_name&gt;.Messaging.GetMessage
  *           get: /v1/messages/{message_id}/{sub.subfield}
+ *
  * This definition enables an automatic, bidrectional mapping of HTTP
  * JSON to RPC. Example:
+ *
  * HTTP | RPC
  * -----|-----
  * `GET /v1/messages/123456/foo`  | `GetMessage(message_id: "123456" sub: SubMessage(subfield: "foo"))`
+ *
  * In general, not only fields but also field paths can be referenced
  * from a path pattern. Fields mapped to the path pattern cannot be
  * repeated and must have a primitive (non-message) type.
+ *
  * Any fields in the request message which are not bound by the path
  * pattern automatically become (optional) HTTP query
  * parameters. Assume the following definition of the request message:
+ *
+ *
  *     service Messaging {
  *       rpc GetMessage(GetMessageRequest) returns (Message) {
  *         option (google.api.http).get = "/v1/messages/{message_id}";
@@ -60,17 +71,24 @@ package com.google.api;
  *       int64 revision = 2;    // becomes a parameter
  *       SubMessage sub = 3;    // `sub.subfield` becomes a parameter
  *     }
+ *
+ *
  * This enables a HTTP JSON to RPC mapping as below:
+ *
  * HTTP | RPC
  * -----|-----
  * `GET /v1/messages/123456?revision=2&amp;sub.subfield=foo` | `GetMessage(message_id: "123456" revision: 2 sub: SubMessage(subfield: "foo"))`
+ *
  * Note that fields which are mapped to HTTP parameters must have a
  * primitive type or a repeated primitive type. Message types are not
  * allowed. In the case of a repeated type, the parameter can be
  * repeated in the URL, as in `...?param=A&amp;param=B`.
+ *
  * For HTTP method kinds which allow a request body, the `body` field
  * specifies the mapping. Consider a REST update method on the
  * message resource collection:
+ *
+ *
  *     service Messaging {
  *       rpc UpdateMessage(UpdateMessageRequest) returns (Message) {
  *         option (google.api.http) = {
@@ -83,16 +101,21 @@ package com.google.api;
  *       string message_id = 1; // mapped to the URL
  *       Message message = 2;   // mapped to the body
  *     }
+ *
+ *
  * The following HTTP JSON to RPC mapping is enabled, where the
  * representation of the JSON in the request body is determined by
  * protos JSON encoding:
+ *
  * HTTP | RPC
  * -----|-----
  * `PUT /v1/messages/123456 { "text": "Hi!" }` | `UpdateMessage(message_id: "123456" message { text: "Hi!" })`
+ *
  * The special name `*` can be used in the body mapping to define that
  * every field not bound by the path template should be mapped to the
  * request body.  This enables the following alternative definition of
  * the update method:
+ *
  *     service Messaging {
  *       rpc UpdateMessage(Message) returns (Message) {
  *         option (google.api.http) = {
@@ -105,17 +128,23 @@ package com.google.api;
  *       string message_id = 1;
  *       string text = 2;
  *     }
+ *
+ *
  * The following HTTP JSON to RPC mapping is enabled:
+ *
  * HTTP | RPC
  * -----|-----
  * `PUT /v1/messages/123456 { "text": "Hi!" }` | `UpdateMessage(message_id: "123456" text: "Hi!")`
+ *
  * Note that when using `*` in the body mapping, it is not possible to
  * have HTTP parameters, as all fields not bound by the path end in
  * the body. This makes this option more rarely used in practice of
  * defining REST APIs. The common usage of `*` is in custom methods
  * which don't use the URL at all for transferring data.
+ *
  * It is possible to define multiple HTTP methods for one RPC by using
  * the `additional_bindings` option. Example:
+ *
  *     service Messaging {
  *       rpc GetMessage(GetMessageRequest) returns (Message) {
  *         option (google.api.http) = {
@@ -130,15 +159,21 @@ package com.google.api;
  *       string message_id = 1;
  *       string user_id = 2;
  *     }
+ *
+ *
  * This enables the following two alternative HTTP JSON to RPC
  * mappings:
+ *
  * HTTP | RPC
  * -----|-----
  * `GET /v1/messages/123456` | `GetMessage(message_id: "123456")`
  * `GET /v1/users/me/messages/123456` | `GetMessage(user_id: "me" message_id: "123456")`
+ *
  * # Rules for HTTP mapping
+ *
  * The rules for mapping HTTP path, query parameters, and body fields
  * to the request message are as follows:
+ *
  * 1. The `body` field specifies either `*` or a field path, or is
  *    omitted. If omitted, it indicates there is no HTTP request body.
  * 2. Leaf fields (recursive expansion of nested messages in the
@@ -149,34 +184,42 @@ package com.google.api;
  *     (c) All other fields.
  * 3. URL query parameters found in the HTTP request are mapped to (c) fields.
  * 4. Any body sent with an HTTP request can contain only (b) fields.
+ *
  * The syntax of the path template is as follows:
+ *
  *     Template = "/" Segments [ Verb ] ;
  *     Segments = Segment { "/" Segment } ;
  *     Segment  = "*" | "**" | LITERAL | Variable ;
  *     Variable = "{" FieldPath [ "=" Segments ] "}" ;
  *     FieldPath = IDENT { "." IDENT } ;
  *     Verb     = ":" LITERAL ;
+ *
  * The syntax `*` matches a single path segment. The syntax `**` matches zero
  * or more path segments, which must be the last part of the path except the
  * `Verb`. The syntax `LITERAL` matches literal text in the path.
+ *
  * The syntax `Variable` matches part of the URL path as specified by its
  * template. A variable template must not contain other variables. If a variable
  * matches a single path segment, its template may be omitted, e.g. `{var}`
  * is equivalent to `{var=*}`.
+ *
  * If a variable contains exactly one path segment, such as `"{var}"` or
  * `"{var=*}"`, when such a variable is expanded into a URL path, all characters
  * except `[-_.~0-9a-zA-Z]` are percent-encoded. Such variables show up in the
  * Discovery Document as `{var}`.
+ *
  * If a variable contains one or more path segments, such as `"{var=foo/&#42;}"`
  * or `"{var=**}"`, when such a variable is expanded into a URL path, all
  * characters except `[-_.~/0-9a-zA-Z]` are percent-encoded. Such variables
  * show up in the Discovery Document as `{+var}`.
+ *
  * NOTE: While the single segment variable matches the semantics of
  * [RFC 6570](https://tools.ietf.org/html/rfc6570) Section 3.2.2
  * Simple String Expansion, the multi segment variable **does not** match
  * RFC 6570 Reserved Expansion. The reason is that the Reserved Expansion
  * does not expand special characters like `?` and `#`, which would lead
  * to invalid URLs.
+ *
  * NOTE: the field paths in variables and in the `body` must not refer to
  * repeated fields or map fields.
  * </pre>
@@ -206,123 +249,6 @@ private static final long serialVersionUID = 0L;
     return new HttpRule();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
-  private HttpRule(
-      com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    this();
-    if (extensionRegistry == null) {
-      throw new java.lang.NullPointerException();
-    }
-    int mutable_bitField0_ = 0;
-    com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-        com.google.protobuf.UnknownFieldSet.newBuilder();
-    try {
-      boolean done = false;
-      while (!done) {
-        int tag = input.readTag();
-        switch (tag) {
-          case 0:
-            done = true;
-            break;
-          case 10: {
-            java.lang.String s = input.readStringRequireUtf8();
-
-            selector_ = s;
-            break;
-          }
-          case 18: {
-            java.lang.String s = input.readStringRequireUtf8();
-            patternCase_ = 2;
-            pattern_ = s;
-            break;
-          }
-          case 26: {
-            java.lang.String s = input.readStringRequireUtf8();
-            patternCase_ = 3;
-            pattern_ = s;
-            break;
-          }
-          case 34: {
-            java.lang.String s = input.readStringRequireUtf8();
-            patternCase_ = 4;
-            pattern_ = s;
-            break;
-          }
-          case 42: {
-            java.lang.String s = input.readStringRequireUtf8();
-            patternCase_ = 5;
-            pattern_ = s;
-            break;
-          }
-          case 50: {
-            java.lang.String s = input.readStringRequireUtf8();
-            patternCase_ = 6;
-            pattern_ = s;
-            break;
-          }
-          case 58: {
-            java.lang.String s = input.readStringRequireUtf8();
-
-            body_ = s;
-            break;
-          }
-          case 66: {
-            com.google.api.CustomHttpPattern.Builder subBuilder = null;
-            if (patternCase_ == 8) {
-              subBuilder = ((com.google.api.CustomHttpPattern) pattern_).toBuilder();
-            }
-            pattern_ =
-                input.readMessage(com.google.api.CustomHttpPattern.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom((com.google.api.CustomHttpPattern) pattern_);
-              pattern_ = subBuilder.buildPartial();
-            }
-            patternCase_ = 8;
-            break;
-          }
-          case 90: {
-            if (!((mutable_bitField0_ & 0x00000001) != 0)) {
-              additionalBindings_ = new java.util.ArrayList<com.google.api.HttpRule>();
-              mutable_bitField0_ |= 0x00000001;
-            }
-            additionalBindings_.add(
-                input.readMessage(com.google.api.HttpRule.parser(), extensionRegistry));
-            break;
-          }
-          case 98: {
-            java.lang.String s = input.readStringRequireUtf8();
-
-            responseBody_ = s;
-            break;
-          }
-          default: {
-            if (!parseUnknownField(
-                input, unknownFields, extensionRegistry, tag)) {
-              done = true;
-            }
-            break;
-          }
-        }
-      }
-    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
-    } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e).setUnfinishedMessage(this);
-    } finally {
-      if (((mutable_bitField0_ & 0x00000001) != 0)) {
-        additionalBindings_ = java.util.Collections.unmodifiableList(additionalBindings_);
-      }
-      this.unknownFields = unknownFields.build();
-      makeExtensionsImmutable();
-    }
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.google.api.HttpProto.internal_static_google_api_HttpRule_descriptor;
@@ -337,6 +263,7 @@ private static final long serialVersionUID = 0L;
   }
 
   private int patternCase_ = 0;
+  @SuppressWarnings("serial")
   private java.lang.Object pattern_;
   public enum PatternCase
       implements com.google.protobuf.Internal.EnumLite,
@@ -386,14 +313,16 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int SELECTOR_FIELD_NUMBER = 1;
-  private volatile java.lang.Object selector_;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object selector_ = "";
   /**
    * <pre>
    * Selects methods to which this rule applies.
+   *
    * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
    * </pre>
    *
-   * <code>string selector = 1;</code>
+   * <code>string selector = 1 [json_name = "selector"];</code>
    * @return The selector.
    */
   @java.lang.Override
@@ -412,10 +341,11 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * Selects methods to which this rule applies.
+   *
    * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
    * </pre>
    *
-   * <code>string selector = 1;</code>
+   * <code>string selector = 1 [json_name = "selector"];</code>
    * @return The bytes for selector.
    */
   @java.lang.Override
@@ -439,7 +369,7 @@ private static final long serialVersionUID = 0L;
    * Used for listing and getting information about resources.
    * </pre>
    *
-   * <code>string get = 2;</code>
+   * <code>string get = 2 [json_name = "get"];</code>
    * @return Whether the get field is set.
    */
   public boolean hasGet() {
@@ -450,7 +380,7 @@ private static final long serialVersionUID = 0L;
    * Used for listing and getting information about resources.
    * </pre>
    *
-   * <code>string get = 2;</code>
+   * <code>string get = 2 [json_name = "get"];</code>
    * @return The get.
    */
   public java.lang.String getGet() {
@@ -475,7 +405,7 @@ private static final long serialVersionUID = 0L;
    * Used for listing and getting information about resources.
    * </pre>
    *
-   * <code>string get = 2;</code>
+   * <code>string get = 2 [json_name = "get"];</code>
    * @return The bytes for get.
    */
   public com.google.protobuf.ByteString
@@ -503,7 +433,7 @@ private static final long serialVersionUID = 0L;
    * Used for updating a resource.
    * </pre>
    *
-   * <code>string put = 3;</code>
+   * <code>string put = 3 [json_name = "put"];</code>
    * @return Whether the put field is set.
    */
   public boolean hasPut() {
@@ -514,7 +444,7 @@ private static final long serialVersionUID = 0L;
    * Used for updating a resource.
    * </pre>
    *
-   * <code>string put = 3;</code>
+   * <code>string put = 3 [json_name = "put"];</code>
    * @return The put.
    */
   public java.lang.String getPut() {
@@ -539,7 +469,7 @@ private static final long serialVersionUID = 0L;
    * Used for updating a resource.
    * </pre>
    *
-   * <code>string put = 3;</code>
+   * <code>string put = 3 [json_name = "put"];</code>
    * @return The bytes for put.
    */
   public com.google.protobuf.ByteString
@@ -567,7 +497,7 @@ private static final long serialVersionUID = 0L;
    * Used for creating a resource.
    * </pre>
    *
-   * <code>string post = 4;</code>
+   * <code>string post = 4 [json_name = "post"];</code>
    * @return Whether the post field is set.
    */
   public boolean hasPost() {
@@ -578,7 +508,7 @@ private static final long serialVersionUID = 0L;
    * Used for creating a resource.
    * </pre>
    *
-   * <code>string post = 4;</code>
+   * <code>string post = 4 [json_name = "post"];</code>
    * @return The post.
    */
   public java.lang.String getPost() {
@@ -603,7 +533,7 @@ private static final long serialVersionUID = 0L;
    * Used for creating a resource.
    * </pre>
    *
-   * <code>string post = 4;</code>
+   * <code>string post = 4 [json_name = "post"];</code>
    * @return The bytes for post.
    */
   public com.google.protobuf.ByteString
@@ -631,7 +561,7 @@ private static final long serialVersionUID = 0L;
    * Used for deleting a resource.
    * </pre>
    *
-   * <code>string delete = 5;</code>
+   * <code>string delete = 5 [json_name = "delete"];</code>
    * @return Whether the delete field is set.
    */
   public boolean hasDelete() {
@@ -642,7 +572,7 @@ private static final long serialVersionUID = 0L;
    * Used for deleting a resource.
    * </pre>
    *
-   * <code>string delete = 5;</code>
+   * <code>string delete = 5 [json_name = "delete"];</code>
    * @return The delete.
    */
   public java.lang.String getDelete() {
@@ -667,7 +597,7 @@ private static final long serialVersionUID = 0L;
    * Used for deleting a resource.
    * </pre>
    *
-   * <code>string delete = 5;</code>
+   * <code>string delete = 5 [json_name = "delete"];</code>
    * @return The bytes for delete.
    */
   public com.google.protobuf.ByteString
@@ -695,7 +625,7 @@ private static final long serialVersionUID = 0L;
    * Used for updating a resource.
    * </pre>
    *
-   * <code>string patch = 6;</code>
+   * <code>string patch = 6 [json_name = "patch"];</code>
    * @return Whether the patch field is set.
    */
   public boolean hasPatch() {
@@ -706,7 +636,7 @@ private static final long serialVersionUID = 0L;
    * Used for updating a resource.
    * </pre>
    *
-   * <code>string patch = 6;</code>
+   * <code>string patch = 6 [json_name = "patch"];</code>
    * @return The patch.
    */
   public java.lang.String getPatch() {
@@ -731,7 +661,7 @@ private static final long serialVersionUID = 0L;
    * Used for updating a resource.
    * </pre>
    *
-   * <code>string patch = 6;</code>
+   * <code>string patch = 6 [json_name = "patch"];</code>
    * @return The bytes for patch.
    */
   public com.google.protobuf.ByteString
@@ -762,7 +692,7 @@ private static final long serialVersionUID = 0L;
    * for services that provide content to Web (HTML) clients.
    * </pre>
    *
-   * <code>.google.api.CustomHttpPattern custom = 8;</code>
+   * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
    * @return Whether the custom field is set.
    */
   @java.lang.Override
@@ -777,7 +707,7 @@ private static final long serialVersionUID = 0L;
    * for services that provide content to Web (HTML) clients.
    * </pre>
    *
-   * <code>.google.api.CustomHttpPattern custom = 8;</code>
+   * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
    * @return The custom.
    */
   @java.lang.Override
@@ -795,7 +725,7 @@ private static final long serialVersionUID = 0L;
    * for services that provide content to Web (HTML) clients.
    * </pre>
    *
-   * <code>.google.api.CustomHttpPattern custom = 8;</code>
+   * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
    */
   @java.lang.Override
   public com.google.api.CustomHttpPatternOrBuilder getCustomOrBuilder() {
@@ -806,7 +736,8 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int BODY_FIELD_NUMBER = 7;
-  private volatile java.lang.Object body_;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object body_ = "";
   /**
    * <pre>
    * The name of the request field whose value is mapped to the HTTP body, or
@@ -815,7 +746,7 @@ private static final long serialVersionUID = 0L;
    * present at the top-level of request message type.
    * </pre>
    *
-   * <code>string body = 7;</code>
+   * <code>string body = 7 [json_name = "body"];</code>
    * @return The body.
    */
   @java.lang.Override
@@ -839,7 +770,7 @@ private static final long serialVersionUID = 0L;
    * present at the top-level of request message type.
    * </pre>
    *
-   * <code>string body = 7;</code>
+   * <code>string body = 7 [json_name = "body"];</code>
    * @return The bytes for body.
    */
   @java.lang.Override
@@ -858,7 +789,8 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int RESPONSE_BODY_FIELD_NUMBER = 12;
-  private volatile java.lang.Object responseBody_;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object responseBody_ = "";
   /**
    * <pre>
    * Optional. The name of the response field whose value is mapped to the HTTP
@@ -866,7 +798,7 @@ private static final long serialVersionUID = 0L;
    * not set, the response message will be used as HTTP body of response.
    * </pre>
    *
-   * <code>string response_body = 12;</code>
+   * <code>string response_body = 12 [json_name = "responseBody"];</code>
    * @return The responseBody.
    */
   @java.lang.Override
@@ -889,7 +821,7 @@ private static final long serialVersionUID = 0L;
    * not set, the response message will be used as HTTP body of response.
    * </pre>
    *
-   * <code>string response_body = 12;</code>
+   * <code>string response_body = 12 [json_name = "responseBody"];</code>
    * @return The bytes for responseBody.
    */
   @java.lang.Override
@@ -908,6 +840,7 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int ADDITIONAL_BINDINGS_FIELD_NUMBER = 11;
+  @SuppressWarnings("serial")
   private java.util.List<com.google.api.HttpRule> additionalBindings_;
   /**
    * <pre>
@@ -916,7 +849,7 @@ private static final long serialVersionUID = 0L;
    * the nesting may only be one level deep).
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+   * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
    */
   @java.lang.Override
   public java.util.List<com.google.api.HttpRule> getAdditionalBindingsList() {
@@ -929,7 +862,7 @@ private static final long serialVersionUID = 0L;
    * the nesting may only be one level deep).
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+   * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
    */
   @java.lang.Override
   public java.util.List<? extends com.google.api.HttpRuleOrBuilder> 
@@ -943,7 +876,7 @@ private static final long serialVersionUID = 0L;
    * the nesting may only be one level deep).
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+   * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
    */
   @java.lang.Override
   public int getAdditionalBindingsCount() {
@@ -956,7 +889,7 @@ private static final long serialVersionUID = 0L;
    * the nesting may only be one level deep).
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+   * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
    */
   @java.lang.Override
   public com.google.api.HttpRule getAdditionalBindings(int index) {
@@ -969,7 +902,7 @@ private static final long serialVersionUID = 0L;
    * the nesting may only be one level deep).
    * </pre>
    *
-   * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+   * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
    */
   @java.lang.Override
   public com.google.api.HttpRuleOrBuilder getAdditionalBindingsOrBuilder(
@@ -1021,7 +954,7 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(responseBody_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 12, responseBody_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
   @java.lang.Override
@@ -1062,7 +995,7 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(responseBody_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(12, responseBody_);
     }
-    size += unknownFields.getSerializedSize();
+    size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
   }
@@ -1114,7 +1047,7 @@ private static final long serialVersionUID = 0L;
       case 0:
       default:
     }
-    if (!unknownFields.equals(other.unknownFields)) return false;
+    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
 
@@ -1163,7 +1096,7 @@ private static final long serialVersionUID = 0L;
       case 0:
       default:
     }
-    hash = (29 * hash) + unknownFields.hashCode();
+    hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
@@ -1266,10 +1199,13 @@ private static final long serialVersionUID = 0L;
    * HTTP request body. The mapping is typically specified as an
    * `google.api.http` annotation on the RPC method,
    * see "google/api/annotations.proto" for details.
+   *
    * The mapping consists of a field specifying the path template and
    * method kind.  The path template can refer to fields in the request
    * message, as in the example below which describes a REST GET
    * operation on a resource collection of messages:
+   *
+   *
    *     service Messaging {
    *       rpc GetMessage(GetMessageRequest) returns (Message) {
    *         option (google.api.http).get = "/v1/messages/{message_id}/{sub.subfield}";
@@ -1285,23 +1221,31 @@ private static final long serialVersionUID = 0L;
    *     message Message {
    *       string text = 1; // content of the resource
    *     }
+   *
    * The same http annotation can alternatively be expressed inside the
    * `GRPC API Configuration` YAML file.
+   *
    *     http:
    *       rules:
    *         - selector: &lt;proto_package_name&gt;.Messaging.GetMessage
    *           get: /v1/messages/{message_id}/{sub.subfield}
+   *
    * This definition enables an automatic, bidrectional mapping of HTTP
    * JSON to RPC. Example:
+   *
    * HTTP | RPC
    * -----|-----
    * `GET /v1/messages/123456/foo`  | `GetMessage(message_id: "123456" sub: SubMessage(subfield: "foo"))`
+   *
    * In general, not only fields but also field paths can be referenced
    * from a path pattern. Fields mapped to the path pattern cannot be
    * repeated and must have a primitive (non-message) type.
+   *
    * Any fields in the request message which are not bound by the path
    * pattern automatically become (optional) HTTP query
    * parameters. Assume the following definition of the request message:
+   *
+   *
    *     service Messaging {
    *       rpc GetMessage(GetMessageRequest) returns (Message) {
    *         option (google.api.http).get = "/v1/messages/{message_id}";
@@ -1315,17 +1259,24 @@ private static final long serialVersionUID = 0L;
    *       int64 revision = 2;    // becomes a parameter
    *       SubMessage sub = 3;    // `sub.subfield` becomes a parameter
    *     }
+   *
+   *
    * This enables a HTTP JSON to RPC mapping as below:
+   *
    * HTTP | RPC
    * -----|-----
    * `GET /v1/messages/123456?revision=2&amp;sub.subfield=foo` | `GetMessage(message_id: "123456" revision: 2 sub: SubMessage(subfield: "foo"))`
+   *
    * Note that fields which are mapped to HTTP parameters must have a
    * primitive type or a repeated primitive type. Message types are not
    * allowed. In the case of a repeated type, the parameter can be
    * repeated in the URL, as in `...?param=A&amp;param=B`.
+   *
    * For HTTP method kinds which allow a request body, the `body` field
    * specifies the mapping. Consider a REST update method on the
    * message resource collection:
+   *
+   *
    *     service Messaging {
    *       rpc UpdateMessage(UpdateMessageRequest) returns (Message) {
    *         option (google.api.http) = {
@@ -1338,16 +1289,21 @@ private static final long serialVersionUID = 0L;
    *       string message_id = 1; // mapped to the URL
    *       Message message = 2;   // mapped to the body
    *     }
+   *
+   *
    * The following HTTP JSON to RPC mapping is enabled, where the
    * representation of the JSON in the request body is determined by
    * protos JSON encoding:
+   *
    * HTTP | RPC
    * -----|-----
    * `PUT /v1/messages/123456 { "text": "Hi!" }` | `UpdateMessage(message_id: "123456" message { text: "Hi!" })`
+   *
    * The special name `*` can be used in the body mapping to define that
    * every field not bound by the path template should be mapped to the
    * request body.  This enables the following alternative definition of
    * the update method:
+   *
    *     service Messaging {
    *       rpc UpdateMessage(Message) returns (Message) {
    *         option (google.api.http) = {
@@ -1360,17 +1316,23 @@ private static final long serialVersionUID = 0L;
    *       string message_id = 1;
    *       string text = 2;
    *     }
+   *
+   *
    * The following HTTP JSON to RPC mapping is enabled:
+   *
    * HTTP | RPC
    * -----|-----
    * `PUT /v1/messages/123456 { "text": "Hi!" }` | `UpdateMessage(message_id: "123456" text: "Hi!")`
+   *
    * Note that when using `*` in the body mapping, it is not possible to
    * have HTTP parameters, as all fields not bound by the path end in
    * the body. This makes this option more rarely used in practice of
    * defining REST APIs. The common usage of `*` is in custom methods
    * which don't use the URL at all for transferring data.
+   *
    * It is possible to define multiple HTTP methods for one RPC by using
    * the `additional_bindings` option. Example:
+   *
    *     service Messaging {
    *       rpc GetMessage(GetMessageRequest) returns (Message) {
    *         option (google.api.http) = {
@@ -1385,15 +1347,21 @@ private static final long serialVersionUID = 0L;
    *       string message_id = 1;
    *       string user_id = 2;
    *     }
+   *
+   *
    * This enables the following two alternative HTTP JSON to RPC
    * mappings:
+   *
    * HTTP | RPC
    * -----|-----
    * `GET /v1/messages/123456` | `GetMessage(message_id: "123456")`
    * `GET /v1/users/me/messages/123456` | `GetMessage(user_id: "me" message_id: "123456")`
+   *
    * # Rules for HTTP mapping
+   *
    * The rules for mapping HTTP path, query parameters, and body fields
    * to the request message are as follows:
+   *
    * 1. The `body` field specifies either `*` or a field path, or is
    *    omitted. If omitted, it indicates there is no HTTP request body.
    * 2. Leaf fields (recursive expansion of nested messages in the
@@ -1404,34 +1372,42 @@ private static final long serialVersionUID = 0L;
    *     (c) All other fields.
    * 3. URL query parameters found in the HTTP request are mapped to (c) fields.
    * 4. Any body sent with an HTTP request can contain only (b) fields.
+   *
    * The syntax of the path template is as follows:
+   *
    *     Template = "/" Segments [ Verb ] ;
    *     Segments = Segment { "/" Segment } ;
    *     Segment  = "*" | "**" | LITERAL | Variable ;
    *     Variable = "{" FieldPath [ "=" Segments ] "}" ;
    *     FieldPath = IDENT { "." IDENT } ;
    *     Verb     = ":" LITERAL ;
+   *
    * The syntax `*` matches a single path segment. The syntax `**` matches zero
    * or more path segments, which must be the last part of the path except the
    * `Verb`. The syntax `LITERAL` matches literal text in the path.
+   *
    * The syntax `Variable` matches part of the URL path as specified by its
    * template. A variable template must not contain other variables. If a variable
    * matches a single path segment, its template may be omitted, e.g. `{var}`
    * is equivalent to `{var=*}`.
+   *
    * If a variable contains exactly one path segment, such as `"{var}"` or
    * `"{var=*}"`, when such a variable is expanded into a URL path, all characters
    * except `[-_.~0-9a-zA-Z]` are percent-encoded. Such variables show up in the
    * Discovery Document as `{var}`.
+   *
    * If a variable contains one or more path segments, such as `"{var=foo/&#42;}"`
    * or `"{var=**}"`, when such a variable is expanded into a URL path, all
    * characters except `[-_.~/0-9a-zA-Z]` are percent-encoded. Such variables
    * show up in the Discovery Document as `{+var}`.
+   *
    * NOTE: While the single segment variable matches the semantics of
    * [RFC 6570](https://tools.ietf.org/html/rfc6570) Section 3.2.2
    * Simple String Expansion, the multi segment variable **does not** match
    * RFC 6570 Reserved Expansion. The reason is that the Reserved Expansion
    * does not expand special characters like `?` and `#`, which would lead
    * to invalid URLs.
+   *
    * NOTE: the field paths in variables and in the `body` must not refer to
    * repeated fields or map fields.
    * </pre>
@@ -1457,35 +1433,31 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.google.api.HttpRule.newBuilder()
     private Builder() {
-      maybeForceBuilderInitialization();
+
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-      maybeForceBuilderInitialization();
-    }
-    private void maybeForceBuilderInitialization() {
-      if (com.google.protobuf.GeneratedMessageV3
-              .alwaysUseFieldBuilders) {
-        getAdditionalBindingsFieldBuilder();
-      }
+
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      bitField0_ = 0;
       selector_ = "";
-
+      if (customBuilder_ != null) {
+        customBuilder_.clear();
+      }
       body_ = "";
-
       responseBody_ = "";
-
       if (additionalBindingsBuilder_ == null) {
         additionalBindings_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000001);
       } else {
+        additionalBindings_ = null;
         additionalBindingsBuilder_.clear();
       }
+      bitField0_ = (bitField0_ & ~0x00000200);
       patternCase_ = 0;
       pattern_ = null;
       return this;
@@ -1514,44 +1486,45 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.api.HttpRule buildPartial() {
       com.google.api.HttpRule result = new com.google.api.HttpRule(this);
-      int from_bitField0_ = bitField0_;
-      result.selector_ = selector_;
-      if (patternCase_ == 2) {
-        result.pattern_ = pattern_;
-      }
-      if (patternCase_ == 3) {
-        result.pattern_ = pattern_;
-      }
-      if (patternCase_ == 4) {
-        result.pattern_ = pattern_;
-      }
-      if (patternCase_ == 5) {
-        result.pattern_ = pattern_;
-      }
-      if (patternCase_ == 6) {
-        result.pattern_ = pattern_;
-      }
-      if (patternCase_ == 8) {
-        if (customBuilder_ == null) {
-          result.pattern_ = pattern_;
-        } else {
-          result.pattern_ = customBuilder_.build();
-        }
-      }
-      result.body_ = body_;
-      result.responseBody_ = responseBody_;
+      buildPartialRepeatedFields(result);
+      if (bitField0_ != 0) { buildPartial0(result); }
+      buildPartialOneofs(result);
+      onBuilt();
+      return result;
+    }
+
+    private void buildPartialRepeatedFields(com.google.api.HttpRule result) {
       if (additionalBindingsBuilder_ == null) {
-        if (((bitField0_ & 0x00000001) != 0)) {
+        if (((bitField0_ & 0x00000200) != 0)) {
           additionalBindings_ = java.util.Collections.unmodifiableList(additionalBindings_);
-          bitField0_ = (bitField0_ & ~0x00000001);
+          bitField0_ = (bitField0_ & ~0x00000200);
         }
         result.additionalBindings_ = additionalBindings_;
       } else {
         result.additionalBindings_ = additionalBindingsBuilder_.build();
       }
+    }
+
+    private void buildPartial0(com.google.api.HttpRule result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.selector_ = selector_;
+      }
+      if (((from_bitField0_ & 0x00000080) != 0)) {
+        result.body_ = body_;
+      }
+      if (((from_bitField0_ & 0x00000100) != 0)) {
+        result.responseBody_ = responseBody_;
+      }
+    }
+
+    private void buildPartialOneofs(com.google.api.HttpRule result) {
       result.patternCase_ = patternCase_;
-      onBuilt();
-      return result;
+      result.pattern_ = this.pattern_;
+      if (patternCase_ == 8 &&
+          customBuilder_ != null) {
+        result.pattern_ = customBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -1600,21 +1573,24 @@ private static final long serialVersionUID = 0L;
       if (other == com.google.api.HttpRule.getDefaultInstance()) return this;
       if (!other.getSelector().isEmpty()) {
         selector_ = other.selector_;
+        bitField0_ |= 0x00000001;
         onChanged();
       }
       if (!other.getBody().isEmpty()) {
         body_ = other.body_;
+        bitField0_ |= 0x00000080;
         onChanged();
       }
       if (!other.getResponseBody().isEmpty()) {
         responseBody_ = other.responseBody_;
+        bitField0_ |= 0x00000100;
         onChanged();
       }
       if (additionalBindingsBuilder_ == null) {
         if (!other.additionalBindings_.isEmpty()) {
           if (additionalBindings_.isEmpty()) {
             additionalBindings_ = other.additionalBindings_;
-            bitField0_ = (bitField0_ & ~0x00000001);
+            bitField0_ = (bitField0_ & ~0x00000200);
           } else {
             ensureAdditionalBindingsIsMutable();
             additionalBindings_.addAll(other.additionalBindings_);
@@ -1627,7 +1603,7 @@ private static final long serialVersionUID = 0L;
             additionalBindingsBuilder_.dispose();
             additionalBindingsBuilder_ = null;
             additionalBindings_ = other.additionalBindings_;
-            bitField0_ = (bitField0_ & ~0x00000001);
+            bitField0_ = (bitField0_ & ~0x00000200);
             additionalBindingsBuilder_ = 
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                  getAdditionalBindingsFieldBuilder() : null;
@@ -1675,7 +1651,7 @@ private static final long serialVersionUID = 0L;
           break;
         }
       }
-      this.mergeUnknownFields(other.unknownFields);
+      this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
     }
@@ -1690,17 +1666,95 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      com.google.api.HttpRule parsedMessage = null;
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       try {
-        parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              selector_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000001;
+              break;
+            } // case 10
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+              patternCase_ = 2;
+              pattern_ = s;
+              break;
+            } // case 18
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+              patternCase_ = 3;
+              pattern_ = s;
+              break;
+            } // case 26
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+              patternCase_ = 4;
+              pattern_ = s;
+              break;
+            } // case 34
+            case 42: {
+              java.lang.String s = input.readStringRequireUtf8();
+              patternCase_ = 5;
+              pattern_ = s;
+              break;
+            } // case 42
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+              patternCase_ = 6;
+              pattern_ = s;
+              break;
+            } // case 50
+            case 58: {
+              body_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000080;
+              break;
+            } // case 58
+            case 66: {
+              input.readMessage(
+                  getCustomFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              patternCase_ = 8;
+              break;
+            } // case 66
+            case 90: {
+              com.google.api.HttpRule m =
+                  input.readMessage(
+                      com.google.api.HttpRule.parser(),
+                      extensionRegistry);
+              if (additionalBindingsBuilder_ == null) {
+                ensureAdditionalBindingsIsMutable();
+                additionalBindings_.add(m);
+              } else {
+                additionalBindingsBuilder_.addMessage(m);
+              }
+              break;
+            } // case 90
+            case 98: {
+              responseBody_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000100;
+              break;
+            } // case 98
+            default: {
+              if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                done = true; // was an endgroup tag
+              }
+              break;
+            } // default:
+          } // switch (tag)
+        } // while (!done)
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (com.google.api.HttpRule) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
-        if (parsedMessage != null) {
-          mergeFrom(parsedMessage);
-        }
-      }
+        onChanged();
+      } // finally
       return this;
     }
     private int patternCase_ = 0;
@@ -1724,10 +1778,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Selects methods to which this rule applies.
+     *
      * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
      * </pre>
      *
-     * <code>string selector = 1;</code>
+     * <code>string selector = 1 [json_name = "selector"];</code>
      * @return The selector.
      */
     public java.lang.String getSelector() {
@@ -1745,10 +1800,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Selects methods to which this rule applies.
+     *
      * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
      * </pre>
      *
-     * <code>string selector = 1;</code>
+     * <code>string selector = 1 [json_name = "selector"];</code>
      * @return The bytes for selector.
      */
     public com.google.protobuf.ByteString
@@ -1767,56 +1823,55 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Selects methods to which this rule applies.
+     *
      * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
      * </pre>
      *
-     * <code>string selector = 1;</code>
+     * <code>string selector = 1 [json_name = "selector"];</code>
      * @param value The selector to set.
      * @return This builder for chaining.
      */
     public Builder setSelector(
         java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      if (value == null) { throw new NullPointerException(); }
       selector_ = value;
+      bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
      * <pre>
      * Selects methods to which this rule applies.
+     *
      * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
      * </pre>
      *
-     * <code>string selector = 1;</code>
+     * <code>string selector = 1 [json_name = "selector"];</code>
      * @return This builder for chaining.
      */
     public Builder clearSelector() {
-      
       selector_ = getDefaultInstance().getSelector();
+      bitField0_ = (bitField0_ & ~0x00000001);
       onChanged();
       return this;
     }
     /**
      * <pre>
      * Selects methods to which this rule applies.
+     *
      * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
      * </pre>
      *
-     * <code>string selector = 1;</code>
+     * <code>string selector = 1 [json_name = "selector"];</code>
      * @param value The bytes for selector to set.
      * @return This builder for chaining.
      */
     public Builder setSelectorBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
       selector_ = value;
+      bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
@@ -1826,7 +1881,7 @@ private static final long serialVersionUID = 0L;
      * Used for listing and getting information about resources.
      * </pre>
      *
-     * <code>string get = 2;</code>
+     * <code>string get = 2 [json_name = "get"];</code>
      * @return Whether the get field is set.
      */
     @java.lang.Override
@@ -1838,7 +1893,7 @@ private static final long serialVersionUID = 0L;
      * Used for listing and getting information about resources.
      * </pre>
      *
-     * <code>string get = 2;</code>
+     * <code>string get = 2 [json_name = "get"];</code>
      * @return The get.
      */
     @java.lang.Override
@@ -1864,7 +1919,7 @@ private static final long serialVersionUID = 0L;
      * Used for listing and getting information about resources.
      * </pre>
      *
-     * <code>string get = 2;</code>
+     * <code>string get = 2 [json_name = "get"];</code>
      * @return The bytes for get.
      */
     @java.lang.Override
@@ -1891,16 +1946,14 @@ private static final long serialVersionUID = 0L;
      * Used for listing and getting information about resources.
      * </pre>
      *
-     * <code>string get = 2;</code>
+     * <code>string get = 2 [json_name = "get"];</code>
      * @param value The get to set.
      * @return This builder for chaining.
      */
     public Builder setGet(
         java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  patternCase_ = 2;
+      if (value == null) { throw new NullPointerException(); }
+      patternCase_ = 2;
       pattern_ = value;
       onChanged();
       return this;
@@ -1910,7 +1963,7 @@ private static final long serialVersionUID = 0L;
      * Used for listing and getting information about resources.
      * </pre>
      *
-     * <code>string get = 2;</code>
+     * <code>string get = 2 [json_name = "get"];</code>
      * @return This builder for chaining.
      */
     public Builder clearGet() {
@@ -1926,16 +1979,14 @@ private static final long serialVersionUID = 0L;
      * Used for listing and getting information about resources.
      * </pre>
      *
-     * <code>string get = 2;</code>
+     * <code>string get = 2 [json_name = "get"];</code>
      * @param value The bytes for get to set.
      * @return This builder for chaining.
      */
     public Builder setGetBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
       patternCase_ = 2;
       pattern_ = value;
       onChanged();
@@ -1947,7 +1998,7 @@ private static final long serialVersionUID = 0L;
      * Used for updating a resource.
      * </pre>
      *
-     * <code>string put = 3;</code>
+     * <code>string put = 3 [json_name = "put"];</code>
      * @return Whether the put field is set.
      */
     @java.lang.Override
@@ -1959,7 +2010,7 @@ private static final long serialVersionUID = 0L;
      * Used for updating a resource.
      * </pre>
      *
-     * <code>string put = 3;</code>
+     * <code>string put = 3 [json_name = "put"];</code>
      * @return The put.
      */
     @java.lang.Override
@@ -1985,7 +2036,7 @@ private static final long serialVersionUID = 0L;
      * Used for updating a resource.
      * </pre>
      *
-     * <code>string put = 3;</code>
+     * <code>string put = 3 [json_name = "put"];</code>
      * @return The bytes for put.
      */
     @java.lang.Override
@@ -2012,16 +2063,14 @@ private static final long serialVersionUID = 0L;
      * Used for updating a resource.
      * </pre>
      *
-     * <code>string put = 3;</code>
+     * <code>string put = 3 [json_name = "put"];</code>
      * @param value The put to set.
      * @return This builder for chaining.
      */
     public Builder setPut(
         java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  patternCase_ = 3;
+      if (value == null) { throw new NullPointerException(); }
+      patternCase_ = 3;
       pattern_ = value;
       onChanged();
       return this;
@@ -2031,7 +2080,7 @@ private static final long serialVersionUID = 0L;
      * Used for updating a resource.
      * </pre>
      *
-     * <code>string put = 3;</code>
+     * <code>string put = 3 [json_name = "put"];</code>
      * @return This builder for chaining.
      */
     public Builder clearPut() {
@@ -2047,16 +2096,14 @@ private static final long serialVersionUID = 0L;
      * Used for updating a resource.
      * </pre>
      *
-     * <code>string put = 3;</code>
+     * <code>string put = 3 [json_name = "put"];</code>
      * @param value The bytes for put to set.
      * @return This builder for chaining.
      */
     public Builder setPutBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
       patternCase_ = 3;
       pattern_ = value;
       onChanged();
@@ -2068,7 +2115,7 @@ private static final long serialVersionUID = 0L;
      * Used for creating a resource.
      * </pre>
      *
-     * <code>string post = 4;</code>
+     * <code>string post = 4 [json_name = "post"];</code>
      * @return Whether the post field is set.
      */
     @java.lang.Override
@@ -2080,7 +2127,7 @@ private static final long serialVersionUID = 0L;
      * Used for creating a resource.
      * </pre>
      *
-     * <code>string post = 4;</code>
+     * <code>string post = 4 [json_name = "post"];</code>
      * @return The post.
      */
     @java.lang.Override
@@ -2106,7 +2153,7 @@ private static final long serialVersionUID = 0L;
      * Used for creating a resource.
      * </pre>
      *
-     * <code>string post = 4;</code>
+     * <code>string post = 4 [json_name = "post"];</code>
      * @return The bytes for post.
      */
     @java.lang.Override
@@ -2133,16 +2180,14 @@ private static final long serialVersionUID = 0L;
      * Used for creating a resource.
      * </pre>
      *
-     * <code>string post = 4;</code>
+     * <code>string post = 4 [json_name = "post"];</code>
      * @param value The post to set.
      * @return This builder for chaining.
      */
     public Builder setPost(
         java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  patternCase_ = 4;
+      if (value == null) { throw new NullPointerException(); }
+      patternCase_ = 4;
       pattern_ = value;
       onChanged();
       return this;
@@ -2152,7 +2197,7 @@ private static final long serialVersionUID = 0L;
      * Used for creating a resource.
      * </pre>
      *
-     * <code>string post = 4;</code>
+     * <code>string post = 4 [json_name = "post"];</code>
      * @return This builder for chaining.
      */
     public Builder clearPost() {
@@ -2168,16 +2213,14 @@ private static final long serialVersionUID = 0L;
      * Used for creating a resource.
      * </pre>
      *
-     * <code>string post = 4;</code>
+     * <code>string post = 4 [json_name = "post"];</code>
      * @param value The bytes for post to set.
      * @return This builder for chaining.
      */
     public Builder setPostBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
       patternCase_ = 4;
       pattern_ = value;
       onChanged();
@@ -2189,7 +2232,7 @@ private static final long serialVersionUID = 0L;
      * Used for deleting a resource.
      * </pre>
      *
-     * <code>string delete = 5;</code>
+     * <code>string delete = 5 [json_name = "delete"];</code>
      * @return Whether the delete field is set.
      */
     @java.lang.Override
@@ -2201,7 +2244,7 @@ private static final long serialVersionUID = 0L;
      * Used for deleting a resource.
      * </pre>
      *
-     * <code>string delete = 5;</code>
+     * <code>string delete = 5 [json_name = "delete"];</code>
      * @return The delete.
      */
     @java.lang.Override
@@ -2227,7 +2270,7 @@ private static final long serialVersionUID = 0L;
      * Used for deleting a resource.
      * </pre>
      *
-     * <code>string delete = 5;</code>
+     * <code>string delete = 5 [json_name = "delete"];</code>
      * @return The bytes for delete.
      */
     @java.lang.Override
@@ -2254,16 +2297,14 @@ private static final long serialVersionUID = 0L;
      * Used for deleting a resource.
      * </pre>
      *
-     * <code>string delete = 5;</code>
+     * <code>string delete = 5 [json_name = "delete"];</code>
      * @param value The delete to set.
      * @return This builder for chaining.
      */
     public Builder setDelete(
         java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  patternCase_ = 5;
+      if (value == null) { throw new NullPointerException(); }
+      patternCase_ = 5;
       pattern_ = value;
       onChanged();
       return this;
@@ -2273,7 +2314,7 @@ private static final long serialVersionUID = 0L;
      * Used for deleting a resource.
      * </pre>
      *
-     * <code>string delete = 5;</code>
+     * <code>string delete = 5 [json_name = "delete"];</code>
      * @return This builder for chaining.
      */
     public Builder clearDelete() {
@@ -2289,16 +2330,14 @@ private static final long serialVersionUID = 0L;
      * Used for deleting a resource.
      * </pre>
      *
-     * <code>string delete = 5;</code>
+     * <code>string delete = 5 [json_name = "delete"];</code>
      * @param value The bytes for delete to set.
      * @return This builder for chaining.
      */
     public Builder setDeleteBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
       patternCase_ = 5;
       pattern_ = value;
       onChanged();
@@ -2310,7 +2349,7 @@ private static final long serialVersionUID = 0L;
      * Used for updating a resource.
      * </pre>
      *
-     * <code>string patch = 6;</code>
+     * <code>string patch = 6 [json_name = "patch"];</code>
      * @return Whether the patch field is set.
      */
     @java.lang.Override
@@ -2322,7 +2361,7 @@ private static final long serialVersionUID = 0L;
      * Used for updating a resource.
      * </pre>
      *
-     * <code>string patch = 6;</code>
+     * <code>string patch = 6 [json_name = "patch"];</code>
      * @return The patch.
      */
     @java.lang.Override
@@ -2348,7 +2387,7 @@ private static final long serialVersionUID = 0L;
      * Used for updating a resource.
      * </pre>
      *
-     * <code>string patch = 6;</code>
+     * <code>string patch = 6 [json_name = "patch"];</code>
      * @return The bytes for patch.
      */
     @java.lang.Override
@@ -2375,16 +2414,14 @@ private static final long serialVersionUID = 0L;
      * Used for updating a resource.
      * </pre>
      *
-     * <code>string patch = 6;</code>
+     * <code>string patch = 6 [json_name = "patch"];</code>
      * @param value The patch to set.
      * @return This builder for chaining.
      */
     public Builder setPatch(
         java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  patternCase_ = 6;
+      if (value == null) { throw new NullPointerException(); }
+      patternCase_ = 6;
       pattern_ = value;
       onChanged();
       return this;
@@ -2394,7 +2431,7 @@ private static final long serialVersionUID = 0L;
      * Used for updating a resource.
      * </pre>
      *
-     * <code>string patch = 6;</code>
+     * <code>string patch = 6 [json_name = "patch"];</code>
      * @return This builder for chaining.
      */
     public Builder clearPatch() {
@@ -2410,16 +2447,14 @@ private static final long serialVersionUID = 0L;
      * Used for updating a resource.
      * </pre>
      *
-     * <code>string patch = 6;</code>
+     * <code>string patch = 6 [json_name = "patch"];</code>
      * @param value The bytes for patch to set.
      * @return This builder for chaining.
      */
     public Builder setPatchBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
       patternCase_ = 6;
       pattern_ = value;
       onChanged();
@@ -2436,7 +2471,7 @@ private static final long serialVersionUID = 0L;
      * for services that provide content to Web (HTML) clients.
      * </pre>
      *
-     * <code>.google.api.CustomHttpPattern custom = 8;</code>
+     * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
      * @return Whether the custom field is set.
      */
     @java.lang.Override
@@ -2451,7 +2486,7 @@ private static final long serialVersionUID = 0L;
      * for services that provide content to Web (HTML) clients.
      * </pre>
      *
-     * <code>.google.api.CustomHttpPattern custom = 8;</code>
+     * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
      * @return The custom.
      */
     @java.lang.Override
@@ -2476,7 +2511,7 @@ private static final long serialVersionUID = 0L;
      * for services that provide content to Web (HTML) clients.
      * </pre>
      *
-     * <code>.google.api.CustomHttpPattern custom = 8;</code>
+     * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
      */
     public Builder setCustom(com.google.api.CustomHttpPattern value) {
       if (customBuilder_ == null) {
@@ -2499,7 +2534,7 @@ private static final long serialVersionUID = 0L;
      * for services that provide content to Web (HTML) clients.
      * </pre>
      *
-     * <code>.google.api.CustomHttpPattern custom = 8;</code>
+     * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
      */
     public Builder setCustom(
         com.google.api.CustomHttpPattern.Builder builderForValue) {
@@ -2520,7 +2555,7 @@ private static final long serialVersionUID = 0L;
      * for services that provide content to Web (HTML) clients.
      * </pre>
      *
-     * <code>.google.api.CustomHttpPattern custom = 8;</code>
+     * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
      */
     public Builder mergeCustom(com.google.api.CustomHttpPattern value) {
       if (customBuilder_ == null) {
@@ -2535,8 +2570,9 @@ private static final long serialVersionUID = 0L;
       } else {
         if (patternCase_ == 8) {
           customBuilder_.mergeFrom(value);
+        } else {
+          customBuilder_.setMessage(value);
         }
-        customBuilder_.setMessage(value);
       }
       patternCase_ = 8;
       return this;
@@ -2549,7 +2585,7 @@ private static final long serialVersionUID = 0L;
      * for services that provide content to Web (HTML) clients.
      * </pre>
      *
-     * <code>.google.api.CustomHttpPattern custom = 8;</code>
+     * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
      */
     public Builder clearCustom() {
       if (customBuilder_ == null) {
@@ -2575,7 +2611,7 @@ private static final long serialVersionUID = 0L;
      * for services that provide content to Web (HTML) clients.
      * </pre>
      *
-     * <code>.google.api.CustomHttpPattern custom = 8;</code>
+     * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
      */
     public com.google.api.CustomHttpPattern.Builder getCustomBuilder() {
       return getCustomFieldBuilder().getBuilder();
@@ -2588,7 +2624,7 @@ private static final long serialVersionUID = 0L;
      * for services that provide content to Web (HTML) clients.
      * </pre>
      *
-     * <code>.google.api.CustomHttpPattern custom = 8;</code>
+     * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
      */
     @java.lang.Override
     public com.google.api.CustomHttpPatternOrBuilder getCustomOrBuilder() {
@@ -2609,7 +2645,7 @@ private static final long serialVersionUID = 0L;
      * for services that provide content to Web (HTML) clients.
      * </pre>
      *
-     * <code>.google.api.CustomHttpPattern custom = 8;</code>
+     * <code>.google.api.CustomHttpPattern custom = 8 [json_name = "custom"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.api.CustomHttpPattern, com.google.api.CustomHttpPattern.Builder, com.google.api.CustomHttpPatternOrBuilder> 
@@ -2626,7 +2662,7 @@ private static final long serialVersionUID = 0L;
         pattern_ = null;
       }
       patternCase_ = 8;
-      onChanged();;
+      onChanged();
       return customBuilder_;
     }
 
@@ -2639,7 +2675,7 @@ private static final long serialVersionUID = 0L;
      * present at the top-level of request message type.
      * </pre>
      *
-     * <code>string body = 7;</code>
+     * <code>string body = 7 [json_name = "body"];</code>
      * @return The body.
      */
     public java.lang.String getBody() {
@@ -2662,7 +2698,7 @@ private static final long serialVersionUID = 0L;
      * present at the top-level of request message type.
      * </pre>
      *
-     * <code>string body = 7;</code>
+     * <code>string body = 7 [json_name = "body"];</code>
      * @return The bytes for body.
      */
     public com.google.protobuf.ByteString
@@ -2686,17 +2722,15 @@ private static final long serialVersionUID = 0L;
      * present at the top-level of request message type.
      * </pre>
      *
-     * <code>string body = 7;</code>
+     * <code>string body = 7 [json_name = "body"];</code>
      * @param value The body to set.
      * @return This builder for chaining.
      */
     public Builder setBody(
         java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      if (value == null) { throw new NullPointerException(); }
       body_ = value;
+      bitField0_ |= 0x00000080;
       onChanged();
       return this;
     }
@@ -2708,12 +2742,12 @@ private static final long serialVersionUID = 0L;
      * present at the top-level of request message type.
      * </pre>
      *
-     * <code>string body = 7;</code>
+     * <code>string body = 7 [json_name = "body"];</code>
      * @return This builder for chaining.
      */
     public Builder clearBody() {
-      
       body_ = getDefaultInstance().getBody();
+      bitField0_ = (bitField0_ & ~0x00000080);
       onChanged();
       return this;
     }
@@ -2725,18 +2759,16 @@ private static final long serialVersionUID = 0L;
      * present at the top-level of request message type.
      * </pre>
      *
-     * <code>string body = 7;</code>
+     * <code>string body = 7 [json_name = "body"];</code>
      * @param value The bytes for body to set.
      * @return This builder for chaining.
      */
     public Builder setBodyBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
       body_ = value;
+      bitField0_ |= 0x00000080;
       onChanged();
       return this;
     }
@@ -2749,7 +2781,7 @@ private static final long serialVersionUID = 0L;
      * not set, the response message will be used as HTTP body of response.
      * </pre>
      *
-     * <code>string response_body = 12;</code>
+     * <code>string response_body = 12 [json_name = "responseBody"];</code>
      * @return The responseBody.
      */
     public java.lang.String getResponseBody() {
@@ -2771,7 +2803,7 @@ private static final long serialVersionUID = 0L;
      * not set, the response message will be used as HTTP body of response.
      * </pre>
      *
-     * <code>string response_body = 12;</code>
+     * <code>string response_body = 12 [json_name = "responseBody"];</code>
      * @return The bytes for responseBody.
      */
     public com.google.protobuf.ByteString
@@ -2794,17 +2826,15 @@ private static final long serialVersionUID = 0L;
      * not set, the response message will be used as HTTP body of response.
      * </pre>
      *
-     * <code>string response_body = 12;</code>
+     * <code>string response_body = 12 [json_name = "responseBody"];</code>
      * @param value The responseBody to set.
      * @return This builder for chaining.
      */
     public Builder setResponseBody(
         java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      if (value == null) { throw new NullPointerException(); }
       responseBody_ = value;
+      bitField0_ |= 0x00000100;
       onChanged();
       return this;
     }
@@ -2815,12 +2845,12 @@ private static final long serialVersionUID = 0L;
      * not set, the response message will be used as HTTP body of response.
      * </pre>
      *
-     * <code>string response_body = 12;</code>
+     * <code>string response_body = 12 [json_name = "responseBody"];</code>
      * @return This builder for chaining.
      */
     public Builder clearResponseBody() {
-      
       responseBody_ = getDefaultInstance().getResponseBody();
+      bitField0_ = (bitField0_ & ~0x00000100);
       onChanged();
       return this;
     }
@@ -2831,18 +2861,16 @@ private static final long serialVersionUID = 0L;
      * not set, the response message will be used as HTTP body of response.
      * </pre>
      *
-     * <code>string response_body = 12;</code>
+     * <code>string response_body = 12 [json_name = "responseBody"];</code>
      * @param value The bytes for responseBody to set.
      * @return This builder for chaining.
      */
     public Builder setResponseBodyBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
       responseBody_ = value;
+      bitField0_ |= 0x00000100;
       onChanged();
       return this;
     }
@@ -2850,9 +2878,9 @@ private static final long serialVersionUID = 0L;
     private java.util.List<com.google.api.HttpRule> additionalBindings_ =
       java.util.Collections.emptyList();
     private void ensureAdditionalBindingsIsMutable() {
-      if (!((bitField0_ & 0x00000001) != 0)) {
+      if (!((bitField0_ & 0x00000200) != 0)) {
         additionalBindings_ = new java.util.ArrayList<com.google.api.HttpRule>(additionalBindings_);
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000200;
        }
     }
 
@@ -2866,7 +2894,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public java.util.List<com.google.api.HttpRule> getAdditionalBindingsList() {
       if (additionalBindingsBuilder_ == null) {
@@ -2882,7 +2910,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public int getAdditionalBindingsCount() {
       if (additionalBindingsBuilder_ == null) {
@@ -2898,7 +2926,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public com.google.api.HttpRule getAdditionalBindings(int index) {
       if (additionalBindingsBuilder_ == null) {
@@ -2914,7 +2942,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public Builder setAdditionalBindings(
         int index, com.google.api.HttpRule value) {
@@ -2937,7 +2965,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public Builder setAdditionalBindings(
         int index, com.google.api.HttpRule.Builder builderForValue) {
@@ -2957,7 +2985,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public Builder addAdditionalBindings(com.google.api.HttpRule value) {
       if (additionalBindingsBuilder_ == null) {
@@ -2979,7 +3007,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public Builder addAdditionalBindings(
         int index, com.google.api.HttpRule value) {
@@ -3002,7 +3030,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public Builder addAdditionalBindings(
         com.google.api.HttpRule.Builder builderForValue) {
@@ -3022,7 +3050,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public Builder addAdditionalBindings(
         int index, com.google.api.HttpRule.Builder builderForValue) {
@@ -3042,7 +3070,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public Builder addAllAdditionalBindings(
         java.lang.Iterable<? extends com.google.api.HttpRule> values) {
@@ -3063,12 +3091,12 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public Builder clearAdditionalBindings() {
       if (additionalBindingsBuilder_ == null) {
         additionalBindings_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000200);
         onChanged();
       } else {
         additionalBindingsBuilder_.clear();
@@ -3082,7 +3110,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public Builder removeAdditionalBindings(int index) {
       if (additionalBindingsBuilder_ == null) {
@@ -3101,7 +3129,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public com.google.api.HttpRule.Builder getAdditionalBindingsBuilder(
         int index) {
@@ -3114,7 +3142,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public com.google.api.HttpRuleOrBuilder getAdditionalBindingsOrBuilder(
         int index) {
@@ -3130,7 +3158,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public java.util.List<? extends com.google.api.HttpRuleOrBuilder> 
          getAdditionalBindingsOrBuilderList() {
@@ -3147,7 +3175,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public com.google.api.HttpRule.Builder addAdditionalBindingsBuilder() {
       return getAdditionalBindingsFieldBuilder().addBuilder(
@@ -3160,7 +3188,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public com.google.api.HttpRule.Builder addAdditionalBindingsBuilder(
         int index) {
@@ -3174,7 +3202,7 @@ private static final long serialVersionUID = 0L;
      * the nesting may only be one level deep).
      * </pre>
      *
-     * <code>repeated .google.api.HttpRule additional_bindings = 11;</code>
+     * <code>repeated .google.api.HttpRule additional_bindings = 11 [json_name = "additionalBindings"];</code>
      */
     public java.util.List<com.google.api.HttpRule.Builder> 
          getAdditionalBindingsBuilderList() {
@@ -3187,7 +3215,7 @@ private static final long serialVersionUID = 0L;
         additionalBindingsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
             com.google.api.HttpRule, com.google.api.HttpRule.Builder, com.google.api.HttpRuleOrBuilder>(
                 additionalBindings_,
-                ((bitField0_ & 0x00000001) != 0),
+                ((bitField0_ & 0x00000200) != 0),
                 getParentForChildren(),
                 isClean());
         additionalBindings_ = null;
@@ -3227,7 +3255,18 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new HttpRule(input, extensionRegistry);
+      Builder builder = newBuilder();
+      try {
+        builder.mergeFrom(input, extensionRegistry);
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(builder.buildPartial());
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(e)
+            .setUnfinishedMessage(builder.buildPartial());
+      }
+      return builder.buildPartial();
     }
   };
 

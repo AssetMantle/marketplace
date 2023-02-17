@@ -38,20 +38,25 @@ public final class HttpProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\025google/api/http.proto\022\ngoogle.api\"T\n\004H" +
-      "ttp\022#\n\005rules\030\001 \003(\0132\024.google.api.HttpRule" +
-      "\022\'\n\037fully_decode_reserved_expansion\030\002 \001(" +
-      "\010\"\201\002\n\010HttpRule\022\020\n\010selector\030\001 \001(\t\022\r\n\003get\030" +
-      "\002 \001(\tH\000\022\r\n\003put\030\003 \001(\tH\000\022\016\n\004post\030\004 \001(\tH\000\022\020" +
-      "\n\006delete\030\005 \001(\tH\000\022\017\n\005patch\030\006 \001(\tH\000\022/\n\006cus" +
-      "tom\030\010 \001(\0132\035.google.api.CustomHttpPattern" +
-      "H\000\022\014\n\004body\030\007 \001(\t\022\025\n\rresponse_body\030\014 \001(\t\022" +
-      "1\n\023additional_bindings\030\013 \003(\0132\024.google.ap" +
-      "i.HttpRuleB\t\n\007pattern\"/\n\021CustomHttpPatte" +
-      "rn\022\014\n\004kind\030\001 \001(\t\022\014\n\004path\030\002 \001(\tBj\n\016com.go" +
-      "ogle.apiB\tHttpProtoP\001ZAgoogle.golang.org" +
-      "/genproto/googleapis/api/annotations;ann" +
-      "otations\370\001\001\242\002\004GAPIb\006proto3"
+      "\n\025google/api/http.proto\022\ngoogle.api\"y\n\004H" +
+      "ttp\022*\n\005rules\030\001 \003(\0132\024.google.api.HttpRule" +
+      "R\005rules\022E\n\037fully_decode_reserved_expansi" +
+      "on\030\002 \001(\010R\034fullyDecodeReservedExpansion\"\332" +
+      "\002\n\010HttpRule\022\032\n\010selector\030\001 \001(\tR\010selector\022" +
+      "\022\n\003get\030\002 \001(\tH\000R\003get\022\022\n\003put\030\003 \001(\tH\000R\003put\022" +
+      "\024\n\004post\030\004 \001(\tH\000R\004post\022\030\n\006delete\030\005 \001(\tH\000R" +
+      "\006delete\022\026\n\005patch\030\006 \001(\tH\000R\005patch\0227\n\006custo" +
+      "m\030\010 \001(\0132\035.google.api.CustomHttpPatternH\000" +
+      "R\006custom\022\022\n\004body\030\007 \001(\tR\004body\022#\n\rresponse" +
+      "_body\030\014 \001(\tR\014responseBody\022E\n\023additional_" +
+      "bindings\030\013 \003(\0132\024.google.api.HttpRuleR\022ad" +
+      "ditionalBindingsB\t\n\007pattern\";\n\021CustomHtt" +
+      "pPattern\022\022\n\004kind\030\001 \001(\tR\004kind\022\022\n\004path\030\002 \001" +
+      "(\tR\004pathB\222\001\n\016com.google.apiB\tHttpProtoP\001" +
+      "Z)github.com/AssetMantle/modules/google/" +
+      "api\370\001\001\242\002\003GAX\252\002\nGoogle.Api\312\002\nGoogle\\Api\342\002" +
+      "\026Google\\Api\\GPBMetadata\352\002\013Google::Apib\006p" +
+      "roto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

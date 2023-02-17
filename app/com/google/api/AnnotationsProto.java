@@ -41,12 +41,13 @@ public final class AnnotationsProto {
     java.lang.String[] descriptorData = {
       "\n\034google/api/annotations.proto\022\ngoogle.a" +
       "pi\032\025google/api/http.proto\032 google/protob" +
-      "uf/descriptor.proto:E\n\004http\022\036.google.pro" +
+      "uf/descriptor.proto:K\n\004http\022\036.google.pro" +
       "tobuf.MethodOptions\030\260\312\274\" \001(\0132\024.google.ap" +
-      "i.HttpRuleBn\n\016com.google.apiB\020Annotation" +
-      "sProtoP\001ZAgoogle.golang.org/genproto/goo" +
-      "gleapis/api/annotations;annotations\242\002\004GA" +
-      "PIb\006proto3"
+      "i.HttpRuleR\004httpB\226\001\n\016com.google.apiB\020Ann" +
+      "otationsProtoP\001Z)github.com/AssetMantle/" +
+      "modules/google/api\242\002\003GAX\252\002\nGoogle.Api\312\002\n" +
+      "Google\\Api\342\002\026Google\\Api\\GPBMetadata\352\002\013Go" +
+      "ogle::Apib\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

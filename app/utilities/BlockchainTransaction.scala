@@ -1,9 +1,9 @@
 package utilities
 
+import com.cosmos.bank.v1beta1.MsgSend
+import com.cosmos.crypto.secp256k1.PubKey
+import com.cosmos.tx.v1beta1._
 import com.google.protobuf.{ByteString, Any => protoBufAny}
-import cosmos.bank.v1beta1.Tx
-import cosmos.crypto.secp256k1.Keys
-import cosmos.tx.v1beta1.TxOuterClass
 import models.common.Coin
 import org.bitcoinj.core.ECKey
 
@@ -12,27 +12,27 @@ import scala.jdk.CollectionConverters.IterableHasAsJava
 object BlockchainTransaction {
 
   private def getTxRawBytes(messages: Seq[protoBufAny], fee: Coin, gasLimit: Int, account: models.blockchain.Account, ecKey: ECKey, memo: String, timeoutHeight: Int): Array[Byte] = {
-    val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(messages.asJava).setMemo(memo).setTimeoutHeight(timeoutHeight.toLong).build()
+    val txBody = TxBody.newBuilder().addAllMessages(messages.asJava).setMemo(memo).setTimeoutHeight(timeoutHeight.toLong).build()
 
-    val signerInfo = TxOuterClass.SignerInfo.newBuilder()
+    val signerInfo = SignerInfo.newBuilder()
       .setSequence(account.sequence)
-      .setPublicKey(com.google.protobuf.Any.newBuilder().setTypeUrl(constants.Blockchain.PublicKey.SINGLE).setValue(Keys.PubKey.newBuilder().setKey(ByteString.copyFrom(ecKey.getPubKey)).build().toByteString).build())
-      .setModeInfo(TxOuterClass.ModeInfo.newBuilder().setSingle(TxOuterClass.ModeInfo.Single.newBuilder().setModeValue(1).build()).build())
+      .setPublicKey(com.google.protobuf.Any.newBuilder().setTypeUrl(constants.Blockchain.PublicKey.SINGLE).setValue(PubKey.newBuilder().setKey(ByteString.copyFrom(ecKey.getPubKey)).build().toByteString).build())
+      .setModeInfo(ModeInfo.newBuilder().setSingle(ModeInfo.Single.newBuilder().setModeValue(1).build()).build())
       .build()
 
-    val authInfo = TxOuterClass.AuthInfo.newBuilder()
+    val authInfo = AuthInfo.newBuilder()
       .addSignerInfos(signerInfo)
-      .setFee(TxOuterClass.Fee.newBuilder().addAmount(fee.toProtoCoin).setGasLimit(gasLimit).build())
+      .setFee(Fee.newBuilder().addAmount(fee.toProtoCoin).setGasLimit(gasLimit).build())
       .build()
 
-    val signDoc = TxOuterClass.SignDoc.newBuilder()
+    val signDoc = SignDoc.newBuilder()
       .setBodyBytes(txBody.toByteString)
       .setAuthInfoBytes(authInfo.toByteString)
       .setChainId(constants.Blockchain.ChainId)
       .setAccountNumber(account.accountNumber)
       .build()
 
-    val txRaw = TxOuterClass.TxRaw.newBuilder()
+    val txRaw = TxRaw.newBuilder()
       .setBodyBytes(txBody.toByteString)
       .setAuthInfoBytes(authInfo.toByteString)
       .addSignatures(ByteString.copyFrom(Wallet.ecdsaSign(utilities.Secrets.sha256Hash(signDoc.toByteArray), ecKey)))
@@ -66,8 +66,8 @@ object BlockchainTransaction {
 
   def getSendCoinMsgAsAny(fromAddress: String, toAddress: String, amount: Seq[Coin]): protoBufAny = protoBufAny.newBuilder()
     .setTypeUrl(constants.Blockchain.TransactionMessage.SEND_COIN)
-    .setValue(Tx
-      .MsgSend.newBuilder()
+    .setValue(MsgSend
+      .newBuilder()
       .setFromAddress(fromAddress)
       .setToAddress(toAddress)
       .addAllAmount(amount.map(_.toProtoCoin).asJava)

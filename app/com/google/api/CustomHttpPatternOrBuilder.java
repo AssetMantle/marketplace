@@ -12,7 +12,7 @@ public interface CustomHttpPatternOrBuilder extends
    * The name of this custom HTTP verb.
    * </pre>
    *
-   * <code>string kind = 1;</code>
+   * <code>string kind = 1 [json_name = "kind"];</code>
    * @return The kind.
    */
   java.lang.String getKind();
@@ -21,7 +21,7 @@ public interface CustomHttpPatternOrBuilder extends
    * The name of this custom HTTP verb.
    * </pre>
    *
-   * <code>string kind = 1;</code>
+   * <code>string kind = 1 [json_name = "kind"];</code>
    * @return The bytes for kind.
    */
   com.google.protobuf.ByteString
@@ -32,7 +32,7 @@ public interface CustomHttpPatternOrBuilder extends
    * The path matched by this custom verb.
    * </pre>
    *
-   * <code>string path = 2;</code>
+   * <code>string path = 2 [json_name = "path"];</code>
    * @return The path.
    */
   java.lang.String getPath();
@@ -41,7 +41,7 @@ public interface CustomHttpPatternOrBuilder extends
    * The path matched by this custom verb.
    * </pre>
    *
-   * <code>string path = 2;</code>
+   * <code>string path = 2 [json_name = "path"];</code>
    * @return The bytes for path.
    */
   com.google.protobuf.ByteString
