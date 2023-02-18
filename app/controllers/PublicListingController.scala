@@ -253,7 +253,7 @@ class PublicListingController @Inject()(
             checkAlreadySold <- checkAlreadySold(nftOwners.map(_.nftId))
             blockchainTransaction <- validateAndTransfer(nftOwners = nftOwners, verifyPassword = verifyPassword, publicListing = publicListing, buyerKey = buyerKey, sellerKey = sellerKey, balance = balance, nfts = nfts, countBuyerNFTsFromPublicListing = countBuyerNFTsFromPublicListing, checkAlreadySold = checkAlreadySold)
           } yield {
-            val tweetURI = if (collection.getTwitterUsername.isDefined) Option(s"https://twitter.com/intent/tweet?text=Just bought ${collection.name} NFTs at a huge discount via Early Access Sale on MantlePlace. @${collection.getTwitterUsername.get} @AssetMantle Check here &url=https://marketplace.assetmantle.one/collections/${collection.id}&hashtags=NFT") else None
+            val tweetURI = if (collection.getTwitterUsername.isDefined) Option(s"https://twitter.com/intent/tweet?text=Just bought ${collection.name} NFTs at a huge discount via Early Access Sale on MantlePlace. @${collection.getTwitterUsername.get} @AssetMantle Check here &url=https://marketplace.assetmantle.one/collection/${collection.id}&hashtags=NFT") else None
             PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction, tweetURI))
           }
             ).recover {
