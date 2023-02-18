@@ -9,7 +9,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Account(id: String, lowercaseId: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, accountType: String, language: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
+case class Account(id: String, identityId: Option[Array[Byte]], lowercaseId: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, accountType: String, language: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
 
   def getLang: Lang = Lang(this.language)
 
@@ -26,9 +26,11 @@ object Accounts {
 
   class AccountTable(tag: Tag) extends Table[Account](tag, "Account") with ModelTable[String] {
 
-    def * = (id, lowercaseId, passwordHash, salt, iterations, accountType, language, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Account.tupled, Account.unapply)
+    def * = (id, identityId.?, lowercaseId, passwordHash, salt, iterations, accountType, language, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Account.tupled, Account.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
+
+    def identityId = column[Array[Byte]]("identityId")
 
     def lowercaseId = column[String]("lowercaseId")
 
@@ -73,6 +75,7 @@ class Accounts @Inject()(
     def add(username: String, lang: Lang, accountType: String): Future[Unit] = {
       val account = Account(
         id = username,
+        identityId = None,
         lowercaseId = username.toLowerCase,
         passwordHash = Array[Byte](),
         salt = Array[Byte](),
@@ -87,6 +90,7 @@ class Accounts @Inject()(
     def upsertOnSignUp(username: String, lang: Lang, accountType: String): Future[Unit] = {
       val account = Account(
         id = username,
+        identityId = None,
         lowercaseId = username.toLowerCase,
         passwordHash = Array[Byte](),
         salt = Array[Byte](),

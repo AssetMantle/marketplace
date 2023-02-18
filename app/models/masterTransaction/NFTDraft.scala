@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class NFTDraft(id: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[Seq[BaseNFTProperty]], tagNames: Option[Seq[String]], fileExtension: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def toNFT(totalSupply: Int = 1): NFT = NFT(id = id, fileExtension = fileExtension, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), totalSupply = totalSupply, ipfsLink = "", edition = None, isMinted = false)
+  def toNFT(totalSupply: Int = 1): NFT = NFT(id = id, asstId = None, fileExtension = fileExtension, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), totalSupply = totalSupply, ipfsLink = "", edition = None, isMinted = false)
 
   def toNFTOwner(ownerID: String, creatorId: String, quantity: Int = 1): NFTOwner = NFTOwner(nftId = id, ownerId = ownerID, creatorId = creatorId, collectionId = collectionId, quantity = quantity, saleId = None, publicListingId = None, secondaryMarketId = None)
 

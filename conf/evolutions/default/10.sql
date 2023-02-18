@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SecondaryMarketTransfer"
 CREATE TABLE IF NOT EXISTS HISTORY."MasterSecondaryMarket"
 (
     "id"                   VARCHAR NOT NULL,
+    "orderId"              BYTEA,
     "collectionId"         VARCHAR NOT NULL,
     "price"                NUMERIC NOT NULL,
     "denom"                VARCHAR NOT NULL,
@@ -37,6 +38,7 @@ CREATE TABLE IF NOT EXISTS HISTORY."MasterSecondaryMarket"
 CREATE TABLE IF NOT EXISTS MASTER."SecondaryMarket"
 (
     "id"                   VARCHAR NOT NULL,
+    "orderId"              BYTEA,
     "collectionId"         VARCHAR NOT NULL,
     "price"                NUMERIC NOT NULL,
     "denom"                VARCHAR NOT NULL,
@@ -45,7 +47,8 @@ CREATE TABLE IF NOT EXISTS MASTER."SecondaryMarket"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("id"),
+    UNIQUE ("orderId")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."secondaryMarketTransferTransactions"
@@ -62,6 +65,11 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."secondaryMarketTransferTransactio
     "updatedOnMillisEpoch" BIGINT,
     PRIMARY KEY ("txHash")
 );
+
+ALTER TABLE MASTER."Account"
+    ADD COLUMN IF NOT EXISTS "identityId" BYTEA DEFAULT NULL UNIQUE;
+ALTER TABLE MASTER."NFT"
+    ADD COLUMN IF NOT EXISTS "asstId" BYTEA DEFAULT NULL UNIQUE;
 
 ALTER TABLE MASTER."NFTOwner"
     ADD COLUMN IF NOT EXISTS "secondaryMarketId" VARCHAR DEFAULT NULL;

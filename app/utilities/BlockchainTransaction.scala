@@ -1,6 +1,7 @@
 package utilities
 
 import com.cosmos.bank.v1beta1.MsgSend
+import com.orders.transactions.make
 import com.cosmos.crypto.secp256k1.PubKey
 import com.cosmos.tx.v1beta1._
 import com.google.protobuf.{ByteString, Any => protoBufAny}
@@ -71,6 +72,16 @@ object BlockchainTransaction {
       .setFromAddress(fromAddress)
       .setToAddress(toAddress)
       .addAllAmount(amount.map(_.toProtoCoin).asJava)
+      .build().toByteString)
+    .build()
+
+  def getMakeOrderMsgAsAny(fromAddress: String, fromId: String, toId: String, classificationId: String): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(constants.Blockchain.TransactionMessage.ORDER_MAKE)
+    .setValue(make.Message
+      .newBuilder()
+      .setFrom(fromAddress)
+//      .setToAddress(toAddress)
+//      .addAllAmount(amount.map(_.toProtoCoin).asJava)
       .build().toByteString)
     .build()
 
