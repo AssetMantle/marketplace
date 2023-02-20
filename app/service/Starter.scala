@@ -226,6 +226,7 @@ class Starter @Inject()(
   }
 
   def validateAll(): Future[Unit] = {
+    println("validating nfts")
     val collections = masterCollections.Service.getAllPublic
 
     def verify(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
@@ -265,6 +266,8 @@ class Starter @Inject()(
         if (count > 0) {
           println("***@@@ " + collection.id + ", count: " + count.toString)
           println(collection.properties.get.map(_.name))
+        } else {
+          println("done validating nfts")
         }
       }
     }
@@ -307,9 +310,57 @@ class Starter @Inject()(
     } yield ()
   }
 
+  def fixMantleMonkeys(): Future[Unit] = {
+    val classificationProperties = Seq(
+      CollectionProperty(name = "Background", `type` = constants.NFT.Data.STRING, value = ""),
+      CollectionProperty(name = "MonkeyBase", `type` = constants.NFT.Data.STRING, value = ""),
+      CollectionProperty(name = "Skin", `type` = constants.NFT.Data.STRING, value = ""),
+      CollectionProperty(name = "Eye", `type` = constants.NFT.Data.STRING, value = ""),
+      CollectionProperty(name = "Body", `type` = constants.NFT.Data.STRING, value = ""),
+      CollectionProperty(name = "Face", `type` = constants.NFT.Data.STRING, value = ""),
+      CollectionProperty(name = "Hat", `type` = constants.NFT.Data.STRING, value = ""),
+      CollectionProperty(name = "Special", `type` = constants.NFT.Data.STRING, value = ""),
+    )
+    val collection = masterCollections.Service.tryGet("90059167EFA307A5")
+    val allNFTIDs = masterNFTs.Service.getAllIdsForCollection("90059167EFA307A5")
+
+    def updateCollection(collection: Collection) = if (collection.properties.get.length != classificationProperties.length) masterCollections.Service.update(collection.copy(properties = Option(classificationProperties.map(_.toProperty)))) else Future()
+
+    def fixAllProperties(collection: Collection, allNFTIDs: Seq[String]) = if (collection.properties.get.length != classificationProperties.length) {
+      utilitiesOperations.traverse(allNFTIDs) { nftID =>
+        val properties = masterNFTProperties.Service.getForNFT(nftID)
+
+        def add(properties: Seq[models.master.NFTProperty]) = {
+          if (properties.map(_.name).contains("Special")) {
+            masterNFTProperties.Service.addMultiple(Seq(
+              properties.head.copy(name = "Body", `value` = ""),
+              properties.head.copy(name = "Face", `value` = ""),
+              properties.head.copy(name = "Hat", `value` = "")
+            ))
+          } else {
+            masterNFTProperties.Service.add(properties.head.copy(name = "Special", `value` = ""))
+          }
+        }
+
+        for {
+          properties <- properties
+          _ <- add(properties)
+        } yield ()
+      }
+    } else Future(Seq())
+
+    for {
+      collection <- collection
+      allNFTIDs <- allNFTIDs
+      _ <- updateCollection(collection)
+      _ <- fixAllProperties(collection, allNFTIDs)
+    } yield ()
+  }
+
   // Delete redundant nft tags
   def start(): Future[Unit] = {
     (for {
+      _ <- fixMantleMonkeys()
       _ <- validateAll()
     } yield ()
       ).recover {
