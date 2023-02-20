@@ -196,7 +196,7 @@ class CollectionController @Inject()(
       }
   }
 
-  def commonCardInfo(id: String, publicListingPrice: Boolean): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def commonCardInfo(id: String, statusId: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
@@ -214,10 +214,12 @@ class CollectionController @Inject()(
         } yield {
           if (publicListing.isEmpty && sale.isEmpty) {
             Ok(s"${collectionAnalysis.totalNFTs.toString}|N/A|0")
-          } else if (publicListingPrice) {
+          } else if (statusId == 1) {
             Ok(s"${collectionAnalysis.totalNFTs.toString}|${publicListing.fold("N/A")(x => s"${x.price.toString} (${utilities.NumericOperation.formatNumber(x.price.toDouble * tokenPrice)} $$)")}|${publicListingStatus}")
-          } else {
+          } else if (statusId == 2) {
             Ok(s"${collectionAnalysis.totalNFTs.toString}|${sale.fold("N/A")(x => s"${x.price.toString} (${utilities.NumericOperation.formatNumber(x.price.toDouble * tokenPrice)} $$)")}|${sale.fold(0)(_.getStatus.id)}")
+          } else {
+            Ok(s"${collectionAnalysis.totalNFTs.toString}|${collectionAnalysis.floorPrice.toString} (${utilities.NumericOperation.formatNumber(collectionAnalysis.floorPrice.toDouble * tokenPrice)} $$)}|1")
           }
         }
           ).recover {

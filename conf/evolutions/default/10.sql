@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SecondaryMarketTransfer"
 CREATE TABLE IF NOT EXISTS HISTORY."MasterSecondaryMarket"
 (
     "id"                   VARCHAR NOT NULL,
-    "orderId"              BYTEA,
+    "orderId"              BYTEA   NOT NULL,
     "collectionId"         VARCHAR NOT NULL,
     "price"                NUMERIC NOT NULL,
     "denom"                VARCHAR NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS HISTORY."MasterSecondaryMarket"
 CREATE TABLE IF NOT EXISTS MASTER."SecondaryMarket"
 (
     "id"                   VARCHAR NOT NULL,
-    "orderId"              BYTEA,
+    "orderId"              BYTEA   NOT NULL,
     "collectionId"         VARCHAR NOT NULL,
     "price"                NUMERIC NOT NULL,
     "denom"                VARCHAR NOT NULL,
@@ -47,8 +47,7 @@ CREATE TABLE IF NOT EXISTS MASTER."SecondaryMarket"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("id"),
-    UNIQUE ("orderId")
+    PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."secondaryMarketTransferTransactions"

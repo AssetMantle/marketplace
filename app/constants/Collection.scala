@@ -1,7 +1,5 @@
 package constants
 
-import models.master.NFTProperty
-
 object Collection {
 
   object File {
@@ -32,5 +30,14 @@ object Collection {
 
     val list: Seq[String] = Seq(NFT_NAME, NFT_DESCRIPTION, FILE_HASH, CLASSIFICATION_ID)
 
+  }
+
+  case class CollectionStatus(name: String, id: Int)
+
+  object Status {
+    val NO_STATUS: CollectionStatus = CollectionStatus("NO_STATUS", 0)
+    val PUBLIC_LISTED: CollectionStatus = CollectionStatus("PUBLIC_LISTED", 1)
+    val WHITELIST_SALE: CollectionStatus = CollectionStatus("WHITELIST_SALE", 2)
+    val MARKET: CollectionStatus = CollectionStatus("MARKET", 3)
   }
 }

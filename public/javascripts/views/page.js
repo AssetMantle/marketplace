@@ -62,6 +62,12 @@ function viewWhitelistSaleCollections() {
     $('#rightContent').html('');
 }
 
+function viewSecondaryMarketCollections() {
+    componentResource('centerContent', jsRoutes.controllers.SecondaryMarketController.secondaryMarketCollectionsSection());
+    $('#leftContent').html('');
+    $('#rightContent').html('');
+}
+
 function viewProfile(lastPart) {
     let accountId = lastPart.split("/")[0];
     let activeTab = lastPart.split("/")[1];

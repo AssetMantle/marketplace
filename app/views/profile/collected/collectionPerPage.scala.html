@@ -9,7 +9,7 @@
     @if(collections.nonEmpty) {
         @collections.map { collection =>
             <div class="mt-3 singleCollection singleCollectedCollection">
-                @commonCollectionCard(collection, JavaScript(s"viewCollectedCollection('$accountId/COLLECTED/${collection.id}')"), showPublicListingPrice = true, showSaleStatus = false)
+                @commonCollectionCard(collection, JavaScript(s"viewCollectedCollection('$accountId/COLLECTED/${collection.id}')"), constants.Collection.Status.NO_STATUS)
                 <script>collectedCollectionCardInfo('@collection.id', '@accountId')</script>
             </div>
         }

@@ -10,7 +10,7 @@ import utilities.MicroNumber
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class SecondaryMarket(id: String, orderId: Option[Array[Byte]], collectionId: String, price: MicroNumber, denom: String, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class SecondaryMarket(id: String, orderId: Array[Byte], collectionId: String, price: MicroNumber, denom: String, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def getStatus: constants.SecondaryMarket.Status = {
     val currentEpoch = System.currentTimeMillis() / 1000
@@ -50,14 +50,14 @@ object SecondaryMarkets {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class SecondaryMarketSerialized(id: String, orderId: Option[Array[Byte]], collectionId: String, price: BigDecimal, denom: String, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
+  case class SecondaryMarketSerialized(id: String, orderId: Array[Byte], collectionId: String, price: BigDecimal, denom: String, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
     def deserialize: SecondaryMarket = SecondaryMarket(id = id, orderId = orderId, collectionId = collectionId, price = MicroNumber(price), denom = denom, endTimeEpoch = endTimeEpoch, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
   class SecondaryMarketTable(tag: Tag) extends Table[SecondaryMarketSerialized](tag, "SecondaryMarket") with ModelTable[String] {
 
-    def * = (id, orderId.?, collectionId, price, denom, endTimeEpoch, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SecondaryMarketSerialized.tupled, SecondaryMarketSerialized.unapply)
+    def * = (id, orderId, collectionId, price, denom, endTimeEpoch, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SecondaryMarketSerialized.tupled, SecondaryMarketSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 

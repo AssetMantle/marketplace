@@ -34,6 +34,9 @@ window.addEventListener('popstate', e => {
         case "whitelistSaleCollections":
             viewWhitelistSaleCollections();
             break;
+        case "secondaryMarket":
+            viewSecondaryMarketCollections();
+            break;
         case "index":
             window.location = "/";
             break;

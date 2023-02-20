@@ -2,6 +2,7 @@
 @import models.master.Collection
 @import views.html.base.commonStringValue
 @import models.master.NFTOwner
+@import views.html.base.buttons.commonPrimaryButton
 
 @(nft: master.NFT, collection: Collection, nftOwner: NFTOwner, numberOfOwners: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <div class="sticky-top item-sticky">
@@ -37,5 +38,8 @@
                 }
             </div>
         </div>
+        @if(loginState.isDefined && loginState.get.username == nftOwner.ownerId && nftOwner.creatorId != loginState.get.username && nftOwner.creatorId != "Mint.E") {
+            @commonPrimaryButton(Messages(constants.View.LIST_NFT), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.createForm('${nft.id}'))"))
+        }
     </div>
 </div>

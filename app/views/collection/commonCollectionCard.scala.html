@@ -1,10 +1,12 @@
-@(collection: master.Collection, onClickFunction: JavaScript, showPublicListingPrice: Boolean, showSaleStatus: Boolean = true)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import constants.Collection.CollectionStatus
+
+@(collection: master.Collection, onClickFunction: JavaScript, status: CollectionStatus)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="collectionCardContainer">
     <div class="single-profile-card commonCollectionCard artCollection">
         <div class="profile-section">
             <div onclick="@onClickFunction" class="collectionLink">
-                @if(showSaleStatus) {
+                @if(status.id > 0) {
                     <div class="saleBadge" id="saleBadge_@collection.id">
                         <div class="option live">
                             <div class="d-flex gap-2 align-items-center">
@@ -119,6 +121,6 @@
         </div>
     </div>
 </div>
-@if(showSaleStatus){
-    <script>commonCollectionCardInfo('@collection.id', @showPublicListingPrice)</script>
+@if(status.id > 0){
+    <script>commonCollectionCardInfo('@collection.id', @status.id)</script>
 }

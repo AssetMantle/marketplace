@@ -5,16 +5,16 @@
 
 <div class="earlyAccessBannerContainer">
     <div class="messageContainer">
-        <div class="header">@Messages(constants.View.EARLY_ACCESS_BANNER_HEADER)</div>
-        <div class="subHeader">@Messages(constants.View.EARLY_ACCESS_BANNER_SUBHEADER)</div>
+        <div class="header">@Messages(constants.View.MARKET_BANNER_HEADER)</div>
+        <div class="subHeader">@Messages(constants.View.MARKET_BANNER_SUBHEADER)</div>
     </div>
     <img src="@routes.Assets.versioned("images/earlyAccessBanner.svg")"/>
 </div>
 <div class="item item-center centerContainer">
     <div class="centerCard">
-        <div class="centerCardHeader">@Messages(constants.View.PUBLIC_LISTING_TITLE)</div>
+        <div class="centerCardHeader">@Messages(constants.View.SECONDARY_MARKET_TITLE)</div>
         <div class="contentContainer">
-            <script src="@utilities.PublicResource.getVersionedRoute("javascripts/collections/publicListed/loadMore.js")" type="text/javascript"></script>
+            <script src="@utilities.PublicResource.getVersionedRoute("javascripts/collections/secondaryMarket/loadMore.js")" type="text/javascript"></script>
             @if(totalCollections > 0) {
                 <div class="mt-2 mb-0 item item-center collectionContainer">
                     <div class="p-0 profile-card">
@@ -52,5 +52,5 @@
 </div>
 <script>
         window.onscroll = function() { loadCollectionOnScroll(); }
-        checkAndPushState(jsRoutes.controllers.PublicListingController.viewPublicListedCollections().url, "", "publicListedCollections");
+        checkAndPushState(jsRoutes.controllers.SecondaryMarketController.viewSecondaryMarket().url, "", "secondaryMarket");
 </script>

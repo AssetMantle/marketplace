@@ -5,7 +5,7 @@
     @if(collections.nonEmpty) {
         @collections.map { collection =>
             <div class="mt-3 singleCollection">
-                @commonCollectionCard(collection, JavaScript(s"viewCollection('${collection.id}', false)"), showPublicListingPrice = false)
+                @commonCollectionCard(collection, JavaScript(s"viewCollection('${collection.id}', false)"), constants.Collection.Status.WHITELIST_SALE)
             </div>
         }
     } else {

@@ -100,6 +100,9 @@ class SecondaryMarketController @Inject()(
 
           def addToSecondaryMarket(nftOwner: NFTOwner, collection: Collection) = {
             val errors = Seq(
+              if (nftOwner.creatorId == "Mint.E") Option(constants.Response.SELLING_MINT_E_COLLECTIONS_NOT_ALLOWED) else None,
+              if (nftOwner.ownerId != loginState.username) Option(constants.Response.NOT_NFT_OWNER) else None,
+              if (nftOwner.creatorId == loginState.username) Option(constants.Response.NFT_CREATOR_NOT_ALLOWED_SECONDARY_SALE) else None,
               if (nftOwner.saleId.isDefined || nftOwner.publicListingId.isDefined || nftOwner.secondaryMarketId.isDefined) Option(constants.Response.NFT_ALREADY_ON_SALE) else None,
               if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
             ).flatten
@@ -111,13 +114,13 @@ class SecondaryMarketController @Inject()(
             } else errors.head.throwFutureBaseException()
           }
 
-          def sendNotification(collection: Collection) = utilitiesNotification.send(loginState.username, notification = constants.Notification.SECONDARY_MARKET_CREATION, collection.name)(s"'${collection.id}'")
+//          def sendNotification(collection: Collection) = utilitiesNotification.send(loginState.username, notification = constants.Notification.SECONDARY_MARKET_CREATION, collection.name)(s"'${collection.id}'")
 
           (for {
             nftOwner <- nftOwner
             collection <- collection(nftOwner.collectionId)
             _ <- addToSecondaryMarket(nftOwner = nftOwner, collection = collection)
-            _ <- sendNotification(collection)
+//            _ <- sendNotification(collection)
             _ <- collectionsAnalysis.Utility.onCreateSecondaryMarket(collection.id, totalListed = 1, listingPrice = createData.price)
           } yield PartialContent(views.html.secondaryMarket.createSuccessful())
             ).recover {

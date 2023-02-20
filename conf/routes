@@ -50,7 +50,7 @@ GET         /collectionNFTs                                    controllers.Colle
 GET         /collectionNFTsPerPage                             controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionInfo                                    controllers.CollectionController.info(id: String)
 GET         /collectionAnalysis                                controllers.CollectionController.topRightCard(id: String, showPublicListing: Boolean ?= true)
-GET         /commonCardInfo                                    controllers.CollectionController.commonCardInfo(id: String, publicListingPrice: Boolean)
+GET         /commonCardInfo                                    controllers.CollectionController.commonCardInfo(id: String, statusId: Int)
 GET         /created                                           controllers.CollectionController.createdSection(accountId: String)
 GET         /createdCollectionPerPage                          controllers.CollectionController.createdCollectionPerPage(accountId: String, pageNumber: Int)
 GET         /countForCreatorNotForSell                         controllers.CollectionController.countForCreatorNotForSell(collectionId: String, accountId: String)
