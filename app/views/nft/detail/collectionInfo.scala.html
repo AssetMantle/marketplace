@@ -8,7 +8,7 @@
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
         <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_COLLECTION_TITLE)</div>
-        <div class="d-flex gap-2 align-items-center badgeImageText" onclick="viewCollection('@collection.id', true)">
+        <div class="d-flex gap-2 align-items-center badgeImageText" onclick="viewCollection('@collection.id', 1)">
             @collection.getProfileFileURL.fold {
                 <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
             } { uri =>

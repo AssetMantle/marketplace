@@ -1,10 +1,10 @@
 @import controllers.actions.LoginState
 
-@(collection: master.Collection, showPublicListing: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(collection: master.Collection, status: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 @views.html.base.common(constants.View.COLLECTION)
 
 <script>
         console.log("here")
-        viewCollection('@collection.id', @showPublicListing);
+        viewCollection('@collection.id', @status);
 </script>

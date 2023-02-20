@@ -56,13 +56,13 @@ class CollectionController @Inject()(
     }
   }
 
-  def viewCollection(id: String, showPublicListing: Boolean): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollection(id: String, statusId: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
         (for {
           collection <- collection
-        } yield Ok(views.html.collection.viewCollection(collection, showPublicListing))
+        } yield Ok(views.html.collection.viewCollection(collection, statusId))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -162,7 +162,7 @@ class CollectionController @Inject()(
     }
   }
 
-  def topRightCard(id: String, showPublicListing: Boolean): Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
+  def topRightCard(id: String, statusId: Int): Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
     implicit request =>
       val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
       val collection = masterCollections.Service.tryGet(id)
@@ -190,7 +190,7 @@ class CollectionController @Inject()(
         totalPublicListingSold <- getTotalPublicListingSold(publicListing.map(_.id))
         (sale, isMember) <- getSalesInfo
         totalWhitelistSaleSold <- getTotalWhitelistSaleSold(sale.map(_.id))
-      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale, publicListing = publicListing, isMember = isMember, publicListingSold = totalPublicListingSold, whitelistSaleSold = totalWhitelistSaleSold, showPublicListing = showPublicListing, tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice))
+      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale, publicListing = publicListing, isMember = isMember, publicListingSold = totalPublicListingSold, whitelistSaleSold = totalWhitelistSaleSold, statusId = statusId, tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice))
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }

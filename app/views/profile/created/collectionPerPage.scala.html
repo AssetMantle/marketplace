@@ -27,7 +27,7 @@
     }
     @collections.map { collection =>
         <div class="mt-3 singleCollection singleCreatedCollection">
-            @commonCollectionCard(collection, JavaScript(s"viewCollection('${collection.id}', true)"), constants.Collection.Status.NO_STATUS)
+            @commonCollectionCard(collection, JavaScript(s"viewCollection('${collection.id}', 0)"), constants.Collection.Status.NO_STATUS)
         </div>
     }
 } else {

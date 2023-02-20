@@ -4,14 +4,15 @@ function viewCollections(section) {
     $('#rightContent').html('');
 }
 
-function viewCollection(collectionId, showPublicListing = true) {
+function viewCollection(collectionId, status) {
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs(collectionId));
-    componentResource('rightContent', jsRoutes.controllers.CollectionController.topRightCard(collectionId, showPublicListing));
-    if (showPublicListing) {
-        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection(collectionId, showPublicListing).url, collectionId, "collectionForPublicListing");
-    } else {
-        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection(collectionId, showPublicListing).url, collectionId, "collectionForWhitelistSale");
+    componentResource('rightContent', jsRoutes.controllers.CollectionController.topRightCard(collectionId, status));
+    if (status === 1) {
+        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection(collectionId, 1).url, collectionId, "collectionForPublicListing");
+    }
+    if (status === 2) {
+        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection(collectionId, 2).url, collectionId, "collectionForWhitelistSale");
     }
 }
 
