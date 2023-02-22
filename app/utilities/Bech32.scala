@@ -1,18 +1,13 @@
 package utilities
 
-import exceptions.BaseException
-import play.api.Logger
-import utilities.Wallet.BouncyHash
+import org.slf4j.{Logger, LoggerFactory}
 
-import java.security.MessageDigest
-import java.util.Base64
 import scala.collection.mutable.ArrayBuffer
-import scala.util.{Failure, Success, Try}
 
 object Bech32 {
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private implicit val module: String = constants.Module.UTILITIES_BECH32
+  private implicit val module: String = constants.Module.COMMON_UTILITIES_BECH32
 
   type Int5 = Byte
   final val CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
@@ -23,81 +18,20 @@ object Bech32 {
 
   private final val GENERATOR = Seq(0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3)
 
-  def convertConsensusAddressToHexAddress(consKey: String): String = decodeBech32(consKey)._2.toUpperCase
-
-  def convertConsensusPubKeyToHexAddress(consensusPubKey: String): String = {
-    val pubKeyBytes = decodeBech32(consensusPubKey)._2.splitAt(10)._2.sliding(2, 2).toArray.map(Integer.parseInt(_, 16).toByte)
-    MessageDigest.getInstance("SHA-256").digest(pubKeyBytes).slice(0, 20).map("%02x".format(_)).mkString.toUpperCase
-  }
-
-  def convertValidatorPublicKeyToHexAddress(pubkey: String): String = {
-    MessageDigest
-      .getInstance("SHA-256")
-      .digest(Base64.getUrlDecoder.decode(pubkey.replace("+", "-").replace("/", "_")))
-      .slice(0, 20)
-      .map("%02x".format(_))
-      .mkString.toUpperCase
-  }
-
-  def convertAccountPublicKeyToAccountAddress(pubkey: String): String = {
-    encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(Base64.getUrlDecoder.decode(pubkey.replace("+", "-").replace("/", "_")))))) match {
-      case Success(address) => address
-      case Failure(exception) => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.KEY_GENERATION_FAILED)
-    }
-  }
-
-  def convertAccountAddressToOperatorAddress(accountAddress: String, hrp: String = constants.Blockchain.ValidatorPrefix): String = {
-    val byteSeq = decode(accountAddress) match {
-      case Success(value: (String, Seq[Int5])) => value._2
-      case Failure(exception) => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.INVALID_ACCOUNT_ADDRESS)
-    }
-    encode(hrp, byteSeq) match {
-      case Success(value: String) => value
-      case Failure(exception) => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.INVALID_ACCOUNT_ADDRESS)
-    }
-  }
-
-  //probably byteSeq converts operatorAddress to hexAddress and then encode converts into wallet address
-  def convertOperatorAddressToAccountAddress(operatorAddress: String, hrp: String = constants.Blockchain.AccountPrefix): String = {
-    val byteSeq = decode(operatorAddress) match {
-      case Success(value: (String, Seq[Int5])) => value._2
-      case Failure(exception) => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.INVALID_OPERATOR_ADDRESS)
-    }
-    encode(hrp, byteSeq) match {
-      case Success(value: String) => value
-      case Failure(exception) => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.INVALID_OPERATOR_ADDRESS)
-    }
-  }
-
-  def pubKeyToBech32(pubKey: String): String = {
-    convertAndEncode(constants.Blockchain.ValidatorConsensusPublicPrefix, "1624DE6420" + pubKey)
-  }
-
   def convertAndEncode(hrp: String, bytes: String): String = {
     var bytesSeq = ArrayBuffer[Byte]()
     for (i <- 0 until (bytes.length - 1) by 2) {
       bytesSeq += Integer.parseInt(bytes.substring(i, i + 2), 16).toByte
     }
-    encode(hrp, to5Bit(bytesSeq.toSeq)) match {
-      case Success(value: String) => value
-      case Failure(exception) => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.INVALID_HRP_OR_BYTES)
-    }
+    encode(hrp, to5Bit(bytesSeq.toSeq))
   }
 
-  final def encode(hrp: String, data: Seq[Int5]): Try[String] = Try {
+  final def encode(hrp: String, data: Seq[Int5]): String = try {
     require(hrp.nonEmpty, s"Invalid hrp length ${hrp.length}.")
     hrp + SEP + (data ++ createChecksum(hrp, data)).map(CHARSET_REVERSE_MAP).mkString
-  }.recover {
-    case _: java.util.NoSuchElementException =>
-      throw new IllegalArgumentException(s"requirement failed: Invalid data: $data. Valid data should contain only UInt5 values.")
-    case t =>
-      throw new IllegalArgumentException(s"requirement failed: Invalid hrp: $hrp or data: $data. " + t.getMessage)
+  } catch {
+    case exception: Exception => logger.error(s"requirement failed: Invalid hrp: $hrp or data: $data. " + exception.getLocalizedMessage)
+      throw new IllegalArgumentException("INVALID_HRP_OR_BYTES")
   }
 
   final def createChecksum(hrp: String, data: Seq[Int5]): Seq[Int5] = {
@@ -150,14 +84,11 @@ object Bech32 {
   }
 
   def decodeBech32(bech32Address: String): (String, String) = {
-    decode(bech32Address) match {
-      case Success(value: (String, Seq[Int5])) => (value._1, from5Bit(value._2).map("%02x".format(_)).mkString)
-      case Failure(exception) => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.INVALID_BECH32_ADDRESS)
-    }
+    val value = decode(bech32Address)
+    (value._1, from5Bit(value._2).map("%02x".format(_)).mkString)
   }
 
-  final def decode(bech32: String): Try[(String, Seq[Int5])] = Try {
+  final def decode(bech32: String): (String, Seq[Int5]) = try {
     val l = bech32.length
     require(l >= 8 && l <= 90, s"Invalid Bech32: $bech32 (length $l). Valid length range: 8-90 characters.")
     require(bech32.forall(c => c.isLower || c.isDigit) || bech32.forall(c => c.isUpper || c.isDigit), s"Invalid Bech32: $bech32. Mixed case.")
@@ -170,11 +101,11 @@ object Bech32 {
     require(data.length >= 6, s"Invalid Bech32: $bech32. Invalid data length ${data.length}.")
     require(verifyCheckSum(hrp, data), s"Invalid checksum for $bech32")
     (hrp, data.dropRight(6))
-  }.recover {
-    case _: java.util.NoSuchElementException =>
-      throw new IllegalArgumentException(s"requirement failed: Invalid Bech32: $bech32. Invalid Character. Valid (both cases): ${CHARSET.mkString("[", ",", "]")}")
-    case t =>
-      throw new IllegalArgumentException(s"requirement failed: Invalid Bech32: $bech32. " + t.getMessage)
+  } catch {
+    case noSuchElementException: NoSuchElementException => logger.error(s"requirement failed: Invalid Bech32: $bech32. Invalid Character.")
+      throw new IllegalArgumentException("INVALID_BECH32_ADDRESS")
+    case exception: Exception => logger.error(s"requirement failed: Invalid Bech32: $bech32. " + exception.getLocalizedMessage)
+      throw new IllegalArgumentException("INVALID_BECH32_ADDRESS")
   }
 
   final def verifyCheckSum(hrp: String, data: Seq[Int5]): Boolean =

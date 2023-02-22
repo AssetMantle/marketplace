@@ -12,7 +12,7 @@ abstract class PublicKey {
 
   def isValidatorKey: Boolean = publicKeyType == constants.Blockchain.PublicKey.VALIDATOR
 
-  def getAccountAddress: String = utilities.Bech32.convertAccountPublicKeyToAccountAddress(value)
+  def getAccountAddress: String = utilities.Crypto.convertAccountPublicKeyToAccountAddress(value)
 }
 
 object PublicKey {

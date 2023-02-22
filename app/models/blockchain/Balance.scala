@@ -1,6 +1,6 @@
 package models.blockchain
 
-import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
+import models.Trait.{Entity, GenericDaoImpl, ModelTable}
 import models.common.Coin
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -9,13 +9,12 @@ import play.db.NamedDatabase
 import slick.jdbc.H2Profile.api._
 import utilities.MicroNumber
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Balance(address: String, coins: Seq[Coin], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Balance(address: String, coins: Seq[Coin]) {
 
-  def serialize(balance: Balance): Balances.BalanceSerialized = Balances.BalanceSerialized(address = balance.address, coins = Json.toJson(balance.coins).toString, createdBy = balance.createdBy, createdOn = balance.createdOn, createdOnTimeZone = balance.createdOnTimeZone, updatedBy = balance.updatedBy, updatedOn = balance.updatedOn, updatedOnTimeZone = balance.updatedOnTimeZone)
+  def serialize(balance: Balance): Balances.BalanceSerialized = Balances.BalanceSerialized(address = balance.address, coins = Json.toJson(balance.coins).toString)
 
 }
 
@@ -25,31 +24,19 @@ object Balances {
 
   implicit val module: String = constants.Module.BLOCKCHAIN_BALANCE
 
-  case class BalanceSerialized(address: String, coins: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) extends Entity[String] {
-    def deserialize: Balance = Balance(address = address, coins = utilities.JSON.convertJsonStringToObject[Seq[Coin]](coins), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class BalanceSerialized(address: String, coins: String) extends Entity[String] {
+    def deserialize: Balance = Balance(address = address, coins = utilities.JSON.convertJsonStringToObject[Seq[Coin]](coins))
 
     def id: String = address
   }
 
-  class BalanceTable(tag: Tag) extends Table[BalanceSerialized](tag, "Balance_BC") with ModelTable[String] {
+  class BalanceTable(tag: Tag) extends Table[BalanceSerialized](tag, "Balance") with ModelTable[String] {
 
-    def * = (address, coins, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (BalanceSerialized.tupled, BalanceSerialized.unapply)
+    def * = (address, coins) <> (BalanceSerialized.tupled, BalanceSerialized.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
     def coins = column[String]("coins")
-
-    def createdBy = column[String]("createdBy")
-
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
-
-    def updatedBy = column[String]("updatedBy")
-
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
     def id = address
   }

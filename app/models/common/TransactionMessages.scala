@@ -3,12 +3,12 @@ package models.common
 import exceptions.BaseException
 import models.Abstract.{ProposalContent, PublicKey, TransactionMessage}
 import models.common.IBC._
+import models.common.Validator._
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
 import utilities.Date.RFC3339
 import utilities.MicroNumber
-import models.common.Validator._
 
 object TransactionMessages {
 
@@ -123,7 +123,7 @@ object TransactionMessages {
   implicit val withdrawDelegatorRewardWrites: OWrites[WithdrawDelegatorReward] = Json.writes[WithdrawDelegatorReward]
 
   case class WithdrawValidatorCommission(validatorAddress: String) extends TransactionMessage {
-    def getSigners: Seq[String] = Seq(utilities.Bech32.convertOperatorAddressToAccountAddress(validatorAddress))
+    def getSigners: Seq[String] = Seq(utilities.Crypto.convertOperatorAddressToAccountAddress(validatorAddress))
   }
 
   implicit val withdrawValidatorCommissionReads: Reads[WithdrawValidatorCommission] = Json.reads[WithdrawValidatorCommission]
@@ -197,7 +197,7 @@ object TransactionMessages {
 
   //slashing
   case class Unjail(validatorAddress: String) extends TransactionMessage {
-    def getSigners: Seq[String] = Seq(utilities.Bech32.convertOperatorAddressToAccountAddress(validatorAddress))
+    def getSigners: Seq[String] = Seq(utilities.Crypto.convertOperatorAddressToAccountAddress(validatorAddress))
   }
 
   implicit val unjailReads: Reads[Unjail] = Json.reads[Unjail]
@@ -207,7 +207,7 @@ object TransactionMessages {
   //staking
   case class CreateValidator(delegatorAddress: String, validatorAddress: String, publicKey: PublicKey, value: Coin, minSelfDelegation: MicroNumber, commissionRates: CommissionRates, description: Description) extends TransactionMessage {
     def getSigners: Seq[String] = {
-      val validatorAccountAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(validatorAddress)
+      val validatorAccountAddress = utilities.Crypto.convertOperatorAddressToAccountAddress(validatorAddress)
       if (validatorAddress == delegatorAddress) Seq(delegatorAddress) else Seq(delegatorAddress, validatorAccountAddress)
     }
   }
@@ -217,7 +217,7 @@ object TransactionMessages {
   implicit val createValidatorWrites: OWrites[CreateValidator] = Json.writes[CreateValidator]
 
   case class EditValidator(validatorAddress: String, commissionRate: Option[BigDecimal], description: Description, minSelfDelegation: Option[MicroNumber]) extends TransactionMessage {
-    def getSigners: Seq[String] = Seq(utilities.Bech32.convertOperatorAddressToAccountAddress(validatorAddress))
+    def getSigners: Seq[String] = Seq(utilities.Crypto.convertOperatorAddressToAccountAddress(validatorAddress))
   }
 
   implicit val editValidatorReads: Reads[EditValidator] = Json.reads[EditValidator]

@@ -4,12 +4,13 @@ import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.i18n.Lang
+import schema.id.base.IdentityID
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Account(id: String, identityId: Option[Array[Byte]], lowercaseId: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, accountType: String, language: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
+case class Account(id: String, identityId: Option[String], lowercaseId: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, accountType: String, language: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
 
   def getLang: Lang = Lang(this.language)
 
@@ -30,7 +31,7 @@ object Accounts {
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def identityId = column[Array[Byte]]("identityId")
+    def identityId = column[String]("identityId")
 
     def lowercaseId = column[String]("lowercaseId")
 
@@ -127,6 +128,8 @@ class Accounts @Inject()(
     def get(username: String): Future[Option[Account]] = getById(username)
 
     def getAllUsernames: Future[Seq[String]] = getAll.map(_.map(_.id))
+
+    def updateIdentityID(accountId: String, identityID: IdentityID): Future[Int] = customUpdate(Accounts.TableQuery.filter(_.id === accountId).map(_.identityId).update(identityID.asString))
 
   }
 }

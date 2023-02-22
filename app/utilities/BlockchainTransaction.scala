@@ -1,12 +1,15 @@
 package utilities
 
 import com.cosmos.bank.v1beta1.MsgSend
-import com.orders.transactions.make
 import com.cosmos.crypto.secp256k1.PubKey
 import com.cosmos.tx.v1beta1._
 import com.google.protobuf.{ByteString, Any => protoBufAny}
+import com.identities.transactions.issue
+import com.orders.transactions.make
 import models.common.Coin
 import org.bitcoinj.core.ECKey
+import schema.id.base.{ClassificationID, IdentityID}
+import schema.list.PropertyList
 
 import scala.jdk.CollectionConverters.IterableHasAsJava
 
@@ -80,8 +83,8 @@ object BlockchainTransaction {
     .setValue(make.Message
       .newBuilder()
       .setFrom(fromAddress)
-//      .setToAddress(toAddress)
-//      .addAllAmount(amount.map(_.toProtoCoin).asJava)
+      //      .setToAddress(toAddress)
+      //      .addAllAmount(amount.map(_.toProtoCoin).asJava)
       .build().toByteString)
     .build()
 
@@ -103,6 +106,21 @@ object BlockchainTransaction {
     //      .setToAddress(toAddress)
     //      .addAllAmount(amount.map(_.toProtoCoin).asJava)
     //      .build().toByteString)
+    .build()
+
+  def getMantlePlaceIdentityMsg(id: String, fromAddress: String, fromID: IdentityID, toAddress: String, classificationID: ClassificationID): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(constants.Blockchain.TransactionMessage.IDENTITY_ISSUE)
+    .setValue(issue
+      .Message.newBuilder()
+      .setFrom(fromAddress)
+      .setFromID(fromID.asProtoIdentityID)
+      .setTo(toAddress)
+      .setClassificationID(classificationID.asProtoClassificationID)
+      .setImmutableMetaProperties(PropertyList(Seq(utilities.Identity.getOriginMetaProperty, utilities.Identity.getIDMetaProperty(id))).asProtoPropertyList)
+      .setImmutableProperties(PropertyList(Seq(utilities.Identity.getExtraMesaProperty(""))).asProtoPropertyList)
+      .setMutableMetaProperties(PropertyList(Seq(utilities.Identity.getTwitterMetaProperty(""), utilities.Identity.getNote1MetaProperty(""))).asProtoPropertyList)
+      .setMutableProperties(PropertyList(Seq(utilities.Identity.getNote2MesaProperty(""))).asProtoPropertyList)
+      .build().toByteString)
     .build()
 
 }

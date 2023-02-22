@@ -29,8 +29,10 @@ class IndexController @Inject()(
                                  nftPublicListings: blockchainTransaction.NFTPublicListings,
                                  sendCoins: blockchainTransaction.SendCoins,
                                  nftSales: blockchainTransaction.NFTSales,
+                                 issueIdentities: blockchainTransaction.IssueIdentities,
                                  masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                  publicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
+                                 issueIdentityTransactions: masterTransaction.IssueIdentityTransactions,
                                  saleNFTTransactions: masterTransaction.SaleNFTTransactions,
                                  masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -62,7 +64,9 @@ class IndexController @Inject()(
     masterTransactionSessionTokens.Utility.scheduler,
     sendCoins.Utility.scheduler,
     masterTransactionTokenPrices.Utility.scheduler,
-    blockchainBlocks.Utility.scheduler
+    blockchainBlocks.Utility.scheduler,
+    issueIdentities.Utility.scheduler,
+    issueIdentityTransactions.Utility.scheduler
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())

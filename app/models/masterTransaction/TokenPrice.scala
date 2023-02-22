@@ -2,18 +2,17 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
+import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
 import slick.jdbc.H2Profile.api._
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.{Duration, FiniteDuration, SECONDS}
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class TokenPrice(serial: Int = 0, denom: String, price: Double, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged with Entity[Int] {
+case class TokenPrice(serial: Int = 0, denom: String, price: Double, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Int] {
   def id: Int = serial
 }
 
@@ -24,7 +23,7 @@ object TokenPrices {
 
   class TokenPriceTable(tag: Tag) extends Table[TokenPrice](tag, "TokenPrice") with ModelTable[Int] {
 
-    def * = (serial, denom, price, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TokenPrice.tupled, TokenPrice.unapply)
+    def * = (serial, denom, price, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (TokenPrice.tupled, TokenPrice.unapply)
 
     def serial = column[Int]("serial", O.PrimaryKey)
 
@@ -34,15 +33,11 @@ object TokenPrices {
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
     def id = serial
   }
