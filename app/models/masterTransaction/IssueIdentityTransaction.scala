@@ -36,11 +36,11 @@ object IssueIdentityTransactions {
 
     def accountId = column[String]("accountId")
 
-    def twitter = column[String]("buyerAccountId")
+    def twitter = column[String]("twitter")
 
-    def note1 = column[String]("sellerAccountId")
+    def note1 = column[String]("note1")
 
-    def note2 = column[String]("secondaryMarketId")
+    def note2 = column[String]("note2")
 
     def status = column[Boolean]("status")
 
@@ -65,6 +65,7 @@ class IssueIdentityTransactions @Inject()(
                                            protected val databaseConfigProvider: DatabaseConfigProvider,
                                            blockchainAccounts: blockchain.Accounts,
                                            masterAccounts: master.Accounts,
+                                           masterKeys: master.Keys,
                                            broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                            utilitiesOperations: utilities.Operations,
                                            getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
@@ -96,7 +97,7 @@ class IssueIdentityTransactions @Inject()(
 
   object Utility {
 
-    def transaction(accountIds: Seq[String], toAddress: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(accountIdAddress: Map[String, String], gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get
@@ -106,9 +107,9 @@ class IssueIdentityTransactions @Inject()(
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
         val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = accountIds.map(x => utilities.BlockchainTransaction.getMantlePlaceIdentityMsg(id = x, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, toAddress = toAddress, classificationID = constants.Blockchain.MantlePlaceIdentityClassificationID, fromID = constants.Blockchain.MantlePlaceFromID)),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultIssueIdentityGasLimit * accountIds.length),
-          gasLimit = constants.Blockchain.DefaultIssueIdentityGasLimit * accountIds.length,
+          messages = accountIdAddress.keys.map(x => utilities.BlockchainTransaction.getMantlePlaceIdentityMsg(id = x, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, toAddress = accountIdAddress.getOrElse(x, ""), classificationID = constants.Blockchain.MantlePlaceIdentityClassificationID, fromID = constants.Blockchain.MantlePlaceFromID)).toSeq,
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultIssueIdentityGasLimit * accountIdAddress.size),
+          gasLimit = constants.Blockchain.DefaultIssueIdentityGasLimit * accountIdAddress.size,
           account = bcAccount,
           ecKey = ecKey,
           timeoutHeight = timeoutHeight)
@@ -117,8 +118,8 @@ class IssueIdentityTransactions @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              issueIdentity <- blockchainTransactionIssueIdentities.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, toAddress = toAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
-              _ <- Service.addWithNoneStatus(txHash = txHash, accountIds = accountIds)
+              issueIdentity <- blockchainTransactionIssueIdentities.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              _ <- Service.addWithNoneStatus(txHash = txHash, accountIds = accountIdAddress.keys.toSeq)
             } yield issueIdentity
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
         }
@@ -150,6 +151,24 @@ class IssueIdentityTransactions @Inject()(
         _ <- broadcastTxAndUpdate(issueIdentity)
       } yield issueIdentity
     }
+
+    //    private def issueIdentities: Future[Unit] = {
+    //      val accountIds = masterAccounts.Service.getNotIssuedIdentityAccountIDs
+    //
+    //      def getKeys(ids: Seq[String]) = masterKeys.Service.getAllActiveKeys(ids)
+    //
+    //      def doTx(accountIds: Seq[String], keys: Seq[Key]) = {
+    //        if (keys)
+    //        Utility.transaction()
+    //      }
+    //
+    //      for {
+    //        accountIds <- accountIds
+    //        keys <- getKeys(accountIds)
+    //        tx <- doTx(accountIds, keys)
+    //      }
+    //      yield ()
+    //    }
 
     val scheduler: Scheduler = new Scheduler {
       val name: String = IssueIdentityTransactions.module

@@ -13,7 +13,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class IssueIdentity(txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
+case class IssueIdentity(txHash: String, txRawBytes: Array[Byte], fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
 
   def id: String = txHash
 }
@@ -26,15 +26,13 @@ object IssueIdentities {
 
   class IssueIdentityTable(tag: Tag) extends Table[IssueIdentity](tag, "IssueIdentity") with ModelTable[String] {
 
-    def * = (txHash, txRawBytes, fromAddress, toAddress, status.?, memo.?, timeoutHeight, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (IssueIdentity.tupled, IssueIdentity.unapply)
+    def * = (txHash, txRawBytes, fromAddress, status.?, memo.?, timeoutHeight, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (IssueIdentity.tupled, IssueIdentity.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
     def txRawBytes = column[Array[Byte]]("txRawBytes")
 
     def fromAddress = column[String]("fromAddress")
-
-    def toAddress = column[String]("toAddress")
 
     def status = column[Boolean]("status")
 
@@ -75,8 +73,8 @@ class IssueIdentities @Inject()(
 
   object Service {
 
-    def add(txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int): Future[IssueIdentity] = {
-      val issueIdentity = IssueIdentity(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, status = status, log = None, memo = memo, timeoutHeight = timeoutHeight)
+    def add(txHash: String, txRawBytes: Array[Byte], fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int): Future[IssueIdentity] = {
+      val issueIdentity = IssueIdentity(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = status, log = None, memo = memo, timeoutHeight = timeoutHeight)
       for {
         _ <- create(issueIdentity)
       } yield issueIdentity

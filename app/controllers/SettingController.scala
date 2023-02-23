@@ -46,7 +46,7 @@ class SettingController @Inject()(
   def settings(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
-        val keys = masterKeys.Service.getAll(loginState.username)
+        val keys = masterKeys.Service.fetchAllForId(loginState.username)
         (for {
           keys <- keys
         } yield Ok(views.html.setting.settings(keys.filter(_.encryptedPrivateKey.nonEmpty).sortBy(_.name) ++ keys.filter(_.encryptedPrivateKey.isEmpty).sortBy(_.name)))
@@ -66,7 +66,7 @@ class SettingController @Inject()(
   def walletPopupKeys(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
-        val keys = masterKeys.Service.getAll(loginState.username)
+        val keys = masterKeys.Service.fetchAllForId(loginState.username)
         (for {
           keys <- keys
         } yield Ok(views.html.base.walletPopupKeys(keys))

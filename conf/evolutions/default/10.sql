@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueIdentity"
     "txHash"               VARCHAR NOT NULL,
     "txRawBytes"           BYTEA   NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
-    "toAddress"            VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
     "timeoutHeight"        INTEGER NOT NULL,
@@ -123,6 +122,8 @@ ALTER TABLE MASTER_TRANSACTION."SecondaryMarketTransferTransactions"
 ALTER TABLE MASTER_TRANSACTION."SecondaryMarketTransferTransactions"
     ADD CONSTRAINT SecondaryMarketTransferTransactions_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."SecondaryMarketTransfer" ("txHash");
 
+
+
 CREATE TRIGGER BT_ISSUE_IDENTITY_LOG
     BEFORE INSERT OR UPDATE
     ON BLOCKCHAIN_TRANSACTION."IssueIdentity"
@@ -156,6 +157,25 @@ CREATE TRIGGER SECONDARY_MARKET_SALE_TX_LOG
     ON MASTER_TRANSACTION."SecondaryMarketTransferTransactions"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
+
+CREATE OR REPLACE FUNCTION MASTER.KEY_VALIDATE() RETURNS TRIGGER AS
+$$
+BEGIN
+    IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
+        IF (EXISTS(SELECT * FROM MASTER."Key" WHERE "accountId" = new."accountId" AND "active" = true) AND
+            new."active" = true) THEN
+            RAISE EXCEPTION using message = 'S 167';;
+        END IF;;
+    END IF;;
+    RETURN NEW;;
+END ;;
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER KEY_VALID
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Key"
+    FOR EACH ROW
+EXECUTE PROCEDURE MASTER.KEY_VALIDATE();
 
 # --- !Downs
 DROP TRIGGER IF EXISTS BT_ISSUE_IDENTITY_LOG ON BLOCKCHAIN_TRANSACTION."IssueIdentity" CASCADE;

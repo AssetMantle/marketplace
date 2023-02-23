@@ -232,6 +232,8 @@ class Keys @Inject()(
       } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = key.passwordHash, salt = key.salt, iterations = key.iterations), key)
     }
 
+    def getAllActiveKeys(accountIds: Seq[String]): Future[Seq[Key]] = filter(x => x.accountId.inSet(accountIds) && x.active).map(_.map(_.deserialize))
+
     def tryGetActive(accountId: String): Future[Key] = filterHead(x => x.id1 === accountId && x.active).map(_.deserialize)
 
     def getActive(accountId: String): Future[Option[Key]] = filter(x => x.id1 === accountId && x.active).map(_.headOption.map(_.deserialize))
@@ -252,7 +254,7 @@ class Keys @Inject()(
       } yield ()
     }
 
-    def getAll(accountId: String): Future[Seq[Key]] = filter(_.id1 === accountId).map(_.map(_.deserialize))
+    def fetchAllForId(accountId: String): Future[Seq[Key]] = filter(_.id1 === accountId).map(_.map(_.deserialize))
 
     def updateOnForgotPassword(accountId: String, address: String, lastWords: Seq[String], newPassword: String): Future[Unit] = {
       val key = tryGet(accountId = accountId, address = address)
@@ -330,6 +332,11 @@ class Keys @Inject()(
       val verified: Option[Boolean] = null
       filterAndDelete(x => x.accountId === accountId && x.verified.? === verified)
     }
+
+    def insertOrUpdateMultiple(keys: Seq[Keys.KeySerialized]): Future[Unit] = upsertMultiple(keys)
+
+    def fetchAllActive: Future[Seq[Keys.KeySerialized]] = filter(_.active)
+
 
   }
 

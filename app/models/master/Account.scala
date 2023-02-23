@@ -131,5 +131,7 @@ class Accounts @Inject()(
 
     def updateIdentityID(accountId: String, identityID: IdentityID): Future[Int] = customUpdate(Accounts.TableQuery.filter(_.id === accountId).map(_.identityId).update(identityID.asString))
 
+    def getNotIssuedIdentityAccountIDs = filterAndSortWithPagination(offset = 0, limit = 50)(_.identityId.?.isEmpty)(_.id).map(_.map(_.id))
+
   }
 }
