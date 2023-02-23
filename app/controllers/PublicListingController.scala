@@ -64,7 +64,7 @@ class PublicListingController @Inject()(
 
           for {
             collections <- collections
-          } yield BadRequest(views.html.publicListing.createPublicListing(formWithErrors, collectionId = formWithErrors.data.get(constants.FormField.SELECT_COLLECTION_ID.name), collections = collections.map(x => x._1 -> x._1).toMap))
+          } yield BadRequest(views.html.publicListing.createPublicListing(formWithErrors, collectionId = formWithErrors.data.get(constants.FormField.SELECT_COLLECTION_ID.name), collections = collections.map(x => x._1 -> x._2).toMap))
         },
         createData => {
           val collection = masterCollections.Service.tryGet(id = createData.collectionId)
