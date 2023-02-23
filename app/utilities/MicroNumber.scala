@@ -184,11 +184,11 @@ object MicroNumber {
 
   private val logger: Logger = Logger(this.getClass)
 
+  val factor = 1000000
+
   val smallest = new MicroNumber("0.000001")
 
   val zero = new MicroNumber(0)
-
-  val factor = 1000000
 
   def apply(value: BigInt): MicroNumber = new MicroNumber(value)
 
