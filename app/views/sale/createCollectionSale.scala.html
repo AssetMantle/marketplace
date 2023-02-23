@@ -11,11 +11,8 @@
     } else {
         @commonCustomSelect(createSaleForm, constants.FormField.SELECT_COLLECTION_ID, collections, Symbol("class") -> "custom-select sources filledSelect")
     }
-    <div class="hidden">
-        @commonInputInt(createSaleForm, constants.FormField.SALE_NFT_NUMBER)
-    </div>
 
-    <div class="mb-3 randomNFTSaleField">
+    <div class="mb-0 randomNFTSaleField">
         <label for="saleNFTNumber" class="form-label">@Messages(constants.View.SALE_NFT_NUMBER)</label>
         <div class="input-group mt-2">
             <input type="number" id="saleNFTNumber" class="form-control" placeholder="@Messages(constants.View.SALE_NFT_PLACEHOLDER)" aria-label="Recipient's username" aria-describedby="basic-addon2" onkeyup="setSaleNFTValue(event)">
@@ -24,6 +21,9 @@
                 <span>@Messages(constants.View.MAX)</span>
             </span>
         </div>
+    </div>
+    <div class="hideLabelField">
+        @commonInputInt(createSaleForm, constants.FormField.SALE_NFT_NUMBER)
     </div>
 
     @if(whitelistId.getOrElse("") != "") {

@@ -105,14 +105,27 @@ function validateForm(form) {
                                 }
                                 break;
                             case "Minimum value":
-                                if (inputValue < parseFloat(ddValidationInfo[1].replace(/,/g, ""))) {
-                                    formValidationBoolean = false;
-                                    fieldError = true;
-                                    $('#minimumFieldError_' + fieldName).removeClass("hidden");
-                                    $('#customFieldError_' + fieldName).removeClass("hidden");
-                                } else {
-                                    $('#minimumFieldError_' + fieldName).addClass("hidden");
-                                    $('#customFieldError_' + fieldName).addClass("hidden");
+                                let minValue = $(`input[name="${fieldName}"]`).attr("min");
+                                if (typeof minValue !== 'undefined' && minValue !== false) {
+                                    if (inputValue < minValue) {
+                                        formValidationBoolean = false;
+                                        fieldError = true;
+                                        $('#minimumFieldError_' + fieldName).removeClass("hidden");
+                                        $('#customFieldError_' + fieldName).removeClass("hidden");
+                                    } else {
+                                        $('#minimumFieldError_' + fieldName).addClass("hidden");
+                                        $('#customFieldError_' + fieldName).addClass("hidden");
+                                    }
+                                }else{
+                                    if (inputValue < parseFloat(ddValidationInfo[1].replace(/,/g, ""))) {
+                                        formValidationBoolean = false;
+                                        fieldError = true;
+                                        $('#minimumFieldError_' + fieldName).removeClass("hidden");
+                                        $('#customFieldError_' + fieldName).removeClass("hidden");
+                                    } else {
+                                        $('#minimumFieldError_' + fieldName).addClass("hidden");
+                                        $('#customFieldError_' + fieldName).addClass("hidden");
+                                    }
                                 }
                                 break;
                             case "Maximum value":

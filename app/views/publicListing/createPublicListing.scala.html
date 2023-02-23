@@ -11,11 +11,8 @@
     } else {
         @commonCustomSelect(createPublicListingForm, constants.FormField.SELECT_COLLECTION_ID, collections, Symbol("class") -> "custom-select sources filledSelect")
     }
-    <div class="hidden">
-        @commonInputInt(createPublicListingForm, constants.FormField.PUBLIC_LISTING_NFT_NUMBER)
-    </div>
 
-    <div class="mb-3 randomNFTSaleField">
+    <div class="mb-0 randomNFTSaleField">
         <label for="publicListingNFTNumber" class="form-label">@Messages(constants.FormField.PUBLIC_LISTING_NFT_NUMBER.name)</label>
         <div class="input-group mt-2">
             <input type="number" id="publicListingNFTNumber" class="form-control" placeholder="@Messages(constants.View.PUBLIC_LISTING_NFT_PLACEHOLDER)" aria-label="Recipient's username" aria-describedby="basic-addon2" onkeyup="setPublicListingNFTValue(event)">
@@ -25,6 +22,10 @@
             </span>
         </div>
     </div>
+    <div class="hideLabelField">
+        @commonInputInt(createPublicListingForm, constants.FormField.PUBLIC_LISTING_NFT_NUMBER)
+    </div>
+
     @commonInputMicroNumber(createPublicListingForm, constants.FormField.PUBLIC_LISTING_PRICE)
     @commonInputInt(createPublicListingForm, constants.FormField.PUBLIC_LISTING_MAX_MINT_PER_ACCOUNT)
     @commonInputEpochTIme(createPublicListingForm, constants.FormField.PUBLIC_LISTING_START_EPOCH, setCurrentTime = true)
