@@ -164,7 +164,7 @@ BEGIN
     IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
         IF (EXISTS(SELECT * FROM MASTER."Key" WHERE "accountId" = new."accountId" AND "active" = true) AND
             new."active" = true) THEN
-            RAISE EXCEPTION using message = 'S 167';;
+            RAISE EXCEPTION 'MULTIPLE_ACTIVE_KEYS';;
         END IF;;
     END IF;;
     RETURN NEW;;
