@@ -4,6 +4,7 @@ import constants.Scheduler
 import exceptions.BaseException
 import models.Trait._
 import models.blockchainTransaction.IssueIdentity
+import models.master.Key
 import models.{blockchain, blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
@@ -16,7 +17,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class IssueIdentityTransaction(txHash: String, accountId: String, twitter: String, note1: String, note2: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
+case class IssueIdentityTransaction(txHash: String, accountId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
   def id: String = txHash
 
   def getIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.accountId)
@@ -30,17 +31,11 @@ object IssueIdentityTransactions {
 
   class IssueIdentityTransactionTable(tag: Tag) extends Table[IssueIdentityTransaction](tag, "IssueIdentityTransaction") with ModelTable[String] {
 
-    def * = (txHash, accountId, twitter, note1, note2, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (IssueIdentityTransaction.tupled, IssueIdentityTransaction.unapply)
+    def * = (txHash, accountId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (IssueIdentityTransaction.tupled, IssueIdentityTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
     def accountId = column[String]("accountId")
-
-    def twitter = column[String]("twitter")
-
-    def note1 = column[String]("note1")
-
-    def note2 = column[String]("note2")
 
     def status = column[Boolean]("status")
 
@@ -84,7 +79,7 @@ class IssueIdentityTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, accountIds: Seq[String]): Future[Unit] = create(accountIds.map(x => IssueIdentityTransaction(txHash = txHash, accountId = x, twitter = "", note1 = "", note2 = "", status = None)))
+    def addWithNoneStatus(txHash: String, accountIds: Seq[String]): Future[Unit] = create(accountIds.map(x => IssueIdentityTransaction(txHash = txHash, accountId = x, status = None)))
 
     def getByTxHash(txHash: String): Future[Seq[IssueIdentityTransaction]] = filter(_.txHash === txHash)
 
@@ -93,6 +88,10 @@ class IssueIdentityTransactions @Inject()(
     def markFailed(txHash: String): Future[Int] = customUpdate(IssueIdentityTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(false))
 
     def getAllPendingStatus: Future[Seq[IssueIdentityTransaction]] = filter(_.status.?.isEmpty)
+
+    def checkAnyPendingTx: Future[Boolean] = filterAndExists(_.status.?.isEmpty)
+
+    def getWithStatusTrueOrPending(ids: Seq[String]): Future[Seq[String]] = filter(x => x.accountId.inSet(ids) && (x.status || x.status.?.isEmpty)).map(_.map(_.accountId))
   }
 
   object Utility {
@@ -152,69 +151,87 @@ class IssueIdentityTransactions @Inject()(
       } yield issueIdentity
     }
 
-    //    private def issueIdentities: Future[Unit] = {
-    //      val accountIds = masterAccounts.Service.getNotIssuedIdentityAccountIDs
-    //
-    //      def getKeys(ids: Seq[String]) = masterKeys.Service.getAllActiveKeys(ids)
-    //
-    //      def doTx(accountIds: Seq[String], keys: Seq[Key]) = {
-    //        if (keys)
-    //        Utility.transaction()
-    //      }
-    //
-    //      for {
-    //        accountIds <- accountIds
-    //        keys <- getKeys(accountIds)
-    //        tx <- doTx(accountIds, keys)
-    //      }
-    //      yield ()
-    //    }
+    private def issueIdentities(): Future[Unit] = {
+      val accountIds = masterKeys.Service.getNotIssuedIdentityAccountIDs
+      val anyPendingTx = Service.checkAnyPendingTx
+
+      def filterOutAlreadyIssuedOrInProcess(anyPendingTx: Boolean, ids: Seq[String]) = if (!anyPendingTx) Service.getWithStatusTrueOrPending(ids) else Future(ids)
+
+      def getKeys(ids: Seq[String]) = if (ids.nonEmpty) masterKeys.Service.getAllActiveKeys(ids) else Future(Seq())
+
+      def doTx(keys: Seq[Key]) = if (keys.nonEmpty) {
+        val tx = transaction(accountIdAddress = keys.map(x => x.accountId -> x.address).toMap, gasPrice = 0.0001, ecKey = constants.Blockchain.MantleNodeMaintainerWallet.getECKey)
+
+        def updateMasterKeys() = masterKeys.Service.markIdentityIssuePending(keys.map(_.accountId).distinct)
+
+        for {
+          tx <- tx
+          _ <- updateMasterKeys()
+        } yield tx.txHash
+      } else Future("")
+
+      for {
+        accountIds <- accountIds
+        anyPendingTx <- anyPendingTx
+        alreadyDoneIDs <- filterOutAlreadyIssuedOrInProcess(anyPendingTx, accountIds)
+        keys <- getKeys(accountIds.diff(alreadyDoneIDs))
+        txHash <- doTx(keys)
+      } yield if (txHash != "") logger.info("ISSUE IDENTITY: " + txHash + " ( " + keys.map(x => x.accountId -> x.address).toMap.toString() + " )")
+    }
+
+    private def checkTransactions() = {
+      val issueIdentityTxs = Service.getAllPendingStatus
+
+      def checkAndUpdate(issueIdentityTxs: Seq[IssueIdentityTransaction]) = utilitiesOperations.traverse(issueIdentityTxs.map(_.txHash).distinct) { txHash =>
+        val transaction = blockchainTransactionIssueIdentities.Service.tryGet(txHash)
+
+        def onTxComplete(transaction: IssueIdentity) = if (transaction.status.isDefined) {
+          if (transaction.status.get) {
+            val markSuccess = Service.markSuccess(txHash)
+
+            def updateMasterKeys() = masterKeys.Service.markIdentityIssued(issueIdentityTxs.filter(_.txHash == txHash).map(_.accountId))
+
+            (for {
+              _ <- markSuccess
+              _ <- updateMasterKeys()
+            } yield ()
+              ).recover {
+              case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+            }
+          } else {
+            val markMasterFailed = Service.markFailed(txHash)
+
+            (for {
+              _ <- markMasterFailed
+            } yield ()
+              ).recover {
+              case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+            }
+          }
+        } else Future()
+
+        for {
+          transaction <- transaction
+          _ <- onTxComplete(transaction)
+        } yield ()
+      }
+
+      for {
+        issueIdentityTxs <- issueIdentityTxs
+        _ <- checkAndUpdate(issueIdentityTxs)
+      } yield ()
+
+    }
 
     val scheduler: Scheduler = new Scheduler {
       val name: String = IssueIdentityTransactions.module
 
       def runner(): Unit = {
-        val issueIdentityTxs = Service.getAllPendingStatus
-
-        def checkAndUpdate(issueIdentityTxs: Seq[IssueIdentityTransaction]) = utilitiesOperations.traverse(issueIdentityTxs.map(_.txHash).distinct) { txHash =>
-          val transaction = blockchainTransactionIssueIdentities.Service.tryGet(txHash)
-
-          def onTxComplete(transaction: IssueIdentity) = if (transaction.status.isDefined) {
-            if (transaction.status.get) {
-              val markSuccess = Service.markSuccess(txHash)
-              val updateMasterAccount = utilitiesOperations.traverse(issueIdentityTxs.filter(_.txHash == txHash))(x => masterAccounts.Service.updateIdentityID(accountId = x.accountId, identityID = x.getIdentityID))
-
-              def sendNotifications(accountIds: Seq[String]): Unit = accountIds.foreach(x => utilitiesNotification.send(x, constants.Notification.IDENTITY_ISSUED)(""))
-
-              (for {
-                _ <- markSuccess
-                _ <- updateMasterAccount
-              } yield sendNotifications(issueIdentityTxs.filter(_.txHash == txHash).map(_.accountId))
-                ).recover {
-                case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
-            } else {
-              val markMasterFailed = Service.markFailed(txHash)
-
-              (for {
-                _ <- markMasterFailed
-              } yield ()
-                ).recover {
-                case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
-            }
-          } else Future()
-
-          for {
-            transaction <- transaction
-            _ <- onTxComplete(transaction)
-          } yield ()
-
-        }
+        val doIssueIdentities = issueIdentities()
 
         val forComplete = (for {
-          issueIdentityTxs <- issueIdentityTxs
-          _ <- checkAndUpdate(issueIdentityTxs)
+          _ <- doIssueIdentities
+          _ <- checkTransactions()
         } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.failure.logMessage)
         }

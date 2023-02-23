@@ -11,7 +11,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Key(accountId: String, address: String, lowercaseId: String, hdPath: Option[Seq[ChildNumber]], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Array[Byte], partialMnemonics: Option[Seq[String]], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class Key(accountId: String, address: String, lowercaseId: String, hdPath: Option[Seq[ChildNumber]], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Array[Byte], partialMnemonics: Option[Seq[String]], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], identityIssued: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
   def serialize(): Keys.KeySerialized = Keys.KeySerialized(
     accountId = this.accountId,
     address = this.address,
@@ -27,6 +27,7 @@ case class Key(accountId: String, address: String, lowercaseId: String, hdPath: 
     active = this.active,
     backupUsed = this.backupUsed,
     verified = this.verified,
+    identityIssued = this.identityIssued,
     createdBy = this.createdBy,
     createdOnMillisEpoch = this.createdOnMillisEpoch,
     updatedBy = this.updatedBy,
@@ -42,7 +43,7 @@ object Keys {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class KeySerialized(accountId: String, address: String, lowercaseId: String, hdPath: Option[String], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Array[Byte], partialMnemonics: Option[String], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity2[String, String] {
+  case class KeySerialized(accountId: String, address: String, lowercaseId: String, hdPath: Option[String], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Array[Byte], partialMnemonics: Option[String], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], identityIssued: Option[Boolean], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity2[String, String] {
     def deserialize: Key = Key(
       accountId = accountId,
       address = address,
@@ -57,7 +58,9 @@ object Keys {
       retryCounter = retryCounter,
       active = active,
       backupUsed = backupUsed,
-      verified = verified, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+      verified = verified,
+      identityIssued = identityIssued,
+      createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
     def id1: String = accountId
 
@@ -66,7 +69,7 @@ object Keys {
 
   class KeyTable(tag: Tag) extends Table[KeySerialized](tag, "Key") with ModelTable2[String, String] {
 
-    def * = (accountId, address, lowercaseId, hdPath.?, passwordHash, salt, iterations, encryptedPrivateKey, partialMnemonics.?, name.?, retryCounter, active, backupUsed, verified.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (KeySerialized.tupled, KeySerialized.unapply)
+    def * = (accountId, address, lowercaseId, hdPath.?, passwordHash, salt, iterations, encryptedPrivateKey, partialMnemonics.?, name.?, retryCounter, active, backupUsed, verified.?, identityIssued.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (KeySerialized.tupled, KeySerialized.unapply)
 
     def accountId = column[String]("accountId", O.PrimaryKey)
 
@@ -95,6 +98,8 @@ object Keys {
     def backupUsed = column[Boolean]("backupUsed")
 
     def verified = column[Boolean]("verified")
+
+    def identityIssued = column[Boolean]("identityIssued")
 
     def createdBy = column[String]("createdBy")
 
@@ -143,7 +148,8 @@ class Keys @Inject()(
         retryCounter = retryCounter,
         active = active,
         backupUsed = backupUsed,
-        verified = verified
+        verified = verified,
+        identityIssued = Option(false),
       )
       create(key.serialize())
     }
@@ -164,7 +170,8 @@ class Keys @Inject()(
         retryCounter = retryCounter,
         active = active,
         backupUsed = backupUsed,
-        verified = verified
+        verified = verified,
+        identityIssued = Option(false),
       ).serialize())
     }
 
@@ -184,7 +191,8 @@ class Keys @Inject()(
         retryCounter = retryCounter,
         active = active,
         backupUsed = backupUsed,
-        verified = verified
+        verified = verified,
+        identityIssued = Option(false),
       ).serialize())
     }
 
@@ -203,7 +211,8 @@ class Keys @Inject()(
         retryCounter = retryCounter,
         active = active,
         backupUsed = backupUsed,
-        verified = verified
+        verified = verified,
+        identityIssued = Option(false),
       ).serialize())
     }
 
@@ -337,6 +346,11 @@ class Keys @Inject()(
 
     def fetchAllActive: Future[Seq[Keys.KeySerialized]] = filter(_.active)
 
+    def getNotIssuedIdentityAccountIDs: Future[Seq[String]] = filterAndSortWithPagination(offset = 0, limit = 50)(x => !x.identityIssued && x.verified && x.active)(_.accountId).map(_.map(_.accountId))
+
+    def markIdentityIssuePending(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(x => !x.identityIssued && x.verified && x.active && x.accountId.inSet(accountIds)).map(_.identityIssued.?).update(null))
+
+    def markIdentityIssued(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(x => x.identityIssued.?.isEmpty && x.verified && x.active && x.accountId.inSet(accountIds)).map(_.identityIssued).update(true))
 
   }
 

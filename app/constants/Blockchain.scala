@@ -7,7 +7,7 @@ import schema.list.PropertyList
 import schema.property.base.{MesaProperty, MetaProperty}
 import schema.qualified._
 import schema.types.Height
-import utilities.MicroNumber
+import utilities.{MicroNumber, Wallet}
 
 object Blockchain {
   val AccountPrefix = "mantle"
@@ -19,7 +19,7 @@ object Blockchain {
   val ChainId: String = CommonConfig.Blockchain.ChainId
   val StakingToken: String = CommonConfig.Blockchain.StakingToken
   val DefaultSendCoinGasAmount = 100000
-  val DefaultIssueIdentityGasLimit = 100000
+  val DefaultIssueIdentityGasLimit = 150000
   val DefaultMintAssetGasAmount = 500000
   val DefaultNubGasAmount = 100000
   val DefaultGasPrice: BigDecimal = 0
@@ -35,7 +35,8 @@ object Blockchain {
   val LowGasPrice: Double = CommonConfig.Blockchain.LowGasPrice
   val MediumGasPrice: Double = CommonConfig.Blockchain.MediumGasPrice
   val HighGasPrice: Double = CommonConfig.Blockchain.HighGasPrice
-  val MantlePlaceMaintainerAddress = "mantle1z674cs5hr9ra8engn8atfcdwcpmzs7wxg9mdv0"
+  val MantleNodeMaintainerWallet: Wallet = utilities.Wallet.getWallet("comfort broccoli urban cheap noise income ensure wheat maze cement panel clinic opinion acoustic select sentence code purchase casual dose brown fish salt coral".split(" "))
+  val MantlePlaceMaintainerAddress = "mantle19qxy9t064v79wkslptpjxn3nealzhxhdfe3ldd"
   val MantlePlaceIdentityClassificationID: ClassificationID = ClassificationID(utilities.Secrets.base64URLDecode("OXt-qbauoEO41FQzh5oSwcJcCTbxyATh85ufYqevmbs="))
   val MantlePlaceFromID: IdentityID = IdentityID(utilities.Secrets.base64URLDecode("MuFGjnQuCNHHVP7u6HfAJ3tqd3Yc-EpOqT2IT4QetdU="))
   val IDSeparator = "."

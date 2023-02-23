@@ -3,7 +3,7 @@ package controllers
 import akka.actor.CoordinatedShutdown
 import controllers.actions._
 import controllers.result.WithUsernameToken
-import models.{blockchain, blockchainTransaction, history, masterTransaction}
+import models._
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -12,7 +12,7 @@ import service.Starter
 
 import javax.inject._
 import scala.concurrent.duration.{DAYS, Duration}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class IndexController @Inject()(
@@ -31,6 +31,8 @@ class IndexController @Inject()(
                                  nftSales: blockchainTransaction.NFTSales,
                                  issueIdentities: blockchainTransaction.IssueIdentities,
                                  masterTransactionTokenPrices: masterTransaction.TokenPrices,
+                                 masterAccounts: master.Accounts,
+                                 masterKeys: master.Keys,
                                  publicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
                                  issueIdentityTransactions: masterTransaction.IssueIdentityTransactions,
                                  saleNFTTransactions: masterTransaction.SaleNFTTransactions,
@@ -53,6 +55,36 @@ class IndexController @Inject()(
       Ok(utilities.Sitemap.generate).as("application/xml; charset=utf-8")
     }
   }
+
+  def fixAllMultipleActiveKeys() = {
+    val allActiveKeys = Await.result(masterKeys.Service.fetchAllActive, Duration.Inf)
+    val allAccountIds = allActiveKeys.map(_.accountId).distinct
+    if (allAccountIds.length != allActiveKeys.length) {
+      println("correcting active")
+      val wrongAccountIds = allAccountIds.flatMap(x => if (allActiveKeys.count(_.accountId == x) > 1) Option(x) else None)
+      println(wrongAccountIds)
+      println(wrongAccountIds.length)
+      Await.result(masterKeys.Service.insertOrUpdateMultiple(allActiveKeys.filter(x => wrongAccountIds.contains(x.accountId) && x.encryptedPrivateKey.length == 0).map(_.copy(active = false))), Duration.Inf)
+      val updatedAllActiveKeys = Await.result(masterKeys.Service.fetchAllActive, Duration.Inf)
+      val updatedAllAccountIds = updatedAllActiveKeys.map(_.accountId).distinct
+      val wrongManagedAccountIds = updatedAllAccountIds.flatMap(x => if (updatedAllActiveKeys.count(_.accountId == x) > 1) Option(x) else None)
+      println(wrongManagedAccountIds)
+      println(wrongManagedAccountIds.length)
+      val wrongManagedKeys = updatedAllActiveKeys.filter(x => wrongManagedAccountIds.contains(x.accountId) && x.encryptedPrivateKey.length > 0)
+      wrongManagedAccountIds.foreach(x => {
+        val updateKeys = wrongManagedKeys.filter(_.accountId == x).sortBy(_.createdOnMillisEpoch.getOrElse(0L)).reverse.drop(1)
+        Await.result(masterKeys.Service.insertOrUpdateMultiple(updateKeys.map(_.copy(active = false))), Duration.Inf)
+      })
+      val finalAllActiveKeys = Await.result(masterKeys.Service.fetchAllActive, Duration.Inf)
+      val finalAllAccountIds = finalAllActiveKeys.map(_.accountId).distinct
+      println(finalAllAccountIds.flatMap(x => if (finalAllActiveKeys.count(_.accountId == x) > 1) Option(x) else None))
+      println(finalAllAccountIds.flatMap(x => if (finalAllActiveKeys.count(_.accountId == x) > 1) Option(x) else None).length)
+    } else {
+      println("all correct")
+    }
+  }
+
+  fixAllMultipleActiveKeys()
 
   utilities.Scheduler.startSchedulers(
     historyMasterPublicListings.Utility.scheduler,

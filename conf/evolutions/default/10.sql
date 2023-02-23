@@ -70,16 +70,12 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueIdentityTransaction"
 (
     "txHash"               VARCHAR NOT NULL,
     "accountId"            VARCHAR NOT NULL,
-    "twitter"              VARCHAR NOT NULL,
-    "note1"                VARCHAR NOT NULL,
-    "note2"                VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash"),
-    UNIQUE ("txHash", "accountId")
+    PRIMARY KEY ("txHash", "accountId")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SecondaryMarketTransferTransactions"
@@ -99,6 +95,8 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SecondaryMarketTransferTransactio
 
 ALTER TABLE MASTER."Account"
     ADD COLUMN IF NOT EXISTS "identityId" VARCHAR DEFAULT NULL UNIQUE;
+ALTER TABLE MASTER."Key"
+    ADD COLUMN IF NOT EXISTS "identityIssued" BOOLEAN DEFAULT false;
 ALTER TABLE MASTER."NFT"
     ADD COLUMN IF NOT EXISTS "assetId" VARCHAR DEFAULT NULL UNIQUE;
 

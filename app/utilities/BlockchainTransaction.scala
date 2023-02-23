@@ -116,7 +116,7 @@ object BlockchainTransaction {
       .setFromID(fromID.asProtoIdentityID)
       .setTo(toAddress)
       .setClassificationID(classificationID.asProtoClassificationID)
-      .setImmutableMetaProperties(PropertyList(Seq(utilities.Identity.getOriginMetaProperty, utilities.Identity.getIDMetaProperty(id))).asProtoPropertyList)
+      .setImmutableMetaProperties(PropertyList(Seq(utilities.Identity.getOriginMetaProperty, utilities.Identity.getBondAmountMetaProperty, utilities.Identity.getIDMetaProperty(id))).asProtoPropertyList)
       .setImmutableProperties(PropertyList(Seq(utilities.Identity.getExtraMesaProperty(""))).asProtoPropertyList)
       .setMutableMetaProperties(PropertyList(Seq(utilities.Identity.getTwitterMetaProperty(""), utilities.Identity.getNote1MetaProperty(""))).asProtoPropertyList)
       .setMutableProperties(PropertyList(Seq(utilities.Identity.getNote2MesaProperty(""))).asProtoPropertyList)

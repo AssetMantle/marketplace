@@ -360,34 +360,11 @@ class Starter @Inject()(
 
   // Delete redundant nft tags
 
-  def fixAllMultipleActiveKeys = {
-    val allActiveKeys = Await.result(masterKeys.Service.fetchAllActive, Duration.Inf)
-    val allAccountIds = allActiveKeys.sortBy(_.createdOnMillisEpoch).reverse.map(_.accountId).distinct
-    val wrongAccountIds = allAccountIds.flatMap(x => if (allActiveKeys.count(_.accountId == x) > 1) Option(x) else None)
-    println(wrongAccountIds)
-    println(wrongAccountIds.length)
-    Await.result(masterKeys.Service.insertOrUpdateMultiple(allActiveKeys.filter(x => wrongAccountIds.contains(x.accountId) && x.encryptedPrivateKey.length == 0).map(_.copy(active = false))), Duration.Inf)
-    val updatedAllActiveKeys = Await.result(masterKeys.Service.fetchAllActive, Duration.Inf)
-    val updatedAllAccountIds = updatedAllActiveKeys.sortBy(_.createdOnMillisEpoch).reverse.map(_.accountId).distinct
-    val wrongManagedAccountIds = updatedAllAccountIds.flatMap(x => if (updatedAllActiveKeys.count(_.accountId == x) > 1) Option(x) else None)
-    println(wrongManagedAccountIds)
-    println(wrongManagedAccountIds.length)
-    val wrongManagedKeys = updatedAllActiveKeys.filter(x => wrongManagedAccountIds.contains(x.accountId) && x.encryptedPrivateKey.length > 0)
-    wrongManagedAccountIds.foreach(x => {
-      val updateKeys = wrongManagedKeys.filter(_.accountId == x).sortBy(_.createdOnMillisEpoch.getOrElse(0L)).drop(1)
-      Await.result(masterKeys.Service.insertOrUpdateMultiple(updateKeys.map(_.copy(active = false))), Duration.Inf)
-    })
-    val finalAllActiveKeys = Await.result(masterKeys.Service.fetchAllActive, Duration.Inf)
-    val finalAllAccountIds = finalAllActiveKeys.sortBy(_.createdOnMillisEpoch).reverse.map(_.accountId).distinct
-    println(finalAllAccountIds.flatMap(x => if (finalAllActiveKeys.count(_.accountId == x) > 1) Option(x) else None))
-    println(finalAllAccountIds.flatMap(x => if (finalAllActiveKeys.count(_.accountId == x) > 1) Option(x) else None).length)
-  }
-
   def start(): Future[Unit] = {
     (for {
       _ <- fixMantleMonkeys()
       //      _ <- validateAll()
-    } yield fixAllMultipleActiveKeys
+    } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
     }

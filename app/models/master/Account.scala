@@ -73,21 +73,6 @@ class Accounts @Inject()(
 
   object Service {
 
-    def add(username: String, lang: Lang, accountType: String): Future[Unit] = {
-      val account = Account(
-        id = username,
-        identityId = None,
-        lowercaseId = username.toLowerCase,
-        passwordHash = Array[Byte](),
-        salt = Array[Byte](),
-        iterations = 0,
-        language = lang.language,
-        accountType = accountType)
-      for {
-        _ <- create(account)
-      } yield ()
-    }
-
     def upsertOnSignUp(username: String, lang: Lang, accountType: String): Future[Unit] = {
       val account = Account(
         id = username,
@@ -97,7 +82,8 @@ class Accounts @Inject()(
         salt = Array[Byte](),
         iterations = 0,
         language = lang.language,
-        accountType = accountType)
+        accountType = accountType,
+      )
       for {
         _ <- upsert(account)
       } yield ()
@@ -130,8 +116,6 @@ class Accounts @Inject()(
     def getAllUsernames: Future[Seq[String]] = getAll.map(_.map(_.id))
 
     def updateIdentityID(accountId: String, identityID: IdentityID): Future[Int] = customUpdate(Accounts.TableQuery.filter(_.id === accountId).map(_.identityId).update(identityID.asString))
-
-    def getNotIssuedIdentityAccountIDs = filterAndSortWithPagination(offset = 0, limit = 50)(_.identityId.?.isEmpty)(_.id).map(_.map(_.id))
 
   }
 }

@@ -16,7 +16,11 @@ import scodec.bits.ByteVector
 import java.nio.charset.StandardCharsets
 import java.security.{MessageDigest, Security}
 
-case class Wallet(address: String, hdPath: Seq[ChildNumber], publicKey: Array[Byte], privateKey: Array[Byte], mnemonics: Seq[String])
+case class Wallet(address: String, hdPath: Seq[ChildNumber], publicKey: Array[Byte], privateKey: Array[Byte], mnemonics: Seq[String]) {
+
+  def getECKey: ECKey = ECKey.fromPrivate(this.privateKey)
+
+}
 
 object Wallet {
 
