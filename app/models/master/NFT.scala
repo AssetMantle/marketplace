@@ -20,7 +20,7 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
     constants.NFT.Property(name = constants.Collection.DefaultProperty.NFT_NAME, `type` = constants.NFT.Data.STRING, `value` = this.name, meta = true, mutable = false),
     constants.NFT.Property(name = constants.Collection.DefaultProperty.NFT_DESCRIPTION, `type` = constants.NFT.Data.STRING, `value` = this.description, meta = true, mutable = false),
     constants.NFT.Property(name = constants.Collection.DefaultProperty.FILE_HASH, `type` = constants.NFT.Data.STRING, `value` = this.id, meta = true, mutable = false),
-    constants.NFT.Property(name = constants.Collection.DefaultProperty.CLASSIFICATION_ID, `type` = constants.NFT.Data.STRING, `value` = classificationId, meta = true, mutable = false),
+    constants.NFT.Property(name = constants.Collection.DefaultProperty.CREATOR_ID, `type` = constants.NFT.Data.STRING, `value` = classificationId, meta = true, mutable = false),
   )
 
   def getAllProperties(classificationId: String, nftProperties: Seq[NFTProperty]): Seq[constants.NFT.Property] = this.getDefaultProperties(classificationId) ++ nftProperties.map(_.asProperty)

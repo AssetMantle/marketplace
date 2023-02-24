@@ -311,8 +311,8 @@ class Keys @Inject()(
 
       def updateKeys(oldKey: Key, newKey: Key) = if (newKey.encryptedPrivateKey.nonEmpty) {
         for {
-          _ <- updateById1AndId2(newKey.copy(active = true).serialize())
           _ <- updateById1AndId2(oldKey.copy(active = false).serialize())
+          _ <- updateById1AndId2(newKey.copy(active = true).serialize())
         } yield ()
       } else constants.Response.ACTIVATING_UNMANAGED_KEY.throwBaseException()
 
@@ -346,7 +346,7 @@ class Keys @Inject()(
 
     def fetchAllActive: Future[Seq[Keys.KeySerialized]] = filter(_.active)
 
-    def getNotIssuedIdentityAccountIDs: Future[Seq[String]] = filterAndSortWithPagination(offset = 0, limit = 50)(x => !x.identityIssued && x.verified && x.active)(_.accountId).map(_.map(_.accountId))
+    def getNotIssuedIdentityAccountIDs: Future[Seq[String]] = filterAndSortWithPagination(offset = 0, limit = 250)(x => !x.identityIssued && x.verified && x.active)(_.accountId).map(_.map(_.accountId))
 
     def markIdentityIssuePending(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(x => !x.identityIssued && x.verified && x.active && x.accountId.inSet(accountIds)).map(_.identityIssued.?).update(null))
 

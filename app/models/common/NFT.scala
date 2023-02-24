@@ -56,7 +56,7 @@ object NFT {
   implicit val stringPropertyWrites: Writes[StringProperty] = Json.writes[StringProperty]
 
   case class DecimalProperty(name: String, `value`: BigDecimal, meta: Boolean, mutable: Boolean) extends BaseNFTProperty {
-    def `type`: String = constants.NFT.Data.DECIMAL
+    def `type`: String = constants.NFT.Data.NUMBER
 
     def valueAsString: String = this.`value`.toString()
   }
@@ -79,14 +79,14 @@ object NFT {
 
     def valid: Boolean = this.`type` match {
       case constants.NFT.Data.STRING | SMALL_STRING => true
-      case constants.NFT.Data.DECIMAL | NUMBER | SMALL_NUMBER => Try(BigDecimal(this.`value`)).isSuccess
+      case constants.NFT.Data.NUMBER | NUMBER | SMALL_NUMBER => Try(BigDecimal(this.`value`)).isSuccess
       case constants.NFT.Data.BOOLEAN => this.`value` == constants.NFT.Data.TRUE || this.`value` == constants.NFT.Data.SMALL_TRUE || this.`value` == constants.NFT.Data.FALSE || this.`value` == constants.NFT.Data.SMALL_FALSE
       case _ => constants.Response.NFT_PROPERTY_TYPE_NOT_FOUND.throwBaseException()
     }
 
     def toBaseNFTProperty: BaseNFTProperty = if (this.valid) this.`type` match {
       case constants.NFT.Data.STRING | SMALL_STRING => StringProperty(name = this.name, `value` = this.`value`, meta = this.meta, mutable = this.mutable)
-      case constants.NFT.Data.DECIMAL | NUMBER | SMALL_NUMBER => DecimalProperty(name = this.name, `value` = BigDecimal(this.`value`), meta = this.meta, mutable = this.mutable)
+      case constants.NFT.Data.NUMBER | NUMBER | SMALL_NUMBER => DecimalProperty(name = this.name, `value` = BigDecimal(this.`value`), meta = this.meta, mutable = this.mutable)
       case constants.NFT.Data.BOOLEAN => BooleanProperty(name = this.name, `value` = this.`value` == constants.NFT.Data.TRUE || this.`value` == constants.NFT.Data.SMALL_TRUE, meta = this.meta, mutable = this.mutable)
       case _ => constants.Response.NFT_PROPERTY_TYPE_NOT_FOUND.throwBaseException()
     } else constants.Response.INVALID_NFT_PROPERTY.throwBaseException()

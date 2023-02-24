@@ -1,5 +1,9 @@
 package constants
 
+import schema.data.base.StringData
+import schema.id.base.{PropertyID, StringID}
+import schema.property.base.MetaProperty
+
 object Collection {
 
   object File {
@@ -26,9 +30,11 @@ object Collection {
     val NFT_NAME = "name"
     val NFT_DESCRIPTION = "description"
     val FILE_HASH = "fileHash"
-    val CLASSIFICATION_ID = "classificationId"
+    val CREATOR_ID = "creatorID"
 
-    val list: Seq[String] = Seq(NFT_NAME, NFT_DESCRIPTION, FILE_HASH, CLASSIFICATION_ID)
+    val list: Seq[String] = Seq(NFT_NAME, NFT_DESCRIPTION, FILE_HASH, CREATOR_ID)
+
+    val MetaProperties: Seq[MetaProperty] = list.map(x => MetaProperty(id = PropertyID(keyID = StringID(x), typeID = constants.Data.StringDataTypeID), data = StringData("").toAnyData))
 
   }
 

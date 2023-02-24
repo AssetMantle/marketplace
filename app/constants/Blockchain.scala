@@ -19,7 +19,7 @@ object Blockchain {
   val ChainId: String = CommonConfig.Blockchain.ChainId
   val StakingToken: String = CommonConfig.Blockchain.StakingToken
   val DefaultSendCoinGasAmount = 100000
-  val DefaultIssueIdentityGasLimit = 150000
+  val DefaultIssueIdentityGasLimit = 120000
   val DefaultMintAssetGasAmount = 500000
   val DefaultNubGasAmount = 100000
   val DefaultGasPrice: BigDecimal = 0

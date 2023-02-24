@@ -106,7 +106,7 @@ function removeProperty(containerId) {
                 $("#COLLECTION_PROPERTY_" + i + " .propertyType").removeClass("active");
                 $("#COLLECTION_PROPERTY_" + i + " .propertyType.boolean").addClass("active");
                 $("#COLLECTION_PROPERTY_" + i + " .dropdown .currentSelected").text(nextElementFixedValue.slice(0, 1).toUpperCase() + nextElementFixedValue.slice(1));
-            } else if (nextElementTypeValue === "DECIMAL") {
+            } else if (nextElementTypeValue === "NUMBER") {
                 $("#COLLECTION_PROPERTY_" + i + " .propertyType").removeClass("active");
                 $("#COLLECTION_PROPERTY_" + i + " .propertyType.number").addClass("active");
                 $("#COLLECTION_PROPERTY_" + i + " .propertyTypeField").val(nextElementFixedValue);
@@ -228,9 +228,6 @@ $(".custom-select .custom-options .custom-option").on("click", function () {
 
 $("select.filledSelect").each((index,element)=>{
     let selectedFieldValue = $(element).val();
-    if (selectedFieldValue === "DECIMAL"){
-        selectedFieldValue = "NUMBER";
-    }
     let valueToShow = selectedFieldValue.substr(0,1).toUpperCase()+selectedFieldValue.substr(1).toLowerCase();
     let selectFieldIndex = $(element).attr("data-index");
     $("#COLLECTION_PROPERTIES_" + selectFieldIndex + "_COLLECTION_PROPERTY_TYPE").closest("div").find(".custom-select-trigger").text(valueToShow);

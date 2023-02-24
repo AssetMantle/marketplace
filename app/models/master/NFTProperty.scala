@@ -84,7 +84,10 @@ class NFTProperties @Inject()(
 
     def tryGet(nftId: String, name: String): Future[NFTProperty] = tryGetById1Id2Id3(id1 = nftId, id2 = name, id3 = constants.NFT.Data.STRING)
 
-    def deleteProperty(nftId: String, name: String): Future[Int] = delete(id1 = nftId, id2 = name, id3 = constants.NFT.Data.STRING)
+    def getOnType(`type`: String) = filter(_.`type` === `type`)
+
+    def changeDecimalTypeToNumber = customUpdate(NFTProperties.TableQuery.filter(_.`type` === "DECIMAL").map(_.`type`).update(constants.NFT.Data.NUMBER))
+
 
   }
 }

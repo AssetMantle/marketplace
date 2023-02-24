@@ -1,5 +1,6 @@
 package utilities
 
+import com.assets.transactions.{define => assetDefine}
 import com.cosmos.bank.v1beta1.MsgSend
 import com.cosmos.crypto.secp256k1.PubKey
 import com.cosmos.tx.v1beta1._
@@ -10,6 +11,7 @@ import models.common.Coin
 import org.bitcoinj.core.ECKey
 import schema.id.base.{ClassificationID, IdentityID}
 import schema.list.PropertyList
+import schema.property.base.{MesaProperty, MetaProperty}
 
 import scala.jdk.CollectionConverters.IterableHasAsJava
 
@@ -120,6 +122,19 @@ object BlockchainTransaction {
       .setImmutableProperties(PropertyList(Seq(utilities.Identity.getExtraMesaProperty(""))).asProtoPropertyList)
       .setMutableMetaProperties(PropertyList(Seq(utilities.Identity.getTwitterMetaProperty(""), utilities.Identity.getNote1MetaProperty(""))).asProtoPropertyList)
       .setMutableProperties(PropertyList(Seq(utilities.Identity.getNote2MesaProperty(""))).asProtoPropertyList)
+      .build().toByteString)
+    .build()
+
+  def getAssetDefineMsg(fromAddress: String, fromID: IdentityID, immutableMetas: Seq[MetaProperty], immutables: Seq[MesaProperty], mutableMetas: Seq[MetaProperty], mutables: Seq[MesaProperty]): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(constants.Blockchain.TransactionMessage.ASSET_DEFINE)
+    .setValue(assetDefine
+      .Message.newBuilder()
+      .setFrom(fromAddress)
+      .setFromID(fromID.asProtoIdentityID)
+      .setImmutableMetaProperties(PropertyList(immutableMetas).asProtoPropertyList)
+      .setImmutableProperties(PropertyList(immutables).asProtoPropertyList)
+      .setMutableMetaProperties(PropertyList(mutableMetas).asProtoPropertyList)
+      .setMutableProperties(PropertyList(mutables).asProtoPropertyList)
       .build().toByteString)
     .build()
 

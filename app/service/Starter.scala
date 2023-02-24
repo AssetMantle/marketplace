@@ -57,7 +57,7 @@ class Starter @Inject()(
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = value)
       } else if (propertyType == constants.NFT.Data.BOOLEAN) {
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = value.toBoolean.toString)
-      } else if (propertyType == constants.NFT.Data.DECIMAL) {
+      } else if (propertyType == constants.NFT.Data.NUMBER) {
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = BigDecimal(value).toString)
       } else constants.Response.INVALID_NFT_PROPERTY.throwBaseException()
     }
@@ -72,7 +72,7 @@ class Starter @Inject()(
       val propertyType = collection.properties.getOrElse(constants.Response.INVALID_NFT_PROPERTY.throwBaseException()).find(_.name == this.name).getOrElse(constants.Response.INVALID_NFT_PROPERTY.throwBaseException()).`type`
       val conversionTry = propertyType match {
         case constants.NFT.Data.STRING => true
-        case constants.NFT.Data.DECIMAL => Try(BigDecimal(this.value)).isSuccess
+        case constants.NFT.Data.NUMBER => Try(BigDecimal(this.value)).isSuccess
         case constants.NFT.Data.BOOLEAN => Try(this.value.toBoolean).isSuccess || (this.value == constants.NFT.Data.TRUE || this.value == constants.NFT.Data.FALSE)
         case _ => false
       }
@@ -102,7 +102,7 @@ class Starter @Inject()(
       val d = nft.properties.map(x => {
         val e = collection.properties.get.find(_.name == x.name)
         e.fold(false)(y => {
-          if (y.`type` == constants.NFT.Data.DECIMAL) Try(BigDecimal(x.value)).isSuccess
+          if (y.`type` == constants.NFT.Data.NUMBER) Try(BigDecimal(x.value)).isSuccess
           else if (y.`type` == constants.NFT.Data.BOOLEAN) (x.value == constants.NFT.Data.SMALL_TRUE || x.value == constants.NFT.Data.TRUE || x.value == constants.NFT.Data.SMALL_FALSE || x.value == constants.NFT.Data.FALSE)
           else if (y.`type` == constants.NFT.Data.STRING) true
           else false
@@ -358,12 +358,59 @@ class Starter @Inject()(
     } yield ()
   }
 
+  def updateDecimalToNumberType(): Future[Unit] = {
+    val nftIds = masterNFTProperties.Service.getOnType("DECIMAL").map(_.map(_.nftId))
+
+    def collectionIds(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds).map(_.map(_.collectionId).distinct)
+
+    def collections(collectionIds: Seq[String]) = masterCollections.Service.getCollections(collectionIds)
+
+    def updateCollections(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
+      val properties = collection.properties.get.filterNot(_.`type` == "DECIMAL") ++ collection.properties.get.filter(_.`type` == "DECIMAL").map(x => {
+        val updatedDefaultValue = if (x.defaultValue == "") 0.toString else x.defaultValue
+        x.copy(`type` = constants.NFT.Data.NUMBER, defaultValue = updatedDefaultValue)
+      })
+      masterCollections.Service.update(collection.copy(properties = Option(properties)))
+    }
+
+    def update = masterNFTProperties.Service.changeDecimalTypeToNumber
+
+    for {
+      nftIds <- nftIds
+      collectionIds <- collectionIds(nftIds)
+      collections <- collections(collectionIds)
+      _ <- updateCollections(collections)
+      _ <- update
+    } yield ()
+  }
+
+  def defineAssets() = {
+    val collections = masterCollections.Service.getAllPublic
+
+    def getMessages(collections: Seq[Collection]) = collections.map(collection => {
+      if (collection.properties.isDefined) {
+        val immutableMetas = collection.properties.get.filter(x => x.meta && !x.mutable).map(_.toMetaProperty) ++ constants.Collection.DefaultProperty.MetaProperties
+        val immutables = collection.properties.get.filter(x => !x.meta && !x.mutable).map(_.toMesaProperty)
+        val mutableMetas = collection.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty)
+        val mutables = collection.properties.get.filter(x => !x.meta && x.mutable).map(_.toMesaProperty)
+        utilities.BlockchainTransaction.getAssetDefineMsg(fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, fromID = constants.Blockchain.MantlePlaceFromID, immutableMetas = immutableMetas, immutables = immutables, mutableMetas = mutableMetas, mutables = mutables)
+      } else {
+        utilities.BlockchainTransaction.getAssetDefineMsg(fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, fromID = constants.Blockchain.MantlePlaceFromID, immutableMetas = constants.Collection.DefaultProperty.MetaProperties, immutables = Seq(), mutableMetas = Seq(), mutables = Seq())
+      }
+    })
+
+    for {
+      collections <- collections
+    } yield ()
+  }
+
   // Delete redundant nft tags
 
   def start(): Future[Unit] = {
     (for {
       _ <- fixMantleMonkeys()
-      //      _ <- validateAll()
+      _ <- updateDecimalToNumberType()
+      _ <- validateAll()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)

@@ -38,7 +38,7 @@
                 </div>
                 <div class="propertyDetail">
                     @commonPropertyBox(index = 3, label = constants.Collection.DefaultProperty.FILE_HASH, value = "", visibility = true, requirement = true)
-                    @commonPropertyBox(index = 4, label = constants.Collection.DefaultProperty.CLASSIFICATION_ID, value = "", visibility = true, requirement = true)
+                    @commonPropertyBox(index = 4, label = constants.Collection.DefaultProperty.CREATOR_ID, value = "", visibility = true, requirement = true)
                 </div>
                 <div class="separator"></div>
             </div>
@@ -128,7 +128,7 @@
                                                             </div>
                                                         </div>
                                                     }
-                                                    @if(collectionDraft.get.properties(index).`type` == constants.NFT.Data.DECIMAL) {
+                                                    @if(collectionDraft.get.properties(index).`type` == constants.NFT.Data.NUMBER) {
                                                         <div class="propertyType number active">
                                                             <div class="mb-0 commonInputInt w-100">
                                                                 <div class="fieldContainer">

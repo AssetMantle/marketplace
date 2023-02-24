@@ -1,5 +1,7 @@
 package constants
 
+import schema.id.base.StringID
+
 import scala.util.Try
 
 object NFT {
@@ -14,9 +16,9 @@ object NFT {
   object Data {
     val STRING = "STRING"
     val BOOLEAN = "BOOLEAN"
-    val DECIMAL = "DECIMAL"
+    val NUMBER = "NUMBER"
 
-    val TypesList: Seq[String] = Seq(STRING, DECIMAL, BOOLEAN)
+    val TypesList: Seq[String] = Seq(STRING, NUMBER, BOOLEAN)
 
     val TRUE = "TRUE"
     val SMALL_TRUE = "true"
@@ -27,7 +29,7 @@ object NFT {
 
     def isCastable(`type`: String, value: String): Boolean = `type` match {
       case constants.NFT.Data.STRING => true
-      case constants.NFT.Data.DECIMAL => Try(BigDecimal(value)).isSuccess
+      case constants.NFT.Data.NUMBER => Try(BigDecimal(value)).isSuccess
       case constants.NFT.Data.BOOLEAN => constants.NFT.Data.isBooleanType(value)
       case _ => false
     }
