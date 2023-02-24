@@ -1,0 +1,63 @@
+<div class="modal-overlay modal fade" id="nftRevealModal">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div id="nftRevealContainer">
+                <img src="" alt="" id="gifImage" />
+                <div class="backRipple"></div>
+                <div class="container">
+                    <div class="row" id="cards_container">
+                        <div class="col-lg-12">
+                            <section class="cards">
+                                <div class="cardd">
+                                    <div class="card__translater">
+                                        <div class="card__rotator">
+                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_1.jpg")" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cardd">
+                                    <div class="card__translater">
+                                        <div class="card__rotator">
+                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_2.jpg")" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cardd">
+                                    <div class="card__translater">
+                                        <div class="card__rotator">
+                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_3.jpg")" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cardd">
+                                    <div class="card__translater">
+                                        <div class="card__rotator">
+                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_1.jpg")" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cardd">
+                                    <div class="card__translater">
+                                        <div class="card__rotator">
+                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_2.jpg")" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <style class="hover"></style>
+                        </div>
+                    </div>
+                </div>
+                @*    <div class="nftRevealBackDrop"></div>*@
+                <div class="middlePoint"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    let myModal = new bootstrap.Modal($("#nftRevealModal"), {});
+    $("#nftRevealModal").addClass('active');
+    myModal.show();
+</script>
