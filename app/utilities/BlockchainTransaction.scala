@@ -150,7 +150,7 @@ object BlockchainTransaction {
       .setTakerID(takerID.asProtoIdentityID)
       .setMakerOwnableID(makerOwnableID.toAnyOwnableID)
       .setTakerOwnableID(takerOwnableID.toAnyOwnableID)
-      .setExpiryHeight(Height(expiryHeight).asProtoHeight)
+      .setExpiresIn(Height(expiryHeight).asProtoHeight)
       .setMakerOwnableSplit(makerOwnableSplit.toString())
       .setTakerOwnableSplit(takerOwnableSplit.toString())
       .setImmutableMetaProperties(PropertyList(immutableMetas).asProtoPropertyList)
