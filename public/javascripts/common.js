@@ -222,5 +222,7 @@ function setGasOption(element, value) {
 
 // Sharable Link
 function setSharableLink(imageUrl){
-    $('meta[name=sharableImage]').attr('content', imageUrl);
+    if(imageUrl !== "") {
+        $('meta[name=sharableImage]').attr('content', imageUrl);
+    }
 }
