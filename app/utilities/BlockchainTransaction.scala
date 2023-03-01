@@ -140,7 +140,7 @@ object BlockchainTransaction {
     .build()
 
   def getMakeOrderMsg(fromAddress: String, fromID: IdentityID, classificationID: ClassificationID, takerID: IdentityID, makerOwnableID: OwnableID, makerOwnableSplit: BigDecimal, expiryHeight: Long, takerOwnableID: OwnableID, takerOwnableSplit: BigDecimal, immutableMetas: Seq[MetaProperty], immutables: Seq[MesaProperty], mutableMetas: Seq[MetaProperty], mutables: Seq[MesaProperty]): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.ASSET_MINT)
+    .setTypeUrl(constants.Blockchain.TransactionMessage.ORDER_MAKE)
     .setValue(ordersMake
       .Message.newBuilder()
       .setFrom(fromAddress)
@@ -151,8 +151,8 @@ object BlockchainTransaction {
       .setMakerOwnableID(makerOwnableID.toAnyOwnableID)
       .setTakerOwnableID(takerOwnableID.toAnyOwnableID)
       .setExpiresIn(Height(expiryHeight).asProtoHeight)
-      .setMakerOwnableSplit(makerOwnableSplit.toString())
-      .setTakerOwnableSplit(takerOwnableSplit.toString())
+      .setMakerOwnableSplit(makerOwnableSplit.bigDecimal.toPlainString)
+      .setTakerOwnableSplit(takerOwnableSplit.bigDecimal.toPlainString)
       .setImmutableMetaProperties(PropertyList(immutableMetas).asProtoPropertyList)
       .setImmutableProperties(PropertyList(immutables).asProtoPropertyList)
       .setMutableMetaProperties(PropertyList(mutableMetas).asProtoPropertyList)

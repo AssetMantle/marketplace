@@ -238,7 +238,7 @@ class IssueIdentityTransactions @Inject()(
     val scheduler: Scheduler = new Scheduler {
       val name: String = IssueIdentityTransactions.module
 
-      override val initialDelay: FiniteDuration = constants.Scheduler.FiveMinutes
+//      override val initialDelay: FiniteDuration = constants.Scheduler.FiveMinutes
 
       def runner(): Unit = {
         val doIssueIdentities = issueIdentities()
