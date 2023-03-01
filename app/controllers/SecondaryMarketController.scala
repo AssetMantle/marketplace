@@ -3,8 +3,8 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
-import models.master.{Collection, NFTOwner}
-import models.{blockchain, blockchainTransaction, master, masterTransaction}
+import models.master.{Collection, Key, NFTOwner}
+import models.{blockchain, master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -29,10 +29,9 @@ class SecondaryMarketController @Inject()(
                                            masterCollections: master.Collections,
                                            masterNFTs: master.NFTs,
                                            masterSecondaryMarkets: master.SecondaryMarkets,
-                                           blockchainTransactionSecondaryMarketTransfers: blockchainTransaction.SecondaryMarketTransfers,
                                            masterNFTOwners: master.NFTOwners,
                                            masterNFTProperties: master.NFTProperties,
-                                           masterTransactionSecondaryMarketTransferTransactions: masterTransaction.SecondaryMarketTransferTransactions,
+                                           masterTransactionMakeOrderTransactions: masterTransaction.MakeOrderTransactions,
                                            utilitiesNotification: utilities.Notification,
                                            utilitiesOperations: utilities.Operations,
                                          )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -95,10 +94,11 @@ class SecondaryMarketController @Inject()(
         },
         createData => {
           val nftOwner = masterNFTOwners.Service.tryGet(nftId = createData.nftId, ownerId = loginState.username)
+          val activeKey = masterKeys.Service.tryGetActive(loginState.username)
 
           def collection(id: String) = masterCollections.Service.tryGet(id)
 
-          def addToSecondaryMarket(nftOwner: NFTOwner, collection: Collection) = {
+          def addToSecondaryMarket(nftOwner: NFTOwner, collection: Collection, activeKey: Key) = {
             val errors = Seq(
               if (nftOwner.creatorId == "Mint.E") Option(constants.Response.SELLING_MINT_E_COLLECTIONS_NOT_ALLOWED) else None,
               if (nftOwner.ownerId != loginState.username) Option(constants.Response.NOT_NFT_OWNER) else None,
@@ -110,17 +110,19 @@ class SecondaryMarketController @Inject()(
               for {
                 secondaryMarketId <- masterSecondaryMarkets.Service.add(createData.toNewSecondaryMarket(nftOwner.collectionId))
                 _ <- masterNFTOwners.Service.listNFTOnSecondaryMarket(NFTOwner = nftOwner, secondaryMarketID = secondaryMarketId)
-              } yield ()
+                tx <- masterTransactionMakeOrderTransactions.Utility.transaction(nftID = createData.nftId, nftOwner = nftOwner, endTimeEpoch = createData.endEpoch, price = createData.price, buyerAccountId = None, secondaryMarketId = secondaryMarketId, gasPrice = constants.Blockchain.DefaultGasPrice, ecKey = activeKey.getECKey(createData.password).get)
+              } yield tx
             } else errors.head.throwFutureBaseException()
           }
 
-//          def sendNotification(collection: Collection) = utilitiesNotification.send(loginState.username, notification = constants.Notification.SECONDARY_MARKET_CREATION, collection.name)(s"'${collection.id}'")
+          //          def sendNotification(collection: Collection) = utilitiesNotification.send(loginState.username, notification = constants.Notification.SECONDARY_MARKET_CREATION, collection.name)(s"'${collection.id}'")
 
           (for {
             nftOwner <- nftOwner
+            activeKey <- activeKey
             collection <- collection(nftOwner.collectionId)
-            _ <- addToSecondaryMarket(nftOwner = nftOwner, collection = collection)
-//            _ <- sendNotification(collection)
+            tx <- addToSecondaryMarket(nftOwner = nftOwner, collection = collection, activeKey = activeKey)
+            //            _ <- sendNotification(collection)
             _ <- collectionsAnalysis.Utility.onCreateSecondaryMarket(collection.id, totalListed = 1, listingPrice = createData.price)
           } yield PartialContent(views.html.secondaryMarket.createSuccessful())
             ).recover {

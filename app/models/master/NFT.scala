@@ -3,27 +3,39 @@ package models.master
 import models.Trait.{Entity, GenericDaoImpl, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import schema.id.base.{AssetID, HashID}
+import schema.list.PropertyList
+import schema.property.base.{MesaProperty, MetaProperty}
+import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class NFT(id: String, assetId: Option[String], collectionId: String, name: String, description: String, totalSupply: Long, isMinted: Boolean, fileExtension: String, ipfsLink: String, edition: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
+case class NFT(id: String, assetId: Option[String], collectionId: String, name: String, description: String, totalSupply: Long, isMinted: Option[Boolean], fileExtension: String, ipfsLink: String, edition: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
   def getFileHash: String = id
 
   def getFileName: String = this.id + "." + this.fileExtension
 
+  def getAssetID: AssetID = AssetID(HashID(utilities.Secrets.base64URLDecode(this.assetId.getOrElse(utilities.Secrets.base64URLEncoder("UNKNOWN_ASSET_ID")))))
+
+  def getAssetID(nftProperties: Seq[NFTProperty], collection: Collection): AssetID = utilities.NFT.getAssetID(collection.getClassificationID, this.getImmutables(nftProperties, collection))
+
   def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getNFTFileAwsKey(collectionId = this.collectionId, fileName = this.getFileName)
 
-  def getDefaultProperties(classificationId: String): Seq[constants.NFT.Property] = Seq(
-    constants.NFT.Property(name = constants.Collection.DefaultProperty.NFT_NAME, `type` = constants.NFT.Data.STRING, `value` = this.name, meta = true, mutable = false),
-    constants.NFT.Property(name = constants.Collection.DefaultProperty.NFT_DESCRIPTION, `type` = constants.NFT.Data.STRING, `value` = this.description, meta = true, mutable = false),
-    constants.NFT.Property(name = constants.Collection.DefaultProperty.FILE_HASH, `type` = constants.NFT.Data.STRING, `value` = this.id, meta = true, mutable = false),
-    constants.NFT.Property(name = constants.Collection.DefaultProperty.CREATOR_ID, `type` = constants.NFT.Data.STRING, `value` = classificationId, meta = true, mutable = false),
-  )
+  def getImmutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && !x.mutable && x.nftId == this.id).map(_.toMetaProperty()(Collections.module, Collections.logger)) ++ utilities.NFT.getDefaultImmutableMetaProperties(name = this.name, description = this.description, fileHash = this.getFileHash, bondAmount = collection.getBondAmount)
 
-  def getAllProperties(classificationId: String, nftProperties: Seq[NFTProperty]): Seq[constants.NFT.Property] = this.getDefaultProperties(classificationId) ++ nftProperties.map(_.asProperty)
+  def getImmutableProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && !x.mutable && x.nftId == this.id).map(_.toMesaProperty()(Collections.module, Collections.logger)) ++ constants.Collection.DefaultProperty.allImmutableMesaProperties(collection.getCreatorIdentityID)
+
+  def getMutableMetaProperties(nftProperties: Seq[NFTProperty]): Seq[MetaProperty] = nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty()(Collections.module, Collections.logger))
+
+  def getMutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && x.mutable && x.nftId == this.id).map(_.toMesaProperty()(Collections.module, Collections.logger))
+
+  def getImmutables(nftProperties: Seq[NFTProperty], collection: Collection): Immutables = Immutables(PropertyList(this.getImmutableMetaProperties(nftProperties, collection) ++ this.getImmutableProperties(nftProperties, collection)))
+
+  def getMutables(nftProperties: Seq[NFTProperty]): Mutables = Mutables(PropertyList(this.getMutableMetaProperties(nftProperties) ++ this.getMutableProperties(nftProperties)))
+
 }
 
 object NFTs {
@@ -34,7 +46,7 @@ object NFTs {
 
   class NFTTable(tag: Tag) extends Table[NFT](tag, "NFT") with ModelTable[String] {
 
-    def * = (id, assetId.?, collectionId, name, description, totalSupply, isMinted, fileExtension, ipfsLink, edition.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFT.tupled, NFT.unapply)
+    def * = (id, assetId.?, collectionId, name, description, totalSupply, isMinted.?, fileExtension, ipfsLink, edition.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFT.tupled, NFT.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -104,12 +116,18 @@ class NFTs @Inject()(
 
     def countNFTs(collectionId: String): Future[Int] = filterAndCount(_.collectionId === collectionId)
 
-    def markNFTMinted(id: String): Future[NFT] =
-      for {
-        nft <- tryGet(id)
-        _ <- update(nft.copy(isMinted = true))
-      } yield nft.copy(isMinted = true)
+    def markNFTsMinted(ids: Seq[String]): Future[Int] = customUpdate(NFTs.TableQuery.filter(_.id.inSet(ids)).map(_.isMinted).update(true))
+
+    def markNFTsMintFailed(ids: Seq[String]): Future[Int] = customUpdate(NFTs.TableQuery.filter(_.id.inSet(ids)).map(_.isMinted).update(false))
+
+    def updateAssetID(id: String, assetID: AssetID): Future[Int] = customUpdate(NFTs.TableQuery.filter(_.id === id).map(_.assetId).update(assetID.asString))
+
+    def fetchAllWithNullAssetID(): Future[Seq[NFT]] = filter(_.assetId.?.isEmpty)
+
+    def markNFTsMintPending(ids: Seq[String]): Future[Int] = customUpdate(NFTs.TableQuery.filter(_.id.inSet(ids)).map(_.isMinted.?).update(null))
 
     def getRandomNFTs(collectionId: String, n: Int, filterOut: Seq[String]): Future[Seq[NFT]] = filter(x => x.collectionId === collectionId && !x.id.inSet(filterOut)).map(util.Random.shuffle(_).take(n))
+
+    def getUnmintedNFTs(collectionId: String): Future[Seq[NFT]] = filter(x => x.collectionId === collectionId && !x.isMinted.?.getOrElse(true))
   }
 }

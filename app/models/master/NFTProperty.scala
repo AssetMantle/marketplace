@@ -3,6 +3,8 @@ package models.master
 import models.Trait.{Entity3, GenericDaoImpl3, Logging, ModelTable3}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import schema.id.base.{PropertyID, StringID}
+import schema.property.base.{MesaProperty, MetaProperty}
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
@@ -16,7 +18,12 @@ case class NFTProperty(nftId: String, name: String, `type`: String, `value`: Str
 
   def id3: String = `type`
 
-  def asProperty: constants.NFT.Property = constants.NFT.Property(name = this.name, `type` = this.`type`, `value` = this.`value`, meta = this.meta, mutable = this.mutable)
+  def getPropertyID: PropertyID = PropertyID(keyID = StringID(this.name), typeID = utilities.Data.getTypeID(this.`type`))
+
+  def toMetaProperty()(implicit module: String, logger: Logger): MetaProperty = if (this.meta) MetaProperty(id = this.getPropertyID, data = utilities.Data.getAnyData(`type` = this.`type`, value = this.`value`)) else constants.Response.NOT_META_PROPERTY.throwBaseException()
+
+  def toMesaProperty()(implicit module: String, logger: Logger): MesaProperty = if (!this.meta) MesaProperty(id = this.getPropertyID, dataID = utilities.Data.getDataID(`type` = this.`type`, value = this.`value`)) else constants.Response.NOT_MESA_PROPERTY.throwBaseException()
+
 
 }
 
@@ -78,15 +85,17 @@ class NFTProperties @Inject()(
 
     def add(property: NFTProperty): Future[Unit] = create(property)
 
+    def get(nftIDs: Seq[String]): Future[Seq[NFTProperty]] = filter(_.nftId.inSet(nftIDs))
+
     def getForNFT(nftId: String): Future[Seq[NFTProperty]] = filter(_.nftId === nftId)
 
     def deleteByNFTIds(nftIDs: Seq[String]): Future[Int] = filterAndDelete(_.nftId.inSet(nftIDs))
 
     def tryGet(nftId: String, name: String): Future[NFTProperty] = tryGetById1Id2Id3(id1 = nftId, id2 = name, id3 = constants.NFT.Data.STRING)
 
-    def getOnType(`type`: String) = filter(_.`type` === `type`)
+    def getOnType(`type`: String): Future[Seq[NFTProperty]] = filter(_.`type` === `type`)
 
-    def changeDecimalTypeToNumber = customUpdate(NFTProperties.TableQuery.filter(_.`type` === "DECIMAL").map(_.`type`).update(constants.NFT.Data.NUMBER))
+    def changeDecimalTypeToNumber: Future[Int] = customUpdate(NFTProperties.TableQuery.filter(_.`type` === "DECIMAL").map(_.`type`).update(constants.NFT.Data.NUMBER))
 
 
   }

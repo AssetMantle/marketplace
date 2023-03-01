@@ -8,4 +8,5 @@
     @commonInputText(createSecondaryMarketForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden")
     @commonInputMicroNumber(createSecondaryMarketForm, constants.FormField.SECONDARY_MARKET_PRICE)
     @commonInputEpochTIme(createSecondaryMarketForm, constants.FormField.SECONDARY_MARKET_END_EPOCH, setCurrentTime = false)
+    @commonInputPassword(createSecondaryMarketForm, constants.FormField.PASSWORD)
 }

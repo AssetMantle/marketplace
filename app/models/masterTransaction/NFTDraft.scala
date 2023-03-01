@@ -2,7 +2,7 @@ package models.masterTransaction
 
 import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
 import models.common.NFT._
-import models.master.{NFT, NFTOwner, NFTProperty, NFTTag}
+import models.master._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -13,7 +13,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class NFTDraft(id: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[Seq[BaseNFTProperty]], tagNames: Option[Seq[String]], fileExtension: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def toNFT(totalSupply: Int = 1): NFT = NFT(id = id, assetId = None, fileExtension = fileExtension, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), totalSupply = totalSupply, ipfsLink = "", edition = None, isMinted = false)
+  def toNFT(totalSupply: Int = 1, collection: Collection): NFT = {
+    val nft = NFT(id = id, assetId = None, fileExtension = fileExtension, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), totalSupply = totalSupply, ipfsLink = "", edition = None, isMinted = Option(false))
+    nft.copy(assetId = Option(nft.getAssetID(this.getNFTProperties, collection).asString))
+  }
 
   def toNFTOwner(ownerID: String, creatorId: String, quantity: Int = 1): NFTOwner = NFTOwner(nftId = id, ownerId = ownerID, creatorId = creatorId, collectionId = collectionId, quantity = quantity, saleId = None, publicListingId = None, secondaryMarketId = None)
 

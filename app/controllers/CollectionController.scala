@@ -486,17 +486,20 @@ class CollectionController @Inject()(
   def countForCreatorNotForSell(collectionId: String, accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val countNFTs = masterNFTOwners.Service.countForCreatorNotForSell(collectionId = collectionId, creatorId = accountId)
+        val unmintedNFTs = masterNFTs.Service.getUnmintedNFTs(collectionId).map(_.map(_.id))
+
+        def countNFTs(umintedNFTs: Seq[String]) = masterNFTOwners.Service.countForCreatorForPrimarySale(collectionId = collectionId, creatorId = accountId, unmintedNFTs = umintedNFTs)
+
         val collectionAnalysis = collectionsAnalysis.Service.tryGet(collectionId)
 
         def maxSellAllowed(collectionAnalysis: CollectionAnalysis) = if (collectionAnalysis.totalNFTs <= 50) collectionAnalysis.totalNFTs else (collectionAnalysis.totalNFTs / 10)
 
         (for {
-          countNFTs <- countNFTs
+          unmintedNFTs <- unmintedNFTs
+          countNFTs <- countNFTs(unmintedNFTs)
           collectionAnalysis <- collectionAnalysis
         } yield {
-          val maxSellOnLeft = if (countNFTs <= 50) countNFTs else (countNFTs / 10)
-          Ok(maxSellAllowed(collectionAnalysis).min(maxSellOnLeft).toString)
+          Ok(maxSellAllowed(collectionAnalysis).min(countNFTs).toString)
         }
           ).recover {
           case _: BaseException => BadRequest("0")

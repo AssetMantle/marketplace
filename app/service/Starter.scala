@@ -1,12 +1,15 @@
 package service
 
 import models.analytics.CollectionsAnalysis
+import models.blockchainTransaction.DefineAsset
 import models.common.Collection.SocialProfile
 import models.common.{Collection => commonCollection}
 import models.master.Collection
 import models.{blockchainTransaction, master, masterTransaction}
 import play.api.libs.json.{Json, Reads}
 import play.api.{Configuration, Logger}
+import queries.blockchain.{GetABCIInfo, GetAccount}
+import transactions.responses.blockchain.BroadcastTxSyncResponse
 
 import java.io.File
 import javax.inject.{Inject, Singleton}
@@ -17,7 +20,12 @@ import scala.util.Try
 
 @Singleton
 class Starter @Inject()(
+                         broadcastTxSync: transactions.blockchain.BroadcastTxSync,
+                         blockchainTransactionDefineAssets: blockchainTransaction.DefineAssets,
+                         masterTransactionDefineAssetTxs: masterTransaction.DefineAssetTransactions,
                          collectionsAnalysis: CollectionsAnalysis,
+                         getAbciInfo: GetABCIInfo,
+                         getAccount: GetAccount,
                          masterAccounts: master.Accounts,
                          masterKeys: master.Keys,
                          masterCollections: master.Collections,
@@ -135,7 +143,7 @@ class Starter @Inject()(
         try {
           val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = uploadCollection.id, fileName = newFileName)
           utilities.AmazonS3.uploadFile(awsKey, nftImageFile)
-          Await.result(masterNFTs.Service.add(master.NFT(id = fileHash, assetId = None, collectionId = uploadCollection.id, name = nftDetails.name, description = nftDetails.description, totalSupply = 1, isMinted = false, fileExtension = uploadCollection.nftFormat, ipfsLink = "", edition = None)), Duration.Inf)
+          Await.result(masterNFTs.Service.add(master.NFT(id = fileHash, assetId = None, collectionId = uploadCollection.id, name = nftDetails.name, description = nftDetails.description, totalSupply = 1, isMinted = Option(false), fileExtension = uploadCollection.nftFormat, ipfsLink = "", edition = None)), Duration.Inf)
           Await.result(masterNFTOwners.Service.add(master.NFTOwner(nftId = fileHash, ownerId = uploadCollection.creatorId, creatorId = uploadCollection.creatorId, collectionId = uploadCollection.id, quantity = 1, saleId = None, publicListingId = None, secondaryMarketId = None)), Duration.Inf)
           Await.result(masterNFTProperties.Service.addMultiple(nftDetails.properties.map(_.toProperty(fileHash, collection))), Duration.Inf)
           Await.result(collectionsAnalysis.Utility.onNewNFT(uploadCollection.id), Duration.Inf)
@@ -384,33 +392,139 @@ class Starter @Inject()(
     } yield ()
   }
 
-  def defineAssets() = {
+  def defineAssets(): Future[Unit] = {
     val collections = masterCollections.Service.getAllPublic
+    val abciInfo = getAbciInfo.Service.get
+    val bcAccount = getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount(constants.Blockchain.MantlePlaceMaintainerAddress))
 
     def getMessages(collections: Seq[Collection]) = collections.map(collection => {
-      if (collection.properties.isDefined) {
-        val immutableMetas = collection.properties.get.filter(x => x.meta && !x.mutable).map(_.toMetaProperty) ++ constants.Collection.DefaultProperty.MetaProperties
-        val immutables = collection.properties.get.filter(x => !x.meta && !x.mutable).map(_.toMesaProperty)
-        val mutableMetas = collection.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty)
-        val mutables = collection.properties.get.filter(x => !x.meta && x.mutable).map(_.toMesaProperty)
-        utilities.BlockchainTransaction.getAssetDefineMsg(fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, fromID = constants.Blockchain.MantlePlaceFromID, immutableMetas = immutableMetas, immutables = immutables, mutableMetas = mutableMetas, mutables = mutables)
-      } else {
-        utilities.BlockchainTransaction.getAssetDefineMsg(fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, fromID = constants.Blockchain.MantlePlaceFromID, immutableMetas = constants.Collection.DefaultProperty.MetaProperties, immutables = Seq(), mutableMetas = Seq(), mutables = Seq())
-      }
+      utilities.BlockchainTransaction.getDefineAssetMsg(fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, fromID = constants.Blockchain.MantlePlaceFromID, immutableMetas = collection.getImmutableMetaProperties, immutables = collection.getImmutableProperties, mutableMetas = collection.getMutableMetaProperties, mutables = collection.getMutableProperties)
     })
+
+    def checkMempoolAndAddTx(collections: Seq[Collection], bcAccount: models.blockchain.Account, latestBlockHeight: Int) = {
+      val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
+      val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
+        messages = getMessages(collections),
+        fee = utilities.BlockchainTransaction.getFee(gasPrice = 0.001, gasLimit = constants.Blockchain.DefaultDefineAssetGasLimit * collections.length),
+        gasLimit = constants.Blockchain.DefaultDefineAssetGasLimit * collections.size,
+        account = bcAccount,
+        ecKey = constants.Blockchain.MantleNodeMaintainerWallet.getECKey,
+        timeoutHeight = timeoutHeight)
+      val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+
+      def checkAndAdd() = {
+        for {
+          issueIdentity <- blockchainTransactionDefineAssets.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+          _ <- masterTransactionDefineAssetTxs.Service.addWithNoneStatus(txHash = txHash, collectionIds = collections.map(_.id))
+        } yield issueIdentity
+      }
+
+      for {
+        issueIdentity <- checkAndAdd()
+      } yield issueIdentity
+    }
+
+    def broadcastTxAndUpdate(defineAsset: DefineAsset) = {
+
+      println(defineAsset.getTxRawAsHexString)
+      val broadcastTx = broadcastTxSync.Service.get(defineAsset.getTxRawAsHexString)
+
+      def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionDefineAssets.Service.markFailedWithLog(txHashes = Seq(defineAsset.txHash), log = errorResponse.get.error.data)
+      else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionDefineAssets.Service.markFailedWithLog(txHashes = Seq(defineAsset.txHash), log = successResponse.get.result.log)
+      else Future(0)
+
+      for {
+        (successResponse, errorResponse) <- broadcastTx
+        _ <- update(successResponse, errorResponse)
+      } yield ()
+    }
 
     for {
       collections <- collections
+      abciInfo <- abciInfo
+      bcAccount <- bcAccount
+      defineAsset <- checkMempoolAndAddTx(collections, bcAccount, abciInfo.result.response.last_block_height.toInt)
+      _ <- broadcastTxAndUpdate(defineAsset)
     } yield ()
+  }
+
+  def updateAssetIDs(): Future[Unit] = {
+    println("Updating asset id")
+    val collections = masterCollections.Service.fetchAll()
+    val nfts = masterNFTs.Service.fetchAllWithNullAssetID()
+
+    def process(collections: Seq[Collection], nfts: Seq[master.NFT]) = utilitiesOperations.traverse(collections) { collection =>
+      val collectionNFTs = nfts.filter(_.collectionId == collection.id)
+      val nftProperties = masterNFTProperties.Service.get(collectionNFTs.map(_.id))
+
+      def update(nftProperties: Seq[master.NFTProperty]) = utilitiesOperations.traverse(collectionNFTs) { nft =>
+        masterNFTs.Service.updateAssetID(nft.id, nft.getAssetID(nftProperties.filter(_.nftId == nft.id), collection))
+      }
+
+      (for {
+        nftProperties <- nftProperties
+        _ <- update(nftProperties)
+      } yield ()
+        ).recover {
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
+      }
+    }
+
+    for {
+      collections <- collections
+      nfts <- nfts
+      _ <- process(collections, nfts)
+    } yield {
+      println("Update asset id DONE")
+    }
+  }
+
+  def fixAllMultipleActiveKeys(): Unit = {
+    val allActiveKeys = Await.result(masterKeys.Service.fetchAllActive, Duration.Inf)
+    val allAccountIds = allActiveKeys.map(_.accountId).distinct
+    if (allAccountIds.length != allActiveKeys.length) {
+      println("correcting active")
+      val wrongAccountIds = allAccountIds.flatMap(x => if (allActiveKeys.count(_.accountId == x) > 1) Option(x) else None)
+      println(wrongAccountIds)
+      println(wrongAccountIds.length)
+      Await.result(masterKeys.Service.insertOrUpdateMultiple(allActiveKeys.filter(x => wrongAccountIds.contains(x.accountId) && x.encryptedPrivateKey.length == 0).map(_.copy(active = false))), Duration.Inf)
+      val updatedAllActiveKeys = Await.result(masterKeys.Service.fetchAllActive, Duration.Inf)
+      val updatedAllAccountIds = updatedAllActiveKeys.map(_.accountId).distinct
+      val wrongManagedAccountIds = updatedAllAccountIds.flatMap(x => if (updatedAllActiveKeys.count(_.accountId == x) > 1) Option(x) else None)
+      println(wrongManagedAccountIds)
+      println(wrongManagedAccountIds.length)
+      val wrongManagedKeys = updatedAllActiveKeys.filter(x => wrongManagedAccountIds.contains(x.accountId) && x.encryptedPrivateKey.length > 0)
+      wrongManagedAccountIds.foreach(x => {
+        val updateKeys = wrongManagedKeys.filter(_.accountId == x).sortBy(_.createdOnMillisEpoch.getOrElse(0L)).reverse.drop(1)
+        Await.result(masterKeys.Service.insertOrUpdateMultiple(updateKeys.map(_.copy(active = false))), Duration.Inf)
+      })
+      val finalAllActiveKeys = Await.result(masterKeys.Service.fetchAllActive, Duration.Inf)
+      val finalAllAccountIds = finalAllActiveKeys.map(_.accountId).distinct
+      println(finalAllAccountIds.flatMap(x => if (finalAllActiveKeys.count(_.accountId == x) > 1) Option(x) else None))
+      println(finalAllAccountIds.flatMap(x => if (finalAllActiveKeys.count(_.accountId == x) > 1) Option(x) else None).length)
+    } else {
+      println("all correct")
+    }
+  }
+
+  def getTx(): Unit = {
+    val abciInfo = Await.result(getAbciInfo.Service.get, Duration.Inf)
+    val bcAccount = Await.result(getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount(constants.Blockchain.MantlePlaceMaintainerAddress)), Duration.Inf)
+    val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
+      messages = Seq(utilities.BlockchainTransaction.getDefineOrderMsg(fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, fromID = constants.Blockchain.MantlePlaceFromID, immutableMetas = Seq(constants.Orders.OriginMetaProperty), mutableMetas = Seq(), immutables = Seq(), mutables = Seq())),
+      fee = utilities.BlockchainTransaction.getFee(gasPrice = 0.001, gasLimit = constants.Blockchain.DefaultMintAssetGasLimit),
+      gasLimit = constants.Blockchain.DefaultMintAssetGasLimit,
+      account = bcAccount,
+      ecKey = constants.Blockchain.MantleNodeMaintainerWallet.getECKey,
+      timeoutHeight = abciInfo.result.response.last_block_height.toInt + 100)
+    println("0x" + txRawBytes.map("%02x".format(_)).mkString.toUpperCase)
   }
 
   // Delete redundant nft tags
 
   def start(): Future[Unit] = {
     (for {
-      _ <- fixMantleMonkeys()
-      _ <- updateDecimalToNumberType()
-      _ <- validateAll()
+      _ <- defineAssets()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)

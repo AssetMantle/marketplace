@@ -22,7 +22,7 @@
             </div>
         </div>
         @nftDrafts.map { nftDraft =>
-            @commonNFTCard(collection, nftDraft.toNFT(), None, JavaScript(s"getForm(jsRoutes.controllers.NFTController.basicDetailsForm('${nftDraft.collectionId}','${nftDraft.id}'))"), draft = true)
+            @commonNFTCard(collection, nftDraft.toNFT(collection = collection), None, JavaScript(s"getForm(jsRoutes.controllers.NFTController.basicDetailsForm('${nftDraft.collectionId}','${nftDraft.id}'))"), draft = true)
         }
     }
 

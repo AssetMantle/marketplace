@@ -9,6 +9,18 @@ import schema.qualified.Immutables
 
 object Identity {
 
+  private var anyPendingTx = false
+
+  def anyTxInProgress: Boolean = anyPendingTx
+
+  def setTxInProgress(): Unit = {
+    anyPendingTx = true
+  }
+
+  def setTxComplete(): Unit = {
+    anyPendingTx = false
+  }
+
   private val idPropertyID = PropertyID(keyID = StringID("id"), typeID = constants.Data.StringDataTypeID)
   private val originPropertyID = PropertyID(keyID = StringID("origin"), typeID = constants.Data.StringDataTypeID)
   private val twitterPropertyID = PropertyID(keyID = StringID("twitter"), typeID = constants.Data.StringDataTypeID)

@@ -27,16 +27,22 @@ class IndexController @Inject()(
                                  historyMasterSales: history.MasterSales,
                                  historyMasterPublicListings: history.MasterPublicListings,
                                  nftPublicListings: blockchainTransaction.NFTPublicListings,
+                                 defineAssets: blockchainTransaction.DefineAssets,
+                                 mintAssets: blockchainTransaction.MintAssets,
                                  sendCoins: blockchainTransaction.SendCoins,
                                  nftSales: blockchainTransaction.NFTSales,
+                                 makeOrders: blockchainTransaction.MakeOrders,
                                  issueIdentities: blockchainTransaction.IssueIdentities,
                                  masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                  masterAccounts: master.Accounts,
                                  masterKeys: master.Keys,
                                  publicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
                                  issueIdentityTransactions: masterTransaction.IssueIdentityTransactions,
+                                 defineAssetTransactions: masterTransaction.DefineAssetTransactions,
+                                 mintAssetTransactions: masterTransaction.MintAssetTransactions,
                                  saleNFTTransactions: masterTransaction.SaleNFTTransactions,
                                  masterTransactionSessionTokens: masterTransaction.SessionTokens,
+                                 makeOrderTransactions: masterTransaction.MakeOrderTransactions,
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -56,35 +62,14 @@ class IndexController @Inject()(
     }
   }
 
-  def fixAllMultipleActiveKeys() = {
-    val allActiveKeys = Await.result(masterKeys.Service.fetchAllActive, Duration.Inf)
-    val allAccountIds = allActiveKeys.map(_.accountId).distinct
-    if (allAccountIds.length != allActiveKeys.length) {
-      println("correcting active")
-      val wrongAccountIds = allAccountIds.flatMap(x => if (allActiveKeys.count(_.accountId == x) > 1) Option(x) else None)
-      println(wrongAccountIds)
-      println(wrongAccountIds.length)
-      Await.result(masterKeys.Service.insertOrUpdateMultiple(allActiveKeys.filter(x => wrongAccountIds.contains(x.accountId) && x.encryptedPrivateKey.length == 0).map(_.copy(active = false))), Duration.Inf)
-      val updatedAllActiveKeys = Await.result(masterKeys.Service.fetchAllActive, Duration.Inf)
-      val updatedAllAccountIds = updatedAllActiveKeys.map(_.accountId).distinct
-      val wrongManagedAccountIds = updatedAllAccountIds.flatMap(x => if (updatedAllActiveKeys.count(_.accountId == x) > 1) Option(x) else None)
-      println(wrongManagedAccountIds)
-      println(wrongManagedAccountIds.length)
-      val wrongManagedKeys = updatedAllActiveKeys.filter(x => wrongManagedAccountIds.contains(x.accountId) && x.encryptedPrivateKey.length > 0)
-      wrongManagedAccountIds.foreach(x => {
-        val updateKeys = wrongManagedKeys.filter(_.accountId == x).sortBy(_.createdOnMillisEpoch.getOrElse(0L)).reverse.drop(1)
-        Await.result(masterKeys.Service.insertOrUpdateMultiple(updateKeys.map(_.copy(active = false))), Duration.Inf)
-      })
-      val finalAllActiveKeys = Await.result(masterKeys.Service.fetchAllActive, Duration.Inf)
-      val finalAllAccountIds = finalAllActiveKeys.map(_.accountId).distinct
-      println(finalAllAccountIds.flatMap(x => if (finalAllActiveKeys.count(_.accountId == x) > 1) Option(x) else None))
-      println(finalAllAccountIds.flatMap(x => if (finalAllActiveKeys.count(_.accountId == x) > 1) Option(x) else None).length)
-    } else {
-      println("all correct")
-    }
-  }
+  starter.getTx()
 
-  fixAllMultipleActiveKeys()
+  Await.result(starter.fixMantleMonkeys(), Duration.Inf)
+  Await.result(starter.updateDecimalToNumberType(), Duration.Inf)
+  Await.result(starter.updateAssetIDs(), Duration.Inf)
+  starter.fixAllMultipleActiveKeys()
+
+  starter.start()
 
   utilities.Scheduler.startSchedulers(
     historyMasterPublicListings.Utility.scheduler,
@@ -97,10 +82,15 @@ class IndexController @Inject()(
     sendCoins.Utility.scheduler,
     masterTransactionTokenPrices.Utility.scheduler,
     blockchainBlocks.Utility.scheduler,
+    defineAssets.Utility.scheduler,
+    defineAssetTransactions.Utility.scheduler,
     issueIdentities.Utility.scheduler,
-    issueIdentityTransactions.Utility.scheduler
+    issueIdentityTransactions.Utility.scheduler,
+    mintAssets.Utility.scheduler,
+    mintAssetTransactions.Utility.scheduler,
+    makeOrders.Utility.scheduler,
+    makeOrderTransactions.Utility.scheduler
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())
-  starter.start()
 }

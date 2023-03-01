@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
-import models.analytics.CollectionsAnalysis
+import models.analytics.{CollectionAnalysis, CollectionsAnalysis}
 import models.master._
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import org.bitcoinj.core.ECKey
@@ -106,22 +106,24 @@ class PublicListingController @Inject()(
         },
         createData => {
           val collection = masterCollections.Service.tryGet(id = createData.collectionId)
-          val totalNFTs = masterNFTOwners.Service.countOwnedAndCreatedNFTsForCollection(accountId = loginState.username, collectionId = createData.collectionId)
-          val countNFts = masterNFTOwners.Service.countForCreatorNotForSell(collectionId = createData.collectionId, creatorId = loginState.username)
+          val collectionAnalysis = collectionsAnalysis.Service.tryGet(createData.collectionId)
+          val unmintedNFTs = masterNFTs.Service.getUnmintedNFTs(createData.collectionId)
 
-          def addToPublicListing(countNFts: Int, collection: Collection, totalNFTs: Int) = {
-            val maxSellNumber: Int = if (totalNFTs <= 50) totalNFTs else totalNFTs / 10
+          def countNFts(unmintedNFTs: Seq[String]) = masterNFTOwners.Service.countForCreatorForPrimarySale(collectionId = createData.collectionId, creatorId = loginState.username, unmintedNFTs = unmintedNFTs)
+
+          def addToPublicListing(countNFts: Int, collection: Collection, collectionAnalysis: CollectionAnalysis, unmintedNFTs: Seq[NFT]) = {
+            val maxSellNumber: Int = if (collectionAnalysis.totalNFTs <= 50) collectionAnalysis.totalNFTs.toInt else collectionAnalysis.totalNFTs.toInt / 10
             val errors = Seq(
               if (!loginState.isGenesisCreator) Option(constants.Response.NOT_GENESIS_CREATOR) else None,
               if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
               if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
-              if (createData.numberOfNFTs > maxSellNumber) Option(constants.Response.CANNOT_SELL_MORE_THAN_ALLOWED_LIMIT) else None,
+              if (createData.numberOfNFTs > maxSellNumber.min(countNFts)) Option(constants.Response.CANNOT_SELL_MORE_THAN_ALLOWED_LIMIT) else None,
               if (createData.numberOfNFTs > countNFts) Option(constants.Response.NOT_ENOUGH_NFTS_IN_COLLECTION) else None,
             ).flatten
             if (errors.isEmpty) {
               for {
                 publicListingId <- masterPublicListings.Service.add(createData.toNewPublicListing)
-                _ <- masterNFTOwners.Service.publicListRandomNFTs(collectionId = collection.id, nfts = createData.numberOfNFTs, creatorId = loginState.username, publicListingId = publicListingId)
+                _ <- masterNFTOwners.Service.publicListRandomNFTs(collectionId = collection.id, nfts = createData.numberOfNFTs, creatorId = loginState.username, publicListingId = publicListingId, unmintedNFTs = unmintedNFTs.map(_.id))
               } yield ()
             } else errors.head.throwFutureBaseException()
           }
@@ -130,9 +132,10 @@ class PublicListingController @Inject()(
 
           (for {
             collection <- collection
-            countNFts <- countNFts
-            totalNFTs <- totalNFTs
-            _ <- addToPublicListing(countNFts = countNFts, collection = collection, totalNFTs = totalNFTs)
+            collectionAnalysis <- collectionAnalysis
+            unmintedNFTs <- unmintedNFTs
+            countNFts <- countNFts(unmintedNFTs.map(_.id))
+            _ <- addToPublicListing(countNFts = countNFts, collection = collection, collectionAnalysis = collectionAnalysis, unmintedNFTs = unmintedNFTs)
             _ <- sendNotification(collection.name)
             _ <- collectionsAnalysis.Utility.onCreatePublicListing(collection.id, totalListed = createData.numberOfNFTs, listingPrice = createData.price)
           } yield PartialContent(views.html.publicListing.createSuccessful())
@@ -258,7 +261,7 @@ class PublicListingController @Inject()(
               //              if (buyNFTData.mintNFT && (balance - (publicListing.price + constants.Blockchain.AssetPropertyRate * (nftProperties.length + constants.Collection.DefaultProperty.list.length)) <= MicroNumber.zero)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if ((countBuyerNFTsFromPublicListing + buyNFTData.buyNFTs) > publicListing.maxMintPerAccount) Option(constants.Response.MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED) else None,
               //              if (buyNFTData.mintNFT && nft.isMinted) Option(constants.Response.NFT_ALREADY_MINTED) else None,
-              if (nfts.exists(_.isMinted)) Option(constants.Response.NFT_ALREADY_MINTED) else None,
+              if (nfts.exists(_.isMinted.getOrElse(true))) Option(constants.Response.NFT_ALREADY_MINTED) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
             ).flatten

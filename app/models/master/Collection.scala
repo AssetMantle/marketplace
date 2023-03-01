@@ -5,12 +5,35 @@ import models.common.Collection._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
+import schema.id.base.{ClassificationID, IdentityID}
+import schema.list.PropertyList
+import schema.property.base.{MesaProperty, MetaProperty}
+import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, properties: Option[Seq[Property]], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+
+  def getBondAmount: Long = utilities.Collection.getTotalBondAmount(this.getImmutables, this.getMutables, constants.Blockchain.BondRate)
+
+  def getCreatorIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.creatorId)
+
+  def getImmutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && !x.mutable).map(_.toMetaProperty()(Collections.module, Collections.logger)) ++ constants.Collection.DefaultProperty.allImmutableMetaProperties
+
+  def getImmutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && !x.mutable).map(_.toMesaProperty()(Collections.module, Collections.logger)) ++ constants.Collection.DefaultProperty.allImmutableMesaProperties(this.getCreatorIdentityID)
+
+  def getMutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty()(Collections.module, Collections.logger))
+
+  def getMutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && x.mutable).map(_.toMesaProperty()(Collections.module, Collections.logger))
+
+  def getImmutables: Immutables = Immutables(PropertyList(this.getImmutableMetaProperties ++ this.getImmutableProperties))
+
+  def getMutables: Mutables = Mutables(PropertyList(this.getMutableMetaProperties ++ this.getMutableProperties))
+
+  def getClassificationID: ClassificationID = utilities.Collection.getClassificationID(immutables = this.getImmutables, mutables = this.getMutables, bondRate = constants.Blockchain.BondRate)
+
   def serialize(): Collections.CollectionSerialized = Collections.CollectionSerialized(
     id = this.id,
     creatorId = this.creatorId,

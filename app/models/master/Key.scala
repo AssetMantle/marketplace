@@ -6,12 +6,16 @@ import org.bitcoinj.crypto.ChildNumber
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
+import schema.id.base.IdentityID
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 case class Key(accountId: String, address: String, lowercaseId: String, hdPath: Option[Seq[ChildNumber]], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Array[Byte], partialMnemonics: Option[Seq[String]], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], identityIssued: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+
+  def getIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.accountId)
+
   def serialize(): Keys.KeySerialized = Keys.KeySerialized(
     accountId = this.accountId,
     address = this.address,
@@ -351,6 +355,8 @@ class Keys @Inject()(
     def markIdentityIssuePending(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(x => !x.identityIssued && x.verified && x.active && x.accountId.inSet(accountIds)).map(_.identityIssued.?).update(null))
 
     def markIdentityIssued(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(x => x.identityIssued.?.isEmpty && x.verified && x.active && x.accountId.inSet(accountIds)).map(_.identityIssued).update(true))
+
+    def markIdentityFailed(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(x => x.identityIssued.?.isEmpty && x.verified && x.active && x.accountId.inSet(accountIds)).map(_.identityIssued).update(false))
 
   }
 

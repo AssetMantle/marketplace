@@ -18,9 +18,12 @@ object Blockchain {
   val MaximumProperties = 22
   val ChainId: String = CommonConfig.Blockchain.ChainId
   val StakingToken: String = CommonConfig.Blockchain.StakingToken
+  val StakingTokenCoinID: CoinID = CoinID(StringID(StakingToken))
   val DefaultSendCoinGasAmount = 100000
   val DefaultIssueIdentityGasLimit = 120000
   val DefaultMintAssetGasAmount = 500000
+  val DefaultDefineAssetGasLimit = 150000
+  val DefaultMintAssetGasLimit = 150000
   val DefaultNubGasAmount = 100000
   val DefaultGasPrice: BigDecimal = 0
   val TxTimeoutHeight: Int = 100
@@ -39,11 +42,16 @@ object Blockchain {
   val MantlePlaceMaintainerAddress = "mantle19qxy9t064v79wkslptpjxn3nealzhxhdfe3ldd"
   val MantlePlaceIdentityClassificationID: ClassificationID = ClassificationID(utilities.Secrets.base64URLDecode("OXt-qbauoEO41FQzh5oSwcJcCTbxyATh85ufYqevmbs="))
   val MantlePlaceFromID: IdentityID = IdentityID(utilities.Secrets.base64URLDecode("MuFGjnQuCNHHVP7u6HfAJ3tqd3Yc-EpOqT2IT4QetdU="))
+  val MantlePlaceOrderClassificationID: ClassificationID = ClassificationID(utilities.Secrets.base64URLDecode("iFQV9507FNXJv__IqxEIffjf4AxXUScgGIe-HUKQ3ek="))
   val IDSeparator = "."
   val OneDec: BigDecimal = BigDecimal("1.000000000000000000")
   val ZeroDec: BigDecimal = BigDecimal("0.0")
   val SmallestDec: BigDecimal = BigDecimal("0.000000000000000001")
   val SmallestDecReciprocal: BigDecimal = 1 / SmallestDec
+  // TODO BondRate from parameters
+  val BondRate = 1
+
+  val EmptyIdentityID: IdentityID = IdentityID(Array[Byte]())
 
   val Mint: StringID = StringID("mint")
   val Burn: StringID = StringID("burn")

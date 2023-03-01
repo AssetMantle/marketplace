@@ -14,7 +14,7 @@ import slick.jdbc.H2Profile.api._
 import transactions.responses.blockchain.BroadcastTxSyncResponse
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 case class IssueIdentityTransaction(txHash: String, accountId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
@@ -35,7 +35,7 @@ object IssueIdentityTransactions {
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
-    def accountId = column[String]("accountId")
+    def accountId = column[String]("accountId", O.PrimaryKey)
 
     def status = column[Boolean]("status")
 
@@ -59,6 +59,7 @@ object IssueIdentityTransactions {
 class IssueIdentityTransactions @Inject()(
                                            protected val databaseConfigProvider: DatabaseConfigProvider,
                                            blockchainAccounts: blockchain.Accounts,
+                                           blockchainIdentities: blockchain.Identities,
                                            masterAccounts: master.Accounts,
                                            masterKeys: master.Keys,
                                            broadcastTxSync: transactions.blockchain.BroadcastTxSync,
@@ -106,7 +107,7 @@ class IssueIdentityTransactions @Inject()(
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
         val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = accountIdAddress.keys.map(x => utilities.BlockchainTransaction.getMantlePlaceIdentityMsg(id = x, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, toAddress = accountIdAddress.getOrElse(x, ""), classificationID = constants.Blockchain.MantlePlaceIdentityClassificationID, fromID = constants.Blockchain.MantlePlaceFromID)).toSeq,
+          messages = accountIdAddress.keys.map(x => utilities.BlockchainTransaction.getMantlePlaceIssueIdentityMsg(id = x, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, toAddress = accountIdAddress.getOrElse(x, ""), classificationID = constants.Blockchain.MantlePlaceIdentityClassificationID, fromID = constants.Blockchain.MantlePlaceFromID)).toSeq,
           fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultIssueIdentityGasLimit * accountIdAddress.size),
           gasLimit = constants.Blockchain.DefaultIssueIdentityGasLimit * accountIdAddress.size,
           account = bcAccount,
@@ -155,9 +156,19 @@ class IssueIdentityTransactions @Inject()(
       val accountIds = masterKeys.Service.getNotIssuedIdentityAccountIDs
       val anyPendingTx = Service.checkAnyPendingTx
 
-      def filterOutAlreadyIssuedOrInProcess(anyPendingTx: Boolean, ids: Seq[String]) = if (!anyPendingTx) Service.getWithStatusTrueOrPending(ids) else Future(ids)
+      def filterAlreadyIssuedIdentities(accountIDs: Seq[String]) = {
+        val identityIDs = accountIDs.map(x => utilities.Identity.getMantlePlaceIdentityID(x))
+        val existingIdentityIDsString = blockchainIdentities.Service.getIDsAlreadyExists(identityIDs.map(_.asString))
 
-      def getKeys(ids: Seq[String]) = if (ids.nonEmpty) masterKeys.Service.getAllActiveKeys(ids) else Future(Seq())
+        def updateMasterKeys(issuedAccountIDs: Seq[String]) = masterKeys.Service.markIdentityIssued(issuedAccountIDs)
+
+        for {
+          existingIdentityIDsString <- existingIdentityIDsString
+          _ <- updateMasterKeys(accountIDs.filter(x => existingIdentityIDsString.contains(utilities.Identity.getMantlePlaceIdentityID(x).asString)))
+        } yield accountIDs.filterNot(x => existingIdentityIDsString.contains(utilities.Identity.getMantlePlaceIdentityID(x).asString))
+      }
+
+      def getKeys(anyPendingTx: Boolean, ids: Seq[String]) = if (!anyPendingTx && ids.nonEmpty) masterKeys.Service.getAllActiveKeys(ids) else Future(Seq())
 
       def doTx(keys: Seq[Key]) = if (keys.nonEmpty) {
         val tx = transaction(accountIdAddress = keys.map(x => x.accountId -> x.address).toMap, gasPrice = 0.0001, ecKey = constants.Blockchain.MantleNodeMaintainerWallet.getECKey)
@@ -172,9 +183,9 @@ class IssueIdentityTransactions @Inject()(
 
       for {
         accountIds <- accountIds
+        issueIdentities <- filterAlreadyIssuedIdentities(accountIds)
         anyPendingTx <- anyPendingTx
-        alreadyDoneIDs <- filterOutAlreadyIssuedOrInProcess(anyPendingTx, accountIds)
-        keys <- getKeys(accountIds.diff(alreadyDoneIDs))
+        keys <- getKeys(anyPendingTx, issueIdentities)
         txHash <- doTx(keys)
       } yield if (txHash != "") logger.info("ISSUE IDENTITY: " + txHash + " ( " + keys.map(x => x.accountId -> x.address).toMap.toString() + " )")
     }
@@ -188,21 +199,22 @@ class IssueIdentityTransactions @Inject()(
         def onTxComplete(transaction: IssueIdentity) = if (transaction.status.isDefined) {
           if (transaction.status.get) {
             val markSuccess = Service.markSuccess(txHash)
-
-            def updateMasterKeys() = masterKeys.Service.markIdentityIssued(issueIdentityTxs.filter(_.txHash == txHash).map(_.accountId))
+            val updateMasterKeys = masterKeys.Service.markIdentityIssued(issueIdentityTxs.filter(_.txHash == txHash).map(_.accountId))
 
             (for {
               _ <- markSuccess
-              _ <- updateMasterKeys()
+              _ <- updateMasterKeys
             } yield ()
               ).recover {
               case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
             }
           } else {
             val markMasterFailed = Service.markFailed(txHash)
+            val updateMasterKeys = masterKeys.Service.markIdentityFailed(issueIdentityTxs.filter(_.txHash == txHash).map(_.accountId))
 
             (for {
               _ <- markMasterFailed
+              _ <- updateMasterKeys
             } yield ()
               ).recover {
               case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
@@ -225,6 +237,8 @@ class IssueIdentityTransactions @Inject()(
 
     val scheduler: Scheduler = new Scheduler {
       val name: String = IssueIdentityTransactions.module
+
+      override val initialDelay: FiniteDuration = constants.Scheduler.FiveMinutes
 
       def runner(): Unit = {
         val doIssueIdentities = issueIdentities()
