@@ -26,13 +26,16 @@ class IndexController @Inject()(
                                  coordinatedShutdown: CoordinatedShutdown,
                                  historyMasterSales: history.MasterSales,
                                  historyMasterPublicListings: history.MasterPublicListings,
+                                 historyMasterSecondaryMarkets: history.MasterSecondaryMarkets,
                                  nftPublicListings: blockchainTransaction.NFTPublicListings,
                                  defineAssets: blockchainTransaction.DefineAssets,
                                  mintAssets: blockchainTransaction.MintAssets,
                                  sendCoins: blockchainTransaction.SendCoins,
                                  nftSales: blockchainTransaction.NFTSales,
                                  makeOrders: blockchainTransaction.MakeOrders,
+                                 takeOrders: blockchainTransaction.TakeOrders,
                                  issueIdentities: blockchainTransaction.IssueIdentities,
+                                 masterCollections: master.Collections,
                                  masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                  masterAccounts: master.Accounts,
                                  masterKeys: master.Keys,
@@ -43,6 +46,7 @@ class IndexController @Inject()(
                                  saleNFTTransactions: masterTransaction.SaleNFTTransactions,
                                  masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                  makeOrderTransactions: masterTransaction.MakeOrderTransactions,
+                                 takeOrderTransactions: masterTransaction.TakeOrderTransactions,
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -89,7 +93,10 @@ class IndexController @Inject()(
     mintAssets.Utility.scheduler,
     mintAssetTransactions.Utility.scheduler,
     makeOrders.Utility.scheduler,
-    makeOrderTransactions.Utility.scheduler
+    makeOrderTransactions.Utility.scheduler,
+    takeOrders.Utility.scheduler,
+    takeOrderTransactions.Utility.scheduler,
+    historyMasterSecondaryMarkets.Utility.scheduler,
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())

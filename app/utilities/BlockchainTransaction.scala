@@ -6,11 +6,12 @@ import com.cosmos.crypto.secp256k1.PubKey
 import com.cosmos.tx.v1beta1._
 import com.google.protobuf.{ByteString, Any => protoBufAny}
 import com.identities.transactions.issue
-import com.orders.transactions.{define => ordersDefine, make => ordersMake}
+import com.orders.transactions.{define => ordersDefine, make => ordersMake, take => ordersTake}
+import com.splits.transactions.wrap
 import models.common.Coin
 import org.bitcoinj.core.ECKey
 import schema.id.OwnableID
-import schema.id.base.{ClassificationID, IdentityID}
+import schema.id.base.{ClassificationID, IdentityID, OrderID}
 import schema.list.PropertyList
 import schema.property.base.{MesaProperty, MetaProperty}
 import schema.types.Height
@@ -139,24 +140,44 @@ object BlockchainTransaction {
       .build().toByteString)
     .build()
 
-  def getMakeOrderMsg(fromAddress: String, fromID: IdentityID, classificationID: ClassificationID, takerID: IdentityID, makerOwnableID: OwnableID, makerOwnableSplit: BigDecimal, expiryHeight: Long, takerOwnableID: OwnableID, takerOwnableSplit: BigDecimal, immutableMetas: Seq[MetaProperty], immutables: Seq[MesaProperty], mutableMetas: Seq[MetaProperty], mutables: Seq[MesaProperty]): protoBufAny = protoBufAny.newBuilder()
+  def getMakeOrderMsg(fromAddress: String, fromID: IdentityID, classificationID: ClassificationID, takerID: IdentityID, makerOwnableID: OwnableID, makerOwnableSplit: AttoNumber, expiresIn: Long, takerOwnableID: OwnableID, takerOwnableSplit: AttoNumber, immutableMetas: Seq[MetaProperty], immutables: Seq[MesaProperty], mutableMetas: Seq[MetaProperty], mutables: Seq[MesaProperty]): protoBufAny = protoBufAny.newBuilder()
     .setTypeUrl(constants.Blockchain.TransactionMessage.ORDER_MAKE)
     .setValue(ordersMake
       .Message.newBuilder()
       .setFrom(fromAddress)
       .setFromID(fromID.asProtoIdentityID)
       .setClassificationID(classificationID.asProtoClassificationID)
-      .setClassificationID(classificationID.asProtoClassificationID)
       .setTakerID(takerID.asProtoIdentityID)
       .setMakerOwnableID(makerOwnableID.toAnyOwnableID)
       .setTakerOwnableID(takerOwnableID.toAnyOwnableID)
-      .setExpiresIn(Height(expiryHeight).asProtoHeight)
-      .setMakerOwnableSplit(makerOwnableSplit.bigDecimal.toPlainString)
-      .setTakerOwnableSplit(takerOwnableSplit.bigDecimal.toPlainString)
+      .setExpiresIn(Height(expiresIn).asProtoHeight)
+      .setMakerOwnableSplit(makerOwnableSplit.toPlainString)
+      .setTakerOwnableSplit(takerOwnableSplit.toPlainString)
       .setImmutableMetaProperties(PropertyList(immutableMetas).asProtoPropertyList)
       .setImmutableProperties(PropertyList(immutables).asProtoPropertyList)
       .setMutableMetaProperties(PropertyList(mutableMetas).asProtoPropertyList)
       .setMutableProperties(PropertyList(mutables).asProtoPropertyList)
+      .build().toByteString)
+    .build()
+
+  def getWrapTokenMsg(fromAddress: String, fromID: IdentityID, coins: Seq[Coin]): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(constants.Blockchain.TransactionMessage.SPLIT_WRAP)
+    .setValue(wrap
+      .Message.newBuilder()
+      .setFrom(fromAddress)
+      .setFromID(fromID.asProtoIdentityID)
+      .addAllCoins(coins.map(_.toProtoCoin).asJava)
+      .build().toByteString)
+    .build()
+
+  def getTakeOrderMsg(fromAddress: String, fromID: IdentityID, takerOwnableSplit: AttoNumber, orderID: OrderID): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(constants.Blockchain.TransactionMessage.ORDER_TAKE)
+    .setValue(ordersTake
+      .Message.newBuilder()
+      .setFrom(fromAddress)
+      .setFromID(fromID.asProtoIdentityID)
+      .setTakerOwnableSplit(takerOwnableSplit.toPlainString)
+      .setOrderID(orderID.asProtoOrderID)
       .build().toByteString)
     .build()
 

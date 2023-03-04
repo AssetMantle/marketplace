@@ -134,9 +134,14 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SaleController.buySaleNFTForm,
 
         routes.javascript.SecondaryMarketController.viewSecondaryMarket,
-        routes.javascript.SecondaryMarketController.secondaryMarketCollectionsSection,
-        routes.javascript.SecondaryMarketController.secondaryMarketCollectionsPerPage,
+        routes.javascript.SecondaryMarketController.viewCollection,
+        routes.javascript.SecondaryMarketController.collectionNFTs,
+        routes.javascript.SecondaryMarketController.collectionNFTsPerPage,
+        routes.javascript.SecondaryMarketController.collectionTopRightCard,
+        routes.javascript.SecondaryMarketController.collectionsSection,
+        routes.javascript.SecondaryMarketController.collectionsPerPage,
         routes.javascript.SecondaryMarketController.createForm,
+        routes.javascript.SecondaryMarketController.buyForm,
 
         routes.javascript.WhitelistController.whitelistSection,
         routes.javascript.WhitelistController.createdWhitelists,

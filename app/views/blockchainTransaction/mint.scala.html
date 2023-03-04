@@ -7,7 +7,7 @@
 
 @commonForm(constants.Form.MINT, mintForm) {
     @commonInputText(mintForm, constants.FormField.NFT_ID, Symbol("value") -> nftId)
-    @commonInputInt(mintForm, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultMintAssetGasAmount, Symbol("class") -> "hidden")
+    @commonInputInt(mintForm, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultMintAssetGasLimit, Symbol("class") -> "hidden")
     @commonSelectGas(mintForm)
     @commonInputPassword(mintForm, constants.FormField.PASSWORD)
 }

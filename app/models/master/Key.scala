@@ -352,11 +352,11 @@ class Keys @Inject()(
 
     def getNotIssuedIdentityAccountIDs: Future[Seq[String]] = filterAndSortWithPagination(offset = 0, limit = 250)(x => !x.identityIssued && x.verified && x.active)(_.accountId).map(_.map(_.accountId))
 
-    def markIdentityIssuePending(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(x => !x.identityIssued && x.verified && x.active && x.accountId.inSet(accountIds)).map(_.identityIssued.?).update(null))
+    def markIdentityIssuePending(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(x => x.verified && x.active && x.accountId.inSet(accountIds)).map(_.identityIssued.?).update(null))
 
-    def markIdentityIssued(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(x => x.identityIssued.?.isEmpty && x.verified && x.active && x.accountId.inSet(accountIds)).map(_.identityIssued).update(true))
+    def markIdentityIssued(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(x => x.verified && x.active && x.accountId.inSet(accountIds)).map(_.identityIssued).update(true))
 
-    def markIdentityFailed(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(x => x.identityIssued.?.isEmpty && x.verified && x.active && x.accountId.inSet(accountIds)).map(_.identityIssued).update(false))
+    def markIdentityFailed(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(x => x.verified && x.active && x.accountId.inSet(accountIds)).map(_.identityIssued).update(false))
 
   }
 

@@ -16,6 +16,13 @@ function viewCollection(collectionId, status) {
     }
 }
 
+function viewMarketCollection(collectionId) {
+    componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
+    componentResource('centerContent', jsRoutes.controllers.SecondaryMarketController.collectionNFTs(collectionId));
+    componentResource('rightContent', jsRoutes.controllers.SecondaryMarketController.collectionTopRightCard(collectionId));
+    checkAndPushState(jsRoutes.controllers.SecondaryMarketController.viewCollection(collectionId).url, collectionId, "marketCollection");
+}
+
 function viewCollectedCollection(lastPart) {
     let accountId = lastPart.split("/")[0];
     let collectionId = lastPart.split("/")[2];
@@ -64,7 +71,7 @@ function viewWhitelistSaleCollections() {
 }
 
 function viewSecondaryMarketCollections() {
-    componentResource('centerContent', jsRoutes.controllers.SecondaryMarketController.secondaryMarketCollectionsSection());
+    componentResource('centerContent', jsRoutes.controllers.SecondaryMarketController.collectionsSection());
     $('#leftContent').html('');
     $('#rightContent').html('');
 }

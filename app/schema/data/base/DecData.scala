@@ -14,11 +14,11 @@ case class DecData(value: AttoNumber) extends Data {
 
   def zeroValue: Data = DecData(AttoNumber.zero)
 
-  def getBytes: Array[Byte] = this.value.getSortableDecBytes
+  def getBytes: Array[Byte] = this.value.toByteArray
 
   def generateHashID: HashID = if (this.value == AttoNumber.zero) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
 
-  def asProtoDecData: protoDecData = protoDecData.newBuilder().setValue(this.value.toString).build()
+  def asProtoDecData: protoDecData = protoDecData.newBuilder().setValue(this.value.toPlainString).build()
 
   def toAnyData: AnyData = AnyData.newBuilder().setDecData(this.asProtoDecData).build()
 

@@ -106,7 +106,7 @@ class MintAssetTransactions @Inject()(
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount(constants.Blockchain.MantlePlaceMaintainerAddress))
+      val bcAccount = getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount)
       val unconfirmedTxs = getUnconfirmedTxs.Service.get()
       val nfts = masterNFTs.Service.getByIds(nftIDs)
       val nftOwners = masterNFTOwners.Service.getByIds(nftIDs)
@@ -179,7 +179,7 @@ class MintAssetTransactions @Inject()(
         val assetIDs = nfts.map(_.getAssetID.asString)
         val existingAssetIDsString = blockchainAssets.Service.getIDsAlreadyExists(assetIDs)
 
-        def updateMaster(nftIDs: Seq[String]) = masterNFTs.Service.markNFTsMinted(nftIDs)
+        def updateMaster(nftIDs: Seq[String]) = if (nftIDs.nonEmpty) masterNFTs.Service.markNFTsMinted(nftIDs) else Future(0)
 
         for {
           existingAssetIDsString <- existingAssetIDsString

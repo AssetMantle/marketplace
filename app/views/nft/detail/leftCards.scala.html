@@ -1,6 +1,8 @@
 @(nftId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div id="nftInfo"></div>
+<div id="collectionInfo"></div>
 <script>
         componentResource('nftInfo', jsRoutes.controllers.NFTController.info('@nftId'));
+        componentResource('collectionInfo', jsRoutes.controllers.NFTController.collectionInfo('@nftId'));
 </script>

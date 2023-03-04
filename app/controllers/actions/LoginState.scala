@@ -10,7 +10,6 @@ case class LoginState(username: String, address: String, accountType: String) {
 
   def isUser: Boolean = this.accountType == constants.Account.Type.USER
 
-  // TODO
-  def getIdentityId: String = ""
+  def getIdentityId: String = utilities.Identity.getMantlePlaceIdentityID(this.username).asString
 
 }

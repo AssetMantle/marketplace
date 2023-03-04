@@ -5,7 +5,6 @@ import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.id.base.IdentityID
 import slick.jdbc.H2Profile.api._
-import utilities.AttoNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,7 +19,7 @@ case class NFTOwner(nftId: String, ownerId: String, creatorId: String, collectio
 
   def getOwnerIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.ownerId)
 
-  def getSplitValue: AttoNumber = AttoNumber(this.quantity * constants.Blockchain.SmallestDec)
+  //  def getSplitValue: AttoNumber = AttoNumber(this.quantity * constants.Blockchain.SmallestDec)
 }
 
 object NFTOwners {
@@ -153,9 +152,33 @@ class NFTOwners @Inject()(
       } yield ()
     }
 
+    def onSuccessfulTakeOrder(secondaryMarketId: String, totalSold: Int, buyerAccountId: String): Future[NFTOwner] = {
+      val oldNFTOwner = Service.tryGetBySecondaryMarketId(secondaryMarketId)
+
+      def verifyAndUpdate(oldNFTOwner: NFTOwner) = {
+        if (oldNFTOwner.quantity == 1) {
+          for {
+            _ <- delete(nftId = oldNFTOwner.nftId, ownerId = oldNFTOwner.ownerId)
+            _ <- create(oldNFTOwner.copy(secondaryMarketId = None, ownerId = buyerAccountId))
+          } yield ()
+        } else
+          for {
+            _ <- update(oldNFTOwner.copy(quantity = oldNFTOwner.quantity - totalSold))
+            _ <- create(oldNFTOwner.copy(secondaryMarketId = None, quantity = totalSold, ownerId = buyerAccountId))
+          } yield ()
+      }
+
+      for {
+        oldNFTOwner <- oldNFTOwner
+        _ <- verifyAndUpdate(oldNFTOwner)
+      } yield oldNFTOwner
+    }
+
     def getSaleId(nftId: String): Future[Option[String]] = filterHead(_.nftId === nftId).map(_.saleId)
 
     def tryGet(nftId: String, ownerId: String): Future[NFTOwner] = tryGetById1AndId2(id1 = nftId, id2 = ownerId)
+
+    def get(nftId: String, ownerId: String): Future[Option[NFTOwner]] = getById(id1 = nftId, id2 = ownerId)
 
     def getOwners(nftId: String): Future[Seq[NFTOwner]] = filter(_.id1 === nftId)
 
@@ -176,11 +199,11 @@ class NFTOwners @Inject()(
       customUpdate(NFTOwners.TableQuery.filter(_.secondaryMarketId === secondaryMarketId).map(_.secondaryMarketId.?).update(nullString))
     }
 
+    def tryGetBySecondaryMarketId(secondaryMarketId: String): Future[NFTOwner] = filterHead(_.secondaryMarketId === secondaryMarketId)
+
     def countOwnedNFTs(accountId: String): Future[Int] = filterAndCount(x => x.ownerId === accountId && x.creatorId =!= accountId)
 
     def countCollectionOwnedNFTs(accountId: String, collectionID: String): Future[Int] = filterAndCount(x => x.ownerId === accountId && x.creatorId =!= accountId && x.collectionId === collectionID)
-
-    def countOwnedAndCreatedNFTsForCollection(accountId: String, collectionId: String): Future[Int] = filterAndCount(x => x.ownerId === accountId && x.creatorId === accountId && x.collectionId === collectionId)
 
     def getRandomNFTsBySaleId(saleId: String, take: Int, creatorId: String): Future[Seq[NFTOwner]] = filter(x => x.saleId === saleId && x.ownerId === creatorId && x.creatorId === creatorId).map(x => util.Random.shuffle(x).take(take))
 
@@ -190,11 +213,17 @@ class NFTOwners @Inject()(
 
     def getCollectedCollection(accountId: String): Future[Seq[String]] = filter(x => x.ownerId === accountId && x.creatorId =!= accountId).map(_.map(_.collectionId).distinct)
 
-    def getByCollectionAndPageNumber(accountId: String, collectionId: String, pageNumber: Int, perPage: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * perPage, limit = perPage)(x => x.ownerId === accountId && x.creatorId =!= accountId && x.collectionId === collectionId)(_.updatedOnMillisEpoch).map(_.map(_.nftId))
+    def getByCollectionAndPageNumber(accountId: String, collectionId: String, pageNumber: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(x => x.ownerId === accountId && x.creatorId =!= accountId && x.collectionId === collectionId)(_.updatedOnMillisEpoch).map(_.map(_.nftId))
 
     def getSoldNFTs(collectionIDs: Seq[String]): Future[Seq[String]] = filter(x => x.ownerId =!= x.creatorId && x.collectionId.inSet(collectionIDs)).map(_.map(_.nftId))
 
     def getByIds(nftIDs: Seq[String]): Future[Seq[NFTOwner]] = filter(_.nftId.inSet(nftIDs))
+
+    def getByMarketIDs(collectionId: String, pageNumber: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(x => x.collectionId === collectionId && x.secondaryMarketId.?.isDefined)(_.updatedOnMillisEpoch).map(_.map(_.nftId))
+
+    def countOwners(nftId: String): Future[Int] = filterAndCount(_.nftId === nftId)
+
+    def getByNFTID(nftId: String): Future[NFTOwner] = filterHead(_.nftId === nftId)
 
     def tryGetByNFTAndSaleId(nftId: String, saleId: String): Future[NFTOwner] = filterHead(x => x.saleId === saleId && x.nftId === nftId)
     //    https://scala-slick.org/doc/3.1.1/sql-to-slick.html#id21

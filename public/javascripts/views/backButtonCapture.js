@@ -37,6 +37,9 @@ window.addEventListener('popstate', e => {
         case "secondaryMarket":
             viewSecondaryMarketCollections();
             break;
+        case "marketCollection":
+            viewMarketCollection(lastPart);
+            break;
         case "index":
             window.location = "/";
             break;

@@ -74,6 +74,7 @@ object FormField {
   val SALE_ID: StringFormField = StringFormField("SALE_ID", 16, 16)
   val PUBLIC_LISTING_ID: StringFormField = StringFormField("PUBLIC_LISTING_ID", 16, 16)
   val NOTIFICATION_ID: StringFormField = StringFormField("NOTIFICATION_ID", 16, 16)
+  val SECONDARY_MARKET_ID: StringFormField = StringFormField("SECONDARY_MARKET_ID", 16, 16)
 
   // UrlFormField
   val COLLECTION_WEBSITE: UrlFormField = UrlFormField("COLLECTION_WEBSITE")
@@ -87,7 +88,7 @@ object FormField {
   val PUBLIC_LISTING_MAX_MINT_PER_ACCOUNT: IntFormField = IntFormField("SALE_MAX_MINT_PER_ACCOUNT", 1, 100000)
   val SALE_BUY_NFT_NUMBER: IntFormField = IntFormField("SALE_BUY_NFT_NUMBER", 1, 100000)
   val PUBLIC_LISTING_BUY_NFT_NUMBER: IntFormField = IntFormField("PUBLIC_LISTING_BUY_NFT_NUMBER", 1, 100000)
-  val SECONDARY_MARKET_SELL_NFT_NUMBER: IntFormField = IntFormField("SECONDARY_MARKET_SELL_NFT_NUMBER", 1, 1000)
+  val SECONDARY_MARKET_END_HOURS: IntFormField = IntFormField("SECONDARY_MARKET_END_HOURS", 1, 72)
 
   // DoubleFormField
   val GAS_PRICE: BigDecimalFormField = BigDecimalFormField("GAS_PRICE", constants.Blockchain.LowGasPrice, constants.Blockchain.HighGasPrice)
@@ -99,7 +100,6 @@ object FormField {
   val NFT_SALE_END_EPOCH: EpochFormField = EpochFormField("NFT_SALE_END_EPOCH", 1, Int.MaxValue)
   val PUBLIC_LISTING_START_EPOCH: EpochFormField = EpochFormField("PUBLIC_LISTING_START_EPOCH", 1, Int.MaxValue)
   val PUBLIC_LISTING_END_EPOCH: EpochFormField = EpochFormField("PUBLIC_LISTING_END_EPOCH", 1, Int.MaxValue)
-  val SECONDARY_MARKET_END_EPOCH: EpochFormField = EpochFormField("SECONDARY_MARKET_END_EPOCH", 1, Int.MaxValue)
 
   // BooleanFormField
   val RECEIVE_NOTIFICATIONS: BooleanFormField = BooleanFormField("RECEIVE_NOTIFICATIONS")

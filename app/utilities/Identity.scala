@@ -40,7 +40,7 @@ object Identity {
 
   def getExtraMesaProperty(value: String): Property = MesaProperty(extraPropertyID, StringData(value).getID)
 
-  def getBondAmountMetaProperty: Property = MetaProperty(constants.Blockchain.BondAmountProperty.id, NumberData(2560L).toAnyData)
+  val getBondAmountMetaProperty: Property = MetaProperty(constants.Blockchain.BondAmountProperty.id, NumberData(2560L).toAnyData)
 
   def getMantlePlaceIdentityID(id: String): IdentityID = {
     val immutables = Immutables(PropertyList(Seq(getOriginMetaProperty, getBondAmountMetaProperty, getIDMetaProperty(id), getExtraMesaProperty(""))))

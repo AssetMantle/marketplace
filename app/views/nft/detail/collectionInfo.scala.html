@@ -4,7 +4,7 @@
 @import models.master.NFTOwner
 @import views.html.base.buttons.commonPrimaryButton
 
-@(nft: master.NFT, collection: Collection, nftOwner: NFTOwner, numberOfOwners: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(nft: master.NFT, collection: Collection, nftOwner: Option[NFTOwner], numberOfOwners: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
         <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_COLLECTION_TITLE)</div>
@@ -28,18 +28,20 @@
         </div>
         <div class="separator"></div>
         <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_OWNER_TITLE)</div>
-        <div class="d-flex gap-2 align-items-center badgeImageText" onclick="viewProfile('@nftOwner.ownerId/@constants.View.COLLECTED')">
-            <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
-            <div class="badgeText">
-                @if(numberOfOwners == 1) {
-                    @commonStringValue(message = nftOwner.ownerId, id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
-                } else {
-                    @commonStringValue(message = s"${numberOfOwners.toString} owners", id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
-                }
+        @if(numberOfOwners == 1) {
+            <div class="d-flex gap-2 align-items-center badgeImageText" onclick="viewProfile('@nftOwner.fold("")(_.ownerId)/@constants.View.COLLECTED')">
+                <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
+                <div class="badgeText">
+                    @commonStringValue(message = nftOwner.fold("")(_.ownerId), id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
+                </div>
             </div>
-        </div>
-        @if(loginState.isDefined && loginState.get.username == nftOwner.ownerId && nftOwner.creatorId != loginState.get.username && nftOwner.creatorId != "Mint.E") {
-            @commonPrimaryButton(Messages(constants.View.LIST_NFT), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.createForm('${nft.id}'))"))
+        } else {
+            <div class="d-flex gap-2 align-items-center badgeImageText">
+                <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
+                <div class="badgeText">
+                @commonStringValue(message = s"${numberOfOwners.toString} owners", id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
+                </div>
+            </div>
         }
     </div>
 </div>

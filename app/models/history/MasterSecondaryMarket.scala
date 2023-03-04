@@ -14,15 +14,18 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class MasterSecondaryMarket(id: String, orderId: Option[String], collectionId: String, price: MicroNumber, denom: String, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends HistoryLogging {
+case class MasterSecondaryMarket(id: String, orderId: Option[String], nftId: String, collectionId: String, sellerId: String, quantity: Int, price: MicroNumber, denom: String, endHours: Int, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends HistoryLogging {
 
   def serialize(): MasterSecondaryMarkets.MasterSecondaryMarketSerialized = MasterSecondaryMarkets.MasterSecondaryMarketSerialized(
     id = this.id,
     orderId = this.orderId,
+    nftId = this.nftId,
     collectionId = this.collectionId,
+    sellerId = this.sellerId,
+    quantity = this.quantity,
     price = this.price.toBigDecimal,
     denom = this.denom,
-    endTimeEpoch = this.endTimeEpoch,
+    endHours = this.endHours,
     createdBy = this.createdBy,
     createdOnMillisEpoch = this.createdOnMillisEpoch,
     updatedBy = this.updatedBy,
@@ -38,26 +41,32 @@ object MasterSecondaryMarkets {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class MasterSecondaryMarketSerialized(id: String, orderId: Option[String], collectionId: String, price: BigDecimal, denom: String, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
+  case class MasterSecondaryMarketSerialized(id: String, orderId: Option[String], nftId: String, collectionId: String, sellerId: String, quantity: Int, price: BigDecimal, denom: String, endHours: Int, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
-    def deserialize: MasterSecondaryMarket = MasterSecondaryMarket(id = id, orderId = orderId, collectionId = collectionId, price = MicroNumber(price), denom = denom, endTimeEpoch = endTimeEpoch, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch, deletedBy = this.deletedBy, deletedOnMillisEpoch = this.deletedOnMillisEpoch)
+    def deserialize: MasterSecondaryMarket = MasterSecondaryMarket(id = id, orderId = orderId, nftId = nftId, collectionId = collectionId, sellerId = sellerId, quantity = this.quantity, price = MicroNumber(price), denom = denom, endHours = endHours, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch, deletedBy = this.deletedBy, deletedOnMillisEpoch = this.deletedOnMillisEpoch)
   }
 
   class MasterSecondaryMarketTable(tag: Tag) extends Table[MasterSecondaryMarketSerialized](tag, "MasterSecondaryMarket") with ModelTable[String] {
 
-    def * = (id, orderId.?, collectionId, price, denom, endTimeEpoch, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?, deletedBy.?, deletedOnMillisEpoch.?) <> (MasterSecondaryMarketSerialized.tupled, MasterSecondaryMarketSerialized.unapply)
+    def * = (id, orderId.?, nftId, collectionId, sellerId, quantity, price, denom, endHours, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?, deletedBy.?, deletedOnMillisEpoch.?) <> (MasterSecondaryMarketSerialized.tupled, MasterSecondaryMarketSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def orderId = column[String]("orderId")
 
+    def nftId = column[String]("nftId")
+
     def collectionId = column[String]("collectionId")
+
+    def sellerId = column[String]("sellerId")
+
+    def quantity = column[Int]("quantity")
 
     def price = column[BigDecimal]("price")
 
     def denom = column[String]("denom")
 
-    def endTimeEpoch = column[Long]("endTimeEpoch")
+    def endHours = column[Int]("endHours")
 
     def createdBy = column[String]("createdBy")
 
@@ -82,6 +91,7 @@ class MasterSecondaryMarkets @Inject()(
                                         masterNFTOwners: master.NFTOwners,
                                         collectionsAnalysis: CollectionsAnalysis,
                                         masterTransactionMakeOrderTransactions: masterTransaction.MakeOrderTransactions,
+                                        masterTransactionTakeOrderTransactions: masterTransaction.TakeOrderTransactions,
                                         protected val databaseConfigProvider: DatabaseConfigProvider
                                       )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[MasterSecondaryMarkets.MasterSecondaryMarketTable, MasterSecondaryMarkets.MasterSecondaryMarketSerialized, String](
@@ -112,10 +122,11 @@ class MasterSecondaryMarkets @Inject()(
       def runner(): Unit = {
         val deleteSecondaryMarket = masterSecondaryMarkets.Service.getForDeletion
 
-        // TODO check txWithPendingStatus with takeOrder tx also
-        def txWithPendingStatus(ids: Seq[String]) = masterTransactionMakeOrderTransactions.Service.checkAnyPendingTx(ids)
+        def makeOrderTxWithPendingStatus(ids: Seq[String]) = masterTransactionMakeOrderTransactions.Service.checkAnyPendingTx(ids)
 
-        def deleteExpiredSecondaryMarkets(deleteSecondaryMarkets: Seq[master.SecondaryMarket]) = utilitiesOperations.traverse(deleteSecondaryMarkets) { sale =>
+        def takeOrderTxWithPendingStatus(ids: Seq[String]) = masterTransactionTakeOrderTransactions.Service.checkAnyPendingTx(ids)
+
+        def deleteExpiredSecondaryMarkets(txWithPendingStatus: Seq[String], unfilteredDeleteSecondaryMarkets: Seq[master.SecondaryMarket]) = utilitiesOperations.traverse(unfilteredDeleteSecondaryMarkets.filterNot(x => txWithPendingStatus.contains(x.id))) { sale =>
           val addToHistory = Service.insertOrUpdate(sale.toHistory)
 
           def markSecondaryMarketNull = masterNFTOwners.Service.markSecondaryMarketNull(sale.id)
@@ -132,8 +143,9 @@ class MasterSecondaryMarkets @Inject()(
 
         val forComplete = (for {
           deleteSecondaryMarket <- deleteSecondaryMarket
-          txWithPendingStatus <- txWithPendingStatus(deleteSecondaryMarket.map(_.id))
-          _ <- deleteExpiredSecondaryMarkets(deleteSecondaryMarket.filterNot(x => txWithPendingStatus.contains(x.id)))
+          makeOrderTxWithPendingStatus <- makeOrderTxWithPendingStatus(deleteSecondaryMarket.map(_.id))
+          takeOrderTxWithPendingStatus <- takeOrderTxWithPendingStatus(deleteSecondaryMarket.map(_.id))
+          _ <- deleteExpiredSecondaryMarkets(makeOrderTxWithPendingStatus ++ takeOrderTxWithPendingStatus, deleteSecondaryMarket)
         } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.failure.logMessage)
         }

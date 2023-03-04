@@ -10,13 +10,13 @@ object CreateSecondaryMarket {
     mapping(
       constants.FormField.NFT_ID.mapping,
       constants.FormField.SECONDARY_MARKET_PRICE.mapping,
-      constants.FormField.SECONDARY_MARKET_END_EPOCH.mapping,
+      constants.FormField.SECONDARY_MARKET_END_HOURS.mapping,
       constants.FormField.PASSWORD.mapping,
-    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.createSecondaryMarket))
+    )(Data.apply)(Data.unapply))
 
-  case class Data(nftId: String, price: MicroNumber, endEpoch: Int, password: String) {
+  case class Data(nftId: String, price: MicroNumber, endHours: Int, password: String) {
 
-    def toNewSecondaryMarket(collectionId: String): SecondaryMarket = SecondaryMarket(id = utilities.IdGenerator.getRandomHexadecimal, orderId = None, collectionId = collectionId, price = this.price, denom = constants.Blockchain.StakingToken, endTimeEpoch = this.endEpoch)
+    def toNewSecondaryMarket(collectionId: String, sellerId: String, quantity: Int): SecondaryMarket = SecondaryMarket(id = utilities.IdGenerator.getRandomHexadecimal, orderId = None, nftId = this.nftId, collectionId = collectionId, sellerId = sellerId, price = this.price, quantity = quantity, denom = constants.Blockchain.StakingToken, endHours = this.endHours, delete = false)
 
   }
 }

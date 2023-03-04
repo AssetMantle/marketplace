@@ -52,6 +52,9 @@ object Notification {
   val NFT_MINT_FAILED: Notification = Notification("NFT_MINT_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
 
   val SECONDARY_MARKET_CREATION: Notification = Notification("SECONDARY_MARKET_CREATION", sendEmail = false, sendPushNotification = true, sendSMS = false, route = null) //Option(routes.javascript.SecondaryMarketController.viewSecondaryMarket))
+  val SELLER_TAKE_ORDER_SUCCESSFUL: Notification = Notification("SELLER_TAKE_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
+  val BUYER_TAKE_ORDER_SUCCESSFUL: Notification = Notification("BUYER_TAKE_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ProfileController.viewProfile))
+  val BUYER_TAKE_ORDER_FAILED: Notification = Notification("BUYER_TAKE_ORDER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
 
   val IDENTITY_ISSUED: Notification = Notification("IDENTITY_ISSUED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = null) //Option(routes.javascript.SecondaryMarketController.viewSecondaryMarket))
   val IDENTITY_ISSUE_FAILED: Notification = Notification("IDENTITY_ISSUE_FAILED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = null) //Option(routes.javascript.SecondaryMarketController.viewSecondaryMarket))

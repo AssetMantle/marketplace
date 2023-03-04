@@ -3,7 +3,7 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
-import models.master.Collection
+import models.master.{Collection, NFTOwner}
 import models.masterTransaction.NFTDraft
 import models.{master, masterTransaction}
 import play.api.Logger
@@ -37,6 +37,8 @@ class NFTController @Inject()(
                                masterWishLists: master.WishLists,
                                masterWhitelists: master.Whitelists,
                                masterWhitelistMembers: master.WhitelistMembers,
+                               masterSecondaryMarkets: master.SecondaryMarkets,
+                               masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                utilitiesNotification: utilities.Notification,
                                masterTransactionSaleNFTTransactions: masterTransaction.SaleNFTTransactions,
                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -107,7 +109,30 @@ class NFTController @Inject()(
   def detailViewRightCards(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.nft.detail.rightCards(nftId)))
+        val lowestPriceSecondaryMarket = masterSecondaryMarkets.Service.getByNFTIdAndLowestPrice(nftId)
+        val userSecondaryMarket = if (loginState.isDefined) {
+          masterSecondaryMarkets.Service.getByNFTIdAndSellerId(nftId = nftId, sellerId = loginState.get.username)
+        } else Future(None)
+        val nft = masterNFTs.Service.tryGet(nftId)
+        val nftOwner: Future[Option[NFTOwner]] = if (loginState.isDefined) {
+          masterNFTOwners.Service.get(nftId = nftId, ownerId = loginState.get.username)
+        } else Future(None)
+
+        def collection(collectionId: String) = masterCollections.Service.tryGet(collectionId)
+
+        def collectionAnalysis(collectionId: String) = collectionsAnalysis.Service.tryGet(collectionId)
+
+        (for {
+          nft <- nft
+          lowestPriceSecondaryMarket <- lowestPriceSecondaryMarket
+          userSecondaryMarket <- userSecondaryMarket
+          nftOwner <- nftOwner
+          collection <- collection(nft.collectionId)
+          collectionAnalysis <- collectionAnalysis(nft.collectionId)
+        } yield Ok(views.html.nft.detail.rightCards(collection, collectionAnalysis, nft, userNFTOwner = nftOwner, lowestPriceSecondaryMarket = lowestPriceSecondaryMarket, userSecondaryMarket = userSecondaryMarket, tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
     }
   }
 
@@ -115,15 +140,20 @@ class NFTController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val nft = masterNFTs.Service.tryGet(nftId)
-        val nftOwners = masterNFTOwners.Service.getOwners(nftId = nftId)
+        val countOwners = masterNFTOwners.Service.countOwners(nftId)
+
+        def nftOwner(countOwners: Int): Future[Option[NFTOwner]] = if (countOwners == 1) {
+          masterNFTOwners.Service.getByNFTID(nftId = nftId).map(Option(_))
+        } else Future(None)
 
         def collection(collectionId: String) = masterCollections.Service.tryGet(collectionId)
 
         (for {
           nft <- nft
-          nftOwners <- nftOwners
+          countOwners <- countOwners
+          nftOwner <- nftOwner(countOwners)
           collection <- collection(nft.collectionId)
-        } yield Ok(views.html.nft.detail.collectionInfo(nft, collection, nftOwners.head, nftOwners.length))
+        } yield Ok(views.html.nft.detail.collectionInfo(nft, collection, nftOwner, countOwners))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

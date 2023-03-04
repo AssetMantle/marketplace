@@ -1,5 +1,5 @@
 MANTLE_PLACE=MantlePlace
-APP_VERSION=v0.1.10-alpha
+APP_VERSION=v0.1.11-alpha
 NFT_MARKET=NFT Market
 MARKET=Market
 HOME=Home
@@ -899,3 +899,9 @@ MOU_16=A statement under penalty of perjury that you are authorized to act on be
 MOU_17=Please note that we will forward your notice of intellectual property infringement, including your contact information, to the party who will have their content removed so they understand why it is no longer available on our platform and can also contact you to resolve any dispute.
 FUND_WALLET_MENU=Fund Wallet
 SEND_MNTL_MENU=Send $MNTL
+BUYER_TAKE_ORDER_FAILED=Failed to buy!
+NOTIFICATION.BUYER_TAKE_ORDER_FAILED.MESSAGE=Tx failed to buy NFT {0}
+BUYER_TAKE_ORDER_SUCCESSFUL=NFT bought!
+NOTIFICATION.BUYER_TAKE_ORDER_SUCCESSFUL.MESSAGE=Successfully bought {0}
+SELLER_TAKE_ORDER_SUCCESSFUL=NFT Sold!
+NOTIFICATION.SELLER_TAKE_ORDER_SUCCESSFUL.MESSAGE=Successfully sold {0}

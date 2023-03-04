@@ -395,7 +395,7 @@ class Starter @Inject()(
   def defineAssets(): Future[Unit] = {
     val collections = masterCollections.Service.getAllPublic
     val abciInfo = getAbciInfo.Service.get
-    val bcAccount = getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount(constants.Blockchain.MantlePlaceMaintainerAddress))
+    val bcAccount = getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount)
 
     def getMessages(collections: Seq[Collection]) = collections.map(collection => {
       utilities.BlockchainTransaction.getDefineAssetMsg(fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, fromID = constants.Blockchain.MantlePlaceFromID, immutableMetas = collection.getImmutableMetaProperties, immutables = collection.getImmutableProperties, mutableMetas = collection.getMutableMetaProperties, mutables = collection.getMutableProperties)
@@ -509,7 +509,7 @@ class Starter @Inject()(
 
   def getTx(): Unit = {
     val abciInfo = Await.result(getAbciInfo.Service.get, Duration.Inf)
-    val bcAccount = Await.result(getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount(constants.Blockchain.MantlePlaceMaintainerAddress)), Duration.Inf)
+    val bcAccount = Await.result(getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount), Duration.Inf)
     val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
       messages = Seq(utilities.BlockchainTransaction.getDefineOrderMsg(fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, fromID = constants.Blockchain.MantlePlaceFromID, immutableMetas = Seq(constants.Orders.OriginMetaProperty), mutableMetas = Seq(), immutables = Seq(), mutables = Seq())),
       fee = utilities.BlockchainTransaction.getFee(gasPrice = 0.001, gasLimit = constants.Blockchain.DefaultMintAssetGasLimit),

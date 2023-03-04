@@ -183,10 +183,16 @@ GET         /buySaleNFT                                        controllers.SaleC
 POST        /buySaleNFT                                        controllers.SaleController.buySaleNFT()
 
 GET         /market                                            controllers.SecondaryMarketController.viewSecondaryMarket()
-GET         /secondaryMarketCollectionsSection                 controllers.SecondaryMarketController.secondaryMarketCollectionsSection()
-GET         /secondaryMarketCollectionsPerPage                 controllers.SecondaryMarketController.secondaryMarketCollectionsPerPage(pageNumber:Int)
+GET         /secondaryMarketCollectionsSection                 controllers.SecondaryMarketController.collectionsSection()
+GET         /secondaryMarketCollectionsPerPage                 controllers.SecondaryMarketController.collectionsPerPage(pageNumber:Int)
+GET         /market/:id                                        controllers.SecondaryMarketController.viewCollection(id: String)
+GET         /marketCollectionNFTs                              controllers.SecondaryMarketController.collectionNFTs(id: String)
+GET         /marketCollectionNFTsPerPage                       controllers.SecondaryMarketController.collectionNFTsPerPage(id: String, pageNumber: Int)
+GET         /marketCollectionRightCards                        controllers.SecondaryMarketController.collectionTopRightCard(id: String)
 GET         /createSecondaryMarket                             controllers.SecondaryMarketController.createForm(nftId: String)
 POST        /createSecondaryMarket                             controllers.SecondaryMarketController.create()
+GET         /buySecondaryMarket                                controllers.SecondaryMarketController.buyForm(nftId: String, secondaryMarketId: String)
+POST        /buySecondaryMarket                                controllers.SecondaryMarketController.buy()
 
 # Should be not changed it will be public
 GET         /acceptWhitelistInvite/:whitelistId                controllers.WhitelistController.viewAcceptInviteDetails(whitelistId: String)

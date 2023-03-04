@@ -82,7 +82,7 @@ class CollectedController @Inject()(
       implicit request =>
         val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
         else masterCollections.Service.tryGet(collectionId)
-        val nftIds = masterNFTOwners.Service.getByCollectionAndPageNumber(accountId = accountId, collectionId = collectionId, pageNumber = pageNumber, perPage = constants.CommonConfig.Pagination.NFTsPerPage)
+        val nftIds = masterNFTOwners.Service.getByCollectionAndPageNumber(accountId = accountId, collectionId = collectionId, pageNumber = pageNumber)
 
         def getNFTs(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds)
 

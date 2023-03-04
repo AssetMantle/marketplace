@@ -21,10 +21,10 @@ object Blockchain {
   val StakingTokenCoinID: CoinID = CoinID(StringID(StakingToken))
   val DefaultSendCoinGasAmount = 100000
   val DefaultIssueIdentityGasLimit = 120000
-  val DefaultMintAssetGasAmount = 500000
   val DefaultDefineAssetGasLimit = 150000
   val DefaultMintAssetGasLimit = 150000
-  val DefaultNubGasAmount = 100000
+  val DefaultMakeOrderGasLimit = 150000
+  val DefaultTakeOrderGasLimit = 150000
   val DefaultGasPrice: BigDecimal = 0
   val TxTimeoutHeight: Int = 100
   val DefaultHDPath: Seq[ChildNumber] = Seq(
@@ -50,6 +50,7 @@ object Blockchain {
   val SmallestDecReciprocal: BigDecimal = 1 / SmallestDec
   // TODO BondRate from parameters
   val BondRate = 1
+  val MaxOrderExpiry: Int = (43210 * 6) / 6
 
   val EmptyIdentityID: IdentityID = IdentityID(Array[Byte]())
 

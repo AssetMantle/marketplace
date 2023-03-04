@@ -129,7 +129,7 @@ class SendCoins @Inject()(
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount(fromAddress))
+      val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount)
       val unconfirmedTxs = getUnconfirmedTxs.Service.get()
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {

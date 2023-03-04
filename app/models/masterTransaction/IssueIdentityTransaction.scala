@@ -14,7 +14,7 @@ import slick.jdbc.H2Profile.api._
 import transactions.responses.blockchain.BroadcastTxSyncResponse
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.{Duration, FiniteDuration}
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 case class IssueIdentityTransaction(txHash: String, accountId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
@@ -101,13 +101,18 @@ class IssueIdentityTransactions @Inject()(
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount(constants.Blockchain.MantlePlaceMaintainerAddress))
+      val bcAccount = getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount)
       val unconfirmedTxs = getUnconfirmedTxs.Service.get()
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
         val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = accountIdAddress.keys.map(x => utilities.BlockchainTransaction.getMantlePlaceIssueIdentityMsg(id = x, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, toAddress = accountIdAddress.getOrElse(x, ""), classificationID = constants.Blockchain.MantlePlaceIdentityClassificationID, fromID = constants.Blockchain.MantlePlaceFromID)).toSeq,
+          messages = accountIdAddress.keys.map(x => utilities.BlockchainTransaction.getMantlePlaceIssueIdentityMsg(
+            id = x,
+            fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress,
+            toAddress = accountIdAddress.getOrElse(x, ""),
+            classificationID = constants.Blockchain.MantlePlaceIdentityClassificationID,
+            fromID = constants.Blockchain.MantlePlaceFromID)).toSeq,
           fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultIssueIdentityGasLimit * accountIdAddress.size),
           gasLimit = constants.Blockchain.DefaultIssueIdentityGasLimit * accountIdAddress.size,
           account = bcAccount,
@@ -160,7 +165,7 @@ class IssueIdentityTransactions @Inject()(
         val identityIDs = accountIDs.map(x => utilities.Identity.getMantlePlaceIdentityID(x))
         val existingIdentityIDsString = blockchainIdentities.Service.getIDsAlreadyExists(identityIDs.map(_.asString))
 
-        def updateMasterKeys(issuedAccountIDs: Seq[String]) = masterKeys.Service.markIdentityIssued(issuedAccountIDs)
+        def updateMasterKeys(issuedAccountIDs: Seq[String]) = if (issuedAccountIDs.nonEmpty) masterKeys.Service.markIdentityIssued(issuedAccountIDs) else Future(0)
 
         for {
           existingIdentityIDsString <- existingIdentityIDsString
@@ -238,13 +243,12 @@ class IssueIdentityTransactions @Inject()(
     val scheduler: Scheduler = new Scheduler {
       val name: String = IssueIdentityTransactions.module
 
-//      override val initialDelay: FiniteDuration = constants.Scheduler.FiveMinutes
+      //      override val initialDelay: FiniteDuration = constants.Scheduler.FiveMinutes
 
       def runner(): Unit = {
-        val doIssueIdentities = issueIdentities()
 
         val forComplete = (for {
-          _ <- doIssueIdentities
+          _ <- issueIdentities()
           _ <- checkTransactions()
         } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.failure.logMessage)

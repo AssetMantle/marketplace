@@ -5,7 +5,7 @@
 @(nubForm: Form[Nub.Data] = Nub.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.NUB, nubForm) {
-    @commonInputInt(nubForm, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultMintAssetGasAmount, Symbol("class") -> "hidden")
+    @commonInputInt(nubForm, constants.FormField.GAS_AMOUNT, Symbol("value") -> constants.Blockchain.DefaultIssueIdentityGasLimit, Symbol("class") -> "hidden")
     @commonSelectGas(nubForm)
     @commonInputPassword(nubForm, constants.FormField.PASSWORD)
 }
