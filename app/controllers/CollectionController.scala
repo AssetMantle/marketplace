@@ -10,6 +10,7 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import utilities.MicroNumber
 import views.base.companion.UploadFile
 import views.collection.companion._
 
@@ -56,13 +57,13 @@ class CollectionController @Inject()(
     }
   }
 
-  def viewCollection(id: String, statusId: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollection(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
         (for {
           collection <- collection
-        } yield Ok(views.html.collection.viewCollection(collection, statusId))
+        } yield Ok(views.html.collection.viewCollection(collection))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -109,17 +110,10 @@ class CollectionController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collection = masterCollections.Service.tryGet(id)
-        val sale = masterSales.Service.getSaleByCollectionId(id)
-        val publicListing = masterPublicListings.Service.getPublicListingByCollectionId(id)
-
-        def randomNFTs(get: Boolean) = if (get) masterNFTs.Service.getRandomNFTs(id, 5, Seq.empty) else Future(Seq())
 
         (for {
           collection <- collection
-          sale <- sale
-          publicListing <- publicListing
-          randomNFTs <- randomNFTs(sale.nonEmpty || publicListing.nonEmpty)
-        } yield Ok(views.html.collection.details.collectionNFTs(collection, sale, publicListing, randomNFTs))
+        } yield Ok(views.html.collection.details.collectionNFTs(collection))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -162,35 +156,19 @@ class CollectionController @Inject()(
     }
   }
 
-  def topRightCard(id: String, statusId: Int): Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
+  def topRightCard(id: String): Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
     implicit request =>
       val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
       val collection = masterCollections.Service.tryGet(id)
-      val publicListing = masterPublicListings.Service.getPublicListingByCollectionId(id)
-
-      def getTotalPublicListingSold(publicListingId: Option[String]): Future[Long] = if (publicListingId.isDefined) masterTransactionPublicListingNFTTransactions.Service.getTotalPublicListingSold(publicListingId.get).map(_.toLong) else Future(0L)
-
-      def getTotalWhitelistSaleSold(saleId: Option[String]): Future[Long] = if (saleId.isDefined) masterTransactionSaleNFTTransactions.Service.getTotalWhitelistSaleSold(saleId.get).map(_.toLong) else Future(0L)
-
-      val getSalesInfo = {
-        val sale = masterSales.Service.getSaleByCollectionId(id)
-
-        def isMember(whitelistId: Option[String]) = if (optionalLoginState.isDefined && whitelistId.isDefined) masterWhitelistMembers.Service.isMember(whitelistId.get, optionalLoginState.get.username) else Future(false)
-
-        for {
-          sale <- sale
-          isMember <- isMember(sale.map(_.whitelistId))
-        } yield (sale, isMember)
-      }
+      val launchpadCreated = masterSales.Service.checkExistsByCollectionId(id)
+      val earlyAccessCreated = masterPublicListings.Service.checkExistsByCollectionId(id)
 
       (for {
         collectionAnalysis <- collectionAnalysis
         collection <- collection
-        publicListing <- publicListing
-        totalPublicListingSold <- getTotalPublicListingSold(publicListing.map(_.id))
-        (sale, isMember) <- getSalesInfo
-        totalWhitelistSaleSold <- getTotalWhitelistSaleSold(sale.map(_.id))
-      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis = collectionAnalysis, collection = collection, sale = sale, publicListing = publicListing, isMember = isMember, publicListingSold = totalPublicListingSold, whitelistSaleSold = totalWhitelistSaleSold, statusId = statusId, tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice))
+        launchpadCreated <- launchpadCreated
+        earlyAccessCreated <- earlyAccessCreated
+      } yield Ok(views.html.collection.details.topRightCard(collectionAnalysis = collectionAnalysis, collection = collection, launchpadCreated = launchpadCreated, earlyAccessCreated = earlyAccessCreated))
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
@@ -200,8 +178,8 @@ class CollectionController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
-        val publicListing = masterPublicListings.Service.getPublicListingByCollectionId(id)
-        val sale = masterSales.Service.getSalesByCollectionId(id)
+        val publicListing = if (statusId == 1) masterPublicListings.Service.getPublicListingByCollectionId(id) else Future(None)
+        val sale = if (statusId == 2) masterSales.Service.getSalesByCollectionId(id) else Future(None)
         val tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice
 
         def publicListingStatus(publicListing: Option[PublicListing]) = if (publicListing.isDefined) masterTransactionPublicListingNFTTransactions.Service.getTotalPublicListingSold(publicListing.get.id).map(x => publicListing.get.getStatus(x).id) else Future(0)
@@ -212,12 +190,21 @@ class CollectionController @Inject()(
           sale <- sale
           publicListingStatus <- publicListingStatus(publicListing)
         } yield {
-          if (publicListing.isEmpty && sale.isEmpty) {
-            Ok(s"${collectionAnalysis.totalNFTs.toString}|N/A|0")
+          if (statusId == 0) {
+            val lowestPrice = if (collectionAnalysis.salePrice > MicroNumber.zero && collectionAnalysis.publicListingPrice > MicroNumber.zero) {
+              collectionAnalysis.floorPrice.min(collectionAnalysis.salePrice).min(collectionAnalysis.publicListingPrice)
+            } else if (collectionAnalysis.salePrice > MicroNumber.zero && collectionAnalysis.publicListingPrice == MicroNumber.zero) {
+              collectionAnalysis.floorPrice.min(collectionAnalysis.salePrice)
+            } else if (collectionAnalysis.salePrice == MicroNumber.zero && collectionAnalysis.publicListingPrice > MicroNumber.zero) {
+              collectionAnalysis.floorPrice.min(collectionAnalysis.publicListingPrice)
+            } else collectionAnalysis.floorPrice
+            val saleStatus = if (lowestPrice == collectionAnalysis.floorPrice) 1 else 0
+
+            Ok(s"${collectionAnalysis.totalNFTs.toString}|${s"${lowestPrice.toString} (${utilities.NumericOperation.formatNumber(lowestPrice.toDouble * tokenPrice)} $$)"}|${saleStatus}")
           } else if (statusId == 1) {
-            Ok(s"${collectionAnalysis.totalNFTs.toString}|${publicListing.fold("N/A")(x => s"${x.price.toString} (${utilities.NumericOperation.formatNumber(x.price.toDouble * tokenPrice)} $$)")}|${publicListingStatus}")
+            Ok(s"${collectionAnalysis.totalNFTs.toString}|${s"${collectionAnalysis.publicListingPrice.toString} (${utilities.NumericOperation.formatNumber(collectionAnalysis.publicListingPrice.toDouble * tokenPrice)} $$)"}|${publicListingStatus}")
           } else if (statusId == 2) {
-            Ok(s"${collectionAnalysis.totalNFTs.toString}|${sale.fold("N/A")(x => s"${x.price.toString} (${utilities.NumericOperation.formatNumber(x.price.toDouble * tokenPrice)} $$)")}|${sale.fold(0)(_.getStatus.id)}")
+            Ok(s"${collectionAnalysis.totalNFTs.toString}|${s"${collectionAnalysis.salePrice.toString} (${utilities.NumericOperation.formatNumber(collectionAnalysis.salePrice.toDouble * tokenPrice)} $$)"}|${sale.fold(0)(_.getStatus.id)}")
           } else {
             Ok(s"${collectionAnalysis.totalNFTs.toString}|${collectionAnalysis.floorPrice.toString} (${utilities.NumericOperation.formatNumber(collectionAnalysis.floorPrice.toDouble * tokenPrice)} $$)}|1")
           }

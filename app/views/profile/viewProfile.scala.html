@@ -5,7 +5,5 @@
 @views.html.base.common(constants.View.PROFILE)
 <link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/userProfile.css")"/>
 <script>
-        componentResource('leftContent', jsRoutes.controllers.ProfileController.profileInfoCard('@accountId'));
-        componentResource('centerContent', jsRoutes.controllers.ProfileController.profile('@accountId', '@activeTab'));
-        componentResource('rightContent', jsRoutes.controllers.ProfileController.profileAnalysisCard('@accountId'));
+        viewProfile('@accountId' + '/' + '@activeTab');
 </script>

@@ -11,7 +11,7 @@
         <entry key="AMAZON_S3_REGION" value="ap-south-1" />
         <entry key="AMAZON_S3_SECRET_KEY" value="DXW8VyWpkvgV9Q8kVpzacip3KZVxGYCnlL/HoT7A" />
         <entry key="APPLICATION_SECRET" value="d7oJaPFAnguWe8OU8aeST964GeR_XJ5TS[ho@_];VBq8sQ0kNBM@v/psglncUr&amp;gt;x" />
-        <entry key="APP_VERSION" value="v0.1.8" />
+        <entry key="APP_VERSION" value="v0.1.11" />
         <entry key="BLOCKCHAIN_CHAIN_ID" value="test" />
         <entry key="BLOCKCHAIN_NAME" value="AssetMantle Testnet" />
         <entry key="BLOCKCHAIN_REST" value="http://localhost:1317" />

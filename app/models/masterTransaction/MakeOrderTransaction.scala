@@ -20,9 +20,13 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 case class MakeOrderTransaction(txHash: String, nftId: String, sellerId: String, buyerId: Option[String], denom: String, makerOwnableSplit: AttoNumber, expiresIn: Long, takerOwnableSplit: AttoNumber, secondaryMarketId: String, status: Option[Boolean], creationHeight: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
+  def getExpiresIn(max: Int, endHours: Int): Option[Int] = this.creationHeight.map(x => x + (max * endHours) / constants.Blockchain.MaxOrderHours)
+
   def getQuantity: Int = (this.makerOwnableSplit.value / constants.Blockchain.SmallestDec).toInt
 
-  def getPrice: MicroNumber = MicroNumber((this.takerOwnableSplit.value / this.getQuantity) / constants.Blockchain.SmallestDec)
+  def getPrice: MicroNumber = MicroNumber((this.takerOwnableSplit / (this.getQuantity * MicroNumber.factor)).value)
+
+  def getExchangeRate: AttoNumber = AttoNumber((this.takerOwnableSplit.value / this.getQuantity) / constants.Blockchain.SmallestDec)
 
   def getOrderID(creationHeight: Int, assetID: AssetID): OrderID = utilities.Order.getOrderID(
     classificationID = constants.Blockchain.MantlePlaceOrderClassificationID,
@@ -166,7 +170,7 @@ class MakeOrderTransactions @Inject()(
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String], nft: NFT, nftOwner: NFTOwner) = {
         val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
-        val expiresIn = ((constants.Blockchain.MaxOrderExpiry * endHours) / 6).toLong
+        val expiresIn = ((constants.Blockchain.MaxOrderExpiry * endHours) / constants.Blockchain.MaxOrderHours).toLong
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(utilities.BlockchainTransaction.getMakeOrderMsg(
             fromAddress = fromAddress,
@@ -193,7 +197,7 @@ class MakeOrderTransactions @Inject()(
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
               makeOrder <- blockchainTransactionMakeOrders.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
-              _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nftID, sellerId = nftOwner.ownerId, buyerId = buyerId, denom = constants.Blockchain.StakingToken, makerOwnableSplit = AttoNumber(quantity * constants.Blockchain.SmallestDec), expiresIn = expiresIn, takerOwnableSplit = AttoNumber(price.toMicroBigDecimal), secondaryMarketId = secondaryMarketId)
+              _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nftID, sellerId = nftOwner.ownerId, buyerId = buyerId, denom = constants.Blockchain.StakingToken, makerOwnableSplit = AttoNumber(quantity * constants.Blockchain.SmallestDec), expiresIn = expiresIn, takerOwnableSplit = AttoNumber((price * quantity).toMicroBigDecimal), secondaryMarketId = secondaryMarketId)
             } yield makeOrder
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
         }
@@ -233,7 +237,7 @@ class MakeOrderTransactions @Inject()(
 
       def filterAndUpdateForDeletion(txs: Seq[MakeOrderTransaction], checkForDeletions: Seq[SecondaryMarket]) = {
         val latestHeight = blockchainBlocks.Service.getLatestHeight
-        val secondaryMarketIds = txs.filter(x => x.creationHeight.isDefined && ((latestHeight + 10) >= (x.creationHeight.get + checkForDeletions.find(_.id == x.secondaryMarketId).fold(0)(_.endHours)))).map(_.secondaryMarketId)
+        val secondaryMarketIds = txs.filter(x => x.creationHeight.isDefined && ((latestHeight + 10) >= x.getExpiresIn(max = constants.Blockchain.MaxOrderExpiry, endHours = checkForDeletions.find(_.id == x.secondaryMarketId).fold(0)(_.endHours)).get)).map(_.secondaryMarketId)
         masterSecondaryMarkets.Service.markForDeletion(secondaryMarketIds)
       }
 

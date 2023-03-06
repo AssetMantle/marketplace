@@ -169,8 +169,7 @@ class CollectionsAnalysis @Inject()(
       val collectionAnalysis = Service.tryGet(collectionId)
 
       def update(collectionAnalysis: CollectionAnalysis) = {
-        val oldFloorPrice = Seq(collectionAnalysis.salePrice, collectionAnalysis.publicListingPrice, collectionAnalysis.floorPrice).min
-        val newFloorPrice = if (oldFloorPrice > MicroNumber.zero) Seq(listingPrice, oldFloorPrice).min else listingPrice
+        val newFloorPrice = if (collectionAnalysis.floorPrice > MicroNumber.zero) Seq(listingPrice, collectionAnalysis.floorPrice).min else listingPrice
         Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed + totalListed, floorPrice = newFloorPrice))
       }
 

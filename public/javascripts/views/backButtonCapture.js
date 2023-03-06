@@ -5,13 +5,28 @@ window.addEventListener('popstate', e => {
 
     switch (this.history.state) {
         case "collections":
-            viewCollections(lastPart);
+            viewCollections();
             break;
-        case "collectionForPublicListing":
-            viewCollection(lastPart, 1);
+        case "collection":
+            viewCollection(lastPart);
             break;
-        case "collectionForWhitelistSale":
-            viewCollection(lastPart, 2);
+        case "earlyAccess":
+            viewEarlyAccess();
+            break;
+        case "earlyAccessCollection":
+            viewEarlyAccessCollection(lastPart);
+            break;
+        case "launchpad":
+            viewLaunchpad();
+            break;
+        case "launchpadCollection":
+            viewLaunchpadCollection(lastPart);
+            break;
+        case "secondaryMarket":
+            viewSecondaryMarketCollections();
+            break;
+        case "marketCollection":
+            viewMarketCollection(lastPart);
             break;
         case "wishListCollection":
             viewWishListCollection(lastPart);
@@ -27,18 +42,6 @@ window.addEventListener('popstate', e => {
             break;
         case "profile":
             viewProfile(lastPart);
-            break;
-        case "publicListedCollections":
-            viewPublicListedCollections();
-            break;
-        case "whitelistSaleCollections":
-            viewWhitelistSaleCollections();
-            break;
-        case "secondaryMarket":
-            viewSecondaryMarketCollections();
-            break;
-        case "marketCollection":
-            viewMarketCollection(lastPart);
             break;
         case "index":
             window.location = "/";

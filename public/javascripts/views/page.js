@@ -1,19 +1,51 @@
-function viewCollections(section) {
-    componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsSection(section));
+function viewCollections() {
+    componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionsSection());
+    checkAndPushState(jsRoutes.controllers.CollectionController.viewCollections().url, "", "collections");
     $('#leftContent').html('');
     $('#rightContent').html('');
 }
 
-function viewCollection(collectionId, status) {
+function viewEarlyAccess() {
+    componentResource('centerContent', jsRoutes.controllers.PublicListingController.collectionsSection());
+    checkAndPushState(jsRoutes.controllers.PublicListingController.viewCollections().url, "", "earlyAccess");
+    $('#leftContent').html('');
+    $('#rightContent').html('');
+}
+
+function viewLaunchpad() {
+    componentResource('centerContent', jsRoutes.controllers.SaleController.collectionsSection());
+    checkAndPushState(jsRoutes.controllers.SaleController.viewCollections().url, "", "launchpad");
+    $('#leftContent').html('');
+    $('#rightContent').html('');
+}
+
+function viewSecondaryMarketCollections() {
+    componentResource('centerContent', jsRoutes.controllers.SecondaryMarketController.collectionsSection());
+    checkAndPushState(jsRoutes.controllers.SecondaryMarketController.viewCollections().url, "", "secondaryMarket");
+    $('#leftContent').html('');
+    $('#rightContent').html('');
+}
+
+function viewCollection(collectionId) {
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs(collectionId));
-    componentResource('rightContent', jsRoutes.controllers.CollectionController.topRightCard(collectionId, status));
-    if (status === 1) {
-        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection(collectionId, 1).url, collectionId, "collectionForPublicListing");
-    }
-    if (status === 2) {
-        checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection(collectionId, 2).url, collectionId, "collectionForWhitelistSale");
-    }
+    componentResource('rightContent', jsRoutes.controllers.CollectionController.topRightCard(collectionId));
+    checkAndPushState(jsRoutes.controllers.CollectionController.viewCollection(collectionId).url, collectionId, "collection");
+}
+
+function viewLaunchpadCollection(collectionId) {
+    componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
+    componentResource('centerContent', jsRoutes.controllers.SaleController.collectionNFTs(collectionId));
+    componentResource('rightContent', jsRoutes.controllers.SaleController.collectionTopRightCard(collectionId));
+    checkAndPushState(jsRoutes.controllers.SaleController.viewCollection(collectionId).url, collectionId, "launchpadCollection");
+}
+
+
+function viewEarlyAccessCollection(collectionId) {
+    componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
+    componentResource('centerContent', jsRoutes.controllers.PublicListingController.collectionNFTs(collectionId));
+    componentResource('rightContent', jsRoutes.controllers.PublicListingController.collectionTopRightCard(collectionId));
+    checkAndPushState(jsRoutes.controllers.PublicListingController.viewCollection(collectionId).url, collectionId, "earlyAccessCollection");
 }
 
 function viewMarketCollection(collectionId) {
@@ -51,27 +83,12 @@ function viewNFT(nftId) {
     componentResource('leftContent', jsRoutes.controllers.NFTController.detailViewLeftCards(nftId));
     componentResource('centerContent', jsRoutes.controllers.NFTController.details(nftId));
     componentResource('rightContent', jsRoutes.controllers.NFTController.detailViewRightCards(nftId));
+    checkAndPushState(jsRoutes.controllers.NFTController.viewNFT(nftId).url, nftId, "nft");
 }
 
 function viewSetting() {
     componentResource('centerContent', jsRoutes.controllers.SettingController.settings());
-    $('#leftContent').html('');
-}
-
-function viewPublicListedCollections() {
-    componentResource('centerContent', jsRoutes.controllers.PublicListingController.publicListedCollectionsSection());
-    $('#leftContent').html('');
-    $('#rightContent').html('');
-}
-
-function viewWhitelistSaleCollections() {
-    componentResource('centerContent', jsRoutes.controllers.SaleController.whitelistSaleCollectionsSection());
-    $('#leftContent').html('');
-    $('#rightContent').html('');
-}
-
-function viewSecondaryMarketCollections() {
-    componentResource('centerContent', jsRoutes.controllers.SecondaryMarketController.collectionsSection());
+    checkAndPushState(jsRoutes.controllers.SettingController.viewSettings().url, '', "setting");
     $('#leftContent').html('');
     $('#rightContent').html('');
 }
@@ -82,4 +99,8 @@ function viewProfile(lastPart) {
     componentResource('leftContent', jsRoutes.controllers.ProfileController.profileInfoCard(accountId));
     componentResource('centerContent', jsRoutes.controllers.ProfileController.profile(accountId, activeTab));
     componentResource('rightContent', jsRoutes.controllers.ProfileController.profileAnalysisCard(accountId));
+}
+
+function changeProfileStateOnSwitcher(accountId, section) {
+    checkAndPushState(jsRoutes.controllers.ProfileController.viewProfile(accountId, section).url, (accountId + '/' + section), 'profile');
 }

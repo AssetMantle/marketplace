@@ -52,6 +52,7 @@ object Blockchain {
   // TODO BondRate from parameters
   val BondRate = 1
   val MaxOrderExpiry: Int = (43210 * 6) / 6
+  val MaxOrderHours = 72
 
   val EmptyIdentityID: IdentityID = IdentityID(Array[Byte]())
 

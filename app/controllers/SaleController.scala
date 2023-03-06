@@ -35,6 +35,7 @@ class SaleController @Inject()(
                                 masterNFTOwners: master.NFTOwners,
                                 masterSales: master.Sales,
                                 masterNFTProperties: master.NFTProperties,
+                                masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                 masterWhitelistMembers: master.WhitelistMembers,
                                 masterTransactionSaleNFTTransactions: masterTransaction.SaleNFTTransactions,
                                 blockchainTransactionNFTSales: blockchainTransaction.NFTSales,
@@ -46,16 +47,16 @@ class SaleController @Inject()(
 
   private implicit val module: String = constants.Module.SALE_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.SaleController.viewWhitelistSaleCollections()
+  implicit val callbackOnSessionTimeout: Call = routes.SaleController.viewCollections()
 
-  def viewWhitelistSaleCollections(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollections(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.sale.viewWhitelistSaleCollections()))
+        Future(Ok(views.html.sale.viewCollections()))
     }
   }
 
-  def whitelistSaleCollectionsSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionsSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val totalCollections = masterSales.Service.total
@@ -68,7 +69,7 @@ class SaleController @Inject()(
     }
   }
 
-  def whitelistSaleCollectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val sales = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
@@ -80,6 +81,66 @@ class SaleController @Inject()(
           sales <- sales
           collections <- collections(sales.map(_.collectionId))
         } yield Ok(views.html.sale.collectionsPerPage(collections))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def viewCollection(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collection = masterCollections.Service.tryGet(id)
+        (for {
+          collection <- collection
+        } yield Ok(views.html.sale.viewCollection(collection))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def collectionNFTs(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val collection = masterCollections.Service.tryGet(id)
+        val nfts = masterNFTs.Service.getRandomNFTs(id, constants.CommonConfig.Pagination.NFTsPerPage, Seq())
+
+        (for {
+          collection <- collection
+          nfts <- nfts
+        } yield Ok(views.html.sale.collection.collectionNFTs(collection, nfts))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def collectionTopRightCard(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit optionalLoginState =>
+      implicit request =>
+        val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
+        val collection = masterCollections.Service.tryGet(id)
+
+        def getTotalWhitelistSaleSold(saleId: String): Future[Long] = masterTransactionSaleNFTTransactions.Service.getTotalWhitelistSaleSold(saleId).map(_.toLong)
+
+        val getSalesInfo = {
+          val sale = masterSales.Service.tryGetSaleByCollectionId(id)
+
+          def isMember(whitelistId: String) = if (optionalLoginState.isDefined) masterWhitelistMembers.Service.isMember(whitelistId, optionalLoginState.get.username) else Future(false)
+
+          for {
+            sale <- sale
+            isMember <- isMember(sale.whitelistId)
+          } yield (sale, isMember)
+        }
+
+        (for {
+          collectionAnalysis <- collectionAnalysis
+          collection <- collection
+          (sale, isMember) <- getSalesInfo
+          totalWhitelistSaleSold <- getTotalWhitelistSaleSold(sale.id)
+        } yield Ok(views.html.sale.collection.topRightCard(collectionAnalysis, collection, sale, isMember, totalWhitelistSaleSold, masterTransactionTokenPrices.Service.getLatestPrice))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

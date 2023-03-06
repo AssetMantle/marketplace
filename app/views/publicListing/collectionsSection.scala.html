@@ -14,7 +14,7 @@
     <div class="centerCard">
         <div class="centerCardHeader">@Messages(constants.View.PUBLIC_LISTING_TITLE)</div>
         <div class="contentContainer">
-            <script src="@utilities.PublicResource.getVersionedRoute("javascripts/collections/publicListed/loadMore.js")" type="text/javascript"></script>
+            <script src="@utilities.PublicResource.getVersionedRoute("javascripts/publicListing/loadMoreCollections.js")" type="text/javascript"></script>
             @if(totalCollections > 0) {
                 <div class="mt-2 mb-0 item item-center collectionContainer">
                     <div class="p-0 profile-card">
@@ -52,5 +52,4 @@
 </div>
 <script>
         window.onscroll = function() { loadCollectionOnScroll(); }
-        checkAndPushState(jsRoutes.controllers.PublicListingController.viewPublicListedCollections().url, "", "publicListedCollections");
 </script>

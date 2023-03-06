@@ -47,12 +47,12 @@ class SecondaryMarketController @Inject()(
 
   private implicit val module: String = constants.Module.SECONDARY_MARKET_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.SecondaryMarketController.viewSecondaryMarket()
+  implicit val callbackOnSessionTimeout: Call = routes.SecondaryMarketController.viewCollections()
 
-  def viewSecondaryMarket(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def viewCollections(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        Future(Ok(views.html.secondaryMarket.viewSecondaryMarkets()))
+        Future(Ok(views.html.secondaryMarket.viewCollections()))
     }
   }
 

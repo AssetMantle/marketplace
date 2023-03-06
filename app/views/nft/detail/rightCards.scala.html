@@ -24,11 +24,10 @@
                 @if(lowestPriceSecondaryMarket.get.id == userSecondaryMarket.get.id) {
                     <div>
                         <div class="analysisTitle">@Messages(constants.View.LOWEST_NFT_PRICE)</div>
-                        <div class="analysisValue">@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price) @Messages(constants.View.NFT_SALE_TOKEN_UNITS)
-                            (@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
+                        <div class="analysisValue">@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price) @Messages(constants.View.NFT_SALE_TOKEN_UNITS) (@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
                     </div>
                     <div>
-                        @* CANCEL ORDER BUTTON *@
+                    @commonPrimaryButton(Messages(constants.View.CANCEL_ORDER), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.cancelForm('${nft.id}', '${lowestPriceSecondaryMarket.get.id}'))"))
                     </div>
                 } else {
                     <div>
@@ -43,7 +42,7 @@
                         <div class="analysisValue">@utilities.NumericOperation.formatNumber(userSecondaryMarket.get.price) @Messages(constants.View.NFT_SALE_TOKEN_UNITS) (@utilities.NumericOperation.formatNumber(userSecondaryMarket.get.price * tokenPrice) $)</div>
                     </div>
                     <div>
-                        @* CANCEL ORDER BUTTON *@
+                    @commonPrimaryButton(Messages(constants.View.CANCEL_ORDER), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.cancelForm('${nft.id}', '${lowestPriceSecondaryMarket.get.id}'))"))
                     </div>
                 }
             }

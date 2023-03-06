@@ -311,19 +311,21 @@ class Keys @Inject()(
 
     def changeActive(accountId: String, oldAddress: String, newAddress: String): Future[Unit] = {
       val oldKey = tryGet(accountId = accountId, address = oldAddress)
-      val key = tryGet(accountId = accountId, address = newAddress)
+      val newKey = tryGet(accountId = accountId, address = newAddress)
 
       def updateKeys(oldKey: Key, newKey: Key) = if (newKey.encryptedPrivateKey.nonEmpty) {
-        for {
-          _ <- updateById1AndId2(oldKey.copy(active = false).serialize())
-          _ <- updateById1AndId2(newKey.copy(active = true).serialize())
-        } yield ()
+        if (!newKey.identityIssued.getOrElse(false)) {
+          for {
+            _ <- updateById1AndId2(oldKey.copy(active = false).serialize())
+            _ <- updateById1AndId2(newKey.copy(active = true).serialize())
+          } yield ()
+        } else constants.Response.KEY_NOT_PROVISIONED.throwBaseException()
       } else constants.Response.ACTIVATING_UNMANAGED_KEY.throwBaseException()
 
       for {
         oldKey <- oldKey
-        key <- key
-        _ <- updateKeys(oldKey = oldKey, newKey = key)
+        newKey <- newKey
+        _ <- updateKeys(oldKey = oldKey, newKey = newKey)
       } yield ()
     }
 

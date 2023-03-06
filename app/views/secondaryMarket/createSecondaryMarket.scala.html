@@ -7,6 +7,6 @@
 @commonForm(constants.Form.CREATE_SECONDARY_MARKET, createSecondaryMarketForm) {
     @commonInputText(createSecondaryMarketForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden")
     @commonInputMicroNumber(createSecondaryMarketForm, constants.FormField.SECONDARY_MARKET_PRICE)
-    @commonInputInt(createSecondaryMarketForm, constants.FormField.SECONDARY_MARKET_END_HOURS)
+    @commonInputInt(createSecondaryMarketForm, constants.FormField.SECONDARY_MARKET_END_HOURS, Symbol("value") -> 72)
     @commonInputPassword(createSecondaryMarketForm, constants.FormField.PASSWORD)
 }

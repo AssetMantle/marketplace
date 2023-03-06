@@ -1,7 +1,7 @@
 package models.master
 
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import models.history
+import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -123,7 +123,7 @@ class Sales @Inject()(
 
     def tryGet(id: String): Future[Sale] = filterHead(_.id === id).map(_.deserialize)
 
-    def get(ids: Seq[String]) = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
+    def get(ids: Seq[String]): Future[Seq[Sale]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
 
     def getByWhitelistId(whitelistId: String): Future[Seq[Sale]] = filter(_.whitelistId === whitelistId).map(_.map(_.deserialize))
 
@@ -143,6 +143,8 @@ class Sales @Inject()(
 
     def getSaleByCollectionId(collectionId: String): Future[Option[Sale]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize).headOption)
 
+    def tryGetSaleByCollectionId(collectionId: String): Future[Sale] = filterHead(_.collectionId === collectionId).map(_.deserialize)
+
     def delete(saleId: String): Future[Int] = deleteById(saleId)
 
     def total: Future[Int] = countTotal()
@@ -150,6 +152,8 @@ class Sales @Inject()(
     def getSalesByCollectionId(collectionId: String): Future[Option[Sale]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize).headOption)
 
     def getByPageNumber(pageNumber: Int): Future[Seq[Sale]] = getAllByPageNumber(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.endTimeEpoch).map(_.map(_.deserialize))
+
+    def checkExistsByCollectionId(collectionId: String): Future[Boolean] = filterAndExists(_.collectionId === collectionId)
   }
 
 }

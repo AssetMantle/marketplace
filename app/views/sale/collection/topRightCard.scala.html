@@ -1,0 +1,84 @@
+@import controllers.actions.LoginState
+@import models.analytics.CollectionAnalysis
+@import models.master.{Collection, PublicListing, Sale}
+@import views.html.base.buttons._
+@import views.html.collection.details._
+
+@(collectionAnalysis: CollectionAnalysis, collection: Collection, sale: Sale, isMember: Boolean, whitelistSaleSold: Long, tokenPrice: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+
+<div class="sticky-top item-sticky">
+    <div class="card rightInfoCard">
+        <div class="d-flex flex-column gap-1">
+            <div class="analysisTitle">@Messages(constants.View.COLLECTION_TOTAL_NFT_TITLE)</div>
+            <div class="analysisValue">@utilities.NumericOperation.formatNumber(collectionAnalysis.totalNFTs)</div>
+        </div>
+        <div class="d-flex flex-column gap-1 mt-3">
+            <div class="analysisTitle">@Messages(constants.View.COLLECTION_TOTAL_NFT_SOLD)</div>
+            <div class="analysisValue">@utilities.NumericOperation.formatNumber(collectionAnalysis.totalSold)</div>
+        </div>
+        <div class="d-flex flex-column gap-1 mt-3">
+            <div class="analysisTitle">@Messages(constants.View.COLLECTION_TOTAL_VOLUME_TRADE)</div>
+            <div class="analysisValue">@utilities.NumericOperation.formatNumber(collectionAnalysis.totalVolumeTraded)
+                $MNTL</div>
+        </div>
+
+        <div class="separator"></div>
+
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="title">@Messages(constants.View.WHITELIST_SALE_TITLE)</div>
+            @if(sale.getStatus.id == constants.Sale.LIVE.id) {
+                <div class="badge">@Messages(constants.View.SALE_LIVE_LABEL)</div>
+            }
+            @if(sale.getStatus.id == constants.Sale.SOLD_OUT.id) {
+                <div class="badge">@Messages(constants.Sale.SOLD_OUT.value)</div>
+            }
+            @if(sale.getStatus.id == constants.Sale.ENDED.id) {
+                <div class="badge">@Messages(constants.Sale.ENDED.value)</div>
+            }
+        </div>
+        <div class="mt-3">
+            <div class="analysisTitle">
+                @Messages(constants.View.NFT_SOLD_LABEL, whitelistSaleSold, sale.numberOfNFTs)
+                <span class="analysisPercentage"></span>
+            </div>
+            <div class="mintedNftWeightage">
+                <div class="progressBar">
+                    <span data-totalNFT="@sale.numberOfNFTs" data-soldNFT="@whitelistSaleSold" style="width:0;"></span>
+                    </div>
+                    </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-1 mt-4">
+                    <div class="analysisTitle">@Messages(constants.View.COLLECTION_SALE_PRICE)</div>
+                <div class="analysisValue">@sale.price.toString @Messages(constants.View.NFT_SALE_TOKEN_UNITS) (@utilities.NumericOperation.formatNumber(sale.price * tokenPrice) $)</div>
+            </div>
+            <div class="d-flex flex-column gap-1 mt-3">
+                <div class="analysisValue">@Messages(constants.View.COLLECTION_MAXIMUM_MINT_PER_USER, sale.maxMintPerAccount)</div>
+            </div>
+            @if(sale.getStatus.id == constants.Sale.NOT_STARTED.id) {
+                <div class="d-flex flex-column gap-1 mt-3">
+                    <div class="analysisTitle">@Messages(constants.View.SALE_START_TIME)</div>
+                    <div id="countdown_@sale.startTimeEpoch" class="d-flex gap-2 analysisValue">
+                    @sale.startTimeEpoch
+                    </div>
+                </div>
+                <script>epochToDateTime('countdown_@sale.startTimeEpoch');</script>
+            } else {
+                @if(sale.getStatus.id == constants.Sale.SOLD_OUT.id) {
+                } else {
+                    <div class="d-flex flex-column gap-1 mt-3">
+                        <div class="analysisTitle">@Messages(constants.View.SALE_ENDS_IN)</div>
+                        <div id="countdown_@sale.endTimeEpoch" class="d-flex gap-2 analysisValue">
+                        @sale.endTimeEpoch
+                        </div>
+                    </div>
+                    <script>epochToDateTime('countdown_@sale.endTimeEpoch');</script>
+                    @if(isMember && sale.getStatus.id == constants.Sale.LIVE.id) {
+                        <div class="separator"></div>
+                        @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SaleController.buySaleNFTForm('${sale.id}', false))"), Symbol("class") -> "mt-4")
+                    }
+                }
+            }
+            <script src="@utilities.PublicResource.getVersionedRoute("javascripts/collection/whitelistSale.js")"></script>
+            <script>setSoldNFTProgressBar();</script>
+    </div>
+</div>

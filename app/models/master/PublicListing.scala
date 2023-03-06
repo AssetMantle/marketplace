@@ -1,7 +1,7 @@
 package models.master
 
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import models.history
+import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -123,11 +123,15 @@ class PublicListings @Inject()(
 
     def getPublicListingByCollectionId(collectionId: String): Future[Option[PublicListing]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize).headOption)
 
+    def tryGetPublicListingByCollectionId(collectionId: String): Future[PublicListing] = filterHead(_.collectionId === collectionId).map(_.deserialize)
+
     def delete(publicListingId: String): Future[Int] = deleteById(publicListingId)
 
     def total: Future[Int] = countTotal()
 
     def getByPageNumber(pageNumber: Int): Future[Seq[PublicListing]] = getAllByPageNumber(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.endTimeEpoch).map(_.map(_.deserialize))
+
+    def checkExistsByCollectionId(collectionId: String): Future[Boolean] = filterAndExists(_.collectionId === collectionId)
   }
 
 }

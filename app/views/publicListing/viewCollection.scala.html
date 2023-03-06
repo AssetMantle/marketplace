@@ -1,0 +1,9 @@
+@import controllers.actions.LoginState
+
+@(collection: master.Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+@views.html.base.common(s"${Messages(constants.View.EARLY_ACCESS)}")
+
+<script>
+        viewEarlyAccessCollection('@collection.id');
+</script>

@@ -2,8 +2,8 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
-@views.html.base.common(constants.View.EARLY_ACCESS_BANNER_HEADER)
+@views.html.base.common(constants.View.LAUNCHPAD_MENU)
 <link rel="stylesheet" media="screen" href="@utilities.PublicResource.getVersionedRoute("stylesheets/explorer.css")"/>
 <script>
-        componentResource('centerContent', jsRoutes.controllers.PublicListingController.publicListedCollectionsSection());
+        viewLaunchpad();
 </script>
