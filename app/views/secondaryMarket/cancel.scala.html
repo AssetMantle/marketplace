@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import views.html.base.form._
+@import views.secondaryMarket.companion.Cancel
+
+@(cancelForm: Form[Cancel.Data] = Cancel.form, nftId: String, secondaryMarketId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonForm(constants.Form.CANCEL_SECONDARY_MARKET, cancelForm) {
+    @commonInputText(cancelForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden")
+    @commonInputText(cancelForm, constants.FormField.SECONDARY_MARKET_ID, Symbol("value") -> secondaryMarketId, Symbol("containerDivClass") -> "hidden")
+    @commonInputPassword(cancelForm, constants.FormField.PASSWORD)
+}

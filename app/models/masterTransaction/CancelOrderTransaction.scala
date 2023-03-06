@@ -2,18 +2,21 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.traits._
 import models.blockchainTransaction.CancelOrder
+import models.master.SecondaryMarket
+import models.traits._
 import models.{blockchain, blockchainTransaction, master}
+import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
+import transactions.responses.blockchain.BroadcastTxSyncResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class CancelOrderTransaction(txHash: String, orderId: String, sellerId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
+case class CancelOrderTransaction(txHash: String, secondaryMarketId: String, sellerId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
   def id: String = txHash
 
 }
@@ -26,11 +29,11 @@ object CancelOrderTransactions {
 
   class CancelOrderTransactionTable(tag: Tag) extends Table[CancelOrderTransaction](tag, "CancelOrderTransaction") with ModelTable[String] {
 
-    def * = (txHash, orderId, sellerId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CancelOrderTransaction.tupled, CancelOrderTransaction.unapply)
+    def * = (txHash, secondaryMarketId, sellerId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CancelOrderTransaction.tupled, CancelOrderTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
-    def orderId = column[String]("orderId", O.PrimaryKey)
+    def secondaryMarketId = column[String]("secondaryMarketId", O.PrimaryKey)
 
     def sellerId = column[String]("sellerId")
 
@@ -59,6 +62,7 @@ class CancelOrderTransactions @Inject()(
                                          blockchainIdentities: blockchain.Identities,
                                          broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                          masterSecondaryMarkets: master.SecondaryMarkets,
+                                         masterNFTs: master.NFTs,
                                          utilitiesOperations: utilities.Operations,
                                          getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
                                          getAccount: queries.blockchain.GetAccount,
@@ -76,7 +80,7 @@ class CancelOrderTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, orderId: String, sellerId: String): Future[String] = create(CancelOrderTransaction(txHash = txHash, orderId = orderId, sellerId = sellerId, status = None))
+    def addWithNoneStatus(txHash: String, secondaryMarketId: String, sellerId: String): Future[String] = create(CancelOrderTransaction(txHash = txHash, secondaryMarketId = secondaryMarketId, sellerId = sellerId, status = None))
 
     def getByTxHash(txHash: String): Future[Seq[CancelOrderTransaction]] = filter(_.txHash === txHash)
 
@@ -88,10 +92,68 @@ class CancelOrderTransactions @Inject()(
 
     def checkAnyPendingTx: Future[Boolean] = filterAndExists(_.status.?.isEmpty)
 
-    def getWithStatusTrueOrPending(orderIds: Seq[String]): Future[Seq[String]] = filter(x => x.orderId.inSet(orderIds) && (x.status || x.status.?.isEmpty)).map(_.map(_.orderId))
+    def getWithStatusTrueOrPending(secondaryMarketIds: Seq[String]): Future[Seq[String]] = filter(x => x.secondaryMarketId.inSet(secondaryMarketIds) && (x.status || x.status.?.isEmpty)).map(_.map(_.secondaryMarketId))
   }
 
   object Utility {
+
+    def transaction(secondaryMarket: SecondaryMarket, fromAddress: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+      // TODO
+      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
+      val abciInfo = getAbciInfo.Service.get
+      val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount)
+      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
+
+      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
+        val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
+        val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
+          messages = Seq(
+            utilities.BlockchainTransaction.getCancelOrderMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(secondaryMarket.sellerId), orderID = secondaryMarket.getOrderID())
+          ),
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultCancelOrderGasLimit),
+          gasLimit = constants.Blockchain.DefaultCancelOrderGasLimit,
+          account = bcAccount,
+          ecKey = ecKey,
+          timeoutHeight = timeoutHeight)
+        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+
+        def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
+          if (!unconfirmedTxHashes.contains(txHash)) {
+            for {
+              cancelOrder <- blockchainTransactionCancelOrders.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              _ <- Service.addWithNoneStatus(txHash = txHash, secondaryMarketId = secondaryMarket.id, sellerId = secondaryMarket.sellerId)
+            } yield cancelOrder
+          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+        }
+
+        for {
+          cancelOrder <- checkAndAdd(unconfirmedTxHashes)
+        } yield cancelOrder
+      }
+
+      def broadcastTxAndUpdate(cancelOrder: CancelOrder) = {
+
+        val broadcastTx = broadcastTxSync.Service.get(cancelOrder.getTxRawAsHexString)
+
+        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionCancelOrders.Service.markFailedWithLog(txHashes = Seq(cancelOrder.txHash), log = errorResponse.get.error.data)
+        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionCancelOrders.Service.markFailedWithLog(txHashes = Seq(cancelOrder.txHash), log = successResponse.get.result.log)
+        else Future(0)
+
+        for {
+          (successResponse, errorResponse) <- broadcastTx
+          _ <- update(successResponse, errorResponse)
+        } yield ()
+      }
+
+      for {
+        abciInfo <- abciInfo
+        bcAccount <- bcAccount
+        unconfirmedTxs <- unconfirmedTxs
+        cancelOrder <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        _ <- broadcastTxAndUpdate(cancelOrder)
+      } yield cancelOrder
+    }
+
     val scheduler: Scheduler = new Scheduler {
       val name: String = CancelOrderTransactions.module
 
@@ -104,7 +166,7 @@ class CancelOrderTransactions @Inject()(
           def onTxComplete(transaction: CancelOrder) = if (transaction.status.isDefined) {
             if (transaction.status.get) {
               val markSuccess = Service.markSuccess(cancelOrderTx.txHash)
-              val markForDeletion = masterSecondaryMarkets.Service.markForDeletion(cancelOrderTx.orderId)
+              val markForDeletion = masterSecondaryMarkets.Service.markForDeletion(cancelOrderTx.secondaryMarketId)
               val sendNotifications = utilitiesNotification.send(cancelOrderTx.sellerId, constants.Notification.CANCEL_ORDER_SUCCESSFUL)("")
 
               (for {

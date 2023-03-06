@@ -141,6 +141,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SecondaryMarketController.collectionsSection,
         routes.javascript.SecondaryMarketController.collectionsPerPage,
         routes.javascript.SecondaryMarketController.createForm,
+        routes.javascript.SecondaryMarketController.cancelForm,
         routes.javascript.SecondaryMarketController.buyForm,
 
         routes.javascript.WhitelistController.whitelistSection,

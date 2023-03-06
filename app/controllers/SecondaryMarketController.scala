@@ -12,7 +12,7 @@ import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import utilities.MicroNumber
-import views.secondaryMarket.companion.{Buy, CreateSecondaryMarket}
+import views.secondaryMarket.companion.{Buy, Cancel, CreateSecondaryMarket}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,6 +38,7 @@ class SecondaryMarketController @Inject()(
                                            masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                            masterTransactionMakeOrderTransactions: masterTransaction.MakeOrderTransactions,
                                            masterTransactionTakeOrderTransactions: masterTransaction.TakeOrderTransactions,
+                                           masterTransactionCancelOrderTransactions: masterTransaction.CancelOrderTransactions,
                                            utilitiesNotification: utilities.Notification,
                                            utilitiesOperations: utilities.Operations,
                                          )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -201,9 +202,62 @@ class SecondaryMarketController @Inject()(
       )
   }
 
+  def cancelForm(nftId: String, secondaryMarketId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.secondaryMarket.cancel(nftId = nftId, secondaryMarketId = secondaryMarketId)))
+  }
+
+
   def buyForm(nftId: String, secondaryMarketId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.secondaryMarket.buy(nftId = nftId, secondaryMarketId = secondaryMarketId)))
+  }
+
+  def cancel(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Cancel.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.secondaryMarket.cancel(formWithErrors, nftId = formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, ""), secondaryMarketId = formWithErrors.data.getOrElse(constants.FormField.SECONDARY_MARKET_ID.name, ""))))
+        },
+        cancelData => {
+          val secondaryMarket = masterSecondaryMarkets.Service.tryGet(cancelData.secondaryMarketId)
+          val makeOrderTx = masterTransactionMakeOrderTransactions.Service.tryGetByNFTAndSecondaryMarket(nftId = cancelData.nftId, secondaryMarketId = cancelData.secondaryMarketId)
+          val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = cancelData.password)
+          val nftOwner = masterNFTOwners.Service.tryGetBySecondaryMarketId(cancelData.secondaryMarketId)
+          val checkAlreadySold = masterTransactionTakeOrderTransactions.Service.checkAlreadySold(nftId = cancelData.nftId, secondaryMarketId = cancelData.secondaryMarketId)
+          // TODO
+          val quantity = 1
+
+          def validateAndTransfer(nftOwner: NFTOwner, makeOrderTx: MakeOrderTransaction, verifyPassword: Boolean, secondaryMarket: SecondaryMarket, buyerKey: Key, checkAlreadySold: Boolean) = {
+            val errors = Seq(
+              if (nftOwner.ownerId != loginState.username) Option(constants.Response.NFT_OWNER_NOT_FOUND) else None,
+              if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
+              if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
+              if (makeOrderTx.secondaryMarketId != secondaryMarket.id || makeOrderTx.nftId != cancelData.nftId || makeOrderTx.sellerId != nftOwner.ownerId || secondaryMarket.sellerId != loginState.username) Option(constants.Response.INVALID_ORDER) else None,
+            ).flatten
+            if (errors.isEmpty) {
+              masterTransactionCancelOrderTransactions.Utility.transaction(
+                secondaryMarket = secondaryMarket,
+                fromAddress = buyerKey.address,
+                gasPrice = constants.Blockchain.DefaultGasPrice,
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, cancelData.password))
+              )
+            } else errors.head.throwFutureBaseException()
+          }
+
+          (for {
+            secondaryMarket <- secondaryMarket
+            makeOrderTx <- makeOrderTx
+            nftOwner <- nftOwner
+            (verifyPassword, buyerKey) <- verifyPassword
+            checkAlreadySold <- checkAlreadySold
+            blockchainTransaction <- validateAndTransfer(nftOwner = nftOwner, makeOrderTx = makeOrderTx, verifyPassword = verifyPassword, secondaryMarket = secondaryMarket, buyerKey = buyerKey, checkAlreadySold = checkAlreadySold)
+          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.secondaryMarket.cancel(Cancel.form.withGlobalError(baseException.failure.message), nftId = cancelData.nftId, secondaryMarketId = cancelData.secondaryMarketId))
+          }
+        }
+      )
   }
 
   def buy(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>

@@ -190,14 +190,14 @@ CREATE TABLE IF NOT EXISTS MASTER."SecondaryMarket"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."CancelOrderTransaction"
 (
     "txHash"               VARCHAR NOT NULL,
-    "orderId"              VARCHAR NOT NULL,
+    "secondaryMarketId"    VARCHAR NOT NULL,
     "sellerId"             VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "orderId"),
+    PRIMARY KEY ("txHash", "secondaryMarketId"),
     UNIQUE ("txHash", "sellerId")
 );
 

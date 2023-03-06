@@ -191,6 +191,8 @@ GET         /marketCollectionNFTsPerPage                       controllers.Secon
 GET         /marketCollectionRightCards                        controllers.SecondaryMarketController.collectionTopRightCard(id: String)
 GET         /createSecondaryMarket                             controllers.SecondaryMarketController.createForm(nftId: String)
 POST        /createSecondaryMarket                             controllers.SecondaryMarketController.create()
+GET         /cancelSecondaryMarket                             controllers.SecondaryMarketController.cancelForm(nftId: String, secondaryMarketId: String)
+POST        /cancelSecondaryMarket                             controllers.SecondaryMarketController.cancel()
 GET         /buySecondaryMarket                                controllers.SecondaryMarketController.buyForm(nftId: String, secondaryMarketId: String)
 POST        /buySecondaryMarket                                controllers.SecondaryMarketController.buy()
 

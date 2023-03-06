@@ -6,7 +6,7 @@ import com.cosmos.crypto.secp256k1.PubKey
 import com.cosmos.tx.v1beta1._
 import com.google.protobuf.{ByteString, Any => protoBufAny}
 import com.identities.transactions.issue
-import com.orders.transactions.{define => ordersDefine, make => ordersMake, take => ordersTake}
+import com.orders.transactions.{cancel => orderCancel, define => ordersDefine, make => ordersMake, take => ordersTake}
 import com.splits.transactions.wrap
 import models.common.Coin
 import org.bitcoinj.core.ECKey
@@ -177,6 +177,16 @@ object BlockchainTransaction {
       .setFrom(fromAddress)
       .setFromID(fromID.asProtoIdentityID)
       .setTakerOwnableSplit(takerOwnableSplit.toPlainString)
+      .setOrderID(orderID.asProtoOrderID)
+      .build().toByteString)
+    .build()
+
+  def getCancelOrderMsg(fromAddress: String, fromID: IdentityID, orderID: OrderID): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(constants.Blockchain.TransactionMessage.ORDER_CANCEL)
+    .setValue(orderCancel
+      .Message.newBuilder()
+      .setFrom(fromAddress)
+      .setFromID(fromID.asProtoIdentityID)
       .setOrderID(orderID.asProtoOrderID)
       .build().toByteString)
     .build()
