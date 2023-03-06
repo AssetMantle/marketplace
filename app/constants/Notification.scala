@@ -62,4 +62,7 @@ object Notification {
   val IDENTITY_ISSUED: Notification = Notification("IDENTITY_ISSUED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = null) //Option(routes.javascript.SecondaryMarketController.viewSecondaryMarket))
   val IDENTITY_ISSUE_FAILED: Notification = Notification("IDENTITY_ISSUE_FAILED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = null) //Option(routes.javascript.SecondaryMarketController.viewSecondaryMarket))
 
+  val UNWRAPPED_TOKEN_SUCCESSFULLY: Notification = Notification("UNWRAPPED_TOKEN_SUCCESSFULLY", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
+  val UNWRAPPED_TOKEN_FAILED: Notification = Notification("UNWRAPPED_TOKEN_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
+
 }

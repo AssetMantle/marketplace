@@ -24,6 +24,7 @@ object Blockchain {
   val DefaultDefineAssetGasLimit = 150000
   val DefaultMintAssetGasLimit = 150000
   val DefaultMakeOrderGasLimit = 150000
+  val DefaultUnwrapGasLimit = 100000
   val DefaultCancelOrderGasLimit = 150000
   val DefaultTakeOrderGasLimit = 150000
   val DefaultGasPrice: BigDecimal = 0

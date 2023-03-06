@@ -7,7 +7,7 @@ import com.cosmos.tx.v1beta1._
 import com.google.protobuf.{ByteString, Any => protoBufAny}
 import com.identities.transactions.issue
 import com.orders.transactions.{cancel => orderCancel, define => ordersDefine, make => ordersMake, take => ordersTake}
-import com.splits.transactions.wrap
+import com.splits.transactions.{unwrap, wrap}
 import models.common.Coin
 import org.bitcoinj.core.ECKey
 import schema.id.OwnableID
@@ -167,6 +167,17 @@ object BlockchainTransaction {
       .setFrom(fromAddress)
       .setFromID(fromID.asProtoIdentityID)
       .addAllCoins(coins.map(_.toProtoCoin).asJava)
+      .build().toByteString)
+    .build()
+
+  def getUnwrapTokenMsg(fromAddress: String, fromID: IdentityID, ownableID: OwnableID, amount: BigDecimal): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(constants.Blockchain.TransactionMessage.SPLIT_UNWRAP)
+    .setValue(unwrap
+      .Message.newBuilder()
+      .setFrom(fromAddress)
+      .setFromID(fromID.asProtoIdentityID)
+      .setOwnableID(ownableID.toAnyOwnableID)
+      .setValue(amount.toString())
       .build().toByteString)
     .build()
 

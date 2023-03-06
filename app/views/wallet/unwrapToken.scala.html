@@ -1,0 +1,9 @@
+@import controllers.actions.LoginState
+@import views.html.base.form._
+@import views.wallet.companion.UnwrapToken
+
+@(unwrapTokenForm: Form[UnwrapToken.Data] = UnwrapToken.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonForm(constants.Form.UNWRAP_TOKEN, unwrapTokenForm) {
+    @commonInputPassword(unwrapTokenForm, constants.FormField.PASSWORD)
+}

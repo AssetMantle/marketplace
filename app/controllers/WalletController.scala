@@ -1,15 +1,19 @@
 package controllers
 
 import controllers.actions._
-import models.analytics.CollectionsAnalysis
+import exceptions.BaseException
+import models.blockchain.Split
+import models.master.Key
 import models.{blockchain, master, masterTransaction}
+import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import views.wallet.companion.UnwrapToken
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WalletController @Inject()(
@@ -19,20 +23,9 @@ class WalletController @Inject()(
                                   withLoginAction: WithLoginAction,
                                   withLoginActionAsync: WithLoginActionAsync,
                                   withoutLoginAction: WithoutLoginAction,
-                                  collectionsAnalysis: CollectionsAnalysis,
-                                  blockchainBalances: blockchain.Balances,
-                                  masterAccounts: master.Accounts,
+                                  blockchainSplits: blockchain.Splits,
                                   masterKeys: master.Keys,
-                                  masterWishLists: master.WishLists,
-                                  masterCollections: master.Collections,
-                                  masterNFTs: master.NFTs,
-                                  masterSecondaryMarkets: master.SecondaryMarkets,
-                                  masterNFTOwners: master.NFTOwners,
-                                  masterNFTProperties: master.NFTProperties,
-                                  masterTransactionTokenPrices: masterTransaction.TokenPrices,
-                                  masterTransactionMakeOrderTransactions: masterTransaction.MakeOrderTransactions,
-                                  masterTransactionTakeOrderTransactions: masterTransaction.TakeOrderTransactions,
-                                  masterTransactionCancelOrderTransactions: masterTransaction.CancelOrderTransactions,
+                                  masterTransactionUnwrapTransactions: masterTransaction.UnwrapTransactions,
                                   utilitiesNotification: utilities.Notification,
                                   utilitiesOperations: utilities.Operations,
                                 )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -42,5 +35,49 @@ class WalletController @Inject()(
   private implicit val module: String = constants.Module.WALLET_CONTROLLER
 
   implicit val callbackOnSessionTimeout: Call = routes.ProfileController.viewDefaultProfile()
+
+  def unwrapTokenForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.wallet.unwrapToken()))
+  }
+
+  def unwrapToken(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      UnwrapToken.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.wallet.unwrapToken(formWithErrors)))
+        },
+        unwrapTokenData => {
+          val split = blockchainSplits.Service.tryGetByOwnerIDAndOwnableID(ownerId = utilities.Identity.getMantlePlaceIdentityID(loginState.username), ownableID = constants.Blockchain.StakingTokenCoinID)
+          val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = unwrapTokenData.password)
+
+          def validateAndTransfer(split: Split, verifyPassword: Boolean, key: Key) = {
+            val errors = Seq(
+              if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
+            ).flatten
+            if (errors.isEmpty) {
+              masterTransactionUnwrapTransactions.Utility.transaction(
+                fromAddress = key.address,
+                accountId = loginState.username,
+                amount = split.value,
+                ownableId = constants.Blockchain.StakingTokenCoinID,
+                gasPrice = constants.Blockchain.DefaultGasPrice,
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, unwrapTokenData.password))
+              )
+            } else errors.head.throwFutureBaseException()
+          }
+
+          (for {
+            split <- split
+            (verifyPassword, key) <- verifyPassword
+            blockchainTransaction <- validateAndTransfer(split = split, verifyPassword = verifyPassword, key = key)
+          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.wallet.unwrapToken(UnwrapToken.form.withGlobalError(baseException.failure.message)))
+          }
+        }
+      )
+  }
+
 
 }

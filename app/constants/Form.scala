@@ -57,4 +57,6 @@ object Form {
   val CANCEL_SECONDARY_MARKET: Form = Form("CANCEL_SECONDARY_MARKET", routes.javascript.SecondaryMarketController.cancelForm, routes.SecondaryMarketController.cancel())
   val BUY_FROM_SECONDARY_MARKET: Form = Form("BUY_FROM_SECONDARY_MARKET", routes.javascript.SecondaryMarketController.buyForm, routes.SecondaryMarketController.buy())
 
+  val UNWRAP_TOKEN: Form = Form("UNWRAP_TOKEN", routes.javascript.WalletController.unwrapTokenForm, routes.WalletController.unwrapToken())
+
 }

@@ -207,12 +207,6 @@ class SecondaryMarketController @Inject()(
       Future(Ok(views.html.secondaryMarket.cancel(nftId = nftId, secondaryMarketId = secondaryMarketId)))
   }
 
-
-  def buyForm(nftId: String, secondaryMarketId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      Future(Ok(views.html.secondaryMarket.buy(nftId = nftId, secondaryMarketId = secondaryMarketId)))
-  }
-
   def cancel(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Cancel.form.bindFromRequest().fold(
@@ -258,6 +252,11 @@ class SecondaryMarketController @Inject()(
           }
         }
       )
+  }
+
+  def buyForm(nftId: String, secondaryMarketId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.secondaryMarket.buy(nftId = nftId, secondaryMarketId = secondaryMarketId)))
   }
 
   def buy(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>

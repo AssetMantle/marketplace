@@ -166,6 +166,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WhitelistController.deleteMember,
         routes.javascript.WhitelistController.detail,
 
+        routes.javascript.WalletController.unwrapTokenForm,
+
       )
     ).as("text/javascript")
 

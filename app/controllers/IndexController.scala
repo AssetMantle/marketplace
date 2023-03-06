@@ -36,6 +36,7 @@ class IndexController @Inject()(
                                  makeOrders: blockchainTransaction.MakeOrders,
                                  takeOrders: blockchainTransaction.TakeOrders,
                                  issueIdentities: blockchainTransaction.IssueIdentities,
+                                 unwraps: blockchainTransaction.Unwraps,
                                  masterCollections: master.Collections,
                                  masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                  masterAccounts: master.Accounts,
@@ -49,6 +50,7 @@ class IndexController @Inject()(
                                  makeOrderTransactions: masterTransaction.MakeOrderTransactions,
                                  takeOrderTransactions: masterTransaction.TakeOrderTransactions,
                                  cancelOrderTransactions: masterTransaction.CancelOrderTransactions,
+                                 unwrapTransactions: masterTransaction.UnwrapTransactions,
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -102,6 +104,8 @@ class IndexController @Inject()(
     historyMasterSecondaryMarkets.Utility.scheduler,
     cancelOrders.Utility.scheduler,
     cancelOrderTransactions.Utility.scheduler,
+    unwraps.Utility.scheduler,
+    unwrapTransactions.Utility.scheduler,
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())

@@ -202,6 +202,9 @@ POST        /cancelSecondaryMarket                             controllers.Secon
 GET         /buySecondaryMarket                                controllers.SecondaryMarketController.buyForm(nftId: String, secondaryMarketId: String)
 POST        /buySecondaryMarket                                controllers.SecondaryMarketController.buy()
 
+GET         /unwrapToken                                       controllers.WalletController.unwrapTokenForm()
+POST        /unwrapToken                                       controllers.WalletController.unwrapToken()
+
 # Should be not changed it will be public
 GET         /acceptWhitelistInvite/:whitelistId                controllers.WhitelistController.viewAcceptInviteDetails(whitelistId: String)
 GET         /whitelistInviteDetails                            controllers.WhitelistController.acceptInviteDetails(whitelistId: String)

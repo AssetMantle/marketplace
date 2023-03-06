@@ -56,8 +56,6 @@ object Splits {
 @Singleton
 class Splits @Inject()(
                         @NamedDatabase("explorer")
-                        blockchainBalances: Balances,
-                        utilitiesOperations: utilities.Operations,
                         protected val databaseConfigProvider: DatabaseConfigProvider
                       )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl2[Splits.DataTable, Split, Array[Byte], Array[Byte]](
