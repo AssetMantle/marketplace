@@ -10,7 +10,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Account(id: String, lowercaseId: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, accountType: String, language: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
+case class Account(id: String, lowercaseId: String, passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, accountType: String, language: String, identityIdString: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
 
   def getIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.id)
 
@@ -29,7 +29,7 @@ object Accounts {
 
   class AccountTable(tag: Tag) extends Table[Account](tag, "Account") with ModelTable[String] {
 
-    def * = (id, lowercaseId, passwordHash, salt, iterations, accountType, language, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Account.tupled, Account.unapply)
+    def * = (id, lowercaseId, passwordHash, salt, iterations, accountType, language, identityIdString.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Account.tupled, Account.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -44,6 +44,8 @@ object Accounts {
     def accountType = column[String]("accountType")
 
     def language = column[String]("language")
+
+    def identityIdString = column[String]("identityIdString")
 
     def createdBy = column[String]("createdBy")
 
@@ -82,6 +84,7 @@ class Accounts @Inject()(
         iterations = 0,
         language = lang.language,
         accountType = accountType,
+        identityIdString = Option(utilities.Identity.getMantlePlaceIdentityID(username).asString),
       )
       for {
         _ <- upsert(account)
@@ -112,7 +115,9 @@ class Accounts @Inject()(
 
     def get(username: String): Future[Option[Account]] = getById(username)
 
-    def getAllUsernames: Future[Seq[String]] = getAll.map(_.map(_.id))
+    def getEmptyIdentityID: Future[Seq[String]] = customQuery(Accounts.TableQuery.filter(_.identityIdString.?.isEmpty).map(_.id).result)
+
+    def updateIdentityId(accountId: String): Future[Int] = customUpdate(Accounts.TableQuery.filter(_.id === accountId).map(_.identityIdString).update(utilities.Identity.getMantlePlaceIdentityID(accountId).asString))
 
   }
 }

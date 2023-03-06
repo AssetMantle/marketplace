@@ -448,6 +448,23 @@ class Starter @Inject()(
     } yield ()
   }
 
+  def updateIdentityIDs(): Future[Unit] = {
+    println("Updating identity id")
+
+    val accountIds = masterAccounts.Service.getEmptyIdentityID
+
+    def process(accountIds: Seq[String]) = utilitiesOperations.traverse(accountIds) { accountId =>
+      masterAccounts.Service.updateIdentityId(accountId)
+    }
+
+    for {
+      accountIds <- accountIds
+      _ <- process(accountIds)
+    } yield {
+      println("Update identity id DONE")
+    }
+  }
+
   def updateAssetIDs(): Future[Unit] = {
     println("Updating asset id")
     val collections = masterCollections.Service.fetchAll()

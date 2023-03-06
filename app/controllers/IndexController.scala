@@ -70,6 +70,7 @@ class IndexController @Inject()(
 
   starter.getTx()
 
+  Await.result(starter.updateIdentityIDs(), Duration.Inf)
   Await.result(starter.fixMantleMonkeys(), Duration.Inf)
   Await.result(starter.updateDecimalToNumberType(), Duration.Inf)
   Await.result(starter.updateAssetIDs(), Duration.Inf)
