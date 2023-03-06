@@ -36,6 +36,26 @@ class WalletController @Inject()(
 
   implicit val callbackOnSessionTimeout: Call = routes.ProfileController.viewDefaultProfile()
 
+  def walletPopup(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.base.commonWalletPopup()))
+    }
+  }
+
+  def walletPopupKeys(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val keys = masterKeys.Service.fetchAllForId(loginState.username)
+        (for {
+          keys <- keys
+        } yield Ok(views.html.base.walletPopupKeys(keys))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
   def unwrapTokenForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.wallet.unwrapToken()))

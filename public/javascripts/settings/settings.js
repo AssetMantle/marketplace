@@ -103,7 +103,7 @@ function showHideSeed() {
 }
 
 function fetchKeys() {
-    let route = jsRoutes.controllers.SettingController.walletPopupKeys();
+    let route = jsRoutes.controllers.WalletController.walletPopupKeys();
     $.ajax({
         url: route.url,
         type: route.type,

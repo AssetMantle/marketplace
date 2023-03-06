@@ -92,8 +92,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.SettingController.viewSettings,
         routes.javascript.SettingController.settings,
-        routes.javascript.SettingController.walletPopup,
-        routes.javascript.SettingController.walletPopupKeys,
         routes.javascript.SettingController.addNewKey,
         routes.javascript.SettingController.addManagedKeyForm,
         routes.javascript.SettingController.addUnmanagedKeyForm,
@@ -166,6 +164,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WhitelistController.deleteMember,
         routes.javascript.WhitelistController.detail,
 
+        routes.javascript.WalletController.walletPopup,
+        routes.javascript.WalletController.walletPopupKeys,
         routes.javascript.WalletController.unwrapTokenForm,
 
       )

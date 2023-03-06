@@ -41,6 +41,9 @@ POST        /migrateWalletToKey                                controllers.Accou
 
 POST        /changeActiveKey                                   controllers.AccountController.changeActiveKey()
 
+GET         /walletPopup                                       controllers.WalletController.walletPopup()
+GET         /walletPopupKeys                                   controllers.WalletController.walletPopupKeys()
+
 GET         /collections                                       controllers.CollectionController.viewCollections()
 GET         /collection/:id                                    controllers.CollectionController.viewCollection(id: String)
 GET         /collectionsSection                                controllers.CollectionController.collectionsSection()
@@ -116,8 +119,6 @@ POST        /deleteNftDraft                                    controllers.NFTCo
 
 GET         /settings                                          controllers.SettingController.viewSettings()
 GET         /profileSettings                                   controllers.SettingController.settings()
-GET         /walletPopup                                       controllers.SettingController.walletPopup()
-GET         /walletPopupKeys                                   controllers.SettingController.walletPopupKeys()
 
 GET         /addNewKey                                         controllers.SettingController.addNewKey()
 

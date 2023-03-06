@@ -56,26 +56,6 @@ class SettingController @Inject()(
     }
   }
 
-  def walletPopup(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withLoginActionAsync { implicit loginState =>
-      implicit request =>
-        Future(Ok(views.html.base.commonWalletPopup()))
-    }
-  }
-
-  def walletPopupKeys(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val keys = masterKeys.Service.fetchAllForId(loginState.username)
-        (for {
-          keys <- keys
-        } yield Ok(views.html.base.walletPopupKeys(keys))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
   def addNewKey(): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.setting.addNewKey())
   }
