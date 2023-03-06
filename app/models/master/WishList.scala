@@ -1,6 +1,6 @@
 package models.master
 
-import models.Trait.{Entity2, GenericDaoImpl2, Logging, ModelTable2}
+import models.traits.{Entity2, GenericDaoImpl2, Logging, ModelTable2}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._

@@ -1,6 +1,6 @@
 package models.masterTransaction
 
-import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import models.common.Collection._
 import models.master.Collection
 import play.api.Logger

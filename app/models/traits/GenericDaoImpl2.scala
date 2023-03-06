@@ -1,4 +1,4 @@
-package models.Trait
+package models.traits
 
 import exceptions.BaseException
 import org.postgresql.util.PSQLException

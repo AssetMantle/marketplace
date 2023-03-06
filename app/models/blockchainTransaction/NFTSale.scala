@@ -2,7 +2,7 @@ package models.blockchainTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.Trait._
+import models.traits._
 import models.blockchain
 import models.blockchain.Transaction
 import models.common.Coin

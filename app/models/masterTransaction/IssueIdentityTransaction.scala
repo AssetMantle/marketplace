@@ -2,7 +2,7 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.Trait._
+import models.traits._
 import models.blockchainTransaction.IssueIdentity
 import models.master.Key
 import models.{blockchain, blockchainTransaction, master}

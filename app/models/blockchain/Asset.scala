@@ -1,6 +1,6 @@
 package models.blockchain
 
-import models.Trait._
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase

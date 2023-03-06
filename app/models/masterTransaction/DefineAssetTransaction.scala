@@ -2,7 +2,7 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.Trait._
+import models.traits._
 import models.blockchainTransaction.DefineAsset
 import models.{blockchain, blockchainTransaction}
 import play.api.Logger

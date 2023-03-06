@@ -182,7 +182,7 @@ class SecondaryMarketController @Inject()(
               for {
                 secondaryMarketId <- masterSecondaryMarkets.Service.add(createData.toNewSecondaryMarket(collectionId = nftOwner.collectionId, sellerId = loginState.username, quantity = quantity))
                 _ <- masterNFTOwners.Service.listNFTOnSecondaryMarket(NFTOwner = nftOwner, secondaryMarketID = secondaryMarketId)
-                tx <- masterTransactionMakeOrderTransactions.Utility.transaction(nftID = createData.nftId, nftOwner = nftOwner, fromAddress = loginState.address, quantity = quantity, endHours = createData.endHours, price = createData.price, buyerAccountId = None, secondaryMarketId = secondaryMarketId, gasPrice = constants.Blockchain.DefaultGasPrice, ecKey = activeKey.getECKey(createData.password).get)
+                tx <- masterTransactionMakeOrderTransactions.Utility.transaction(nftID = createData.nftId, nftOwner = nftOwner, fromAddress = loginState.address, quantity = quantity, endHours = createData.endHours, price = createData.price, buyerId = None, secondaryMarketId = secondaryMarketId, gasPrice = constants.Blockchain.DefaultGasPrice, ecKey = activeKey.getECKey(createData.password).get)
               } yield tx
             } else errors.head.throwFutureBaseException()
           }
@@ -228,14 +228,14 @@ class SecondaryMarketController @Inject()(
               if (balance == MicroNumber.zero || balance <= (secondaryMarket.price * quantity)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
-              if (makeOrderTx.secondaryMarketId != secondaryMarket.id || makeOrderTx.nftId != buyData.nftId || makeOrderTx.sellerAccountId != nftOwner.ownerId) Option(constants.Response.INVALID_ORDER) else None,
+              if (makeOrderTx.secondaryMarketId != secondaryMarket.id || makeOrderTx.nftId != buyData.nftId || makeOrderTx.sellerId != nftOwner.ownerId) Option(constants.Response.INVALID_ORDER) else None,
             ).flatten
             if (errors.isEmpty) {
               masterTransactionTakeOrderTransactions.Utility.transaction(
                 nftID = buyData.nftId,
                 nftOwner = nftOwner,
                 quantity = 1,
-                buyerAccountId = loginState.username,
+                buyerId = loginState.username,
                 fromAddress = buyerKey.address,
                 secondaryMarket = secondaryMarket,
                 gasPrice = constants.Blockchain.DefaultGasPrice,

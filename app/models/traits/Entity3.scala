@@ -1,4 +1,4 @@
-package models.Trait
+package models.traits
 
 trait Entity3[PK1, PK2, PK3] {
   def id1: PK1

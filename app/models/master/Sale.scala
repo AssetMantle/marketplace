@@ -1,6 +1,6 @@
 package models.master
 
-import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import models.history
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider

@@ -2,7 +2,7 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.Trait._
+import models.traits._
 import models.blockchainTransaction.NFTSale
 import models.common.Coin
 import models.master.NFT

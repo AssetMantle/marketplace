@@ -2,7 +2,7 @@ package models.history
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.Trait.{Entity, GenericDaoImpl, HistoryLogging, ModelTable}
+import models.traits.{Entity, GenericDaoImpl, HistoryLogging, ModelTable}
 import models.analytics.CollectionsAnalysis
 import models.{master, masterTransaction}
 import play.api.Logger

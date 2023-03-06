@@ -1,6 +1,6 @@
 package models.master
 
-import models.Trait._
+import models.traits._
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.ChildNumber
 import play.api.Logger

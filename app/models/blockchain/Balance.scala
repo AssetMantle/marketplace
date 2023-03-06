@@ -1,6 +1,6 @@
 package models.blockchain
 
-import models.Trait.{Entity, GenericDaoImpl, ModelTable}
+import models.traits.{Entity, GenericDaoImpl, ModelTable}
 import models.common.Coin
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider

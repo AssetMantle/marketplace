@@ -2,7 +2,7 @@ package models.blockchain
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.Trait.{Entity, GenericDaoImpl, ModelTable}
+import models.traits.{Entity, GenericDaoImpl, ModelTable}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import play.db.NamedDatabase

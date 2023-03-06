@@ -1,6 +1,6 @@
 package models.masterTransaction
 
-import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json

@@ -1,4 +1,4 @@
-package models.Trait
+package models.traits
 
 trait ModelTable2[PK1, PK2] {
 

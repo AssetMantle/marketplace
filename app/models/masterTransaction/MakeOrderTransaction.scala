@@ -2,9 +2,9 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.Trait._
 import models.blockchainTransaction.MakeOrder
 import models.master.{NFT, NFTOwner, SecondaryMarket}
+import models.traits._
 import models.{analytics, blockchain, blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
@@ -18,7 +18,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class MakeOrderTransaction(txHash: String, nftId: String, sellerAccountId: String, buyerAccountId: Option[String], denom: String, makerOwnableSplit: AttoNumber, expiresIn: Long, takerOwnableSplit: AttoNumber, secondaryMarketId: String, status: Option[Boolean], creationHeight: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class MakeOrderTransaction(txHash: String, nftId: String, sellerId: String, buyerId: Option[String], denom: String, makerOwnableSplit: AttoNumber, expiresIn: Long, takerOwnableSplit: AttoNumber, secondaryMarketId: String, status: Option[Boolean], creationHeight: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def getQuantity: Int = (this.makerOwnableSplit.value / constants.Blockchain.SmallestDec).toInt
 
@@ -27,17 +27,17 @@ case class MakeOrderTransaction(txHash: String, nftId: String, sellerAccountId: 
   def getOrderID(creationHeight: Int, assetID: AssetID): OrderID = utilities.Order.getOrderID(
     classificationID = constants.Blockchain.MantlePlaceOrderClassificationID,
     properties = constants.Orders.ImmutableMetas,
-    makerID = utilities.Identity.getMantlePlaceIdentityID(this.sellerAccountId),
+    makerID = utilities.Identity.getMantlePlaceIdentityID(this.sellerId),
     makerOwnableID = assetID,
     makerOwnableSplit = this.makerOwnableSplit.toBigDecimal,
     creationHeight = creationHeight,
-    takerID = if (buyerAccountId.isEmpty) constants.Blockchain.EmptyIdentityID else utilities.Identity.getMantlePlaceIdentityID(buyerAccountId.get),
+    takerID = if (buyerId.isEmpty) constants.Blockchain.EmptyIdentityID else utilities.Identity.getMantlePlaceIdentityID(buyerId.get),
     takerOwnableID = constants.Blockchain.StakingTokenCoinID,
     takerOwnableSplit = this.takerOwnableSplit.toBigDecimal
   )
 
   def serialize: MakeOrderTransactions.MakeOrderTransactionSerialized = MakeOrderTransactions.MakeOrderTransactionSerialized(
-    txHash = this.txHash, nftId = this.nftId, sellerAccountId = this.sellerAccountId, buyerAccountId = this.buyerAccountId, denom = this.denom, makerOwnableSplit = this.makerOwnableSplit.toBigDecimal, expiresIn = this.expiresIn, takerOwnableSplit = this.takerOwnableSplit.toBigDecimal, secondaryMarketId = this.secondaryMarketId, status = this.status, creationHeight = this.creationHeight, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+    txHash = this.txHash, nftId = this.nftId, sellerId = this.sellerId, buyerId = this.buyerId, denom = this.denom, makerOwnableSplit = this.makerOwnableSplit.toBigDecimal, expiresIn = this.expiresIn, takerOwnableSplit = this.takerOwnableSplit.toBigDecimal, secondaryMarketId = this.secondaryMarketId, status = this.status, creationHeight = this.creationHeight, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
   )
 }
 
@@ -47,30 +47,30 @@ object MakeOrderTransactions {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_MAKE_ORDER_TRANSACTION
 
-  case class MakeOrderTransactionSerialized(txHash: String, nftId: String, sellerAccountId: String, buyerAccountId: Option[String], denom: String, makerOwnableSplit: BigDecimal, expiresIn: Long, takerOwnableSplit: BigDecimal, secondaryMarketId: String, status: Option[Boolean], creationHeight: Option[Int], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity3[String, String, String] {
+  case class MakeOrderTransactionSerialized(txHash: String, nftId: String, sellerId: String, buyerId: Option[String], denom: String, makerOwnableSplit: BigDecimal, expiresIn: Long, takerOwnableSplit: BigDecimal, secondaryMarketId: String, status: Option[Boolean], creationHeight: Option[Int], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity3[String, String, String] {
     def id1: String = txHash
 
     def id2: String = nftId
 
-    def id3: String = sellerAccountId
+    def id3: String = sellerId
 
     def deserialize: MakeOrderTransaction = MakeOrderTransaction(
-      txHash = this.txHash, nftId = this.nftId, sellerAccountId = this.sellerAccountId, buyerAccountId = this.buyerAccountId, denom = this.denom, makerOwnableSplit = AttoNumber(this.makerOwnableSplit), expiresIn = this.expiresIn, takerOwnableSplit = AttoNumber(this.takerOwnableSplit), secondaryMarketId = this.secondaryMarketId, status = this.status, creationHeight = this.creationHeight, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+      txHash = this.txHash, nftId = this.nftId, sellerId = this.sellerId, buyerId = this.buyerId, denom = this.denom, makerOwnableSplit = AttoNumber(this.makerOwnableSplit), expiresIn = this.expiresIn, takerOwnableSplit = AttoNumber(this.takerOwnableSplit), secondaryMarketId = this.secondaryMarketId, status = this.status, creationHeight = this.creationHeight, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
     )
 
   }
 
   class MakeOrderTransactionTable(tag: Tag) extends Table[MakeOrderTransactionSerialized](tag, "MakeOrderTransaction") with ModelTable3[String, String, String] {
 
-    def * = (txHash, nftId, sellerAccountId, buyerAccountId.?, denom, makerOwnableSplit, expiresIn, takerOwnableSplit, secondaryMarketId, status.?, creationHeight.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (MakeOrderTransactionSerialized.tupled, MakeOrderTransactionSerialized.unapply)
+    def * = (txHash, nftId, sellerId, buyerId.?, denom, makerOwnableSplit, expiresIn, takerOwnableSplit, secondaryMarketId, status.?, creationHeight.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (MakeOrderTransactionSerialized.tupled, MakeOrderTransactionSerialized.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
     def nftId = column[String]("nftId", O.PrimaryKey)
 
-    def sellerAccountId = column[String]("sellerAccountId", O.PrimaryKey)
+    def sellerId = column[String]("sellerId", O.PrimaryKey)
 
-    def buyerAccountId = column[String]("buyerAccountId")
+    def buyerId = column[String]("buyerId")
 
     def denom = column[String]("denom")
 
@@ -98,7 +98,7 @@ object MakeOrderTransactions {
 
     def id2 = nftId
 
-    def id3 = sellerAccountId
+    def id3 = sellerId
 
   }
 
@@ -136,7 +136,7 @@ class MakeOrderTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, nftId: String, sellerAccountId: String, buyerAccountId: Option[String], denom: String, makerOwnableSplit: AttoNumber, expiresIn: Long, takerOwnableSplit: AttoNumber, secondaryMarketId: String): Future[Unit] = create(MakeOrderTransaction(txHash = txHash, nftId = nftId, sellerAccountId = sellerAccountId, buyerAccountId = buyerAccountId, denom = denom, makerOwnableSplit = makerOwnableSplit, expiresIn = expiresIn, takerOwnableSplit = takerOwnableSplit, secondaryMarketId = secondaryMarketId, status = None, creationHeight = None).serialize)
+    def addWithNoneStatus(txHash: String, nftId: String, sellerId: String, buyerId: Option[String], denom: String, makerOwnableSplit: AttoNumber, expiresIn: Long, takerOwnableSplit: AttoNumber, secondaryMarketId: String): Future[Unit] = create(MakeOrderTransaction(txHash = txHash, nftId = nftId, sellerId = sellerId, buyerId = buyerId, denom = denom, makerOwnableSplit = makerOwnableSplit, expiresIn = expiresIn, takerOwnableSplit = takerOwnableSplit, secondaryMarketId = secondaryMarketId, status = None, creationHeight = None).serialize)
 
     def getByTxHash(txHash: String): Future[Seq[MakeOrderTransaction]] = filter(_.txHash === txHash).map(_.map(_.deserialize))
 
@@ -154,7 +154,7 @@ class MakeOrderTransactions @Inject()(
   }
 
   object Utility {
-    def transaction(nftID: String, nftOwner: NFTOwner, quantity: Int, fromAddress: String, endHours: Int, price: MicroNumber, buyerAccountId: Option[String], secondaryMarketId: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(nftID: String, nftOwner: NFTOwner, quantity: Int, fromAddress: String, endHours: Int, price: MicroNumber, buyerId: Option[String], secondaryMarketId: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get
@@ -172,7 +172,7 @@ class MakeOrderTransactions @Inject()(
             fromAddress = fromAddress,
             fromID = utilities.Identity.getMantlePlaceIdentityID(nftOwner.ownerId),
             classificationID = constants.Blockchain.MantlePlaceOrderClassificationID,
-            takerID = if (buyerAccountId.isEmpty) constants.Blockchain.EmptyIdentityID else utilities.Identity.getMantlePlaceIdentityID(buyerAccountId.get),
+            takerID = if (buyerId.isEmpty) constants.Blockchain.EmptyIdentityID else utilities.Identity.getMantlePlaceIdentityID(buyerId.get),
             makerOwnableID = nft.getAssetID,
             makerOwnableSplit = AttoNumber(quantity * constants.Blockchain.SmallestDec),
             expiresIn = expiresIn,
@@ -193,7 +193,7 @@ class MakeOrderTransactions @Inject()(
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
               makeOrder <- blockchainTransactionMakeOrders.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
-              _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nftID, sellerAccountId = nftOwner.ownerId, buyerAccountId = buyerAccountId, denom = constants.Blockchain.StakingToken, makerOwnableSplit = AttoNumber(quantity * constants.Blockchain.SmallestDec), expiresIn = expiresIn, takerOwnableSplit = AttoNumber(price.toMicroBigDecimal), secondaryMarketId = secondaryMarketId)
+              _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nftID, sellerId = nftOwner.ownerId, buyerId = buyerId, denom = constants.Blockchain.StakingToken, makerOwnableSplit = AttoNumber(quantity * constants.Blockchain.SmallestDec), expiresIn = expiresIn, takerOwnableSplit = AttoNumber(price.toMicroBigDecimal), secondaryMarketId = secondaryMarketId)
             } yield makeOrder
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
         }
@@ -268,6 +268,8 @@ class MakeOrderTransactions @Inject()(
               val markSuccess = Service.markSuccessAndCreationHeight(makeOrderTx.txHash, creationHeight)
               val nft = masterNFTs.Service.tryGet(makeOrderTx.nftId)
 
+              def sendNotifications(nft: NFT) = utilitiesNotification.send(makeOrderTx.sellerId, constants.Notification.SECONDARY_MARKET_CREATION_SUCCESSFUL, nft.name)(s"'${nft.id}'")
+
               def updateOrderId(nft: NFT) = {
                 val orderID = makeOrderTx.getOrderID(creationHeight = creationHeight, nft.getAssetID)
                 masterSecondaryMarkets.Service.updateOrderID(makeOrderTx.secondaryMarketId, orderID)
@@ -280,6 +282,7 @@ class MakeOrderTransactions @Inject()(
                 nft <- nft
                 _ <- updateOrderId(nft)
                 _ <- updateAnalytics(nft.collectionId)
+                _ <- sendNotifications(nft)
               } yield ()
                 ).recover {
                 case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
@@ -287,12 +290,17 @@ class MakeOrderTransactions @Inject()(
             } else {
               val markFailed = Service.markFailed(makeOrderTx.txHash)
               val updateNFTOwner = masterNFTOwners.Service.markSecondaryMarketNull(secondaryMarketId = makeOrderTxs.filter(_.txHash == makeOrderTx.txHash).head.secondaryMarketId)
+              val nft = masterNFTs.Service.tryGet(makeOrderTx.nftId)
               val markMasterForDelete = masterSecondaryMarkets.Service.markForDeletion(makeOrderTxs.filter(_.txHash == makeOrderTx.txHash).map(_.secondaryMarketId))
+
+              def sendNotifications(nft: NFT) = utilitiesNotification.send(makeOrderTx.sellerId, constants.Notification.SECONDARY_MARKET_CREATION_FAILED, nft.name)(s"'${nft.id}'")
 
               (for {
                 _ <- markFailed
                 _ <- updateNFTOwner
                 _ <- markMasterForDelete
+                nft <- nft
+                _ <- sendNotifications(nft)
               } yield ()
                 ).recover {
                 case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")

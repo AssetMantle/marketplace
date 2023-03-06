@@ -1,5 +1,21 @@
 # --- !Ups
 
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."CancelOrder"
+(
+    "txHash"               VARCHAR NOT NULL,
+    "txRawBytes"           BYTEA   NOT NULL,
+    "fromAddress"          VARCHAR NOT NULL,
+    "status"               BOOLEAN,
+    "memo"                 VARCHAR,
+    "timeoutHeight"        INTEGER NOT NULL,
+    "log"                  VARCHAR,
+    "createdBy"            VARCHAR,
+    "createdOnMillisEpoch" BIGINT,
+    "updatedBy"            VARCHAR,
+    "updatedOnMillisEpoch" BIGINT,
+    PRIMARY KEY ("txHash")
+);
+
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."DefineAsset"
 (
     "txHash"               VARCHAR NOT NULL,
@@ -171,6 +187,19 @@ CREATE TABLE IF NOT EXISTS MASTER."SecondaryMarket"
     UNIQUE ("id", "nftId")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."CancelOrderTransaction"
+(
+    "txHash"               VARCHAR NOT NULL,
+    "orderId"              VARCHAR NOT NULL,
+    "sellerId"             VARCHAR NOT NULL,
+    "status"               BOOLEAN,
+    "createdBy"            VARCHAR,
+    "createdOnMillisEpoch" BIGINT,
+    "updatedBy"            VARCHAR,
+    "updatedOnMillisEpoch" BIGINT,
+    PRIMARY KEY ("txHash", "orderId"),
+    UNIQUE ("txHash", "sellerId")
+);
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."DefineAssetTransaction"
 (
@@ -200,8 +229,8 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."MakeOrderTransaction"
 (
     "txHash"               VARCHAR NOT NULL,
     "nftId"                VARCHAR NOT NULL,
-    "sellerAccountId"      VARCHAR NOT NULL,
-    "buyerAccountId"       VARCHAR,
+    "sellerId"             VARCHAR NOT NULL,
+    "buyerId"              VARCHAR,
     "denom"                VARCHAR NOT NULL,
     "expiresIn"            BIGINT  NOT NULL,
     "makerOwnableSplit"    NUMERIC NOT NULL,
@@ -213,7 +242,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."MakeOrderTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "nftId", "sellerAccountId"),
+    PRIMARY KEY ("txHash", "nftId", "sellerId"),
     UNIQUE ("nftId", "secondaryMarketId")
 );
 
@@ -247,7 +276,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TakeOrderTransaction"
 (
     "txHash"               VARCHAR NOT NULL,
     "nftId"                VARCHAR NOT NULL,
-    "buyerAccountId"       VARCHAR NOT NULL,
+    "buyerId"              VARCHAR NOT NULL,
     "quantity"             INTEGER NOT NULL,
     "secondaryMarketId"    VARCHAR NOT NULL,
     "status"               BOOLEAN,
@@ -255,7 +284,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TakeOrderTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "nftId", "buyerAccountId")
+    PRIMARY KEY ("txHash", "nftId", "buyerId")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."UnprovisionAddressTransaction"
@@ -306,6 +335,11 @@ ALTER TABLE MASTER."SecondaryMarket"
 ALTER TABLE MASTER."SecondaryMarket"
     ADD CONSTRAINT SecondaryMarket_sellerId FOREIGN KEY ("sellerId") REFERENCES MASTER."Account" ("id");
 
+ALTER TABLE MASTER_TRANSACTION."CancelOrderTransaction"
+    ADD CONSTRAINT CancelOrderTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."CancelOrder" ("txHash");
+ALTER TABLE MASTER_TRANSACTION."CancelOrderTransaction"
+    ADD CONSTRAINT CancelOrderTransaction_SellerId FOREIGN KEY ("sellerId") REFERENCES MASTER."Account" ("id");
+
 ALTER TABLE MASTER_TRANSACTION."DefineAssetTransaction"
     ADD CONSTRAINT DefineAssetTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."DefineAsset" ("txHash");
 ALTER TABLE MASTER_TRANSACTION."DefineAssetTransaction"
@@ -334,14 +368,14 @@ ALTER TABLE MASTER_TRANSACTION."UnprovisionAddressTransaction"
     ADD CONSTRAINT UnprovisionAddressTransaction_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."MakeOrderTransaction"
-    ADD CONSTRAINT MakeOrderTransaction_BuyerAccountId FOREIGN KEY ("buyerAccountId") REFERENCES MASTER."Account" ("id");
+    ADD CONSTRAINT MakeOrderTransaction_BuyerAccountId FOREIGN KEY ("buyerId") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."MakeOrderTransaction"
-    ADD CONSTRAINT MakeOrderTransaction_sellerAccountId FOREIGN KEY ("sellerAccountId") REFERENCES MASTER."Account" ("id");
+    ADD CONSTRAINT MakeOrderTransaction_sellerId FOREIGN KEY ("sellerId") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."MakeOrderTransaction"
     ADD CONSTRAINT MakeOrderTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."MakeOrder" ("txHash");
 
 ALTER TABLE MASTER_TRANSACTION."TakeOrderTransaction"
-    ADD CONSTRAINT TakeOrderTransaction_BuyerAccountId FOREIGN KEY ("buyerAccountId") REFERENCES MASTER."Account" ("id");
+    ADD CONSTRAINT TakeOrderTransaction_BuyerAccountId FOREIGN KEY ("buyerId") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."TakeOrderTransaction"
     ADD CONSTRAINT TakeOrderTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."TakeOrder" ("txHash");
 
@@ -350,6 +384,11 @@ ALTER TABLE MASTER_TRANSACTION."UnwrapTransaction"
 ALTER TABLE MASTER_TRANSACTION."UnwrapTransaction"
     ADD CONSTRAINT UnwrapTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."Unwrap" ("txHash");
 
+CREATE TRIGGER BT_CANCEL_ORDER_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."CancelOrder"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 CREATE TRIGGER BT_DEFINE_ASSET_LOG
     BEFORE INSERT OR UPDATE
     ON BLOCKCHAIN_TRANSACTION."DefineAsset"
@@ -403,6 +442,11 @@ CREATE TRIGGER SECONDARY_MARKET_LOG
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 
+CREATE TRIGGER CANCEL_ORDER_TRANSACTION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."CancelOrderTransaction"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 CREATE TRIGGER DEFINE_ASSET_TRANSACTION_LOG
     BEFORE INSERT OR UPDATE
     ON MASTER_TRANSACTION."DefineAssetTransaction"
@@ -475,6 +519,7 @@ CREATE TRIGGER KEY_VALID
 EXECUTE PROCEDURE MASTER.KEY_VALIDATE();
 
 # --- !Downs
+DROP TRIGGER IF EXISTS BT_CANCEL_ORDER_LOG ON BLOCKCHAIN_TRANSACTION."CancelOrder" CASCADE;
 DROP TRIGGER IF EXISTS BT_DEFINE_ASSET_LOG ON BLOCKCHAIN_TRANSACTION."DefineAsset" CASCADE;
 DROP TRIGGER IF EXISTS BT_ISSUE_IDENTITY_LOG ON BLOCKCHAIN_TRANSACTION."IssueIdentity" CASCADE;
 DROP TRIGGER IF EXISTS BT_MINT_ASSET_LOG ON BLOCKCHAIN_TRANSACTION."MintAsset" CASCADE;
@@ -488,6 +533,7 @@ DROP TRIGGER IF EXISTS SECONDARY_MARKET_HISTORY_LOG ON HISTORY."MasterSecondaryM
 
 DROP TRIGGER IF EXISTS SECONDARY_MARKET_LOG ON MASTER."SecondaryMarket" CASCADE;
 
+DROP TRIGGER IF EXISTS DEFINE_ASSET_TRANSACTION_LOG ON MASTER_TRANSACTION."CancelOrderTransaction" CASCADE;
 DROP TRIGGER IF EXISTS DEFINE_ASSET_TRANSACTION_LOG ON MASTER_TRANSACTION."DefineAssetTransaction" CASCADE;
 DROP TRIGGER IF EXISTS ISSUE_IDENTITY_TRANSACTION_LOG ON MASTER_TRANSACTION."IssueIdentityTransaction" CASCADE;
 DROP TRIGGER IF EXISTS MINT_ASSET_TRANSACTION_LOG ON MASTER_TRANSACTION."MintAssetTransaction" CASCADE;
@@ -498,6 +544,7 @@ DROP TRIGGER IF EXISTS TAKE_ORDER_TRANSACTION_LOG ON MASTER_TRANSACTION."TakeOrd
 DROP TRIGGER IF EXISTS UNPROVISION_ADDRESS_TRANSACTION_LOG ON MASTER_TRANSACTION."UnprovisionAddressTransaction" CASCADE;
 DROP TRIGGER IF EXISTS UNWRAP_TRANSACTION_LOG ON MASTER_TRANSACTION."UnwrapTransaction" CASCADE;
 
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."CancelOrder" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."DefineAsset" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."IssueIdentity" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."TakeOrder" CASCADE;
@@ -510,6 +557,7 @@ DROP TABLE IF EXISTS HISTORY."MasterSecondaryMarket" CASCADE;
 
 DROP TABLE IF EXISTS MASTER."SecondaryMarket" CASCADE;
 
+DROP TABLE IF EXISTS MASTER_TRANSACTION."CancelOrderTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."DefineAssetTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."MakeOrderTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."MintAssetTransaction" CASCADE;

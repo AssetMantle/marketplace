@@ -2,10 +2,10 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.Trait._
 import models.blockchainTransaction.TakeOrder
 import models.common.Coin
 import models.master.{NFT, NFTOwner, SecondaryMarket}
+import models.traits._
 import models.{analytics, blockchain, blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
@@ -18,13 +18,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class TakeOrderTransaction(txHash: String, nftId: String, buyerAccountId: String, quantity: Int, secondaryMarketId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity3[String, String, String] {
+case class TakeOrderTransaction(txHash: String, nftId: String, buyerId: String, quantity: Int, secondaryMarketId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity3[String, String, String] {
 
   def id1: String = txHash
 
   def id2: String = nftId
 
-  def id3: String = buyerAccountId
+  def id3: String = buyerId
 }
 
 object TakeOrderTransactions {
@@ -36,13 +36,13 @@ object TakeOrderTransactions {
 
   class TakeOrderTransactionTable(tag: Tag) extends Table[TakeOrderTransaction](tag, "TakeOrderTransaction") with ModelTable3[String, String, String] {
 
-    def * = (txHash, nftId, buyerAccountId, quantity, secondaryMarketId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (TakeOrderTransaction.tupled, TakeOrderTransaction.unapply)
+    def * = (txHash, nftId, buyerId, quantity, secondaryMarketId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (TakeOrderTransaction.tupled, TakeOrderTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
     def nftId = column[String]("nftId", O.PrimaryKey)
 
-    def buyerAccountId = column[String]("buyerAccountId", O.PrimaryKey)
+    def buyerId = column[String]("buyerId", O.PrimaryKey)
 
     def secondaryMarketId = column[String]("secondaryMarketId")
 
@@ -62,7 +62,7 @@ object TakeOrderTransactions {
 
     def id2 = nftId
 
-    def id3 = buyerAccountId
+    def id3 = buyerId
 
   }
 
@@ -100,7 +100,7 @@ class TakeOrderTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, nftId: String, buyerAccountId: String, quantity: Int, secondaryMarketId: String): Future[Unit] = create(TakeOrderTransaction(txHash = txHash, nftId = nftId, buyerAccountId = buyerAccountId, quantity = quantity, secondaryMarketId = secondaryMarketId, status = None))
+    def addWithNoneStatus(txHash: String, nftId: String, buyerId: String, quantity: Int, secondaryMarketId: String): Future[Unit] = create(TakeOrderTransaction(txHash = txHash, nftId = nftId, buyerId = buyerId, quantity = quantity, secondaryMarketId = secondaryMarketId, status = None))
 
     def checkAlreadySold(nftId: String, secondaryMarketId: String): Future[Boolean] = {
       val nullStatus: Option[Boolean] = null
@@ -121,7 +121,7 @@ class TakeOrderTransactions @Inject()(
   }
 
   object Utility {
-    def transaction(nftID: String, nftOwner: NFTOwner, buyerAccountId: String, quantity: Int, fromAddress: String, secondaryMarket: SecondaryMarket, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(nftID: String, nftOwner: NFTOwner, buyerId: String, quantity: Int, fromAddress: String, secondaryMarket: SecondaryMarket, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get
@@ -135,12 +135,12 @@ class TakeOrderTransactions @Inject()(
         val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
         val takeOrderMsg = utilities.BlockchainTransaction.getTakeOrderMsg(
           fromAddress = fromAddress,
-          fromID = utilities.Identity.getMantlePlaceIdentityID(buyerAccountId),
+          fromID = utilities.Identity.getMantlePlaceIdentityID(buyerId),
           takerOwnableSplit = AttoNumber((secondaryMarket.price * quantity).toMicroBigDecimal),
           orderID = secondaryMarket.getOrderID())
         val wrapCoinMsg = utilities.BlockchainTransaction.getWrapTokenMsg(
           fromAddress = fromAddress,
-          fromID = utilities.Identity.getMantlePlaceIdentityID(buyerAccountId),
+          fromID = utilities.Identity.getMantlePlaceIdentityID(buyerId),
           coins = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = secondaryMarket.price * quantity))
         )
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
@@ -156,7 +156,7 @@ class TakeOrderTransactions @Inject()(
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
               takeOrder <- blockchainTransactionTakeOrders.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
-              _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nftID, buyerAccountId = buyerAccountId, quantity = nftOwner.quantity.toInt, secondaryMarketId = secondaryMarket.id)
+              _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nftID, buyerId = buyerId, quantity = nftOwner.quantity.toInt, secondaryMarketId = secondaryMarket.id)
             } yield takeOrder
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
         }
@@ -207,12 +207,12 @@ class TakeOrderTransactions @Inject()(
             if (transaction.status.get) {
               val markSuccess = Service.markSuccess(takeOrderTx.txHash)
               val nft = masterNFTs.Service.tryGet(takeOrderTx.nftId)
-              val oldNFTOwner = masterNFTOwners.Service.onSuccessfulTakeOrder(secondaryMarketId = takeOrderTx.secondaryMarketId, totalSold = takeOrderTx.quantity, buyerAccountId = takeOrderTx.buyerAccountId)
+              val oldNFTOwner = masterNFTOwners.Service.onSuccessfulTakeOrder(secondaryMarketId = takeOrderTx.secondaryMarketId, totalSold = takeOrderTx.quantity, buyerId = takeOrderTx.buyerId)
               val markOrderForDeletion = masterSecondaryMarkets.Service.markForDeletion(takeOrderTx.secondaryMarketId)
 
               def sendNotifications(oldNFTOwner: NFTOwner, nft: NFT) = {
                 utilitiesNotification.send(oldNFTOwner.ownerId, constants.Notification.SELLER_TAKE_ORDER_SUCCESSFUL, nft.name)("")
-                utilitiesNotification.send(takeOrderTx.buyerAccountId, constants.Notification.BUYER_TAKE_ORDER_SUCCESSFUL, nft.name)(s"'${takeOrderTx.buyerAccountId}', '${constants.View.COLLECTED}'")
+                utilitiesNotification.send(takeOrderTx.buyerId, constants.Notification.BUYER_TAKE_ORDER_SUCCESSFUL, nft.name)(s"'${takeOrderTx.buyerId}', '${constants.View.COLLECTED}'")
               }
 
               (for {
@@ -229,7 +229,7 @@ class TakeOrderTransactions @Inject()(
               val markFailed = Service.markFailed(takeOrderTx.txHash)
               val nft = masterNFTs.Service.tryGet(takeOrderTx.nftId)
 
-              def sendNotifications(nft: NFT) = utilitiesNotification.send(takeOrderTx.buyerAccountId, constants.Notification.BUYER_TAKE_ORDER_FAILED, nft.name)("")
+              def sendNotifications(nft: NFT) = utilitiesNotification.send(takeOrderTx.buyerId, constants.Notification.BUYER_TAKE_ORDER_FAILED, nft.name)("")
 
               (for {
                 _ <- markFailed

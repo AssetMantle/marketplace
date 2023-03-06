@@ -51,7 +51,10 @@ object Notification {
   val NFT_MINT_SUCCESSFUL: Notification = Notification("NFT_MINT_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
   val NFT_MINT_FAILED: Notification = Notification("NFT_MINT_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
 
-  val SECONDARY_MARKET_CREATION: Notification = Notification("SECONDARY_MARKET_CREATION", sendEmail = false, sendPushNotification = true, sendSMS = false, route = null) //Option(routes.javascript.SecondaryMarketController.viewSecondaryMarket))
+  val SECONDARY_MARKET_CREATION_SUCCESSFUL: Notification = Notification("SECONDARY_MARKET_CREATION_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
+  val SECONDARY_MARKET_CREATION_FAILED: Notification = Notification("SECONDARY_MARKET_CREATION_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
+  val CANCEL_ORDER_SUCCESSFUL: Notification = Notification("CANCEL_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
+  val CANCEL_ORDER_FAILED: Notification = Notification("CANCEL_ORDER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
   val SELLER_TAKE_ORDER_SUCCESSFUL: Notification = Notification("SELLER_TAKE_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
   val BUYER_TAKE_ORDER_SUCCESSFUL: Notification = Notification("BUYER_TAKE_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ProfileController.viewProfile))
   val BUYER_TAKE_ORDER_FAILED: Notification = Notification("BUYER_TAKE_ORDER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)

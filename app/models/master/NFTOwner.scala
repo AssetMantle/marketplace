@@ -1,6 +1,6 @@
 package models.master
 
-import models.Trait.{Entity2, GenericDaoImpl2, Logging, ModelTable2}
+import models.traits.{Entity2, GenericDaoImpl2, Logging, ModelTable2}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.id.base.IdentityID
@@ -152,19 +152,19 @@ class NFTOwners @Inject()(
       } yield ()
     }
 
-    def onSuccessfulTakeOrder(secondaryMarketId: String, totalSold: Int, buyerAccountId: String): Future[NFTOwner] = {
+    def onSuccessfulTakeOrder(secondaryMarketId: String, totalSold: Int, buyerId: String): Future[NFTOwner] = {
       val oldNFTOwner = Service.tryGetBySecondaryMarketId(secondaryMarketId)
 
       def verifyAndUpdate(oldNFTOwner: NFTOwner) = {
         if (oldNFTOwner.quantity == 1) {
           for {
             _ <- delete(nftId = oldNFTOwner.nftId, ownerId = oldNFTOwner.ownerId)
-            _ <- create(oldNFTOwner.copy(secondaryMarketId = None, ownerId = buyerAccountId))
+            _ <- create(oldNFTOwner.copy(secondaryMarketId = None, ownerId = buyerId))
           } yield ()
         } else
           for {
             _ <- update(oldNFTOwner.copy(quantity = oldNFTOwner.quantity - totalSold))
-            _ <- create(oldNFTOwner.copy(secondaryMarketId = None, quantity = totalSold, ownerId = buyerAccountId))
+            _ <- create(oldNFTOwner.copy(secondaryMarketId = None, quantity = totalSold, ownerId = buyerId))
           } yield ()
       }
 

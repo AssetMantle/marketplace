@@ -2,7 +2,7 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.Trait.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider

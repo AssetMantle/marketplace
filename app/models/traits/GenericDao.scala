@@ -1,4 +1,4 @@
-package models.Trait
+package models.traits
 
 import play.api.db.slick._
 import slick.jdbc.H2Profile.api._
