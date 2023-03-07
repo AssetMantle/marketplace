@@ -96,30 +96,30 @@
                 <label for="show-menu" class="menu-icon"></label>
                 <div class="content">
                     <div class="logo">
-                        <a href="@routes.IndexController.index()">
+                        <a onclick="componentResource('centerContent', jsRoutes.controllers.IndexController.index())">
                             <img class="lazyload" src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" data-src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" class="logo"/>
                             <span class="appVersion">@Messages(constants.View.APP_VERSION)</span>
                         </a>
                     </div>
                     <ul class="links">
                         <li>
-                            <a href="@routes.CollectionController.viewCollections()">
+                            <a onclick="componentResource('centerContent', jsRoutes.controllers.CollectionController.viewCollections())">
                             @Messages(constants.View.EXPLORE)
                             </a>
                         </li>
                         <li>
-                            <a href="@routes.SecondaryMarketController.viewCollections()">
+                            <a onclick="componentResource('centerContent', jsRoutes.controllers.SecondaryMarketController.viewCollections())">
                                 <span class="newFeatureIcon">@Messages(constants.View.NEW_LABEL)</span>
                                 @Messages(constants.View.MARKET)
                             </a>
                         </li>
                         <li>
-                            <a href="@routes.PublicListingController.viewCollections()">
+                            <a onclick="componentResource('centerContent', jsRoutes.controllers.PublicListingController.viewCollections())">
                                 @Messages(constants.View.EARLY_ACCESS_MENU)
                             </a>
                         </li>
                         <li>
-                            <a href="@routes.SaleController.viewCollections()">
+                            <a onclick="componentResource('centerContent', jsRoutes.controllers.SaleController.viewCollections())">
                             @Messages(constants.View.LAUNCHPAD_MENU)
                             </a>
                         </li>
