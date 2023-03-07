@@ -72,10 +72,10 @@ function fetchBalance(address) {
         async: true,
         statusCode: {
             200: function (data) {
-                $("#walletBalance_" + address).html(data);
+                $(".walletBalance_" + address).html(data);
             },
             400: function (data) {
-                $("#walletBalance_" + address).html(data.responseText);
+                $(".walletBalance_" + address).html(data.responseText);
             }
         }
     });

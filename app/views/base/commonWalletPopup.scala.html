@@ -11,7 +11,7 @@
                 <a href="@routes.ProfileController.viewProfile(loginState.username, constants.View.COLLECTED)" class="d-flex flex-row align-items-center p-0 profileItemLink">
                     <div class="userName">@loginState.username</div>
                 </a>
-                <div class="userBalance" id="walletBalance_@loginState.address"></div>
+                <div class="userBalance walletBalance_@loginState.address"></div>
             </div>
         </div>
         <i id="openWalletMenu" class="bi bi-list iconDefault iconLarge" onclick="fetchKeys(); openCloseWalletScreen(this, 'addressBook');"></i>
