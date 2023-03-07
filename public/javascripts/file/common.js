@@ -30,10 +30,13 @@ function uploadFile(storeFileRoute, uploadRoute, id, documentType, filesSupporte
         $("#fileName_" + documentType).html(file.fileName);
         $("#uploader_" + documentType).show();
         $("#uploadControls_" + documentType).show();
+        $("#uploadCompletionMessage_" + documentType + " .previewImageContainer").hide();
     });
 
     rFile.on('fileProgress', function (file) {
-        moveProgressBar($("#fileUploadProgressBar_" + documentType), (file.progress(false) * 100.00));
+        $("#fileUploadProgressBar_" + documentType).animate({width: (file.progress(false) * 100.00)+"%"},10);
+        $("#progressBarMessage_" + documentType).show();
+        $(".progressBarPercentage").text(Math.round((file.progress(false) * 100.00))+"%");
     });
 
     let uploadCompletionMessage = document.getElementById('uploadCompletionMessage_' + documentType);
@@ -54,17 +57,17 @@ function uploadFile(storeFileRoute, uploadRoute, id, documentType, filesSupporte
             // },
             statusCode: {
                 200: function (data) {
+                    $("#progressBarMessage_" + documentType + " .message").hide();
                     $("#uploadControls_" + documentType).fadeOut(500);
                     $("#uploadCompletionMessage_" + documentType).delay(500).show();
-                    $("#uploadCompletionMessage_" + documentType + " .previewImageContainer").delay(2000).show();
                     $("#uploadCompletionMessage_" + documentType + " .previewImage").attr("src",data);
-                    console.log(data);
                     onSuccessCallback(data);
                 },
                 206: function (data) {
                     $("#commonModalContent").html(data);
                 },
                 400: function (error) {
+                    $("#progressBarMessage_" + documentType).hide();
                     $("#uploadCompletionMessage_" + documentType).show();
                     uploadCompletionMessage.textContent = error.responseText;
                 },
@@ -164,4 +167,9 @@ function moveProgressBar(target, progress) {
             $(target).width(width + '%');
         }
     }
+}
+
+function hideProgressBar(documentType){
+    $("#progressBarMessage_" + documentType).hide();
+    $("#uploadCompletionMessage_" + documentType + " .previewImageContainer").show();
 }

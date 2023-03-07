@@ -803,16 +803,15 @@
   }
   .uploadForm{
     border: 1px dashed var(--gray);
-    border-radius: 6px;
-    min-height: 374px;
+    border-radius: 10px;
+    min-height: 396px;
     max-height: 400px;
     height: 100%;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 48px 48px 48px 48px;
     display: flex;
-    align-items: center;
+    position: relative;
     .uploadBox{
       .uploadIcon{
         font-size: 40px;
@@ -843,11 +842,12 @@
     }
   }
   .modalInfoBlock{
+    z-index: 999;
     height: 100%;
   }
   .previewImageContainer{
-    height: 200px;
-    width: 150px;
+    height: 250px;
+    width: 250px;
     img{
       display: block;
       max-width: 100%;
@@ -855,8 +855,51 @@
       min-width: 100%;
       min-height: 100%;
       margin: auto;
-      object-fit: contain;
       aspect-ratio: 1/1;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+  }
+  .progressContainer{
+    height: 100%;
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 99;
+    .progressBar{
+      height: 100%;
+      width: 0%;
+      background-color: var(--card-dark);
+    }
+  }
+  .progressBarMessage{
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--background-dark);
+    border-radius: 36px;
+    padding: 12px;
+    @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+    white-space: nowrap;
+    z-index: 999;
+    .progressSpinner {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-top: 3px solid var(--dark);
+      border-right: 3px solid transparent;
+      -webkit-animation: rotation 1s linear infinite;
+      animation: rotation 1s linear infinite;
+      @-webkit-keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
     }
   }
 }
