@@ -50,7 +50,7 @@ function loadCreatedCollectionOnScroll(accountId) {
 
 function loadFirstCreatedCollections(accountId){
     loadMoreCollections(accountId);
-    if($(document).height() > 1000){
+    if($(document).height() > 900){
         loadCreatedCollectionOnScroll(accountId);
     }
 }
