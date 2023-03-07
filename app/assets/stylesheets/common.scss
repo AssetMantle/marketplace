@@ -1046,14 +1046,22 @@ body.modal-open{
   @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--default));
 }
 
-// Early access
-.earlyAccessBannerContainer{
+// Section Banner
+.bannerContainer{
   height: 300px;
   width: 100%;
   border-radius: 20px;
   position: relative;
   top: -30px;
   overflow: hidden;
+  &::before{
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: conic-gradient(from 267.15deg at 77.48% 100%, rgba(0, 0, 0, 0.119658) -156.36deg, #000000 14.1deg, rgba(0, 0, 0, 0) 19.22deg, rgba(0, 0, 0, 0.119658) 203.64deg, #000000 374.1deg);
+    opacity: 0.6;
+  }
   img{
     height: 100%;
     width: 100%;
@@ -1064,12 +1072,12 @@ body.modal-open{
     bottom: 20px;
     left: 24px;
     .header{
-      @include setFont(var(--font-type-1), normal, 500, 28px, 34px, var(--mantle-off-white));
+      @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--mantle-off-white));
       text-transform: capitalize;
       margin-bottom: 12px;
     }
     .subHeader{
-      @include setFont(var(--font-type-2), normal, 400, 18px, 22px, var(--mantle-off-white));
+      @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
     }
   }
 }

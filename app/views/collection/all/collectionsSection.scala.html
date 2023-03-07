@@ -2,6 +2,13 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
+<div class="bannerContainer">
+    <div class="messageContainer">
+        <div class="header">@Messages(constants.View.EXPLORE_BANNER_HEADER)</div>
+        <div class="subHeader">@Messages(constants.View.EXPLORE_BANNER_SUBHEADER)</div>
+    </div>
+    <img src="@routes.Assets.versioned("images/banner/exploreBanner.svg")"/>
+</div>
 <div class="item item-center centerContainer">
     <div class="pt-2 centerCard">
         <div class="contentContainer">
