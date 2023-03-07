@@ -19,8 +19,7 @@
             <div class="titleLink" onclick="markAllAsRead()">@Messages(constants.View.NOTIFICATION_POPUP_MARK_ALL_AS_READ)</div>
         </div>
         <div class="separator"></div>
-        <div id="notificationList"></div>
-        <div class="loadOlderNotificationButton" onclick="loadMoreNotifications()">@Messages(constants.View.NOTIFICATION_POPUP_LOAD_MORE)</div>
+        <div id="notificationList" onscroll="loadNotificationOnScroll(this)"></div>
     </div>
 </div>
 <script>loadMoreNotifications();
