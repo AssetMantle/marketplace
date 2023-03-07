@@ -580,22 +580,25 @@
         background-color: var(--card-dark);
         font-size: 20px;
         border-radius: 50%;
+        z-index: 99;
       }
       .toast-title{
         @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+        z-index: 99;
       }
       .toast-body{
         @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
         padding: 0px;
+        z-index: 99;
       }
       .snackbarProgress {
         position: absolute;
         bottom: 0;
         left: 0;
-        height: 3px;
+        height: 100%;
         width: 100%;
         background-color: var(--popup-bg);
-
+        z-index: 1;
         &:before {
           content: "";
           position: absolute;
@@ -603,7 +606,7 @@
           left: 0%;
           height: 100%;
           width: 100%;
-          background-color: var(--default);
+          background-color: var(--line-2);
           display: none;
         }
       }
