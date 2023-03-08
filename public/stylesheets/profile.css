@@ -532,7 +532,7 @@ profileContainer .item-sticky .profile-card{
     aspect-ratio: 1/1;
     transition: all .5s ease-in-out;
 }
-.nft-list .card:hover .card-img img{
+.nft-list .card:hover .card-img:not(.staticImage) img{
     transform: scale(1.15);
 }
 @media (min-width: 1200px) {
