@@ -44,41 +44,47 @@
             <div class="mintedNftWeightage">
                 <div class="progressBar">
                     <span data-totalNFT="@sale.numberOfNFTs" data-soldNFT="@whitelistSaleSold" style="width:0;"></span>
-                    </div>
-                    </div>
-                    </div>
-                    <div class="d-flex align-items-center gap-1 mt-4">
-                    <div class="analysisTitle">@Messages(constants.View.COLLECTION_SALE_PRICE)</div>
-                <div class="analysisValue">@sale.price.toString @Messages(constants.View.NFT_SALE_TOKEN_UNITS) (@utilities.NumericOperation.formatNumber(sale.price * tokenPrice) $)</div>
+                </div>
             </div>
+        </div>
+
+        <div class="analysisValue mb-2 mt-4">@Messages(constants.View.COLLECTION_SALE_PRICE)</div>
+        <div class="d-flex flex-row gap-1 priceHolder">
+            <img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/>
+            <div class="d-flex gap-1 align-items-center flex-wrap">
+                <div class="nft-mantle-price">@sale.price.toString @Messages(constants.View.NFT_SALE_TOKEN_UNITS)</div>
+                <div class="nft-dollar-price">(@utilities.NumericOperation.formatNumber(sale.price * tokenPrice) $)</div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column gap-1 mt-3">
+            <div class="analysisValue">@Messages(constants.View.COLLECTION_MAXIMUM_MINT_PER_USER, sale.maxMintPerAccount)</div>
+        </div>
+        @if(sale.getStatus.id == constants.Sale.NOT_STARTED.id) {
             <div class="d-flex flex-column gap-1 mt-3">
-                <div class="analysisValue">@Messages(constants.View.COLLECTION_MAXIMUM_MINT_PER_USER, sale.maxMintPerAccount)</div>
+                <div class="analysisTitle">@Messages(constants.View.SALE_START_TIME)</div>
+                <div id="countdown_@sale.startTimeEpoch" class="d-flex gap-2 analysisValue">
+                @sale.startTimeEpoch
+                </div>
             </div>
-            @if(sale.getStatus.id == constants.Sale.NOT_STARTED.id) {
+            <script>epochToDateTime('countdown_@sale.startTimeEpoch');</script>
+        } else {
+            @if(sale.getStatus.id == constants.Sale.SOLD_OUT.id) {
+            } else {
                 <div class="d-flex flex-column gap-1 mt-3">
-                    <div class="analysisTitle">@Messages(constants.View.SALE_START_TIME)</div>
-                    <div id="countdown_@sale.startTimeEpoch" class="d-flex gap-2 analysisValue">
-                    @sale.startTimeEpoch
+                    <div class="analysisTitle">@Messages(constants.View.SALE_ENDS_IN)</div>
+                    <div id="countdown_@sale.endTimeEpoch" class="d-flex gap-2 analysisValue">
+                    @sale.endTimeEpoch
                     </div>
                 </div>
-                <script>epochToDateTime('countdown_@sale.startTimeEpoch');</script>
-            } else {
-                @if(sale.getStatus.id == constants.Sale.SOLD_OUT.id) {
-                } else {
-                    <div class="d-flex flex-column gap-1 mt-3">
-                        <div class="analysisTitle">@Messages(constants.View.SALE_ENDS_IN)</div>
-                        <div id="countdown_@sale.endTimeEpoch" class="d-flex gap-2 analysisValue">
-                        @sale.endTimeEpoch
-                        </div>
-                    </div>
-                    <script>epochToDateTime('countdown_@sale.endTimeEpoch');</script>
-                    @if(isMember && sale.getStatus.id == constants.Sale.LIVE.id) {
-                        <div class="separator"></div>
-                        @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SaleController.buySaleNFTForm('${sale.id}', false))"), Symbol("class") -> "mt-4")
-                    }
+                <script>epochToDateTime('countdown_@sale.endTimeEpoch');</script>
+                @if(isMember && sale.getStatus.id == constants.Sale.LIVE.id) {
+                    <div class="separator"></div>
+                    @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SaleController.buySaleNFTForm('${sale.id}', false))"), Symbol("class") -> "mt-4")
                 }
             }
-            <script src="@utilities.PublicResource.getVersionedRoute("javascripts/collection/whitelistSale.js")"></script>
-            <script>setSoldNFTProgressBar();</script>
+        }
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/collection/whitelistSale.js")"></script>
+        <script>setSoldNFTProgressBar();</script>
     </div>
 </div>

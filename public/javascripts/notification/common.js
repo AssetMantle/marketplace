@@ -120,3 +120,13 @@ function markAllAsRead(){
         }
     });
 }
+
+timeout = 0;
+function loadNotificationOnScroll(notificationList) {
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+        if(notificationList.scrollHeight - $(notificationList).scrollTop() - 20 <= $(notificationList).height()){
+            loadMoreNotifications();
+        }
+    }, 300);
+}

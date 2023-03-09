@@ -1,11 +1,11 @@
 window.onbeforeunload = function () {
     if ($(".nftContainer").length !== 0) {
-        window.scrollTo(0, 0);
+        window.scrollTo({ top:0, left:0, behavior: "instant"});
     }
 }
 document.onload = function () {
     if ($(".nftContainer").length !== 0) {
-        window.scrollTo(0, 0);
+        window.scrollTo({ top:0, left:0, behavior: "instant"});
     }
 }
 
@@ -105,7 +105,7 @@ function loadArtNftOnScroll(collectionId) {
 
 function loadFirstNFTs(collectionId){
     loadFirstNFTBulk('nftsPerPage', jsRoutes.controllers.CollectionController.collectionNFTsPerPage(`${collectionId}`, 1));
-    if($(document).height() > 1000) {
+    if($(document).height() > 900) {
         setTimeout(() => {
             loadArtNftOnScroll(`${collectionId}`)
         }, 1000);

@@ -66,7 +66,6 @@
   .priceHolder{
     .nft-mantle-price{
       @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--default));
-      margin-left: 4px;
     }
     .nft-dollar-price{
       @include setFont(var(--font-type-2), normal, 500, 12px, 14px, var(--disable));
@@ -800,33 +799,40 @@
     .profile-detail{
       .collectionDetail{
         padding: 0 20px;
-        .leftInfo{
-          h1{
+        .leftInfo {
+          h1 {
             text-align: left;
           }
-          .collectionStats{
-            .collectionStatsContainer {
-              margin: 0px 0px 12px 0px;
+          .collectionBottomContainer{
+            .collectionStats {
+              .collectionStatsContainer {
+                margin: 0px 0px 12px 0px;
 
-              .collectionStatsBadge {
-                background-color: var(--popup-bg);
-                border-radius: 8px;
-                padding: 4px 6px;
+                .collectionStatsBadge {
+                  background-color: var(--popup-bg);
+                  border-radius: 8px;
+                  padding: 4px 6px;
 
-                .badgeLabel {
-                  @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--mantle-off-white));
-                  white-space: nowrap;
-                }
+                  .badgeLabel {
+                    @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--mantle-off-white));
+                    white-space: nowrap;
+                  }
 
-                .badgeValue {
-                  @include setFont(var(--font-type-1), normal, 500, 12px, 14px, var(--gray));
-                  text-align: right;
-                  white-space: nowrap;
+                  .badgeValue {
+                    @include setFont(var(--font-type-1), normal, 500, 12px, 14px, var(--gray));
+                    text-align: right;
+                    white-space: nowrap;
+                  }
                 }
               }
-              @media (max-width: 426px){
-                flex-direction: column;
-              }
+            }
+            @media (min-width: 1500px) {
+              flex-direction: column;
+              gap: 8px !important;
+            }
+            @media (max-width: 900px) {
+              flex-direction: column;
+              gap: 8px !important;
             }
           }
         }

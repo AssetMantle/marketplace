@@ -96,30 +96,30 @@
                 <label for="show-menu" class="menu-icon"></label>
                 <div class="content">
                     <div class="logo">
-                        <a href="@routes.IndexController.index()">
+                        <a onclick="componentResource('centerContent', jsRoutes.controllers.IndexController.index())">
                             <img class="lazyload" src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" data-src="@routes.Assets.versioned("images/mantlePlaceLogo.svg")" class="logo"/>
                             <span class="appVersion">@Messages(constants.View.APP_VERSION)</span>
                         </a>
                     </div>
                     <ul class="links">
                         <li>
-                            <a href="@routes.CollectionController.viewCollections()">
+                            <a onclick="viewCollections()">
                             @Messages(constants.View.EXPLORE)
                             </a>
                         </li>
                         <li>
-                            <a href="@routes.SecondaryMarketController.viewCollections()">
+                            <a onclick="viewSecondaryMarketCollections()">
                                 <span class="newFeatureIcon">@Messages(constants.View.NEW_LABEL)</span>
                                 @Messages(constants.View.MARKET)
                             </a>
                         </li>
                         <li>
-                            <a href="@routes.PublicListingController.viewCollections()">
+                            <a onclick="viewEarlyAccess()">
                                 @Messages(constants.View.EARLY_ACCESS_MENU)
                             </a>
                         </li>
                         <li>
-                            <a href="@routes.SaleController.viewCollections()">
+                            <a onclick="viewLaunchpad()">
                             @Messages(constants.View.LAUNCHPAD_MENU)
                             </a>
                         </li>
@@ -251,9 +251,9 @@
 
         <div class="container-fluid common-container p-0">
             <div class="row">
-                <div id="leftContent" class="col-12 col-md-3 col-lg-3 col-xl-2 mb-3"></div>
-                <div id="centerContent" class="col-12 col-md-6 col-lg-6 col-xl-8 mb-3"></div>
-                <div id="rightContent" class="col-12 col-md-3 col-lg-3 col-xl-2"></div>
+                <div id="leftContent" class="col-12 col-md-3 col-lg-3 col-xl-2 mb-3 order-md-1 order-2"></div>
+                <div id="centerContent" class="col-12 col-md-6 col-lg-6 col-xl-8 mb-3 order-md-2 order-3"></div>
+                <div id="rightContent" class="col-12 col-md-3 col-lg-3 col-xl-2 mb-3 order-md-3 order-1"></div>
             </div>
         </div>
     </body>

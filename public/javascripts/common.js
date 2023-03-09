@@ -1,6 +1,6 @@
 // Goto top on load
 document.onload = function () {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top:0, left:0, behavior: "instant"});
 }
 
 // Hide modal backdrop
@@ -230,4 +230,12 @@ function setSoldNFTProgressBar(){
     for(let i = 0; i < progress; i++) {
         progressBar.style.width = i + '%';
     }
+}
+
+// Skeleton Loading
+function showLoader() {
+    $('.skeletonLoadContainer img').one('load', function () {
+        $(this).parent().closest('.skeletonLoadContainer').addClass("hide");
+        $(this).addClass("show");
+    });
 }

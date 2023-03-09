@@ -50,7 +50,7 @@ function loadCollectedCollectionOnScroll(accountId) {
 
 function loadFirstCollectedCollections(accountId){
     componentResource('collectedCollectionsPerPage', jsRoutes.controllers.CollectedController.collectionPerPage(`${accountId}`, 1));
-    if($(document).height() > 1000) {
+    if($(document).height() > 900) {
         setTimeout(() => {
             loadCollectedCollectionOnScroll(`${accountId}`)
         }, 1000);

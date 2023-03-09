@@ -510,6 +510,8 @@
   --bs-nav-link-color: var(--gray);
   --bs-nav-link-hover-color: var(--gray);
   --bs-nav-link-disabled-color: var(--disable);
+  flex-wrap: nowrap;
+  overflow-x: auto;
 
   &.nav-tabs{
     --bs-nav-tabs-border-width: 0px;
@@ -530,6 +532,9 @@
         padding-left: 0px;
       }
     }
+  }
+  &::-webkit-scrollbar{
+    display: none;
   }
 }
 .tab-content{
@@ -580,22 +585,25 @@
         background-color: var(--card-dark);
         font-size: 20px;
         border-radius: 50%;
+        z-index: 99;
       }
       .toast-title{
         @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+        z-index: 99;
       }
       .toast-body{
         @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--text-medium));
         padding: 0px;
+        z-index: 99;
       }
       .snackbarProgress {
         position: absolute;
         bottom: 0;
         left: 0;
-        height: 3px;
+        height: 100%;
         width: 100%;
         background-color: var(--popup-bg);
-
+        z-index: 1;
         &:before {
           content: "";
           position: absolute;
@@ -603,7 +611,7 @@
           left: 0%;
           height: 100%;
           width: 100%;
-          background-color: var(--default);
+          background-color: var(--line-2);
           display: none;
         }
       }
@@ -800,16 +808,15 @@
   }
   .uploadForm{
     border: 1px dashed var(--gray);
-    border-radius: 6px;
-    min-height: 374px;
+    border-radius: 10px;
+    min-height: 396px;
     max-height: 400px;
     height: 100%;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 48px 48px 48px 48px;
     display: flex;
-    align-items: center;
+    position: relative;
     .uploadBox{
       .uploadIcon{
         font-size: 40px;
@@ -840,11 +847,12 @@
     }
   }
   .modalInfoBlock{
+    z-index: 999;
     height: 100%;
   }
   .previewImageContainer{
-    height: 200px;
-    width: 150px;
+    height: 250px;
+    width: 250px;
     img{
       display: block;
       max-width: 100%;
@@ -852,8 +860,51 @@
       min-width: 100%;
       min-height: 100%;
       margin: auto;
-      object-fit: contain;
       aspect-ratio: 1/1;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+  }
+  .progressContainer{
+    height: 100%;
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 99;
+    .progressBar{
+      height: 100%;
+      width: 0%;
+      background-color: var(--card-dark);
+    }
+  }
+  .progressBarMessage{
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--background-dark);
+    border-radius: 36px;
+    padding: 12px;
+    @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+    white-space: nowrap;
+    z-index: 999;
+    .progressSpinner {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-top: 3px solid var(--dark);
+      border-right: 3px solid transparent;
+      -webkit-animation: rotation 1s linear infinite;
+      animation: rotation 1s linear infinite;
+      @-webkit-keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
     }
   }
 }
@@ -871,8 +922,7 @@
 }
 
 #notificationList{
-  height: 215px;
-  //height: 188px;
+  height: 200px;
   overflow-y: auto;
 }
 
@@ -1046,14 +1096,23 @@ body.modal-open{
   @include setFont(var(--font-type-1), normal, 700, 14px, 17px, var(--default));
 }
 
-// Early access
-.earlyAccessBannerContainer{
+// Section Banner
+.bannerContainer{
   height: 300px;
   width: 100%;
+  background-color: var(--card-dark);
   border-radius: 20px;
   position: relative;
   top: -30px;
   overflow: hidden;
+  &::before{
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: conic-gradient(from 267.15deg at 77.48% 100%, rgba(0, 0, 0, 0.119658) -156.36deg, #000000 14.1deg, rgba(0, 0, 0, 0) 19.22deg, rgba(0, 0, 0, 0.119658) 203.64deg, #000000 374.1deg);
+    opacity: 0.6;
+  }
   img{
     height: 100%;
     width: 100%;
@@ -1063,13 +1122,103 @@ body.modal-open{
     position: absolute;
     bottom: 20px;
     left: 24px;
+    z-index: 99;
     .header{
-      @include setFont(var(--font-type-1), normal, 500, 28px, 34px, var(--mantle-off-white));
+      @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--mantle-off-white));
       text-transform: capitalize;
       margin-bottom: 12px;
     }
     .subHeader{
-      @include setFont(var(--font-type-2), normal, 400, 18px, 22px, var(--mantle-off-white));
+      @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
+    }
+  }
+}
+
+// Common NFT Card
+.singleNFTCard{
+  .card{
+    .nft-detail{
+      .nft-creator-detail{
+        .creator-profile{
+          height: 34px;
+          width: 34px;
+          aspect-ratio: 1;
+          border-radius: 50%;
+          overflow: hidden;
+          img{
+            height: 100%;
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Skeleton Loading
+.skeletonLoadContainer{
+  height: 100%;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  &::before{
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(40, 40, 38, 0.4), transparent);
+    animation: anim 1.2s infinite;
+  }
+  &.hide::before{
+    display:none;
+  }
+  @keyframes anim {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  img{
+    visibility: hidden;
+    &.show{
+      visibility: visible;
+    }
+  }
+}
+
+// Invoice
+#invoice{
+  .tableHeading{
+    @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--text-medium));
+    text-transform: capitalize;
+  }
+  .card{
+    background: var(--card-dark);
+    border-radius: 10px;
+    .table {
+      .tableTitle{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+        text-transform: capitalize;
+      }
+      .tableLabel{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--gray));
+        text-transform: capitalize;
+      }
+      .tableValue{
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--gray));
+        text-transform: capitalize;
+      }
+      .tableValueBig{
+        @include setFont(var(--font-type-2), normal, 400, 18px, 22px, var(--gray));
+        text-transform: capitalize;
+      }
+      .tableSeparator{
+        display: block;
+        width: 100%;
+        height: 1px;
+        background-color: var(--line);
+        margin: 8px 0px;
+      }
     }
   }
 }
