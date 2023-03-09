@@ -7,6 +7,7 @@ import play.db.NamedDatabase
 import schema.id.OwnableID
 import schema.id.base.IdentityID
 import slick.jdbc.H2Profile.api._
+import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,6 +17,8 @@ case class Split(ownerID: Array[Byte], ownableID: Array[Byte], value: BigDecimal
   def id1: Array[Byte] = this.ownerID
 
   def id2: Array[Byte] = this.ownableID
+
+  def getBalanceAsMicroNumber: MicroNumber = MicroNumber(this.value / MicroNumber.factor)
 
 }
 
