@@ -7,7 +7,9 @@
         <div class="header">@Messages(constants.View.EXPLORE_BANNER_HEADER)</div>
         <div class="subHeader">@Messages(constants.View.EXPLORE_BANNER_SUBHEADER)</div>
     </div>
-    <img src="@routes.Assets.versioned("images/banner/exploreBanner.svg")"/>
+    <div class="skeletonLoadContainer">
+        <img src="@routes.Assets.versioned("images/banner/exploreBanner.svg")"/>
+    </div>
 </div>
 <div class="item item-center centerContainer">
     <div class="pt-2 centerCard">
@@ -39,4 +41,5 @@
 <script>
         loadFirstCollections();
         window.onscroll = function() { loadCollectionOnScroll(); }
+        showLoader();
 </script>

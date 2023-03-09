@@ -1100,6 +1100,7 @@ body.modal-open{
 .bannerContainer{
   height: 300px;
   width: 100%;
+  background-color: var(--card-dark);
   border-radius: 20px;
   position: relative;
   top: -30px;
@@ -1121,6 +1122,7 @@ body.modal-open{
     position: absolute;
     bottom: 20px;
     left: 24px;
+    z-index: 99;
     .header{
       @include setFont(var(--font-type-1), normal, 600, 20px, 24px, var(--mantle-off-white));
       text-transform: capitalize;
@@ -1158,6 +1160,7 @@ body.modal-open{
   height: 100%;
   width: 100%;
   position: relative;
+  z-index: 1;
   &::before{
     content: '';
     position: absolute;

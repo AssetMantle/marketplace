@@ -8,7 +8,9 @@
         <div class="header">@Messages(constants.View.WHITELIST_SALE_BANNER_HEADER)</div>
         <div class="subHeader">@Messages(constants.View.WHITELIST_SALE_BANNER_SUBHEADER)</div>
     </div>
-    <img src="@routes.Assets.versioned("images/banner/launchPadBanner.svg")"/>
+    <div class="skeletonLoadContainer">
+        <img src="@routes.Assets.versioned("images/banner/launchPadBanner.svg")"/>
+    </div>
 </div>
 <div class="item item-center centerContainer">
     <div class="centerCard">
@@ -52,4 +54,5 @@
 </div>
 <script>
         window.onscroll = function() { loadCollectionOnScroll(); }
+        showLoader();
 </script>
