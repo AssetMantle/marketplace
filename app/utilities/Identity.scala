@@ -36,9 +36,9 @@ object Identity {
 
   def getNote1MetaProperty(value: String): Property = MetaProperty(note1PropertyID, StringData(value).toAnyData)
 
-  def getNote2MesaProperty(value: String): Property = MesaProperty(note2PropertyID, StringData(value).getID)
+  def getNote2MesaProperty(value: String): Property = MesaProperty(note2PropertyID, StringData(value).getDataID)
 
-  def getExtraMesaProperty(value: String): Property = MesaProperty(extraPropertyID, StringData(value).getID)
+  def getExtraMesaProperty(value: String): Property = MesaProperty(extraPropertyID, StringData(value).getDataID)
 
   val getBondAmountMetaProperty: Property = MetaProperty(constants.Blockchain.BondAmountProperty.id, NumberData(2560L).toAnyData)
 
