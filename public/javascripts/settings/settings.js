@@ -123,3 +123,26 @@ function fetchKeys() {
         }
     });
 }
+
+function fetchWrappedTokenBalance() {
+    let route = jsRoutes.controllers.WalletController.wrappedTokenBalance();
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        async: true,
+        statusCode: {
+            200: function (data) {
+                console.log(data)
+                $('#walletTradeBalance').html(data);
+            },
+            400: function (data) {
+                console.log(data.responseText)
+            },
+            204: function (data) {
+            },
+            500: function (data) {
+                console.log(data.responseText)
+            }
+        }
+    });
+}

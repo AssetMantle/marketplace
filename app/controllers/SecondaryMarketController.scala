@@ -227,6 +227,7 @@ class SecondaryMarketController @Inject()(
               if (nftOwner.ownerId != loginState.username) Option(constants.Response.NFT_OWNER_NOT_FOUND) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
+              if (secondaryMarket.orderId.isEmpty || makeOrderTx.status.getOrElse(false)) Option(constants.Response.ORDER_NOT_CREATED_ON_BLOCKCHAIN) else None,
               if (makeOrderTx.secondaryMarketId != secondaryMarket.id || makeOrderTx.nftId != cancelData.nftId || makeOrderTx.sellerId != nftOwner.ownerId || secondaryMarket.sellerId != loginState.username) Option(constants.Response.INVALID_ORDER) else None,
             ).flatten
             if (errors.isEmpty) {

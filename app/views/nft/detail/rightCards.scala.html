@@ -13,12 +13,16 @@
                     <div class="analysisTitle">@Messages(constants.View.LOWEST_NFT_PRICE)</div>
                     <div class="analysisValue">@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price) @Messages(constants.View.NFT_SALE_TOKEN_UNITS) (@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
                 </div>
+                <div class="separator"></div>
                 <div>
                 @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.buyForm('${nft.id}', '${lowestPriceSecondaryMarket.get.id}'))"))
-                </div>
                 @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId && userNFTOwner.get.creatorId != optionalLoginState.get.username && userNFTOwner.get.creatorId != "Mint.E" && nft.isMinted.getOrElse(false)) {
+                    <div class="separator"></div>
+                    <div>
                     @commonPrimaryButton(Messages(constants.View.SELL_NFT), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.createForm('${nft.id}'))"))
+                    </div>
                 }
+                </div>
             }
             @if(lowestPriceSecondaryMarket.isDefined && userSecondaryMarket.isDefined) {
                 @if(lowestPriceSecondaryMarket.get.id == userSecondaryMarket.get.id) {
@@ -26,6 +30,7 @@
                         <div class="analysisTitle">@Messages(constants.View.LOWEST_NFT_PRICE)</div>
                         <div class="analysisValue">@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price) @Messages(constants.View.NFT_SALE_TOKEN_UNITS) (@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
                     </div>
+                    <div class="separator"></div>
                     <div>
                     @commonPrimaryButton(Messages(constants.View.CANCEL_ORDER), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.cancelForm('${nft.id}', '${lowestPriceSecondaryMarket.get.id}'))"))
                     </div>
@@ -34,13 +39,16 @@
                         <div class="analysisTitle">@Messages(constants.View.LOWEST_NFT_PRICE)</div>
                         <div class="analysisValue">@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price) @Messages(constants.View.NFT_SALE_TOKEN_UNITS) (@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
                     </div>
+                    <div class="separator"></div>
                     <div>
                     @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.buyForm('${nft.id}', '${lowestPriceSecondaryMarket.get.id}'))"))
                     </div>
+                    <div class="separator"></div>
                     <div>
                         <div class="analysisTitle">@Messages(constants.View.SELLER_NFT_PRICE)</div>
                         <div class="analysisValue">@utilities.NumericOperation.formatNumber(userSecondaryMarket.get.price) @Messages(constants.View.NFT_SALE_TOKEN_UNITS) (@utilities.NumericOperation.formatNumber(userSecondaryMarket.get.price * tokenPrice) $)</div>
                     </div>
+                    <div class="separator"></div>
                     <div>
                     @commonPrimaryButton(Messages(constants.View.CANCEL_ORDER), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.cancelForm('${nft.id}', '${lowestPriceSecondaryMarket.get.id}'))"))
                     </div>
@@ -49,6 +57,8 @@
             @if(lowestPriceSecondaryMarket.isEmpty && userSecondaryMarket.isEmpty) {
                 @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId && userNFTOwner.get.creatorId != optionalLoginState.get.username && userNFTOwner.get.creatorId != "Mint.E" && nft.isMinted.getOrElse(false)) {
                     @commonPrimaryButton(Messages(constants.View.SELL_NFT), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.createForm('${nft.id}'))"))
+                } else {
+                    @Messages(constants.View.CANNOT_BE_SOLD)
                 }
             }
         } else {
@@ -57,7 +67,10 @@
                     <div class="analysisTitle">@Messages(constants.View.LOWEST_NFT_PRICE)</div>
                     <div class="analysisValue">@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price) @Messages(constants.View.NFT_SALE_TOKEN_UNITS) (@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
                 </div>
+                <div class="separator"></div>
+                <div>
                 @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.AccountController.signInWithCallbackForm('/market/${collection.id}'))"), Symbol("class") -> "mt-4")
+                </div>
             } else {
                 @Messages(constants.View.NOT_ON_SALE)
             }

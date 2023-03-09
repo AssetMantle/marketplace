@@ -42,6 +42,7 @@ POST        /migrateWalletToKey                                controllers.Accou
 POST        /changeActiveKey                                   controllers.AccountController.changeActiveKey()
 
 GET         /walletPopup                                       controllers.WalletController.walletPopup()
+GET         /wrappedTokenBalance                               controllers.WalletController.wrappedTokenBalance()
 GET         /walletPopupKeys                                   controllers.WalletController.walletPopupKeys()
 
 GET         /collections                                       controllers.CollectionController.viewCollections()

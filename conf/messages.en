@@ -937,3 +937,5 @@ UNWRAPPED_TOKEN_SUCCESSFULLY=Token unwrapped!
 NOTIFICATION.UNWRAPPED_TOKEN_SUCCESSFULLY.MESSAGE={0} unwrapped successfully.
 UNWRAPPED_TOKEN_FAILED=Order Token unwrap failed!
 NOTIFICATION.UNWRAPPED_TOKEN_FAILED.MESSAGE=Check tx history on explorer.
+CANNOT_BE_SOLD=Cannot be sold at the moment.
+TRADE_BALANCE=Trade Balance

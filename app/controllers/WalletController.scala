@@ -56,6 +56,19 @@ class WalletController @Inject()(
     }
   }
 
+  def wrappedTokenBalance(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val split = blockchainSplits.Service.tryGetByOwnerIDAndOwnableID(ownerId = utilities.Identity.getMantlePlaceIdentityID(loginState.username), ownableID = constants.Blockchain.StakingTokenCoinID)
+        (for {
+          split <- split
+        } yield Ok(s"${utilities.NumericOperation.formatNumber(split.getBalanceAsMicroNumber)} $$MNTL")
+          ).recover {
+          case _: BaseException => BadRequest("0")
+        }
+    }
+  }
+
   def unwrapTokenForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.wallet.unwrapToken()))

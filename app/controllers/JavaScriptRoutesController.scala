@@ -165,6 +165,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WhitelistController.detail,
 
         routes.javascript.WalletController.walletPopup,
+        routes.javascript.WalletController.wrappedTokenBalance,
         routes.javascript.WalletController.walletPopupKeys,
         routes.javascript.WalletController.unwrapTokenForm,
 
