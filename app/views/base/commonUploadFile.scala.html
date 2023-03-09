@@ -7,55 +7,40 @@
     <div class="mb-2 uploadFileLabel">@Messages(label)</div>
     <div class="uploadForm">
         @CSRF.formField
-        <div class="modalInfoBlock">
-        @if(fileUrl.nonEmpty) {
-            <div id="uploader_@documentType" class="centerText uploader h-100" style="display: block">
-                <div class="d-flex flex-column gap-1 h-100">
-                    <div id="uploadCompletionMessage_@documentType" class="uploadCompletionMessage">
-                        <div class="previewImageContainer">
-                            <img src="@fileUrl" class="previewImage"/>
-                        </div>
-                    </div>
-
-                    <div class="text-center">
-                        <div id="nftId_@documentType" class="nftId"></div>
-                        <br>
-                        <div class="progressContainer">
-                            <div class="progressBar" id="fileUploadProgressBar_@documentType"></div>
-                        </div>
+    <div class="modalInfoBlock">
+    @if(fileUrl.nonEmpty) {
+        <div id="uploader_@documentType" class="centerText uploader h-100" style="display: block">
+            <div class="d-flex flex-column gap-1 h-100">
+                <div id="uploadCompletionMessage_@documentType" class="uploadCompletionMessage">
+                    <div class="previewImageContainer">
+                        <img src="@fileUrl" class="previewImage" onload="hideProgressBar('@documentType')"/>
                     </div>
                 </div>
-            </div>
 
-            <div class="d-flex justify-content-center">
-                <div id="uploadSelector_@documentType" class="h-100 centerText uploadBox">
-                    <div class="d-flex flex-column justify-content-between h-100">
-                        <div class="text-center">
-                            <button type="button" class="secondaryButton" id="browseUploadButton_@documentType">@Messages(constants.View.BROWSE)</button>
-                        </div>
-                    </div>
-                </div>
                 <div id="uploadControls_@documentType" style="display: none;">
-                <div class = "mt-0" >
-                <button type = "button" class = "secondaryButton" id = "uploadButton_@documentType" style="width: 120px;">
-                    @Messages(constants.View.UPLOAD) </button>
+                <div class="mt-2">
+                    <button type="button" class="secondaryButton" id="uploadButton_@documentType" style="width: 120px;">@Messages(constants.View.UPLOAD) </button>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div id="uploadSelector_@documentType" class="h-100 mt-2 centerText uploadBox">
+        <div class="text-center">
+            <button type="button" class="secondaryButton" id="browseUploadButton_@documentType">@Messages(constants.View.BROWSE)</button>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <div id="nftId_@documentType" class="nftId"></div>
+    </div>
+
     } else {
         <div id="uploader_@documentType" class="centerText uploader h-100">
             <div class="d-flex flex-column gap-1 h-100">
                 <div id="uploadCompletionMessage_@documentType" class="uploadCompletionMessage">
                     <div class="previewImageContainer" style="display: none;">
-                        <img src="@fileUrl" class="previewImage"/>
-                    </div>
-                </div>
-
-                <div class="text-center">
-                    <div id="nftId_@documentType" class="nftId"></div>
-                    <br>
-                    <div class="progressContainer">
-                        <div class="progressBar" id="fileUploadProgressBar_@documentType"></div>
+                        <img src="@fileUrl" class="previewImage" onload="hideProgressBar('@documentType')"/>
                     </div>
                 </div>
 
@@ -84,6 +69,20 @@
         </div>
     }
     </div>
+    <div class="progressBarMessage" id="progressBarMessage_@documentType">
+        <div class=" d-flex gap-2 align-items-center">
+            <div class="progressSpinner"></div>
+            <div class="message">
+                <span>@Messages(constants.View.UPLOADING_FILE) -</span>
+                <span class="progressBarPercentage"></span>
+            </div>
+        </div>
+    </div>
+    <div class="progressContainer" style="position: absolute;">
+        <div class="progressBar" id="fileUploadProgressBar_@documentType">
+            </div>
+    </div>
 </div>
 </div>
+
 <script>uploadFile(@utilities.JsRoutes.getJsRouteFunction(fileUploadForm.store), @utilities.JsRoutes.getJsRouteFunction(fileUploadForm.upload), '@id', '@documentType', '@fileUploadForm.fileTypes.mkString("_")', @fileUploadForm.maxFileSize, @onSuccessCallback)</script>

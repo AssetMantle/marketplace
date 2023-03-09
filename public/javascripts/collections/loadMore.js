@@ -1,11 +1,11 @@
 window.onbeforeunload = function () {
     if ($(".collectionsPerPage").length !== 0) {
-        window.scrollTo(0, 0);
+        window.scrollTo({ top:0, left:0, behavior: "instant"});
     }
 }
 document.onload = function () {
     if ($(".collectionsPerPage").length !== 0) {
-        window.scrollTo(0, 0);
+        window.scrollTo({ top:0, left:0, behavior: "instant"});
     }
 }
 

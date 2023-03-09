@@ -104,7 +104,7 @@ function loadCollectedNftOnScroll(accountId, collectionId){
 
 function loadFirstCollectedNFTs(accountId, collectionId){
     loadFirstNFTBulk('nftsPerPage', jsRoutes.controllers.CollectedController.collectionNFTsPerPage(`${accountId}`,`${collectionId}`, 1));
-    if($(document).height() > 1000) {
+    if($(document).height() > 900) {
         setTimeout(() => {
             loadCollectedNftOnScroll(`${accountId}`,`${collectionId}`)
         }, 1000);

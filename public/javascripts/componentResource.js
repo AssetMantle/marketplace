@@ -13,6 +13,7 @@ function componentResource(source, route, loadingSpinnerID = 'commonSpinner', ev
         // },
         statusCode: {
             200: function (data) {
+                window.scrollTo({ top:0, left:0, behavior: "instant"});
                 div.html(data);
             },
             400: function (data) {

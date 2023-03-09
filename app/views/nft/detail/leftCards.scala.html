@@ -1,7 +1,9 @@
 @(nftId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<div id="nftInfo"></div>
-<div id="collectionInfo"></div>
+<div class="d-flex flex-column gap-3 sticky-top item-sticky">
+        <div id="nftInfo"></div>
+        <div id="collectionInfo"></div>
+</div>
 <script>
         componentResource('nftInfo', jsRoutes.controllers.NFTController.info('@nftId'));
         componentResource('collectionInfo', jsRoutes.controllers.NFTController.collectionInfo('@nftId'));
