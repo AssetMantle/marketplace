@@ -1131,3 +1131,54 @@ body.modal-open{
     }
   }
 }
+
+// Common NFT Card
+.singleNFTCard{
+  .card{
+    .nft-detail{
+      .nft-creator-detail{
+        .creator-profile{
+          height: 34px;
+          width: 34px;
+          aspect-ratio: 1;
+          border-radius: 50%;
+          overflow: hidden;
+          img{
+            height: 100%;
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Skeleton Loading
+.skeletonLoadContainer{
+  height: 100%;
+  width: 100%;
+  position: relative;
+  &::before{
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(40, 40, 38, 0.4), transparent);
+    animation: anim 1.2s infinite;
+  }
+  &.hide::before{
+    display:none;
+  }
+  @keyframes anim {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  img{
+    visibility: hidden;
+    &.show{
+      visibility: visible;
+    }
+  }
+}

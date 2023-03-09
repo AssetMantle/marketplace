@@ -231,3 +231,11 @@ function setSoldNFTProgressBar(){
         progressBar.style.width = i + '%';
     }
 }
+
+// Skeleton Loading
+function showLoader() {
+    $('.skeletonLoadContainer img').one('load', function () {
+        $(this).parent().closest('.skeletonLoadContainer').addClass("hide");
+        $(this).addClass("show");
+    });
+}
