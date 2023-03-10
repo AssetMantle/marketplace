@@ -252,6 +252,7 @@ class SettingController @Inject()(
               if (key.active) Option(constants.Response.CANNOT_DELETE_ACTIVE_KEY) else None,
               if (!validated) Option(constants.Response.INVALID_PASSWORD) else None,
               if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (key.identityIssued.isEmpty) Option(constants.Response.KEY_PROVISION_STATE_UNKNOWN) else None,
             ).flatten
 
             if (errors.isEmpty) {
