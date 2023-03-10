@@ -219,3 +219,10 @@ function setGasOption(element, value) {
     $(element).addClass("active");
     $('#GAS_PRICE').val(value);
 }
+
+// Sharable Link
+function setSharableLink(imageUrl){
+    if(imageUrl !== "") {
+        $('meta[name=sharableImage]').attr('content', imageUrl);
+    }
+}
