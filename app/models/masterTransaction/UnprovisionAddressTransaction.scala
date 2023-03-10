@@ -61,7 +61,7 @@ class UnprovisionAddressTransactions @Inject()(
                                                 blockchainAccounts: blockchain.Accounts,
                                                 blockchainBlocks: blockchain.Blocks,
                                                 blockchainTransactions: blockchain.Transactions,
-                                                blockchainTransactionUnprovisionAddresss: blockchainTransaction.UnprovisionAddresss,
+                                                blockchainTransactionUnprovisionAddresses: blockchainTransaction.UnprovisionAddresses,
                                                 broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                                 utilitiesOperations: utilities.Operations,
                                                 getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
@@ -125,7 +125,7 @@ class UnprovisionAddressTransactions @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              unprovisionAddress <- blockchainTransactionUnprovisionAddresss.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              unprovisionAddress <- blockchainTransactionUnprovisionAddresses.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, accountId = accountId, toAddress = toAddress)
             } yield unprovisionAddress
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
@@ -139,8 +139,8 @@ class UnprovisionAddressTransactions @Inject()(
       def broadcastTxAndUpdate(unprovisionAddress: UnprovisionAddress) = {
         val broadcastTx = broadcastTxSync.Service.get(unprovisionAddress.getTxRawAsHexString)
 
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionUnprovisionAddresss.Service.markFailedWithLog(txHashes = Seq(unprovisionAddress.txHash), log = errorResponse.get.error.data)
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionUnprovisionAddresss.Service.markFailedWithLog(txHashes = Seq(unprovisionAddress.txHash), log = successResponse.get.result.log)
+        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionUnprovisionAddresses.Service.markFailedWithLog(txHashes = Seq(unprovisionAddress.txHash), log = errorResponse.get.error.data)
+        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionUnprovisionAddresses.Service.markFailedWithLog(txHashes = Seq(unprovisionAddress.txHash), log = successResponse.get.result.log)
         else Future(0)
 
         for {
@@ -165,7 +165,7 @@ class UnprovisionAddressTransactions @Inject()(
         val unprovisionAddressTxs = Service.getAllPendingStatus
 
         def checkAndUpdate(unprovisionAddressTxs: Seq[UnprovisionAddressTransaction]) = utilitiesOperations.traverse(unprovisionAddressTxs) { unprovisionAddressTx =>
-          val transaction = blockchainTransactionUnprovisionAddresss.Service.tryGet(unprovisionAddressTx.txHash)
+          val transaction = blockchainTransactionUnprovisionAddresses.Service.tryGet(unprovisionAddressTx.txHash)
 
           def onTxComplete(transaction: UnprovisionAddress) = if (transaction.status.isDefined) {
             if (transaction.status.get) {

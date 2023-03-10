@@ -66,7 +66,7 @@ class ProvisionAddressTransactions @Inject()(
                                               getAccount: queries.blockchain.GetAccount,
                                               getAbciInfo: queries.blockchain.GetABCIInfo,
                                               utilitiesNotification: utilities.Notification,
-                                              blockchainTransactionProvisionAddresss: blockchainTransaction.ProvisionAddresss,
+                                              blockchainTransactionProvisionAddresses: blockchainTransaction.ProvisionAddresses,
                                             )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[ProvisionAddressTransactions.ProvisionAddressTransactionTable, ProvisionAddressTransaction, String](
     databaseConfigProvider,
@@ -123,7 +123,7 @@ class ProvisionAddressTransactions @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              provisionAddress <- blockchainTransactionProvisionAddresss.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              provisionAddress <- blockchainTransactionProvisionAddresses.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, accountId = accountId, toAddress = toAddress)
             } yield provisionAddress
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
@@ -137,8 +137,8 @@ class ProvisionAddressTransactions @Inject()(
       def broadcastTxAndUpdate(provisionAddress: ProvisionAddress) = {
         val broadcastTx = broadcastTxSync.Service.get(provisionAddress.getTxRawAsHexString)
 
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionProvisionAddresss.Service.markFailedWithLog(txHashes = Seq(provisionAddress.txHash), log = errorResponse.get.error.data)
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionProvisionAddresss.Service.markFailedWithLog(txHashes = Seq(provisionAddress.txHash), log = successResponse.get.result.log)
+        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionProvisionAddresses.Service.markFailedWithLog(txHashes = Seq(provisionAddress.txHash), log = errorResponse.get.error.data)
+        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionProvisionAddresses.Service.markFailedWithLog(txHashes = Seq(provisionAddress.txHash), log = successResponse.get.result.log)
         else Future(0)
 
         for {
@@ -163,7 +163,7 @@ class ProvisionAddressTransactions @Inject()(
         val provisionAddressTxs = Service.getAllPendingStatus
 
         def checkAndUpdate(provisionAddressTxs: Seq[ProvisionAddressTransaction]) = utilitiesOperations.traverse(provisionAddressTxs) { provisionAddressTx =>
-          val transaction = blockchainTransactionProvisionAddresss.Service.tryGet(provisionAddressTx.txHash)
+          val transaction = blockchainTransactionProvisionAddresses.Service.tryGet(provisionAddressTx.txHash)
 
           def onTxComplete(transaction: ProvisionAddress) = if (transaction.status.isDefined) {
             if (transaction.status.get) {

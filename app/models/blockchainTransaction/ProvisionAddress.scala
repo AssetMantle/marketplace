@@ -18,7 +18,7 @@ case class ProvisionAddress(txHash: String, txRawBytes: Array[Byte], fromAddress
   def id: String = txHash
 }
 
-object ProvisionAddresss {
+object ProvisionAddresses {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -58,17 +58,17 @@ object ProvisionAddresss {
 }
 
 @Singleton
-class ProvisionAddresss @Inject()(
+class ProvisionAddresses @Inject()(
                                  protected val databaseConfigProvider: DatabaseConfigProvider,
                                  blockchainTransactions: models.blockchain.Transactions,
                                  blockchainBlocks: blockchain.Blocks,
                                )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[ProvisionAddresss.ProvisionAddressTable, ProvisionAddress, String](
+  extends GenericDaoImpl[ProvisionAddresses.ProvisionAddressTable, ProvisionAddress, String](
     databaseConfigProvider,
-    ProvisionAddresss.TableQuery,
+    ProvisionAddresses.TableQuery,
     executionContext,
-    ProvisionAddresss.module,
-    ProvisionAddresss.logger
+    ProvisionAddresses.module,
+    ProvisionAddresses.logger
   ) {
 
   object Service {
@@ -82,11 +82,11 @@ class ProvisionAddresss @Inject()(
 
     def tryGet(txHash: String): Future[ProvisionAddress] = tryGetById(txHash)
 
-    def markSuccess(txHashes: Seq[String]): Future[Int] = customUpdate(ProvisionAddresss.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(true))
+    def markSuccess(txHashes: Seq[String]): Future[Int] = customUpdate(ProvisionAddresses.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(true))
 
-    def markFailed(txHashes: Seq[String]): Future[Int] = customUpdate(ProvisionAddresss.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(false))
+    def markFailed(txHashes: Seq[String]): Future[Int] = customUpdate(ProvisionAddresses.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(false))
 
-    def markFailedWithLog(txHashes: Seq[String], log: String): Future[Int] = customUpdate(ProvisionAddresss.TableQuery.filter(_.txHash.inSet(txHashes)).map(x => (x.status, x.log)).update((false, log)))
+    def markFailedWithLog(txHashes: Seq[String], log: String): Future[Int] = customUpdate(ProvisionAddresses.TableQuery.filter(_.txHash.inSet(txHashes)).map(x => (x.status, x.log)).update((false, log)))
 
     def getAllPendingStatus: Future[Seq[ProvisionAddress]] = filter(_.status.?.isEmpty)
 
@@ -95,10 +95,10 @@ class ProvisionAddresss @Inject()(
   object Utility {
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = ProvisionAddresss.module
+      val name: String = ProvisionAddresses.module
 
       def runner(): Unit = {
-        val provisionAddresss = Service.getAllPendingStatus
+        val provisionAddresses = Service.getAllPendingStatus
 
         def getTransactions(hashes: Seq[String]) = blockchainTransactions.Service.getByHashes(hashes)
 
@@ -106,18 +106,18 @@ class ProvisionAddresss @Inject()(
 
         def markFailed(hashes: Seq[String]) = if (hashes.nonEmpty) Service.markFailed(hashes) else Future(0)
 
-        def markFailedTimedOut(provisionAddresss: Seq[ProvisionAddress], allTxs: Seq[Transaction]) = if (provisionAddresss.nonEmpty) {
-          val notFoundTxHashes = provisionAddresss.map(_.txHash).diff(allTxs.map(_.hash))
-          val timedoutFailedTxs = provisionAddresss.filter(x => notFoundTxHashes.contains(x.txHash) && x.timeoutHeight > 0 && blockchainBlocks.Service.getLatestHeight > x.timeoutHeight).map(_.txHash)
+        def markFailedTimedOut(provisionAddresses: Seq[ProvisionAddress], allTxs: Seq[Transaction]) = if (provisionAddresses.nonEmpty) {
+          val notFoundTxHashes = provisionAddresses.map(_.txHash).diff(allTxs.map(_.hash))
+          val timedoutFailedTxs = provisionAddresses.filter(x => notFoundTxHashes.contains(x.txHash) && x.timeoutHeight > 0 && blockchainBlocks.Service.getLatestHeight > x.timeoutHeight).map(_.txHash)
           if (timedoutFailedTxs.nonEmpty) Service.markFailedWithLog(timedoutFailedTxs, constants.Response.TRANSACTION_NOT_FOUND.logMessage) else Future(0)
         } else Future(0)
 
         val forComplete = (for {
-          provisionAddresss <- provisionAddresss
-          txs <- getTransactions(provisionAddresss.map(_.txHash))
+          provisionAddresses <- provisionAddresses
+          txs <- getTransactions(provisionAddresses.map(_.txHash))
           _ <- markSuccess(txs.filter(_.status).map(_.hash))
           _ <- markFailed(txs.filter(!_.status).map(_.hash))
-          _ <- markFailedTimedOut(provisionAddresss, txs)
+          _ <- markFailedTimedOut(provisionAddresses, txs)
         } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.failure.logMessage)
         }
