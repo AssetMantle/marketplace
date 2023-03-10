@@ -27,23 +27,27 @@
         <div class="title">
             <ul class="d-flex flex-row justify-content-between">
                 <li>@Messages(constants.View.PROPERTIES)</li>
+                <li><i class="bi bi-chevron-up iconDefault dropdownIcon" id="showHidePropertyButton" onclick="openPropertyList()"></i></li>
             </ul>
         </div>
-        <div class="d-flex flex-row flex-wrap gap-3 propertyList">
-        @nftProperties.filter(_.`value` != "").map { property =>
-            <div class="singleProperty">
-                <div class="propertyName">@property.name</div>
-                <div class="mt-2 propertyValue">
-                @if(property.meta){
-                    @defining(property.`value`) { propertyValue =>
-                        @propertyValue
+        <div class="propertyListContainer">
+            <div class="d-flex flex-row flex-wrap gap-3 propertyList">
+            @nftProperties.filter(_.`value` != "").map { property =>
+                <div class="singleProperty">
+                    <div class="propertyName">@property.name</div>
+                    <div class="mt-2 propertyValue">
+                    @if(property.meta){
+                        @defining(property.`value`) { propertyValue =>
+                            @propertyValue
+                        }
+                    } else {
+                        *****
                     }
-                } else {
-                    *****
-                }
+                    </div>
                 </div>
+            }
             </div>
-        }
         </div>
     </div>
 </div>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/view.js")" type="text/javascript"></script>

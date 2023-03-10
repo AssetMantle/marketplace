@@ -156,6 +156,14 @@
     .title{
       @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
       text-transform: capitalize;
+      .dropdownIcon {
+        display: inline-block;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+        &.active {
+          transform: rotate(180deg);
+        }
+      }
     }
     .propertyList{
       padding-right: 20px;
