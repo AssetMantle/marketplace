@@ -42,7 +42,7 @@
                 }
 
                 <div id="collectionCoverImage_@collection.id">
-                    <div class="hero-img">
+                    <div class="hero-img skeletonLoadContainer">
                     @collection.getCoverFileURL.fold {
                         <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
                     } { uri =>
@@ -53,7 +53,7 @@
             </div>
             <div class="profile-detail">
                 <div id="collectionProfileImage_@collection.id">
-                    <div class="profile-img">
+                    <div class="profile-img skeletonLoadContainer">
                         <div onclick="@onClickFunction" class="collectionLink">
                         @collection.getProfileFileURL.fold {
                             <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
@@ -121,4 +121,5 @@
         </div>
     </div>
 </div>
-<script>commonCollectionCardInfo('@collection.id', @status.id)</script>
+<script>commonCollectionCardInfo('@collection.id', @status.id);
+showLoader();</script>

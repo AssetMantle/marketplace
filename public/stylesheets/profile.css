@@ -358,12 +358,14 @@ profileContainer .item-sticky .profile-card{
     height: 100% !important;
 }
 .single-profile-card .profile-img {
+    background-color: var(--card-dark);
     width: 50px;
     height: 50px;
     margin: -25px auto 0 18px;
     border-radius: 50%;
     position: relative;
     z-index: 99;
+    overflow: hidden;
 }
 .single-profile-card .profile-img img {
     width: 100%;
@@ -692,7 +694,9 @@ profileContainer .item-sticky .profile-card{
         height: 150px;
     }
 }
-
+.profileCoverContainer{
+    background-color: var(--card-dark);
+}
 .profileCoverContainer::after {
     content: '';
     position: absolute;

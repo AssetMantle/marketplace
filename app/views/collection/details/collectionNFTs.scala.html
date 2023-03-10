@@ -4,7 +4,7 @@
 
 <div class="item item-center nftContainer">
     <div class="profileCover">
-        <div class="profileCoverContainer" id="collectionUncompressedCoverImage_@collection.id">
+        <div class="profileCoverContainer skeletonLoadContainer" id="collectionUncompressedCoverImage_@collection.id">
             @if(loginState.fold("")(_.username) == collection.creatorId) {
                 <div class="editCollectionCover" onclick="getForm(jsRoutes.controllers.CollectionController.uploadCollectionFilesForm('@collection.id'))">
                     <i class="bi bi-pencil iconDefault"></i>
@@ -41,5 +41,6 @@
             window.onscroll = function () {
                 loadArtNftOnScroll('@{collection.id}');
             }
+            showLoader();
     </script>
 </div>
