@@ -255,21 +255,31 @@ class SettingController @Inject()(
             ).flatten
 
             if (errors.isEmpty) {
-              masterTransactionUnprovisionAddressTransactions.Utility.transaction(
-                fromAddress = loginState.address,
-                accountId = loginState.username,
-                toAddress = deleteKeyData.address,
-                gasPrice = constants.Blockchain.DefaultGasPrice,
-                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, deleteKeyData.password))
-              )
+              if (key.identityIssued.getOrElse(true)) {
+                val blockchainTransaction = masterTransactionUnprovisionAddressTransactions.Utility.transaction(
+                  fromAddress = loginState.address,
+                  accountId = loginState.username,
+                  toAddress = deleteKeyData.address,
+                  gasPrice = constants.Blockchain.DefaultGasPrice,
+                  ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, deleteKeyData.password))
+                )
+                for {
+                  blockchainTransaction <- blockchainTransaction
+                } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+              } else {
+                val deleteKey = masterKeys.Service.delete(accountId = loginState.username, address = deleteKeyData.address)
+                for {
+                  _ <- deleteKey
+                } yield PartialContent(views.html.setting.keyDeletedSuccessfully())
+              }
             } else errors.head.throwFutureBaseException()
           }
 
           (for {
             (validated, key) <- validateAndGetKey
             balance <- balance
-            blockchainTransaction <- delete(validated, key, balance)
-          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+            result <- delete(validated, key, balance)
+          } yield result
             ).recover {
             case baseException: BaseException => BadRequest(views.html.setting.deleteKey(DeleteKey.form.withGlobalError(baseException.failure.message), deleteKeyData.address))
           }
@@ -330,6 +340,7 @@ class SettingController @Inject()(
 
           def provision(validated: Boolean, key: master.Key, balance: MicroNumber) = {
             val errors = Seq(
+              if (key.identityIssued.getOrElse(true)) Option(constants.Response.ADDRES_ALREADY_PROVISIONED) else None,
               if (!validated) Option(constants.Response.INVALID_PASSWORD) else None,
               if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
             ).flatten

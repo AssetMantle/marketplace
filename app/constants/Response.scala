@@ -173,6 +173,7 @@ object Response {
   val TRANSACTION_NOT_FOUND = new Failure("TRANSACTION_NOT_FOUND")
   val ORDER_ID_NOT_FOUND = new Failure("ORDER_ID_NOT_FOUND")
   val INVALID_IDENTITY_ISSUE_MESSAGE = new Failure("INVALID_IDENTITY_ISSUE_MESSAGE")
+  val ADDRES_ALREADY_PROVISIONED = new Failure("ADDRES_ALREADY_PROVISIONED")
 
   class Failure(private val response: String) {
     val message: String = PREFIX + FAILURE_PREFIX + response
