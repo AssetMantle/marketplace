@@ -965,3 +965,7 @@ NFT_INVOICE_TABLE_FIELD_TRANSACTION_FEES=Transaction Fees
 NFT_INVOICE_TABLE_INVOICE_TOTAL=Invoice Total
 NFT_INVOICE_TABLE_INFO_MESSAGE=Upon confirmation, Keplr extension will open. Approve transaction in Keplr.
 NFT_INVOICE_TABLE_CONFIRM_BUTTON=Confirm
+FORM.UNWRAP_TOKEN.TITLE=Transfer From Trade Balance to Main Balance
+FORM.UNWRAP_TOKEN.SUBTITLE=Unwrap Transaction
+FORM.UNWRAP_TOKEN.SUBMIT=Submit
+FORM.UNWRAP_TOKEN.BUTTON=Transfer to Main

@@ -120,25 +120,20 @@ POST        /deleteNftDraft                                    controllers.NFTCo
 
 GET         /settings                                          controllers.SettingController.viewSettings()
 GET         /profileSettings                                   controllers.SettingController.settings()
-
 GET         /addNewKey                                         controllers.SettingController.addNewKey()
-
 GET         /addManagedKey                                     controllers.SettingController.addManagedKeyForm()
 POST        /addManagedKey                                     controllers.SettingController.addManagedKey()
-
 GET         /addUnmanagedKey                                   controllers.SettingController.addUnmanagedKeyForm()
 POST        /addUnmanagedKey                                   controllers.SettingController.addUnmanagedKey()
-
 GET         /changeKeyName                                     controllers.SettingController.changeKeyNameForm(address: String)
 POST        /changeKeyName                                     controllers.SettingController.changeKeyName()
-
 GET         /viewMnemonics                                     controllers.SettingController.viewMnemonicsForm(address: String)
 POST        /viewMnemonics                                     controllers.SettingController.viewMnemonics()
-
 GET         /deleteKey                                         controllers.SettingController.deleteKeyForm(address: String)
 POST        /deleteKey                                         controllers.SettingController.deleteKey()
-
 GET         /walletBalance                                     controllers.SettingController.walletBalance(address: String)
+GET         /provisionAddress                                  controllers.SettingController.provisionAddressForm(address: String)
+POST        /provisionAddress                                  controllers.SettingController.provisionAddress()
 
 GET         /defaultProfile                                    controllers.ProfileController.viewDefaultProfile()
 GET         /profile/:accountId/:activeTab                     controllers.ProfileController.viewProfile(accountId: String, activeTab: String)

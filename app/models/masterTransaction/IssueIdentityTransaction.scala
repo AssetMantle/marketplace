@@ -97,7 +97,7 @@ class IssueIdentityTransactions @Inject()(
 
   object Utility {
 
-    def transaction(accountIdAddress: Map[String, String], gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(accountIdAddress: Map[String, Seq[String]], gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get
@@ -107,12 +107,14 @@ class IssueIdentityTransactions @Inject()(
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
         val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = accountIdAddress.keys.map(x => utilities.BlockchainTransaction.getMantlePlaceIssueIdentityMsg(
+          messages = accountIdAddress.keys.map(x => utilities.BlockchainTransaction.getMantlePlaceIssueIdentityMsgWithAuthentication(
             id = x,
             fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress,
-            toAddress = accountIdAddress.getOrElse(x, ""),
+            toAddress = accountIdAddress.getOrElse(x, Seq()).headOption.getOrElse(""),
             classificationID = constants.Blockchain.MantlePlaceIdentityClassificationID,
-            fromID = constants.Blockchain.MantlePlaceFromID)).toSeq,
+            fromID = constants.Blockchain.MantlePlaceFromID,
+            addresses = accountIdAddress.getOrElse(x, Seq())
+          )).toSeq,
           fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultIssueIdentityGasLimit * accountIdAddress.size),
           gasLimit = constants.Blockchain.DefaultIssueIdentityGasLimit * accountIdAddress.size,
           account = bcAccount,
@@ -173,10 +175,10 @@ class IssueIdentityTransactions @Inject()(
         } yield accountIDs.filterNot(x => existingIdentityIDsString.contains(utilities.Identity.getMantlePlaceIdentityID(x).asString))
       }
 
-      def getKeys(anyPendingTx: Boolean, ids: Seq[String]) = if (!anyPendingTx && ids.nonEmpty) masterKeys.Service.getAllActiveKeys(ids) else Future(Seq())
+      def getKeys(anyPendingTx: Boolean, ids: Seq[String]) = if (!anyPendingTx && ids.nonEmpty) masterKeys.Service.getAllKeys(ids) else Future(Seq())
 
-      def doTx(keys: Seq[Key]) = if (keys.nonEmpty) {
-        val tx = transaction(accountIdAddress = keys.map(x => x.accountId -> x.address).toMap, gasPrice = 0.0001, ecKey = constants.Blockchain.MantleNodeMaintainerWallet.getECKey)
+      def doTx(ids: Seq[String], keys: Seq[Key]) = if (keys.nonEmpty) {
+        val tx = transaction(accountIdAddress = ids.map(x => x -> keys.filter(_.accountId == x).map(_.address)).toMap, gasPrice = 0.0001, ecKey = constants.Blockchain.MantleNodeMaintainerWallet.getECKey)
 
         def updateMasterKeys() = masterKeys.Service.markIdentityIssuePending(keys.map(_.accountId).distinct)
 
@@ -191,7 +193,7 @@ class IssueIdentityTransactions @Inject()(
         issueIdentities <- filterAlreadyIssuedIdentities(accountIds)
         anyPendingTx <- anyPendingTx
         keys <- getKeys(anyPendingTx, issueIdentities)
-        txHash <- doTx(keys)
+        txHash <- doTx(issueIdentities, keys)
       } yield if (txHash != "") logger.info("ISSUE IDENTITY: " + txHash + " ( " + keys.map(x => x.accountId -> x.address).toMap.toString() + " )")
     }
 

@@ -59,8 +59,10 @@ object Notification {
   val BUYER_TAKE_ORDER_SUCCESSFUL: Notification = Notification("BUYER_TAKE_ORDER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ProfileController.viewProfile))
   val BUYER_TAKE_ORDER_FAILED: Notification = Notification("BUYER_TAKE_ORDER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
 
-  val IDENTITY_ISSUED: Notification = Notification("IDENTITY_ISSUED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = null) //Option(routes.javascript.SecondaryMarketController.viewSecondaryMarket))
-  val IDENTITY_ISSUE_FAILED: Notification = Notification("IDENTITY_ISSUE_FAILED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = null) //Option(routes.javascript.SecondaryMarketController.viewSecondaryMarket))
+  val ADDRESS_PROVISIONED_SUCCESSFULLY: Notification = Notification("ADDRESS_PROVISIONED_SUCCESSFULLY", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.SettingController.viewSettings))
+  val ADDRESS_PROVISIONED_FAILED: Notification = Notification("ADDRESS_PROVISIONED_FAILED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.SettingController.viewSettings))
+  val ADDRESS_UNPROVISIONED_SUCCESSFULLY: Notification = Notification("ADDRESS_UNPROVISIONED_SUCCESSFULLY", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.SettingController.viewSettings))
+  val ADDRESS_UNPROVISIONED_FAILED: Notification = Notification("ADDRESS_UNPROVISIONED_FAILED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.SettingController.viewSettings))
 
   val UNWRAPPED_TOKEN_SUCCESSFULLY: Notification = Notification("UNWRAPPED_TOKEN_SUCCESSFULLY", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
   val UNWRAPPED_TOKEN_FAILED: Notification = Notification("UNWRAPPED_TOKEN_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
