@@ -354,7 +354,7 @@ class Keys @Inject()(
 
     def fetchAllActive: Future[Seq[Keys.KeySerialized]] = filter(_.active)
 
-    def getNotIssuedIdentityAccountIDs: Future[Seq[String]] = filterAndSortWithPagination(offset = 0, limit = 250)(x => !x.identityIssued && x.verified && x.active)(_.accountId).map(_.map(_.accountId))
+    def getNotIssuedIdentityAccountIDs: Future[Seq[String]] = filterAndSortWithPagination(offset = 0, limit = 500)(x => !x.identityIssued && x.verified && x.active)(_.accountId).map(_.map(_.accountId))
 
     def markIdentityIssuePending(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(_.accountId.inSet(accountIds)).map(_.identityIssued.?).update(null))
 
