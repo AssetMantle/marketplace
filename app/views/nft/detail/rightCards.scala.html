@@ -64,7 +64,7 @@
                 @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId && userNFTOwner.get.creatorId != optionalLoginState.get.username && userNFTOwner.get.creatorId != "Mint.E" && nft.isMinted.getOrElse(false)) {
                     @commonPrimaryButton(Messages(constants.View.SELL_NFT), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.createForm('${nft.id}'))"))
                 } else {
-                    @Messages(constants.View.CANNOT_BE_SOLD)
+                    <div class="analysisValue">@Messages(constants.View.CANNOT_BE_SOLD)</div>
                 }
             }
         } else {

@@ -26,10 +26,12 @@
         </div>
     </div>
 
-    <div>
+    <div class="d-flex justify-content-between align-items-center mt-3 balanceContainer">
+        <div class="balanceLabel">
         @Messages(constants.View.TRADE_BALANCE)
+        </div>
+        <div class="balanceValue" id="walletTradeBalance">0 $MNTL</div>
     </div>
-    <div id="walletTradeBalance">0 $MNTL</div>
     <div>
     @commonFormButton(constants.Form.UNWRAP_TOKEN, Symbol("class") -> "primaryButton")
     </div>

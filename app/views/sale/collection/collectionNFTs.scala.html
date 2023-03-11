@@ -5,7 +5,7 @@
 
 <div class="item item-center nftContainer">
     <div class="profileCover">
-        <div class="profileCoverContainer" id="collectionUncompressedCoverImage_@collection.id">
+        <div class="profileCoverContainer skeletonLoadContainer" id="collectionUncompressedCoverImage_@collection.id">
         @collection.getCoverFileURL.fold {
             <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
         } { uri =>
@@ -22,7 +22,7 @@
             <div class="swiper-wrapper">
             @randomNFTs.map { randomNFT =>
                 <div class="swiper-slide">
-                    <div class="imageContainer">
+                    <div class="imageContainer skeletonLoadContainer">
                         <img src="@randomNFT.getS3Url"/>
                     </div>
                 </div>
@@ -32,7 +32,7 @@
         </div>
     } else {
         <div class="NFTCard">
-            <div class="imageContainer">
+            <div class="imageContainer skeletonLoadContainer">
             @randomNFTs.map { randomNFT =>
                 <img src="@randomNFT.getS3Url"/>
             }
@@ -42,3 +42,6 @@
     </div>
     <script src="@routes.Assets.versioned("javascripts/collections/nftOnSale.js")"></script>
 </div>
+<script>
+        showLoader();
+</script>

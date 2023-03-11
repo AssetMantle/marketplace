@@ -4,7 +4,7 @@
 
 <div class="item item-center nftContainer">
     <div class="profileCover">
-        <div class="profileCoverContainer" id="collectionUncompressedCoverImage_@collection.id">
+        <div class="profileCoverContainer skeletonLoadContainer" id="collectionUncompressedCoverImage_@collection.id">
             @collection.getCoverFileURL.fold{
                 <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
             }{uri =>
@@ -35,4 +35,5 @@
      loadFirstWishlistNFTs('@accountId', '@collection.id');
      checkAndPushState(jsRoutes.controllers.WishlistController.viewCollectionNFTs('@accountId', '@collection.id').url, ('@accountId' + '/WISHLIST/' + '@collection.id'), "wishListCollection");
      window.onscroll = function() { loadWishlistNftOnScroll('@{accountId}', '@{collection.id}'); }
+     showLoader();
 </script>
