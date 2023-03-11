@@ -36,6 +36,8 @@ class IndexController @Inject()(
                                  makeOrders: blockchainTransaction.MakeOrders,
                                  takeOrders: blockchainTransaction.TakeOrders,
                                  issueIdentities: blockchainTransaction.IssueIdentities,
+                                 provisionAddresses: blockchainTransaction.ProvisionAddresses,
+                                 unprovisionAddresses: blockchainTransaction.UnprovisionAddresses,
                                  unwraps: blockchainTransaction.Unwraps,
                                  masterCollections: master.Collections,
                                  masterTransactionTokenPrices: masterTransaction.TokenPrices,
@@ -51,6 +53,8 @@ class IndexController @Inject()(
                                  takeOrderTransactions: masterTransaction.TakeOrderTransactions,
                                  cancelOrderTransactions: masterTransaction.CancelOrderTransactions,
                                  unwrapTransactions: masterTransaction.UnwrapTransactions,
+                                 provisionAddressTransactions: masterTransaction.ProvisionAddressTransactions,
+                                 unprovisionAddressTransactions: masterTransaction.UnprovisionAddressTransactions,
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -95,8 +99,8 @@ class IndexController @Inject()(
     defineAssetTransactions.Utility.scheduler,
     issueIdentities.Utility.scheduler,
     issueIdentityTransactions.Utility.scheduler,
-    mintAssets.Utility.scheduler,
-    mintAssetTransactions.Utility.scheduler,
+//    mintAssets.Utility.scheduler,
+//    mintAssetTransactions.Utility.scheduler,
     makeOrders.Utility.scheduler,
     makeOrderTransactions.Utility.scheduler,
     takeOrders.Utility.scheduler,
@@ -106,6 +110,10 @@ class IndexController @Inject()(
     cancelOrderTransactions.Utility.scheduler,
     unwraps.Utility.scheduler,
     unwrapTransactions.Utility.scheduler,
+    provisionAddresses.Utility.scheduler,
+    provisionAddressTransactions.Utility.scheduler,
+    unprovisionAddresses.Utility.scheduler,
+    unprovisionAddressTransactions.Utility.scheduler,
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())

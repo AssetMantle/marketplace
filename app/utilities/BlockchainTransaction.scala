@@ -5,11 +5,12 @@ import com.cosmos.bank.v1beta1.MsgSend
 import com.cosmos.crypto.secp256k1.PubKey
 import com.cosmos.tx.v1beta1._
 import com.google.protobuf.{ByteString, Any => protoBufAny}
-import com.identities.transactions.issue
+import com.identities.transactions.{issue, provision, unprovision}
 import com.orders.transactions.{cancel => orderCancel, define => ordersDefine, make => ordersMake, take => ordersTake}
 import com.splits.transactions.{unwrap, wrap}
 import models.common.Coin
 import org.bitcoinj.core.ECKey
+import play.api.Logger
 import schema.id.OwnableID
 import schema.id.base.{ClassificationID, IdentityID, OrderID}
 import schema.list.PropertyList
@@ -98,6 +99,24 @@ object BlockchainTransaction {
       .setMutableProperties(PropertyList(Seq(utilities.Identity.getNote2MesaProperty(""))).asProtoPropertyList)
       .build().toByteString)
     .build()
+
+  def getMantlePlaceIssueIdentityMsgWithAuthentication(id: String, fromAddress: String, fromID: IdentityID, toAddress: String, classificationID: ClassificationID, addresses: Seq[String])(implicit module: String, logger: Logger): protoBufAny = {
+    if (!addresses.contains(toAddress)) constants.Response.INVALID_IDENTITY_ISSUE_MESSAGE.throwBaseException()
+    protoBufAny.newBuilder()
+      .setTypeUrl(constants.Blockchain.TransactionMessage.IDENTITY_ISSUE)
+      .setValue(issue
+        .Message.newBuilder()
+        .setFrom(fromAddress)
+        .setFromID(fromID.asProtoIdentityID)
+        .setTo(toAddress)
+        .setClassificationID(classificationID.asProtoClassificationID)
+        .setImmutableMetaProperties(PropertyList(Seq(utilities.Identity.getOriginMetaProperty, utilities.Identity.getBondAmountMetaProperty, utilities.Identity.getIDMetaProperty(id))).asProtoPropertyList)
+        .setImmutableProperties(PropertyList(Seq(utilities.Identity.getExtraMesaProperty(""))).asProtoPropertyList)
+        .setMutableMetaProperties(PropertyList(Seq(utilities.Identity.getTwitterMetaProperty(""), utilities.Identity.getNote1MetaProperty(""), utilities.Identity.getAuthenticationProperty(addresses))).asProtoPropertyList)
+        .setMutableProperties(PropertyList(Seq(utilities.Identity.getNote2MesaProperty(""))).asProtoPropertyList)
+        .build().toByteString)
+      .build()
+  }
 
   def getDefineAssetMsg(fromAddress: String, fromID: IdentityID, immutableMetas: Seq[MetaProperty], immutables: Seq[MesaProperty], mutableMetas: Seq[MetaProperty], mutables: Seq[MesaProperty]): protoBufAny = protoBufAny.newBuilder()
     .setTypeUrl(constants.Blockchain.TransactionMessage.ASSET_DEFINE)
@@ -199,6 +218,28 @@ object BlockchainTransaction {
       .setFrom(fromAddress)
       .setFromID(fromID.asProtoIdentityID)
       .setOrderID(orderID.asProtoOrderID)
+      .build().toByteString)
+    .build()
+
+
+  def getProvisionMsg(fromAddress: String, fromID: IdentityID, toAddress: String): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(constants.Blockchain.TransactionMessage.IDENTITY_PROVISION)
+    .setValue(provision
+      .Message.newBuilder()
+      .setFrom(fromAddress)
+      .setTo(toAddress)
+      .setIdentityID(fromID.asProtoIdentityID)
+      .build().toByteString)
+    .build()
+
+
+  def getUnprovisionMsg(fromAddress: String, fromID: IdentityID, toAddress: String): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION)
+    .setValue(unprovision
+      .Message.newBuilder()
+      .setFrom(fromAddress)
+      .setTo(toAddress)
+      .setIdentityID(fromID.asProtoIdentityID)
       .build().toByteString)
     .build()
 

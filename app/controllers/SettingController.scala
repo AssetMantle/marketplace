@@ -4,6 +4,7 @@ import controllers.actions._
 import controllers.result.WithUsernameToken
 import exceptions.BaseException
 import models.{blockchain, master, masterTransaction}
+import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -23,11 +24,11 @@ class SettingController @Inject()(
                                    withoutLoginAction: WithoutLoginAction,
                                    masterAccounts: master.Accounts,
                                    masterKeys: master.Keys,
-                                   masterTransactionSessionTokens: masterTransaction.SessionTokens,
-                                   masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                                    withUsernameToken: WithUsernameToken,
                                    withLoginActionAsync: WithLoginActionAsync,
-                                   withLoginAction: WithLoginAction
+                                   withLoginAction: WithLoginAction,
+                                   masterTransactionUnprovisionAddressTransactions: masterTransaction.UnprovisionAddressTransactions,
+                                   masterTransactionProvisionAddressTransactions: masterTransaction.ProvisionAddressTransactions,
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -73,26 +74,49 @@ class SettingController @Inject()(
         addManagedKeyData => {
           val wallet = utilities.Wallet.getWallet(addManagedKeyData.seeds.split(" "))
           val validatePassword = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = addManagedKeyData.password)
+          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
 
-          def validateAndAdd(validatePassword: Boolean) = if (validatePassword && wallet.address == addManagedKeyData.address) {
-            masterKeys.Service.addManagedKey(
-              accountId = loginState.username,
-              address = wallet.address,
-              hdPath = wallet.hdPath,
-              password = addManagedKeyData.password,
-              privateKey = wallet.privateKey,
-              partialMnemonics = Option(wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown)),
-              name = addManagedKeyData.keyName,
-              retryCounter = 0,
-              backupUsed = true,
-              active = false,
-              verified = Option(true)
-            )
-          } else constants.Response.INVALID_SEEDS_OR_ADDRESS_OR_PASSWORD.throwFutureBaseException()
+          def validateAndAdd(validated: Boolean, key: master.Key, balance: MicroNumber) = {
+            val errors = Seq(
+              if (wallet.address != addManagedKeyData.address) Option(constants.Response.INVALID_SEEDS_OR_ADDRESS) else None,
+              if (!validated) Option(constants.Response.INVALID_PASSWORD) else None,
+              if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+            ).flatten
+
+            if (errors.isEmpty) {
+              val addToMaster = masterKeys.Service.addManagedKey(
+                accountId = loginState.username,
+                address = wallet.address,
+                hdPath = wallet.hdPath,
+                password = addManagedKeyData.password,
+                privateKey = wallet.privateKey,
+                partialMnemonics = Option(wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown)),
+                name = addManagedKeyData.keyName,
+                retryCounter = 0,
+                backupUsed = true,
+                active = false,
+                verified = Option(true)
+              )
+
+              def doTx() = masterTransactionProvisionAddressTransactions.Utility.transaction(
+                fromAddress = loginState.address,
+                accountId = loginState.username,
+                toAddress = addManagedKeyData.address,
+                gasPrice = constants.Blockchain.DefaultGasPrice,
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, addManagedKeyData.password))
+              )
+
+              for {
+                _ <- addToMaster
+                _ <- doTx()
+              } yield ()
+            } else errors.head.throwFutureBaseException()
+          }
 
           (for {
-            (validatePassword, _) <- validatePassword
-            _ <- validateAndAdd(validatePassword)
+            (validatePassword, key) <- validatePassword
+            balance <- balance
+            _ <- validateAndAdd(validatePassword, key, balance)
           } yield PartialContent(views.html.setting.keyAddedOrUpdatedSuccessfully(address = wallet.address, name = addManagedKeyData.keyName))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.setting.addManagedKey(AddManagedKey.form.withGlobalError(baseException.failure.message)))
@@ -113,23 +137,45 @@ class SettingController @Inject()(
         },
         addUnmanagedKeyData => {
           val validatePassword = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = addUnmanagedKeyData.password)
+          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
 
-          def validateAndAdd(validatePassword: Boolean) = if (validatePassword) {
-            masterKeys.Service.addUnmanagedKey(
-              accountId = loginState.username,
-              address = addUnmanagedKeyData.address,
-              password = addUnmanagedKeyData.password,
-              name = addUnmanagedKeyData.keyName,
-              retryCounter = 0,
-              backupUsed = true,
-              active = false,
-              verified = Option(true)
-            )
-          } else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+          def validateAndAdd(validated: Boolean, key: master.Key, balance: MicroNumber) = {
+            val errors = Seq(
+              if (!validated) Option(constants.Response.INVALID_PASSWORD) else None,
+              if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+            ).flatten
+
+            if (errors.isEmpty) {
+              val addToMaster = masterKeys.Service.addUnmanagedKey(
+                accountId = loginState.username,
+                address = addUnmanagedKeyData.address,
+                password = addUnmanagedKeyData.password,
+                name = addUnmanagedKeyData.keyName,
+                retryCounter = 0,
+                backupUsed = true,
+                active = false,
+                verified = Option(true)
+              )
+
+              def doTx() = masterTransactionProvisionAddressTransactions.Utility.transaction(
+                fromAddress = loginState.address,
+                accountId = loginState.username,
+                toAddress = addUnmanagedKeyData.address,
+                gasPrice = constants.Blockchain.DefaultGasPrice,
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, addUnmanagedKeyData.password))
+              )
+
+              for {
+                _ <- addToMaster
+                _ <- doTx()
+              } yield ()
+            } else errors.head.throwFutureBaseException()
+          }
 
           (for {
-            (validatePassword, _) <- validatePassword
-            _ <- validateAndAdd(validatePassword)
+            (validatePassword, key) <- validatePassword
+            balance <- balance
+            _ <- validateAndAdd(validatePassword, key, balance)
           } yield PartialContent(views.html.setting.keyAddedOrUpdatedSuccessfully(address = addUnmanagedKeyData.address, name = addUnmanagedKeyData.keyName))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.setting.addUnmanagedKey(AddUnmanagedKey.form.withGlobalError(baseException.failure.message)))
@@ -199,15 +245,42 @@ class SettingController @Inject()(
         },
         deleteKeyData => {
           val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = deleteKeyData.address, password = deleteKeyData.password)
+          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
 
-          def delete(validated: Boolean, key: master.Key) = if (!key.active) {
-            if (validated) masterKeys.Service.delete(accountId = key.accountId, address = key.address) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
-          } else constants.Response.CANNOT_DELETE_ACTIVE_KEY.throwFutureBaseException()
+          def delete(validated: Boolean, key: master.Key, balance: MicroNumber) = {
+            val errors = Seq(
+              if (key.active) Option(constants.Response.CANNOT_DELETE_ACTIVE_KEY) else None,
+              if (!validated) Option(constants.Response.INVALID_PASSWORD) else None,
+              if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (key.identityIssued.isEmpty) Option(constants.Response.KEY_PROVISION_STATE_UNKNOWN) else None,
+            ).flatten
+
+            if (errors.isEmpty) {
+              if (key.identityIssued.getOrElse(true)) {
+                val blockchainTransaction = masterTransactionUnprovisionAddressTransactions.Utility.transaction(
+                  fromAddress = loginState.address,
+                  accountId = loginState.username,
+                  toAddress = deleteKeyData.address,
+                  gasPrice = constants.Blockchain.DefaultGasPrice,
+                  ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, deleteKeyData.password))
+                )
+                for {
+                  blockchainTransaction <- blockchainTransaction
+                } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+              } else {
+                val deleteKey = masterKeys.Service.delete(accountId = loginState.username, address = deleteKeyData.address)
+                for {
+                  _ <- deleteKey
+                } yield PartialContent(views.html.setting.keyDeletedSuccessfully())
+              }
+            } else errors.head.throwFutureBaseException()
+          }
 
           (for {
             (validated, key) <- validateAndGetKey
-            _ <- delete(validated, key)
-          } yield PartialContent(views.html.setting.keyDeletedSuccessfully())
+            balance <- balance
+            result <- delete(validated, key, balance)
+          } yield result
             ).recover {
             case baseException: BaseException => BadRequest(views.html.setting.deleteKey(DeleteKey.form.withGlobalError(baseException.failure.message), deleteKeyData.address))
           }
@@ -250,6 +323,50 @@ class SettingController @Inject()(
           case _: BaseException => BadRequest(views.html.base.info.commonMicroNumber(MicroNumber.zero, constants.View.STAKING_TOKEN_UNITS))
         }
     }
+  }
+
+  def provisionAddressForm(address: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.setting.provisionAddress(address = address))
+  }
+
+  def provisionAddress(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      ProvisionAddress.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.setting.provisionAddress(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.WALLET_ADDRESS.name, ""))))
+        },
+        provisionAddressData => {
+          val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = provisionAddressData.address, password = provisionAddressData.password)
+          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
+
+          def provision(validated: Boolean, key: master.Key, balance: MicroNumber) = {
+            val errors = Seq(
+              if (key.identityIssued.getOrElse(true)) Option(constants.Response.ADDRES_ALREADY_PROVISIONED) else None,
+              if (!validated) Option(constants.Response.INVALID_PASSWORD) else None,
+              if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+            ).flatten
+
+            if (errors.isEmpty) {
+              masterTransactionProvisionAddressTransactions.Utility.transaction(
+                fromAddress = loginState.address,
+                accountId = loginState.username,
+                toAddress = provisionAddressData.address,
+                gasPrice = constants.Blockchain.DefaultGasPrice,
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, provisionAddressData.password))
+              )
+            } else errors.head.throwFutureBaseException()
+          }
+
+          (for {
+            (validated, key) <- validateAndGetKey
+            balance <- balance
+            blockchainTransaction <- provision(validated, key, balance)
+          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.setting.provisionAddress(ProvisionAddress.form.withGlobalError(baseException.failure.message), provisionAddressData.address))
+          }
+        }
+      )
   }
 
 }

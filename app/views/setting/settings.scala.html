@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base.commonAddressValue
+@import views.html.base.buttons.commonFormButton
 
 @(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="profileSettingsContainer">
@@ -59,6 +60,8 @@
                             } else {
                                 @if(key.identityIssued.getOrElse(false)) {
                                     <input type="radio" name="walletAddress" id="@key.address" onclick="changeActive('@key.address')"/>
+                                } else {
+                                    @commonFormButton(constants.Form.PROVISION_ADDRESS, Symbol("class") -> "primaryButton", Symbol("parameters") -> s"'${key.address}'")
                                 }
                             }
                         } else {

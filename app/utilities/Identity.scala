@@ -1,6 +1,6 @@
 package utilities
 
-import schema.data.base.{NumberData, StringData}
+import schema.data.base.{AccAddressData, ListData, NumberData, StringData}
 import schema.id.base.{IdentityID, PropertyID, StringID}
 import schema.list.PropertyList
 import schema.property.Property
@@ -41,6 +41,8 @@ object Identity {
   def getExtraMesaProperty(value: String): Property = MesaProperty(extraPropertyID, StringData(value).getDataID)
 
   val getBondAmountMetaProperty: Property = MetaProperty(constants.Blockchain.BondAmountProperty.id, NumberData(2560L).toAnyData)
+
+  def getAuthenticationProperty(addresses: Seq[String]): Property = constants.Blockchain.AuthenticationProperty.copy(data = ListData(addresses.map(x => AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(x)).toAnyData)).toAnyData)
 
   def getMantlePlaceIdentityID(id: String): IdentityID = {
     val immutables = Immutables(PropertyList(Seq(getOriginMetaProperty, getBondAmountMetaProperty, getIDMetaProperty(id), getExtraMesaProperty(""))))

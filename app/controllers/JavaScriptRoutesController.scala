@@ -99,7 +99,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SettingController.viewMnemonicsForm,
         routes.javascript.SettingController.deleteKeyForm,
         routes.javascript.SettingController.walletBalance,
-
+        routes.javascript.SettingController.provisionAddressForm,
 
         //        routes.javascript.ProfileController.viewOffers,
         //        routes.javascript.ProfileController.offers,

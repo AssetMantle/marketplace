@@ -7,7 +7,6 @@
 @commonForm(constants.Form.BUY_FROM_SECONDARY_MARKET, buyForm) {
     @commonInputText(buyForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden")
     @commonInputText(buyForm, constants.FormField.SECONDARY_MARKET_ID, Symbol("value") -> secondaryMarketId, Symbol("containerDivClass") -> "hidden")
-    @commonInputPassword(buyForm, constants.FormField.PASSWORD)
 
     <div class="container p-0" id="invoice">
         <p class="tableHeading mt-4 mb-2">@Messages(constants.View.NFT_INVOICE_SUBTITLE)</p>
@@ -114,4 +113,5 @@
         </div>
         <div class="form-information-text">@Messages(constants.View.NFT_INVOICE_TABLE_INFO_MESSAGE)</div>
     </div>
+    @commonInputPassword(buyForm, constants.FormField.PASSWORD)
 }

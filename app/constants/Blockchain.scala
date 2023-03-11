@@ -28,6 +28,7 @@ object Blockchain {
   val DefaultCancelOrderGasLimit = 150000
   val DefaultTakeOrderGasLimit = 150000
   val DefaultGasPrice: BigDecimal = 0
+  val DefaultProvisionGasLimit = 100000
   val TxTimeoutHeight: Int = 100
   val DefaultHDPath: Seq[ChildNumber] = Seq(
     new ChildNumber(44, true),

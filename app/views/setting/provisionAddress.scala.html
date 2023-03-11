@@ -1,0 +1,22 @@
+@import views.setting.companion.ProvisionAddress
+@import views.html.base.form._
+
+@(provisionAddressForm: Form[ProvisionAddress.Data] = ProvisionAddress.form, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.PROVISION_ADDRESS, provisionAddressForm) {
+    <div class="modal-body">
+        <div class="mb-3">
+            <div class="inputField">
+                <div class="inputFieldBody">
+                @commonInputText(provisionAddressForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> "readonly")
+                </div>
+            </div>
+
+            <div class="mt-3 inputField">
+                <div class="inputFieldBody">
+                @commonInputPassword(provisionAddressForm, constants.FormField.PASSWORD)
+                </div>
+            </div>
+        </div>
+    </div>
+}
