@@ -3,7 +3,7 @@ package models.masterTransaction
 import constants.Scheduler
 import exceptions.BaseException
 import models.blockchainTransaction.MakeOrder
-import models.master.{NFT, NFTOwner, SecondaryMarket}
+import models.master.{NFT, NFTOwner}
 import models.traits._
 import models.{analytics, blockchain, blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
@@ -117,6 +117,7 @@ class MakeOrderTransactions @Inject()(
                                        blockchainBlocks: blockchain.Blocks,
                                        blockchainTransactions: blockchain.Transactions,
                                        blockchainTransactionMakeOrders: blockchainTransaction.MakeOrders,
+                                       blockchainOrders: blockchain.Orders,
                                        broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                        utilitiesOperations: utilities.Operations,
                                        getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
@@ -231,20 +232,16 @@ class MakeOrderTransactions @Inject()(
     }
 
     private def updateForExpiredOrders() = {
-      val checkForDeletions = masterSecondaryMarkets.Service.getForCheckingForDeletion
+      val allOrderIds = masterSecondaryMarkets.Service.getAllOrderIDs
 
-      def getTx(ids: Seq[String]) = Service.getBySecondaryMarketIDs(ids)
+      def filterExistingOrderIds(allOrderIds: Seq[String]) = blockchainOrders.Service.filterExistingIds(allOrderIds)
 
-      def filterAndUpdateForDeletion(txs: Seq[MakeOrderTransaction], checkForDeletions: Seq[SecondaryMarket]) = {
-        val latestHeight = blockchainBlocks.Service.getLatestHeight
-        val secondaryMarketIds = txs.filter(x => x.creationHeight.isDefined && ((latestHeight + 10) >= x.getExpiresIn(max = constants.Blockchain.MaxOrderExpiry, endHours = checkForDeletions.find(_.id == x.secondaryMarketId).fold(0)(_.endHours)).get)).map(_.secondaryMarketId)
-        masterSecondaryMarkets.Service.markForDeletion(secondaryMarketIds)
-      }
+      def markForDeletion(orderIds: Seq[String]) = masterSecondaryMarkets.Service.markForDeletionByOrderIds(orderIds)
 
       (for {
-        checkForDeletions <- checkForDeletions
-        txs <- getTx(checkForDeletions.map(_.id))
-        _ <- filterAndUpdateForDeletion(txs, checkForDeletions)
+        allOrderIds <- allOrderIds
+        existingOrderIds <- filterExistingOrderIds(allOrderIds)
+        _ <- markForDeletion(allOrderIds.diff(existingOrderIds))
       } yield ()
         ).recover {
         case exception: Exception => logger.error(exception.getLocalizedMessage)

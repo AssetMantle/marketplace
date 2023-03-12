@@ -119,6 +119,8 @@ class Orders @Inject()(
 
     def tryGet(id: OrderID): Future[Order] = tryGetById(id.getBytes)
 
+    def filterExistingIds(ids: Seq[String]): Future[Seq[String]] = customQuery(Orders.TableQuery.filter(_.idString.inSet(ids)).map(_.idString).result)
+
   }
 
 }
