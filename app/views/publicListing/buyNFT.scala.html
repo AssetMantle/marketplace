@@ -13,7 +13,9 @@
                 @commonInputInt(buyNFTForm, constants.FormField.PUBLIC_LISTING_BUY_NFT_NUMBER, Symbol("value") -> 1)
             </div>
         </div>
-        @commonToggleButton(buyNFTForm, constants.FormField.MINT_NFT)
+        <div class="mb-2">
+            @commonToggleButton(buyNFTForm, constants.FormField.MINT_NFT)
+        </div>
         @commonInputPassword(buyNFTForm, constants.FormField.PASSWORD)
     </div>
 
@@ -40,21 +42,39 @@
                                 </tr>
                                 <tr>
                                     <td class="text-left tableLabel">@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_LISTED_PRICE)</td>
-                                    <td class="text-center tableValue">@publicListing.price.formatNumber() $MNTL</td>
-                                    <td class="text-center tableValue publicListingBuyQuantity">00</td>
-                                    <td class="text-end tableValue">0.00 $MNTL</td>
+                                    <td class="text-center tableValue">
+                                        <span class="listedUnitCost">@publicListing.price.formatNumber()</span> $MNTL
+                                    </td>
+                                    <td class="text-center tableValue">
+                                        <span class="quantity">00</span>
+                                    </td>
+                                    <td class="text-end tableValue">
+                                        <span class="listedAmount">0.00</span> $MNTL
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="text-left tableLabel">@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_BONDING_AMOUNT)</td>
-                                    <td class="text-center tableValue">@collection.getBondAmount.formatNumber() $MNTL</td>
-                                    <td class="text-center tableValue publicListingBuyQuantity">00</td>
-                                    <td class="text-end tableValue">0.00 $MNTL</td>
+                                    <td class="text-center tableValue">
+                                        <span class="BondingUnitCost">@collection.getBondAmount.formatNumber()</span> $MNTL
+                                    </td>
+                                    <td class="text-center tableValue">
+                                        <span class="quantity">00</span>
+                                    </td>
+                                    <td class="text-end tableValue">
+                                        <span class="BondingAmount">0.00</span> $MNTL
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="text-left tableLabel">@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_PLATFORM_COMMISSION)</td>
-                                    <td class="text-center tableValue">@(constants.Platform.Commission * 100) %</td>
-                                    <td class="text-center tableValue publicListingBuyQuantity">00</td>
-                                    <td class="text-end tableValue">0.00 $MNTL</td>
+                                    <td class="text-center tableValue">
+                                        <span class="commissionRate">@(constants.Platform.Commission * 100)</span> %
+                                    </td>
+                                    <td class="text-center tableValue">
+                                        <span class="quantity">00</span>
+                                    </td>
+                                    <td class="text-end tableValue">
+                                        <span class="commissionAmount">0.00</span> $MNTL
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td colspan="4" class="p-0">
@@ -67,7 +87,9 @@
                                     <td class="text-end tableTitle">
                                         <strong>@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_SUBTOTAL)</strong>
                                     </td>
-                                    <td class="text-end tableValue">0.00 $MNTL</td>
+                                    <td class="text-end tableValue">
+                                        <span class="subTotal">0.00</span> $MNTL
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td></td>
@@ -75,7 +97,9 @@
                                     <td class="text-end tableTitle">
                                         <strong>@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_DISCOUNTS)</strong>
                                     </td>
-                                    <td class="text-end tableValue">– 0.00 $MNTL</td>
+                                    <td class="text-end tableValue ">
+                                       - <span class="discount">0.00</span> $MNTL
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td></td>
@@ -102,7 +126,9 @@
                                     <td class="text-end tableTitle">
                                         <strong>@Messages(constants.View.NFT_INVOICE_TABLE_INVOICE_TOTAL)</strong>
                                     </td>
-                                    <td class="text-end tableValueBig">0.00 $MNTL</td>
+                                    <td class="text-end tableValueBig">
+                                        <span class="invoiceTotal">0.00</span> $MNTL
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -120,7 +146,7 @@
 
     </div>
     <div class="horizontal-align mb-0">
-    @commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideModalScreen('#publicListingInvoice', '#publicListingForm'); showSubmitButton();"), Symbol("id") -> "publicListingNextButton", Symbol("class") -> "disable")
+    @commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideModalScreen('#publicListingInvoice', '#publicListingForm'); showSubmitButton(); computeInvoice();"), Symbol("id") -> "publicListingNextButton", Symbol("class") -> "disable")
     </div>
 }
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/publicListing/buyNFT.js")" type="text/javascript"></script>
