@@ -117,6 +117,7 @@ object FormConstraint {
       if ((definedPropertiesNames.length + constants.Collection.DefaultProperty.list.length) > constants.Blockchain.MaximumProperties) Option(ValidationError(constants.Response.MAXIMUM_COLLECTION_PROPERTIES_EXCEEDED.message)) else None,
       if (definedPropertiesNames.map(_.toLowerCase).intersect(constants.Collection.DefaultProperty.list.map(_.toLowerCase)).nonEmpty) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES.message)) else None,
       if (definedPropertiesNames.distinct.length != definedPropertiesNames.length) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DUPLICATE_PROPERTIES.message)) else None,
+      if (definedPropertiesNames.map(_.toLowerCase).intersect(constants.Collection.RestrictedPropertyList.map(_.toLowerCase)).nonEmpty) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_RESTRICTED_PROPERTIES.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })

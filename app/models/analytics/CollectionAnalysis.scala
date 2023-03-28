@@ -1,7 +1,7 @@
 package models.analytics
 
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import models.master._
+import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -10,12 +10,13 @@ import utilities.MicroNumber
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class CollectionAnalysis(id: String, totalNFTs: Long, totalMinted: Long, totalSold: Long, totalTraded: Long, floorPrice: MicroNumber, salePrice: MicroNumber, publicListingPrice: MicroNumber, totalVolumeTraded: MicroNumber, bestOffer: MicroNumber, listed: Long, owners: Long, uniqueOwners: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] with Logging {
+case class CollectionAnalysis(id: String, totalNFTs: Long, totalMinted: Long, totalBurnt: Long, totalSold: Long, totalTraded: Long, floorPrice: MicroNumber, salePrice: MicroNumber, publicListingPrice: MicroNumber, totalVolumeTraded: MicroNumber, bestOffer: MicroNumber, listed: Long, owners: Long, uniqueOwners: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] with Logging {
 
   def serialize: CollectionsAnalysis.CollectionAnalysisSerialized = CollectionsAnalysis.CollectionAnalysisSerialized(
     id = this.id,
     totalNFTs = this.totalNFTs,
     totalMinted = this.totalMinted,
+    totalBurnt = this.totalBurnt,
     totalSold = this.totalSold,
     totalTraded = this.totalTraded,
     floorPrice = this.floorPrice.toBigDecimal,
@@ -36,12 +37,13 @@ case class CollectionAnalysis(id: String, totalNFTs: Long, totalMinted: Long, to
 
 object CollectionsAnalysis {
 
-  case class CollectionAnalysisSerialized(id: String, totalNFTs: Long, totalMinted: Long, totalSold: Long, totalTraded: Long, floorPrice: BigDecimal, salePrice: BigDecimal, publicListingPrice: BigDecimal, totalVolumeTraded: BigDecimal, bestOffer: BigDecimal, listed: Long, owners: Long, uniqueOwners: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] with Logging {
+  case class CollectionAnalysisSerialized(id: String, totalNFTs: Long, totalMinted: Long, totalBurnt: Long, totalSold: Long, totalTraded: Long, floorPrice: BigDecimal, salePrice: BigDecimal, publicListingPrice: BigDecimal, totalVolumeTraded: BigDecimal, bestOffer: BigDecimal, listed: Long, owners: Long, uniqueOwners: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] with Logging {
 
     def deserialize: CollectionAnalysis = CollectionAnalysis(
       id = this.id,
       totalNFTs = this.totalNFTs,
       totalMinted = this.totalMinted,
+      totalBurnt = this.totalBurnt,
       totalSold = this.totalSold,
       totalTraded = this.totalTraded,
       floorPrice = MicroNumber(this.floorPrice),
@@ -66,13 +68,15 @@ object CollectionsAnalysis {
 
   class CollectionAnalysisTable(tag: Tag) extends Table[CollectionAnalysisSerialized](tag, "CollectionAnalysis") with ModelTable[String] {
 
-    def * = (id, totalNFTs, totalMinted, totalSold, totalTraded, floorPrice, salePrice, publicListingPrice, totalVolumeTraded, bestOffer, listed, owners, uniqueOwners, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionAnalysisSerialized.tupled, CollectionAnalysisSerialized.unapply)
+    def * = (id, totalNFTs, totalMinted, totalBurnt, totalSold, totalTraded, floorPrice, salePrice, publicListingPrice, totalVolumeTraded, bestOffer, listed, owners, uniqueOwners, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionAnalysisSerialized.tupled, CollectionAnalysisSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def totalNFTs = column[Long]("totalNFTs")
 
     def totalMinted = column[Long]("totalMinted")
+
+    def totalBurnt = column[Long]("totalBurnt")
 
     def totalSold = column[Long]("totalSold")
 
@@ -136,7 +140,7 @@ class CollectionsAnalysis @Inject()(
 
   object Utility {
 
-    def onNewCollection(id: String): Future[String] = Service.add(CollectionAnalysis(id = id, totalNFTs = 0, totalSold = 0, totalTraded = 0, floorPrice = 0, salePrice = 0, publicListingPrice = 0, totalVolumeTraded = 0, bestOffer = 0, listed = 0, owners = 0, uniqueOwners = 0, totalMinted = 0))
+    def onNewCollection(id: String): Future[String] = Service.add(CollectionAnalysis(id = id, totalNFTs = 0, totalSold = 0, totalTraded = 0, floorPrice = 0, salePrice = 0, publicListingPrice = 0, totalVolumeTraded = 0, bestOffer = 0, listed = 0, owners = 0, uniqueOwners = 0, totalMinted = 0, totalBurnt = 0))
 
     def onNewNFT(collectionId: String): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
@@ -197,6 +201,15 @@ class CollectionsAnalysis @Inject()(
       } yield ()
     }
 
+    def onBurn(collectionId: String): Future[Unit] = {
+      val collectionAnalysis = Service.tryGet(collectionId)
+
+      for {
+        collectionAnalysis <- collectionAnalysis
+        _ <- Service.update(collectionAnalysis.copy(totalBurnt = collectionAnalysis.totalBurnt + 1))
+      } yield ()
+    }
+
     def onMint(collectionId: String): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
 
@@ -233,5 +246,13 @@ class CollectionsAnalysis @Inject()(
       } yield ()
     }
 
+    def addMinted(collectionId: String, minted: Long): Future[Unit] = {
+      val collectionAnalysis = Service.tryGet(collectionId)
+
+      for {
+        collectionAnalysis <- collectionAnalysis
+        _ <- Service.update(collectionAnalysis.copy(totalMinted = collectionAnalysis.totalMinted + minted))
+      } yield ()
+    }
   }
 }

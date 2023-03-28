@@ -235,7 +235,7 @@ class SaleController @Inject()(
       )
   }
 
-  def buySaleNFTForm(saleId: String, mintNft: Boolean): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def buySaleNFTForm(saleId: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.sale.buySaleNFT(saleId = saleId))
   }
 
@@ -284,6 +284,7 @@ class SaleController @Inject()(
                 buyerAccountId = loginState.username,
                 sellerAccountId = sellerKey.accountId,
                 saleId = sale.id,
+                mintOnSuccess = buySaleNFTData.mintOnSuccess,
                 nftIds = nftOwners.map(_.nftId),
                 fromAddress = buyerKey.address,
                 toAddress = sellerKey.address,

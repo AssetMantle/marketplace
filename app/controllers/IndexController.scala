@@ -80,6 +80,7 @@ class IndexController @Inject()(
   Await.result(starter.fixMantleMonkeys(), Duration.Inf)
   Await.result(starter.updateDecimalToNumberType(), Duration.Inf)
   Await.result(starter.updateAssetIDs(), Duration.Inf)
+  Await.result(starter.markMintReady(), Duration.Inf)
   starter.fixAllMultipleActiveKeys()
 
   starter.start()
@@ -99,8 +100,8 @@ class IndexController @Inject()(
     defineAssetTransactions.Utility.scheduler,
     issueIdentities.Utility.scheduler,
     issueIdentityTransactions.Utility.scheduler,
-//    mintAssets.Utility.scheduler,
-//    mintAssetTransactions.Utility.scheduler,
+    mintAssets.Utility.scheduler,
+    mintAssetTransactions.Utility.scheduler,
     makeOrders.Utility.scheduler,
     makeOrderTransactions.Utility.scheduler,
     takeOrders.Utility.scheduler,

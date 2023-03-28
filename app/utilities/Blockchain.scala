@@ -1,14 +1,11 @@
 package utilities
 
 import exceptions.BaseException
-import models.Abstract.Authz.Authorization
 import models.common.Coin
-import models.common.FeeGrant.Allowance
 import org.bouncycastle.asn1.sec.SECNamedCurves
 import org.bouncycastle.crypto.params.{ECDomainParameters, ECPublicKeyParameters}
 import org.bouncycastle.crypto.signers.ECDSASigner
 import play.api.Logger
-import utilities.Date.RFC3339
 
 import java.math.BigInteger
 
@@ -27,16 +24,6 @@ object Blockchain {
     val result = addCoins(fromCoins, amount.map(x => x.copy(amount = x.amount * -1)))
     (result, result.exists(_.isNegative == true))
   }
-
-  object Authz {
-    case class ValidateResponse(accept: Boolean, delete: Boolean, updated: Option[Authorization])
-  }
-
-  object FeeGrant {
-    case class ValidateResponse(delete: Boolean, updated: Allowance)
-  }
-
-  case class SlashingEvidence(height: Int, time: RFC3339, validatorHexAddress: String, validatorPower: MicroNumber)
 
   def verifySecp256k1Signature(publicKey: String, data: Array[Byte], signature: String): Boolean = verifySecp256k1Signature(publicKey = utilities.Secrets.base64Decoder(publicKey), data, signature = utilities.Secrets.base64Decoder(signature))
 

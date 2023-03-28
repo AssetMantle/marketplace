@@ -80,7 +80,7 @@
                 <script>epochToDateTime('countdown_@sale.endTimeEpoch');</script>
                 @if(isMember && sale.getStatus.id == constants.Sale.LIVE.id) {
                     <div class="separator"></div>
-                    @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SaleController.buySaleNFTForm('${sale.id}', false))"), Symbol("class") -> "mt-4")
+                    @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SaleController.buySaleNFTForm('${sale.id}'))"), Symbol("class") -> "mt-4")
                 }
             }
         }

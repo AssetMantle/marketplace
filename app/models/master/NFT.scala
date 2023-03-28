@@ -12,7 +12,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class NFT(id: String, assetId: Option[String], collectionId: String, name: String, description: String, totalSupply: Long, isMinted: Option[Boolean], fileExtension: String, ipfsLink: String, edition: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
+case class NFT(id: String, assetId: Option[String], collectionId: String, name: String, description: String, totalSupply: Long, isMinted: Option[Boolean], mintReady: Boolean, fileExtension: String, ipfsLink: String, edition: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
   def getFileHash: String = id
 
@@ -46,7 +46,7 @@ object NFTs {
 
   class NFTTable(tag: Tag) extends Table[NFT](tag, "NFT") with ModelTable[String] {
 
-    def * = (id, assetId.?, collectionId, name, description, totalSupply, isMinted.?, fileExtension, ipfsLink, edition.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFT.tupled, NFT.unapply)
+    def * = (id, assetId.?, collectionId, name, description, totalSupply, isMinted.?, mintReady, fileExtension, ipfsLink, edition.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFT.tupled, NFT.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -61,6 +61,8 @@ object NFTs {
     def totalSupply = column[Long]("totalSupply")
 
     def isMinted = column[Boolean]("isMinted")
+
+    def mintReady = column[Boolean]("mintReady")
 
     def fileExtension = column[String]("fileExtension")
 
@@ -110,11 +112,15 @@ class NFTs @Inject()(
 
     def getByIds(ids: Seq[String]): Future[Seq[NFT]] = filter(_.id.inSet(ids))
 
+    def getForMinting: Future[Seq[NFT]] = filter(_.mintReady).map(_.take(300))
+
     def deleteCollections(collectionIds: Seq[String]): Future[Int] = filterAndDelete(_.collectionId.inSet(collectionIds))
 
     def update(nft: NFT): Future[Unit] = updateById(nft)
 
     def countNFTs(collectionId: String): Future[Int] = filterAndCount(_.collectionId === collectionId)
+
+    def markNFTsMintPending(ids: Seq[String]): Future[Int] = customUpdate(NFTs.TableQuery.filter(_.id.inSet(ids)).map(_.isMinted.?).update(null))
 
     def markNFTsMinted(ids: Seq[String]): Future[Int] = customUpdate(NFTs.TableQuery.filter(_.id.inSet(ids)).map(_.isMinted).update(true))
 
@@ -124,10 +130,16 @@ class NFTs @Inject()(
 
     def fetchAllWithNullAssetID(): Future[Seq[NFT]] = filter(_.assetId.?.isEmpty)
 
-    def markNFTsMintPending(ids: Seq[String]): Future[Int] = customUpdate(NFTs.TableQuery.filter(_.id.inSet(ids)).map(_.isMinted.?).update(null))
-
     def getRandomNFTs(collectionId: String, n: Int, filterOut: Seq[String]): Future[Seq[NFT]] = filter(x => x.collectionId === collectionId && !x.id.inSet(filterOut)).map(util.Random.shuffle(_).take(n))
 
     def getUnmintedNFTs(collectionId: String): Future[Seq[NFT]] = filter(x => x.collectionId === collectionId && !x.isMinted.?.getOrElse(true))
+
+    def getByAssetId(assetId: AssetID): Future[Option[NFT]] = filter(_.assetId === assetId.asString).map(_.headOption)
+
+    def getByAssetId(assetId: String): Future[Option[NFT]] = filter(_.assetId === assetId).map(_.headOption)
+
+    def delete(id: String): Future[Int] = deleteById(id)
+
+    def markReadyForMint(ids: Seq[String]): Future[Int] = if (ids.nonEmpty) customUpdate(NFTs.TableQuery.filter(_.id.inSet(ids)).map(_.mintReady).update(true)) else Future(0)
   }
 }

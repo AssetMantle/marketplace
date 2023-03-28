@@ -71,6 +71,8 @@ class NFTTags @Inject()(
 
     def deleteByNFTIds(nftIDs: Seq[String]): Future[Int] = filterAndDelete(_.nftId.inSet(nftIDs))
 
+    def deleteByNFTId(nftID: String): Future[Int] = filterAndDelete(_.nftId === nftID)
+
     def deleteByTagName(tagName: String): Future[Int] = filterAndDelete(_.tagName === tagName)
 
   }

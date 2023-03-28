@@ -2,10 +2,10 @@ package utilities
 
 import exceptions.BaseException
 import models.{master, masterTransaction}
+import play.api.Logger
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.WSClient
-import play.api.{Configuration, Logger}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,7 +16,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
                              wsClient: WSClient,
                              masterAccounts: master.Accounts,
                              messagesApi: MessagesApi,
-                            )(implicit executionContext: ExecutionContext, configuration: Configuration) {
+                            )(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.UTILITIES_NOTIFICATION
 

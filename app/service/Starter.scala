@@ -80,7 +80,7 @@ class Starter @Inject()(
       val propertyType = collection.properties.getOrElse(constants.Response.INVALID_NFT_PROPERTY.throwBaseException()).find(_.name == this.name).getOrElse(constants.Response.INVALID_NFT_PROPERTY.throwBaseException()).`type`
       val conversionTry = propertyType match {
         case constants.NFT.Data.STRING => true
-        case constants.NFT.Data.NUMBER => Try(BigDecimal(this.value)).isSuccess
+        case constants.NFT.Data.NUMBER => Try(this.value.toLong).isSuccess
         case constants.NFT.Data.BOOLEAN => Try(this.value.toBoolean).isSuccess || (this.value == constants.NFT.Data.TRUE || this.value == constants.NFT.Data.FALSE)
         case _ => false
       }
@@ -143,7 +143,7 @@ class Starter @Inject()(
         try {
           val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = uploadCollection.id, fileName = newFileName)
           utilities.AmazonS3.uploadFile(awsKey, nftImageFile)
-          Await.result(masterNFTs.Service.add(master.NFT(id = fileHash, assetId = None, collectionId = uploadCollection.id, name = nftDetails.name, description = nftDetails.description, totalSupply = 1, isMinted = Option(false), fileExtension = uploadCollection.nftFormat, ipfsLink = "", edition = None)), Duration.Inf)
+          Await.result(masterNFTs.Service.add(master.NFT(id = fileHash, assetId = None, collectionId = uploadCollection.id, name = nftDetails.name, description = nftDetails.description, totalSupply = 1, isMinted = Option(false), fileExtension = uploadCollection.nftFormat, ipfsLink = "", edition = None, mintReady = false)), Duration.Inf)
           Await.result(masterNFTOwners.Service.add(master.NFTOwner(nftId = fileHash, ownerId = uploadCollection.creatorId, creatorId = uploadCollection.creatorId, collectionId = uploadCollection.id, quantity = 1, saleId = None, publicListingId = None, secondaryMarketId = None)), Duration.Inf)
           Await.result(masterNFTProperties.Service.addMultiple(nftDetails.properties.map(_.toProperty(fileHash, collection))), Duration.Inf)
           Await.result(collectionsAnalysis.Utility.onNewNFT(uploadCollection.id), Duration.Inf)
@@ -535,6 +535,17 @@ class Starter @Inject()(
       ecKey = constants.Blockchain.MantleNodeMaintainerWallet.getECKey,
       timeoutHeight = abciInfo.result.response.last_block_height.toInt + 100)
     println("0x" + txRawBytes.map("%02x".format(_)).mkString.toUpperCase)
+  }
+
+  def markMintReady(): Future[Unit] = {
+    val nftIds = masterNFTOwners.Service.getSoldNFTs(constants.Collection.GenesisCollectionIDs)
+
+    def update(ids: Seq[String]) = masterNFTs.Service.markReadyForMint(ids)
+
+    for {
+      nftIds <- nftIds
+      _ <- update(nftIds)
+    } yield ()
   }
 
   // Delete redundant nft tags

@@ -2,9 +2,10 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.traits._
+import models.analytics.CollectionsAnalysis
 import models.blockchainTransaction.MintAsset
 import models.master.{Collection, NFT, NFTOwner, NFTProperty}
+import models.traits._
 import models.{blockchain, blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
@@ -62,6 +63,7 @@ class MintAssetTransactions @Inject()(
                                        protected val databaseConfigProvider: DatabaseConfigProvider,
                                        blockchainAccounts: blockchain.Accounts,
                                        blockchainAssets: blockchain.Assets,
+                                       collectionsAnalysis: CollectionsAnalysis,
                                        masterAccounts: master.Accounts,
                                        masterNFTs: master.NFTs,
                                        masterNFTOwners: master.NFTOwners,
@@ -171,9 +173,7 @@ class MintAssetTransactions @Inject()(
 
     private def mintGenesisAssets(): Future[Unit] = {
       val anyPendingTx = Service.checkAnyPendingTx
-      val nftIds = masterNFTOwners.Service.getSoldNFTs(constants.Collection.GenesisCollectionIDs)
-
-      def getNFTs(nftIDs: Seq[String]) = masterNFTs.Service.getByIds(nftIDs)
+      val nfts = masterNFTs.Service.getForMinting
 
       def filterAlreadyMintedNFTs(nfts: Seq[NFT]) = {
         val assetIDs = nfts.map(_.getAssetID.asString)
@@ -181,9 +181,20 @@ class MintAssetTransactions @Inject()(
 
         def updateMaster(nftIDs: Seq[String]) = if (nftIDs.nonEmpty) masterNFTs.Service.markNFTsMinted(nftIDs) else Future(0)
 
+        def updateAnalysis(nftIDs: Seq[String]) = if (nftIDs.nonEmpty) {
+          val mintedNFTs = nfts.filter(x => nftIDs.contains(x.id)).groupMap(_.collectionId)(_.id)
+          utilitiesOperations.traverse(mintedNFTs.keys.toSeq) { collectionId =>
+            val update = collectionsAnalysis.Utility.addMinted(collectionId, mintedNFTs.getOrElse(collectionId, Seq()).length)
+            for {
+              _ <- update
+            } yield ()
+          }
+        } else Future(Seq())
+
         for {
           existingAssetIDsString <- existingAssetIDsString
           _ <- updateMaster(nfts.filter(x => existingAssetIDsString.contains(x.assetId.getOrElse(""))).map(_.id))
+          _ <- updateAnalysis(nfts.filter(x => existingAssetIDsString.contains(x.assetId.getOrElse(""))).map(_.id))
         } yield nfts.filterNot(x => existingAssetIDsString.contains(x.assetId.getOrElse(""))).take(250)
       }
 
@@ -199,9 +210,8 @@ class MintAssetTransactions @Inject()(
       } else Future("")
 
       for {
-        nftIds <- nftIds
-        nfts <- getNFTs(nftIds)
-        mintAssets <- filterAlreadyMintedNFTs(nfts)
+        nfts <- nfts
+        mintAssets <- filterAlreadyMintedNFTs(nfts.filter(x => !x.isMinted.getOrElse(true)))
         anyPendingTx <- anyPendingTx
         txHash <- doTx(mintAssets, anyPendingTx)
       } yield if (txHash != "") logger.info("MINT_ASSET: " + txHash + " ( " + nfts.map(_.assetId).mkString(",") + " )")
@@ -217,10 +227,23 @@ class MintAssetTransactions @Inject()(
           if (transaction.status.get) {
             val markSuccess = Service.markSuccess(txHash)
             val updateMaster = masterNFTs.Service.markNFTsMinted(mintAssetTxs.filter(_.txHash == txHash).map(_.nftID))
+            val nfts = masterNFTs.Service.getByIds(mintAssetTxs.filter(_.txHash == txHash).map(_.nftID))
+
+            def updateAnalysis(nfts: Seq[NFT]) = if (nfts.nonEmpty) {
+              val mintedNFTs = nfts.groupMap(_.collectionId)(_.id)
+              utilitiesOperations.traverse(mintedNFTs.keys.toSeq) { collectionId =>
+                val update = collectionsAnalysis.Utility.addMinted(collectionId, mintedNFTs.getOrElse(collectionId, Seq()).length)
+                for {
+                  _ <- update
+                } yield ()
+              }
+            } else Future(Seq())
 
             (for {
               _ <- markSuccess
               _ <- updateMaster
+              nfts <- nfts
+              _ <- updateAnalysis(nfts)
             } yield ()
               ).recover {
               case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")

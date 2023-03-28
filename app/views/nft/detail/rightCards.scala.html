@@ -61,8 +61,12 @@
                 }
             }
             @if(lowestPriceSecondaryMarket.isEmpty && userSecondaryMarket.isEmpty) {
-                @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId && userNFTOwner.get.creatorId != optionalLoginState.get.username && userNFTOwner.get.creatorId != "Mint.E" && nft.isMinted.getOrElse(false)) {
-                    @commonPrimaryButton(Messages(constants.View.SELL_NFT), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.createForm('${nft.id}'))"))
+                @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId && userNFTOwner.get.creatorId != optionalLoginState.get.username && userNFTOwner.get.creatorId != "Mint.E") {
+                    @if(nft.isMinted.getOrElse(false)) {
+                        @commonPrimaryButton(Messages(constants.View.SELL_NFT), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.createForm('${nft.id}'))"))
+                    } else {
+                        @commonPrimaryButton(Messages(constants.View.MINT_NFT), JavaScript(s"getForm(jsRoutes.controllers.NFTController.mintForm('${nft.id}'))"))
+                    }
                 } else {
                     <div class="analysisValue">@Messages(constants.View.CANNOT_BE_SOLD)</div>
                 }

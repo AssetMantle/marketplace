@@ -321,6 +321,7 @@ class PublicListingController @Inject()(
                 buyerAccountId = loginState.username,
                 sellerAccountId = sellerKey.accountId,
                 publicListingId = publicListing.id,
+                mintOnSuccess = buyNFTData.mintOnSuccess,
                 nftIds = nftOwners.map(_.nftId),
                 fromAddress = buyerKey.address,
                 toAddress = sellerKey.address,

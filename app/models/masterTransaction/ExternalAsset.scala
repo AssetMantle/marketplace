@@ -9,7 +9,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class ExternalAsset(nftId: String, lastOwnerId: String, assetId: String, lastOwnerIdentityId: String, currentOwnerIdentityId: String, collectionId: String, amount: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, String] {
+case class ExternalAsset(nftId: String, lastOwnerId: String, assetId: String, currentOwnerIdentityId: String, collectionId: String, amount: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, String] {
 
   def id1: String = nftId
 
@@ -25,15 +25,13 @@ object ExternalAssets {
 
   class ExternalAssetTable(tag: Tag) extends Table[ExternalAsset](tag, "ExternalAsset") with ModelTable2[String, String] {
 
-    def * = (nftId, lastOwnerId, collectionId, assetId, lastOwnerIdentityId, currentOwnerIdentityId, collectionId, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ExternalAsset.tupled, ExternalAsset.unapply)
+    def * = (nftId, lastOwnerId, assetId, currentOwnerIdentityId, collectionId, amount, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ExternalAsset.tupled, ExternalAsset.unapply)
 
     def nftId = column[String]("nftId", O.PrimaryKey)
 
     def lastOwnerId = column[String]("lastOwnerId", O.PrimaryKey)
 
     def assetId = column[String]("assetId")
-
-    def lastOwnerIdentityId = column[String]("lastOwnerIdentityId")
 
     def currentOwnerIdentityId = column[String]("currentOwnerIdentityId")
 
@@ -75,8 +73,8 @@ class ExternalAssets @Inject()(
 
   object Service {
 
-    def insertOrUpdate(nftId: String, lastOwnerId: String, assetId: String, lastOwnerIdentityId: String, currentOwnerIdentityId: String, collectionId: String, amount: Long): Future[Unit] = {
-      upsert(ExternalAsset(nftId = nftId, lastOwnerId = lastOwnerId, assetId = assetId, lastOwnerIdentityId = lastOwnerIdentityId, currentOwnerIdentityId = currentOwnerIdentityId, collectionId = collectionId, amount = amount))
+    def insertOrUpdate(nftId: String, lastOwnerId: String, assetId: String, currentOwnerIdentityId: String, collectionId: String, amount: Long): Future[Unit] = {
+      upsert(ExternalAsset(nftId = nftId, lastOwnerId = lastOwnerId, assetId = assetId, currentOwnerIdentityId = currentOwnerIdentityId, collectionId = collectionId, amount = amount))
     }
 
     def delete(nftId: String, lastOwnerId: String): Future[Int] = deleteById1AndId2(id1 = nftId, id2 = lastOwnerId)

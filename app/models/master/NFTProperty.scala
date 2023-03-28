@@ -1,8 +1,10 @@
 package models.master
 
+import models.common.NFT.BaseNFTProperty
 import models.traits.{Entity3, GenericDaoImpl3, Logging, ModelTable3}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import schema.data.base.{BooleanData, NumberData, StringData}
 import schema.id.base.{PropertyID, StringID}
 import schema.property.base.{MesaProperty, MetaProperty}
 import slick.jdbc.H2Profile.api._
@@ -24,6 +26,7 @@ case class NFTProperty(nftId: String, name: String, `type`: String, `value`: Str
 
   def toMesaProperty()(implicit module: String, logger: Logger): MesaProperty = if (!this.meta) MesaProperty(id = this.getPropertyID, dataID = utilities.Data.getDataID(`type` = this.`type`, value = this.`value`)) else constants.Response.NOT_MESA_PROPERTY.throwBaseException()
 
+  def toBaseNFTProperty: BaseNFTProperty = BaseNFTProperty(this)
 
 }
 
@@ -91,12 +94,15 @@ class NFTProperties @Inject()(
 
     def deleteByNFTIds(nftIDs: Seq[String]): Future[Int] = filterAndDelete(_.nftId.inSet(nftIDs))
 
+    def deleteByNFTId(nftId: String): Future[Int] = filterAndDelete(_.nftId === nftId)
+
     def tryGet(nftId: String, name: String): Future[NFTProperty] = tryGetById1Id2Id3(id1 = nftId, id2 = name, id3 = constants.NFT.Data.STRING)
 
     def getOnType(`type`: String): Future[Seq[NFTProperty]] = filter(_.`type` === `type`)
 
     def changeDecimalTypeToNumber: Future[Int] = customUpdate(NFTProperties.TableQuery.filter(_.`type` === "DECIMAL").map(_.`type`).update(constants.NFT.Data.NUMBER))
 
+    def updateMultiple(properties: Seq[NFTProperty]): Future[Unit] = upsertMultiple(properties)
 
   }
 }

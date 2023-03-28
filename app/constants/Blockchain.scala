@@ -41,6 +41,7 @@ object Blockchain {
   val LowGasPrice: Double = CommonConfig.Blockchain.LowGasPrice
   val MediumGasPrice: Double = CommonConfig.Blockchain.MediumGasPrice
   val HighGasPrice: Double = CommonConfig.Blockchain.HighGasPrice
+  val MantlePlaceFeeCollectorAddress = "mantle19qxy9t064v79wkslptpjxn3nealzhxhdfe3ldd"
   val MantleNodeMaintainerWallet: Wallet = utilities.Wallet.getWallet("comfort broccoli urban cheap noise income ensure wheat maze cement panel clinic opinion acoustic select sentence code purchase casual dose brown fish salt coral".split(" "))
   val MantlePlaceMaintainerAddress = "mantle19qxy9t064v79wkslptpjxn3nealzhxhdfe3ldd"
   val MantlePlaceIdentityClassificationID: ClassificationID = ClassificationID(utilities.Secrets.base64URLDecode("OXt-qbauoEO41FQzh5oSwcJcCTbxyATh85ufYqevmbs="))

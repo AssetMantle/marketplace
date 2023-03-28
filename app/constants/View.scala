@@ -229,7 +229,7 @@ object View {
   val META_DESCRIPTION = "META_DESCRIPTION"
   val MINT = "MINT"
   val MINT_BUTTON = "MINT_BUTTON"
-  val MINT_NFTS = "MINT_NFTS"
+  val MINT_NFT = "MINT_NFT"
   val MINTED_NFT_LABEL = "MINTED_NFT_LABEL"
   val MISC = "MISC"
   val MORE = "MORE"

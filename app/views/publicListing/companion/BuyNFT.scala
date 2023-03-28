@@ -8,8 +8,9 @@ object BuyNFT {
     mapping(
       constants.FormField.PUBLIC_LISTING_ID.mapping,
       constants.FormField.PUBLIC_LISTING_BUY_NFT_NUMBER.mapping,
+      constants.FormField.MINT_NFT.mapping,
       constants.FormField.PASSWORD.mapping
     )(Data.apply)(Data.unapply))
 
-  case class Data(publicListingId: String, buyNFTs: Int, password: String)
+  case class Data(publicListingId: String, buyNFTs: Int, mintOnSuccess: Boolean, password: String)
 }

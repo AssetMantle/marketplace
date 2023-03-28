@@ -220,13 +220,13 @@ class Keys @Inject()(
       ).serialize())
     }
 
-    def updateOnVerifyMnemonics(key: Key, password: String, privateKey: Array[Byte]): Future[Unit] = updateKey(key.copy(
+    def updateOnVerifyMnemonics(key: Key, password: String, privateKey: Array[Byte]): Future[Int] = updateKey(key.copy(
       passwordHash = utilities.Secrets.hashPassword(password = password, salt = key.salt, iterations = key.iterations),
       encryptedPrivateKey = utilities.Secrets.encryptData(privateKey, password),
       verified = Option(true)
     ))
 
-    def updateOnMigration(key: Key, password: String, privateKey: Array[Byte]): Future[Unit] = updateKey(key.copy(
+    def updateOnMigration(key: Key, password: String, privateKey: Array[Byte]): Future[Int] = updateKey(key.copy(
       encryptedPrivateKey = utilities.Secrets.encryptData(privateKey, password),
       verified = Option(true)
     ))
@@ -253,7 +253,7 @@ class Keys @Inject()(
 
     def getActive(accountId: String): Future[Option[Key]] = filter(x => x.id1 === accountId && x.active).map(_.headOption.map(_.deserialize))
 
-    def updateKey(key: Key): Future[Unit] = updateById1AndId2(key.serialize())
+    def updateKey(key: Key): Future[Int] = updateById1AndId2(key.serialize())
 
     def getActiveByAccountId(accountId: String): Future[Option[Key]] = filter(x => x.id1 === accountId && x.active).map(_.map(_.deserialize).headOption)
 
@@ -366,6 +366,9 @@ class Keys @Inject()(
 
     def markAddressProvisionFailed(accountId: String, address: String): Future[Int] = customUpdate(Keys.TableQuery.filter(x => x.accountId === accountId && x.address === address).map(_.identityIssued).update(false))
 
+    def getKeysByAddresses(addresses: Seq[String]): Future[Seq[Key]] = filter(_.address.inSet(addresses)).map(_.map(_.deserialize))
+
+    def countKeys(id: String): Future[Int] = filterAndCount(_.accountId === id)
   }
 
 }

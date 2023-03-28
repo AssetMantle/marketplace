@@ -84,5 +84,7 @@ class WishLists @Inject()(
 
     def deleteCollections(collectionIds: Seq[String]): Future[Int] = filterAndDelete(_.collectionId.inSet(collectionIds))
 
+    def deleteForNFT(nftId: String): Future[Int] = filterAndDelete(_.nftId === nftId)
+
   }
 }

@@ -83,7 +83,7 @@ class NFTOwners @Inject()(
 
     def add(nftOwners: Seq[NFTOwner]): Future[Unit] = create(nftOwners)
 
-    def update(NFTOwner: NFTOwner): Future[Unit] = updateById1AndId2(NFTOwner)
+    def update(NFTOwner: NFTOwner): Future[Int] = updateById1AndId2(NFTOwner)
 
     def countForCreatorForPrimarySale(collectionId: String, creatorId: String, unmintedNFTs: Seq[String]): Future[Int] = {
       val nullString: Option[String] = null
@@ -108,11 +108,13 @@ class NFTOwners @Inject()(
       } yield ()
     }
 
-    def listNFTOnSecondaryMarket(NFTOwner: NFTOwner, secondaryMarketID: String): Future[Unit] = if (NFTOwner.secondaryMarketId.isEmpty && NFTOwner.publicListingId.isEmpty && NFTOwner.saleId.isEmpty) {
+    def listNFTOnSecondaryMarket(NFTOwner: NFTOwner, secondaryMarketID: String): Future[Int] = if (NFTOwner.secondaryMarketId.isEmpty && NFTOwner.publicListingId.isEmpty && NFTOwner.saleId.isEmpty) {
       update(NFTOwner.copy(secondaryMarketId = Option(secondaryMarketID)))
     } else constants.Response.NFT_ALREADY_ON_SALE.throwBaseException()
 
     def delete(nftId: String, ownerId: String): Future[Int] = deleteById1AndId2(id1 = nftId, id2 = ownerId)
+
+    def deleteByNFT(nftId: String): Future[Int] = filterAndDelete(_.nftId === nftId)
 
     def markNFTSoldFromSale(nftId: String, saleId: String, sellerAccountId: String, buyerAccountId: String): Future[Unit] = {
       val nftOwner = tryGet(nftId = nftId, ownerId = sellerAccountId)

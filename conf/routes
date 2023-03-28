@@ -182,7 +182,7 @@ GET         /launchpadCollectionNFTs                           controllers.SaleC
 GET         /launchpadCollectionTopRightCard                   controllers.SaleController.collectionTopRightCard(id: String)
 GET         /createSale                                        controllers.SaleController.createCollectionSaleForm(whitelistId: Option[String], collectionId: Option[String])
 POST        /createSale                                        controllers.SaleController.createCollectionSale()
-GET         /buySaleNFT                                        controllers.SaleController.buySaleNFTForm(saleId: String, mintNft: Boolean)
+GET         /buySaleNFT                                        controllers.SaleController.buySaleNFTForm(saleId: String)
 POST        /buySaleNFT                                        controllers.SaleController.buySaleNFT()
 
 GET         /market                                            controllers.SecondaryMarketController.viewCollections()

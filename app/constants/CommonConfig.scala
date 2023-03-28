@@ -80,4 +80,9 @@ object CommonConfig {
     val DownloadEndPoint: String = config.get[String]("ipfs.downloadEndPoint")
     val DownloadAccessToken: String = config.get[String]("ipfs.accessToken")
   }
+
+  object Telegram {
+    val BotToken: String = config.get[String]("telegram.botToken")
+    val ChatId: String = config.get[String]("telegram.chatId")
+  }
 }

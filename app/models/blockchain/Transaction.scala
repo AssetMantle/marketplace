@@ -1,5 +1,7 @@
 package models.blockchain
 
+import com.cosmos.tx.v1beta1.Tx
+import com.google.protobuf.{Any => protoAny}
 import models.traits.{Entity, GenericDaoImpl, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -8,11 +10,16 @@ import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-case class Transaction(hash: String, height: Int, code: Int, log: String, gasWanted: String, gasUsed: String) extends Entity[String] {
+case class Transaction(hash: String, height: Int, code: Int, log: String, gasWanted: String, gasUsed: String, txBytes: Array[Byte]) extends Entity[String] {
   def id: String = hash
 
   def status: Boolean = code == 0
+
+  lazy val parsedTx: Tx = Tx.parseFrom(txBytes)
+
+  def getMessages: Seq[protoAny] = parsedTx.getBody.getMessagesList.asScala.toSeq
 }
 
 object Transactions {
@@ -23,7 +30,7 @@ object Transactions {
 
   class TransactionTable(tag: Tag) extends Table[Transaction](tag, "Transaction") with ModelTable[String] {
 
-    def * = (hash, height, code, log, gasWanted, gasUsed) <> (Transaction.tupled, Transaction.unapply)
+    def * = (hash, height, code, log, gasWanted, gasUsed, txBytes) <> (Transaction.tupled, Transaction.unapply)
 
     def hash = column[String]("hash", O.PrimaryKey)
 
@@ -36,6 +43,8 @@ object Transactions {
     def gasWanted = column[String]("gasWanted")
 
     def gasUsed = column[String]("gasUsed")
+
+    def txBytes = column[Array[Byte]]("txBytes")
 
     def id = hash
   }
@@ -64,6 +73,8 @@ class Transactions @Inject()(
     def getStatus(hash: String): Future[Option[Boolean]] = getById(hash).map(_.map(_.code == 0))
 
     def getByHashes(hashes: Seq[String]): Future[Seq[Transaction]] = if (hashes.nonEmpty) filter(_.hash.inSet(hashes)) else Future(Seq[Transaction]())
+
+    def getByHeight(height: Int): Future[Seq[Transaction]] = filter(_.height === height)
 
   }
 }

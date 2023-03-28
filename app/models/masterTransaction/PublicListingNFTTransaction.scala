@@ -2,10 +2,10 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.traits._
 import models.blockchainTransaction.NFTPublicListing
 import models.common.Coin
 import models.master.NFT
+import models.traits._
 import models.{analytics, blockchain, blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
@@ -18,7 +18,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class PublicListingNFTTransaction(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, publicListingId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, String] {
+case class PublicListingNFTTransaction(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, mintOnSuccess: Boolean, publicListingId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, String] {
   def id1: String = txHash
 
   def id2: String = nftId
@@ -32,7 +32,7 @@ object PublicListingNFTTransactions {
 
   class PublicListingNFTTransactionTable(tag: Tag) extends Table[PublicListingNFTTransaction](tag, "PublicListingNFTTransaction") with ModelTable2[String, String] {
 
-    def * = (txHash, nftId, buyerAccountId, sellerAccountId, publicListingId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (PublicListingNFTTransaction.tupled, PublicListingNFTTransaction.unapply)
+    def * = (txHash, nftId, buyerAccountId, sellerAccountId, mintOnSuccess, publicListingId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (PublicListingNFTTransaction.tupled, PublicListingNFTTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
@@ -41,6 +41,8 @@ object PublicListingNFTTransactions {
     def buyerAccountId = column[String]("buyerAccountId")
 
     def sellerAccountId = column[String]("sellerAccountId")
+
+    def mintOnSuccess = column[Boolean]("mintOnSuccess")
 
     def publicListingId = column[String]("publicListingId")
 
@@ -92,7 +94,7 @@ class PublicListingNFTTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftIds: Seq[String], publicListingId: String): Future[Unit] = create(nftIds.map(x => PublicListingNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = x, publicListingId = publicListingId, status = None)))
+    def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftIds: Seq[String], publicListingId: String, mintOnSuccess: Boolean): Future[Unit] = create(nftIds.map(x => PublicListingNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = x, publicListingId = publicListingId, status = None, mintOnSuccess = mintOnSuccess)))
 
     def checkAlreadySold(nftIds: Seq[String], publicListingId: String): Future[Boolean] = {
       val nullStatus: Option[Boolean] = null
@@ -121,7 +123,7 @@ class PublicListingNFTTransactions @Inject()(
   }
 
   object Utility {
-    def transaction(buyerAccountId: String, sellerAccountId: String, nftIds: Seq[String], publicListingId: String, fromAddress: String, toAddress: String, amount: MicroNumber, gasPrice: BigDecimal, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(buyerAccountId: String, sellerAccountId: String, nftIds: Seq[String], publicListingId: String, mintOnSuccess: Boolean, fromAddress: String, toAddress: String, amount: MicroNumber, gasPrice: BigDecimal, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get
@@ -143,7 +145,7 @@ class PublicListingNFTTransactions @Inject()(
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
               nftSale <- blockchainTransactionNFTPublicListings.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
-              _ <- Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, publicListingId = publicListingId)
+              _ <- Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, publicListingId = publicListingId, mintOnSuccess = mintOnSuccess)
             } yield nftSale
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
         }
@@ -189,6 +191,7 @@ class PublicListingNFTTransactions @Inject()(
             if (transaction.status.get) {
               val boughtNFTs = nftPublicListingTxs.filter(_.txHash == txHash)
               val markSuccess = Service.markSuccess(txHash)
+              val markForMinting = masterNFTs.Service.markReadyForMint(boughtNFTs.filter(_.mintOnSuccess).map(_.nftId))
               val publicListing = masterPublicListings.Service.tryGet(boughtNFTs.head.publicListingId)
               val nft = masterNFTs.Service.tryGet(boughtNFTs.head.nftId)
 
@@ -206,6 +209,7 @@ class PublicListingNFTTransactions @Inject()(
               (for {
                 _ <- markSuccess
                 publicListing <- publicListing
+                _ <- markForMinting
                 _ <- transferNFTOwnership(boughtNFTs)
                 nft <- nft
                 _ <- analysisUpdate(nft, boughtNFTs.length, publicListing.price)

@@ -58,4 +58,6 @@ object Coin {
     "amount" -> coin.amount.toMicroString
   )
 
+  def apply(coinProto: protoCoin): Coin = Coin(denom = coinProto.getDenom, amount = MicroNumber(BigInt(coinProto.getAmount)))
+
 }

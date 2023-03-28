@@ -3,13 +3,14 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
-import models.master.{Collection, NFTOwner}
+import models.master.{Collection, Key, NFT, NFTOwner}
 import models.masterTransaction.NFTDraft
-import models.{master, masterTransaction}
+import models.{blockchain, master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import utilities.MicroNumber
 import views.base.companion.UploadFile
 import views.nft.companion._
 
@@ -28,6 +29,8 @@ class NFTController @Inject()(
                                collectionsAnalysis: CollectionsAnalysis,
                                masterAccounts: master.Accounts,
                                masterCollections: master.Collections,
+                               masterKeys: master.Keys,
+                               blockchainBalances: blockchain.Balances,
                                masterNFTs: master.NFTs,
                                masterSales: master.Sales,
                                masterNFTOwners: master.NFTOwners,
@@ -449,6 +452,47 @@ class NFTController @Inject()(
           case _: BaseException => BadRequest("--")
         }
     }
+  }
+
+  def mintForm(nftId: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.nft.mint(nftId = nftId))
+  }
+
+  def mint(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Mint.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.nft.mint(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, ""))))
+        },
+        mintData => {
+          val nft = masterNFTs.Service.tryGet(mintData.nftId)
+          val nftOwner = masterNFTOwners.Service.tryGet(nftId = mintData.nftId, ownerId = loginState.username)
+          val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = mintData.password)
+          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
+
+          def collection(collectionId: String) = masterCollections.Service.tryGet(collectionId)
+
+          def verifyAndTx(verifyPassword: Boolean, balance: MicroNumber, key: Key, nft: NFT, nftOwner: NFTOwner, collection: Collection) = {
+            val errors = Seq(
+              if (balance.value <= collection.getBondAmount) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
+              if (nft.isMinted.getOrElse(true)) Option(constants.Response.NFT_ALREADY_MINTED) else None,
+              if (nft.totalSupply != nftOwner.quantity) Option(constants.Response.NFT_TOTAL_SUPPLY_AND_OWNED_DIFFERENT) else None,
+            ).flatten
+          }
+
+          (for {
+            nft <- nft
+            collection <- collection(nft.collectionId)
+            nftOwner <- nftOwner
+            (verified, key) <- verifyPassword
+            balance <- balance
+          } yield Ok
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        }
+      )
   }
 
 }
