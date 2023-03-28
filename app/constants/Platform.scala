@@ -2,6 +2,6 @@ package constants
 
 object Platform {
 
-  val Commission: BigDecimal = 0.0
+  val Commission: BigDecimal = 0.05
 
 }
