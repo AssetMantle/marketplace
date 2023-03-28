@@ -153,7 +153,7 @@ class PublicListingController @Inject()(
 
           for {
             collections <- collections
-          } yield BadRequest(views.html.publicListing.createPublicListing(formWithErrors, collectionId = formWithErrors.data.get(constants.FormField.SELECT_COLLECTION_ID.name), collections = collections.map(x => x._1 -> x._1).toMap))
+          } yield BadRequest(views.html.publicListing.createPublicListing(formWithErrors, collectionId = formWithErrors.data.get(constants.FormField.SELECT_COLLECTION_ID.name), collections = collections.map(x => x._1 -> x._2).toMap))
         },
         createData => {
           val collection = masterCollections.Service.tryGet(id = createData.collectionId)
@@ -345,7 +345,10 @@ class PublicListingController @Inject()(
             countBuyerNFTsFromPublicListing <- countBuyerNFTsFromPublicListing
             checkAlreadySold <- checkAlreadySold(nftOwners.map(_.nftId))
             blockchainTransaction <- validateAndTransfer(nftOwners = nftOwners, verifyPassword = verifyPassword, publicListing = publicListing, buyerKey = buyerKey, sellerKey = sellerKey, balance = balance, nfts = nfts, countBuyerNFTsFromPublicListing = countBuyerNFTsFromPublicListing, checkAlreadySold = checkAlreadySold)
-          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+          } yield {
+            val tweetURI = if (collection.getTwitterUsername.isDefined) Option(s"https://twitter.com/intent/tweet?text=Just bought ${collection.name} NFTs at a huge discount via Early Access Sale on MantlePlace. @${collection.getTwitterUsername.get} @AssetMantle Check here &url=https://marketplace.assetmantle.one/collection/${collection.id}&hashtags=NFT") else None
+            PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction, tweetURI))
+          }
             ).recover {
             case baseException: BaseException => BadRequest(views.html.publicListing.buyNFT(BuyNFT.form.withGlobalError(baseException.failure.message), publicListingId = buyNFTData.publicListingId))
           }

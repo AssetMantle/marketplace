@@ -169,7 +169,7 @@ class SaleController @Inject()(
           for {
             whitelists <- whitelists
             collections <- collections
-          } yield BadRequest(views.html.sale.createCollectionSale(formWithErrors, whitelists = whitelists, whitelistId = formWithErrors.data.get(constants.FormField.SELECT_WHITELIST_ID.name), collectionId = formWithErrors.data.get(constants.FormField.SELECT_COLLECTION_ID.name), collections = collections.map(x => x._1 -> x._1).toMap))
+          } yield BadRequest(views.html.sale.createCollectionSale(formWithErrors, whitelists = whitelists, whitelistId = formWithErrors.data.get(constants.FormField.SELECT_WHITELIST_ID.name), collectionId = formWithErrors.data.get(constants.FormField.SELECT_COLLECTION_ID.name), collections = collections.map(x => x._1 -> x._2).toMap))
         },
         createData => {
           val collection = masterCollections.Service.tryGet(id = createData.collectionId)
@@ -309,7 +309,10 @@ class SaleController @Inject()(
             countBuyerNFTsFromSale <- countBuyerNFTsFromSale
             checkAlreadySold <- checkAlreadySold(nftOwners.map(_.nftId))
             blockchainTransaction <- validateAndTransfer(nftOwners = nftOwners, verifyPassword = verifyPassword, sale = sale, isWhitelistMember = isWhitelistMember, buyerKey = buyerKey, sellerKey = sellerKey, balance = balance, nfts = nfts, countBuyerNFTsFromSale = countBuyerNFTsFromSale, checkAlreadySold = checkAlreadySold)
-          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+          } yield {
+            val tweetURI = if (collection.getTwitterUsername.isDefined) Option(s"https://twitter.com/intent/tweet?text=Just bought ${collection.name} NFTs at a huge discount via Launchpad Sale on MantlePlace. @${collection.getTwitterUsername.get} @AssetMantle Check here &url=https://marketplace.assetmantle.one/collection/${collection.id}&hashtags=NFT") else None
+            PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction, tweetURI))
+          }
             ).recover {
             case baseException: BaseException => BadRequest(views.html.sale.buySaleNFT(BuySaleNFT.form.withGlobalError(baseException.failure.message), saleId = buySaleNFTData.saleId))
           }

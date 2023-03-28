@@ -800,3 +800,12 @@
     border-color: var(--inactive-gray);
   }
 }
+
+.hideLabelField{
+  label{
+    display: none !important;
+  }
+  input{
+    display: none !important;
+  }
+}

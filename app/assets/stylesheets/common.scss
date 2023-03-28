@@ -1222,3 +1222,39 @@ body.modal-open{
     }
   }
 }
+
+#invoice{
+  .tableHeading{
+    @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--text-medium));
+    text-transform: capitalize;
+  }
+  .card{
+    background: var(--card-dark);
+    border-radius: 10px;
+    .table {
+      .tableTitle{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
+        text-transform: capitalize;
+      }
+      .tableLabel{
+        @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--gray));
+        text-transform: capitalize;
+      }
+      .tableValue{
+        @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--gray));
+        text-transform: capitalize;
+      }
+      .tableValueBig{
+        @include setFont(var(--font-type-2), normal, 400, 18px, 22px, var(--gray));
+        text-transform: capitalize;
+      }
+      .tableSeparator{
+        display: block;
+        width: 100%;
+        height: 1px;
+        background-color: var(--line);
+        margin: 8px 0px;
+      }
+    }
+  }
+}

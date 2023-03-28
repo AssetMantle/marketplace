@@ -220,6 +220,13 @@ function setGasOption(element, value) {
     $('#GAS_PRICE').val(value);
 }
 
+// Sharable Link
+function setSharableLink(imageUrl){
+    if(imageUrl !== "") {
+        $('meta[name=sharableImage]').attr('content', imageUrl);
+    }
+}
+
 function setSoldNFTProgressBar(){
     let progressBar = document.querySelector('.progressBar > span');
     let totalNFTs = progressBar.getAttribute("data-totalNFT");
