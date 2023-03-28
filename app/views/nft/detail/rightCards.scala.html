@@ -18,7 +18,7 @@
                     </div>
                 </div>
                 <div class="separator"></div>
-                @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.buyForm('${nft.id}', '${lowestPriceSecondaryMarket.get.id}'))"), Symbol("class") -> "mt-4")
+                @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.buyForm('${lowestPriceSecondaryMarket.get.id}'))"), Symbol("class") -> "mt-4")
                 @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId && userNFTOwner.get.creatorId != optionalLoginState.get.username && userNFTOwner.get.creatorId != "Mint.E" && nft.isMinted.getOrElse(false)) {
                     <div class="separator"></div>
                     @commonPrimaryButton(Messages(constants.View.SELL_NFT), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.createForm('${nft.id}'))"), Symbol("class") -> "mt-4")
@@ -46,7 +46,7 @@
                         </div>
                     </div>
                     <div class="separator"></div>
-                    @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.buyForm('${nft.id}', '${lowestPriceSecondaryMarket.get.id}'))"), Symbol("class") -> "mt-4")
+                    @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.buyForm('${lowestPriceSecondaryMarket.get.id}'))"), Symbol("class") -> "mt-4")
                     <div class="separator"></div>
                     <div class="analysisValue mb-2">@Messages(constants.View.SELLER_NFT_PRICE)</div>
                     <div class="d-flex flex-row gap-1 priceHolder">

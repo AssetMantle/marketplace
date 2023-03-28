@@ -474,7 +474,7 @@ class NFTController @Inject()(
 
           def verifyAndTx(verifyPassword: Boolean, balance: MicroNumber, key: Key, nft: NFT, nftOwner: NFTOwner, collection: Collection) = {
             val errors = Seq(
-              if (balance.value <= collection.getBondAmount) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (balance <= collection.getBondAmount) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (nft.isMinted.getOrElse(true)) Option(constants.Response.NFT_ALREADY_MINTED) else None,
               if (nft.totalSupply != nftOwner.quantity) Option(constants.Response.NFT_TOTAL_SUPPLY_AND_OWNED_DIFFERENT) else None,

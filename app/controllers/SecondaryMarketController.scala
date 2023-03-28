@@ -15,7 +15,8 @@ import utilities.MicroNumber
 import views.secondaryMarket.companion.{Buy, Cancel, CreateSecondaryMarket}
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class SecondaryMarketController @Inject()(
@@ -255,16 +256,36 @@ class SecondaryMarketController @Inject()(
       )
   }
 
-  def buyForm(nftId: String, secondaryMarketId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def buyForm(secondaryMarketId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.secondaryMarket.buy(nftId = nftId, secondaryMarketId = secondaryMarketId)))
+      val secondaryMarket = masterSecondaryMarkets.Service.tryGet(secondaryMarketId)
+
+      def collection(id: String) = masterCollections.Service.tryGet(id)
+
+      (for {
+        secondaryMarket <- secondaryMarket
+        collection <- collection(secondaryMarket.collectionId)
+      } yield Ok(views.html.secondaryMarket.buy(secondaryMarket = secondaryMarket, collection = collection))
+        ).recover {
+        case _: BaseException => BadRequest
+      }
   }
 
   def buy(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Buy.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.secondaryMarket.buy(formWithErrors, nftId = formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, ""), secondaryMarketId = formWithErrors.data.getOrElse(constants.FormField.SECONDARY_MARKET_ID.name, ""))))
+          val secondaryMarket = masterSecondaryMarkets.Service.tryGet(formWithErrors.data.getOrElse(constants.FormField.SECONDARY_MARKET_ID.name, ""))
+
+          def collection(id: String) = masterCollections.Service.tryGet(id)
+
+          (for {
+            secondaryMarket <- secondaryMarket
+            collection <- collection(secondaryMarket.collectionId)
+          } yield BadRequest(views.html.secondaryMarket.buy(formWithErrors, secondaryMarket = secondaryMarket, collection = collection))
+            ).recover {
+            case _: BaseException => BadRequest
+          }
         },
         buyData => {
           val secondaryMarket = masterSecondaryMarkets.Service.tryGet(buyData.secondaryMarketId)
@@ -308,7 +329,22 @@ class SecondaryMarketController @Inject()(
             blockchainTransaction <- validateAndTransfer(nftOwner = nftOwner, makeOrderTx = makeOrderTx, verifyPassword = verifyPassword, secondaryMarket = secondaryMarket, buyerKey = buyerKey, balance = balance, checkAlreadySold = checkAlreadySold)
           } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.secondaryMarket.buy(Buy.form.withGlobalError(baseException.failure.message), nftId = buyData.nftId, secondaryMarketId = buyData.secondaryMarketId))
+            case baseException: BaseException => {
+              val badResult = {
+                val secondaryMarket = masterSecondaryMarkets.Service.tryGet(buyData.secondaryMarketId)
+
+                def collection(id: String) = masterCollections.Service.tryGet(id)
+
+                (for {
+                  secondaryMarket <- secondaryMarket
+                  collection <- collection(secondaryMarket.collectionId)
+                } yield BadRequest(views.html.secondaryMarket.buy(Buy.form.withGlobalError(baseException.failure.message), secondaryMarket, collection))
+                  ).recover {
+                  case _: BaseException => BadRequest
+                }
+              }
+              Await.result(badResult, Duration.Inf)
+            }
           }
         }
       )

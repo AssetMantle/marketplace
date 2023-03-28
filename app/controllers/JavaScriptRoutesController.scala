@@ -107,7 +107,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.BlockchainTransactionController.gasTokenPrice,
         routes.javascript.BlockchainTransactionController.balance,
         routes.javascript.BlockchainTransactionController.sendCoinForm,
-        routes.javascript.BlockchainTransactionController.nftInvoice,
 
         routes.javascript.ProfileController.viewProfile,
         routes.javascript.ProfileController.profile,

@@ -181,6 +181,8 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
   def wholePart: BigInt = this.value / MicroNumber.factor
 
   def decimalPart: Int = (this.value - (wholePart * MicroNumber.factor)).toInt
+
+  def formatNumber(normalize: Boolean = true): String = utilities.NumericOperation.formatNumber(this, normalize)
 }
 
 object MicroNumber {

@@ -24,7 +24,7 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getNFTFileAwsKey(collectionId = this.collectionId, fileName = this.getFileName)
 
-  def getImmutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && !x.mutable && x.nftId == this.id).map(_.toMetaProperty()(Collections.module, Collections.logger)) ++ utilities.NFT.getDefaultImmutableMetaProperties(name = this.name, description = this.description, fileHash = this.getFileHash, bondAmount = collection.getBondAmount)
+  def getImmutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && !x.mutable && x.nftId == this.id).map(_.toMetaProperty()(Collections.module, Collections.logger)) ++ utilities.NFT.getDefaultImmutableMetaProperties(name = this.name, description = this.description, fileHash = this.getFileHash, bondAmount = collection.getBondAmount.value.toLong)
 
   def getImmutableProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && !x.mutable && x.nftId == this.id).map(_.toMesaProperty()(Collections.module, Collections.logger)) ++ constants.Collection.DefaultProperty.allImmutableMesaProperties(collection.getCreatorIdentityID)
 

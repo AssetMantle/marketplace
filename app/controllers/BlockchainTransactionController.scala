@@ -108,8 +108,4 @@ class BlockchainTransactionController @Inject()(
         }
       )
   }
-
-  def nftInvoice(): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.blockchainTransaction.NFTInvoice())
-  }
 }

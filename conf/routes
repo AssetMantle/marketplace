@@ -171,7 +171,7 @@ POST        /createPublicListing                               controllers.Publi
 GET         /editPublicListing                                 controllers.PublicListingController.editForm(publicListingId: String)
 POST        /editPublicListing                                 controllers.PublicListingController.edit()
 
-GET         /buyPublicListingNFT                               controllers.PublicListingController.buyNFTForm(publicListingId: String, mintNft: Boolean)
+GET         /buyPublicListingNFT                               controllers.PublicListingController.buyNFTForm(publicListingId: String)
 POST        /buyPublicListingNFT                               controllers.PublicListingController.buyNFT()
 
 GET         /launchpad                                         controllers.SaleController.viewCollections()
@@ -196,7 +196,7 @@ GET         /createSecondaryMarket                             controllers.Secon
 POST        /createSecondaryMarket                             controllers.SecondaryMarketController.create()
 GET         /cancelSecondaryMarket                             controllers.SecondaryMarketController.cancelForm(nftId: String, secondaryMarketId: String)
 POST        /cancelSecondaryMarket                             controllers.SecondaryMarketController.cancel()
-GET         /buySecondaryMarket                                controllers.SecondaryMarketController.buyForm(nftId: String, secondaryMarketId: String)
+GET         /buySecondaryMarket                                controllers.SecondaryMarketController.buyForm(secondaryMarketId: String)
 POST        /buySecondaryMarket                                controllers.SecondaryMarketController.buy()
 
 GET         /unwrapToken                                       controllers.WalletController.unwrapTokenForm()
@@ -219,4 +219,3 @@ GET         /gasTokenPrice                                     controllers.Block
 GET         /addressBalance                                    controllers.BlockchainTransactionController.balance(address: String)
 GET         /sendCoin                                          controllers.BlockchainTransactionController.sendCoinForm(fromAddress: String)
 POST        /sendCoin                                          controllers.BlockchainTransactionController.sendCoin()
-GET         /nftInvoice                                        controllers.BlockchainTransactionController.nftInvoice()

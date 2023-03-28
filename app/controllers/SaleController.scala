@@ -235,15 +235,38 @@ class SaleController @Inject()(
       )
   }
 
-  def buySaleNFTForm(saleId: String): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.sale.buySaleNFT(saleId = saleId))
+  def buySaleNFTForm(saleId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val sale = masterSales.Service.tryGet(saleId)
+
+        def collection(id: String) = masterCollections.Service.tryGet(id)
+
+        (for {
+          sale <- sale
+          collection <- collection(sale.collectionId)
+        } yield Ok(views.html.sale.buySaleNFT(sale = sale, collection = collection))
+          ).recover {
+          case _: Exception => BadRequest
+        }
+    }
   }
 
   def buySaleNFT(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       BuySaleNFT.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.sale.buySaleNFT(formWithErrors, saleId = formWithErrors.data.getOrElse(constants.FormField.SALE_ID.name, ""))))
+          val sale = masterSales.Service.tryGet(formWithErrors.data.getOrElse(constants.FormField.SALE_ID.name, ""))
+
+          def collection(id: String) = masterCollections.Service.tryGet(id)
+
+          (for {
+            sale <- sale
+            collection <- collection(sale.collectionId)
+          } yield BadRequest(views.html.sale.buySaleNFT(formWithErrors, sale = sale, collection = collection))
+            ).recover {
+            case _: Exception => BadRequest
+          }
         },
         buySaleNFTData => {
           val sale = masterSales.Service.tryGet(buySaleNFTData.saleId)
@@ -314,7 +337,22 @@ class SaleController @Inject()(
             PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction, tweetURI))
           }
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.sale.buySaleNFT(BuySaleNFT.form.withGlobalError(baseException.failure.message), saleId = buySaleNFTData.saleId))
+            case baseException: BaseException => {
+              val badResult = {
+                val sale = masterSales.Service.tryGet(buySaleNFTData.saleId)
+
+                def collection(id: String) = masterCollections.Service.tryGet(id)
+
+                (for {
+                  sale <- sale
+                  collection <- collection(sale.collectionId)
+                } yield BadRequest(views.html.sale.buySaleNFT(BuySaleNFT.form.withGlobalError(baseException.failure.message), sale = sale, collection = collection))
+                  ).recover {
+                  case _: Exception => BadRequest
+                }
+              }
+              Await.result(badResult, Duration.Inf)
+            }
           }
         }
       )

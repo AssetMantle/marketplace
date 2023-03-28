@@ -275,15 +275,38 @@ class PublicListingController @Inject()(
       )
   }
 
-  def buyNFTForm(publicListingId: String, mintNft: Boolean): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.publicListing.buyNFT(publicListingId = publicListingId))
+  def buyNFTForm(publicListingId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val publicListing = masterPublicListings.Service.tryGet(publicListingId)
+
+        def collection(id: String) = masterCollections.Service.tryGet(id)
+
+        (for {
+          publicListing <- publicListing
+          collection <- collection(publicListing.collectionId)
+        } yield Ok(views.html.publicListing.buyNFT(publicListing = publicListing, collection = collection))
+          ).recover {
+          case _: BaseException => BadRequest
+        }
+    }
   }
 
   def buyNFT(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       BuyNFT.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.publicListing.buyNFT(formWithErrors, publicListingId = formWithErrors.data.getOrElse(constants.FormField.PUBLIC_LISTING_ID.name, ""))))
+          val publicListing = masterPublicListings.Service.tryGet(formWithErrors.data.getOrElse(constants.FormField.PUBLIC_LISTING_ID.name, ""))
+
+          def collection(id: String) = masterCollections.Service.tryGet(id)
+
+          (for {
+            publicListing <- publicListing
+            collection <- collection(publicListing.collectionId)
+          } yield BadRequest(views.html.publicListing.buyNFT(formWithErrors, publicListing, collection))
+            ).recover {
+            case _: BaseException => BadRequest
+          }
         },
         buyNFTData => {
           val publicListing = masterPublicListings.Service.tryGet(buyNFTData.publicListingId)
@@ -350,7 +373,22 @@ class PublicListingController @Inject()(
             PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction, tweetURI))
           }
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.publicListing.buyNFT(BuyNFT.form.withGlobalError(baseException.failure.message), publicListingId = buyNFTData.publicListingId))
+            case baseException: BaseException => {
+              val badResult = {
+                val publicListing = masterPublicListings.Service.tryGet(buyNFTData.publicListingId)
+
+                def collection(id: String) = masterCollections.Service.tryGet(id)
+
+                (for {
+                  publicListing <- publicListing
+                  collection <- collection(publicListing.collectionId)
+                } yield BadRequest(views.html.publicListing.buyNFT(BuyNFT.form.withGlobalError(baseException.failure.message), publicListing, collection))
+                  ).recover {
+                  case _: BaseException => BadRequest
+                }
+              }
+              Await.result(badResult, Duration.Inf)
+            }
           }
         }
       )

@@ -1,7 +1,7 @@
 package models.master
 
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import models.common.Collection._
+import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -10,13 +10,16 @@ import schema.list.PropertyList
 import schema.property.base.{MesaProperty, MetaProperty}
 import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
+import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, properties: Option[Seq[Property]], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def getBondAmount: Long = utilities.Collection.getTotalBondAmount(this.getImmutables, this.getMutables, constants.Blockchain.BondRate)
+  def getBondAmount: MicroNumber = MicroNumber(BigInt(utilities.Collection.getTotalBondAmount(this.getImmutables, this.getMutables, constants.Blockchain.BondRate)))
+
+  def getRoyaltyFee: BigDecimal = 0.02
 
   def getCreatorIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.creatorId)
 

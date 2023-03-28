@@ -1,12 +1,13 @@
 @import views.html.base.form._
 @import views.publicListing.companion.BuyNFT
 @import views.html.base.buttons._
+@import models.master.{Collection, PublicListing}
 
-@(buyNFTForm: Form[BuyNFT.Data] = BuyNFT.form, publicListingId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(buyNFTForm: Form[BuyNFT.Data] = BuyNFT.form, publicListing: PublicListing, collection: Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.BUY_NFT_PUBLIC_LISTING, buyNFTForm) {
     <div id="publicListingForm">
-        @commonInputText(buyNFTForm, constants.FormField.PUBLIC_LISTING_ID, Symbol("value") -> publicListingId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> true)
+        @commonInputText(buyNFTForm, constants.FormField.PUBLIC_LISTING_ID, Symbol("value") -> publicListing.id, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> true)
         <div class="mb-3 inputField">
             <div class="inputFieldBody">
                 @commonInputInt(buyNFTForm, constants.FormField.PUBLIC_LISTING_BUY_NFT_NUMBER, Symbol("value") -> 1)
@@ -39,25 +40,19 @@
                                 </tr>
                                 <tr>
                                     <td class="text-left tableLabel">@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_LISTED_PRICE)</td>
-                                    <td class="text-center tableValue">0.00 $MNTL</td>
+                                    <td class="text-center tableValue">@publicListing.price.formatNumber() $MNTL</td>
                                     <td class="text-center tableValue publicListingBuyQuantity">00</td>
                                     <td class="text-end tableValue">0.00 $MNTL</td>
                                 </tr>
                                 <tr>
                                     <td class="text-left tableLabel">@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_BONDING_AMOUNT)</td>
-                                    <td class="text-center tableValue">0.00 $MNTL</td>
+                                    <td class="text-center tableValue">@collection.getBondAmount.formatNumber() $MNTL</td>
                                     <td class="text-center tableValue publicListingBuyQuantity">00</td>
                                     <td class="text-end tableValue">0.00 $MNTL</td>
                                 </tr>
                                 <tr>
                                     <td class="text-left tableLabel">@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_PLATFORM_COMMISSION)</td>
-                                    <td class="text-center tableValue">0.00 $MNTL</td>
-                                    <td class="text-center tableValue publicListingBuyQuantity">00</td>
-                                    <td class="text-end tableValue">0.00 $MNTL</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left tableLabel">@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_ROYALTY_FEES)</td>
-                                    <td class="text-center tableValue">0.00 $MNTL</td>
+                                    <td class="text-center tableValue">@(constants.Platform.Commission * 100) %</td>
                                     <td class="text-center tableValue publicListingBuyQuantity">00</td>
                                     <td class="text-end tableValue">0.00 $MNTL</td>
                                 </tr>
