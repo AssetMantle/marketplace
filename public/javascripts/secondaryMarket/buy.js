@@ -1,33 +1,32 @@
 $("#formSubmitButton").hide();
 
 function showSubmitButton() {
-    $("#publicListingNextButton").hide();
+    $("#secondaryMarketNextButton").hide();
     $("#formSubmitButton").show();
-    $(".quantity").text($("#PUBLIC_LISTING_BUY_NFT_NUMBER").val());
 }
 
 $("#PASSWORD").on("keyup",function(){
     if($("#PASSWORD").val() !== ""){
-        $("#publicListingNextButton").removeClass("disable");
+        $("#secondaryMarketNextButton").removeClass("disable");
     }else{
-        $("#publicListingNextButton").addClass("disable");
+        $("#secondaryMarketNextButton").addClass("disable");
     }
 });
 
 function computeInvoice(){
-    let quantity = parseInt($("#PUBLIC_LISTING_BUY_NFT_NUMBER").val());
+    let quantity = parseInt($("#quantity").text());
     let listedUnitCost = parseFloat($(".listedUnitCost").text().replace(",",""));
     let listedAmount = listedUnitCost * quantity;
-    let BondingUnitCost = parseFloat($(".BondingUnitCost").text().replace(",",""));
-    let BondingAmount = BondingUnitCost * quantity;
     let commissionRate = parseFloat($(".commissionRate").text());
     let commissionAmount = parseFloat((listedAmount * commissionRate) / 100);
-    let subTotal = listedAmount + BondingAmount + commissionAmount;
+    let royaltyFees = parseFloat($(".royaltyFees").text());
+    let royaltyAmount = parseFloat((listedAmount * royaltyFees) / 100);
+    let subTotal = listedAmount + commissionAmount + royaltyAmount;
     let discount = $(".discount").text();
     let invoiceTotal = subTotal - discount;
     $(".listedAmount").text(listedAmount);
-    $(".BondingAmount").text(BondingAmount);
     $(".commissionAmount").text(commissionAmount);
+    $(".royaltyAmount").text(royaltyAmount);
     $(".subTotal").text(subTotal);
     $(".invoiceTotal").text(invoiceTotal);
 }
