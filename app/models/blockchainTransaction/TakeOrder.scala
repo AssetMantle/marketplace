@@ -90,6 +90,8 @@ class TakeOrders @Inject()(
 
     def getAllPendingStatus: Future[Seq[TakeOrder]] = filter(_.status.?.isEmpty)
 
+    def checkExists(txHash: String): Future[Boolean] = filterAndExists(_.txHash === txHash)
+
   }
 
   object Utility {

@@ -2,13 +2,14 @@ package utilities
 
 import com.assets.{transactions => assetTransactions}
 import com.cosmos.bank.{v1beta1 => bankTx}
+import com.google.protobuf.{Any => protobufAny}
 import com.ibc.applications.transfer.v2.FungibleTokenPacketData
 import com.ibc.core.channel.{v1 => channelTx}
 import com.identities.{transactions => identityTransactions}
 import com.orders.{transactions => orderTransactions}
 import com.splits.{transactions => splitTransactions}
 import models.analytics.CollectionsAnalysis
-import models.blockchain.Split
+import models.blockchain.{Split, Transaction}
 import models.common.Coin
 import models.master._
 import models.{blockchain, master, masterTransaction}
@@ -164,7 +165,8 @@ class ExternalTransactions @Inject()(
     } yield ()
   }
 
-  def onProvisionIdentity(msg: identityTransactions.provision.Message): Future[Unit] = {
+  def onProvisionIdentity(stdMsg: protobufAny, transaction: Transaction): Future[Unit] = {
+    val msg = identityTransactions.provision.Message.parseFrom(stdMsg.getValue)
     val account = masterAccounts.Service.getByIdentityId(IdentityID(msg.getIdentityID))
 
     def update(account: Option[Account]) = if (account.isDefined) {
@@ -193,7 +195,8 @@ class ExternalTransactions @Inject()(
     } yield ()
   }
 
-  def onUnprovisionIdentity(msg: identityTransactions.unprovision.Message): Future[Unit] = {
+  def onUnprovisionIdentity(stdMsg: protobufAny, transaction: Transaction): Future[Unit] = {
+    val msg = identityTransactions.unprovision.Message.parseFrom(stdMsg.getValue)
     val account = masterAccounts.Service.getByIdentityId(IdentityID(msg.getIdentityID))
 
     def update(account: Option[Account]) = if (account.isDefined) {
@@ -206,7 +209,8 @@ class ExternalTransactions @Inject()(
     } yield ()
   }
 
-  def onOrderCancel(msg: orderTransactions.cancel.Message): Future[Unit] = {
+  def onOrderCancel(stdMsg: protobufAny, transaction: Transaction): Future[Unit] = {
+    val msg = orderTransactions.cancel.Message.parseFrom(stdMsg.getValue)
     val secondaryMarket = masterSecondaryMarkets.Service.getByOrderId(OrderID(msg.getOrderID))
 
     def update(secondaryMarket: Option[SecondaryMarket]) = if (secondaryMarket.isDefined) {
@@ -219,7 +223,8 @@ class ExternalTransactions @Inject()(
     } yield ()
   }
 
-  def onOrderMake(msg: orderTransactions.make.Message, creationHeight: Long, txHash: String): Future[Unit] = {
+  def onOrderMake(stdMsg: protobufAny, transaction: Transaction): Future[Unit] = {
+    val msg = orderTransactions.make.Message.parseFrom(stdMsg.getValue)
     val orderClassificationId = ClassificationID(msg.getClassificationID)
     val nft = masterNFTs.Service.getByAssetId(OwnableID(msg.getMakerOwnableID).asString)
     val account = masterAccounts.Service.getByIdentityId(IdentityID(msg.getFromID))
@@ -236,13 +241,13 @@ class ExternalTransactions @Inject()(
           makerID = IdentityID(msg.getFromID),
           makerOwnableID = nft.get.getAssetID,
           makerOwnableSplit = BigDecimal(msg.getMakerOwnableSplit),
-          creationHeight = creationHeight,
+          creationHeight = transaction.height,
           takerID = IdentityID(msg.getTakerID),
           takerOwnableID = constants.Blockchain.StakingTokenCoinID,
           takerOwnableSplit = BigDecimal(msg.getTakerOwnableSplit)
         )
         val secondaryMarketId = utilities.IdGenerator.getRandomHexadecimal
-        val endHours = (creationHeight + msg.getExpiresIn.getValue - blockchainBlocks.Service.getLatestHeight) * 6
+        val endHours = (transaction.height + msg.getExpiresIn.getValue - blockchainBlocks.Service.getLatestHeight) * 6
         val secondaryMarket = SecondaryMarket(id = secondaryMarketId, orderId = Option(orderID.asString), nftId = nft.get.id, collectionId = nft.get.collectionId, sellerId = account.get.id, quantity = (BigDecimal(msg.getMakerOwnableSplit) * AttoNumber.factor).toInt, price = MicroNumber(BigDecimal(msg.getTakerOwnableSplit).toBigInt + 1), denom = constants.Blockchain.StakingToken, endHours = endHours.toInt, externallyMade = true, delete = false)
         val add = masterSecondaryMarkets.Service.add(secondaryMarket)
 
@@ -256,7 +261,7 @@ class ExternalTransactions @Inject()(
         val quantity = (BigDecimal(msg.getMakerOwnableSplit) * AttoNumber.factor).toLong
         val updateOrDeleteNFTOwner = if (quantity == nftOwner.get.quantity) masterNFTOwners.Service.delete(nftId = nftOwner.get.nftId, ownerId = nftOwner.get.ownerId)
         else if (quantity < nftOwner.get.quantity) masterNFTOwners.Service.update(nftOwner.get.copy(quantity = nftOwner.get.quantity - quantity))
-        else Future(telegramNotifications.send("EXTERNAL_TX [onOrderMake] MakerOwnableSplit more than the nft owned for: " + nftOwner.get.nftId + " of owner: " + account.get.id + ", txHash: " + txHash))
+        else Future(telegramNotifications.send("EXTERNAL_TX [onOrderMake] MakerOwnableSplit more than the nft owned for: " + nftOwner.get.nftId + " of owner: " + account.get.id + ", txHash: " + transaction.hash))
 
         def transfer = masterTransactionExternalAssets.Service.insertOrUpdate(nftId = nft.get.id, lastOwnerId = nftOwner.get.ownerId, assetId = nft.get.assetId.get, currentOwnerIdentityId = constants.Blockchain.OrderIdentityID.asString, collectionId = nft.get.collectionId, amount = quantity)
 
@@ -275,7 +280,8 @@ class ExternalTransactions @Inject()(
     } yield ()
   }
 
-  def onOrderTake(msg: orderTransactions.take.Message): Future[Unit] = {
+  def onOrderTake(stdMsg: protobufAny, transaction: Transaction): Future[Unit] = {
+    val msg = orderTransactions.take.Message.parseFrom(stdMsg.getValue)
     val blockchainOrder = blockchainOrders.Service.tryGet(OrderID(msg.getOrderID))
     val account = masterAccounts.Service.getByIdentityId(IdentityID(msg.getFromID))
 
@@ -336,7 +342,7 @@ class ExternalTransactions @Inject()(
       _ <- update(nft, toAccount)
     } yield ()
   }
-//
+  //
   //  def onSplitUnwrap(msg: splitTransactions.unwrap.Message): Future[Unit] = if (OwnableID(msg.getOwnableID).asString != constants.Blockchain.StakingTokenCoinID.asString) {
   //    val nft = masterNFTs.Service.getByAssetId(OwnableID(msg.getOwnableID).asString)
   //    val fromAccount = masterAccounts.Service.getByIdentityId(IdentityID(msg.getFromID))

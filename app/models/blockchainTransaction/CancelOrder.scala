@@ -90,6 +90,8 @@ class CancelOrders @Inject()(
 
     def getAllPendingStatus: Future[Seq[CancelOrder]] = filter(_.status.?.isEmpty)
 
+    def checkExists(txHash: String): Future[Boolean] = filterAndExists(_.txHash === txHash)
+
   }
 
   object Utility {

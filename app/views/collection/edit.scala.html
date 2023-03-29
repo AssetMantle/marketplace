@@ -13,7 +13,7 @@
     }else{
         @commonToggleButton(editForm, constants.FormField.NSFW_COLLECTION, Symbol("value") -> collectionDraft.fold("")(_.nsfw.toString))
     }
-@*    @commonSelect(editForm, constants.FormField.COLLECTION_CATEGORY, Symbol("class") -> "custom-select sources", Symbol("placeholder") -> Messages(constants.View.ART))*@
+    @commonInputBigDecimal(editForm, constants.FormField.COLLECTION_ROYALTY, Symbol("value") -> collectionDraft.fold[BigDecimal](0.0)(_.royalty))
     @commonInputURL(editForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false, Symbol("value") -> collectionDraft.fold("")(_.getWebsite.getOrElse(""))))
     @commonInputText(editForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false, Symbol("value") -> collectionDraft.fold("")(_.getTwitter.getOrElse(""))))
     @commonInputText(editForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false, Symbol("value") -> collectionDraft.fold("")(_.getInstagram.getOrElse(""))))

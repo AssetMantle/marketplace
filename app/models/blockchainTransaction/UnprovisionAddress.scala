@@ -90,6 +90,8 @@ class UnprovisionAddresses @Inject()(
 
     def getAllPendingStatus: Future[Seq[UnprovisionAddress]] = filter(_.status.?.isEmpty)
 
+    def checkExists(txHash: String): Future[Boolean] = filterAndExists(_.txHash === txHash)
+
   }
 
   object Utility {

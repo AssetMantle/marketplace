@@ -10,7 +10,7 @@
         @commonInputText(createForm, constants.FormField.COLLECTION_NAME)
         @commonDescriptionText(createForm, constants.FormField.COLLECTION_DESCRIPTION)
         @commonToggleButton(createForm, constants.FormField.NSFW_COLLECTION)
-        @* @commonSelect(createForm, constants.FormField.COLLECTION_CATEGORY, Symbol("class") -> "custom-select sources", Symbol("placeholder") -> Messages(constants.View.ART))*@
+        @commonInputBigDecimal(createForm, constants.FormField.COLLECTION_ROYALTY, Symbol("value") -> 2.0)
         @commonInputURL(createForm, constants.FormField.COLLECTION_WEBSITE, Symbol("required") -> false)
         @commonInputText(createForm, constants.FormField.COLLECTION_TWITTER, Symbol("required") -> false)
         @commonInputText(createForm, constants.FormField.COLLECTION_INSTAGRAM, Symbol("required") -> false)

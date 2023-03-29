@@ -282,22 +282,20 @@ class SaleController @Inject()(
 
           def nfts(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds)
 
-          //          def nftProperties(nftId: String) = masterNFTProperties.Service.getForNFT(nftId)
-
           def sellerKey(ownerId: String) = masterKeys.Service.tryGetActive(ownerId)
 
           def isWhitelistMember(sale: Sale) = masterWhitelistMembers.Service.isMember(whitelistId = sale.whitelistId, accountId = loginState.username)
 
-          def validateAndTransfer(nftOwners: Seq[NFTOwner], verifyPassword: Boolean, sale: Sale, isWhitelistMember: Boolean, buyerKey: Key, sellerKey: Key, balance: MicroNumber, nfts: Seq[NFT], countBuyerNFTsFromSale: Int, checkAlreadySold: Boolean) = {
+          def validateAndTransfer(nftOwners: Seq[NFTOwner], verifyPassword: Boolean, sale: Sale, isWhitelistMember: Boolean, buyerKey: Key, collection: Collection, sellerKey: Key, balance: MicroNumber, nfts: Seq[NFT], countBuyerNFTsFromSale: Int, checkAlreadySold: Boolean) = {
             val errors = Seq(
               if (nftOwners.map(_.ownerId).distinct.contains(loginState.username)) Option(constants.Response.CANNOT_SELL_TO_YOURSELF) else None,
               if (!isWhitelistMember) Option(constants.Response.NOT_MEMBER_OF_WHITELIST) else None,
               if (sale.startTimeEpoch > utilities.Date.currentEpoch) Option(constants.Response.SALE_NOT_STARTED) else None,
               if (utilities.Date.currentEpoch >= sale.endTimeEpoch) Option(constants.Response.SALE_EXPIRED) else None,
               if (balance == MicroNumber.zero || balance <= (sale.price * buySaleNFTData.buyNFTs)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
-              //              if (buySaleNFTData.mintNFT && (balance - (sale.price + constants.Blockchain.AssetPropertyRate * (nftProperties.length + constants.Collection.DefaultProperty.list.length)) <= MicroNumber.zero)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (buySaleNFTData.mintOnSuccess && (balance - (buySaleNFTData.buyNFTs * collection.getBondAmount) <= MicroNumber.zero)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if ((countBuyerNFTsFromSale + buySaleNFTData.buyNFTs) > sale.maxMintPerAccount) Option(constants.Response.MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED) else None,
-              //              if (buySaleNFTData.mintNFT && nft.isMinted) Option(constants.Response.NFT_ALREADY_MINTED) else None,
+              if (buySaleNFTData.mintOnSuccess && nfts.map(_.isMinted.getOrElse(true)).exists(identity)) Option(constants.Response.NFT_ALREADY_MINTED) else None,
               if (nfts.exists(_.isMinted.getOrElse(true))) Option(constants.Response.NFT_ALREADY_MINTED) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
@@ -310,6 +308,7 @@ class SaleController @Inject()(
                 mintOnSuccess = buySaleNFTData.mintOnSuccess,
                 nftIds = nftOwners.map(_.nftId),
                 fromAddress = buyerKey.address,
+                collection = collection,
                 toAddress = sellerKey.address,
                 amount = sale.price * buySaleNFTData.buyNFTs,
                 gasLimit = constants.Blockchain.DefaultSendCoinGasAmount,
@@ -324,14 +323,13 @@ class SaleController @Inject()(
             collection <- collection(sale.collectionId)
             nftOwners <- nftOwners(collection)
             nfts <- nfts(nftOwners.map(_.nftId))
-            //            nftProperties <- nftProperties(nftOwner.nftId)
             sellerKey <- sellerKey(collection.creatorId)
             (verifyPassword, buyerKey) <- verifyPassword
             isWhitelistMember <- isWhitelistMember(sale)
             balance <- balance
             countBuyerNFTsFromSale <- countBuyerNFTsFromSale
             checkAlreadySold <- checkAlreadySold(nftOwners.map(_.nftId))
-            blockchainTransaction <- validateAndTransfer(nftOwners = nftOwners, verifyPassword = verifyPassword, sale = sale, isWhitelistMember = isWhitelistMember, buyerKey = buyerKey, sellerKey = sellerKey, balance = balance, nfts = nfts, countBuyerNFTsFromSale = countBuyerNFTsFromSale, checkAlreadySold = checkAlreadySold)
+            blockchainTransaction <- validateAndTransfer(nftOwners = nftOwners, verifyPassword = verifyPassword, sale = sale, isWhitelistMember = isWhitelistMember, buyerKey = buyerKey, collection = collection, sellerKey = sellerKey, balance = balance, nfts = nfts, countBuyerNFTsFromSale = countBuyerNFTsFromSale, checkAlreadySold = checkAlreadySold)
           } yield {
             val tweetURI = if (collection.getTwitterUsername.isDefined) Option(s"https://twitter.com/intent/tweet?text=Just bought ${collection.name} NFTs at a huge discount via Launchpad Sale on MantlePlace. @${collection.getTwitterUsername.get} @AssetMantle Check here &url=https://marketplace.assetmantle.one/collection/${collection.id}&hashtags=NFT") else None
             PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction, tweetURI))

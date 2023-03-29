@@ -17,9 +17,10 @@ object Edit {
       constants.FormField.COLLECTION_WEBSITE.optionalMapping,
       constants.FormField.COLLECTION_TWITTER.optionalMapping,
       constants.FormField.COLLECTION_INSTAGRAM.optionalMapping,
+      constants.FormField.COLLECTION_ROYALTY.mapping,
     )(Data.apply)(Data.unapply))
 
-  case class Data(collectionId: String, name: String, description: String, nsfw: Boolean, website: Option[URL], twitter: Option[String], instagram: Option[String]) {
+  case class Data(collectionId: String, name: String, description: String, nsfw: Boolean, website: Option[URL], twitter: Option[String], instagram: Option[String], royalty: BigDecimal) {
     def getSocialProfiles: Seq[SocialProfile] = Seq(
       this.website.fold[Option[SocialProfile]](None)(x => Option(SocialProfile(name = constants.Collection.SocialProfile.WEBSITE, url = x.toString))),
       this.twitter.fold[Option[SocialProfile]](None)(x => Option(SocialProfile(name = constants.Collection.SocialProfile.TWITTER, url = x))),

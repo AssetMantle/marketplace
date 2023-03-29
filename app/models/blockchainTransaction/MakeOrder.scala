@@ -90,6 +90,7 @@ class MakeOrders @Inject()(
 
     def getAllPendingStatus: Future[Seq[MakeOrder]] = filter(_.status.?.isEmpty)
 
+    def checkExists(txHash: String): Future[Boolean] = filterAndExists(_.txHash === txHash)
   }
 
   object Utility {
