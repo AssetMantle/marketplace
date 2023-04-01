@@ -184,7 +184,7 @@ class Starter @Inject()(
           if (uploadCollection.instagram != "") Option(SocialProfile(name = constants.Collection.SocialProfile.INSTAGRAM, url = uploadCollection.instagram)) else None,
           if (uploadCollection.website != "") Option(SocialProfile(name = constants.Collection.SocialProfile.WEBSITE, url = uploadCollection.website)) else None,
         ).flatten
-        val collection = Collection(id = uploadCollection.id, creatorId = uploadCollection.creatorId, classificationId = None, name = uploadCollection.name, description = uploadCollection.description, socialProfiles = socialProfiles, category = constants.Collection.Category.ART, nsfw = false, properties = Option(uploadCollection.classificationProperties.map(_.toProperty)), profileFileName = profileFileName, coverFileName = coverFileName, public = true, royalty = BigDecimal(uploadCollection.royalty))
+        val collection = Collection(id = uploadCollection.id, creatorId = uploadCollection.creatorId, classificationId = None, name = uploadCollection.name, description = uploadCollection.description, socialProfiles = socialProfiles, nsfw = false, properties = Option(uploadCollection.classificationProperties.map(_.toProperty)), profileFileName = profileFileName, coverFileName = coverFileName, public = true, royalty = BigDecimal(uploadCollection.royalty))
 
         def add = masterCollections.Service.add(collection)
 
@@ -392,14 +392,14 @@ class Starter @Inject()(
     } yield ()
   }
 
-  def defineAssets(): Future[Unit] = {
+  def defineOrderAndAssets(): Future[Unit] = {
     val collections = masterCollections.Service.getAllPublic
     val abciInfo = getAbciInfo.Service.get
     val bcAccount = getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount)
 
     def getMessages(collections: Seq[Collection]) = collections.map(collection => {
       utilities.BlockchainTransaction.getDefineAssetMsg(fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, fromID = constants.Blockchain.MantlePlaceFromID, immutableMetas = collection.getImmutableMetaProperties, immutables = collection.getImmutableProperties, mutableMetas = collection.getMutableMetaProperties, mutables = collection.getMutableProperties)
-    })
+    }) ++ Seq(utilities.BlockchainTransaction.getDefineOrderMsg(fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, fromID = constants.Blockchain.MantlePlaceFromID, immutableMetas = Seq(constants.Orders.OriginMetaProperty), mutableMetas = Seq(), immutables = Seq(), mutables = Seq()))
 
     def checkMempoolAndAddTx(collections: Seq[Collection], bcAccount: models.blockchain.Account, latestBlockHeight: Int) = {
       val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
@@ -524,19 +524,6 @@ class Starter @Inject()(
     }
   }
 
-  def getTx(): Unit = {
-    val abciInfo = Await.result(getAbciInfo.Service.get, Duration.Inf)
-    val bcAccount = Await.result(getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount), Duration.Inf)
-    val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-      messages = Seq(utilities.BlockchainTransaction.getDefineOrderMsg(fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, fromID = constants.Blockchain.MantlePlaceFromID, immutableMetas = Seq(constants.Orders.OriginMetaProperty), mutableMetas = Seq(), immutables = Seq(), mutables = Seq())),
-      fee = utilities.BlockchainTransaction.getFee(gasPrice = 0.001, gasLimit = constants.Blockchain.DefaultMintAssetGasLimit),
-      gasLimit = constants.Blockchain.DefaultMintAssetGasLimit,
-      account = bcAccount,
-      ecKey = constants.Blockchain.MantleNodeMaintainerWallet.getECKey,
-      timeoutHeight = abciInfo.result.response.last_block_height.toInt + 100)
-    println("0x" + txRawBytes.map("%02x".format(_)).mkString.toUpperCase)
-  }
-
   def markMintReady(): Future[Unit] = {
     val nftIds = masterNFTOwners.Service.getSoldNFTs(constants.Collection.GenesisCollectionIDs)
 
@@ -548,11 +535,23 @@ class Starter @Inject()(
     } yield ()
   }
 
+  def updateCollectionRankings(): Future[Unit] = {
+    val collections = masterCollections.Service.getAllPublic
+    val update = masterCollections.Service.updateRanking()
+    for {
+      collections <- collections
+      _ <- update
+    } yield {
+      constants.Collection.GenesisCollectionIDs = collections.map(_.id)
+    }
+  }
+
   // Delete redundant nft tags
 
   def start(): Future[Unit] = {
     (for {
-      _ <- defineAssets()
+      _ <- updateCollectionRankings()
+      _ <- defineOrderAndAssets()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)

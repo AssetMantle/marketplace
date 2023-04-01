@@ -11,7 +11,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class CollectionDraft(id: String, creatorId: String, name: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, properties: Seq[Property], profileFileName: Option[String], coverFileName: Option[String], royalty: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class CollectionDraft(id: String, creatorId: String, name: String, description: String, socialProfiles: Seq[SocialProfile], nsfw: Boolean, properties: Seq[Property], profileFileName: Option[String], coverFileName: Option[String], royalty: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def getWebsite: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.WEBSITE).map(_.url)
 
@@ -19,7 +19,7 @@ case class CollectionDraft(id: String, creatorId: String, name: String, descript
 
   def getInstagram: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.INSTAGRAM).map(_.url)
 
-  def toCollection(public: Boolean = false): Collection = Collection(id = id, creatorId = creatorId, classificationId = None, name = name, description = description, socialProfiles = socialProfiles, category = category, nsfw = nsfw, properties = Option(this.properties), profileFileName = this.profileFileName, coverFileName = this.coverFileName, public = public, royalty = royalty)
+  def toCollection(public: Boolean = false): Collection = Collection(id = id, creatorId = creatorId, classificationId = None, name = name, description = description, socialProfiles = socialProfiles, nsfw = nsfw, properties = Option(this.properties), profileFileName = this.profileFileName, coverFileName = this.coverFileName, public = public, royalty = royalty)
 
   def getProfileFileURL: Option[String] = this.profileFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getOthersFileAwsKey(collectionId = this.id, fileName = x))
 
@@ -31,7 +31,6 @@ case class CollectionDraft(id: String, creatorId: String, name: String, descript
     name = this.name,
     description = this.description,
     socialProfiles = Json.toJson(this.socialProfiles).toString(),
-    category = this.category,
     nsfw = this.nsfw,
     properties = Json.toJson(this.properties).toString(),
     profileFileName = this.profileFileName,
@@ -49,13 +48,13 @@ object CollectionDrafts {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class CollectionDraftSerialized(id: String, creatorId: String, name: String, description: String, socialProfiles: String, category: String, nsfw: Boolean, properties: String, profileFileName: Option[String], coverFileName: Option[String], royalty: BigDecimal, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize: CollectionDraft = CollectionDraft(id = id, creatorId = creatorId, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), category = category, nsfw = nsfw, properties = utilities.JSON.convertJsonStringToObject[Seq[Property]](properties), profileFileName = profileFileName, coverFileName = coverFileName, royalty = royalty, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class CollectionDraftSerialized(id: String, creatorId: String, name: String, description: String, socialProfiles: String, nsfw: Boolean, properties: String, profileFileName: Option[String], coverFileName: Option[String], royalty: BigDecimal, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
+    def deserialize: CollectionDraft = CollectionDraft(id = id, creatorId = creatorId, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), nsfw = nsfw, properties = utilities.JSON.convertJsonStringToObject[Seq[Property]](properties), profileFileName = profileFileName, coverFileName = coverFileName, royalty = royalty, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
   class CollectionDraftTable(tag: Tag) extends Table[CollectionDraftSerialized](tag, "CollectionDraft") with ModelTable[String] {
 
-    def * = (id, creatorId, name, description, socialProfiles, category, nsfw, properties, profileFileName.?, coverFileName.?, royalty, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionDraftSerialized.tupled, CollectionDraftSerialized.unapply)
+    def * = (id, creatorId, name, description, socialProfiles, nsfw, properties, profileFileName.?, coverFileName.?, royalty, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionDraftSerialized.tupled, CollectionDraftSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -66,8 +65,6 @@ object CollectionDrafts {
     def description = column[String]("description")
 
     def socialProfiles = column[String]("socialProfiles")
-
-    def category = column[String]("category")
 
     def nsfw = column[Boolean]("nsfw")
 
@@ -106,7 +103,7 @@ class CollectionDrafts @Inject()(
 
   object Service {
 
-    def add(name: String, creatorId: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, royalty: BigDecimal): Future[CollectionDraft] = {
+    def add(name: String, creatorId: String, description: String, socialProfiles: Seq[SocialProfile], nsfw: Boolean, royalty: BigDecimal): Future[CollectionDraft] = {
       val id = utilities.IdGenerator.getRandomHexadecimal
       val collection = CollectionDraft(
         id = id,
@@ -114,7 +111,6 @@ class CollectionDrafts @Inject()(
         name = name,
         description = description,
         socialProfiles = socialProfiles,
-        category = category,
         nsfw = nsfw,
         properties = Seq(),
         profileFileName = None,
@@ -127,17 +123,17 @@ class CollectionDrafts @Inject()(
 
     def tryGet(id: String): Future[CollectionDraft] = tryGetById(id).map(_.deserialize)
 
-    def checkOwnerAndUpdate(id: String, creatorId: String, name: String, description: String, socialProfiles: Seq[SocialProfile], category: String, nsfw: Boolean, royalty: BigDecimal): Future[CollectionDraft] = {
+    def checkOwnerAndUpdate(id: String, creatorId: String, name: String, description: String, socialProfiles: Seq[SocialProfile], nsfw: Boolean, royalty: BigDecimal): Future[CollectionDraft] = {
       val collectionDraft = tryGet(id)
 
       def validateAndUpdate(collectionDraft: CollectionDraft) = if (collectionDraft.creatorId == creatorId) {
-        updateById(collectionDraft.copy(name = name, description = description, socialProfiles = socialProfiles, category = category, nsfw = nsfw, royalty = royalty).serialize())
+        updateById(collectionDraft.copy(name = name, description = description, socialProfiles = socialProfiles, nsfw = nsfw, royalty = royalty).serialize())
       } else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
 
       for {
         collectionDraft <- collectionDraft
         _ <- validateAndUpdate(collectionDraft)
-      } yield collectionDraft.copy(name = name, description = description, socialProfiles = socialProfiles, category = category, nsfw = nsfw)
+      } yield collectionDraft.copy(name = name, description = description, socialProfiles = socialProfiles, nsfw = nsfw)
     }
 
     def isOwner(id: String, accountId: String): Future[Boolean] = filterAndExists(x => x.id === id && x.creatorId === accountId)

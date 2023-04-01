@@ -34,8 +34,6 @@
         <entry key="POSTGRES_USER" value="mantlePlace" />
         <entry key="ROOT_FILE_PATH" value="$USER_HOME$/" />
         <entry key="SITE_URL" value="http://localhost:9000" />
-        <entry key="TELEGRAM_BOT_TOKEN" value="5863635272:AAEiBbSbtdmqjB6qQLbQ9Wgbs_iJIkSKMFE" />
-        <entry key="TELEGRAM_CHAT_ID" value="-925654334" />
       </map>
     </option>
     <option name="play2IsNonDefaultInstallDirUsed" value="false" />

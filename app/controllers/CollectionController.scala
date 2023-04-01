@@ -80,7 +80,7 @@ class CollectionController @Inject()(
   def collectionList(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val totalCollections = masterCollections.Service.totalByCategory(constants.Collection.Category.ART)
+        val totalCollections = masterCollections.Service.countPublicCollections
 
         (for {
           totalCollections <- totalCollections
@@ -91,11 +91,12 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionsPerPage(pageNumber: Int, showAll: Boolean): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
-        else masterCollections.Service.getByPageNumber(constants.Collection.Category.ART, pageNumber)
+        else if(!showAll) masterCollections.Service.getPublicByPageNumber(pageNumber)
+        else masterCollections.Service.getByRankingAndPageNumber(pageNumber)
 
         (for {
           collections <- collections
@@ -256,7 +257,7 @@ class CollectionController @Inject()(
           Future(BadRequest(views.html.collection.create(formWithErrors, 0)))
         },
         createData => {
-          val collectionDraft = masterTransactionCollectionDrafts.Service.add(name = createData.name, description = createData.description, socialProfiles = createData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = createData.nsfw, royalty = createData.royalty / 100)
+          val collectionDraft = masterTransactionCollectionDrafts.Service.add(name = createData.name, description = createData.description, socialProfiles = createData.getSocialProfiles, creatorId = loginState.username, nsfw = createData.nsfw, royalty = createData.royalty / 100)
 
           (for {
             collectionDraft <- collectionDraft
@@ -292,7 +293,7 @@ class CollectionController @Inject()(
           }
         },
         editData => {
-          val update = masterTransactionCollectionDrafts.Service.checkOwnerAndUpdate(id = editData.collectionId, name = editData.name, description = editData.description, socialProfiles = editData.getSocialProfiles, category = constants.Collection.Category.ART, creatorId = loginState.username, nsfw = editData.nsfw, royalty = editData.royalty)
+          val update = masterTransactionCollectionDrafts.Service.checkOwnerAndUpdate(id = editData.collectionId, name = editData.name, description = editData.description, socialProfiles = editData.getSocialProfiles, creatorId = loginState.username, nsfw = editData.nsfw, royalty = editData.royalty)
 
           (for {
             collectionDraft <- update

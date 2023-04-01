@@ -41,7 +41,6 @@ class ExternalTransactions @Inject()(
                                       masterSecondaryMarkets: master.SecondaryMarkets,
                                       masterTransactionExternalAssets: masterTransaction.ExternalAssets,
                                       notification: Notification,
-                                      telegramNotifications: TelegramNotifications
                                     )
                                     (implicit executionContext: ExecutionContext, configuration: Configuration) {
 
@@ -261,7 +260,7 @@ class ExternalTransactions @Inject()(
         val quantity = (BigDecimal(msg.getMakerOwnableSplit) * AttoNumber.factor).toLong
         val updateOrDeleteNFTOwner = if (quantity == nftOwner.get.quantity) masterNFTOwners.Service.delete(nftId = nftOwner.get.nftId, ownerId = nftOwner.get.ownerId)
         else if (quantity < nftOwner.get.quantity) masterNFTOwners.Service.update(nftOwner.get.copy(quantity = nftOwner.get.quantity - quantity))
-        else Future(telegramNotifications.send("EXTERNAL_TX [onOrderMake] MakerOwnableSplit more than the nft owned for: " + nftOwner.get.nftId + " of owner: " + account.get.id + ", txHash: " + transaction.hash))
+        else Future()
 
         def transfer = masterTransactionExternalAssets.Service.insertOrUpdate(nftId = nft.get.id, lastOwnerId = nftOwner.get.ownerId, assetId = nft.get.assetId.get, currentOwnerIdentityId = constants.Blockchain.OrderIdentityID.asString, collectionId = nft.get.collectionId, amount = quantity)
 

@@ -49,7 +49,7 @@ GET         /collections                                       controllers.Colle
 GET         /collection/:id                                    controllers.CollectionController.viewCollection(id: String)
 GET         /collectionsSection                                controllers.CollectionController.collectionsSection()
 GET         /collectionList                                    controllers.CollectionController.collectionList()
-GET         /collectionsPerPage                                controllers.CollectionController.collectionsPerPage(pageNumber: Int)
+GET         /collectionsPerPage                                controllers.CollectionController.collectionsPerPage(pageNumber: Int, showAll: Boolean)
 GET         /collectionNFTs                                    controllers.CollectionController.collectionNFTs(id: String)
 GET         /collectionNFTsPerPage                             controllers.CollectionController.collectionNFTsPerPage(id: String, pageNumber: Int)
 GET         /collectionInfo                                    controllers.CollectionController.info(id: String)
