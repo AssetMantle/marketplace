@@ -11,7 +11,7 @@ document.onload = function () {
 
 function loadMoreCollections() {
     if ($(".noCollection").length === 0) {
-        let showAll = true;
+        let showAll = $('#showAll').is(":checked");
         let route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1, showAll);
         let loadMore = $("#collectionsPerPage");
         $.ajax({
@@ -46,3 +46,13 @@ function loadFirstCollections() {
         setTimeout(loadMoreCollections, 1000);
     }
 }
+
+$(document).ready(function() {
+    $('#showAll').change(function() {
+        $("#collectionsPerPage").html("");
+        loadMoreCollections();
+        if ($(document).height() > 900) {
+            setTimeout(loadMoreCollections, 1000);
+        }
+    });
+});
