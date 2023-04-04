@@ -66,7 +66,7 @@
 
 .headerWithBackButton {
   .headerTitle {
-    @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
+    @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--mantle-off-white));
   }
 }
 
@@ -94,35 +94,74 @@
     background: var(--popup-bg);
     border: 2px solid var(--popup-stroke);
     border-radius: 0 0 20px 20px;
-    padding: 20px;
+    padding: 16px;
     position: relative;
     overflow: hidden;
 
-    .headerContainer {
+    .cardContainer {
+      background-color: var(--card-dark);
+      padding: 12px 16px;
+      border-radius: 8px;
+      .label{
+        @include setFont(var(--font-type-1), normal, 500, 14px, 17px, var(--text-medium));
+        margin-bottom: 16px;
+      }
       .userDetails {
+        background-color: var(--popup-bg);
+        padding: 6px;
+        border-radius: 8px;
         .userName {
-          @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--default));
+          @include setFont(var(--font-type-2), normal, 600, 18px, 22px, var(--mantle-off-white));
         }
+      }
+    }
+    .userBalance {
+      @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--mantle-off-white));
 
-        .userBalance {
-          @include setFont(var(--font-type-2), normal, 600, 14px, 17px, var(--text-medium));
+      .start {
+        @include setFont(var(--font-type-2), normal, 700, 16px, 17px, var(--mantle-off-white));
+      }
 
-          .start {
-            @include setFont(var(--font-type-2), normal, 700, 16px, 17px, var(--text-medium));
-          }
-
-          .end {
-            @include setFont(var(--font-type-2), normal, 700, 12px, 17px, var(--text-medium));
-          }
+      .end {
+        @include setFont(var(--font-type-2), normal, 700, 12px, 17px, var(--mantle-off-white));
+      }
+    }
+    .primaryIconButton{
+      width: 100%;
+      padding: 6px 12px;
+      background-color: var(--default);
+      border-radius: 32px;
+      line-height: 0;
+      cursor: pointer;
+      @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--card-dark));
+      text-transform: capitalize;
+      a{
+        @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--card-dark));
+        text-transform: capitalize;
+        i {
+          color: var(--card-dark) !important;
+        }
+      }
+    }
+    .secondaryIconButton{
+      width: 100%;
+      padding: 6px 12px;
+      border: 1px solid var(--default);
+      border-radius: 32px;
+      line-height: 0;
+      cursor: pointer;
+      @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--default));
+      text-transform: capitalize;
+      a{
+        i {
+          color: var(--default) !important;
         }
       }
     }
 
     .userAddressBox {
-      background-color: var(--card-dark);
-      border-radius: 8px;
+      padding: 10px 4px;
       line-height: 0;
-
       .userAddressData {
         @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
         word-break: break-word;
@@ -136,6 +175,10 @@
 
     .buttons {
       line-height: 0px;
+    }
+
+    .tertiaryButton{
+      @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--radial));
     }
   }
 
@@ -267,27 +310,28 @@
   }
 
   .addressBook {
-    height: 450px;
-    width: 274px;
+    height: 100%;
+    width: 260px;
     position: absolute;
-    right: -275px;
+    right: -260px;
     top: 1px;
     z-index: 1000;
     background: var(--card-dark);
-    border-radius: 10px 10px 0px 0px;
+    border-radius: 10px 0px 0px 10px;
     padding: 20px;
     line-height: 0px;
     transition: right 0.3s ease;
+    border-left: 2px solid var(--popup-stroke);
 
     &.open {
       right: 0px;
     }
 
     .walletAddressList {
-      height: 215px;
+      height: 286px;
       overflow-y: auto;
-      padding-right: 12px;
-      margin-bottom: 24px;
+      padding-right: 8px;
+      margin-bottom: 18px;
 
       .walletAddressItem {
         padding: 12px 0px;
@@ -343,10 +387,12 @@
 
     .bottomMenu {
       .primaryButton {
-        background-color: transparent;
-        color: var(--default);
+        @include setFont(var(--font-type-2), normal, 600, 16px, 19px, var(--button-text));
+        width: 100%;
         border: none;
         box-shadow: none;
+        cursor: pointer;
+        max-width: 100%;
       }
     }
   }
