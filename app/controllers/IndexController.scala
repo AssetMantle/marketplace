@@ -74,14 +74,14 @@ class IndexController @Inject()(
     }
   }
 
+  starter.start()
+
   Await.result(starter.updateIdentityIDs(), Duration.Inf)
   Await.result(starter.fixMantleMonkeys(), Duration.Inf)
   Await.result(starter.updateDecimalToNumberType(), Duration.Inf)
   Await.result(starter.updateAssetIDs(), Duration.Inf)
   Await.result(starter.markMintReady(), Duration.Inf)
   starter.fixAllMultipleActiveKeys()
-
-  starter.start()
 
   utilities.Scheduler.startSchedulers(
     historyMasterPublicListings.Utility.scheduler,

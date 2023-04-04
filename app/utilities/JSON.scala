@@ -18,7 +18,7 @@ object JSON {
         case errors: JsError =>
           logger.error(errors.errors.map(_.toString()).mkString(", "))
           logger.error(jsonString)
-          throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
+          constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
       }
     } catch {
       case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
@@ -28,6 +28,8 @@ object JSON {
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
         logger.error("Check order of case class definitions")
         throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
 
@@ -45,6 +47,11 @@ object JSON {
       case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
         constants.Response.JSON_MAPPING_EXCEPTION.throwBaseException(jsonMappingException)
       case baseException: BaseException => throw baseException
+      case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
+        logger.error("Check order of case class definitions")
+        constants.Response.NULL_POINTER_EXCEPTION.throwBaseException(nullPointerException)
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        constants.Response.GENERIC_JSON_EXCEPTION.throwBaseException(exception)
     }
   }
 
@@ -63,6 +70,11 @@ object JSON {
     case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
       constants.Response.JSON_MAPPING_EXCEPTION.throwBaseException(jsonMappingException)
     case baseException: BaseException => throw baseException
+    case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
+      logger.error("Check order of case class definitions")
+      constants.Response.NULL_POINTER_EXCEPTION.throwBaseException(nullPointerException)
+    case exception: Exception => logger.error(exception.getLocalizedMessage)
+      constants.Response.GENERIC_JSON_EXCEPTION.throwBaseException(exception)
   }
 
 }

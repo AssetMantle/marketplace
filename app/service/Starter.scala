@@ -393,7 +393,7 @@ class Starter @Inject()(
   }
 
   def defineOrderAndAssets(): Future[Unit] = {
-    val collections = masterCollections.Service.getAllPublic
+    val collections = masterCollections.Service.fetchAll()
     val abciInfo = getAbciInfo.Service.get
     val bcAccount = getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount)
 
@@ -535,22 +535,10 @@ class Starter @Inject()(
     } yield ()
   }
 
-  def updateCollectionRankings(): Future[Unit] = {
-    val collections = masterCollections.Service.getAllPublic
-    val update = masterCollections.Service.updateRanking()
-    for {
-      collections <- collections
-      _ <- update
-    } yield {
-      constants.Collection.GenesisCollectionIDs = collections.map(_.id)
-    }
-  }
-
   // Delete redundant nft tags
 
   def start(): Future[Unit] = {
     (for {
-      _ <- updateCollectionRankings()
       _ <- defineOrderAndAssets()
     } yield ()
       ).recover {

@@ -91,12 +91,11 @@ class CollectionController @Inject()(
     }
   }
 
-  def collectionsPerPage(pageNumber: Int, showAll: Boolean): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val collections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
-        else if(!showAll) masterCollections.Service.getPublicByPageNumber(pageNumber)
-        else masterCollections.Service.getByRankingAndPageNumber(pageNumber)
+        else masterCollections.Service.getPublicByPageNumber(pageNumber)
 
         (for {
           collections <- collections

@@ -138,7 +138,7 @@ class SecondaryMarkets @Inject()(
 
     def markForDeletion(id: String): Future[Int] = customUpdate(SecondaryMarkets.TableQuery.filter(_.id === id).map(_.delete).update(true))
 
-    def getByPageNumber(pageNumber: Int): Future[Seq[SecondaryMarket]] = getAllByPageNumber(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.endHours).map(_.map(_.deserialize))
+    def getByPageNumber(pageNumber: Int): Future[Seq[SecondaryMarket]] = sortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.endHours).map(_.map(_.deserialize))
 
     def getAllOrderIDs: Future[Seq[String]] = customQuery(SecondaryMarkets.TableQuery.filter(_.orderId.?.nonEmpty).map(_.orderId).result)
 
