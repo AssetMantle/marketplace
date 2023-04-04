@@ -84,7 +84,7 @@ class Starter @Inject()(
 
   case class UploadCollection(id: String, creatorId: String, name: String, description: String, jsonPath: String, downloadFromIPFS: Boolean, imagePath: String, nftFormat: String, twitter: String, instagram: String, website: String, profileImagePath: Option[String], coverImagePath: Option[String], addCollection: Boolean, updateNFTs: Boolean, classificationProperties: Seq[CollectionProperty])
 
-  case class NFT(name: String, description: String, image: String, properties: Seq[NFTProperty])
+  case class NFT(name: String, description: String, image: Option[String], properties: Seq[NFTProperty])
 
   implicit val UploadCollectionReads: Reads[UploadCollection] = Json.reads[UploadCollection]
 
@@ -111,19 +111,13 @@ class Starter @Inject()(
     }
   }
 
-  private def addNft(originalNFT: NFT, uploadCollection: UploadCollection, nftImageFileName: String, collection: Collection) = {
-    val classificationPropertiesNames = uploadCollection.classificationProperties.map(_.name)
-    val originalNFTPropertiesNames = originalNFT.properties.map(_.name)
-    val nftDetails = if (uploadCollection.id == "C5FD79BDDDCB75C4") {
-      originalNFT.copy(properties = originalNFT.properties.filter(x => classificationPropertiesNames.contains(x.name)) ++ uploadCollection.classificationProperties.filterNot(x => originalNFTPropertiesNames.contains(x.name)).map(_.toNFTProperty))
-    } else originalNFT
+  private def addNft(nftDetails: NFT, uploadCollection: UploadCollection, nftImageFileName: String, collection: Collection) = {
     val valid = verifyNFT(nftDetails, collection)
-    println(valid)
     if (valid) {
       val nftImageFile = constants.CommonConfig.Files.CollectionPath + "/" + uploadCollection.imagePath + "/" + nftImageFileName
       println(nftImageFile)
       if (uploadCollection.downloadFromIPFS) {
-        val fileUrl = nftDetails.image.split("\\/").drop(2).mkString("/")
+        val fileUrl = nftDetails.image.get.split("\\/").drop(2).mkString("/")
         println(fileUrl)
         utilities.IPFS.downloadFile(fileUrl, nftImageFile)
       }
@@ -133,22 +127,17 @@ class Starter @Inject()(
       if (!exists) {
         try {
           val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = uploadCollection.id, fileName = newFileName)
-          utilities.AmazonS3.uploadFile(awsKey, nftImageFile)
+          if (!utilities.AmazonS3.exists(awsKey)) utilities.AmazonS3.uploadFile(awsKey, nftImageFile)
           Await.result(masterNFTs.Service.add(master.NFT(id = fileHash, collectionId = uploadCollection.id, name = nftDetails.name, description = nftDetails.description, totalSupply = 1, isMinted = false, fileExtension = uploadCollection.nftFormat, ipfsLink = "", edition = None)), Duration.Inf)
           Await.result(masterNFTOwners.Service.add(master.NFTOwner(nftId = fileHash, ownerId = uploadCollection.creatorId, creatorId = uploadCollection.creatorId, collectionId = uploadCollection.id, quantity = 1, saleId = None, publicListingId = None)), Duration.Inf)
           Await.result(masterNFTProperties.Service.addMultiple(nftDetails.properties.map(_.toProperty(fileHash, collection))), Duration.Inf)
           Await.result(collectionsAnalysis.Utility.onNewNFT(uploadCollection.id), Duration.Inf)
-          ""
+          utilities.FileOperations.deleteFile(nftImageFile)
         } catch {
           case exception: Exception => logger.error(exception.getLocalizedMessage)
-            ""
         }
-      } else ""
-      utilities.FileOperations.deleteFile(nftImageFile)
-    } else {
-      logger.error("incorrect nft: " + nftDetails.name + " (" + uploadCollection.name + ")")
-      ""
-    }
+      } else logger.error("NFT with hash already exists: " + fileHash)
+    } else logger.error("validation failed, incorrect nft: " + nftDetails.name + " (" + uploadCollection.name + ")")
   }
 
   def uploadCollections(): Future[Unit] = {
@@ -201,14 +190,10 @@ class Starter @Inject()(
           println(nftImageFileName)
           (for {
             nftDetails <- nftDetails
-          } yield {
-            addNft(nftDetails, uploadCollection, nftImageFileName, collection)
-            ""
-          }
-            ).recover {
-            case exception: Exception => logger.error(exception.getLocalizedMessage)
-              Future("")
-          }
+          } yield addNft(nftDetails, uploadCollection, nftImageFileName, collection))
+            .recover {
+              case exception: Exception => logger.error(exception.getLocalizedMessage)
+            }
         }
 
         for {
@@ -309,13 +294,15 @@ class Starter @Inject()(
 
   // Delete redundant nft tags
   def start(): Future[Unit] = {
-    //    (for {
-    //      _ <- validateAll()
-    //    } yield ()
-    //      ).recover {
-    //      case exception: Exception => logger.error(exception.getLocalizedMessage)
-    //    }
-    Future()
+    (for {
+      _ <- deleteCollection("E93C0A1B72E3B340")
+      _ <- deleteCollection("D3597B243628110D")
+      _ <- uploadCollections()
+    } yield ()
+      ).recover {
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+    }
+    //    Future()
   }
 
 }
