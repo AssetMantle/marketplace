@@ -6,7 +6,7 @@ import models.blockchainTransaction.NFTMintingFee
 import models.common.Coin
 import models.master.NFT
 import models.traits._
-import models.{blockchain, blockchainTransaction, master}
+import models.{blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -65,7 +65,6 @@ object NFTMintingFeeTransactions {
 @Singleton
 class NFTMintingFeeTransactions @Inject()(
                                            protected val databaseConfigProvider: DatabaseConfigProvider,
-                                           blockchainAccounts: blockchain.Accounts,
                                            blockchainTransactionNFTMintingFees: blockchainTransaction.NFTMintingFees,
                                            broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                            utilitiesOperations: utilities.Operations,
@@ -100,7 +99,7 @@ class NFTMintingFeeTransactions @Inject()(
   }
 
   object Utility {
-    def transaction(accountId: String, nftId: String, collectionId: String, fromAddress: String, amount: MicroNumber, gasPrice: BigDecimal, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(accountId: String, nft: NFT, fromAddress: String, amount: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get
@@ -111,8 +110,8 @@ class NFTMintingFeeTransactions @Inject()(
         val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = constants.Blockchain.MantlePlaceFeeCollectorAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)))),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = gasLimit),
-          gasLimit = gasLimit,
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultMintAssetGasLimit),
+          gasLimit = constants.Blockchain.DefaultMintAssetGasLimit,
           account = bcAccount,
           ecKey = ecKey,
           timeoutHeight = timeoutHeight)
@@ -122,7 +121,7 @@ class NFTMintingFeeTransactions @Inject()(
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
               nftSale <- blockchainTransactionNFTMintingFees.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = constants.Blockchain.MantlePlaceFeeCollectorAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
-              _ <- Service.addWithNoneStatus(accountId = accountId, collectionId = collectionId, txHash = txHash, nftId = nftId)
+              _ <- Service.addWithNoneStatus(accountId = accountId, collectionId = nft.collectionId, txHash = txHash, nftId = nft.id)
             } yield nftSale
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
         }

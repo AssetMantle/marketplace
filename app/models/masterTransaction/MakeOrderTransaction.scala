@@ -113,7 +113,6 @@ object MakeOrderTransactions {
 @Singleton
 class MakeOrderTransactions @Inject()(
                                        protected val databaseConfigProvider: DatabaseConfigProvider,
-                                       blockchainAccounts: blockchain.Accounts,
                                        blockchainBlocks: blockchain.Blocks,
                                        blockchainTransactions: blockchain.Transactions,
                                        blockchainTransactionMakeOrders: blockchainTransaction.MakeOrders,

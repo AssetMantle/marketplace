@@ -28,6 +28,7 @@ object FormField {
 
   //StringFormField
   val USERNAME: StringFormField = StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
+  val TO_ACCOUNT_ID: StringFormField = StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
   val PASSWORD: StringFormField = StringFormField("PASSWORD", 5, 128)
   val WALLET_ADDRESS: StringFormField = StringFormField("WALLET_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val PUSH_NOTIFICATION_TOKEN: StringFormField = StringFormField("PUSH_NOTIFICATION_TOKEN", 0, 200)

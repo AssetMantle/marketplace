@@ -6,6 +6,7 @@ import models.analytics.CollectionsAnalysis
 import models.master.{Collection, Key, NFT, NFTOwner}
 import models.masterTransaction.NFTDraft
 import models.{blockchain, master, masterTransaction}
+import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -43,7 +44,8 @@ class NFTController @Inject()(
                                masterSecondaryMarkets: master.SecondaryMarkets,
                                masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                utilitiesNotification: utilities.Notification,
-                               masterTransactionSaleNFTTransactions: masterTransaction.SaleNFTTransactions,
+                               masterTransactionNFTMintingFeeTransactions: masterTransaction.NFTMintingFeeTransactions,
+                               masterTransactionNFTTransferTransactions: masterTransaction.NFTTransferTransactions,
                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -479,6 +481,16 @@ class NFTController @Inject()(
               if (nft.isMinted.getOrElse(true)) Option(constants.Response.NFT_ALREADY_MINTED) else None,
               if (nft.totalSupply != nftOwner.quantity) Option(constants.Response.NFT_TOTAL_SUPPLY_AND_OWNED_DIFFERENT) else None,
             ).flatten
+            if (errors.isEmpty) {
+              masterTransactionNFTMintingFeeTransactions.Utility.transaction(
+                accountId = loginState.username,
+                nft = nft,
+                fromAddress = loginState.address,
+                amount = collection.getBondAmount,
+                gasPrice = constants.Blockchain.DefaultGasPrice,
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, mintData.password))
+              )
+            } else errors.head.throwBaseException()
           }
 
           (for {
@@ -490,6 +502,58 @@ class NFTController @Inject()(
           } yield Ok
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        }
+      )
+  }
+
+  def transferForm(nftId: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.nft.transfer(nftId = nftId))
+  }
+
+  def transfer(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Transfer.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.nft.transfer(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, ""))))
+        },
+        transferData => {
+          val quantity = 1 // TODO
+          val nft = masterNFTs.Service.tryGet(transferData.nftId)
+          val nftOwner = masterNFTOwners.Service.tryGet(nftId = transferData.nftId, ownerId = loginState.username)
+          val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = transferData.password)
+          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
+
+          def verifyAndTx(verifyPassword: Boolean, balance: MicroNumber, key: Key, nft: NFT, nftOwner: NFTOwner) = {
+            val errors = Seq(
+              if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
+              if (!nft.isMinted.getOrElse(false)) Option(constants.Response.NFT_NOT_MINTED) else None,
+              if (quantity > nftOwner.quantity) Option(constants.Response.INSUFFICIENT_NFT_BALANCE) else None,
+            ).flatten
+
+            if (errors.isEmpty) {
+              masterTransactionNFTTransferTransactions.Utility.transaction(
+                nft = nft,
+                ownerId = loginState.username,
+                quantity = quantity,
+                fromAddress = key.address,
+                toAccountId = transferData.toAccountId,
+                gasPrice = constants.Blockchain.DefaultGasPrice,
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, transferData.password))
+              )
+            } else errors.head.throwBaseException()
+          }
+
+          (for {
+            nft <- nft
+            (verified, key) <- verifyPassword
+            balance <- balance
+            nftOwner <- nftOwner
+            blockchainTransaction <- verifyAndTx(verifyPassword = verified, balance = balance, key = key, nft = nft, nftOwner = nftOwner)
+          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.nft.transfer(Transfer.form.withGlobalError(baseException.failure.message), transferData.nftId))
           }
         }
       )

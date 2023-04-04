@@ -4,7 +4,7 @@ import constants.Scheduler
 import exceptions.BaseException
 import models.blockchainTransaction.Unwrap
 import models.traits._
-import models.{blockchain, blockchainTransaction, master}
+import models.{blockchain, blockchainTransaction}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -65,10 +65,7 @@ object UnwrapTransactions {
 @Singleton
 class UnwrapTransactions @Inject()(
                                     protected val databaseConfigProvider: DatabaseConfigProvider,
-                                    blockchainAccounts: blockchain.Accounts,
                                     blockchainIdentities: blockchain.Identities,
-                                    masterAccounts: master.Accounts,
-                                    masterKeys: master.Keys,
                                     broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                     utilitiesOperations: utilities.Operations,
                                     getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,

@@ -119,6 +119,8 @@ GET         /deleteNftDraft                                    controllers.NFTCo
 POST        /deleteNftDraft                                    controllers.NFTController.deleteDraft()
 GET         /mintNFT                                           controllers.NFTController.mintForm(nftId: String)
 POST        /mintNFT                                           controllers.NFTController.mint()
+GET         /transferNFT                                       controllers.NFTController.transferForm(nftId: String)
+POST        /transferNFT                                       controllers.NFTController.transfer()
 
 GET         /settings                                          controllers.SettingController.viewSettings()
 GET         /profileSettings                                   controllers.SettingController.settings()

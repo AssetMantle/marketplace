@@ -61,7 +61,6 @@ object MintAssetTransactions {
 @Singleton
 class MintAssetTransactions @Inject()(
                                        protected val databaseConfigProvider: DatabaseConfigProvider,
-                                       blockchainAccounts: blockchain.Accounts,
                                        blockchainAssets: blockchain.Assets,
                                        collectionsAnalysis: CollectionsAnalysis,
                                        masterAccounts: master.Accounts,
@@ -104,7 +103,7 @@ class MintAssetTransactions @Inject()(
 
   object Utility {
 
-    def transaction(nftIDs: Seq[String], gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    private def transaction(nftIDs: Seq[String], gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get

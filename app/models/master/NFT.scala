@@ -18,7 +18,7 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getFileName: String = this.id + "." + this.fileExtension
 
-  def getAssetID: AssetID = AssetID(HashID(utilities.Secrets.base64URLDecode(this.assetId.getOrElse(utilities.Secrets.base64URLEncoder("UNKNOWN_ASSET_ID")))))
+  def getAssetID: AssetID = AssetID(HashID(utilities.Secrets.base64URLDecode(this.assetId.getOrElse("UNKNOWN_ASSET_ID"))))
 
   def getAssetID(nftProperties: Seq[NFTProperty], collection: Collection): AssetID = utilities.NFT.getAssetID(collection.getClassificationID, this.getImmutables(nftProperties, collection))
 

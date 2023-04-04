@@ -72,4 +72,9 @@ object Notification {
   val IBC_RECEIVED_TOKEN: Notification = Notification("IBC_RECEIVED_TOKEN", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
   val NFT_MINTING_FEE_TRANSACTION_SUCCESSFUL: Notification = Notification("NFT_MINTING_FEE_TRANSACTION_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
   val NFT_MINTING_FEE_TRANSACTION_FAILED: Notification = Notification("NFT_MINTING_FEE_TRANSACTION_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
+
+  val FROM_OWNER_NFT_TRANSFER_SUCCESSFUL: Notification = Notification("FROM_OWNER_NFT_TRANSFER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
+  val TO_OWNER_NFT_TRANSFER_SUCCESSFUL: Notification = Notification("TO_OWNER_NFT_TRANSFER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
+  val NFT_TRANSFER_FAILED: Notification = Notification("NFT_TRANSFER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
+
 }

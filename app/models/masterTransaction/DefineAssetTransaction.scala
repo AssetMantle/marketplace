@@ -53,7 +53,6 @@ object DefineAssetTransactions {
 @Singleton
 class DefineAssetTransactions @Inject()(
                                          protected val databaseConfigProvider: DatabaseConfigProvider,
-                                         blockchainAccounts: blockchain.Accounts,
                                          blockchainIdentities: blockchain.Identities,
                                          broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                          utilitiesOperations: utilities.Operations,

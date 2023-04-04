@@ -2,9 +2,9 @@ package models.blockchainTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.traits._
 import models.blockchain
 import models.blockchain.Transaction
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -91,6 +91,8 @@ class TakeOrders @Inject()(
     def getAllPendingStatus: Future[Seq[TakeOrder]] = filter(_.status.?.isEmpty)
 
     def checkExists(txHash: String): Future[Boolean] = filterAndExists(_.txHash === txHash)
+
+    def getByHashes(hashes: Seq[String]): Future[Seq[TakeOrder]] = filter(_.txHash.inSet(hashes))
 
   }
 

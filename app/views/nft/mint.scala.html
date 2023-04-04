@@ -3,7 +3,7 @@
 
 @(mintForm: Form[Mint.Data] = Mint.form, nftId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonForm(constants.Form.NFT_BASIC_DETAIL, mintForm) {
+@commonForm(constants.Form.NFT_MINT, mintForm) {
     @commonInputText(mintForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> "readonly")
     @commonInputPassword(mintForm, constants.FormField.PASSWORD)
 }
