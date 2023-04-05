@@ -7,12 +7,12 @@ import com.cosmos.tx.v1beta1._
 import com.google.protobuf.{ByteString, Any => protoBufAny}
 import com.identities.transactions.{issue, provision, unprovision}
 import com.orders.transactions.{cancel => orderCancel, define => ordersDefine, make => ordersMake, take => ordersTake}
-import com.splits.transactions.{unwrap, wrap}
+import com.splits.transactions.{unwrap, wrap, send => splitSend}
 import models.common.Coin
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import schema.id.OwnableID
-import schema.id.base.{ClassificationID, IdentityID, OrderID}
+import schema.id.base.{AssetID, ClassificationID, IdentityID, OrderID}
 import schema.list.PropertyList
 import schema.property.base.{MesaProperty, MetaProperty}
 import schema.types.Height
@@ -221,7 +221,6 @@ object BlockchainTransaction {
       .build().toByteString)
     .build()
 
-
   def getProvisionMsg(fromAddress: String, fromID: IdentityID, toAddress: String): protoBufAny = protoBufAny.newBuilder()
     .setTypeUrl(constants.Blockchain.TransactionMessage.IDENTITY_PROVISION)
     .setValue(provision
@@ -231,7 +230,6 @@ object BlockchainTransaction {
       .setIdentityID(fromID.asProtoIdentityID)
       .build().toByteString)
     .build()
-
 
   def getUnprovisionMsg(fromAddress: String, fromID: IdentityID, toAddress: String): protoBufAny = protoBufAny.newBuilder()
     .setTypeUrl(constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION)
@@ -243,4 +241,15 @@ object BlockchainTransaction {
       .build().toByteString)
     .build()
 
+  def getSplitSendMsg(fromID: IdentityID, fromAddress: String, toID: IdentityID, assetId: AssetID, amount: BigDecimal): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(constants.Blockchain.TransactionMessage.SPLIT_SEND)
+    .setValue(splitSend
+      .Message.newBuilder()
+      .setFrom(fromAddress)
+      .setFromID(fromID.asProtoIdentityID)
+      .setToID(toID.asProtoIdentityID)
+      .setOwnableID(assetId.toAnyOwnableID)
+      .setValue(amount.toString())
+      .build().toByteString)
+    .build()
 }

@@ -18,7 +18,7 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getFileName: String = this.id + "." + this.fileExtension
 
-  def getAssetID: AssetID = AssetID(HashID(utilities.Secrets.base64URLDecode(this.assetId.getOrElse(utilities.Secrets.base64URLEncoder("UNKNOWN_ASSET_ID")))))
+  def getAssetID: AssetID = AssetID(HashID(utilities.Secrets.base64URLDecode(this.assetId.getOrElse("UNKNOWN_ASSET_ID"))))
 
   def getAssetID(nftProperties: Seq[NFTProperty], collection: Collection): AssetID = utilities.NFT.getAssetID(collection.getClassificationID, this.getImmutables(nftProperties, collection))
 
@@ -103,6 +103,8 @@ class NFTs @Inject()(
     def getAllIdsForCollection(collectionId: String): Future[Seq[String]] = filter(_.collectionId === collectionId).map(_.map(_.id))
 
     def getAllIdsForCollections(collectionIds: Seq[String]): Future[Seq[String]] = filter(_.collectionId.inSet(collectionIds)).map(_.map(_.id))
+
+    def getAllINFTsForCollections(collectionIds: Seq[String]): Future[Seq[NFT]] = filter(_.collectionId.inSet(collectionIds))
 
     def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[NFT]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.collectionId === collectionId)(_.createdOnMillisEpoch)
 

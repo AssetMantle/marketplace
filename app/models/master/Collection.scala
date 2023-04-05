@@ -15,7 +15,7 @@ import utilities.MicroNumber
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: Seq[SocialProfile], nsfw: Boolean, properties: Option[Seq[Property]], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, royalty: BigDecimal, ranking: Int = Int.MaxValue, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: Seq[SocialProfile], nsfw: Boolean, properties: Option[Seq[Property]], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, royalty: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def getBondAmount: MicroNumber = MicroNumber(BigInt(utilities.Collection.getTotalBondAmount(this.getImmutables, this.getMutables, constants.Blockchain.BondRate)))
 
@@ -50,7 +50,6 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
     coverFileName = this.coverFileName,
     public = this.public,
     royalty = this.royalty,
-    ranking = this.ranking,
     createdBy = this.createdBy,
     createdOnMillisEpoch = this.createdOnMillisEpoch,
     updatedBy = this.updatedBy,
@@ -76,13 +75,13 @@ object Collections {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class CollectionSerialized(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: String, nsfw: Boolean, properties: Option[String], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, royalty: BigDecimal, ranking: Int, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize: Collection = Collection(id = id, creatorId = creatorId, classificationId = classificationId, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), nsfw = nsfw, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[Property]](_)), profileFileName = profileFileName, coverFileName = coverFileName, public = public, royalty = royalty, ranking = ranking, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class CollectionSerialized(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: String, nsfw: Boolean, properties: Option[String], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, royalty: BigDecimal, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
+    def deserialize: Collection = Collection(id = id, creatorId = creatorId, classificationId = classificationId, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), nsfw = nsfw, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[Property]](_)), profileFileName = profileFileName, coverFileName = coverFileName, public = public, royalty = royalty, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
   class CollectionTable(tag: Tag) extends Table[CollectionSerialized](tag, "Collection") with ModelTable[String] {
 
-    def * = (id, creatorId, classificationId.?, name, description, socialProfiles, nsfw, properties.?, profileFileName.?, coverFileName.?, public, royalty, ranking, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionSerialized.tupled, CollectionSerialized.unapply)
+    def * = (id, creatorId, classificationId.?, name, description, socialProfiles, nsfw, properties.?, profileFileName.?, coverFileName.?, public, royalty, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionSerialized.tupled, CollectionSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -107,8 +106,6 @@ object Collections {
     def public = column[Boolean]("public")
 
     def royalty = column[BigDecimal]("royalty")
-
-    def ranking = column[Int]("ranking")
 
     def createdBy = column[String]("createdBy")
 
@@ -150,9 +147,7 @@ class Collections @Inject()(
 
     def tryGet(id: String): Future[Collection] = tryGetById(id).map(_.deserialize)
 
-    def getPublicByPageNumber(pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.public)(_.ranking).map(_.map(_.deserialize))
-
-    def getByRankingAndPageNumber(pageNumber: Int): Future[Seq[Collection]] = sortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.ranking).map(_.map(_.deserialize))
+    def getPublicByPageNumber(pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.public)(_.createdOnMillisEpoch).map(_.map(_.deserialize))
 
     def getCollectionsByPage(collectionIds: Seq[String], pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.id.inSet(collectionIds))(_.createdOnMillisEpoch).map(_.map(_.deserialize))
 
@@ -191,7 +186,5 @@ class Collections @Inject()(
     def delete(ids: Seq[String]): Future[Int] = filterAndDelete(_.id.inSet(ids))
 
     def getAllPublic: Future[Seq[Collection]] = filter(_.public).map(_.map(_.deserialize))
-
-    def updateRanking(): Future[Int] = customUpdate(Collections.TableQuery.filter(_.public).map(_.ranking).update(1))
   }
 }

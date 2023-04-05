@@ -227,6 +227,24 @@ class NFTOwners @Inject()(
 
     def getByNFTID(nftId: String): Future[NFTOwner] = filterHead(_.nftId === nftId)
 
+    def onSuccessfulNFTTransfer(nftId: String, fromOwnerID: String, quantity: Int, toOwnerID: String): Future[Unit] = {
+      val fromNFTOwner = tryGet(nftId = nftId, ownerId = fromOwnerID)
+      val toNFTOwner = get(nftId = nftId, ownerId = toOwnerID)
+
+      def fromUpdate(fromOwner: NFTOwner) = if (fromOwner.quantity - quantity >= 0) {
+        if (fromOwner.quantity - quantity == 0) delete(nftId = nftId, ownerId = fromOwnerID) else update(fromOwner.copy(quantity = fromOwner.quantity - quantity))
+      } else constants.Response.INSUFFICIENT_NFT_BALANCE.throwBaseException()
+
+      def toUpdate(fromOwner: NFTOwner, toOwner: Option[NFTOwner]) = if (toOwner.isDefined) update(toOwner.get.copy(quantity = toOwner.get.quantity + quantity)) else add(fromOwner.copy(ownerId = toOwnerID, quantity = quantity))
+
+      for {
+        fromNFTOwner <- fromNFTOwner
+        toNFTOwner <- toNFTOwner
+        _ <- fromUpdate(fromNFTOwner)
+        _ <- toUpdate(fromNFTOwner, toNFTOwner)
+      } yield ()
+    }
+
     def tryGetByNFTAndSaleId(nftId: String, saleId: String): Future[NFTOwner] = filterHead(x => x.saleId === saleId && x.nftId === nftId)
     //    https://scala-slick.org/doc/3.1.1/sql-to-slick.html#id21
     //    def getQuery = NFTOwners.TableQuery.filter(x => x.ownerId === "asd" && x.creatorId)

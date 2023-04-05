@@ -151,7 +151,7 @@ class Sales @Inject()(
 
     def getSalesByCollectionId(collectionId: String): Future[Option[Sale]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize).headOption)
 
-    def getByPageNumber(pageNumber: Int): Future[Seq[Sale]] = getAllByPageNumber(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.endTimeEpoch).map(_.map(_.deserialize))
+    def getByPageNumber(pageNumber: Int): Future[Seq[Sale]] = sortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.endTimeEpoch).map(_.map(_.deserialize))
 
     def checkExistsByCollectionId(collectionId: String): Future[Boolean] = filterAndExists(_.collectionId === collectionId)
   }

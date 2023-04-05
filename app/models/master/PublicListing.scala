@@ -129,7 +129,7 @@ class PublicListings @Inject()(
 
     def total: Future[Int] = countTotal()
 
-    def getByPageNumber(pageNumber: Int): Future[Seq[PublicListing]] = getAllByPageNumber(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.endTimeEpoch).map(_.map(_.deserialize))
+    def getByPageNumber(pageNumber: Int): Future[Seq[PublicListing]] = sortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.endTimeEpoch).map(_.map(_.deserialize))
 
     def checkExistsByCollectionId(collectionId: String): Future[Boolean] = filterAndExists(_.collectionId === collectionId)
   }

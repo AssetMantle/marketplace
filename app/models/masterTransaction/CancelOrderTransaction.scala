@@ -58,7 +58,6 @@ object CancelOrderTransactions {
 @Singleton
 class CancelOrderTransactions @Inject()(
                                          protected val databaseConfigProvider: DatabaseConfigProvider,
-                                         blockchainAccounts: blockchain.Accounts,
                                          blockchainIdentities: blockchain.Identities,
                                          broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                          masterSecondaryMarkets: master.SecondaryMarkets,

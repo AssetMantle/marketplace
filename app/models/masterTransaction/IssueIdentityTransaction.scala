@@ -58,7 +58,6 @@ object IssueIdentityTransactions {
 @Singleton
 class IssueIdentityTransactions @Inject()(
                                            protected val databaseConfigProvider: DatabaseConfigProvider,
-                                           blockchainAccounts: blockchain.Accounts,
                                            blockchainIdentities: blockchain.Identities,
                                            masterAccounts: master.Accounts,
                                            masterKeys: master.Keys,

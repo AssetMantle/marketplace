@@ -6,7 +6,7 @@ import models.blockchainTransaction.TakeOrder
 import models.common.Coin
 import models.master.{NFT, NFTOwner, SecondaryMarket}
 import models.traits._
-import models.{analytics, blockchain, blockchainTransaction, master}
+import models.{analytics, blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -73,9 +73,6 @@ object TakeOrderTransactions {
 @Singleton
 class TakeOrderTransactions @Inject()(
                                        protected val databaseConfigProvider: DatabaseConfigProvider,
-                                       blockchainAccounts: blockchain.Accounts,
-                                       blockchainBlocks: blockchain.Blocks,
-                                       blockchainTransactions: blockchain.Transactions,
                                        blockchainTransactionTakeOrders: blockchainTransaction.TakeOrders,
                                        broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                        utilitiesOperations: utilities.Operations,
@@ -198,12 +195,11 @@ class TakeOrderTransactions @Inject()(
 
         val takeOrderTxs = Service.getAllPendingStatus
 
-        def getTxs(hashes: Seq[String]) = blockchainTransactions.Service.getByHashes(hashes)
+        def getTxs(hashes: Seq[String]) = blockchainTransactionTakeOrders.Service.getByHashes(hashes)
 
-        def checkAndUpdate(takeOrderTxs: Seq[TakeOrderTransaction], txs: Seq[blockchain.Transaction]) = utilitiesOperations.traverse(takeOrderTxs) { takeOrderTx =>
-          val transaction = blockchainTransactionTakeOrders.Service.tryGet(takeOrderTx.txHash)
-
-          def onTxComplete(transaction: TakeOrder) = if (transaction.status.isDefined) {
+        def checkAndUpdate(takeOrderTxs: Seq[TakeOrderTransaction], txs: Seq[TakeOrder]) = utilitiesOperations.traverse(takeOrderTxs) { takeOrderTx =>
+          val transaction = txs.find(_.txHash == takeOrderTx.txHash).get
+          val onTxComplete = if (transaction.status.isDefined) {
             if (transaction.status.get) {
               val markSuccess = Service.markSuccess(takeOrderTx.txHash)
               val nft = masterNFTs.Service.tryGet(takeOrderTx.nftId)
@@ -243,8 +239,7 @@ class TakeOrderTransactions @Inject()(
           } else Future()
 
           for {
-            transaction <- transaction
-            _ <- onTxComplete(transaction)
+            _ <- onTxComplete
           } yield ()
 
         }

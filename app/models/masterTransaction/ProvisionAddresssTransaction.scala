@@ -57,7 +57,6 @@ object ProvisionAddressTransactions {
 @Singleton
 class ProvisionAddressTransactions @Inject()(
                                               protected val databaseConfigProvider: DatabaseConfigProvider,
-                                              blockchainAccounts: blockchain.Accounts,
                                               blockchainIdentities: blockchain.Identities,
                                               broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                               utilitiesOperations: utilities.Operations,

@@ -4,7 +4,7 @@ import constants.Scheduler
 import exceptions.BaseException
 import models.blockchainTransaction.UnprovisionAddress
 import models.traits._
-import models.{blockchain, blockchainTransaction, master}
+import models.{blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -58,9 +58,6 @@ object UnprovisionAddressTransactions {
 @Singleton
 class UnprovisionAddressTransactions @Inject()(
                                                 protected val databaseConfigProvider: DatabaseConfigProvider,
-                                                blockchainAccounts: blockchain.Accounts,
-                                                blockchainBlocks: blockchain.Blocks,
-                                                blockchainTransactions: blockchain.Transactions,
                                                 blockchainTransactionUnprovisionAddresses: blockchainTransaction.UnprovisionAddresses,
                                                 broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                                 utilitiesOperations: utilities.Operations,
