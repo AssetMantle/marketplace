@@ -717,3 +717,12 @@ nav .content .links
     justify-self: end;
     margin-left: 8px;
 }
+
+.hiddenMenu .walletPopupContainer{
+    padding: 6px;
+    border-radius: 10px;
+}
+
+.hiddenMenu .walletPopupContainer .addressBook .walletAddressList{
+    height: 267px;
+}
