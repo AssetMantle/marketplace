@@ -66,6 +66,8 @@ object Notification {
 
   val UNWRAPPED_TOKEN_SUCCESSFULLY: Notification = Notification("UNWRAPPED_TOKEN_SUCCESSFULLY", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
   val UNWRAPPED_TOKEN_FAILED: Notification = Notification("UNWRAPPED_TOKEN_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
+  val WRAPPED_TOKEN_SUCCESSFULLY: Notification = Notification("WRAPPED_TOKEN_SUCCESSFULLY", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
+  val WRAPPED_TOKEN_FAILED: Notification = Notification("WRAPPED_TOKEN_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
 
   val SEND_COIN_FROM_ACCOUNT: Notification = Notification("SEND_COIN_FROM_ACCOUNT", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
   val SEND_COIN_TO_ACCOUNT: Notification = Notification("SEND_COIN_TO_ACCOUNT", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)

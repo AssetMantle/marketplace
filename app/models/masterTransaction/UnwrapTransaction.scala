@@ -18,7 +18,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class UnwrapTransaction(txHash: String, accountId: String, ownableId: String, amount: BigDecimal, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
+case class UnwrapTransaction(txHash: String, accountId: String, ownableId: String, isCoin: Boolean, amount: BigDecimal, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
   def id: String = txHash
 
   def getIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.accountId)
@@ -34,13 +34,15 @@ object UnwrapTransactions {
 
   class UnwrapTransactionTable(tag: Tag) extends Table[UnwrapTransaction](tag, "UnwrapTransaction") with ModelTable[String] {
 
-    def * = (txHash, accountId, ownableId, amount, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (UnwrapTransaction.tupled, UnwrapTransaction.unapply)
+    def * = (txHash, accountId, ownableId, isCoin, amount, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (UnwrapTransaction.tupled, UnwrapTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
     def accountId = column[String]("accountId", O.PrimaryKey)
 
     def ownableId = column[String]("ownableId")
+
+    def isCoin = column[Boolean]("isCoin")
 
     def amount = column[BigDecimal]("amount")
 
@@ -84,7 +86,7 @@ class UnwrapTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, ownableID: OwnableID, amount: BigDecimal, accountId: String): Future[String] = create(UnwrapTransaction(txHash = txHash, ownableId = ownableID.asString, amount = amount, accountId = accountId, status = None))
+    def addWithNoneStatus(txHash: String, ownableID: OwnableID, amount: BigDecimal, accountId: String): Future[String] = create(UnwrapTransaction(txHash = txHash, ownableId = ownableID.asString, isCoin = ownableID.isCoinId, amount = amount, accountId = accountId, status = None))
 
     def getByTxHash(txHash: String): Future[Seq[UnwrapTransaction]] = filter(_.txHash === txHash)
 

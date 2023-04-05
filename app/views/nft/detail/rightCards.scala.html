@@ -19,9 +19,17 @@
                 </div>
                 <div class="separator"></div>
                 @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.buyForm('${lowestPriceSecondaryMarket.get.id}'))"), Symbol("class") -> "mt-4")
-                @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId && userNFTOwner.get.creatorId != optionalLoginState.get.username && userNFTOwner.get.creatorId != "Mint.E" && nft.isMinted.getOrElse(false)) {
+                @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId && userNFTOwner.get.creatorId != optionalLoginState.get.username && userNFTOwner.get.creatorId != "Mint.E") {
                     <div class="separator"></div>
-                    @commonPrimaryButton(Messages(constants.View.SELL_NFT), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.createForm('${nft.id}'))"), Symbol("class") -> "mt-4")
+                    @if(nft.isMinted.isDefined) {
+                        @if(nft.isMinted.getOrElse(false)) {
+                            @commonPrimaryButton(Messages(constants.View.SELL_NFT), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.createForm('${nft.id}'))"), Symbol("class") -> "mt-4")
+                            <div class="separator"></div>
+                            @commonSecondaryButton(Messages(constants.View.TRANSFER_NFT), JavaScript(s"getForm(jsRoutes.controllers.NFTController.transferForm('${nft.id}'))"), Symbol("class") -> "mt-4")
+                        } else {
+                            @commonPrimaryButton(Messages(constants.View.MINT_NFT), JavaScript(s"getForm(jsRoutes.controllers.NFTController.mintForm('${nft.id}'))"))
+                        }
+                    }
                 }
             }
             @if(lowestPriceSecondaryMarket.isDefined && userSecondaryMarket.isDefined) {
@@ -64,6 +72,8 @@
                 @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId && userNFTOwner.get.creatorId != optionalLoginState.get.username && userNFTOwner.get.creatorId != "Mint.E") {
                     @if(nft.isMinted.getOrElse(false)) {
                         @commonPrimaryButton(Messages(constants.View.SELL_NFT), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.createForm('${nft.id}'))"))
+                        <div class="separator"></div>
+                        @commonSecondaryButton(Messages(constants.View.TRANSFER_NFT), JavaScript(s"getForm(jsRoutes.controllers.NFTController.transferForm('${nft.id}'))"), Symbol("class") -> "mt-4")
                     } else {
                         @commonPrimaryButton(Messages(constants.View.MINT_NFT), JavaScript(s"getForm(jsRoutes.controllers.NFTController.mintForm('${nft.id}'))"))
                     }
