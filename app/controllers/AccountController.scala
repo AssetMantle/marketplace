@@ -339,18 +339,23 @@ class AccountController @Inject()(
       )
   }
 
+  def changeActiveKeyForm(address: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.setting.changeActiveKey(address = address)))
+  }
+
   def changeActiveKey(): Action[AnyContent] = withLoginActionAsync { oldLoginState =>
     implicit request =>
       ChangeActiveKey.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest)
+          Future(BadRequest(views.html.setting.changeActiveKey(formWithErrors, address = formWithErrors.data.getOrElse(constants.FormField.WALLET_ADDRESS.name, ""))))
         },
         changeKeyData => {
-          val changeActive = masterKeys.Service.changeActive(accountId = oldLoginState.username, oldAddress = oldLoginState.address, newAddress = changeKeyData.address)
+          val changeActive = masterKeys.Service.changeActive(accountId = oldLoginState.username, oldAddress = oldLoginState.address, newAddress = changeKeyData.address, newKeyPassword = changeKeyData.password)
 
           def getResult = {
             implicit val loginState: LoginState = LoginState(username = oldLoginState.username, address = changeKeyData.address, accountType = oldLoginState.accountType)
-            withUsernameToken.Ok(views.html.setting.changeActiveKey())
+            withUsernameToken.Ok()
           }
 
           (for {
@@ -358,7 +363,7 @@ class AccountController @Inject()(
             result <- getResult
           } yield result
             ).recover {
-            case _: BaseException => NoContent
+            case baseException: BaseException => BadRequest(views.html.setting.changeActiveKey(ChangeActiveKey.form.withGlobalError(baseException.failure.message), address = changeKeyData.address))
           }
         }
       )

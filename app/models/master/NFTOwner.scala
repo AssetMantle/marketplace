@@ -184,6 +184,8 @@ class NFTOwners @Inject()(
 
     def getOwners(nftId: String): Future[Seq[NFTOwner]] = filter(_.id1 === nftId)
 
+    def getOwnersByCollectionId(collectionId: String): Future[Seq[String]] = customQuery(NFTOwners.TableQuery.filter(_.collectionId === collectionId).map(_.ownerId).result)
+
     def checkExists(nftId: String, ownerId: String): Future[Boolean] = exists(id1 = nftId, id2 = ownerId)
 
     def markSaleNull(saleId: String): Future[Int] = {

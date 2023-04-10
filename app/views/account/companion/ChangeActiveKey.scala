@@ -8,8 +8,9 @@ object ChangeActiveKey {
   val form: Form[Data] = Form(
     mapping(
       constants.FormField.WALLET_ADDRESS.mapping,
+      constants.FormField.PASSWORD.mapping,
     )(Data.apply)(Data.unapply))
 
-  case class Data(address: String)
+  case class Data(address: String, password: String)
 
 }

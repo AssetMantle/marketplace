@@ -11,7 +11,8 @@ import play.api.mvc._
 import views.profile.whitelist.companion._
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class WhitelistController @Inject()(
@@ -21,6 +22,7 @@ class WhitelistController @Inject()(
                                      withLoginAction: WithLoginAction,
                                      withLoginActionAsync: WithLoginActionAsync,
                                      withoutLoginAction: WithoutLoginAction,
+                                     masterNFTOwners: master.NFTOwners,
                                      masterAccounts: master.Accounts,
                                      masterCollections: master.Collections,
                                      masterWhitelists: master.Whitelists,
@@ -291,6 +293,7 @@ class WhitelistController @Inject()(
         val whitelist = masterWhitelists.Service.tryGet(whitelistId)
         val members = masterWhitelistMembers.Service.getWhitelistsMemberCount(whitelistId)
         val sales = masterSales.Service.getByWhitelistId(whitelistId)
+
         def collectionOnSales(collectionIds: Seq[String]) = masterCollections.Service.getCollectionNames(collectionIds)
 
         (for {
@@ -303,5 +306,63 @@ class WhitelistController @Inject()(
           case baseException: BaseException => BadRequest(baseException.failure.message)
         }
     }
+  }
+
+  def addFromNFTOwnersForm(whitelistId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val collections = masterCollections.Service.getByCreator(loginState.username)
+      (for {
+        collections <- collections
+      } yield Ok(views.html.profile.whitelist.addFromNFTOwners(whitelistId = whitelistId, options = collections.toMap))
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def addFromNFTOwners(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      AddFromNFTOwners.form.bindFromRequest().fold(
+        formWithErrors => {
+          val collections = masterCollections.Service.getByCreator(loginState.username)
+          (for {
+            collections <- collections
+          } yield BadRequest(views.html.profile.whitelist.addFromNFTOwners(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.WHITELIST_ID.name, ""), collections.toMap))
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        },
+        addFromNFTOwnersData => {
+          val allNFTOwners = masterNFTOwners.Service.getOwnersByCollectionId(addFromNFTOwnersData.collectionId)
+          val existingMembers = masterWhitelistMembers.Service.getAllMembers(addFromNFTOwnersData.whitelistId)
+          val whitelist = masterWhitelists.Service.tryGet(addFromNFTOwnersData.whitelistId)
+
+          def addMembers(add: Seq[String], whitelist: Whitelist) = if (whitelist.ownerId == loginState.username) {
+            val index = add.indexWhere(_ == loginState.username)
+            if (index == -1) masterWhitelistMembers.Service.add(whitelistId = addFromNFTOwnersData.whitelistId, accountIds = add)
+            else masterWhitelistMembers.Service.add(whitelistId = addFromNFTOwnersData.whitelistId, accountIds = add.zipWithIndex.filter(_._2 != index).map(_._1))
+          } else constants.Response.NOT_WHITELIST_CREATOR.throwBaseException()
+
+          (for {
+            allNFTOwners <- allNFTOwners
+            existingMembers <- existingMembers
+            whitelist <- whitelist
+            _ <- addMembers(allNFTOwners.diff(existingMembers), whitelist)
+          } yield PartialContent(views.html.profile.whitelist.membersAddedSuccessfully())
+            ).recover {
+            case baseException: BaseException => {
+              Await.result({
+                val collections = masterCollections.Service.getByCreator(loginState.username)
+                (for {
+                  collections <- collections
+                } yield BadRequest(views.html.profile.whitelist.addFromNFTOwners(AddFromNFTOwners.form.withGlobalError(baseException.failure.message), addFromNFTOwnersData.whitelistId, collections.toMap))
+                  ).recover {
+                  case baseException: BaseException => BadRequest(baseException.failure.message)
+                }
+              }, Duration.Inf
+              )
+            }
+          }
+        }
+      )
   }
 }

@@ -311,18 +311,23 @@ class Keys @Inject()(
       } yield ()
     }
 
-    def changeActive(accountId: String, oldAddress: String, newAddress: String): Future[Unit] = {
+    def changeActive(accountId: String, oldAddress: String, newAddress: String, newKeyPassword: String): Future[Unit] = {
       val oldKey = tryGet(accountId = accountId, address = oldAddress)
       val newKey = tryGet(accountId = accountId, address = newAddress)
 
-      def updateKeys(oldKey: Key, newKey: Key) = if (newKey.encryptedPrivateKey.nonEmpty) {
-        if (!newKey.identityIssued.getOrElse(false)) {
+      def updateKeys(oldKey: Key, newKey: Key) = {
+        val errors = Seq(
+          if (!utilities.Secrets.verifyPassword(password = newKeyPassword, passwordHash = newKey.passwordHash, salt = newKey.salt, iterations = newKey.iterations)) Option(constants.Response.INVALID_PASSWORD) else None,
+          if (newKey.encryptedPrivateKey.isEmpty) Option(constants.Response.ACTIVATING_UNMANAGED_KEY) else None,
+          if (!newKey.identityIssued.getOrElse(false)) Option(constants.Response.KEY_NOT_PROVISIONED) else None,
+        ).flatten
+        if (errors.isEmpty) {
           for {
             _ <- updateById1AndId2(oldKey.copy(active = false).serialize())
             _ <- updateById1AndId2(newKey.copy(active = true).serialize())
           } yield ()
-        } else constants.Response.KEY_NOT_PROVISIONED.throwBaseException()
-      } else constants.Response.ACTIVATING_UNMANAGED_KEY.throwBaseException()
+        } else errors.head.throwBaseException()
+      }
 
       for {
         oldKey <- oldKey

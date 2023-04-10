@@ -39,6 +39,7 @@ POST        /changePassword                                    controllers.Accou
 GET         /migrateWalletToKey                                controllers.AccountController.migrateWalletToKeyForm()
 POST        /migrateWalletToKey                                controllers.AccountController.migrateWalletToKey()
 
+GET         /changeActiveKey                                   controllers.AccountController.changeActiveKeyForm(address: String)
 POST        /changeActiveKey                                   controllers.AccountController.changeActiveKey()
 
 GET         /walletPopup                                       controllers.WalletController.walletPopup()
@@ -163,6 +164,9 @@ POST        /createWhitelist                                   controllers.White
 
 GET         /editWhitelist                                     controllers.WhitelistController.editWhitelistForm(whitelistId: String)
 POST        /editWhitelist                                     controllers.WhitelistController.editWhitelist()
+
+GET         /addFromNFTOwners                                  controllers.WhitelistController.addFromNFTOwnersForm(whitelistId: String)
+POST        /addFromNFTOwners                                  controllers.WhitelistController.addFromNFTOwners()
 
 GET         /earlyAccess                                       controllers.PublicListingController.viewCollections()
 GET         /publicListedCollectionsSection                    controllers.PublicListingController.collectionsSection()

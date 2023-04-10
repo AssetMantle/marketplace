@@ -31,27 +31,9 @@ function openCloseWalletScreen(e, elementID) {
 
 function changeActive(setAddress) {
     let oldAddress = $('.activeKey').attr("id");
+    getForm(jsRoutes.controllers.AccountController.changeActiveKeyForm(setAddress));
     if (oldAddress !== setAddress) {
-        let form = $('#changeActiveKeyForm');
-        $('#WALLET_ADDRESS').val(setAddress);
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: form.serialize(),
-            async: true,
-            statusCode: {
-                200: function (data) {
-                    $('#' + oldAddress).removeClass("activeKey");
-                    $('#' + setAddress).addClass("activeKey");
-                    $('#changeActiveKeyForm').html(data);
-                },
-                400: function (data) {
-                },
-                204: function (data) {
-
-                },
-            }
-        });
+        getForm(jsRoutes.controllers.AccountController.changeActiveKeyForm(setAddress));
     } else {
         console.log("setting to same address");
     }

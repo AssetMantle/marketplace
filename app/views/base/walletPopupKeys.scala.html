@@ -1,9 +1,6 @@
 @import controllers.actions.LoginState
 @(keys: Seq[master.Key])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-<div id="changeActiveKeyFormContainer" class="hidden">
-    @views.html.setting.changeActiveKey()
-</div>
 @keys.filter(_.encryptedPrivateKey.nonEmpty).sortBy(_.name).map { key =>
     <div class="d-flex flex-row-reverse justify-content-between walletAddressItem">
         @if(key.active) {
