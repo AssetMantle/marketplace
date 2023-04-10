@@ -22,8 +22,8 @@
                 <i class="bi bi-pencil iconDefault iconMedium icon"></i>
             </div>
         </div>
-        <div class="d-flex flex-row align-items-center flex-wrap walletInfoField">
-            <div class=" pe-2 fieldLabel">@Messages(constants.View.PROFILE_IDENTITY_ADDRESS)</div>
+        <div class="d-flex flex-row align-items-center flex-wrap infoField">
+            <div class="ps-0 ps-xl-4 ms-0 ms-xl-1 pe-2 fieldLabel">@Messages(constants.View.PROFILE_IDENTITY_ADDRESS)</div>
             <div class=" fieldValue username-data" data-value="@loginState.getIdentityId">
                 @loginState.getIdentityId
             </div>
@@ -51,7 +51,7 @@
                 </div>
                 <div class="ms-xl-auto ms-lg-3 ms-0 ms-sm-3 mt-2 mt-xl-0 mt-lg-2">
                     <div class="d-flex flex-row justify-content-between align-items-center walletAddressItem">
-                        <div class="me-3 align-self-start fieldValue walletBalance">
+                        <div class="me-3 align-self-start fieldValue walletBalance text-nowrap">
                             <span class="walletBalance_@key.address"></span>
                         </div>
                         @if(key.encryptedPrivateKey.nonEmpty) {
@@ -61,7 +61,7 @@
                                 @if(key.identityIssued.getOrElse(false)) {
                                     <input type="radio" name="walletAddress" id="@key.address" onclick="changeActive('@key.address')"/>
                                 } else {
-                                    @commonFormButton(constants.Form.PROVISION_ADDRESS, Symbol("class") -> "primaryButton", Symbol("parameters") -> s"'${key.address}'")
+                                    @commonFormButton(constants.Form.PROVISION_ADDRESS, Symbol("class") -> "primaryButton mw-100 p-2", Symbol("parameters") -> s"'${key.address}'")
                                 }
                             }
                         } else {
