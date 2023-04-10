@@ -1,6 +1,5 @@
 @import controllers.actions.LoginState
-@import views.html.base.commonAddressValue
-@import views.html.base.commonStringValue
+@import views.html.base.{commonAddressValue, commonStringValue}
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 <div class="walletPopupContainer">
@@ -12,7 +11,7 @@
                 <div class="ms-2 d-flex flex-column justify-content-between">
                     <a href="@routes.ProfileController.viewProfile(loginState.username, constants.View.COLLECTED)" class="p-0 profileItemLink">
                         <div class="userName">
-                            @commonStringValue(message = loginState.username, id = utilities.IdGenerator.getRandomHexadecimal, length = 15, showToolTip = false)
+                        @commonStringValue(message = loginState.username, id = utilities.IdGenerator.getRandomHexadecimal, length = 15, showToolTip = false)
                         </div>
                     </a>
                 </div>
@@ -27,12 +26,12 @@
             <div class="userBalance walletBalance_@loginState.address"></div>
             <div class="d-flex gap-2">
                 <div class="primaryIconButton">
-                    <a href="https://wallet.assetmantle.one/?toAddress=@loginState.address" target="_blank" class="p-0">
+                    <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.WRAP_COIN.get, ""))" class="p-0">
                         <i class="bi bi-arrow-down-left"></i>
                     </a>
                 </div>
                 <div class="secondaryIconButton">
-                    <a class="p-0" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SEND_COIN.get, s"'${loginState.address}'"))">
+                    <a class="p-0" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.UNWRAP_TOKEN.get, s"'${loginState.address}'"))">
                         <i class="bi bi-arrow-up-right"></i>
                     </a>
                 </div>
@@ -55,14 +54,15 @@
                 </div>
             </div>
             <div class="align-self-center lh-1">
-                <i class="bi bi-three-dots-vertical iconDefault" id="openWalletMenu" onclick="fetchKeys(); openCloseWalletScreen(this, 'addressBook');"></i>
+                <i class="bi bi-three-dots-vertical iconDefault" id="openWalletMenu" onclick="fetchKeys();
+                openCloseWalletScreen(this, 'addressBook');"></i>
             </div>
         </div>
         <div class="d-flex justify-content-between align-items-center mt-3">
             <div class="userBalance" id="walletTradeBalance">0 $MNTL</div>
             <div class="d-flex gap-2">
                 <div class="primaryIconButton">
-                    <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.UNWRAP_TOKEN.get, ""))" class="p-0">
+                    <a href="https://wallet.assetmantle.one/?toAddress=@loginState.address" target="_blank" class="p-0">
                         <i class="bi bi-arrow-down-left"></i>
                     </a>
                 </div>
@@ -98,7 +98,7 @@
     </div>
 
 
-    <!-- Address Book -->
+        <!-- Address Book -->
     <div id="addressBook" class="addressBook">
         <div class="d-flex flex-row gap-2 align-items-center mb-3 headerWithBackButton">
             <i id="addressBookCloseBtn" class="bi bi-chevron-left iconDefault mt-1" style="cursor: pointer;" onclick="openCloseWalletScreen(this, 'addressBook')"></i>

@@ -2,13 +2,13 @@ package constants
 
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import views.account.companion._
-import views.blockchainTransaction.companion._
 import views.collection.{companion => collection}
 import views.nft.companion._
 import views.profile.whitelist.{companion => whitelist}
 import views.publicListing.{companion => publicListing}
 import views.sale.{companion => sale}
 import views.setting.companion._
+import views.wallet.companion.SendCoin
 
 object FormConstraint {
   val passwordSymbols = "!@#$%^&*._-"

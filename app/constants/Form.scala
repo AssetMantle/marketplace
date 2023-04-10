@@ -23,10 +23,6 @@ object Form {
   val MIGRATE_WALLET_TO_KEY: Form = Form("MIGRATE_WALLET_TO_KEY", routes.javascript.AccountController.migrateWalletToKeyForm, routes.AccountController.migrateWalletToKey())
   val CHANGE_ACTIVE_KEY: Form = Form("CHANGE_ACTIVE_KEY", routes.javascript.AccountController.changeActiveKeyForm, routes.AccountController.changeActiveKey())
 
-  val SEND_COIN: Form = Form("SEND_COIN", routes.javascript.BlockchainTransactionController.sendCoinForm, routes.BlockchainTransactionController.sendCoin())
-  val MINT: Form = Form("MINT", routes.javascript.BlockchainTransactionController.sendCoinForm, routes.BlockchainTransactionController.sendCoin())
-  val NUB: Form = Form("NUB", routes.javascript.BlockchainTransactionController.sendCoinForm, routes.BlockchainTransactionController.sendCoin())
-
   val CREATE_COLLECTION: Form = Form("CREATE_COLLECTION", routes.javascript.CollectionController.createForm, routes.CollectionController.create())
   val EDIT_COLLECTION: Form = Form("EDIT_COLLECTION", routes.javascript.CollectionController.editForm, routes.CollectionController.edit())
   val DEFINE_COLLECTION_PROPERTIES: Form = Form("DEFINE_COLLECTION_PROPERTIES", routes.javascript.CollectionController.definePropertiesForm, routes.CollectionController.defineProperties())
@@ -62,6 +58,8 @@ object Form {
   val CANCEL_SECONDARY_MARKET: Form = Form("CANCEL_SECONDARY_MARKET", routes.javascript.SecondaryMarketController.cancelForm, routes.SecondaryMarketController.cancel())
   val BUY_FROM_SECONDARY_MARKET: Form = Form("BUY_FROM_SECONDARY_MARKET", routes.javascript.SecondaryMarketController.buyForm, routes.SecondaryMarketController.buy())
 
+  val SEND_COIN: Form = Form("SEND_COIN", routes.javascript.WalletController.sendCoinForm, routes.WalletController.sendCoin())
+  val WRAP_COIN: Form = Form("WRAP_COIN", routes.javascript.WalletController.wrapCoinForm, routes.WalletController.wrapCoin())
   val UNWRAP_TOKEN: Form = Form("UNWRAP_TOKEN", routes.javascript.WalletController.unwrapTokenForm, routes.WalletController.unwrapToken())
 
 }

@@ -104,7 +104,7 @@ class WrapTransactions @Inject()(
 
   object Utility {
 
-    def transaction(fromAddress: String, accountId: String, amount: BigDecimal, coin: Coin, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(fromAddress: String, accountId: String, coin: Coin, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get

@@ -150,7 +150,7 @@ function truncate(message, fieldId, length) {
 }
 
 function getDollarPrice(mntlPrice, nftId) {
-    route = jsRoutes.controllers.BlockchainTransactionController.gasTokenPrice();
+    route = jsRoutes.controllers.WalletController.gasTokenPrice();
     $.ajax({
         url: route.url,
         type: route.type,

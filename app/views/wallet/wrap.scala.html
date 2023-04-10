@@ -1,0 +1,13 @@
+@import utilities.MicroNumber
+@import views.wallet.companion.Wrap
+@import views.html.base.form._
+
+@(wrapForm: Form[Wrap.Data] = Wrap.form, balance: MicroNumber)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.WRAP_COIN, wrapForm) {
+    <div class="sendCoinAmountField">
+        <div id="availableBalance" class="availableBalance" onclick="setAvailableBalance('@constants.FormField.WRAP_COIN_AMOUNT.name', @balance)">@Messages(constants.View.SEND_COIN_AVAILABLE_BALANCE, balance)</div>
+        @commonInputMicroNumber(wrapForm, constants.FormField.WRAP_COIN_AMOUNT)
+    </div>
+    @commonInputPassword(wrapForm, constants.FormField.PASSWORD)
+}

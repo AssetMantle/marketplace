@@ -266,7 +266,7 @@ class SettingController @Inject()(
                 )
                 for {
                   blockchainTransaction <- blockchainTransaction
-                } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+                } yield PartialContent(views.html.transactionSuccessful(blockchainTransaction))
               } else {
                 val deleteKey = masterKeys.Service.delete(accountId = loginState.username, address = deleteKeyData.address)
                 for {
@@ -361,7 +361,7 @@ class SettingController @Inject()(
             (validated, key) <- validateAndGetKey
             balance <- balance
             blockchainTransaction <- provision(validated, key, balance)
-          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+          } yield PartialContent(views.html.transactionSuccessful(blockchainTransaction))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.setting.provisionAddress(ProvisionAddress.form.withGlobalError(baseException.failure.message), provisionAddressData.address))
           }

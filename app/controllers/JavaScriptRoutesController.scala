@@ -106,10 +106,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         //        routes.javascript.ProfileController.viewOffers,
         //        routes.javascript.ProfileController.offers,
 
-        routes.javascript.BlockchainTransactionController.gasTokenPrice,
-        routes.javascript.BlockchainTransactionController.balance,
-        routes.javascript.BlockchainTransactionController.sendCoinForm,
-
         routes.javascript.ProfileController.viewProfile,
         routes.javascript.ProfileController.profile,
         routes.javascript.ProfileController.notificationPopup,
@@ -171,6 +167,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WalletController.wrappedTokenBalance,
         routes.javascript.WalletController.walletPopupKeys,
         routes.javascript.WalletController.unwrapTokenForm,
+        routes.javascript.WalletController.sendCoinForm,
+        routes.javascript.WalletController.gasTokenPrice,
+        routes.javascript.WalletController.balance,
+        routes.javascript.WalletController.wrapCoinForm,
 
       )
     ).as("text/javascript")

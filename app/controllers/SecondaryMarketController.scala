@@ -195,7 +195,7 @@ class SecondaryMarketController @Inject()(
             activeKey <- activeKey
             collection <- collection(nftOwner.collectionId)
             tx <- addToSecondaryMarket(nft = nft, nftOwner = nftOwner, collection = collection, activeKey = activeKey)
-          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(tx))
+          } yield PartialContent(views.html.transactionSuccessful(tx))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.secondaryMarket.createSecondaryMarket(CreateSecondaryMarket.form.withGlobalError(baseException.failure.message), createData.nftId))
           }
@@ -248,7 +248,7 @@ class SecondaryMarketController @Inject()(
             (verifyPassword, buyerKey) <- verifyPassword
             checkAlreadySold <- checkAlreadySold
             blockchainTransaction <- validateAndTransfer(nftOwner = nftOwner, makeOrderTx = makeOrderTx, verifyPassword = verifyPassword, secondaryMarket = secondaryMarket, buyerKey = buyerKey, checkAlreadySold = checkAlreadySold)
-          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+          } yield PartialContent(views.html.transactionSuccessful(blockchainTransaction))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.secondaryMarket.cancel(Cancel.form.withGlobalError(baseException.failure.message), nftId = cancelData.nftId, secondaryMarketId = cancelData.secondaryMarketId))
           }
@@ -328,7 +328,7 @@ class SecondaryMarketController @Inject()(
             balance <- balance
             checkAlreadySold <- checkAlreadySold
             blockchainTransaction <- validateAndTransfer(nftOwner = nftOwner, makeOrderTx = makeOrderTx, verifyPassword = verifyPassword, secondaryMarket = secondaryMarket, buyerKey = buyerKey, balance = balance, checkAlreadySold = checkAlreadySold)
-          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+          } yield PartialContent(views.html.transactionSuccessful(blockchainTransaction))
             ).recover {
             case baseException: BaseException => {
               val badResult = {

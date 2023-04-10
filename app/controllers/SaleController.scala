@@ -332,7 +332,7 @@ class SaleController @Inject()(
             blockchainTransaction <- validateAndTransfer(nftOwners = nftOwners, verifyPassword = verifyPassword, sale = sale, isWhitelistMember = isWhitelistMember, buyerKey = buyerKey, collection = collection, sellerKey = sellerKey, balance = balance, nfts = nfts, countBuyerNFTsFromSale = countBuyerNFTsFromSale, checkAlreadySold = checkAlreadySold)
           } yield {
             val tweetURI = if (collection.getTwitterUsername.isDefined) Option(s"https://twitter.com/intent/tweet?text=Just bought ${collection.name} NFTs via Launchpad Sale on MantlePlace. @${collection.getTwitterUsername.get} @AssetMantle Check here &url=https://marketplace.assetmantle.one/collection/${collection.id}&hashtags=NFT") else None
-            PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction, tweetURI))
+            PartialContent(views.html.transactionSuccessful(blockchainTransaction, tweetURI))
           }
             ).recover {
             case baseException: BaseException => {

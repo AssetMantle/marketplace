@@ -223,7 +223,9 @@ GET         /whitelistDetail                                   controllers.White
 #GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()
 
-GET         /gasTokenPrice                                     controllers.BlockchainTransactionController.gasTokenPrice()
-GET         /addressBalance                                    controllers.BlockchainTransactionController.balance(address: String)
-GET         /sendCoin                                          controllers.BlockchainTransactionController.sendCoinForm(fromAddress: String)
-POST        /sendCoin                                          controllers.BlockchainTransactionController.sendCoin()
+GET         /gasTokenPrice                                     controllers.WalletController.gasTokenPrice()
+GET         /addressBalance                                    controllers.WalletController.balance(address: String)
+GET         /sendCoin                                          controllers.WalletController.sendCoinForm(fromAddress: String)
+POST        /sendCoin                                          controllers.WalletController.sendCoin()
+GET         /wrapCoin                                          controllers.WalletController.wrapCoinForm()
+POST        /wrapCoin                                          controllers.WalletController.wrapCoin()

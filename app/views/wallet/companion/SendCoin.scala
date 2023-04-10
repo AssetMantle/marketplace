@@ -1,4 +1,4 @@
-package views.blockchainTransaction.companion
+package views.wallet.companion
 
 import play.api.data.Form
 import play.api.data.Forms.mapping

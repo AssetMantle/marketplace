@@ -523,13 +523,15 @@ class NFTController @Inject()(
           val nftOwner = masterNFTOwners.Service.tryGet(nftId = transferData.nftId, ownerId = loginState.username)
           val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = transferData.password)
           val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
+          val toAccountExists = masterKeys.Service.checkVerifiedKeyExists(transferData.toAccountId)
 
-          def verifyAndTx(verifyPassword: Boolean, balance: MicroNumber, key: Key, nft: NFT, nftOwner: NFTOwner) = {
+          def verifyAndTx(verifyPassword: Boolean, balance: MicroNumber, key: Key, nft: NFT, nftOwner: NFTOwner, toAccountExists: Boolean) = {
             val errors = Seq(
               if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (!nft.isMinted.getOrElse(false)) Option(constants.Response.NFT_NOT_MINTED) else None,
               if (quantity > nftOwner.quantity) Option(constants.Response.INSUFFICIENT_NFT_BALANCE) else None,
+              if (!toAccountExists) Option(constants.Response.TO_ACCOUNT_ID_DOES_NOT_EXISTS) else None,
             ).flatten
 
             if (errors.isEmpty) {
@@ -550,8 +552,9 @@ class NFTController @Inject()(
             (verified, key) <- verifyPassword
             balance <- balance
             nftOwner <- nftOwner
-            blockchainTransaction <- verifyAndTx(verifyPassword = verified, balance = balance, key = key, nft = nft, nftOwner = nftOwner)
-          } yield PartialContent(views.html.blockchainTransaction.transactionSuccessful(blockchainTransaction))
+            toAccountExists <- toAccountExists
+            blockchainTransaction <- verifyAndTx(verifyPassword = verified, balance = balance, key = key, nft = nft, nftOwner = nftOwner, toAccountExists = toAccountExists)
+          } yield PartialContent(views.html.transactionSuccessful(blockchainTransaction))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.nft.transfer(Transfer.form.withGlobalError(baseException.failure.message), transferData.nftId))
           }
