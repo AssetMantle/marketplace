@@ -1,0 +1,9 @@
+@import views.profile.whitelist.companion.AddFromNFTOwners
+@import views.html.base.form._
+
+@(addFromNFTOwnersForm: Form[AddFromNFTOwners.Data] = AddFromNFTOwners.form, whitelistId: String, options: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.ADD_FROM_NFT_OWNERS, addFromNFTOwnersForm) {
+    @commonInputText(addFromNFTOwnersForm, constants.FormField.WHITELIST_ID, Symbol("value") -> whitelistId, Symbol("readonly") -> true, Symbol("class") -> "hidden")
+    @commonCustomSelect(addFromNFTOwnersForm, constants.FormField.SELECT_COLLECTION_ID, options)
+}

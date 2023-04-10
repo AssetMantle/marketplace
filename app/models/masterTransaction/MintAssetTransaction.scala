@@ -4,9 +4,9 @@ import constants.Scheduler
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
 import models.blockchainTransaction.MintAsset
-import models.master.{Collection, NFT, NFTOwner, NFTProperty}
+import models.master._
 import models.traits._
-import models.{blockchain, blockchainTransaction, master}
+import models.{blockchain, blockchainTransaction, campaign, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -62,8 +62,9 @@ object MintAssetTransactions {
 class MintAssetTransactions @Inject()(
                                        protected val databaseConfigProvider: DatabaseConfigProvider,
                                        blockchainAssets: blockchain.Assets,
+                                       campaignMintNFTAirDrops: campaign.MintNFTAirDrops,
                                        collectionsAnalysis: CollectionsAnalysis,
-                                       masterAccounts: master.Accounts,
+                                       masterKeys: master.Keys,
                                        masterNFTs: master.NFTs,
                                        masterNFTOwners: master.NFTOwners,
                                        masterNFTProperties: master.NFTProperties,
@@ -237,6 +238,20 @@ class MintAssetTransactions @Inject()(
                 } yield ()
               }
             } else Future(Seq())
+
+            def checkAndForAirDrop = {
+              val toBeDropped = campaignMintNFTAirDrops.Service.filterExisting(mintAssetTxs.filter(_.txHash == txHash).map(_.minterAccountID))
+
+              def keys(toBeDropped: Seq[String]) = if (toBeDropped.nonEmpty) masterKeys.Service.getAllActiveKeys(toBeDropped) else Future(Seq())
+
+              def add(keys: Seq[Key]) = if (keys.nonEmpty) campaignMintNFTAirDrops.Service.addForDropping(accountIdsAddressMap = keys.map(x => x.accountId -> x.address).toMap, amount = constants.Campaign.MintNFTAirDropAmount, eligibilityTxHash = txHash) else Future()
+
+              for {
+                toBeDropped <- toBeDropped
+                keys <- keys(toBeDropped)
+                _ <- add(keys)
+              } yield ()
+            }
 
             (for {
               _ <- markSuccess

@@ -36,9 +36,6 @@
         <div class="containerTitle">@Messages(constants.View.PROFILE_WALLET_DETAIL_TITLE)</div>
             <!-- Single Address Start -->
 
-        <div id="changeActiveKeyFormContainer" class="hidden">
-        @views.html.setting.changeActiveKey()
-        </div>
         @keys.zipWithIndex.map { case (key, index) =>
         <div class="walletInfoField active">
             <div class="pe-2 mb-2 fieldLabel"><label for="walletAddress1">@key.name.getOrElse("")</label></div>
@@ -56,7 +53,7 @@
                         </div>
                         @if(key.encryptedPrivateKey.nonEmpty) {
                             @if(key.active) {
-                                <input type="radio" name="walletAddress" class='activeKey' id="@key.address" checked/>
+                                <input type="radio" name="walletAddress" class='activeKey' id="@key.address" onclick="changeActive('@key.address')"/>
                             } else {
                                 @if(key.identityIssued.getOrElse(false)) {
                                     <input type="radio" name="walletAddress" id="@key.address" onclick="changeActive('@key.address')"/>

@@ -79,4 +79,6 @@ object Notification {
   val TO_OWNER_NFT_TRANSFER_SUCCESSFUL: Notification = Notification("TO_OWNER_NFT_TRANSFER_SUCCESSFUL", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.NFTController.viewNFT))
   val NFT_TRANSFER_FAILED: Notification = Notification("NFT_TRANSFER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
 
+  val MINT_NFT_AIR_DROP_SUCCESSFUL: Notification = Notification("MINT_NFT_AIR_DROP_SUCCESSFUL", sendEmail = false, sendPushNotification = false, sendSMS = false, route = None)
+
 }

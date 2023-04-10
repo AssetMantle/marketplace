@@ -336,8 +336,8 @@ VIEW_MNEMONICS_SEED_PHRASE_SUBTITLE=Click to show or hide seed phrase
 
 #//Delete Account
 FORM.DELETE_KEY.TITLE=Delete Key
-FORM.DELETE_KEY.SUBTITLE=Enter your password to confirm action
-FORM.DELETE_KEY.SUBMIT=Confirm
+FORM.DELETE_KEY.SUBTITLE=Enter your password of the address to do the transaction
+FORM.DELETE_KEY.SUBMIT=Submit
 
 #//Change Password
 FORM.CHANGE_PASSWORD.TITLE=Change Password
@@ -1021,3 +1021,15 @@ MANTLEPLACE_IDENTITY=MantlePlace Identity
 ACTIVE_ADDRESS=Active Address
 MY_ASSETS=My Assets
 LOGOUT=Logout
+MINT_NFT_AIR_DROP_SUCCESSFUL=MantleDrop Mission #5
+NOTIFICATION.MINT_NFT_AIR_DROP_SUCCESSFUL=Airdrop for minting NFT received!
+WHITELIST_ADD_FROM_NFT_OWNERS=Add From Collection
+FORM.ADD_FROM_NFT_OWNERS.TITLE=Add From Collection
+FORM.ADD_FROM_NFT_OWNERS.SUBTITLE=Add members who are owners of NFT in your collection
+FORM.CHANGE_ACTIVE_KEY.TITLE=Change Active Key
+FORM.CHANGE_ACTIVE_KEY.SUBTITLE=Please enter password of the address
+FORM.CHANGE_ACTIVE_KEY.SUBMIT=Submit
+FORM.PROVISION_ADDRESS.TITLE=Provision Address
+FORM.PROVISION_ADDRESS.SUBTITLE=Please enter password to do the transaction
+FORM.PROVISION_ADDRESS.SUBMIT=Submit
+FORM.PROVISION_ADDRESS.BUTTON=Provision

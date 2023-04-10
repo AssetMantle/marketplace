@@ -25,7 +25,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.signOutForm,
         routes.javascript.AccountController.forgetPasswordForm,
         routes.javascript.AccountController.changePasswordForm,
-        routes.javascript.AccountController.changeActiveKey,
+        routes.javascript.AccountController.changeActiveKeyForm,
 
         routes.javascript.CollectionController.viewCollections,
         routes.javascript.CollectionController.viewCollection,
@@ -165,6 +165,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WhitelistController.listMembers,
         routes.javascript.WhitelistController.deleteMember,
         routes.javascript.WhitelistController.detail,
+        routes.javascript.WhitelistController.addFromNFTOwnersForm,
 
         routes.javascript.WalletController.walletPopup,
         routes.javascript.WalletController.wrappedTokenBalance,

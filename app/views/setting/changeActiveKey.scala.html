@@ -1,11 +1,12 @@
 @import helper._
 @import views.account.companion.ChangeActiveKey
 @import views.html.base.form._
-@import controllers.actions.LoginState
 
-@(changeActiveKeyForm: Form[ChangeActiveKey.Data] = ChangeActiveKey.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(changeActiveKeyForm: Form[ChangeActiveKey.Data] = ChangeActiveKey.form, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<form id="changeActiveKeyForm" action="@routes.AccountController.changeActiveKey()">
-    @CSRF.formField
-    @commonInputText(changeActiveKeyForm, constants.FormField.WALLET_ADDRESS)
-</form>
+    @commonForm(constants.Form.CHANGE_ACTIVE_KEY, changeActiveKeyForm) {
+        @CSRF.formField
+        @commonInputText(changeActiveKeyForm, constants.FormField.WALLET_ADDRESS, Symbol("value") -> address, Symbol("readonly") -> true)
+        @commonInputPassword(changeActiveKeyForm, constants.FormField.PASSWORD)
+
+    }

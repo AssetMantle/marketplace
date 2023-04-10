@@ -59,6 +59,10 @@ object Blockchain {
   val MaxOrderExpiry: Int = (43210 * 6) / 6
   val MaxOrderHours = 72
 
+  object Campaign {
+    val AirDropWallet: Wallet = utilities.Wallet.getWallet("comfort broccoli urban cheap noise income ensure wheat maze cement panel clinic opinion acoustic select sentence code purchase casual dose brown fish salt coral".split(" "))
+  }
+
   val EmptyIdentityID: IdentityID = IdentityID(Array[Byte]())
 
   val Mint: StringID = StringID("mint")
