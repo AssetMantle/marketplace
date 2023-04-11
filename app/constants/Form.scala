@@ -37,6 +37,7 @@ object Form {
 
   val CREATE_WHITELIST: Form = Form("CREATE_WHITELIST", routes.javascript.WhitelistController.createWhitelistForm, routes.WhitelistController.createWhitelist())
   val EDIT_WHITELIST: Form = Form("EDIT_WHITELIST", routes.javascript.WhitelistController.editWhitelistForm, routes.WhitelistController.editWhitelist())
+  val DELETE_WHITELIST: Form = Form("DELETE_WHITELIST", routes.javascript.WhitelistController.deleteForm, routes.WhitelistController.delete())
   val ACCEPT_WHITELIST_INVITE: Form = Form("ACCEPT_WHITELIST_INVITE", JavaScriptReverseRoute("", ""), routes.WhitelistController.acceptInvite())
   val LEAVE_WHITELIST: Form = Form("LEAVE_WHITELIST", JavaScriptReverseRoute("", ""), routes.WhitelistController.leaveWhitelist())
   val ADD_FROM_NFT_OWNERS: Form = Form("ADD_FROM_NFT_OWNERS", routes.javascript.WhitelistController.addFromNFTOwnersForm, routes.WhitelistController.addFromNFTOwners())

@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 case class NFTDraft(id: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[Seq[BaseNFTProperty]], tagNames: Option[Seq[String]], fileExtension: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def toNFT(totalSupply: Int = 1, collection: Collection): NFT = {
-    val nft = NFT(id = id, assetId = None, fileExtension = fileExtension, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), totalSupply = totalSupply, ipfsLink = "", edition = None, isMinted = Option(false), mintReady = false)
+    val nft = NFT(id = id, assetId = None, fileExtension = fileExtension, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), totalSupply = totalSupply, ipfsLink = "", isMinted = Option(false), mintReady = false)
     nft.copy(assetId = Option(nft.getAssetID(this.getNFTProperties, collection).asString))
   }
 

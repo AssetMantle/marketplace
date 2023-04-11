@@ -162,6 +162,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WhitelistController.deleteMember,
         routes.javascript.WhitelistController.detail,
         routes.javascript.WhitelistController.addFromNFTOwnersForm,
+        routes.javascript.WhitelistController.deleteForm,
 
         routes.javascript.WalletController.walletPopup,
         routes.javascript.WalletController.wrappedTokenBalance,

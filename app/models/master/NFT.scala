@@ -12,7 +12,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class NFT(id: String, assetId: Option[String], collectionId: String, name: String, description: String, totalSupply: Long, isMinted: Option[Boolean], mintReady: Boolean, fileExtension: String, ipfsLink: String, edition: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
+case class NFT(id: String, assetId: Option[String], collectionId: String, name: String, description: String, totalSupply: Long, isMinted: Option[Boolean], mintReady: Boolean, fileExtension: String, ipfsLink: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
   def getFileHash: String = id
 
@@ -46,7 +46,7 @@ object NFTs {
 
   class NFTTable(tag: Tag) extends Table[NFT](tag, "NFT") with ModelTable[String] {
 
-    def * = (id, assetId.?, collectionId, name, description, totalSupply, isMinted.?, mintReady, fileExtension, ipfsLink, edition.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFT.tupled, NFT.unapply)
+    def * = (id, assetId.?, collectionId, name, description, totalSupply, isMinted.?, mintReady, fileExtension, ipfsLink, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFT.tupled, NFT.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -67,8 +67,6 @@ object NFTs {
     def fileExtension = column[String]("fileExtension")
 
     def ipfsLink = column[String]("ipfsLink")
-
-    def edition = column[Int]("edition")
 
     def createdBy = column[String]("createdBy")
 

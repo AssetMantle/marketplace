@@ -10,6 +10,7 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import play.twirl.api.Html
 import utilities.MicroNumber
 import views.publicListing.companion._
 
@@ -368,7 +369,7 @@ class PublicListingController @Inject()(
             blockchainTransaction <- validateAndTransfer(nftOwners = nftOwners, verifyPassword = verifyPassword, publicListing = publicListing, buyerKey = buyerKey, collection = collection, sellerKey = sellerKey, balance = balance, nfts = nfts, countBuyerNFTsFromPublicListing = countBuyerNFTsFromPublicListing, checkAlreadySold = checkAlreadySold)
           } yield {
             val tweetURI = if (collection.getTwitterUsername.isDefined) Option(s"https://twitter.com/intent/tweet?text=Just bought ${collection.name} NFTs via Early Access Sale on MantlePlace. @${collection.getTwitterUsername.get} @AssetMantle Check here &url=https://marketplace.assetmantle.one/collection/${collection.id}&hashtags=NFT") else None
-            PartialContent(views.html.transactionSuccessful(blockchainTransaction, tweetURI))
+            PartialContent(views.html.transactionSuccessful(blockchainTransaction, tweetURI, nfts))
           }
             ).recover {
             case baseException: BaseException => {

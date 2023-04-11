@@ -219,6 +219,8 @@ POST        /leaveWhitelist                                    controllers.White
 POST        /deleteMember                                      controllers.WhitelistController.deleteMember()
 GET         /listMembers                                       controllers.WhitelistController.listMembers(whitelistId: String)
 GET         /whitelistDetail                                   controllers.WhitelistController.detail(whitelistId: String)
+GET         /deleteWhitelist                                   controllers.WhitelistController.deleteForm(id: String)
+POST        /deleteWhitelist                                   controllers.WhitelistController.delete()
 
 #GET         /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanagedForm(address: String)
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()

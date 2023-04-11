@@ -1,0 +1,29 @@
+@import views.profile.whitelist.companion.Delete
+@import views.html.base.form._
+@import models.master.Whitelist
+
+@(deleteForm: Form[Delete.Data] = Delete.form, whitelist: Whitelist, totalMembers: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.DELETE_WHITELIST, deleteForm, submitDisable = false) {
+    <div class="whitelistInfo form-address-box">
+        <div class="form-address-box-item">
+            <span class="address-box-label">@Messages(constants.View.WHITELIST_NAME)</span>
+            <span class="address-box-text">
+                <span class="username-data">@whitelist.name</span>
+            </span>
+        </div>
+        <div class="form-address-box-item">
+            <span class="address-box-label">@Messages(constants.View.WHITELIST_DESCRIPTION)</span>
+            <span class="address-box-text">
+                <span class="username-data">@whitelist.description</span>
+            </span>
+        </div>
+        <div class="form-address-box-item">
+            <span class="address-box-label">@Messages(constants.View.WHITELIST_TABLE_TITLE_TOTAL_MEMBERS)</span>
+            <span class="address-box-text">
+                <span class="username-data">@totalMembers</span>
+            </span>
+        </div>
+    </div>
+    @commonInputText(deleteForm, constants.FormField.WHITELIST_ID, Symbol("class") -> "hidden", Symbol("value") -> whitelist.id, Symbol("readonly") -> true)
+}

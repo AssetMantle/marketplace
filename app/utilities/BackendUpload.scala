@@ -128,7 +128,7 @@ class BackendUpload @Inject()(
         try {
           val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = uploadCollection.id, fileName = newFileName)
           if (!utilities.AmazonS3.exists(awsKey)) utilities.AmazonS3.uploadFile(awsKey, nftImageFile)
-          val nftOld = master.NFT(id = fileHash, collectionId = uploadCollection.id, name = nftDetails.name, description = nftDetails.description, totalSupply = 1, isMinted = Option(false), fileExtension = uploadCollection.nftFormat, ipfsLink = "", edition = None, mintReady = false, assetId = None)
+          val nftOld = master.NFT(id = fileHash, collectionId = uploadCollection.id, name = nftDetails.name, description = nftDetails.description, totalSupply = 1, isMinted = Option(false), fileExtension = uploadCollection.nftFormat, ipfsLink = "", mintReady = false, assetId = None)
           val assetID = nftOld.getAssetID(nftDetails.properties.map(_.toProperty(fileHash, collection)), collection)
           val nft = nftOld.copy(assetId = Option(assetID.asString))
           Await.result(masterNFTs.Service.add(nft), Duration.Inf)

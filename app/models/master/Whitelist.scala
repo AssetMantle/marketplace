@@ -92,5 +92,7 @@ class Whitelists @Inject()(
 
     def getIdNameMapForOwner(ownerId: String): Future[Map[String, String]] = filter(_.ownerId === ownerId).map(_.map(x => x.id -> x.name).toMap)
 
+    def delete(id: String): Future[Int] = deleteById(id)
+
   }
 }

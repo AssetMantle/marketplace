@@ -287,6 +287,8 @@ class Starter @Inject()(
     }
   }
 
+//  def changeAwsKey(): Future[Unit]
+
   def updateAssetIDs(): Future[Unit] = {
     println("Updating asset id")
     val collections = masterCollections.Service.fetchAll()

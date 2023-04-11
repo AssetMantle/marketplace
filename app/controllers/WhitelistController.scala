@@ -22,6 +22,7 @@ class WhitelistController @Inject()(
                                      withLoginAction: WithLoginAction,
                                      withLoginActionAsync: WithLoginActionAsync,
                                      withoutLoginAction: WithoutLoginAction,
+                                     masterNFTs: master.NFTs,
                                      masterNFTOwners: master.NFTOwners,
                                      masterAccounts: master.Accounts,
                                      masterCollections: master.Collections,
@@ -85,11 +86,20 @@ class WhitelistController @Inject()(
           Future(BadRequest(views.html.profile.whitelist.create(formWithErrors)))
         },
         createData => {
-          val create = if (loginState.isCreator) masterWhitelists.Service.addWhitelist(ownerId = loginState.username, name = createData.name, description = createData.description, maxMembers = createData.maxMembers, startEpoch = createData.startEpoch, endEpoch = createData.endEpoch)
-          else constants.Response.NO_COLLECTION_TO_CREATE_WHITELIST.throwFutureBaseException()
+          val totalCreated = masterWhitelists.Service.totalWhitelistsByOwner(loginState.username)
+
+          def create(totalCreated: Int) = {
+            val errors = Seq(
+              if (!loginState.isCreator) Option(constants.Response.NO_COLLECTION_TO_CREATE_WHITELIST) else None,
+              if (totalCreated >= constants.Whitelist.MaxAllowed) Option(constants.Response.CANNOT_CREATE_MORE_ALLOWED_WHITELISTS) else None,
+            ).flatten
+            if (errors.isEmpty) masterWhitelists.Service.addWhitelist(ownerId = loginState.username, name = createData.name, description = createData.description, maxMembers = createData.maxMembers, startEpoch = createData.startEpoch, endEpoch = createData.endEpoch)
+            else errors.head.throwFutureBaseException()
+          }
 
           (for {
-            id <- create
+            totalCreated <- totalCreated
+            id <- create(totalCreated)
           } yield PartialContent(views.html.profile.whitelist.whitelistSuccessful(whitelistId = id))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.profile.whitelist.create(Create.form.withGlobalError(baseException.failure.message)))
@@ -120,6 +130,59 @@ class WhitelistController @Inject()(
           } yield PartialContent(views.html.profile.whitelist.whitelistSuccessful(whitelistId = editData.whitelistId, edited = true))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.profile.whitelist.edit(Edit.form.withGlobalError(baseException.failure.message)))
+          }
+        }
+      )
+  }
+
+  def deleteForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val whitelist = masterWhitelists.Service.tryGet(id)
+      val totalMembers = masterWhitelistMembers.Service.getWhitelistsMemberCount(id)
+      (for {
+        whitelist <- whitelist
+        totalMembers <- totalMembers
+      } yield Ok(views.html.profile.whitelist.delete(whitelist = whitelist, totalMembers = totalMembers))
+        ).recover {
+        case _: BaseException => BadRequest
+      }
+  }
+
+  def delete(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Delete.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest)
+        },
+        deleteData => {
+          val whitelist = masterWhitelists.Service.tryGet(deleteData.whitelistId)
+
+          def checkAndDelete(whitelist: Whitelist) = {
+            val errors = Seq(
+              if (whitelist.ownerId != loginState.username) Option(constants.Response.NOT_WHITELIST_CREATOR) else None,
+            ).flatten
+            if (errors.isEmpty) {
+              val deleteMembers = masterWhitelistMembers.Service.deleteAllMembers(whitelist.id)
+
+              def deleteWhitelist() = masterWhitelists.Service.delete(whitelist.id)
+
+              for {
+                _ <- deleteMembers
+                _ <- deleteWhitelist()
+              } yield ()
+
+            } else errors.head.throwFutureBaseException()
+          }
+
+          (for {
+            whitelist <- whitelist
+            _ <- checkAndDelete(whitelist)
+          } yield {
+            implicit val optionalLoginState: Option[LoginState] = Option(loginState)
+            Ok(views.html.profile.viewProfile(accountId = loginState.username, activeTab = constants.View.WHITELIST))
+          }
+            ).recover {
+            case _: BaseException => BadRequest
           }
         }
       )

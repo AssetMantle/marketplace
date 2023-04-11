@@ -1,3 +1,5 @@
+@(nftURLs: Seq[String])(implicit messagesProvider: MessagesProvider)
+
 <div class="modal-overlay modal fade" id="nftRevealModal">
     <div class="modal-dialog modal-dialog-centered modal-md" role="document">
         <div class="modal-content">
@@ -14,69 +16,15 @@
                         <div class="col-lg-12">
                             <div class="d-flex justify-content-center">
                             <section class="cards">
-                                <div class="cardd">
-                                    <div class="cartTranslator">
-                                        <div class="cardRotator">
-                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_1.jpg")" />
+                                @nftURLs.map{nftURL =>
+                                    <div class="cardd">
+                                        <div class="cartTranslator">
+                                            <div class="cardRotator">
+                                                <img src="@nftURL" />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="cardd">
-                                    <div class="cartTranslator">
-                                        <div class="cardRotator">
-                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_2.jpg")" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="cardd">
-                                    <div class="cartTranslator">
-                                        <div class="cardRotator">
-                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_3.png")" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="cardd">
-                                    <div class="cartTranslator">
-                                        <div class="cardRotator">
-                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_1.jpg")" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="cardd">
-                                    <div class="cartTranslator">
-                                        <div class="cardRotator">
-                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_2.jpg")" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="cardd">
-                                    <div class="cartTranslator">
-                                        <div class="cardRotator">
-                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_3.png")" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="cardd">
-                                    <div class="cartTranslator">
-                                        <div class="cardRotator">
-                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_1.jpg")" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="cardd">
-                                    <div class="cartTranslator">
-                                        <div class="cardRotator">
-                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_2.jpg")" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="cardd">
-                                    <div class="cartTranslator">
-                                        <div class="cardRotator">
-                                            <img src="@routes.Assets.versioned("images/NFT/IGOR_3.png")" />
-                                        </div>
-                                    </div>
-                                </div>
+                                }
                             </section>
                             </div>
                         </div>

@@ -1,8 +1,12 @@
 @import views.html.base.modal._
 @import models.traits.BlockchainTransaction
+@import models.master.NFT
 
-@(blockchainTx: BlockchainTransaction, tweetURI: Option[String] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(blockchainTx: BlockchainTransaction, tweetURI: Option[String] = None, nfts: Seq[NFT] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
+@if(nfts.nonEmpty) {
+    @views.html.base.commonNFTReveal(nfts.map(_.getS3Url))
+}
 @if(blockchainTx.status.nonEmpty) {
     @if(!blockchainTx.status.get) {
         @errorModal(heading = constants.View.BROADCASTING_BLOCKCHAIN_TRANSACTION_FAILURE_TITLE, subHeading = blockchainTx.log.getOrElse(""))
