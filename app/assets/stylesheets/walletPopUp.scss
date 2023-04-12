@@ -396,6 +396,7 @@
     .userAddressData {
       @include setFont(var(--font-type-2), normal, 400, 14px, 17px, var(--mantle-off-white));
       word-break: break-word;
+      cursor: pointer;
     }
 
     .copyIcon {
