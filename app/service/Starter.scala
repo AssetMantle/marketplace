@@ -236,9 +236,9 @@ class Starter @Inject()(
 
       def checkAndAdd() = {
         for {
-          issueIdentity <- blockchainTransactionDefineAssets.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+          defineAsset <- blockchainTransactionDefineAssets.Service.add(txHash = txHash, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
           _ <- masterTransactionDefineAssetTxs.Service.addWithNoneStatus(txHash = txHash, collectionIds = collections.map(_.id))
-        } yield issueIdentity
+        } yield (defineAsset, txRawBytes)
       }
 
       for {
@@ -246,10 +246,9 @@ class Starter @Inject()(
       } yield issueIdentity
     }
 
-    def broadcastTxAndUpdate(defineAsset: DefineAsset) = {
+    def broadcastTxAndUpdate(defineAsset: DefineAsset, txRawBytes: Array[Byte]) = {
 
-      println(defineAsset.getTxRawAsHexString)
-      val broadcastTx = broadcastTxSync.Service.get(defineAsset.getTxRawAsHexString)
+      val broadcastTx = broadcastTxSync.Service.get(defineAsset.getTxRawAsHexString(txRawBytes))
 
       def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionDefineAssets.Service.markFailedWithLog(txHashes = Seq(defineAsset.txHash), log = errorResponse.get.error.data)
       else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionDefineAssets.Service.markFailedWithLog(txHashes = Seq(defineAsset.txHash), log = successResponse.get.result.log)
@@ -265,8 +264,8 @@ class Starter @Inject()(
       collections <- collections
       abciInfo <- abciInfo
       bcAccount <- bcAccount
-      defineAsset <- checkMempoolAndAddTx(collections, bcAccount, abciInfo.result.response.last_block_height.toInt)
-      _ <- broadcastTxAndUpdate(defineAsset)
+      (defineAsset, txRawBytes) <- checkMempoolAndAddTx(collections, bcAccount, abciInfo.result.response.last_block_height.toInt)
+      _ <- broadcastTxAndUpdate(defineAsset, txRawBytes)
     } yield ()
   }
 
@@ -287,7 +286,7 @@ class Starter @Inject()(
     }
   }
 
-//  def changeAwsKey(): Future[Unit]
+  //  def changeAwsKey(): Future[Unit]
 
   def updateAssetIDs(): Future[Unit] = {
     println("Updating asset id")

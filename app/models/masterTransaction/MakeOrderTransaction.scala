@@ -196,7 +196,7 @@ class MakeOrderTransactions @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              makeOrder <- blockchainTransactionMakeOrders.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              makeOrder <- blockchainTransactionMakeOrders.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nftID, sellerId = nftOwner.ownerId, buyerId = buyerId, denom = constants.Blockchain.StakingToken, makerOwnableSplit = AttoNumber(quantity * constants.Blockchain.SmallestDec), expiresIn = expiresIn, takerOwnableSplit = AttoNumber((price * quantity).toMicroBigDecimal), secondaryMarketId = secondaryMarketId)
             } yield makeOrder
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
@@ -204,11 +204,11 @@ class MakeOrderTransactions @Inject()(
 
         for {
           makeOrder <- checkAndAdd(unconfirmedTxHashes)
-        } yield makeOrder
+        } yield (makeOrder, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(makerOrder: MakeOrder) = {
-        val broadcastTx = broadcastTxSync.Service.get(makerOrder.getTxRawAsHexString)
+      def broadcastTxAndUpdate(makerOrder: MakeOrder, txRawBytes: Array[Byte]) = {
+        val broadcastTx = broadcastTxSync.Service.get(makerOrder.getTxRawAsHexString(txRawBytes))
 
         def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionMakeOrders.Service.markFailedWithLog(txHashes = Seq(makerOrder.txHash), log = errorResponse.get.error.data)
         else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionMakeOrders.Service.markFailedWithLog(txHashes = Seq(makerOrder.txHash), log = successResponse.get.result.log)
@@ -225,8 +225,8 @@ class MakeOrderTransactions @Inject()(
         bcAccount <- bcAccount
         unconfirmedTxs <- unconfirmedTxs
         nft <- nft
-        makeOrder <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase), nft, nftOwner)
-        _ <- broadcastTxAndUpdate(makeOrder)
+        (makeOrder, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase), nft, nftOwner)
+        _ <- broadcastTxAndUpdate(makeOrder, txRawBytes)
       } yield makeOrder
     }
 

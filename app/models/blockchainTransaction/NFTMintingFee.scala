@@ -2,10 +2,10 @@ package models.blockchainTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.traits._
 import models.blockchain
 import models.blockchain.Transaction
 import models.common.Coin
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -15,9 +15,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class NFTMintingFee(txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
+case class NFTMintingFee(txHash: String, fromAddress: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
 
-  def serialize(): NFTMintingFees.NFTMintingFeeSerialized = NFTMintingFees.NFTMintingFeeSerialized(txHash = this.txHash, txRawBytes = this.txRawBytes, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, status = this.status, memo = this.memo, timeoutHeight = this.timeoutHeight, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+  def serialize(): NFTMintingFees.NFTMintingFeeSerialized = NFTMintingFees.NFTMintingFeeSerialized(txHash = this.txHash, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, status = this.status, memo = this.memo, timeoutHeight = this.timeoutHeight, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
 object NFTMintingFees {
@@ -26,19 +26,17 @@ object NFTMintingFees {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_NFT_MINTING_FEE
 
-  case class NFTMintingFeeSerialized(txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize: NFTMintingFee = NFTMintingFee(txHash = txHash, txRawBytes = this.txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), status = status, memo = memo, timeoutHeight = timeoutHeight, log = log, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class NFTMintingFeeSerialized(txHash: String, fromAddress: String, toAddress: String, amount: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
+    def deserialize: NFTMintingFee = NFTMintingFee(txHash = txHash, fromAddress = fromAddress, toAddress = toAddress, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), status = status, memo = memo, timeoutHeight = timeoutHeight, log = log, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
     def id: String = txHash
   }
 
   class NFTMintingFeeTable(tag: Tag) extends Table[NFTMintingFeeSerialized](tag, "NFTMintingFee") with ModelTable[String] {
 
-    def * = (txHash, txRawBytes, fromAddress, toAddress, amount, status.?, memo.?, timeoutHeight, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTMintingFeeSerialized.tupled, NFTMintingFeeSerialized.unapply)
+    def * = (txHash, fromAddress, toAddress, amount, status.?, memo.?, timeoutHeight, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTMintingFeeSerialized.tupled, NFTMintingFeeSerialized.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
-
-    def txRawBytes = column[Array[Byte]]("txRawBytes")
 
     def fromAddress = column[String]("fromAddress")
 
@@ -71,10 +69,10 @@ object NFTMintingFees {
 
 @Singleton
 class NFTMintingFees @Inject()(
-                                   protected val databaseConfigProvider: DatabaseConfigProvider,
-                                   blockchainTransactions: models.blockchain.Transactions,
-                                   blockchainBlocks: blockchain.Blocks,
-                                 )(implicit override val executionContext: ExecutionContext)
+                                protected val databaseConfigProvider: DatabaseConfigProvider,
+                                blockchainTransactions: models.blockchain.Transactions,
+                                blockchainBlocks: blockchain.Blocks,
+                              )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[NFTMintingFees.NFTMintingFeeTable, NFTMintingFees.NFTMintingFeeSerialized, String](
     databaseConfigProvider,
     NFTMintingFees.TableQuery,
@@ -85,8 +83,8 @@ class NFTMintingFees @Inject()(
 
   object Service {
 
-    def add(txHash: String, txRawBytes: Array[Byte], fromAddress: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], memo: Option[String], timeoutHeight: Int): Future[NFTMintingFee] = {
-      val nftMintingFee = NFTMintingFee(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = amount, status = status, log = None, memo = memo, timeoutHeight = timeoutHeight)
+    def add(txHash: String, fromAddress: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], memo: Option[String], timeoutHeight: Int): Future[NFTMintingFee] = {
+      val nftMintingFee = NFTMintingFee(txHash = txHash, fromAddress = fromAddress, toAddress = toAddress, amount = amount, status = status, log = None, memo = memo, timeoutHeight = timeoutHeight)
       for {
         _ <- create(nftMintingFee.serialize())
       } yield nftMintingFee

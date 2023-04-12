@@ -2,9 +2,9 @@ package models.blockchainTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.traits._
 import models.blockchain
 import models.blockchain.Transaction
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -13,7 +13,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class ProvisionAddress(txHash: String, txRawBytes: Array[Byte], fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
+case class ProvisionAddress(txHash: String, fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
 
   def id: String = txHash
 }
@@ -26,11 +26,9 @@ object ProvisionAddresses {
 
   class ProvisionAddressTable(tag: Tag) extends Table[ProvisionAddress](tag, "ProvisionAddress") with ModelTable[String] {
 
-    def * = (txHash, txRawBytes, fromAddress, status.?, memo.?, timeoutHeight, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ProvisionAddress.tupled, ProvisionAddress.unapply)
+    def * = (txHash, fromAddress, status.?, memo.?, timeoutHeight, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ProvisionAddress.tupled, ProvisionAddress.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
-
-    def txRawBytes = column[Array[Byte]]("txRawBytes")
 
     def fromAddress = column[String]("fromAddress")
 
@@ -59,10 +57,10 @@ object ProvisionAddresses {
 
 @Singleton
 class ProvisionAddresses @Inject()(
-                                 protected val databaseConfigProvider: DatabaseConfigProvider,
-                                 blockchainTransactions: models.blockchain.Transactions,
-                                 blockchainBlocks: blockchain.Blocks,
-                               )(implicit override val executionContext: ExecutionContext)
+                                    protected val databaseConfigProvider: DatabaseConfigProvider,
+                                    blockchainTransactions: models.blockchain.Transactions,
+                                    blockchainBlocks: blockchain.Blocks,
+                                  )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[ProvisionAddresses.ProvisionAddressTable, ProvisionAddress, String](
     databaseConfigProvider,
     ProvisionAddresses.TableQuery,
@@ -73,8 +71,8 @@ class ProvisionAddresses @Inject()(
 
   object Service {
 
-    def add(txHash: String, txRawBytes: Array[Byte], fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int): Future[ProvisionAddress] = {
-      val provisionAddress = ProvisionAddress(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = status, log = None, memo = memo, timeoutHeight = timeoutHeight)
+    def add(txHash: String, fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int): Future[ProvisionAddress] = {
+      val provisionAddress = ProvisionAddress(txHash = txHash, fromAddress = fromAddress, status = status, log = None, memo = memo, timeoutHeight = timeoutHeight)
       for {
         _ <- create(provisionAddress)
       } yield provisionAddress

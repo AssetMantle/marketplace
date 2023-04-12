@@ -133,7 +133,7 @@ class MintAssetTransactions @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              mintAsset <- blockchainTransactionMintAssets.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              mintAsset <- blockchainTransactionMintAssets.Service.add(txHash = txHash, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, nftIDs = nftIDs, minterAccountIDs = nftOwners.map(x => x.nftId -> x.ownerId).toMap)
             } yield mintAsset
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
@@ -141,12 +141,12 @@ class MintAssetTransactions @Inject()(
 
         for {
           mintAsset <- checkAndAdd(unconfirmedTxHashes)
-        } yield mintAsset
+        } yield (mintAsset, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(mintAsset: MintAsset) = {
+      def broadcastTxAndUpdate(mintAsset: MintAsset, txRawBytes: Array[Byte]) = {
 
-        val broadcastTx = broadcastTxSync.Service.get(mintAsset.getTxRawAsHexString)
+        val broadcastTx = broadcastTxSync.Service.get(mintAsset.getTxRawAsHexString(txRawBytes))
 
         def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionMintAssets.Service.markFailedWithLog(txHashes = Seq(mintAsset.txHash), log = errorResponse.get.error.data)
         else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionMintAssets.Service.markFailedWithLog(txHashes = Seq(mintAsset.txHash), log = successResponse.get.result.log)
@@ -166,8 +166,8 @@ class MintAssetTransactions @Inject()(
         nftOwners <- nftOwners
         nftProperties <- nftProperties
         collections <- collections(nfts.map(_.collectionId).distinct)
-        mintAsset <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase), nfts, collections, nftOwners, nftProperties)
-        _ <- broadcastTxAndUpdate(mintAsset)
+        (mintAsset, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase), nfts, collections, nftOwners, nftProperties)
+        _ <- broadcastTxAndUpdate(mintAsset, txRawBytes)
       } yield mintAsset
     }
 

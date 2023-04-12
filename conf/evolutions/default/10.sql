@@ -2,10 +2,16 @@
 CREATE SCHEMA IF NOT EXISTS CAMPAIGN
     AUTHORIZATION "mantlePlace";
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."CancelOrder"
+ALTER TABLE BLOCKCHAIN_TRANSACTION."NFTPublicListing"
+    DROP COLUMN IF EXISTS "txRawBytes";
+ALTER TABLE BLOCKCHAIN_TRANSACTION."NFTSale"
+    DROP COLUMN IF EXISTS "txRawBytes";
+ALTER TABLE BLOCKCHAIN_TRANSACTION."SendCoin"
+    DROP COLUMN IF EXISTS "txRawBytes";
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."CampaignSendCoin"
 (
     "txHash"               VARCHAR NOT NULL,
-    "txRawBytes"           BYTEA   NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
@@ -18,7 +24,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."CancelOrder"
     PRIMARY KEY ("txHash")
 );
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."CampaignSendCoin"
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."CancelOrder"
 (
     "txHash"               VARCHAR NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
@@ -36,7 +42,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."CampaignSendCoin"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."DefineAsset"
 (
     "txHash"               VARCHAR NOT NULL,
-    "txRawBytes"           BYTEA   NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
@@ -52,7 +57,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."DefineAsset"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueIdentity"
 (
     "txHash"               VARCHAR NOT NULL,
-    "txRawBytes"           BYTEA   NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
@@ -68,7 +72,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueIdentity"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."MakeOrder"
 (
     "txHash"               VARCHAR NOT NULL,
-    "txRawBytes"           BYTEA   NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
@@ -84,7 +87,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."MakeOrder"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."MintAsset"
 (
     "txHash"               VARCHAR NOT NULL,
-    "txRawBytes"           BYTEA   NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
@@ -100,7 +102,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."MintAsset"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."NFTMintingFee"
 (
     "txHash"               VARCHAR NOT NULL,
-    "txRawBytes"           BYTEA   NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "toAddress"            VARCHAR NOT NULL,
     "amount"               VARCHAR NOT NULL,
@@ -118,7 +119,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."NFTMintingFee"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ProvisionAddress"
 (
     "txHash"               VARCHAR NOT NULL,
-    "txRawBytes"           BYTEA   NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
@@ -134,7 +134,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ProvisionAddress"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SplitSend"
 (
     "txHash"               VARCHAR NOT NULL,
-    "txRawBytes"           BYTEA   NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
@@ -150,7 +149,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SplitSend"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."TakeOrder"
 (
     "txHash"               VARCHAR NOT NULL,
-    "txRawBytes"           BYTEA   NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
@@ -166,7 +164,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."TakeOrder"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."UnprovisionAddress"
 (
     "txHash"               VARCHAR NOT NULL,
-    "txRawBytes"           BYTEA   NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
@@ -182,7 +179,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."UnprovisionAddress"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."Unwrap"
 (
     "txHash"               VARCHAR NOT NULL,
-    "txRawBytes"           BYTEA   NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
@@ -198,7 +194,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."Unwrap"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."Wrap"
 (
     "txHash"               VARCHAR NOT NULL,
-    "txRawBytes"           BYTEA   NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,

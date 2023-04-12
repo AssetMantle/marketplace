@@ -129,7 +129,7 @@ class UnwrapTransactions @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              unwrap <- blockchainTransactionUnwraps.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              unwrap <- blockchainTransactionUnwraps.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, ownableID = ownableId, amount = amount, accountId = accountId)
             } yield unwrap
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
@@ -137,12 +137,12 @@ class UnwrapTransactions @Inject()(
 
         for {
           unwrap <- checkAndAdd(unconfirmedTxHashes)
-        } yield unwrap
+        } yield (unwrap, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(unwrap: Unwrap) = {
+      def broadcastTxAndUpdate(unwrap: Unwrap, txRawBytes: Array[Byte]) = {
 
-        val broadcastTx = broadcastTxSync.Service.get(unwrap.getTxRawAsHexString)
+        val broadcastTx = broadcastTxSync.Service.get(unwrap.getTxRawAsHexString(txRawBytes))
 
         def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionUnwraps.Service.markFailedWithLog(txHashes = Seq(unwrap.txHash), log = errorResponse.get.error.data)
         else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionUnwraps.Service.markFailedWithLog(txHashes = Seq(unwrap.txHash), log = successResponse.get.result.log)
@@ -158,8 +158,8 @@ class UnwrapTransactions @Inject()(
         abciInfo <- abciInfo
         bcAccount <- bcAccount
         unconfirmedTxs <- unconfirmedTxs
-        unwrap <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        _ <- broadcastTxAndUpdate(unwrap)
+        (unwrap, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        _ <- broadcastTxAndUpdate(unwrap, txRawBytes)
       } yield unwrap
     }
 

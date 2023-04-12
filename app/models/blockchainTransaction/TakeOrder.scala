@@ -13,7 +13,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class TakeOrder(txHash: String, txRawBytes: Array[Byte], fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
+case class TakeOrder(txHash: String, fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
 
   def id: String = txHash
 }
@@ -26,11 +26,9 @@ object TakeOrders {
 
   class TakeOrderTable(tag: Tag) extends Table[TakeOrder](tag, "TakeOrder") with ModelTable[String] {
 
-    def * = (txHash, txRawBytes, fromAddress, status.?, memo.?, timeoutHeight, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (TakeOrder.tupled, TakeOrder.unapply)
+    def * = (txHash, fromAddress, status.?, memo.?, timeoutHeight, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (TakeOrder.tupled, TakeOrder.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
-
-    def txRawBytes = column[Array[Byte]]("txRawBytes")
 
     def fromAddress = column[String]("fromAddress")
 
@@ -73,8 +71,8 @@ class TakeOrders @Inject()(
 
   object Service {
 
-    def add(txHash: String, txRawBytes: Array[Byte], fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int): Future[TakeOrder] = {
-      val takeOrder = TakeOrder(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = status, log = None, memo = memo, timeoutHeight = timeoutHeight)
+    def add(txHash: String, fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int): Future[TakeOrder] = {
+      val takeOrder = TakeOrder(txHash = txHash, fromAddress = fromAddress, status = status, log = None, memo = memo, timeoutHeight = timeoutHeight)
       for {
         _ <- create(takeOrder)
       } yield takeOrder

@@ -122,7 +122,7 @@ class UnprovisionAddressTransactions @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              unprovisionAddress <- blockchainTransactionUnprovisionAddresses.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              unprovisionAddress <- blockchainTransactionUnprovisionAddresses.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, accountId = accountId, toAddress = toAddress)
             } yield unprovisionAddress
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
@@ -130,11 +130,11 @@ class UnprovisionAddressTransactions @Inject()(
 
         for {
           unprovisionAddress <- checkAndAdd(unconfirmedTxHashes)
-        } yield unprovisionAddress
+        } yield (unprovisionAddress, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(unprovisionAddress: UnprovisionAddress) = {
-        val broadcastTx = broadcastTxSync.Service.get(unprovisionAddress.getTxRawAsHexString)
+      def broadcastTxAndUpdate(unprovisionAddress: UnprovisionAddress, txRawBytes: Array[Byte]) = {
+        val broadcastTx = broadcastTxSync.Service.get(unprovisionAddress.getTxRawAsHexString(txRawBytes))
 
         def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionUnprovisionAddresses.Service.markFailedWithLog(txHashes = Seq(unprovisionAddress.txHash), log = errorResponse.get.error.data)
         else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionUnprovisionAddresses.Service.markFailedWithLog(txHashes = Seq(unprovisionAddress.txHash), log = successResponse.get.result.log)
@@ -150,8 +150,8 @@ class UnprovisionAddressTransactions @Inject()(
         abciInfo <- abciInfo
         bcAccount <- bcAccount
         unconfirmedTxs <- unconfirmedTxs
-        unprovisionAddress <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        _ <- broadcastTxAndUpdate(unprovisionAddress)
+        (unprovisionAddress, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        _ <- broadcastTxAndUpdate(unprovisionAddress, txRawBytes)
       } yield unprovisionAddress
     }
 

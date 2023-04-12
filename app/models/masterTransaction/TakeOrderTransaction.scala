@@ -152,7 +152,7 @@ class TakeOrderTransactions @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              takeOrder <- blockchainTransactionTakeOrders.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              takeOrder <- blockchainTransactionTakeOrders.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nftID, buyerId = buyerId, quantity = nftOwner.quantity.toInt, secondaryMarketId = secondaryMarket.id)
             } yield takeOrder
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
@@ -160,11 +160,11 @@ class TakeOrderTransactions @Inject()(
 
         for {
           takeOrder <- checkAndAdd(unconfirmedTxHashes)
-        } yield takeOrder
+        } yield (takeOrder, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(takerOrder: TakeOrder) = {
-        val broadcastTx = broadcastTxSync.Service.get(takerOrder.getTxRawAsHexString)
+      def broadcastTxAndUpdate(takerOrder: TakeOrder, txRawBytes: Array[Byte]) = {
+        val broadcastTx = broadcastTxSync.Service.get(takerOrder.getTxRawAsHexString(txRawBytes))
 
         def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionTakeOrders.Service.markFailedWithLog(txHashes = Seq(takerOrder.txHash), log = errorResponse.get.error.data)
         else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionTakeOrders.Service.markFailedWithLog(txHashes = Seq(takerOrder.txHash), log = successResponse.get.result.log)
@@ -181,8 +181,8 @@ class TakeOrderTransactions @Inject()(
         bcAccount <- bcAccount
         unconfirmedTxs <- unconfirmedTxs
         nft <- nft
-        takeOrder <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase), nft, nftOwner)
-        _ <- broadcastTxAndUpdate(takeOrder)
+        (takeOrder, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase), nft, nftOwner)
+        _ <- broadcastTxAndUpdate(takeOrder, txRawBytes)
       } yield takeOrder
     }
 

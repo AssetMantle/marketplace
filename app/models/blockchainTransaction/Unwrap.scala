@@ -2,9 +2,9 @@ package models.blockchainTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.traits._
 import models.blockchain
 import models.blockchain.Transaction
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -13,7 +13,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class Unwrap(txHash: String, txRawBytes: Array[Byte], fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
+case class Unwrap(txHash: String, fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
 
   def id: String = txHash
 }
@@ -26,11 +26,9 @@ object Unwraps {
 
   class UnwrapTable(tag: Tag) extends Table[Unwrap](tag, "Unwrap") with ModelTable[String] {
 
-    def * = (txHash, txRawBytes, fromAddress, status.?, memo.?, timeoutHeight, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Unwrap.tupled, Unwrap.unapply)
+    def * = (txHash, fromAddress, status.?, memo.?, timeoutHeight, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Unwrap.tupled, Unwrap.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
-
-    def txRawBytes = column[Array[Byte]]("txRawBytes")
 
     def fromAddress = column[String]("fromAddress")
 
@@ -59,10 +57,10 @@ object Unwraps {
 
 @Singleton
 class Unwraps @Inject()(
-                                 protected val databaseConfigProvider: DatabaseConfigProvider,
-                                 blockchainTransactions: models.blockchain.Transactions,
-                                 blockchainBlocks: blockchain.Blocks,
-                               )(implicit override val executionContext: ExecutionContext)
+                         protected val databaseConfigProvider: DatabaseConfigProvider,
+                         blockchainTransactions: models.blockchain.Transactions,
+                         blockchainBlocks: blockchain.Blocks,
+                       )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[Unwraps.UnwrapTable, Unwrap, String](
     databaseConfigProvider,
     Unwraps.TableQuery,
@@ -73,8 +71,8 @@ class Unwraps @Inject()(
 
   object Service {
 
-    def add(txHash: String, txRawBytes: Array[Byte], fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int): Future[Unwrap] = {
-      val unwrap = Unwrap(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = status, log = None, memo = memo, timeoutHeight = timeoutHeight)
+    def add(txHash: String, fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int): Future[Unwrap] = {
+      val unwrap = Unwrap(txHash = txHash, fromAddress = fromAddress, status = status, log = None, memo = memo, timeoutHeight = timeoutHeight)
       for {
         _ <- create(unwrap)
       } yield unwrap

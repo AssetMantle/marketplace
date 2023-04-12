@@ -141,7 +141,7 @@ class NFTTransferTransactions @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              nftTransfer <- blockchainTransactionSplitSends.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              nftTransfer <- blockchainTransactionSplitSends.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nft.id, ownerId = ownerId, quantity = quantity, toIdentityId = utilities.Identity.getMantlePlaceIdentityID(toAccountId).asString, toAccountId = toAccountId)
             } yield nftTransfer
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
@@ -149,11 +149,11 @@ class NFTTransferTransactions @Inject()(
 
         for {
           nftTransfer <- checkAndAdd(unconfirmedTxHashes)
-        } yield nftTransfer
+        } yield (nftTransfer, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(splitSend: SplitSend) = {
-        val broadcastTx = broadcastTxSync.Service.get(splitSend.getTxRawAsHexString)
+      def broadcastTxAndUpdate(splitSend: SplitSend, txRawBytes: Array[Byte]) = {
+        val broadcastTx = broadcastTxSync.Service.get(splitSend.getTxRawAsHexString(txRawBytes))
 
         def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionSplitSends.Service.markFailedWithLog(txHashes = Seq(splitSend.txHash), log = errorResponse.get.error.data)
         else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionSplitSends.Service.markFailedWithLog(txHashes = Seq(splitSend.txHash), log = successResponse.get.result.log)
@@ -169,8 +169,8 @@ class NFTTransferTransactions @Inject()(
         abciInfo <- abciInfo
         bcAccount <- bcAccount
         unconfirmedTxs <- unconfirmedTxs
-        nftTransfer <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        _ <- broadcastTxAndUpdate(nftTransfer)
+        (nftTransfer, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        _ <- broadcastTxAndUpdate(nftTransfer, txRawBytes)
       } yield nftTransfer
     }
 

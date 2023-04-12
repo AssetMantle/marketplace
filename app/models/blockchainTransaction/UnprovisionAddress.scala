@@ -13,7 +13,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class UnprovisionAddress(txHash: String, txRawBytes: Array[Byte], fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
+case class UnprovisionAddress(txHash: String, fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
 
   def id: String = txHash
 }
@@ -26,11 +26,9 @@ object UnprovisionAddresses {
 
   class UnprovisionAddressTable(tag: Tag) extends Table[UnprovisionAddress](tag, "UnprovisionAddress") with ModelTable[String] {
 
-    def * = (txHash, txRawBytes, fromAddress, status.?, memo.?, timeoutHeight, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (UnprovisionAddress.tupled, UnprovisionAddress.unapply)
+    def * = (txHash, fromAddress, status.?, memo.?, timeoutHeight, log.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (UnprovisionAddress.tupled, UnprovisionAddress.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
-
-    def txRawBytes = column[Array[Byte]]("txRawBytes")
 
     def fromAddress = column[String]("fromAddress")
 
@@ -59,10 +57,10 @@ object UnprovisionAddresses {
 
 @Singleton
 class UnprovisionAddresses @Inject()(
-                              protected val databaseConfigProvider: DatabaseConfigProvider,
-                              blockchainTransactions: models.blockchain.Transactions,
-                              blockchainBlocks: blockchain.Blocks,
-                            )(implicit override val executionContext: ExecutionContext)
+                                      protected val databaseConfigProvider: DatabaseConfigProvider,
+                                      blockchainTransactions: models.blockchain.Transactions,
+                                      blockchainBlocks: blockchain.Blocks,
+                                    )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[UnprovisionAddresses.UnprovisionAddressTable, UnprovisionAddress, String](
     databaseConfigProvider,
     UnprovisionAddresses.TableQuery,
@@ -73,8 +71,8 @@ class UnprovisionAddresses @Inject()(
 
   object Service {
 
-    def add(txHash: String, txRawBytes: Array[Byte], fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int): Future[UnprovisionAddress] = {
-      val unprovisionAddress = UnprovisionAddress(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, status = status, log = None, memo = memo, timeoutHeight = timeoutHeight)
+    def add(txHash: String, fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int): Future[UnprovisionAddress] = {
+      val unprovisionAddress = UnprovisionAddress(txHash = txHash, fromAddress = fromAddress, status = status, log = None, memo = memo, timeoutHeight = timeoutHeight)
       for {
         _ <- create(unprovisionAddress)
       } yield unprovisionAddress

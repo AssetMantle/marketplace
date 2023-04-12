@@ -151,7 +151,7 @@ class SaleNFTTransactions @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              nftSale <- blockchainTransactionNFTSales.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              nftSale <- blockchainTransactionNFTSales.Service.add(txHash = txHash, fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, saleId = saleId, mintOnSuccess = mintOnSuccess)
             } yield nftSale
           }
@@ -160,12 +160,12 @@ class SaleNFTTransactions @Inject()(
 
         for {
           nftSale <- checkAndAdd(unconfirmedTxHashes)
-        } yield nftSale
+        } yield (nftSale, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(nftSale: NFTSale) = {
+      def broadcastTxAndUpdate(nftSale: NFTSale, txRawBytes: Array[Byte]) = {
 
-        val broadcastTx = broadcastTxSync.Service.get(nftSale.getTxRawAsHexString)
+        val broadcastTx = broadcastTxSync.Service.get(nftSale.getTxRawAsHexString(txRawBytes))
 
         def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionNFTSales.Service.updateNFTSale(nftSale.copy(status = Option(false), log = Option(errorResponse.get.error.data)))
         else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionNFTSales.Service.updateNFTSale(nftSale.copy(status = Option(false), log = Option(successResponse.get.result.log)))
@@ -181,8 +181,8 @@ class SaleNFTTransactions @Inject()(
         abciInfo <- abciInfo
         bcAccount <- bcAccount
         unconfirmedTxs <- unconfirmedTxs
-        nftSale <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedNFTSale <- broadcastTxAndUpdate(nftSale)
+        (nftSale, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        updatedNFTSale <- broadcastTxAndUpdate(nftSale, txRawBytes)
       } yield updatedNFTSale
     }
 

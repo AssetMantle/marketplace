@@ -120,7 +120,7 @@ class NFTMintingFeeTransactions @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              nftSale <- blockchainTransactionNFTMintingFees.Service.add(txHash = txHash, txRawBytes = txRawBytes, fromAddress = fromAddress, toAddress = constants.Blockchain.MantlePlaceFeeCollectorAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              nftSale <- blockchainTransactionNFTMintingFees.Service.add(txHash = txHash, fromAddress = fromAddress, toAddress = constants.Blockchain.MantlePlaceFeeCollectorAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(accountId = accountId, collectionId = nft.collectionId, txHash = txHash, nftId = nft.id)
             } yield nftSale
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
@@ -128,12 +128,12 @@ class NFTMintingFeeTransactions @Inject()(
 
         for {
           nftSale <- checkAndAdd(unconfirmedTxHashes)
-        } yield nftSale
+        } yield (nftSale, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(nftMintingFee: NFTMintingFee) = {
+      def broadcastTxAndUpdate(nftMintingFee: NFTMintingFee, txRawBytes: Array[Byte]) = {
 
-        val broadcastTx = broadcastTxSync.Service.get(nftMintingFee.getTxRawAsHexString)
+        val broadcastTx = broadcastTxSync.Service.get(nftMintingFee.getTxRawAsHexString(txRawBytes))
 
         def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionNFTMintingFees.Service.updateNFTMintingFee(nftMintingFee.copy(status = Option(false), log = Option(errorResponse.get.error.data)))
         else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionNFTMintingFees.Service.updateNFTMintingFee(nftMintingFee.copy(status = Option(false), log = Option(successResponse.get.result.log)))
@@ -149,8 +149,8 @@ class NFTMintingFeeTransactions @Inject()(
         abciInfo <- abciInfo
         bcAccount <- bcAccount
         unconfirmedTxs <- unconfirmedTxs
-        nftSale <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedNFTSale <- broadcastTxAndUpdate(nftSale)
+        (nftSale, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        updatedNFTSale <- broadcastTxAndUpdate(nftSale, txRawBytes)
       } yield updatedNFTSale
     }
 
