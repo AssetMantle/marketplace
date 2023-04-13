@@ -246,3 +246,8 @@ function showLoader() {
         $(this).addClass("show");
     });
 }
+
+// Banner
+function setBanner(){
+    $("#bannerContent").html("").html($(".bannerContainer"));
+}
