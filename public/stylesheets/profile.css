@@ -25,6 +25,11 @@
     overflow: hidden;
     margin-bottom: 100px;
 }
+@media (max-width: 768px){
+    .nftContainer{
+        margin-bottom: 0px;
+    }
+}
 profileContainer .item-sticky .profile-card{
     height: fit-content;
     background-color: var(--card-color);

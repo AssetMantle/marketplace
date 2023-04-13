@@ -511,7 +511,6 @@
   height: fit-content;
   background-color: var(--card-color);
   border-radius: 20px;
-  margin-bottom: 100px;
 
   .centerCard {
     background-color: var(--card-color);
@@ -528,6 +527,12 @@
         }
       }
     }
+  }
+  @media (min-width: 768px){
+    margin-bottom: 100px;
+  }
+  @media (max-width: 768px){
+    margin-bottom: 0px;
   }
 }
 
