@@ -22,7 +22,9 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getAssetID(nftProperties: Seq[NFTProperty], collection: Collection): AssetID = utilities.NFT.getAssetID(collection.getClassificationID, this.getImmutables(nftProperties, collection))
 
-  def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getNFTFileAwsKey(collectionId = this.collectionId, fileName = this.getFileName)
+  def getAwsKey: String = utilities.NFT.getAWSKey(this.getFileName)
+
+  def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + this.getAwsKey
 
   def getImmutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && !x.mutable && x.nftId == this.id).map(_.toMetaProperty()(Collections.module, Collections.logger)) ++ utilities.NFT.getDefaultImmutableMetaProperties(name = this.name, description = this.description, fileHash = this.getFileHash, bondAmount = collection.getBondAmount.value.toLong)
 
@@ -132,7 +134,7 @@ class NFTs @Inject()(
 
     def getRandomNFTs(collectionId: String, n: Int, filterOut: Seq[String]): Future[Seq[NFT]] = filter(x => x.collectionId === collectionId && !x.id.inSet(filterOut)).map(util.Random.shuffle(_).take(n))
 
-    def getUnmintedNFTs(collectionId: String): Future[Seq[NFT]] = filter(x => x.collectionId === collectionId && !x.isMinted.?.getOrElse(true))
+    def getUnmintedNFTIDs(collectionId: String): Future[Seq[String]] = customQuery(NFTs.TableQuery.filter(x => x.collectionId === collectionId && !x.isMinted.?.getOrElse(true)).map(_.id).result)
 
     def getByAssetId(assetId: AssetID): Future[Option[NFT]] = filter(_.assetId === assetId.asString).map(_.headOption)
 
@@ -141,5 +143,7 @@ class NFTs @Inject()(
     def delete(id: String): Future[Int] = deleteById(id)
 
     def markReadyForMint(ids: Seq[String]): Future[Int] = if (ids.nonEmpty) customUpdate(NFTs.TableQuery.filter(_.id.inSet(ids)).map(_.mintReady).update(true)) else Future(0)
+
+    def getAllNFTs: Future[Seq[NFT]] = getAll
   }
 }

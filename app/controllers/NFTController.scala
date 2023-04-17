@@ -231,7 +231,7 @@ class NFTController @Inject()(
       val nftId = utilities.FileOperations.getFileHash(oldFilePath)
       val fileExtension = utilities.FileOperations.fileExtensionFromName(name)
       val newFileName = nftId + "." + fileExtension
-      val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collectionId, fileName = newFileName)
+      val awsKey = utilities.NFT.getAWSKey(fileName = newFileName)
       val collection = masterCollections.Service.tryGet(id = collectionId)
 
       def uploadToAws(collection: Collection) = if (collection.creatorId == loginState.username) Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))

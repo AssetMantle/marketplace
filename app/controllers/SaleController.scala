@@ -176,11 +176,11 @@ class SaleController @Inject()(
           val whitelistMembers = masterWhitelistMembers.Service.getAllMembers(createData.whitelistId)
           val collectionAnalysis = collectionsAnalysis.Service.tryGet(createData.collectionId)
           val saleExistOnCollection = masterSales.Service.getSaleByCollectionId(createData.collectionId).map(_.nonEmpty)
-          val unmintedNFTs = masterNFTs.Service.getUnmintedNFTs(createData.collectionId)
+          val unmintedNFTs = masterNFTs.Service.getUnmintedNFTIDs(createData.collectionId)
 
           def countNFts(unmintedNFTs: Seq[String]) = masterNFTOwners.Service.countForCreatorForPrimarySale(collectionId = createData.collectionId, creatorId = loginState.username, unmintedNFTs = unmintedNFTs)
 
-          def addToSale(collection: Collection, countNFts: Int, saleExistOnCollection: Boolean, collectionAnalysis: CollectionAnalysis, unmintedNFTs: Seq[NFT]) = {
+          def addToSale(collection: Collection, countNFts: Int, saleExistOnCollection: Boolean, collectionAnalysis: CollectionAnalysis, unmintedNFTs: Seq[String]) = {
             val maxSellNumber: Int = if (collectionAnalysis.totalNFTs <= 50) collectionAnalysis.totalNFTs.toInt else collectionAnalysis.totalNFTs.toInt / 10
             val errors = Seq(
               if (!loginState.isGenesisCreator) Option(constants.Response.NOT_GENESIS_CREATOR) else None,
@@ -193,7 +193,7 @@ class SaleController @Inject()(
             if (errors.isEmpty) {
               for {
                 saleId <- masterSales.Service.add(createData.toNewSale)
-                _ <- masterNFTOwners.Service.whitelistSaleRandomNFTs(collectionId = collection.id, nfts = createData.nftForSale, creatorId = loginState.username, saleId = saleId, unmintedNFTs = unmintedNFTs.map(_.id))
+                _ <- masterNFTOwners.Service.whitelistSaleRandomNFTs(collectionId = collection.id, nfts = createData.nftForSale, creatorId = loginState.username, saleId = saleId, unmintedNFTs = unmintedNFTs)
               } yield ()
             } else errors.head.throwFutureBaseException()
           }
@@ -208,7 +208,7 @@ class SaleController @Inject()(
             saleExistOnCollection <- saleExistOnCollection
             collectionAnalysis <- collectionAnalysis
             unmintedNFTs <- unmintedNFTs
-            countNFts <- countNFts(unmintedNFTs.map(_.id))
+            countNFts <- countNFts(unmintedNFTs)
             _ <- addToSale(collection = collection, countNFts = countNFts, saleExistOnCollection = saleExistOnCollection, collectionAnalysis = collectionAnalysis, unmintedNFTs = unmintedNFTs)
             _ <- collectionsAnalysis.Utility.onCreateSale(collection.id, totalListed = createData.nftForSale, salePrice = createData.price)
           } yield {

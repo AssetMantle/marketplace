@@ -10,7 +10,6 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import play.twirl.api.Html
 import utilities.MicroNumber
 import views.publicListing.companion._
 
@@ -159,11 +158,11 @@ class PublicListingController @Inject()(
         createData => {
           val collection = masterCollections.Service.tryGet(id = createData.collectionId)
           val collectionAnalysis = collectionsAnalysis.Service.tryGet(createData.collectionId)
-          val unmintedNFTs = masterNFTs.Service.getUnmintedNFTs(createData.collectionId)
+          val unmintedNFTs = masterNFTs.Service.getUnmintedNFTIDs(createData.collectionId)
 
           def countNFts(unmintedNFTs: Seq[String]) = masterNFTOwners.Service.countForCreatorForPrimarySale(collectionId = createData.collectionId, creatorId = loginState.username, unmintedNFTs = unmintedNFTs)
 
-          def addToPublicListing(countNFts: Int, collection: Collection, collectionAnalysis: CollectionAnalysis, unmintedNFTs: Seq[NFT]) = {
+          def addToPublicListing(countNFts: Int, collection: Collection, collectionAnalysis: CollectionAnalysis, unmintedNFTs: Seq[String]) = {
             val maxSellNumber: Int = if (collectionAnalysis.totalNFTs <= 50) collectionAnalysis.totalNFTs.toInt else collectionAnalysis.totalNFTs.toInt / 10
             val errors = Seq(
               if (!loginState.isGenesisCreator) Option(constants.Response.NOT_GENESIS_CREATOR) else None,
@@ -175,7 +174,7 @@ class PublicListingController @Inject()(
             if (errors.isEmpty) {
               for {
                 publicListingId <- masterPublicListings.Service.add(createData.toNewPublicListing)
-                _ <- masterNFTOwners.Service.publicListRandomNFTs(collectionId = collection.id, nfts = createData.numberOfNFTs, creatorId = loginState.username, publicListingId = publicListingId, unmintedNFTs = unmintedNFTs.map(_.id))
+                _ <- masterNFTOwners.Service.publicListRandomNFTs(collectionId = collection.id, nfts = createData.numberOfNFTs, creatorId = loginState.username, publicListingId = publicListingId, unmintedNFTs = unmintedNFTs)
               } yield ()
             } else errors.head.throwFutureBaseException()
           }
@@ -186,7 +185,7 @@ class PublicListingController @Inject()(
             collection <- collection
             collectionAnalysis <- collectionAnalysis
             unmintedNFTs <- unmintedNFTs
-            countNFts <- countNFts(unmintedNFTs.map(_.id))
+            countNFts <- countNFts(unmintedNFTs)
             _ <- addToPublicListing(countNFts = countNFts, collection = collection, collectionAnalysis = collectionAnalysis, unmintedNFTs = unmintedNFTs)
             _ <- sendNotification(collection.name)
             _ <- collectionsAnalysis.Utility.onCreatePublicListing(collection.id, totalListed = createData.numberOfNFTs, listingPrice = createData.price)

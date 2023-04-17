@@ -473,7 +473,7 @@ class CollectionController @Inject()(
   def countForCreatorNotForSell(collectionId: String, accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val unmintedNFTs = masterNFTs.Service.getUnmintedNFTs(collectionId).map(_.map(_.id))
+        val unmintedNFTs = masterNFTs.Service.getUnmintedNFTIDs(collectionId)
 
         def countNFTs(umintedNFTs: Seq[String]) = masterNFTOwners.Service.countForCreatorForPrimarySale(collectionId = collectionId, creatorId = accountId, unmintedNFTs = umintedNFTs)
 

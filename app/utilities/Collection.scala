@@ -16,7 +16,7 @@ object Collection {
 
   def getOthersFileAwsKey(collectionId: String, fileName: String): String = collectionId + others + fileName
 
-  def getNFTFileAwsKey(collectionId: String, fileName: String): String = collectionId + nfts + fileName
+  def getOldNFTFileAwsKey(collectionId: String, fileName: String): String = collectionId + nfts + fileName
 
   def getTotalBondAmount(immutables: Immutables, mutables: Mutables, bondRate: Int): Long = {
     val totalWeight = mutables.propertyList.propertyList.map(_.getBondedWeight).sum + immutables.propertyList.propertyList.map(_.getBondedWeight).sum

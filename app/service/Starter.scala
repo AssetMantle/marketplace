@@ -3,7 +3,8 @@ package service
 import models.analytics.CollectionsAnalysis
 import models.blockchainTransaction.DefineAsset
 import models.common.{Collection => commonCollection}
-import models.master.Collection
+import models.master.{Collection, NFT}
+import models.masterTransaction.NFTDraft
 import models.{blockchainTransaction, master, masterTransaction}
 import play.api.libs.json.{Json, Reads}
 import play.api.{Configuration, Logger}
@@ -286,7 +287,34 @@ class Starter @Inject()(
     }
   }
 
-  //  def changeAwsKey(): Future[Unit]
+  def changeAwsKey(): Future[Unit] = {
+    val nfts = masterNFTs.Service.getAllNFTs
+    val nftDrafts = masterTransactionNFTDrafts.Service.getAllNFTs
+    val collections = masterCollections.Service.fetchAll()
+
+    def updateKey(nfts: Seq[NFT], nftDrafts: Seq[NFTDraft], collections: Seq[Collection]): Unit = {
+      val allNFTs = nfts ++ nftDrafts.map(x => x.toNFT(collection = collections.find(_.id == x.collectionId).get))
+      logger.info("Copying all NFTs: " + allNFTs.length)
+      var migrated = 0
+      allNFTs.foreach(nft => {
+        val newKey = nft.getAwsKey
+        val oldKey = utilities.Collection.getOldNFTFileAwsKey(collectionId = nft.collectionId, fileName = nft.getFileName)
+        Thread.sleep(25)
+        if (!utilities.AmazonS3.exists(newKey)) {
+          if (utilities.AmazonS3.exists(oldKey)) {
+            utilities.AmazonS3.copyObject(sourceKey = oldKey, destinationKey = newKey)
+          } //else logger.error("NFT does not exists: " + nft.id + " collection: " + nft.collectionId)
+        } else migrated = migrated + 1
+      })
+      logger.info("Copied all NFTs: " + migrated)
+    }
+
+    for {
+      nfts <- nfts
+      nftDrafts <- nftDrafts
+      collections <- collections
+    } yield updateKey(nfts, nftDrafts, collections)
+  }
 
   def updateAssetIDs(): Future[Unit] = {
     println("Updating asset id")

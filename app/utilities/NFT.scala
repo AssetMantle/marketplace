@@ -8,6 +8,8 @@ import schema.qualified.Immutables
 
 object NFT {
 
+  def getAWSKey(fileName: String): String = "nft/" + fileName
+
   def getDefaultImmutableMetaProperties(name: String, description: String, fileHash: String, bondAmount: Long): Seq[MetaProperty] = Seq(
     MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.NFT_NAME), typeID = constants.Data.StringDataTypeID), data = StringData(name).toAnyData),
     //    MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.NFT_DESCRIPTION), typeID = constants.Data.StringDataTypeID), data = StringData(description).toAnyData),
