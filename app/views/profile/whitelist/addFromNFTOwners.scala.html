@@ -5,5 +5,5 @@
 
 @commonForm(constants.Form.ADD_FROM_NFT_OWNERS, addFromNFTOwnersForm) {
     @commonInputText(addFromNFTOwnersForm, constants.FormField.WHITELIST_ID, Symbol("value") -> whitelistId, Symbol("readonly") -> true, Symbol("class") -> "hidden")
-    @commonCustomSelect(addFromNFTOwnersForm, constants.FormField.SELECT_COLLECTION_ID, options)
+    @commonCustomSelect(addFromNFTOwnersForm, constants.FormField.SELECT_COLLECTION_ID, options, Symbol("class") -> "custom-select sources filledSelect")
 }
