@@ -14,10 +14,17 @@ function loadMoreCollections() {
         let showAll = true;
         let route = jsRoutes.controllers.CollectionController.collectionsPerPage($(".collectionPage").length + 1, showAll);
         let loadMore = $("#collectionsPerPage");
+        let loading = document.querySelector('.loading');
         $.ajax({
             url: route.url,
             type: route.type,
             async: true,
+            beforeSend: function () {
+                loading.classList.add('show');
+            },
+            complete: function () {
+                loading.classList.remove('show');
+            },
             statusCode: {
                 200: function (data) {
                     loadMore.append(data);
