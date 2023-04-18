@@ -321,7 +321,7 @@ class Starter @Inject()(
     val collectionId = "D4C3FD5554AEDB64"
     val creator = "Mint.E"
     val anniversaryNFT = NFT(name = "Anniversary Token", description = "", image = None, properties = Seq())
-    val anniversaryFile = constants.CommonConfig.Files.CollectionPath + "/anniversary.gif"
+    val anniversaryFile = constants.CommonConfig.Files.CollectionPath + "/annivresary.gif"
     val anniversaryFileHash = utilities.FileOperations.getFileHash(anniversaryFile)
     val newFileName = anniversaryFileHash + ".gif"
     val exists = Await.result(masterNFTs.Service.checkExists(anniversaryFileHash), Duration.Inf)
