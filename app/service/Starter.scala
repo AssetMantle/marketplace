@@ -342,9 +342,8 @@ class Starter @Inject()(
   def changeAwsKey(): Future[Unit] = {
     val nfts = masterNFTs.Service.getAllNFTs
     val nftDrafts = masterTransactionNFTDrafts.Service.getAllNFTs
-    val collections = masterCollections.Service.fetchAll()
 
-    def updateKey(nfts: Seq[master.NFT], nftDrafts: Seq[NFTDraft], collections: Seq[Collection]): Unit = {
+    def updateKey(nfts: Seq[master.NFT], nftDrafts: Seq[NFTDraft]): Unit = {
       val allNFTs = nfts ++ nftDrafts.map(x => x.toNFT())
       logger.info("Copying all NFTs: " + allNFTs.length)
       var migrated = 0
@@ -369,8 +368,7 @@ class Starter @Inject()(
     for {
       nfts <- nfts
       nftDrafts <- nftDrafts
-      collections <- collections
-    } yield updateKey(nfts, nftDrafts, collections)
+    } yield updateKey(nfts, nftDrafts)
   }
 
   // Delete redundant nft tags
