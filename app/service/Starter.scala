@@ -299,44 +299,22 @@ class Starter @Inject()(
     val bronzeNFT = NFT(name = "Token of Appreciation - Bronze", description = "", image = None, properties = Seq())
     val bronzeFile = constants.CommonConfig.Files.CollectionPath + "/bronze.gif"
 
-    val owners = Seq("sanidhya17", "hattori", "iamsecure1920", "ibrahim005", "mulemangesh09", "eysec", "sey1")
+    val owners = Seq("sanidhya17", "hattori", "iamsecure1920", "ibrahim005", "eysec", "sey1")
+
+    Await.result(masterNFTs.Service.delete("371ce239b88e770f86ea6393503b5b3ffeeb131f5a09e709758cc93f596abe91"), Duration.Inf)
 
     val bronzeFileHash = utilities.FileOperations.getFileHash(bronzeFile)
     val newFileName = bronzeFileHash + ".gif"
-    val exists = Await.result(masterNFTs.Service.checkExists(bronzeFileHash), Duration.Inf)
-    if (!exists) {
-      try {
-        val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collectionId, fileName = newFileName)
-        if (!utilities.AmazonS3.exists(awsKey)) utilities.AmazonS3.uploadFile(awsKey, bronzeFile)
-        Await.result(masterNFTs.Service.add(master.NFT(id = bronzeFileHash, collectionId = collectionId, name = bronzeNFT.name, description = bronzeNFT.description, totalSupply = owners.length, isMinted = false, fileExtension = "gif", ipfsLink = "", edition = None)), Duration.Inf)
-        Await.result(masterNFTOwners.Service.add(owners.map(x => master.NFTOwner(nftId = bronzeFileHash, ownerId = x, creatorId = creator, collectionId = collectionId, quantity = 1, saleId = None, publicListingId = None))), Duration.Inf)
-        Await.result(collectionsAnalysis.Utility.onNewNFT(collectionId), Duration.Inf)
-      } catch {
-        case exception: Exception => logger.error(exception.getLocalizedMessage)
-      }
-    } else logger.error("NFT with hash already exists: " + bronzeFileHash)
-  }
-
-  def addAnniversary(): Unit = {
-    val collectionId = "D4C3FD5554AEDB64"
-    val creator = "Mint.E"
-    val anniversaryNFT = NFT(name = "Anniversary Token", description = "", image = None, properties = Seq())
-    val anniversaryFile = constants.CommonConfig.Files.CollectionPath + "/annivresary.gif"
-    val anniversaryFileHash = utilities.FileOperations.getFileHash(anniversaryFile)
-    val newFileName = anniversaryFileHash + ".gif"
-    val exists = Await.result(masterNFTs.Service.checkExists(anniversaryFileHash), Duration.Inf)
-    val accountIds = Await.result(masterAccounts.Service.getAllUsernames, Duration.Inf)
     try {
       val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collectionId, fileName = newFileName)
-      if (!utilities.AmazonS3.exists(awsKey)) utilities.AmazonS3.uploadFile(awsKey, anniversaryFile)
-      if (!exists) {
-        Await.result(masterNFTs.Service.add(master.NFT(id = anniversaryFileHash, collectionId = collectionId, name = anniversaryNFT.name, description = anniversaryNFT.description, totalSupply = accountIds.length, isMinted = false, fileExtension = "gif", ipfsLink = "", edition = None)), Duration.Inf)
-      }
-      Await.result(masterNFTOwners.Service.add(accountIds.map(x => master.NFTOwner(nftId = anniversaryFileHash, ownerId = x, creatorId = creator, collectionId = collectionId, quantity = 1, saleId = None, publicListingId = None))), Duration.Inf)
+      if (!utilities.AmazonS3.exists(awsKey)) utilities.AmazonS3.uploadFile(awsKey, bronzeFile)
+      Await.result(masterNFTs.Service.add(master.NFT(id = bronzeFileHash, collectionId = collectionId, name = bronzeNFT.name, description = bronzeNFT.description, totalSupply = owners.length, isMinted = false, fileExtension = "gif", ipfsLink = "", edition = None)), Duration.Inf)
+      Await.result(masterNFTOwners.Service.add(owners.map(x => master.NFTOwner(nftId = bronzeFileHash, ownerId = x, creatorId = creator, collectionId = collectionId, quantity = 1, saleId = None, publicListingId = None))), Duration.Inf)
       Await.result(collectionsAnalysis.Utility.onNewNFT(collectionId), Duration.Inf)
     } catch {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
+
   }
 
   def changeAwsKey(): Future[Unit] = {
@@ -374,7 +352,6 @@ class Starter @Inject()(
   // Delete redundant nft tags
   def start(): Future[Unit] = {
     addBugBountyNFT()
-    addAnniversary()
     (for {
       _ <- changeAwsKey()
     } yield ()

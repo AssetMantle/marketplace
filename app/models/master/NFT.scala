@@ -113,5 +113,7 @@ class NFTs @Inject()(
       } yield nft.copy(isMinted = true)
 
     def getRandomNFTs(collectionId: String, n: Int, filterOut: Seq[String]): Future[Seq[NFT]] = filter(x => x.collectionId === collectionId && !x.id.inSet(filterOut)).map(util.Random.shuffle(_).take(n))
+
+    def delete(id: String): Future[Int] = deleteById(id)
   }
 }
