@@ -4,6 +4,7 @@ import models.analytics.CollectionsAnalysis
 import models.common.Collection.SocialProfile
 import models.common.{Collection => commonCollection}
 import models.master.Collection
+import models.masterTransaction.NFTDraft
 import models.{blockchainTransaction, master, masterTransaction}
 import play.api.libs.json.{Json, Reads}
 import play.api.{Configuration, Logger}
@@ -292,12 +293,92 @@ class Starter @Inject()(
     } yield ()
   }
 
+  def addBugBountyNFT(): Unit = {
+    val collectionId = "D4C3FD5554AEDB64"
+    val creator = "Mint.E"
+    val bronzeNFT = NFT(name = "Token of Appreciation - Bronze", description = "", image = None, properties = Seq())
+    val bronzeFile = constants.CommonConfig.Files.CollectionPath + "/bronze.gif"
+
+    val owners = Seq("sanidhya17", "hattori", "iamsecure1920", "ibrahim005", "mulemangesh09", "eysec", "sey1")
+
+    val bronzeFileHash = utilities.FileOperations.getFileHash(bronzeFile)
+    val newFileName = bronzeFileHash + ".gif"
+    val exists = Await.result(masterNFTs.Service.checkExists(bronzeFileHash), Duration.Inf)
+    if (!exists) {
+      try {
+        val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collectionId, fileName = newFileName)
+        if (!utilities.AmazonS3.exists(awsKey)) utilities.AmazonS3.uploadFile(awsKey, bronzeFile)
+        Await.result(masterNFTs.Service.add(master.NFT(id = bronzeFileHash, collectionId = collectionId, name = bronzeNFT.name, description = bronzeNFT.description, totalSupply = owners.length, isMinted = false, fileExtension = "gif", ipfsLink = "", edition = None)), Duration.Inf)
+        Await.result(masterNFTOwners.Service.add(owners.map(x => master.NFTOwner(nftId = bronzeFileHash, ownerId = x, creatorId = creator, collectionId = collectionId, quantity = 1, saleId = None, publicListingId = None))), Duration.Inf)
+        Await.result(collectionsAnalysis.Utility.onNewNFT(collectionId), Duration.Inf)
+      } catch {
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
+      }
+    } else logger.error("NFT with hash already exists: " + bronzeFileHash)
+  }
+
+  def addAnniversary(): Unit = {
+    val collectionId = "D4C3FD5554AEDB64"
+    val creator = "Mint.E"
+    val anniversaryNFT = NFT(name = "Anniversary Token", description = "", image = None, properties = Seq())
+    val anniversaryFile = constants.CommonConfig.Files.CollectionPath + "/anniversary.gif"
+    val anniversaryFileHash = utilities.FileOperations.getFileHash(anniversaryFile)
+    val newFileName = anniversaryFileHash + ".gif"
+    val exists = Await.result(masterNFTs.Service.checkExists(anniversaryFileHash), Duration.Inf)
+    val accountIds = Await.result(masterAccounts.Service.getAllUsernames, Duration.Inf)
+    try {
+      val awsKey = utilities.Collection.getNFTFileAwsKey(collectionId = collectionId, fileName = newFileName)
+      if (!utilities.AmazonS3.exists(awsKey)) utilities.AmazonS3.uploadFile(awsKey, anniversaryFile)
+      if (!exists) {
+        Await.result(masterNFTs.Service.add(master.NFT(id = anniversaryFileHash, collectionId = collectionId, name = anniversaryNFT.name, description = anniversaryNFT.description, totalSupply = accountIds.length, isMinted = false, fileExtension = "gif", ipfsLink = "", edition = None)), Duration.Inf)
+      }
+      Await.result(masterNFTOwners.Service.add(accountIds.map(x => master.NFTOwner(nftId = anniversaryFileHash, ownerId = x, creatorId = creator, collectionId = collectionId, quantity = 1, saleId = None, publicListingId = None))), Duration.Inf)
+      Await.result(collectionsAnalysis.Utility.onNewNFT(collectionId), Duration.Inf)
+    } catch {
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+    }
+  }
+
+  def changeAwsKey(): Future[Unit] = {
+    val nfts = masterNFTs.Service.getAllNFTs
+    val nftDrafts = masterTransactionNFTDrafts.Service.getAllNFTs
+    val collections = masterCollections.Service.fetchAll()
+
+    def updateKey(nfts: Seq[master.NFT], nftDrafts: Seq[NFTDraft], collections: Seq[Collection]): Unit = {
+      val allNFTs = nfts ++ nftDrafts.map(x => x.toNFT())
+      logger.info("Copying all NFTs: " + allNFTs.length)
+      var migrated = 0
+      allNFTs.foreach(nft => {
+        val newKey = utilities.Collection.getNFTNewAwsKey(nft.getFileName)
+        val oldKey = nft.getAwsKey
+        Thread.sleep(50)
+        try {
+          if (!utilities.AmazonS3.exists(newKey)) {
+            if (utilities.AmazonS3.exists(oldKey)) {
+              utilities.AmazonS3.copyObject(sourceKey = oldKey, destinationKey = newKey)
+              migrated = migrated + 1
+            } else logger.error("NFT does not exists: " + nft.id + " collection: " + nft.collectionId)
+          } else migrated = migrated + 1
+        } catch {
+          case exception: Exception => logger.error(exception.getLocalizedMessage)
+        }
+      })
+      logger.info("Copied all NFTs: " + migrated)
+    }
+
+    for {
+      nfts <- nfts
+      nftDrafts <- nftDrafts
+      collections <- collections
+    } yield updateKey(nfts, nftDrafts, collections)
+  }
+
   // Delete redundant nft tags
   def start(): Future[Unit] = {
+    addBugBountyNFT()
+    addAnniversary()
     (for {
-      _ <- deleteCollection("E93C0A1B72E3B340")
-      _ <- deleteCollection("D3597B243628110D")
-      _ <- uploadCollections()
+      _ <- changeAwsKey()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)

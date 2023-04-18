@@ -14,7 +14,9 @@ case class NFT(id: String, collectionId: String, name: String, description: Stri
 
   def getFileName: String = this.id + "." + this.fileExtension
 
-  def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getNFTFileAwsKey(collectionId = this.collectionId, fileName = this.getFileName)
+  def getAwsKey: String = utilities.Collection.getNFTFileAwsKey(collectionId = this.collectionId, fileName = this.getFileName)
+
+  def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + this.getAwsKey
 
   def getDefaultProperties(classificationId: String): Seq[constants.NFT.Property] = Seq(
     constants.NFT.Property(name = constants.Collection.DefaultProperty.NFT_NAME, `type` = constants.NFT.Data.STRING, `value` = this.name, meta = true, mutable = false),
@@ -101,6 +103,8 @@ class NFTs @Inject()(
     def update(nft: NFT): Future[Unit] = updateById(nft)
 
     def countNFTs(collectionId: String): Future[Int] = filterAndCount(_.collectionId === collectionId)
+
+    def getAllNFTs: Future[Seq[NFT]] = getAll
 
     def markNFTMinted(id: String): Future[NFT] =
       for {
