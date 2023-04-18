@@ -302,6 +302,7 @@ class Starter @Inject()(
     val owners = Seq("sanidhya17", "hattori", "iamsecure1920", "ibrahim005", "eysec", "sey1")
 
     Await.result(masterNFTs.Service.delete("371ce239b88e770f86ea6393503b5b3ffeeb131f5a09e709758cc93f596abe91"), Duration.Inf)
+    Await.result(masterNFTOwners.Service.deleteByNFTID("371ce239b88e770f86ea6393503b5b3ffeeb131f5a09e709758cc93f596abe91"), Duration.Inf)
 
     val bronzeFileHash = utilities.FileOperations.getFileHash(bronzeFile)
     val newFileName = bronzeFileHash + ".gif"
@@ -310,7 +311,6 @@ class Starter @Inject()(
       if (!utilities.AmazonS3.exists(awsKey)) utilities.AmazonS3.uploadFile(awsKey, bronzeFile)
       Await.result(masterNFTs.Service.add(master.NFT(id = bronzeFileHash, collectionId = collectionId, name = bronzeNFT.name, description = bronzeNFT.description, totalSupply = owners.length, isMinted = false, fileExtension = "gif", ipfsLink = "", edition = None)), Duration.Inf)
       Await.result(masterNFTOwners.Service.add(owners.map(x => master.NFTOwner(nftId = bronzeFileHash, ownerId = x, creatorId = creator, collectionId = collectionId, quantity = 1, saleId = None, publicListingId = None))), Duration.Inf)
-      Await.result(collectionsAnalysis.Utility.onNewNFT(collectionId), Duration.Inf)
     } catch {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
     }

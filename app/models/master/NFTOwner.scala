@@ -105,6 +105,8 @@ class NFTOwners @Inject()(
 
     def delete(nftId: String, ownerId: String): Future[Int] = deleteById1AndId2(id1 = nftId, id2 = ownerId)
 
+    def deleteByNFTID(nftId: String): Future[Int] = filterAndDelete(_.nftId === nftId)
+
     def markNFTSoldFromSale(nftId: String, saleId: String, sellerAccountId: String, buyerAccountId: String): Future[Unit] = {
       val nftOwner = tryGet(nftId = nftId, ownerId = sellerAccountId)
 
