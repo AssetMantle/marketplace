@@ -1,7 +1,7 @@
 $gif = $("#gifImage");
 $timer = undefined;
-let myModal = new bootstrap.Modal($("#nftRevealModal"), {});
-let isModalOpen = false;
+myModal = new bootstrap.Modal($("#nftRevealModal"), {});
+isModalOpen = false;
 
 function loadGif() {
     var style = document.createElement("style");

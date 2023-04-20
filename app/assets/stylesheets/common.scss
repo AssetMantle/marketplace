@@ -1388,11 +1388,12 @@ body.modal-open{
                 .cardRotator {
                   width: 340px;
                   height: 340px;
+                  background-color: var(--popup-bg);
                   aspect-ratio: 1;
                   position: relative;
                   z-index: 10;
                   touch-action: none;
-                  border-radius: 5% / 3.5%;
+                  border-radius: 10px;
                   transition: transform 0.1s ease-out;
                   will-change: transform, filter;
                   transform-origin: center;
