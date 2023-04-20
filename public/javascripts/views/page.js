@@ -27,6 +27,7 @@ function viewSecondaryMarketCollections() {
 }
 
 function viewCollection(collectionId) {
+    $('#bannerContent').html('');
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs(collectionId));
     componentResource('rightContent', jsRoutes.controllers.CollectionController.topRightCard(collectionId));
@@ -34,6 +35,7 @@ function viewCollection(collectionId) {
 }
 
 function viewLaunchpadCollection(collectionId) {
+    $('#bannerContent').html('');
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.SaleController.collectionNFTs(collectionId));
     componentResource('rightContent', jsRoutes.controllers.SaleController.collectionTopRightCard(collectionId));
@@ -42,6 +44,7 @@ function viewLaunchpadCollection(collectionId) {
 
 
 function viewEarlyAccessCollection(collectionId) {
+    $('#bannerContent').html('');
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.PublicListingController.collectionNFTs(collectionId));
     componentResource('rightContent', jsRoutes.controllers.PublicListingController.collectionTopRightCard(collectionId));
@@ -49,6 +52,7 @@ function viewEarlyAccessCollection(collectionId) {
 }
 
 function viewMarketCollection(collectionId) {
+    $('#bannerContent').html('');
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.SecondaryMarketController.collectionNFTs(collectionId));
     componentResource('rightContent', jsRoutes.controllers.SecondaryMarketController.collectionTopRightCard(collectionId));
@@ -58,6 +62,7 @@ function viewMarketCollection(collectionId) {
 function viewCollectedCollection(lastPart) {
     let accountId = lastPart.split("/")[0];
     let collectionId = lastPart.split("/")[2];
+    $('#bannerContent').html('');
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.CollectedController.collectionNFTs(accountId, collectionId));
     componentResource('rightContent', jsRoutes.controllers.CollectedController.topRightCard(collectionId, accountId));
@@ -67,6 +72,7 @@ function viewCollectedCollection(lastPart) {
 function viewWishListCollection(lastPart) {
     let accountId = lastPart.split("/")[0];
     let collectionId = lastPart.split("/")[2];
+    $('#bannerContent').html('');
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.WishlistController.collectionNFTs(accountId, collectionId));
     $('#rightContent').html('');
@@ -75,11 +81,13 @@ function viewWishListCollection(lastPart) {
 function viewCreatedCollection(lastPart) {
     let accountId = lastPart.split("/")[0];
     let collectionId = lastPart.split("/")[2];
+    $('#bannerContent').html('');
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs(accountId, collectionId));
 }
 
 function viewNFT(nftId) {
+    $('#bannerContent').html('');
     componentResource('leftContent', jsRoutes.controllers.NFTController.detailViewLeftCards(nftId));
     componentResource('centerContent', jsRoutes.controllers.NFTController.details(nftId));
     componentResource('rightContent', jsRoutes.controllers.NFTController.detailViewRightCards(nftId));
@@ -87,6 +95,7 @@ function viewNFT(nftId) {
 }
 
 function viewSetting() {
+    $('#bannerContent').html('');
     componentResource('centerContent', jsRoutes.controllers.SettingController.settings());
     checkAndPushState(jsRoutes.controllers.SettingController.viewSettings().url, '', "setting");
     $('#leftContent').html('');
@@ -96,6 +105,7 @@ function viewSetting() {
 function viewProfile(lastPart) {
     let accountId = lastPart.split("/")[0];
     let activeTab = lastPart.split("/")[1];
+    $('#bannerContent').html('');
     componentResource('leftContent', jsRoutes.controllers.ProfileController.profileInfoCard(accountId));
     componentResource('centerContent', jsRoutes.controllers.ProfileController.profile(accountId, activeTab));
     componentResource('rightContent', jsRoutes.controllers.ProfileController.profileAnalysisCard(accountId));

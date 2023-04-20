@@ -922,8 +922,9 @@
 }
 
 #notificationList{
-  height: 200px;
+  height: 190px;
   overflow-y: auto;
+  padding-right: 10px;
 }
 
 // New Feature Icon
@@ -1117,6 +1118,7 @@ body.modal-open{
     height: 100%;
     width: 100%;
     object-fit: cover;
+    object-position: center;
   }
   .messageContainer{
     position: absolute;

@@ -159,6 +159,9 @@
       }
     }
   }
+  @media (max-width: 768px){
+    margin-bottom: 0px;
+  }
 }
 .toggleBtn{
   position: relative;
@@ -781,6 +784,9 @@
         }
       }
     }
+  }
+  @media (max-width: 768px){
+    margin-bottom: 0px;
   }
 }
 
