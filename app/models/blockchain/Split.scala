@@ -1,6 +1,6 @@
 package models.blockchain
 
-import models.traits.{Entity2, GenericDaoImpl2, Logging, ModelTable2}
+import models.traits.{Entity2, GenericDaoImpl2, ModelTable2}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
@@ -12,7 +12,7 @@ import utilities.MicroNumber
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Split(ownerID: Array[Byte], ownableID: Array[Byte], value: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[Array[Byte], Array[Byte]] {
+case class Split(ownerID: Array[Byte], ownableID: Array[Byte], value: BigDecimal) extends Entity2[Array[Byte], Array[Byte]] {
 
   def id1: Array[Byte] = this.ownerID
 
@@ -30,21 +30,13 @@ object Splits {
 
   class DataTable(tag: Tag) extends Table[Split](tag, "Split") with ModelTable2[Array[Byte], Array[Byte]] {
 
-    def * = (ownerID, ownableID, value, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Split.tupled, Split.unapply)
+    def * = (ownerID, ownableID, value) <> (Split.tupled, Split.unapply)
 
     def ownerID = column[Array[Byte]]("ownerID", O.PrimaryKey)
 
     def ownableID = column[Array[Byte]]("ownableID", O.PrimaryKey)
 
     def value = column[BigDecimal]("value")
-
-    def createdBy = column[String]("createdBy")
-
-    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
-
-    def updatedBy = column[String]("updatedBy")
-
-    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
     def id1 = ownerID
 

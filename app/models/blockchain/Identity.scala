@@ -1,6 +1,6 @@
 package models.blockchain
 
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.traits.{Entity, GenericDaoImpl, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
@@ -16,7 +16,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Identity(id: Array[Byte], idString: String, classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
+case class Identity(id: Array[Byte], idString: String, classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte]) extends Entity[Array[Byte]] {
 
   def getIDString: String = utilities.Secrets.base64URLEncoder(this.id)
 
@@ -56,7 +56,7 @@ object Identities {
 
   class DataTable(tag: Tag) extends Table[Identity](tag, "Identity") with ModelTable[Array[Byte]] {
 
-    def * = (id, idString, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Identity.tupled, Identity.unapply)
+    def * = (id, idString, classificationID, immutables, mutables) <> (Identity.tupled, Identity.unapply)
 
     def id = column[Array[Byte]]("id", O.PrimaryKey)
 
@@ -67,15 +67,6 @@ object Identities {
     def immutables = column[Array[Byte]]("immutables")
 
     def mutables = column[Array[Byte]]("mutables")
-
-    def createdBy = column[String]("createdBy")
-
-    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
-
-    def updatedBy = column[String]("updatedBy")
-
-    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
-
   }
 
   val TableQuery = new TableQuery(tag => new DataTable(tag))

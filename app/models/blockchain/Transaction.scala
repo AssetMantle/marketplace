@@ -12,7 +12,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-case class Transaction(hash: String, height: Int, code: Int, log: String, gasWanted: String, gasUsed: String, txBytes: Array[Byte]) extends Entity[String] {
+case class Transaction(hash: String, height: Int, code: Int, log: Option[String], gasWanted: String, gasUsed: String, txBytes: Array[Byte]) extends Entity[String] {
   def id: String = hash
 
   def status: Boolean = code == 0
@@ -30,7 +30,7 @@ object Transactions {
 
   class TransactionTable(tag: Tag) extends Table[Transaction](tag, "Transaction") with ModelTable[String] {
 
-    def * = (hash, height, code, log, gasWanted, gasUsed, txBytes) <> (Transaction.tupled, Transaction.unapply)
+    def * = (hash, height, code, log.?, gasWanted, gasUsed, txBytes) <> (Transaction.tupled, Transaction.unapply)
 
     def hash = column[String]("hash", O.PrimaryKey)
 

@@ -15,7 +15,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Asset(id: Array[Byte], idString: String, classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
+case class Asset(id: Array[Byte], idString: String, classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte]) extends Entity[Array[Byte]] {
 
   def getIDString: String = utilities.Secrets.base64URLEncoder(this.id)
 
@@ -59,7 +59,7 @@ object Assets {
 
   class DataTable(tag: Tag) extends Table[Asset](tag, "Asset") with ModelTable[Array[Byte]] {
 
-    def * = (id, idString, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Asset.tupled, Asset.unapply)
+    def * = (id, idString, classificationID, immutables, mutables) <> (Asset.tupled, Asset.unapply)
 
     def id = column[Array[Byte]]("id", O.PrimaryKey)
 
@@ -70,14 +70,6 @@ object Assets {
     def immutables = column[Array[Byte]]("immutables")
 
     def mutables = column[Array[Byte]]("mutables")
-
-    def createdBy = column[String]("createdBy")
-
-    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
-
-    def updatedBy = column[String]("updatedBy")
-
-    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
   }
 
