@@ -27,10 +27,9 @@
             </div>
         </div>
     </div>
-    <div id="createdWhitelistPagination" class="mt-4 horizontal-align">
-        @commonPaginationButton(constants.View.BACK, JavaScript(s"createdWhitelistPaginationOnBack()"), icon = "bi-chevron-left", size = "small", iconFirst = true, Symbol("id") -> "createdWhitelistPaginationBack")
-        @commonPaginationButton(constants.View.NEXT, JavaScript(s"createdWhitelistPaginationOnNext(${totalWhitelists}, ${constants.CommonConfig.Pagination.WhitelistPerPage})"), icon = "bi-chevron-right", size = "small", iconFirst = false, Symbol("id") -> "createdWhitelistPaginationNext")
-
+    <div id="createdWhitelistPagination" class="mt-0 horizontal-align">
+        @commonPaginationButton(constants.View.BACK, JavaScript(s"createdWhitelistPaginationOnBack()"), icon = "bi-chevron-left", size = "small", iconFirst = true, Symbol("id") -> "createdWhitelistPaginationBack", Symbol("class") -> "mt-4")
+        @commonPaginationButton(constants.View.NEXT, JavaScript(s"createdWhitelistPaginationOnNext(${totalWhitelists}, ${constants.CommonConfig.Pagination.WhitelistPerPage})"), icon = "bi-chevron-right", size = "small", iconFirst = false, Symbol("id") -> "createdWhitelistPaginationNext", Symbol("class") -> "mt-4")
     </div>
     <script>createdWhitelistPaginationOnNext(@totalWhitelists, @constants.CommonConfig.Pagination.WhitelistPerPage)</script>
 } else {

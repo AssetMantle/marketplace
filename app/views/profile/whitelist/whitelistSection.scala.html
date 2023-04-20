@@ -7,36 +7,34 @@
         @if(loginState.isCreator || whitelistsMade > 0) {
             <div class="d-flex gap-2 align-items-center justify-content-between title" style="width: 110px;">
             } else {
-            <div class="d-flex gap-2 align-items-center justify-content-between title">
+            <div class="d-flex gap-2 align-items-center justify-content-between title" style="height: 34px;">
             }
     <div class="titleLabel"></div>
-    <div class="hoverMenu">
-        <ul class="d-flex flex-row gap-2 mb-0 links">
-            <li class="menuItem">
-                @if(loginState.isCreator || whitelistsMade > 0) {
-                    <a class="desktop-link" target="_blank">
-                        <i class="bi bi-chevron-down iconGray iconSmall"></i>
-                    </a>
-                }
-                <div class="subMenu">
-                    <div class="subMenuList">
-                        @if(loginState.isCreator || whitelistsMade > 0) {
-                            <div class="subMenuItem">
-                                <a onclick="showWhitelistScreen('created')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
-                                    <div class="subMenuItemLabel">@Messages(constants.View.CREATED_WHITELISTS)</div>
-                                </a>
+        @if(loginState.isCreator || whitelistsMade > 0) {
+            <div class="hoverMenu">
+                <ul class="d-flex flex-row gap-2 mb-0 links">
+                    <li class="menuItem">
+                        <a class="desktop-link" target="_blank">
+                            <i class="bi bi-chevron-down iconGray iconSmall"></i>
+                        </a>
+                        <div class="subMenu">
+                            <div class="subMenuList">
+                                <div class="subMenuItem">
+                                    <a onclick="showWhitelistScreen('created')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
+                                        <div class="subMenuItemLabel">@Messages(constants.View.CREATED_WHITELISTS)</div>
+                                    </a>
+                                </div>
+                                <div class="subMenuItem">
+                                    <a onclick="showWhitelistScreen('joined')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
+                                        <div class="subMenuItemLabel">@Messages(constants.View.JOINED_WHITELISTS)</div>
+                                    </a>
+                                </div>
                             </div>
-                        }
-                        <div class="subMenuItem">
-                            <a onclick="showWhitelistScreen('joined')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
-                                <div class="subMenuItemLabel">@Messages(constants.View.JOINED_WHITELISTS)</div>
-                            </a>
                         </div>
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </div>
+                    </li>
+                </ul>
+            </div>
+        }
     </div>
         @if(loginState.isCreator) {
             <div class="titleMenu">
