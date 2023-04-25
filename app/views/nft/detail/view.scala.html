@@ -19,7 +19,13 @@
     <div class="mt-2 nftImagePreview">
         <a href="@nft.getS3Url" target="_blank">
             <div id="nftImage_@nft.id">
-                <img src="@nft.getS3Url">
+                @if(constants.File.ALL_IMAGES_WITH_GIF.contains(nft.fileExtension)) {
+                    <img src="@nft.getS3Url">
+                } else {
+                    <audio controls>
+                        <source src="@nft.getS3Url">
+                    </audio>
+                }
             </div>
         </a>
     </div>

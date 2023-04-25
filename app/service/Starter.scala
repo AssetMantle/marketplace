@@ -1,7 +1,6 @@
 package service
 
 import models.analytics.CollectionsAnalysis
-import models.blockchainTransaction.DefineAsset
 import models.common.{Collection => commonCollection}
 import models.master.{Collection, NFT}
 import models.masterTransaction.NFTDraft
@@ -9,7 +8,6 @@ import models.{blockchainTransaction, master, masterTransaction}
 import play.api.libs.json.{Json, Reads}
 import play.api.{Configuration, Logger}
 import queries.blockchain.{GetABCIInfo, GetAccount}
-import transactions.responses.blockchain.BroadcastTxSyncResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
@@ -215,61 +213,6 @@ class Starter @Inject()(
     } yield ()
   }
 
-  def defineOrderAndAssets(): Future[Unit] = {
-    val collections = masterCollections.Service.fetchAll()
-    val abciInfo = getAbciInfo.Service.get
-    val bcAccount = getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount)
-
-    def getMessages(collections: Seq[Collection]) = collections.map(collection => {
-      utilities.BlockchainTransaction.getDefineAssetMsg(fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, fromID = constants.Blockchain.MantlePlaceFromID, immutableMetas = collection.getImmutableMetaProperties, immutables = collection.getImmutableProperties, mutableMetas = collection.getMutableMetaProperties, mutables = collection.getMutableProperties)
-    }) ++ Seq(utilities.BlockchainTransaction.getDefineOrderMsg(fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, fromID = constants.Blockchain.MantlePlaceFromID, immutableMetas = Seq(constants.Orders.OriginMetaProperty), mutableMetas = Seq(), immutables = Seq(), mutables = Seq()))
-
-    def checkMempoolAndAddTx(collections: Seq[Collection], bcAccount: models.blockchain.Account, latestBlockHeight: Int) = {
-      val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
-      val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-        messages = getMessages(collections),
-        fee = utilities.BlockchainTransaction.getFee(gasPrice = 0.001, gasLimit = constants.Blockchain.DefaultDefineAssetGasLimit * collections.length),
-        gasLimit = constants.Blockchain.DefaultDefineAssetGasLimit * collections.size,
-        account = bcAccount,
-        ecKey = constants.Blockchain.MantleNodeMaintainerWallet.getECKey,
-        timeoutHeight = timeoutHeight)
-      val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
-
-      def checkAndAdd() = {
-        for {
-          defineAsset <- blockchainTransactionDefineAssets.Service.add(txHash = txHash, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
-          _ <- masterTransactionDefineAssetTxs.Service.addWithNoneStatus(txHash = txHash, collectionIds = collections.map(_.id))
-        } yield (defineAsset, txRawBytes)
-      }
-
-      for {
-        issueIdentity <- checkAndAdd()
-      } yield issueIdentity
-    }
-
-    def broadcastTxAndUpdate(defineAsset: DefineAsset, txRawBytes: Array[Byte]) = {
-
-      val broadcastTx = broadcastTxSync.Service.get(defineAsset.getTxRawAsHexString(txRawBytes))
-
-      def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionDefineAssets.Service.markFailedWithLog(txHashes = Seq(defineAsset.txHash), log = errorResponse.get.error.data)
-      else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionDefineAssets.Service.markFailedWithLog(txHashes = Seq(defineAsset.txHash), log = successResponse.get.result.log)
-      else Future(0)
-
-      for {
-        (successResponse, errorResponse) <- broadcastTx
-        _ <- update(successResponse, errorResponse)
-      } yield ()
-    }
-
-    for {
-      collections <- collections
-      abciInfo <- abciInfo
-      bcAccount <- bcAccount
-      (defineAsset, txRawBytes) <- checkMempoolAndAddTx(collections, bcAccount, abciInfo.result.response.last_block_height.toInt)
-      _ <- broadcastTxAndUpdate(defineAsset, txRawBytes)
-    } yield ()
-  }
-
   def updateIdentityIDs(): Future[Unit] = {
     println("Updating identity id")
 
@@ -389,12 +332,13 @@ class Starter @Inject()(
   // Delete redundant nft tags
 
   def start(): Future[Unit] = {
-    (for {
-      _ <- defineOrderAndAssets()
-    } yield ()
-      ).recover {
-      case exception: Exception => logger.error(exception.getLocalizedMessage)
-    }
+//    (for {
+//      _ <- defineOrderAndAssets()
+//    } yield ()
+//      ).recover {
+//      case exception: Exception => logger.error(exception.getLocalizedMessage)
+//    }
+    Future()
   }
 
 }

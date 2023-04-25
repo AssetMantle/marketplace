@@ -216,8 +216,9 @@ object FileOperations {
 
   def checkAndCreateDirectory(path: String): String = try {
     val directory = new File(path)
-    if (directory.exists()) path
-    else {
+    if (directory.exists()) {
+      path
+    } else {
       if (directory.mkdirs()) path
       else constants.Response.DIRECTORY_CREATION_FAILED.throwBaseException()
     }
