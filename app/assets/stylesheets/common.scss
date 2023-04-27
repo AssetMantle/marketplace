@@ -1468,3 +1468,74 @@ body.modal-open{
     display: none;
   }
 }
+
+// Audio NFT Card
+.audioNftContainer{
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  .audioPlayer{
+    display: none;
+  }
+  .controls {
+    margin: 0 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .playButton {
+      height: 36px;
+      width: 36px;
+      aspect-ratio: 1;
+      background-color: rgba(44,44,44,0.4);
+      border-radius: 50%;
+      position: relative;
+      transition: all 0.3s;
+      cursor: pointer;
+      &:hover{
+        background-color: rgba(44,44,44,1);
+      }
+
+      i {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    .volumeContainer {
+      cursor: pointer;
+      z-index: 2;
+      width: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(44,44,44,0.4);
+      height: 36px;
+      padding: 9px;
+      border-radius: 18px;
+      position: relative;
+      transition: all 0.3s;
+      .volumeSlider {
+        width: 0%;
+        height: 4px;
+        background: white;
+        border-radius: 2px;
+        overflow: hidden;
+        .volumePercentage {
+          background: var(--default);
+          height: 100%;
+          width: 100%;
+        }
+      }
+      &:hover{
+        background-color: rgba(44,44,44,1);
+        width: 120px;
+        gap: 4px;
+        .volumeSlider {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

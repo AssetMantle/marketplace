@@ -251,3 +251,24 @@ function showLoader() {
 function setBanner(){
     $("#bannerContent").html("").html($(".bannerContainer"));
 }
+
+// Audio NFT
+function playToggle(e) {
+    var player = $(e).closest(".audioNftContainer").find(".audioPlayer");
+    let buttonIcon = $(e).find("i");
+    if ($(player)[0].paused === false) {
+        $(player)[0].pause();
+        $(buttonIcon).attr("class","bi bi-play iconWhite");
+    } else {
+        $(player)[0].play();
+        $(buttonIcon).attr("class","bi bi-pause iconWhite");
+    }
+}
+
+function setVolume(e){
+    var player = $(e).closest(".audioNftContainer").find(".audioPlayer");
+    const sliderWidth = window.getComputedStyle(e).width;
+    const newVolume = event.offsetX / parseInt(sliderWidth);
+    $(player)[0].volume = newVolume;
+    $(e).find(".volumePercentage").css("width", newVolume * 100 + '%');
+}
