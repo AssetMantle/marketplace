@@ -33,13 +33,15 @@
                 </audio>
 
                 <div class="controls">
-                    <div class="playButton" onclick="playToggle(this)">
-                        <i class="bi bi-play iconWhite"></i>
+                    <div class="playButtonContainer">
+                        <div class="playButton" onclick="playToggle(this)">
+                            <i class="bi bi-play"></i>
+                        </div>
                     </div>
 
                     <div class="volumeContainer">
-                        <div class="volumeButton">
-                            <i class="bi bi-volume-up iconWhite"></i>
+                        <div class="volumeButton" onclick="muteVolume(this)">
+                            <i class="bi bi-volume-up"></i>
                         </div>
 
                         <div class="volumeSlider" onclick="setVolume(this)">

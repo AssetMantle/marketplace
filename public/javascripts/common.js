@@ -253,22 +253,116 @@ function setBanner(){
 }
 
 // Audio NFT
+// Set Audio Duration
+function setDuration(e){
+    event.preventDefault();
+    let player = $(e).closest(".audioNftContainer").find(".audioPlayer");
+    $(".time .length").text(getTimeCodeFromNum($(player)[0].duration));
+}
+
+// Play/Pause Audio
 function playToggle(e) {
-    var player = $(e).closest(".audioNftContainer").find(".audioPlayer");
+    event.preventDefault();
+    let player = $(e).closest(".audioNftContainer").find(".audioPlayer");
     let buttonIcon = $(e).find("i");
     if ($(player)[0].paused === false) {
         $(player)[0].pause();
-        $(buttonIcon).attr("class","bi bi-play iconWhite");
+        $(buttonIcon).attr("class","bi bi-play");
     } else {
         $(player)[0].play();
-        $(buttonIcon).attr("class","bi bi-pause iconWhite");
+        $(buttonIcon).attr("class","bi bi-pause");
+    }
+    if($(".timelineContainer").length) {
+        setInterval(() => {
+            let progressBar = $(e).closest(".controls").find(".progress");
+            $(progressBar).css("width",$(player)[0].currentTime / $(player)[0].duration * 100 + "%");
+            $(".time .current").text(getTimeCodeFromNum($(player)[0].currentTime));
+        }, 100);
     }
 }
 
+// Audio Volume
 function setVolume(e){
-    var player = $(e).closest(".audioNftContainer").find(".audioPlayer");
+    event.preventDefault();
+    let player = $(e).closest(".audioNftContainer").find(".audioPlayer");
+    let buttonIcon = $(e).closest(".volumeContainer").find("i");
     const sliderWidth = window.getComputedStyle(e).width;
     const newVolume = event.offsetX / parseInt(sliderWidth);
     $(player)[0].volume = newVolume;
+    $(player)[0].muted = false;
+    if(newVolume >= 0.5){
+        $(buttonIcon).attr("class","bi bi-volume-up");
+    }
+    else if(newVolume < 0.5 && newVolume > 0){
+        $(buttonIcon).attr("class","bi bi-volume-down");
+    }
+    else{
+        $(buttonIcon).attr("class","bi bi-volume-mute");
+    }
     $(e).find(".volumePercentage").css("width", newVolume * 100 + '%');
+}
+
+// Mute/Unmute Audio
+function muteVolume(e){
+    event.preventDefault();
+    let player = $(e).closest(".audioNftContainer").find(".audioPlayer");
+    let buttonIcon = $(e).closest(".volumeContainer").find("i");
+    let volumeSeekBar = $(e).next(".volumeSlider").find(".volumePercentage");
+
+    $(player)[0].muted = !$(player)[0].muted;
+    if ($(player)[0].muted) {
+        $(buttonIcon).attr("class","bi bi-volume-mute");
+        $(volumeSeekBar).css("width", '0%');
+    } else {
+        if($(player)[0].volume >= 0.5){
+            $(buttonIcon).attr("class","bi bi-volume-up");
+        }
+        else if($(player)[0].volume < 0.5 && $(player)[0].volume > 0){
+            $(buttonIcon).attr("class","bi bi-volume-down");
+        }
+        else{
+            $(buttonIcon).attr("class","bi bi-volume-mute");
+        }
+        $(volumeSeekBar).css("width", $(player)[0].volume * 100 +'%');
+    }
+}
+
+// Audio Timeline
+function skipAudio(e){
+    event.preventDefault();
+    let player = $(e).closest(".audioNftContainer").find(".audioPlayer");
+    const timelineWidth = window.getComputedStyle(e).width;
+    const timeToSeek = event.offsetX / parseInt(timelineWidth) * $(player)[0].duration;
+    $(player)[0].currentTime = timeToSeek;
+}
+
+// Convert Audio time from second to min
+function getTimeCodeFromNum(num) {
+    let seconds = parseInt(num);
+    let minutes = parseInt(seconds / 60);
+    seconds -= minutes * 60;
+    const hours = parseInt(minutes / 60);
+    minutes -= hours * 60;
+
+    if (hours === 0) return `${minutes}:${String(seconds % 60).padStart(2, 0)}`;
+    return `${String(hours).padStart(2, 0)}:${minutes}:${String(
+        seconds % 60
+    ).padStart(2, 0)}`;
+}
+
+// Reset Audio Player
+function resetAudioPlayer(e){
+    let player = $(e);
+    let buttonIcon = $(e).next(".controls").find(".playButton i");
+    if ($(player)[0].ended) {
+        $(buttonIcon).attr("class","bi bi-play");
+    }
+
+    if($(".timelineContainer").length) {
+        let progressBar = $(e).next(".controls").find(".timelineContainer .timeline .progress");
+        // console.log($(player)[0].currentTime);
+        // console.log($(player)[0].duration * 100);
+        // $(progressBar).css("width",$(player)[0].currentTime / $(player)[0].duration * 100 + "%");
+        // $(".time .current").text("0:00");
+    }
 }
