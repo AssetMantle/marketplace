@@ -7,10 +7,10 @@ import schema.id.base.{DataID, StringID}
 object Data {
 
   def getTypeID(`type`: String): StringID = `type` match {
-    case constants.NFT.Data.STRING => constants.Data.StringDataTypeID
-    case constants.NFT.Data.BOOLEAN => constants.Data.BooleanDataTypeID
-    case constants.NFT.Data.NUMBER => constants.Data.NumberDataTypeID
-    case _ => constants.Data.StringDataTypeID
+    case constants.NFT.Data.STRING => schema.constants.Data.StringDataTypeID
+    case constants.NFT.Data.BOOLEAN => schema.constants.Data.BooleanDataTypeID
+    case constants.NFT.Data.NUMBER => schema.constants.Data.NumberDataTypeID
+    case _ => schema.constants.Data.StringDataTypeID
   }
 
   def getDataID(`type`: String, value: String): DataID = `type` match {

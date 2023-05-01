@@ -9,12 +9,12 @@ import schema.qualified.Immutables
 
 object Identity {
 
-  private val idPropertyID = PropertyID(keyID = StringID("id"), typeID = constants.Data.StringDataTypeID)
-  private val originPropertyID = PropertyID(keyID = StringID("origin"), typeID = constants.Data.StringDataTypeID)
-  private val twitterPropertyID = PropertyID(keyID = StringID("twitter"), typeID = constants.Data.StringDataTypeID)
-  private val note1PropertyID = PropertyID(keyID = StringID("note1"), typeID = constants.Data.StringDataTypeID)
-  private val note2PropertyID = PropertyID(keyID = StringID("note2"), typeID = constants.Data.StringDataTypeID)
-  private val extraPropertyID = PropertyID(keyID = StringID("extra"), typeID = constants.Data.StringDataTypeID)
+  private val idPropertyID = PropertyID(keyID = StringID("id"), typeID = schema.constants.Data.StringDataTypeID)
+  private val originPropertyID = PropertyID(keyID = StringID("origin"), typeID = schema.constants.Data.StringDataTypeID)
+  private val twitterPropertyID = PropertyID(keyID = StringID("twitter"), typeID = schema.constants.Data.StringDataTypeID)
+  private val note1PropertyID = PropertyID(keyID = StringID("note1"), typeID = schema.constants.Data.StringDataTypeID)
+  private val note2PropertyID = PropertyID(keyID = StringID("note2"), typeID = schema.constants.Data.StringDataTypeID)
+  private val extraPropertyID = PropertyID(keyID = StringID("extra"), typeID = schema.constants.Data.StringDataTypeID)
 
   val getOriginMetaProperty: Property = MetaProperty(originPropertyID, StringData("MantlePlace"))
 
