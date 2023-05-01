@@ -48,6 +48,4 @@ object Data {
     case "S" => StringDataWeight
     case _ => 0
   }
-
-
 }

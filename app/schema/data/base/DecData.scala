@@ -37,7 +37,7 @@ case class DecData(value: String) extends Data {
   def validSortable: Boolean = this.getValue.abs <= schema.constants.Data.DecDataMaxValue
 
   def getSortableDecBytes: Array[Byte] = {
-    if (!this.validSortable) throw new IllegalArgumentException("UNSORTABLE_NUMBER")
+    if (!this.validSortable) throw new IllegalArgumentException("UNSORTABLE_ATTONUMBER")
     else {
       if (this.getValue == schema.constants.Data.DecDataMaxValue) "max".getBytes
       else if (this.getValue == (-1 * schema.constants.Data.DecDataMaxValue)) "--".getBytes
