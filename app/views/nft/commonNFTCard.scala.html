@@ -7,19 +7,49 @@
 
     @if(draft) {
         <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 draftNft">
-            <div class="card border-0 h-100" style="cursor: pointer;">
+            <div class="card border-0 h-100">
             } else {
         <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3">
-            <div class="card border-0" style="cursor: pointer;">
+            <div class="card border-0">
             }
-    <div class="card-img rounded-0 skeletonLoadContainer" onclick="@onClickFunction">
-        @if(constants.File.ALL_IMAGES_WITH_GIF.contains(nft.fileExtension)) {
-            <img src="@nft.getS3Url"/>
-        }
-        @if(constants.File.ALL_AUDIO.contains(nft.fileExtension)) {
-            <audio controls>
-                <source src="@nft.getS3Url">
-            </audio>
+    <div class="card-img rounded-0 skeletonLoadContainer">
+        <span onclick="@onClickFunction" style="cursor: pointer;">
+            @if(constants.File.ALL_IMAGES_WITH_GIF.contains(nft.fileExtension)) {
+                <img src="@nft.getS3Url"/>
+            }
+        </span>
+            @if(constants.File.ALL_AUDIO.contains(nft.fileExtension)) {
+                <span onclick="@onClickFunction" style="cursor: pointer;">
+                    @collection.getCoverFileURL.fold{
+                        <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
+                    }{uri =>
+                        <img src="@uri"/>
+                    }
+                </span>
+
+            <div class="audioNftContainer">
+                <audio controls class="audioPlayer">
+                    <source src="@nft.getS3Url">
+                </audio>
+
+                <div class="controls">
+                    <div class="playButtonContainer">
+                        <div class="playButton" onclick="playToggle(this)">
+                            <i class="bi bi-play"></i>
+                        </div>
+                    </div>
+
+                    <div class="volumeContainer">
+                        <div class="volumeButton" onclick="muteVolume(this)">
+                            <i class="bi bi-volume-up"></i>
+                        </div>
+
+                        <div class="volumeSlider" onclick="setVolume(this)">
+                            <div class="volumePercentage"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         }
     </div>
     <div class="nft-detail p-3">
