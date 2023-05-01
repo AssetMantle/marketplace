@@ -19,15 +19,15 @@ object Collection {
   def getOldNFTFileAwsKey(collectionId: String, fileName: String): String = collectionId + nfts + fileName
 
   def getTotalBondAmount(immutables: Immutables, mutables: Mutables, bondRate: Int): Long = {
-    val totalWeight = mutables.propertyList.propertyList.map(_.getBondedWeight).sum + immutables.propertyList.propertyList.map(_.getBondedWeight).sum
+    val totalWeight = mutables.propertyList.properties.map(_.getBondedWeight).sum + immutables.propertyList.properties.map(_.getBondedWeight).sum
     (totalWeight * bondRate).toLong
   }
 
   // TODO BondRate from parameters
   def getClassificationID(immutables: Immutables, mutables: Mutables, bondRate: Int): ClassificationID = {
-    val totalWeight = mutables.propertyList.propertyList.map(_.getBondedWeight).sum + immutables.propertyList.propertyList.map(_.getBondedWeight).sum
+    val totalWeight = mutables.propertyList.properties.map(_.getBondedWeight).sum + immutables.propertyList.properties.map(_.getBondedWeight).sum
 
-    val updatedImmutables = Immutables(PropertyList(immutables.propertyList.propertyList ++ Seq(constants.Blockchain.BondAmountProperty.copy(data = NumberData(totalWeight * bondRate).toAnyData))))
-    utilities.ID.getClassificationID(immutables = updatedImmutables, mutables = mutables)
+    val updatedImmutables = Immutables(PropertyList(immutables.propertyList.properties ++ Seq(schema.constants.Properties.BondAmountProperty.copy(data = NumberData(totalWeight * bondRate)))))
+    schema.utilities.ID.getClassificationID(immutables = updatedImmutables, mutables = mutables)
   }
 }

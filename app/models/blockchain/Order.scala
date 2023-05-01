@@ -35,28 +35,28 @@ case class Order(id: Array[Byte], idString: String, classificationID: Array[Byte
   def getProperty(id: PropertyID): Option[Property] = this.getDocument.getProperty(id)
 
   def getMakerID: IdentityID = {
-    val property = this.getProperty(constants.Blockchain.MakerIDProperty.getID)
+    val property = this.getProperty(schema.constants.Properties.MakerIDProperty.getID)
     if (property.isDefined && property.get.isMeta) IdentityID(IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getAnyID.getIdentityID) else IdentityID(HashID(Array[Byte]()))
   }
 
   def getMakerOwnableID: OwnableID = {
-    val property = this.getProperty(constants.Blockchain.MakerOwnableIDProperty.getID)
-    if (property.isDefined && property.get.isMeta) OwnableID(IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getProtoBytes) else OwnableID(IDData(StringID("").toAnyID).getProtoBytes)
+    val property = this.getProperty(schema.constants.Properties.MakerOwnableIDProperty.getID)
+    if (property.isDefined && property.get.isMeta) OwnableID(IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getProtoBytes) else OwnableID(IDData(StringID("")).getProtoBytes)
   }
 
   def getTakerOwnableID: OwnableID = {
-    val property = this.getProperty(constants.Blockchain.TakerOwnableIDProperty.getID)
-    if (property.isDefined && property.get.isMeta) OwnableID(IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getProtoBytes) else OwnableID(IDData(StringID("").toAnyID).getProtoBytes)
+    val property = this.getProperty(schema.constants.Properties.TakerOwnableIDProperty.getID)
+    if (property.isDefined && property.get.isMeta) OwnableID(IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getProtoBytes) else OwnableID(IDData(StringID("")).getProtoBytes)
   }
 
   def getExchangeRate: BigDecimal = {
-    val property = this.getProperty(constants.Blockchain.ExchangeRateProperty.getID)
-    if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value.toBigDecimal else constants.Blockchain.SmallestDec
+    val property = this.getProperty(schema.constants.Properties.ExchangeRateProperty.getID)
+    if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getValue else constants.Blockchain.SmallestDec
   }
 
   def getMakerOwnableSplit: BigDecimal = {
-    val property = this.getProperty(constants.Blockchain.MakerOwnableSplitProperty.getID)
-    if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value.toBigDecimal else constants.Blockchain.SmallestDec
+    val property = this.getProperty(schema.constants.Properties.MakerOwnableSplitProperty.getID)
+    if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getValue else constants.Blockchain.SmallestDec
   }
 
   def mutate(properties: Seq[Property]): Order = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)

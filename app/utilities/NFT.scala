@@ -11,13 +11,13 @@ object NFT {
   def getAWSKey(fileName: String): String = "nft/" + fileName
 
   def getDefaultImmutableMetaProperties(name: String, description: String, fileHash: String, bondAmount: Long): Seq[MetaProperty] = Seq(
-    MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.NFT_NAME), typeID = constants.Data.StringDataTypeID), data = StringData(name).toAnyData),
+    MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.NFT_NAME), typeID = constants.Data.StringDataTypeID), data = StringData(name)),
     //    MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.NFT_DESCRIPTION), typeID = constants.Data.StringDataTypeID), data = StringData(description).toAnyData),
-    MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.FILE_HASH), typeID = constants.Data.StringDataTypeID), data = StringData(fileHash).toAnyData),
-    MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.BOND_AMOUNT), typeID = constants.Data.NumberDataTypeID), data = NumberData(bondAmount).toAnyData)
+    MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.FILE_HASH), typeID = constants.Data.StringDataTypeID), data = StringData(fileHash)),
+    MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.BOND_AMOUNT), typeID = constants.Data.NumberDataTypeID), data = NumberData(bondAmount))
   )
 
-  def getAssetID(classificationID: ClassificationID, immutables: Immutables): AssetID = utilities.ID.getAssetID(classificationID, immutables)
+  def getAssetID(classificationID: ClassificationID, immutables: Immutables): AssetID = schema.utilities.ID.getAssetID(classificationID, immutables)
 
   def metaPropertyToNFTProperty(nftId: String, metaProperty: MetaProperty, mutable: Boolean): NFTProperty = metaProperty.getData.getType.value match {
     case constants.Data.BooleanDataTypeID.value => NFTProperty(nftId = nftId, name = metaProperty.id.keyID.value, `type` = constants.NFT.Data.BOOLEAN, `value` = BooleanData(metaProperty.getData.getProtoBytes).value.toString, meta = true, mutable = mutable)

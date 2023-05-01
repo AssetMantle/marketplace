@@ -44,9 +44,9 @@ object Collection {
 
     val metaList: Seq[String] = Seq(NFT_NAME, FILE_HASH)
 
-    val allImmutableMetaProperties: Seq[MetaProperty] = metaList.map(x => MetaProperty(id = PropertyID(keyID = StringID(x), typeID = constants.Data.StringDataTypeID), data = StringData("").toAnyData))
+    val allImmutableMetaProperties: Seq[MetaProperty] = metaList.map(x => MetaProperty(id = PropertyID(keyID = StringID(x), typeID = constants.Data.StringDataTypeID), data = StringData("")))
 
-    def allImmutableMesaProperties(creatorID: IdentityID): Seq[MesaProperty] = Seq(MesaProperty(id = PropertyID(keyID = StringID(CREATOR_ID), typeID = constants.Data.IDDataTypeID), dataID = IDData(creatorID.toAnyID).getDataID))
+    def allImmutableMesaProperties(creatorID: IdentityID): Seq[MesaProperty] = Seq(MesaProperty(id = PropertyID(keyID = StringID(CREATOR_ID), typeID = constants.Data.IDDataTypeID), dataID = IDData(creatorID).getDataID))
 
   }
 

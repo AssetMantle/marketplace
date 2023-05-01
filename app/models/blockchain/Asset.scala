@@ -4,7 +4,7 @@ import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
-import schema.data.base.{DecData, HeightData}
+import schema.data.base.{HeightData, NumberData}
 import schema.document.Document
 import schema.id.base._
 import schema.property.Property
@@ -33,19 +33,19 @@ case class Asset(id: Array[Byte], idString: String, classificationID: Array[Byte
 
   def getProperty(id: PropertyID): Option[Property] = this.getDocument.getProperty(id)
 
-  def getSupply: DecData = {
-    val supply = this.getProperty(constants.Blockchain.SupplyProperty.getID)
-    DecData((if (supply.isDefined) MetaProperty(supply.get.getProtoBytes) else constants.Blockchain.SupplyProperty).getData.getProtoBytes)
+  def getSupply: NumberData = {
+    val supply = this.getProperty(schema.constants.Properties.SupplyProperty.getID)
+    NumberData((if (supply.isDefined) MetaProperty(supply.get.getProtoBytes) else schema.constants.Properties.SupplyProperty).getData.getProtoBytes)
   }
 
   def getBurnHeight: HeightData = {
-    val burnHeight = this.getProperty(constants.Blockchain.BurnHeightProperty.getID)
-    HeightData((if (burnHeight.isDefined) MetaProperty(burnHeight.get.getProtoBytes) else constants.Blockchain.BurnHeightProperty).getData.getProtoBytes)
+    val burnHeight = this.getProperty(schema.constants.Properties.BurnHeightProperty.getID)
+    HeightData((if (burnHeight.isDefined) MetaProperty(burnHeight.get.getProtoBytes) else schema.constants.Properties.BurnHeightProperty).getData.getProtoBytes)
   }
 
   def getLockHeight: HeightData = {
-    val lock = this.getProperty(constants.Blockchain.LockProperty.getID)
-    HeightData((if (lock.isDefined) MetaProperty(lock.get.getProtoBytes) else constants.Blockchain.LockProperty).getData.getProtoBytes)
+    val lock = this.getProperty(schema.constants.Properties.LockProperty.getID)
+    HeightData((if (lock.isDefined) MetaProperty(lock.get.getProtoBytes) else schema.constants.Properties.LockProperty).getData.getProtoBytes)
   }
 
   def mutate(properties: Seq[Property]): Asset = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)

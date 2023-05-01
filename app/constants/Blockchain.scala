@@ -1,12 +1,7 @@
 package constants
 
 import org.bitcoinj.crypto.ChildNumber
-import schema.data.base._
 import schema.id.base._
-import schema.list.PropertyList
-import schema.property.base.{MesaProperty, MetaProperty}
-import schema.qualified._
-import schema.types.Height
 import utilities.{MicroNumber, Wallet}
 
 object Blockchain {
@@ -64,40 +59,6 @@ object Blockchain {
   }
 
   val EmptyIdentityID: IdentityID = IdentityID(Array[Byte]())
-
-  val Mint: StringID = StringID("mint")
-  val Burn: StringID = StringID("burn")
-  val Renumerate: StringID = StringID("renumerate")
-  val Add: StringID = StringID("add")
-  val Remove: StringID = StringID("remove")
-  val Mutate: StringID = StringID("mutate")
-
-  val AuthenticationProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("authentication"), typeID = constants.Data.ListDataTypeID), data = ListData(Seq()).toAnyData)
-  val BondAmountProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("bondAmount"), typeID = constants.Data.NumberDataTypeID), data = NumberData(0).toAnyData)
-  val BondRateProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("bondRate"), typeID = constants.Data.NumberDataTypeID), data = NumberData(0).toAnyData)
-  val BurnHeightProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("burnHeight"), typeID = constants.Data.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
-  val ExpiryHeightProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("expiryHeight"), typeID = constants.Data.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
-  val ExchangeRateProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("exchangeRate"), typeID = constants.Data.DecDataTypeID), data = DecData(SmallestDec.toString()).toAnyData)
-  val CreationHeightProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("creationHeight"), typeID = constants.Data.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
-  val IdentityIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("identityID"), typeID = constants.Data.IDDataTypeID), data = IDData(ClassificationID(HashID(Array[Byte]())).toAnyID).toAnyData)
-  val LockProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("lock"), typeID = constants.Data.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
-  val MaintainedPropertiesProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maintainedProperties"), typeID = constants.Data.ListDataTypeID), data = ListData(Seq()).toAnyData)
-  val MaintainedClassificationIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maintainedClassificationID"), typeID = constants.Data.IDDataTypeID), data = IDData(ClassificationID(HashID(Array[Byte]())).toAnyID).toAnyData)
-  val MakerOwnableIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("makerOwnableID"), typeID = constants.Data.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
-  val MakerIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("makerID"), typeID = constants.Data.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
-  val MakerOwnableSplitProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("makerOwnableSplit"), typeID = constants.Data.DecDataTypeID), data = DecData(SmallestDec.toString()).toAnyData)
-  val MaxOrderLifeProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maxOrderLife"), typeID = constants.Data.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
-  val MaxPropertyCountProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maxPropertyCount"), typeID = constants.Data.NumberDataTypeID), data = NumberData(0).toAnyData)
-  val MaxProvisionAddressCountProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maxProvisionAddressCount"), typeID = constants.Data.NumberDataTypeID), data = NumberData(0).toAnyData)
-  val NubProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("nubID"), typeID = constants.Data.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
-  val PermissionsProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("permissions"), typeID = constants.Data.ListDataTypeID), data = ListData(Seq()).toAnyData)
-  val SupplyProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("supply"), typeID = constants.Data.DecDataTypeID), data = DecData(SmallestDec.toString()).toAnyData)
-  val TakerOwnableIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("takerOwnableID"), typeID = constants.Data.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
-  val TakerIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("takerID"), typeID = constants.Data.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
-  val WrapAllowedCoinsProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("wrapAllowedCoins"), typeID = constants.Data.ListDataTypeID), data = ListData(Seq()).toAnyData)
-
-  val NubClassificationID: ClassificationID = utilities.ID.getClassificationID(Immutables(PropertyList(Seq(NubProperty))), Mutables(PropertyList(Seq(AuthenticationProperty))))
-  val OrderIdentityID: IdentityID = utilities.ID.getIdentityID(NubClassificationID, Immutables(PropertyList(Seq(MesaProperty(id = NubProperty.id, dataID = StringData("orders").getDataID)))))
 
   val Name: String = CommonConfig.Blockchain.name
   val RestEndPoint: String = CommonConfig.Blockchain.RestEndPoint

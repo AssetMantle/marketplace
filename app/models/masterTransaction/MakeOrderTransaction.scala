@@ -9,39 +9,40 @@ import models.{analytics, blockchain, blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import schema.data.base.NumberData
 import schema.id.base.{AssetID, OrderID}
 import slick.jdbc.H2Profile.api._
 import transactions.responses.blockchain.BroadcastTxSyncResponse
-import utilities.{AttoNumber, MicroNumber}
+import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class MakeOrderTransaction(txHash: String, nftId: String, sellerId: String, buyerId: Option[String], denom: String, makerOwnableSplit: AttoNumber, expiresIn: Long, takerOwnableSplit: AttoNumber, secondaryMarketId: String, status: Option[Boolean], creationHeight: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class MakeOrderTransaction(txHash: String, nftId: String, sellerId: String, buyerId: Option[String], denom: String, makerOwnableSplit: BigInt, expiresIn: Long, takerOwnableSplit: BigInt, secondaryMarketId: String, status: Option[Boolean], creationHeight: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def getExpiresIn(max: Int, endHours: Int): Option[Int] = this.creationHeight.map(x => x + (max * endHours) / constants.Blockchain.MaxOrderHours)
 
-  def getQuantity: Int = (this.makerOwnableSplit.value / constants.Blockchain.SmallestDec).toInt
+  def getQuantity: BigInt = this.makerOwnableSplit
 
-  def getPrice: MicroNumber = MicroNumber((this.takerOwnableSplit / (this.getQuantity * MicroNumber.factor)).value)
+  def getPrice: MicroNumber = MicroNumber(this.takerOwnableSplit / this.getQuantity)
 
-  def getExchangeRate: AttoNumber = AttoNumber((this.takerOwnableSplit.value / this.getQuantity) / constants.Blockchain.SmallestDec)
+  def getExchangeRate: BigDecimal = this.getPrice.toBigDecimal
 
   def getOrderID(creationHeight: Int, assetID: AssetID): OrderID = utilities.Order.getOrderID(
     classificationID = constants.Blockchain.MantlePlaceOrderClassificationID,
     properties = constants.Orders.ImmutableMetas,
     makerID = utilities.Identity.getMantlePlaceIdentityID(this.sellerId),
     makerOwnableID = assetID,
-    makerOwnableSplit = this.makerOwnableSplit.toBigDecimal,
+    makerOwnableSplit = this.makerOwnableSplit,
     creationHeight = creationHeight,
     takerID = if (buyerId.isEmpty) constants.Blockchain.EmptyIdentityID else utilities.Identity.getMantlePlaceIdentityID(buyerId.get),
     takerOwnableID = constants.Blockchain.StakingTokenCoinID,
-    takerOwnableSplit = this.takerOwnableSplit.toBigDecimal
+    takerOwnableSplit = this.takerOwnableSplit
   )
 
   def serialize: MakeOrderTransactions.MakeOrderTransactionSerialized = MakeOrderTransactions.MakeOrderTransactionSerialized(
-    txHash = this.txHash, nftId = this.nftId, sellerId = this.sellerId, buyerId = this.buyerId, denom = this.denom, makerOwnableSplit = this.makerOwnableSplit.toBigDecimal, expiresIn = this.expiresIn, takerOwnableSplit = this.takerOwnableSplit.toBigDecimal, secondaryMarketId = this.secondaryMarketId, status = this.status, creationHeight = this.creationHeight, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+    txHash = this.txHash, nftId = this.nftId, sellerId = this.sellerId, buyerId = this.buyerId, denom = this.denom, makerOwnableSplit = BigDecimal(this.makerOwnableSplit.toString()), expiresIn = this.expiresIn, takerOwnableSplit = BigDecimal(this.takerOwnableSplit.toString()), secondaryMarketId = this.secondaryMarketId, status = this.status, creationHeight = this.creationHeight, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
   )
 }
 
@@ -59,7 +60,7 @@ object MakeOrderTransactions {
     def id3: String = sellerId
 
     def deserialize: MakeOrderTransaction = MakeOrderTransaction(
-      txHash = this.txHash, nftId = this.nftId, sellerId = this.sellerId, buyerId = this.buyerId, denom = this.denom, makerOwnableSplit = AttoNumber(this.makerOwnableSplit), expiresIn = this.expiresIn, takerOwnableSplit = AttoNumber(this.takerOwnableSplit), secondaryMarketId = this.secondaryMarketId, status = this.status, creationHeight = this.creationHeight, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+      txHash = this.txHash, nftId = this.nftId, sellerId = this.sellerId, buyerId = this.buyerId, denom = this.denom, makerOwnableSplit = this.makerOwnableSplit.toBigInt, expiresIn = this.expiresIn, takerOwnableSplit = this.takerOwnableSplit.toBigInt, secondaryMarketId = this.secondaryMarketId, status = this.status, creationHeight = this.creationHeight, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
     )
 
   }
@@ -140,7 +141,7 @@ class MakeOrderTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, nftId: String, sellerId: String, buyerId: Option[String], denom: String, makerOwnableSplit: AttoNumber, expiresIn: Long, takerOwnableSplit: AttoNumber, secondaryMarketId: String): Future[Unit] = create(MakeOrderTransaction(txHash = txHash, nftId = nftId, sellerId = sellerId, buyerId = buyerId, denom = denom, makerOwnableSplit = makerOwnableSplit, expiresIn = expiresIn, takerOwnableSplit = takerOwnableSplit, secondaryMarketId = secondaryMarketId, status = None, creationHeight = None).serialize)
+    def addWithNoneStatus(txHash: String, nftId: String, sellerId: String, buyerId: Option[String], denom: String, makerOwnableSplit: BigInt, expiresIn: Long, takerOwnableSplit: BigInt, secondaryMarketId: String): Future[Unit] = create(MakeOrderTransaction(txHash = txHash, nftId = nftId, sellerId = sellerId, buyerId = buyerId, denom = denom, makerOwnableSplit = makerOwnableSplit, expiresIn = expiresIn, takerOwnableSplit = takerOwnableSplit, secondaryMarketId = secondaryMarketId, status = None, creationHeight = None).serialize)
 
     def getByTxHash(txHash: String): Future[Seq[MakeOrderTransaction]] = filter(_.txHash === txHash).map(_.map(_.deserialize))
 
@@ -178,10 +179,10 @@ class MakeOrderTransactions @Inject()(
             classificationID = constants.Blockchain.MantlePlaceOrderClassificationID,
             takerID = if (buyerId.isEmpty) constants.Blockchain.EmptyIdentityID else utilities.Identity.getMantlePlaceIdentityID(buyerId.get),
             makerOwnableID = nft.getAssetID,
-            makerOwnableSplit = AttoNumber(quantity * constants.Blockchain.SmallestDec),
+            makerOwnableSplit = NumberData(quantity),
             expiresIn = expiresIn,
             takerOwnableID = constants.Blockchain.StakingTokenCoinID,
-            takerOwnableSplit = AttoNumber((price * quantity).toMicroBigDecimal),
+            takerOwnableSplit = NumberData(price.value * quantity),
             immutableMetas = constants.Orders.ImmutableMetas,
             mutableMetas = Seq(),
             immutables = Seq(),
@@ -197,7 +198,7 @@ class MakeOrderTransactions @Inject()(
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
               makeOrder <- blockchainTransactionMakeOrders.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
-              _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nftID, sellerId = nftOwner.ownerId, buyerId = buyerId, denom = constants.Blockchain.StakingToken, makerOwnableSplit = AttoNumber(quantity * constants.Blockchain.SmallestDec), expiresIn = expiresIn, takerOwnableSplit = AttoNumber((price * quantity).toMicroBigDecimal), secondaryMarketId = secondaryMarketId)
+              _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nftID, sellerId = nftOwner.ownerId, buyerId = buyerId, denom = constants.Blockchain.StakingToken, makerOwnableSplit = quantity, expiresIn = expiresIn, takerOwnableSplit = price.value * quantity, secondaryMarketId = secondaryMarketId)
             } yield makeOrder
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
         }
@@ -275,7 +276,7 @@ class MakeOrderTransactions @Inject()(
                 masterSecondaryMarkets.Service.updateOrderID(makeOrderTx.secondaryMarketId, orderID)
               }
 
-              def updateAnalytics(collectionId: String) = collectionsAnalysis.Utility.onCreateSecondaryMarket(collectionId, totalListed = makeOrderTx.getQuantity, listingPrice = makeOrderTx.getPrice)
+              def updateAnalytics(collectionId: String) = collectionsAnalysis.Utility.onCreateSecondaryMarket(collectionId, totalListed = makeOrderTx.getQuantity.toInt, listingPrice = makeOrderTx.getPrice)
 
               (for {
                 _ <- markSuccess

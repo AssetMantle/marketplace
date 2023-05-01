@@ -1,6 +1,6 @@
 package schema.property
 
-import com.properties.AnyProperty
+import com.assetmantle.schema.properties.base.AnyProperty
 import org.slf4j.{Logger, LoggerFactory}
 import schema.id.base.{DataID, PropertyID, StringID}
 import schema.property.base.{MesaProperty, MetaProperty}
@@ -22,6 +22,8 @@ abstract class Property {
   def toAnyProperty: AnyProperty
 
   def getProtoBytes: Array[Byte]
+
+  def scrub(): MesaProperty
 
 }
 

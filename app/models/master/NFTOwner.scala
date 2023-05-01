@@ -19,7 +19,6 @@ case class NFTOwner(nftId: String, ownerId: String, creatorId: String, collectio
 
   def getOwnerIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.ownerId)
 
-  //  def getSplitValue: AttoNumber = AttoNumber(this.quantity * constants.Blockchain.SmallestDec)
 }
 
 object NFTOwners {

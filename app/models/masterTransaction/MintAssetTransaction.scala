@@ -62,6 +62,7 @@ object MintAssetTransactions {
 class MintAssetTransactions @Inject()(
                                        protected val databaseConfigProvider: DatabaseConfigProvider,
                                        blockchainAssets: blockchain.Assets,
+                                       blockchainIdentities: blockchain.Identities,
                                        campaignMintNFTAirDrops: campaign.MintNFTAirDrops,
                                        collectionsAnalysis: CollectionsAnalysis,
                                        masterKeys: master.Keys,
@@ -114,9 +115,11 @@ class MintAssetTransactions @Inject()(
       val nftOwners = masterNFTOwners.Service.getByIds(nftIDs)
       val nftProperties = masterNFTProperties.Service.get(nftIDs)
 
+      def identityIDExists(nftOwners: Seq[NFTOwner]) = blockchainIdentities.Service.getIDsAlreadyExists(nftOwners.map(_.getOwnerIdentityID.asString))
+
       def collections(collectionIDs: Seq[String]) = masterCollections.Service.getCollections(collectionIDs)
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String], nfts: Seq[NFT], collections: Seq[Collection], nftOwners: Seq[NFTOwner], nftProperties: Seq[NFTProperty]) = {
+      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String], nfts: Seq[NFT], collections: Seq[Collection], nftOwners: Seq[NFTOwner], nftProperties: Seq[NFTProperty], identityIDExists: Seq[String]) = if (identityIDExists.length == nftOwners.length){
         val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = nfts.map(nft => {
@@ -142,6 +145,9 @@ class MintAssetTransactions @Inject()(
         for {
           mintAsset <- checkAndAdd(unconfirmedTxHashes)
         } yield (mintAsset, txRawBytes)
+      } else {
+        logger.error(s"${nftOwners.map(_.getOwnerIdentityID.asString).diff(identityIDExists).mkString(", ")} identities does not exist for minting asset")
+        constants.Response.IDENTITY_DOES_NOT_EXIST_TO_MINT.throwBaseException()
       }
 
       def broadcastTxAndUpdate(mintAsset: MintAsset, txRawBytes: Array[Byte]) = {
@@ -164,14 +170,15 @@ class MintAssetTransactions @Inject()(
         unconfirmedTxs <- unconfirmedTxs
         nfts <- nfts
         nftOwners <- nftOwners
+        identityIDExists <- identityIDExists(nftOwners)
         nftProperties <- nftProperties
         collections <- collections(nfts.map(_.collectionId).distinct)
-        (mintAsset, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase), nfts, collections, nftOwners, nftProperties)
+        (mintAsset, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase), nfts, collections, nftOwners, nftProperties, identityIDExists)
         _ <- broadcastTxAndUpdate(mintAsset, txRawBytes)
       } yield mintAsset
     }
 
-    private def mintGenesisAssets(): Future[Unit] = {
+    private def mintAssets(): Future[Unit] = {
       val anyPendingTx = Service.checkAnyPendingTx
       val nfts = masterNFTs.Service.getForMinting
 
@@ -295,7 +302,7 @@ class MintAssetTransactions @Inject()(
       //      override val initialDelay: FiniteDuration = constants.Scheduler.QuarterHour
 
       def runner(): Unit = {
-        val doMintAssets = mintGenesisAssets()
+        val doMintAssets = mintAssets()
 
         val forComplete = (for {
           _ <- doMintAssets

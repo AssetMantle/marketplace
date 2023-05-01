@@ -1,6 +1,6 @@
 package utilities
 
-import schema.data.base.{HeightData, IDData}
+import schema.data.base.{DecData, HeightData, IDData, NumberData}
 import schema.id.OwnableID
 import schema.id.base.{ClassificationID, IdentityID, OrderID}
 import schema.list.PropertyList
@@ -12,29 +12,30 @@ import schema.types.Height
 
 object Order {
 
-  def getOrderID(classificationID: ClassificationID, properties: Seq[Property], makerID: IdentityID, makerOwnableID: OwnableID, makerOwnableSplit: BigDecimal, creationHeight: Long, takerID: IdentityID, takerOwnableID: OwnableID, takerOwnableSplit: BigDecimal): OrderID = {
+  def getOrderID(classificationID: ClassificationID, properties: Seq[Property], makerID: IdentityID, makerOwnableID: OwnableID, makerOwnableSplit: BigInt, creationHeight: Long, takerID: IdentityID, takerOwnableID: OwnableID, takerOwnableSplit: BigInt): OrderID = {
     val immutables = Immutables(PropertyList(properties ++ Seq(
-      constants.Blockchain.ExchangeRateProperty.copy(data = AttoNumber(takerOwnableSplit).quotientTruncate(AttoNumber(constants.Blockchain.SmallestDec)).quotientTruncate(AttoNumber(makerOwnableSplit)).toDecData.toAnyData),
-      constants.Blockchain.CreationHeightProperty.copy(data = HeightData(Height(creationHeight)).toAnyData),
-      constants.Blockchain.MakerOwnableIDProperty.copy(data = IDData(makerOwnableID.toAnyID).toAnyData),
-      constants.Blockchain.TakerOwnableIDProperty.copy(data = IDData(takerOwnableID.toAnyID).toAnyData),
-      constants.Blockchain.MakerIDProperty.copy(data = IDData(makerID.toAnyID).toAnyData),
-      constants.Blockchain.TakerIDProperty.copy(data = IDData(takerID.toAnyID).toAnyData))))
-    utilities.ID.getOrderID(classificationID = classificationID, immutables = immutables)
+      schema.constants.Properties.ExchangeRateProperty.copy(data = DecData(BigDecimal(takerOwnableSplit)).quotientTruncate(DecData(BigDecimal(makerOwnableSplit)))),
+      schema.constants.Properties.CreationHeightProperty.copy(data = HeightData(Height(creationHeight))),
+      schema.constants.Properties.MakerOwnableIDProperty.copy(data = IDData(makerOwnableID)),
+      schema.constants.Properties.TakerOwnableIDProperty.copy(data = IDData(takerOwnableID)),
+      schema.constants.Properties.MakerIDProperty.copy(data = IDData(makerID)),
+      schema.constants.Properties.TakerIDProperty.copy(data = IDData(takerID))))
+    )
+    schema.utilities.ID.getOrderID(classificationID = classificationID, immutables = immutables)
   }
 
   def getDefaultImmutableMetas(others: Seq[MetaProperty]): Seq[MetaProperty] = others ++ Seq(
-    constants.Blockchain.ExchangeRateProperty,
-    constants.Blockchain.CreationHeightProperty,
-    constants.Blockchain.MakerOwnableIDProperty,
-    constants.Blockchain.TakerOwnableIDProperty,
-    constants.Blockchain.MakerIDProperty,
-    constants.Blockchain.TakerIDProperty
+    schema.constants.Properties.ExchangeRateProperty,
+    schema.constants.Properties.CreationHeightProperty,
+    schema.constants.Properties.MakerOwnableIDProperty,
+    schema.constants.Properties.TakerOwnableIDProperty,
+    schema.constants.Properties.MakerIDProperty,
+    schema.constants.Properties.TakerIDProperty
   )
 
-  def getDefaultMutableMetas(expiryHeight: Long, makerOwnableSplit: BigDecimal, others: Seq[MetaProperty]): Seq[MetaProperty] = others ++ Seq(
-    constants.Blockchain.ExpiryHeightProperty.copy(data = HeightData(Height(expiryHeight)).toAnyData),
-    constants.Blockchain.MakerOwnableSplitProperty.copy(data = AttoNumber(makerOwnableSplit).toDecData.toAnyData),
+  def getDefaultMutableMetas(expiryHeight: Long, makerOwnableSplit: BigInt, others: Seq[MetaProperty]): Seq[MetaProperty] = others ++ Seq(
+    schema.constants.Properties.ExpiryHeightProperty.copy(data = HeightData(Height(expiryHeight))),
+    schema.constants.Properties.MakerOwnableSplitProperty.copy(data = NumberData(makerOwnableSplit)),
   )
 
 }

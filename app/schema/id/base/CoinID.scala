@@ -1,11 +1,13 @@
 package schema.id.base
 
-import com.ids.{AnyID, AnyOwnableID, CoinID => protoCoinID}
+import com.assetmantle.schema.ids.base.{AnyID, AnyOwnableID, CoinID => protoCoinID}
 import schema.id.OwnableID
 
 case class CoinID(value: StringID) extends OwnableID {
 
   def getBytes: Array[Byte] = this.value.getBytes
+
+  def getType: StringID = constants.ID.CoinIDType
 
   def asString: String = this.value.asString
 
@@ -13,11 +15,11 @@ case class CoinID(value: StringID) extends OwnableID {
 
   def toAnyOwnableID: AnyOwnableID = AnyOwnableID.newBuilder().setCoinID(this.asProtoCoinID).build()
 
-  def toAnyID: AnyID = AnyID.newBuilder().setAnyOwnableID(this.toAnyOwnableID).build()
+  def toAnyID: AnyID = AnyID.newBuilder().setCoinID(this.asProtoCoinID).build()
 
   def getProtoBytes: Array[Byte] = this.asProtoCoinID.toByteString.toByteArray
 
-  def isCoinId: Boolean = true
+  def isCoinId: Boolean = false
 
 }
 
@@ -25,4 +27,6 @@ object CoinID {
   def apply(id: protoCoinID): CoinID = CoinID(StringID(id.getStringID))
 
   def apply(id: AnyOwnableID): CoinID = CoinID(id.getCoinID)
+
+  def apply(value: String): CoinID = CoinID(StringID(value))
 }

@@ -1,6 +1,6 @@
 package utilities
 
-import com.data.AnyData
+import schema.data.Data
 import schema.data.base._
 import schema.id.base.{DataID, StringID}
 
@@ -17,13 +17,13 @@ object Data {
     case constants.NFT.Data.STRING => StringData(value).getDataID
     case constants.NFT.Data.BOOLEAN => if (value != "") BooleanData(value.toBoolean).getDataID else BooleanData(false).getDataID
     case constants.NFT.Data.NUMBER => NumberData(value.toLong).getDataID
-    case _ => StringData(value).getDataID
+    case _ => throw new IllegalArgumentException("INVALID_DATA")
   }
 
-  def getAnyData(`type`: String, value: String): AnyData = `type` match {
-    case constants.NFT.Data.STRING => StringData(value).toAnyData
-    case constants.NFT.Data.BOOLEAN => if (value != "") BooleanData(value.toBoolean).toAnyData else BooleanData(false).toAnyData
-    case constants.NFT.Data.NUMBER => NumberData(value.toLong).toAnyData
-    case _ => StringData(value).toAnyData
+  def getData(`type`: String, value: String): Data = `type` match {
+    case constants.NFT.Data.STRING => StringData(value)
+    case constants.NFT.Data.BOOLEAN => if (value != "") BooleanData(value.toBoolean) else BooleanData(false)
+    case constants.NFT.Data.NUMBER => NumberData(value.toLong)
+    case _ => throw new IllegalArgumentException("INVALID_DATA")
   }
 }

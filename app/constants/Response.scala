@@ -181,6 +181,7 @@ object Response {
   val ORDER_ID_NOT_FOUND = new Failure("ORDER_ID_NOT_FOUND")
   val INVALID_IDENTITY_ISSUE_MESSAGE = new Failure("INVALID_IDENTITY_ISSUE_MESSAGE")
   val ADDRES_ALREADY_PROVISIONED = new Failure("ADDRES_ALREADY_PROVISIONED")
+  val IDENTITY_DOES_NOT_EXIST_TO_MINT = new Failure("IDENTITY_DOES_NOT_EXIST_TO_MINT")
 
   class Failure(private val response: String) {
     val message: String = PREFIX + FAILURE_PREFIX + response

@@ -11,7 +11,6 @@ import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
 import transactions.responses.blockchain.BroadcastTxSyncResponse
-import utilities.AttoNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
@@ -127,7 +126,7 @@ class NFTTransferTransactions @Inject()(
           fromAddress = fromAddress,
           toID = utilities.Identity.getMantlePlaceIdentityID(toAccountId),
           assetId = nft.getAssetID,
-          amount = BigDecimal(quantity) / AttoNumber.factor,
+          amount = quantity,
         )
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(nftTransferMsg),

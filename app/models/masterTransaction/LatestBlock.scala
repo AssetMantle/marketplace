@@ -1,10 +1,10 @@
 package models.masterTransaction
 
-import com.assets.{transactions => assetTransactions}
+import com.assetmantle.modules.assets.{transactions => assetTransactions}
 import com.cosmos.bank.{v1beta1 => bankTx}
 import com.google.protobuf.{Any => protobufAny}
 import com.ibc.core.channel.{v1 => channelTx}
-import com.splits.{transactions => splitTransactions}
+import com.assetmantle.modules.splits.{transactions => splitTransactions}
 import constants.Scheduler
 import exceptions.BaseException
 import models.blockchain.Transaction

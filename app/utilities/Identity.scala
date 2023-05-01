@@ -9,18 +9,6 @@ import schema.qualified.Immutables
 
 object Identity {
 
-  private var anyPendingTx = false
-
-  def anyTxInProgress: Boolean = anyPendingTx
-
-  def setTxInProgress(): Unit = {
-    anyPendingTx = true
-  }
-
-  def setTxComplete(): Unit = {
-    anyPendingTx = false
-  }
-
   private val idPropertyID = PropertyID(keyID = StringID("id"), typeID = constants.Data.StringDataTypeID)
   private val originPropertyID = PropertyID(keyID = StringID("origin"), typeID = constants.Data.StringDataTypeID)
   private val twitterPropertyID = PropertyID(keyID = StringID("twitter"), typeID = constants.Data.StringDataTypeID)
@@ -28,25 +16,25 @@ object Identity {
   private val note2PropertyID = PropertyID(keyID = StringID("note2"), typeID = constants.Data.StringDataTypeID)
   private val extraPropertyID = PropertyID(keyID = StringID("extra"), typeID = constants.Data.StringDataTypeID)
 
-  val getOriginMetaProperty: Property = MetaProperty(originPropertyID, StringData("MantlePlace").toAnyData)
+  val getOriginMetaProperty: Property = MetaProperty(originPropertyID, StringData("MantlePlace"))
 
-  def getIDMetaProperty(value: String): Property = MetaProperty(idPropertyID, StringData(value).toAnyData)
+  def getIDMetaProperty(value: String): Property = MetaProperty(idPropertyID, StringData(value))
 
-  def getTwitterMetaProperty(value: String): Property = MetaProperty(twitterPropertyID, StringData(value).toAnyData)
+  def getTwitterMetaProperty(value: String): Property = MetaProperty(twitterPropertyID, StringData(value))
 
-  def getNote1MetaProperty(value: String): Property = MetaProperty(note1PropertyID, StringData(value).toAnyData)
+  def getNote1MetaProperty(value: String): Property = MetaProperty(note1PropertyID, StringData(value))
 
   def getNote2MesaProperty(value: String): Property = MesaProperty(note2PropertyID, StringData(value).getDataID)
 
   def getExtraMesaProperty(value: String): Property = MesaProperty(extraPropertyID, StringData(value).getDataID)
 
-  val getBondAmountMetaProperty: Property = MetaProperty(constants.Blockchain.BondAmountProperty.id, NumberData(2560L).toAnyData)
+  val getBondAmountMetaProperty: Property = MetaProperty(schema.constants.Properties.BondAmountProperty.id, NumberData(2560L))
 
-  def getAuthenticationProperty(addresses: Seq[String]): Property = constants.Blockchain.AuthenticationProperty.copy(data = ListData(addresses.map(x => AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(x)).toAnyData)).toAnyData)
+  def getAuthenticationProperty(addresses: Seq[String]): Property = schema.constants.Properties.AuthenticationProperty.copy(data = ListData(addresses.map(x => AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(x)))))
 
   def getMantlePlaceIdentityID(id: String): IdentityID = {
     val immutables = Immutables(PropertyList(Seq(getOriginMetaProperty, getBondAmountMetaProperty, getIDMetaProperty(id), getExtraMesaProperty(""))))
-    utilities.ID.getIdentityID(classificationID = constants.Blockchain.MantlePlaceIdentityClassificationID, immutables = immutables)
+    schema.utilities.ID.getIdentityID(classificationID = constants.Blockchain.MantlePlaceIdentityClassificationID, immutables = immutables)
   }
 
 }

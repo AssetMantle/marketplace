@@ -8,9 +8,9 @@ object Orders {
 
   val ORIGIN = "origin"
 
-  val BondAmountMetaProperty: MetaProperty = MetaProperty(constants.Blockchain.BondAmountProperty.id, NumberData(560L).toAnyData)
+  val BondAmountMetaProperty: MetaProperty = MetaProperty(schema.constants.Properties.BondAmountProperty.getID, NumberData(560L))
 
-  val OriginMetaProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID(ORIGIN), typeID = constants.Data.StringDataTypeID), data = StringData("MantlePlaceSecondaryMarket").toAnyData)
+  val OriginMetaProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID(ORIGIN), typeID = constants.Data.StringDataTypeID), data = StringData("MantlePlaceSecondaryMarket"))
 
   val ImmutableMetas: Seq[MetaProperty] = Seq(OriginMetaProperty, BondAmountMetaProperty)
 }

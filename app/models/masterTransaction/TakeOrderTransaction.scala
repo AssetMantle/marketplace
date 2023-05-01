@@ -10,9 +10,9 @@ import models.{analytics, blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import schema.data.base.NumberData
 import slick.jdbc.H2Profile.api._
 import transactions.responses.blockchain.BroadcastTxSyncResponse
-import utilities.AttoNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
@@ -133,7 +133,7 @@ class TakeOrderTransactions @Inject()(
         val takeOrderMsg = utilities.BlockchainTransaction.getTakeOrderMsg(
           fromAddress = fromAddress,
           fromID = utilities.Identity.getMantlePlaceIdentityID(buyerId),
-          takerOwnableSplit = AttoNumber((secondaryMarket.price * quantity).toMicroBigDecimal),
+          takerOwnableSplit = NumberData(secondaryMarket.price.value * quantity),
           orderID = secondaryMarket.getOrderID())
         val wrapCoinMsg = utilities.BlockchainTransaction.getWrapTokenMsg(
           fromAddress = fromAddress,

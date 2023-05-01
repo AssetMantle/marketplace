@@ -35,10 +35,10 @@ case class Identity(id: Array[Byte], idString: String, classificationID: Array[B
   def getProperty(id: PropertyID): Option[Property] = this.getDocument.getProperty(id)
 
   def getAuthentication: ListData = {
-    val property = this.getProperty(constants.Blockchain.AuthenticationProperty.getID)
+    val property = this.getProperty(schema.constants.Properties.AuthenticationProperty.getID)
     if (property.isDefined) {
       if (property.get.isMeta) ListData(MetaProperty(property.get.getProtoBytes).getData.toAnyData.getListData)
-      else ListData(Seq(constants.Blockchain.AuthenticationProperty.getData.toAnyData))
+      else ListData(Seq(schema.constants.Properties.AuthenticationProperty.getData))
     } else ListData(Seq())
   }
 
