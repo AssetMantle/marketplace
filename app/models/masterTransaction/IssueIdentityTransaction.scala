@@ -100,7 +100,7 @@ class IssueIdentityTransactions @Inject()(
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(constants.Blockchain.MantlePlaceMaintainerAddress).map(_.account.toSerializableAccount)
+      val bcAccount = getAccount.Service.get(constants.Wallet.IssueIdentityWallet.address).map(_.account.toSerializableAccount)
       val unconfirmedTxs = getUnconfirmedTxs.Service.get()
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
@@ -108,7 +108,7 @@ class IssueIdentityTransactions @Inject()(
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = accountIdAddress.keys.map(x => utilities.BlockchainTransaction.getMantlePlaceIssueIdentityMsgWithAuthentication(
             id = x,
-            fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress,
+            fromAddress = constants.Wallet.IssueIdentityWallet.address,
             toAddress = accountIdAddress.getOrElse(x, Seq()).headOption.getOrElse(""),
             classificationID = constants.Blockchain.MantlePlaceIdentityClassificationID,
             fromID = constants.Blockchain.MantlePlaceFromID,
@@ -124,7 +124,7 @@ class IssueIdentityTransactions @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              issueIdentity <- blockchainTransactionIssueIdentities.Service.add(txHash = txHash, fromAddress = constants.Blockchain.MantlePlaceMaintainerAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              issueIdentity <- blockchainTransactionIssueIdentities.Service.add(txHash = txHash, fromAddress = constants.Wallet.IssueIdentityWallet.address, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, accountIds = accountIdAddress.keys.toSeq)
             } yield issueIdentity
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
@@ -177,7 +177,7 @@ class IssueIdentityTransactions @Inject()(
       def getKeys(anyPendingTx: Boolean, ids: Seq[String]) = if (!anyPendingTx && ids.nonEmpty) masterKeys.Service.getAllKeys(ids) else Future(Seq())
 
       def doTx(ids: Seq[String], keys: Seq[Key]) = if (keys.nonEmpty) {
-        val tx = transaction(accountIdAddress = ids.map(x => x -> keys.filter(_.accountId == x).map(_.address)).toMap, gasPrice = 0.0001, ecKey = constants.Blockchain.MantleNodeMaintainerWallet.getECKey)
+        val tx = transaction(accountIdAddress = ids.map(x => x -> keys.filter(_.accountId == x).map(_.address)).toMap, gasPrice = 0.0001, ecKey = constants.Wallet.IssueIdentityWallet.getECKey)
 
         def updateMasterKeys() = masterKeys.Service.markIdentityIssuePending(keys.map(_.accountId).distinct)
 
@@ -187,13 +187,16 @@ class IssueIdentityTransactions @Inject()(
         } yield tx.txHash
       } else Future("")
 
-      for {
+      (for {
         accountIds <- accountIds
         issueIdentities <- filterAlreadyIssuedIdentities(accountIds)
         anyPendingTx <- anyPendingTx
         keys <- getKeys(anyPendingTx, issueIdentities)
         txHash <- doTx(issueIdentities, keys)
-      } yield if (txHash != "") logger.info("ISSUE IDENTITY: " + txHash + " ( " + keys.map(x => x.accountId -> x.address).toMap.toString() + " )")
+      } yield if (txHash != "") logger.info("ISSUE_IDENTITY: " + txHash + " ( " + keys.map(x => x.accountId -> x.address).toMap.toString() + " )")
+        ).recover{
+        case _: BaseException => logger.error("UNABLE_TO_ISSUE_IDENTITIES")
+      }
     }
 
     private def checkTransactions() = {

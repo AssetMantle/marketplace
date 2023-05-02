@@ -38,10 +38,7 @@ object Blockchain {
   val LowGasPrice: Double = CommonConfig.Blockchain.LowGasPrice
   val MediumGasPrice: Double = CommonConfig.Blockchain.MediumGasPrice
   val HighGasPrice: Double = CommonConfig.Blockchain.HighGasPrice
-  val MantlePlaceFeeCollectorAddress = "mantle19qxy9t064v79wkslptpjxn3nealzhxhdfe3ldd"
-  val MantleNodeMaintainerWallet: Wallet = utilities.Wallet.getWallet("comfort broccoli urban cheap noise income ensure wheat maze cement panel clinic opinion acoustic select sentence code purchase casual dose brown fish salt coral".split(" "))
-  val MantlePlaceMaintainerAddress = "mantle19qxy9t064v79wkslptpjxn3nealzhxhdfe3ldd"
-  val MantlePlaceIdentityClassificationID: ClassificationID = ClassificationID(utilities.Secrets.base64URLDecode("OXt-qbauoEO41FQzh5oSwcJcCTbxyATh85ufYqevmbs="))
+  val MantlePlaceIdentityClassificationID: ClassificationID = ClassificationID(utilities.Secrets.base64URLDecode("IoTaHkXLe_NVFxz11-BhmxQZZX52EfmuAq5QM6DBR3k="))
   val MantlePlaceFromID: IdentityID = IdentityID(utilities.Secrets.base64URLDecode("MuFGjnQuCNHHVP7u6HfAJ3tqd3Yc-EpOqT2IT4QetdU="))
   val MantlePlaceOrderClassificationID: ClassificationID = ClassificationID(utilities.Secrets.base64URLDecode("iFQV9507FNXJv__IqxEIffjf4AxXUScgGIe-HUKQ3ek="))
   val IDSeparator = "."
@@ -178,37 +175,38 @@ object Blockchain {
     //ibc-transfer
     val TRANSFER = "/ibc.applications.transfer.v1.MsgTransfer"
     //asset
-    val ASSET_BURN = "/assets.transactions.burn.Message"
-    val ASSET_DEFINE = "/assets.transactions.define.Message"
-    val ASSET_DEPUTIZE = "/assets.transactions.deputize.Message"
-    val ASSET_MINT = "/assets.transactions.mint.Message"
-    val ASSET_MUTATE = "/assets.transactions.mutate.Message"
+    val ASSET_BURN = "/assetmantle.modules.assets.transactions.burn.Message"
+    val ASSET_DEFINE = "/assetmantle.modules.assets.transactions.define.Message"
+    val ASSET_DEPUTIZE = "/assetmantle.modules.assets.transactions.deputize.Message"
+    val ASSET_MINT = "/assetmantle.modules.assets.transactions.mint.Message"
+    val ASSET_MUTATE = "/assetmantle.modules.assets.transactions.mutate.Message"
     val ASSET_RENUMERATE = "/assets.transactions.renumerate.Message"
     val ASSET_REVOKE = "/assets.transactions.revoke.Message"
     //identity
-    val IDENTITY_DEFINE = "/identities.transactions.define.Message"
-    val IDENTITY_DEPUTIZE = "/identities.transactions.deputize.Message"
-    val IDENTITY_ISSUE = "/identities.transactions.issue.Message"
-    val IDENTITY_MUTATE = "/identities.transactions.mutate.Message"
-    val IDENTITY_NUB = "/identities.transactions.nub.Message"
-    val IDENTITY_PROVISION = "/identities.transactions.provision.Message"
-    val IDENTITY_QUASH = "/identities.transactions.quash.Message"
-    val IDENTITY_REVOKE = "/identities.transactions.revoke.Message"
-    val IDENTITY_UNPROVISION = "/identities.transactions.unprovision.Message"
+    val IDENTITY_DEFINE = "/assetmantle.modules.identities.transactions.define.Message"
+    val IDENTITY_DEPUTIZE = "/assetmantle.modules.identities.transactions.deputize.Message"
+    val IDENTITY_ISSUE = "/assetmantle.modules.identities.transactions.issue.Message"
+    val IDENTITY_MUTATE = "/assetmantle.modules.identities.transactions.mutate.Message"
+    val IDENTITY_NUB = "/assetmantle.modules.identities.transactions.nub.Message"
+    val IDENTITY_PROVISION = "/assetmantle.modules.identities.transactions.provision.Message"
+    val IDENTITY_QUASH = "/assetmantle.modules.identities.transactions.quash.Message"
+    val IDENTITY_REVOKE = "/assetmantle.modules.identities.transactions.revoke.Message"
+    val IDENTITY_UNPROVISION = "/assetmantle.modules.identities.transactions.unprovision.Message"
     //split
-    val SPLIT_SEND = "/splits.transactions.send.Message"
-    val SPLIT_WRAP = "/splits.transactions.wrap.Message"
-    val SPLIT_UNWRAP = "/splits.transactions.unwrap.Message"
+    val SPLIT_SEND = "/assetmantle.modules.splits.transactions.send.Message"
+    val SPLIT_WRAP = "/assetmantle.modules.splits.transactions.wrap.Message"
+    val SPLIT_UNWRAP = "/assetmantle.modules.splits.transactions.unwrap.Message"
     //order
-    val ORDER_CANCEL = "/orders.transactions.cancel.Message"
-    val ORDER_DEFINE = "/orders.transactions.define.Message"
-    val ORDER_DEPUTIZE = "/orders.transactions.deputize.Message"
-    val ORDER_IMMEDIATE = "/orders.transactions.immediate.Message"
-    val ORDER_MAKE = "/orders.transactions.make.Message"
-    val ORDER_MODIFY = "/orders.transactions.modify.Message"
-    val ORDER_REVOKE = "/orders.transactions.revoke.Message"
-    val ORDER_TAKE = "/orders.transactions.take.Message"
-    //metaList
-    val META_REVEAL = "/metas.transactions.reveal.Message"
+    val ORDER_CANCEL = "/assetmantle.modules.orders.transactions.cancel.Message"
+    val ORDER_DEFINE = "/assetmantle.modules.orders.transactions.define.Message"
+    val ORDER_DEPUTIZE = "/assetmantle.modules.orders.transactions.deputize.Message"
+    val ORDER_IMMEDIATE = "/assetmantle.modules.orders.transactions.immediate.Message"
+    val ORDER_MAKE = "/assetmantle.modules.orders.transactions.make.Message"
+    val ORDER_MODIFY = "/assetmantle.modules.orders.transactions.modify.Message"
+    val ORDER_REVOKE = "/assetmantle.modules.orders.transactions.revoke.Message"
+    val ORDER_TAKE = "/assetmantle.modules.orders.transactions.take.Message"
+    //meta
+    val META_REVEAL = "/assetmantle.modules.metas.transactions.reveal.Message"
+
   }
 }

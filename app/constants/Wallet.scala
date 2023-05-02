@@ -29,7 +29,7 @@ object Wallet {
     new ChildNumber(3, false)
   )
 
-  val MantlePlaceFeeCollectorAddress = "mantle19qxy9t064v79wkslptpjxn3nealzhxhdfe3ldd"
+  val FeeCollectorAddress = "mantle19qxy9t064v79wkslptpjxn3nealzhxhdfe3ldd"
   val IssueIdentityWallet: Wallet = utilities.Wallet.getWallet(seeds, hdPath = IssueIdentityHDPath)
   val DefineAssetWallet: Wallet = utilities.Wallet.getWallet(seeds, hdPath = DefineAssetHDPath)
   val MintAssetWallet: Wallet = utilities.Wallet.getWallet(seeds, hdPath = MintAssetHDPath)
