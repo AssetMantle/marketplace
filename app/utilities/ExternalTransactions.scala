@@ -233,9 +233,9 @@ class ExternalTransactions @Inject()(
     } else Future(None)
 
     def update(nft: Option[NFT], account: Option[Account], nftOwner: Option[NFTOwner]) = if (nft.isDefined && account.isDefined && nftOwner.isDefined && OwnableID(msg.getTakerOwnableID).asString == constants.Blockchain.StakingTokenCoinID.asString) {
-      if (orderClassificationId.asString == constants.Blockchain.MantlePlaceOrderClassificationID.asString) {
+      if (orderClassificationId.asString == constants.Transaction.OrderClassificationID.asString) {
         val orderID = utilities.Order.getOrderID(
-          classificationID = constants.Blockchain.MantlePlaceOrderClassificationID,
+          classificationID = constants.Transaction.OrderClassificationID,
           properties = constants.Orders.ImmutableMetas,
           makerID = IdentityID(msg.getFromID),
           makerOwnableID = nft.get.getAssetID,

@@ -21,7 +21,7 @@ object Scheduler {
   def shutdownThread(name: String): Unit = {
     val cancellable = SchedulersCancellable.get(name)
     if (cancellable.isDefined) {
-      val keysList = SchedulersCancellable.keys.toSeq
+      val keysList = SchedulersCancellable.keys.toSeq.sorted
       if (cancellable.get.cancel()) logger.info(s"Successfully shutdown thread (${keysList.indexOf(name) + 1}/${keysList.length}): $name") else logger.error("Failed to shutdown thread: " + name)
     } else logger.error("Thread not found: " + name)
   }

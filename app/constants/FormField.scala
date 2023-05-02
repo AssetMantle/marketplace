@@ -89,10 +89,10 @@ object FormField {
   val PUBLIC_LISTING_MAX_MINT_PER_ACCOUNT: IntFormField = IntFormField("SALE_MAX_MINT_PER_ACCOUNT", 1, 100000)
   val SALE_BUY_NFT_NUMBER: IntFormField = IntFormField("SALE_BUY_NFT_NUMBER", 1, 100000)
   val PUBLIC_LISTING_BUY_NFT_NUMBER: IntFormField = IntFormField("PUBLIC_LISTING_BUY_NFT_NUMBER", 1, 100000)
-  val SECONDARY_MARKET_END_HOURS: IntFormField = IntFormField("SECONDARY_MARKET_END_HOURS", 1, constants.Blockchain.MaxOrderHours)
+  val SECONDARY_MARKET_END_HOURS: IntFormField = IntFormField("SECONDARY_MARKET_END_HOURS", 1, constants.Transaction.MaxOrderHours)
 
   // DoubleFormField
-  val GAS_PRICE: BigDecimalFormField = BigDecimalFormField("GAS_PRICE", constants.Blockchain.LowGasPrice, constants.Blockchain.HighGasPrice)
+  val GAS_PRICE: BigDecimalFormField = BigDecimalFormField("GAS_PRICE", constants.Transaction.LowGasPrice, constants.Transaction.HighGasPrice)
 
   // EpochFormField
   val WHITELIST_INVITE_START_EPOCH: EpochFormField = EpochFormField("WHITELIST_INVITE_START_EPOCH", 1, Int.MaxValue)

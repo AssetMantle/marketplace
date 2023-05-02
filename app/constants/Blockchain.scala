@@ -34,22 +34,6 @@ object Blockchain {
     new ChildNumber(0, false),
     new ChildNumber(0, false)
   )
-  val AssetPropertyRate: MicroNumber = CommonConfig.Blockchain.AssetPropertyRate
-  val LowGasPrice: Double = CommonConfig.Blockchain.LowGasPrice
-  val MediumGasPrice: Double = CommonConfig.Blockchain.MediumGasPrice
-  val HighGasPrice: Double = CommonConfig.Blockchain.HighGasPrice
-  val MantlePlaceIdentityClassificationID: ClassificationID = ClassificationID(utilities.Secrets.base64URLDecode("IoTaHkXLe_NVFxz11-BhmxQZZX52EfmuAq5QM6DBR3k="))
-  val MantlePlaceFromID: IdentityID = IdentityID(utilities.Secrets.base64URLDecode("MuFGjnQuCNHHVP7u6HfAJ3tqd3Yc-EpOqT2IT4QetdU="))
-  val MantlePlaceOrderClassificationID: ClassificationID = ClassificationID(utilities.Secrets.base64URLDecode("iFQV9507FNXJv__IqxEIffjf4AxXUScgGIe-HUKQ3ek="))
-  val IDSeparator = "."
-  val OneDec: BigDecimal = BigDecimal("1.000000000000000000")
-  val ZeroDec: BigDecimal = BigDecimal("0.0")
-  val SmallestDec: BigDecimal = BigDecimal("0.000000000000000001")
-  val SmallestDecReciprocal: BigDecimal = 1 / SmallestDec
-  // TODO BondRate from parameters
-  val BondRate = 1
-  val MaxOrderExpiry: Int = (43210 * 6) / 6
-  val MaxOrderHours = 72
 
   object Campaign {
     val AirDropWallet: Wallet = utilities.Wallet.getWallet("comfort broccoli urban cheap noise income ensure wheat maze cement panel clinic opinion acoustic select sentence code purchase casual dose brown fish salt coral".split(" "))
@@ -57,7 +41,6 @@ object Blockchain {
 
   val EmptyIdentityID: IdentityID = IdentityID(Array[Byte]())
 
-  val Name: String = CommonConfig.Blockchain.name
   val RestEndPoint: String = CommonConfig.Blockchain.RestEndPoint
   val RPCEndPoint: String = CommonConfig.Blockchain.RPCEndPoint
 

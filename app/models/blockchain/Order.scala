@@ -4,7 +4,7 @@ import models.traits.{Entity, GenericDaoImpl, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
-import schema.data.base.{DecData, IDData}
+import schema.data.base.{DecData, IDData, NumberData}
 import schema.document.Document
 import schema.id.OwnableID
 import schema.id.base._
@@ -51,12 +51,12 @@ case class Order(id: Array[Byte], idString: String, classificationID: Array[Byte
 
   def getExchangeRate: BigDecimal = {
     val property = this.getProperty(schema.constants.Properties.ExchangeRateProperty.getID)
-    if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getValue else constants.Blockchain.SmallestDec
+    if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getValue else schema.constants.Data.ZeroDec
   }
 
-  def getMakerOwnableSplit: BigDecimal = {
+  def getMakerOwnableSplit: BigInt = {
     val property = this.getProperty(schema.constants.Properties.MakerOwnableSplitProperty.getID)
-    if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getValue else constants.Blockchain.SmallestDec
+    if (property.isDefined && property.get.isMeta) NumberData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value else BigInt(1)
   }
 
   def mutate(properties: Seq[Property]): Order = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)

@@ -24,11 +24,17 @@ abstract class Scheduler extends Runnable {
 }
 
 object Scheduler {
-  val InitialDelay: FiniteDuration = constants.CommonConfig.initialDelay.millis
-  val FixedDelay: FiniteDuration = constants.CommonConfig.fixedDelay.millis
-  val HalfDay: FiniteDuration = Duration.create(43200, SECONDS)
-  val OneHour: FiniteDuration = Duration.create(3600, SECONDS)
-  val HalfHour: FiniteDuration = Duration.create(1800, SECONDS)
-  val QuarterHour: FiniteDuration = Duration.create(900, SECONDS)
-  val FiveMinutes: FiniteDuration = Duration.create(300, SECONDS)
+  def InitialDelay: FiniteDuration = constants.CommonConfig.initialDelay.millis
+
+  def FixedDelay: FiniteDuration = constants.CommonConfig.fixedDelay.millis
+
+  def HalfDay: FiniteDuration = Duration.create(43200, SECONDS)
+
+  def OneHour: FiniteDuration = Duration.create(3600, SECONDS)
+
+  def HalfHour: FiniteDuration = Duration.create(1800, SECONDS)
+
+  def QuarterHour: FiniteDuration = Duration.create(900, SECONDS)
+
+  def FiveMinutes: FiniteDuration = Duration.create(300, SECONDS)
 }

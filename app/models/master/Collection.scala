@@ -17,7 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: Seq[SocialProfile], nsfw: Boolean, properties: Option[Seq[Property]], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, royalty: BigDecimal, isDefined: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def getBondAmount: MicroNumber = MicroNumber(BigInt(utilities.Collection.getTotalBondAmount(this.getImmutables, this.getMutables, constants.Blockchain.BondRate)))
+  def getBondAmount: MicroNumber = MicroNumber(BigInt(utilities.Collection.getTotalBondAmount(this.getImmutables, this.getMutables, constants.Transaction.BondRate)))
 
   def getRoyaltyFee: BigDecimal = 0.02
 
@@ -35,7 +35,7 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
 
   def getMutables: Mutables = Mutables(PropertyList(this.getMutableMetaProperties ++ this.getMutableProperties))
 
-  def getClassificationID: ClassificationID = utilities.Collection.getClassificationID(immutables = this.getImmutables, mutables = this.getMutables, bondRate = constants.Blockchain.BondRate)
+  def getClassificationID: ClassificationID = utilities.Collection.getClassificationID(immutables = this.getImmutables, mutables = this.getMutables, bondRate = constants.Transaction.BondRate)
 
   def serialize(): Collections.CollectionSerialized = Collections.CollectionSerialized(
     id = this.id,

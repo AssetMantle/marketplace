@@ -104,7 +104,7 @@ class DefineAssetTransactions @Inject()(
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = collections.map(x => utilities.BlockchainTransaction.getDefineAssetMsg(
             fromAddress = constants.Wallet.DefineAssetWallet.address,
-            fromID = constants.Blockchain.MantlePlaceFromID,
+            fromID = constants.Transaction.FromID,
             immutableMetas = x.getImmutableMetaProperties,
             immutables = x.getImmutableProperties,
             mutableMetas = x.getMutableMetaProperties,

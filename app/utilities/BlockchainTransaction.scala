@@ -76,7 +76,7 @@ object BlockchainTransaction {
   def getFee(gasPrice: BigDecimal, gasLimit: Int): Coin = Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber((gasPrice * gasLimit) / MicroNumber.factor))
 
   def getSendCoinMsgAsAny(fromAddress: String, toAddress: String, amount: Seq[Coin]): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.SEND_COIN)
+    .setTypeUrl(schema.constants.Messages.SEND_COIN)
     .setValue(MsgSend
       .newBuilder()
       .setFromAddress(fromAddress)
@@ -87,7 +87,7 @@ object BlockchainTransaction {
 
 
   def getMantlePlaceIssueIdentityMsg(id: String, fromAddress: String, fromID: IdentityID, toAddress: String, classificationID: ClassificationID): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.IDENTITY_ISSUE)
+    .setTypeUrl(schema.constants.Messages.IDENTITY_ISSUE)
     .setValue(issue
       .Message.newBuilder()
       .setFrom(fromAddress)
@@ -104,7 +104,7 @@ object BlockchainTransaction {
   def getMantlePlaceIssueIdentityMsgWithAuthentication(id: String, fromAddress: String, fromID: IdentityID, toAddress: String, classificationID: ClassificationID, addresses: Seq[String])(implicit module: String, logger: Logger): protoBufAny = {
     if (!addresses.contains(toAddress)) constants.Response.INVALID_IDENTITY_ISSUE_MESSAGE.throwBaseException()
     protoBufAny.newBuilder()
-      .setTypeUrl(constants.Blockchain.TransactionMessage.IDENTITY_ISSUE)
+      .setTypeUrl(schema.constants.Messages.IDENTITY_ISSUE)
       .setValue(issue
         .Message.newBuilder()
         .setFrom(fromAddress)
@@ -120,7 +120,7 @@ object BlockchainTransaction {
   }
 
   def getDefineAssetMsg(fromAddress: String, fromID: IdentityID, immutableMetas: Seq[MetaProperty], immutables: Seq[MesaProperty], mutableMetas: Seq[MetaProperty], mutables: Seq[MesaProperty]): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.ASSET_DEFINE)
+    .setTypeUrl(schema.constants.Messages.ASSET_DEFINE)
     .setValue(assetDefine
       .Message.newBuilder()
       .setFrom(fromAddress)
@@ -133,7 +133,7 @@ object BlockchainTransaction {
     .build()
 
   def getDefineOrderMsg(fromAddress: String, fromID: IdentityID, immutableMetas: Seq[MetaProperty], immutables: Seq[MesaProperty], mutableMetas: Seq[MetaProperty], mutables: Seq[MesaProperty]): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.ORDER_DEFINE)
+    .setTypeUrl(schema.constants.Messages.ORDER_DEFINE)
     .setValue(ordersDefine
       .Message.newBuilder()
       .setFrom(fromAddress)
@@ -146,7 +146,7 @@ object BlockchainTransaction {
     .build()
 
   def getMintAssetMsg(fromAddress: String, fromID: IdentityID, classificationID: ClassificationID, toID: IdentityID, immutableMetas: Seq[MetaProperty], immutables: Seq[MesaProperty], mutableMetas: Seq[MetaProperty], mutables: Seq[MesaProperty]): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.ASSET_MINT)
+    .setTypeUrl(schema.constants.Messages.ASSET_MINT)
     .setValue(mintAsset
       .Message.newBuilder()
       .setFrom(fromAddress)
@@ -161,7 +161,7 @@ object BlockchainTransaction {
     .build()
 
   def getMakeOrderMsg(fromAddress: String, fromID: IdentityID, classificationID: ClassificationID, takerID: IdentityID, makerOwnableID: OwnableID, makerOwnableSplit: NumberData, expiresIn: Long, takerOwnableID: OwnableID, takerOwnableSplit: NumberData, immutableMetas: Seq[MetaProperty], immutables: Seq[MesaProperty], mutableMetas: Seq[MetaProperty], mutables: Seq[MesaProperty]): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.ORDER_MAKE)
+    .setTypeUrl(schema.constants.Messages.ORDER_MAKE)
     .setValue(ordersMake
       .Message.newBuilder()
       .setFrom(fromAddress)
@@ -181,7 +181,7 @@ object BlockchainTransaction {
     .build()
 
   def getWrapTokenMsg(fromAddress: String, fromID: IdentityID, coins: Seq[Coin]): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.SPLIT_WRAP)
+    .setTypeUrl(schema.constants.Messages.SPLIT_WRAP)
     .setValue(wrap
       .Message.newBuilder()
       .setFrom(fromAddress)
@@ -191,7 +191,7 @@ object BlockchainTransaction {
     .build()
 
   def getUnwrapTokenMsg(fromAddress: String, fromID: IdentityID, ownableID: OwnableID, amount: BigInt): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.SPLIT_UNWRAP)
+    .setTypeUrl(schema.constants.Messages.SPLIT_UNWRAP)
     .setValue(unwrap
       .Message.newBuilder()
       .setFrom(fromAddress)
@@ -202,7 +202,7 @@ object BlockchainTransaction {
     .build()
 
   def getTakeOrderMsg(fromAddress: String, fromID: IdentityID, takerOwnableSplit: NumberData, orderID: OrderID): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.ORDER_TAKE)
+    .setTypeUrl(schema.constants.Messages.ORDER_TAKE)
     .setValue(ordersTake
       .Message.newBuilder()
       .setFrom(fromAddress)
@@ -213,7 +213,7 @@ object BlockchainTransaction {
     .build()
 
   def getCancelOrderMsg(fromAddress: String, fromID: IdentityID, orderID: OrderID): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.ORDER_CANCEL)
+    .setTypeUrl(schema.constants.Messages.ORDER_CANCEL)
     .setValue(orderCancel
       .Message.newBuilder()
       .setFrom(fromAddress)
@@ -223,7 +223,7 @@ object BlockchainTransaction {
     .build()
 
   def getProvisionMsg(fromAddress: String, fromID: IdentityID, toAddress: String): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.IDENTITY_PROVISION)
+    .setTypeUrl(schema.constants.Messages.IDENTITY_PROVISION)
     .setValue(provision
       .Message.newBuilder()
       .setFrom(fromAddress)
@@ -233,7 +233,7 @@ object BlockchainTransaction {
     .build()
 
   def getUnprovisionMsg(fromAddress: String, fromID: IdentityID, toAddress: String): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION)
+    .setTypeUrl(schema.constants.Messages.IDENTITY_UNPROVISION)
     .setValue(unprovision
       .Message.newBuilder()
       .setFrom(fromAddress)
@@ -243,7 +243,7 @@ object BlockchainTransaction {
     .build()
 
   def getSplitSendMsg(fromID: IdentityID, fromAddress: String, toID: IdentityID, assetId: AssetID, amount: BigInt): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(constants.Blockchain.TransactionMessage.SPLIT_SEND)
+    .setTypeUrl(schema.constants.Messages.SPLIT_SEND)
     .setValue(splitSend
       .Message.newBuilder()
       .setFrom(fromAddress)

@@ -21,7 +21,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 case class MakeOrderTransaction(txHash: String, nftId: String, sellerId: String, buyerId: Option[String], denom: String, makerOwnableSplit: BigInt, expiresIn: Long, takerOwnableSplit: BigInt, secondaryMarketId: String, status: Option[Boolean], creationHeight: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def getExpiresIn(max: Int, endHours: Int): Option[Int] = this.creationHeight.map(x => x + (max * endHours) / constants.Blockchain.MaxOrderHours)
+  def getExpiresIn(max: Int, endHours: Int): Option[Int] = this.creationHeight.map(x => x + (max * endHours) / constants.Transaction.MaxOrderHours)
 
   def getQuantity: BigInt = this.makerOwnableSplit
 
@@ -30,7 +30,7 @@ case class MakeOrderTransaction(txHash: String, nftId: String, sellerId: String,
   def getExchangeRate: BigDecimal = this.getPrice.toBigDecimal
 
   def getOrderID(creationHeight: Int, assetID: AssetID): OrderID = utilities.Order.getOrderID(
-    classificationID = constants.Blockchain.MantlePlaceOrderClassificationID,
+    classificationID = constants.Transaction.OrderClassificationID,
     properties = constants.Orders.ImmutableMetas,
     makerID = utilities.Identity.getMantlePlaceIdentityID(this.sellerId),
     makerOwnableID = assetID,
@@ -171,12 +171,12 @@ class MakeOrderTransactions @Inject()(
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String], nft: NFT, nftOwner: NFTOwner) = {
         val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
-        val expiresIn = ((constants.Blockchain.MaxOrderExpiry * endHours) / constants.Blockchain.MaxOrderHours).toLong
+        val expiresIn = ((constants.Transaction.MaxOrderExpiry * endHours) / constants.Transaction.MaxOrderHours).toLong
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(utilities.BlockchainTransaction.getMakeOrderMsg(
             fromAddress = fromAddress,
             fromID = utilities.Identity.getMantlePlaceIdentityID(nftOwner.ownerId),
-            classificationID = constants.Blockchain.MantlePlaceOrderClassificationID,
+            classificationID = constants.Transaction.OrderClassificationID,
             takerID = if (buyerId.isEmpty) constants.Blockchain.EmptyIdentityID else utilities.Identity.getMantlePlaceIdentityID(buyerId.get),
             makerOwnableID = nft.getAssetID,
             makerOwnableSplit = NumberData(quantity),

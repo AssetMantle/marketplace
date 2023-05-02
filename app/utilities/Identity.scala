@@ -34,7 +34,7 @@ object Identity {
 
   def getMantlePlaceIdentityID(id: String): IdentityID = {
     val immutables = Immutables(PropertyList(Seq(getOriginMetaProperty, getBondAmountMetaProperty, getIDMetaProperty(id), getExtraMesaProperty(""))))
-    schema.utilities.ID.getIdentityID(classificationID = constants.Blockchain.MantlePlaceIdentityClassificationID, immutables = immutables)
+    schema.utilities.ID.getIdentityID(classificationID = constants.Transaction.IdentityClassificationID, immutables = immutables)
   }
 
 }

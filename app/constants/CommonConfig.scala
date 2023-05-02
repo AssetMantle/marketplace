@@ -3,7 +3,7 @@ package constants
 import com.typesafe.config.ConfigFactory
 import play.api.Configuration
 import play.api.i18n.Lang
-import utilities.{MicroNumber, Wallet}
+import utilities.Wallet
 
 import scala.concurrent.duration.{Duration, MILLISECONDS}
 
@@ -46,8 +46,6 @@ object CommonConfig {
     def MediumGasPrice: Double = config.get[Double]("blockchain.mediumGasPrice")
 
     def HighGasPrice: Double = config.get[Double]("blockchain.highGasPrice")
-
-    def AssetPropertyRate: MicroNumber = MicroNumber(BigInt(config.get[Int]("blockchain.assetPropertyRate")))
   }
 
   object Pagination {

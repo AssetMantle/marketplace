@@ -2,22 +2,22 @@
 
 @(formData: Form[_])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonInputBigDecimal(formData, constants.FormField.GAS_PRICE, Symbol("class") -> "hidden", Symbol("value") -> constants.Blockchain.MediumGasPrice)
+@commonInputBigDecimal(formData, constants.FormField.GAS_PRICE, Symbol("class") -> "hidden", Symbol("value") -> constants.Transaction.MediumGasPrice)
 <div class="mb-2 gasFeesLabel">@Messages(constants.View.BLOCKCHAIN_TRANSACTION_FEES)</div>
 <div id="gasPriceToggleButton" class="btn-group w-100 toggleBtn" role="group">
-    <span id="option1" type="button" class="btn p-2 toggleOption" onclick="setGasOption(this, @constants.Blockchain.LowGasPrice)">
+    <span id="option1" type="button" class="btn p-2 toggleOption" onclick="setGasOption(this, @constants.Transaction.LowGasPrice)">
         <div class="gasPricePriority">@Messages(constants.View.GAS_LOW)</div>
-        <div id="gasCharges1" class="gasCharges">@constants.Blockchain.LowGasPrice</div>
+        <div id="gasCharges1" class="gasCharges">@constants.Transaction.LowGasPrice</div>
         <div id="gasChargesPrice1" class="gasChargesPrice">00</div>
     </span>
-    <span id="option2" type="button" class="btn p-2 active toggleOption" onclick="setGasOption(this, @constants.Blockchain.MediumGasPrice)">
+    <span id="option2" type="button" class="btn p-2 active toggleOption" onclick="setGasOption(this, @constants.Transaction.MediumGasPrice)">
         <div class="gasPricePriority">@Messages(constants.View.GAS_MEDIUM)</div>
-        <div id="gasCharges2" class="gasCharges">@constants.Blockchain.MediumGasPrice</div>
+        <div id="gasCharges2" class="gasCharges">@constants.Transaction.MediumGasPrice</div>
         <div id="gasChargesPrice2" class="gasChargesPrice">00</div>
     </span>
-    <span id="option3" type="button" class="btn p-2 toggleOption" onclick="setGasOption(this, @constants.Blockchain.HighGasPrice)">
+    <span id="option3" type="button" class="btn p-2 toggleOption" onclick="setGasOption(this, @constants.Transaction.HighGasPrice)">
         <div class="gasPricePriority">@Messages(constants.View.GAS_HIGH)</div>
-        <div id="gasCharges3" class="gasCharges">@constants.Blockchain.HighGasPrice</div>
+        <div id="gasCharges3" class="gasCharges">@constants.Transaction.HighGasPrice</div>
         <div id="gasChargesPrice3" class="gasChargesPrice">00</div>
     </span>
 </div>

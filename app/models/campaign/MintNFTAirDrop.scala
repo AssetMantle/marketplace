@@ -115,7 +115,7 @@ class MintNFTAirDrops @Inject()(
         val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
         val txRawBytes = utilities.BlockchainTransaction.getTxRawBytes(
           messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = constants.Blockchain.Campaign.AirDropWallet.address, toAddress = address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)))),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = constants.Blockchain.MediumGasPrice, gasLimit = constants.Blockchain.DefaultSendCoinGasAmount),
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = constants.Transaction.MediumGasPrice, gasLimit = constants.Blockchain.DefaultSendCoinGasAmount),
           gasLimit = constants.Blockchain.DefaultSendCoinGasAmount,
           account = bcAccount,
           ecKey = constants.Blockchain.Campaign.AirDropWallet.getECKey,

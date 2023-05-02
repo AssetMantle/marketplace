@@ -110,8 +110,8 @@ class IssueIdentityTransactions @Inject()(
             id = x,
             fromAddress = constants.Wallet.IssueIdentityWallet.address,
             toAddress = accountIdAddress.getOrElse(x, Seq()).headOption.getOrElse(""),
-            classificationID = constants.Blockchain.MantlePlaceIdentityClassificationID,
-            fromID = constants.Blockchain.MantlePlaceFromID,
+            classificationID = constants.Transaction.IdentityClassificationID,
+            fromID = constants.Transaction.FromID,
             addresses = accountIdAddress.getOrElse(x, Seq())
           )).toSeq,
           fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultIssueIdentityGasLimit * accountIdAddress.size),

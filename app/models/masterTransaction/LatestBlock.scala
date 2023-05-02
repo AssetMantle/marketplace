@@ -101,34 +101,34 @@ class LatestBlocks @Inject()(
       var mantlePlaceTx = false
       val check = utilitiesOperations.traverse(transaction.getMessages) { stdMsg =>
         stdMsg.getTypeUrl match {
-          case constants.Blockchain.TransactionMessage.SEND_COIN => utilitiesExternalTransactions.onSendCoin(bankTx.MsgSend.parseFrom(stdMsg.getValue))
-          case constants.Blockchain.TransactionMessage.RECV_PACKET => utilitiesExternalTransactions.onIBCReceive(channelTx.MsgRecvPacket.parseFrom(stdMsg.getValue))
-          case constants.Blockchain.TransactionMessage.ASSET_BURN => utilitiesExternalTransactions.onBurnNFT(assetTransactions.burn.Message.parseFrom(stdMsg.getValue), transaction.hash)
-          case constants.Blockchain.TransactionMessage.ASSET_MUTATE => utilitiesExternalTransactions.onMutateNFT(assetTransactions.mutate.Message.parseFrom(stdMsg.getValue))
-          case constants.Blockchain.TransactionMessage.ASSET_RENUMERATE => utilitiesExternalTransactions.onRenumerateNFT(assetTransactions.renumerate.Message.parseFrom(stdMsg.getValue))
-          case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION =>
+          case schema.constants.Messages.SEND_COIN => utilitiesExternalTransactions.onSendCoin(bankTx.MsgSend.parseFrom(stdMsg.getValue))
+          case schema.constants.Messages.RECV_PACKET => utilitiesExternalTransactions.onIBCReceive(channelTx.MsgRecvPacket.parseFrom(stdMsg.getValue))
+          case schema.constants.Messages.ASSET_BURN => utilitiesExternalTransactions.onBurnNFT(assetTransactions.burn.Message.parseFrom(stdMsg.getValue), transaction.hash)
+          case schema.constants.Messages.ASSET_MUTATE => utilitiesExternalTransactions.onMutateNFT(assetTransactions.mutate.Message.parseFrom(stdMsg.getValue))
+          case schema.constants.Messages.ASSET_RENUMERATE => utilitiesExternalTransactions.onRenumerateNFT(assetTransactions.renumerate.Message.parseFrom(stdMsg.getValue))
+          case schema.constants.Messages.IDENTITY_PROVISION =>
             for {
               txExists <- checkAndProcess(mantlePlaceTx, transaction, stdMsg, blockchainTransactionProvisionAddresses.Service.checkExists, utilitiesExternalTransactions.onProvisionIdentity)
             } yield mantlePlaceTx = txExists
-          case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION =>
+          case schema.constants.Messages.IDENTITY_UNPROVISION =>
             for {
               txExists <- checkAndProcess(mantlePlaceTx, transaction, stdMsg, blockchainTransactionUnprovisionAddresses.Service.checkExists, utilitiesExternalTransactions.onUnprovisionIdentity)
             } yield mantlePlaceTx = txExists
-          case constants.Blockchain.TransactionMessage.ORDER_CANCEL =>
+          case schema.constants.Messages.ORDER_CANCEL =>
             for {
               txExists <- checkAndProcess(mantlePlaceTx, transaction, stdMsg, blockchainTransactionCancelOrders.Service.checkExists, utilitiesExternalTransactions.onOrderCancel)
             } yield mantlePlaceTx = txExists
-          case constants.Blockchain.TransactionMessage.ORDER_MAKE =>
+          case schema.constants.Messages.ORDER_MAKE =>
             for {
               txExists <- checkAndProcess(mantlePlaceTx, transaction, stdMsg, blockchainTransactionMakeOrders.Service.checkExists, utilitiesExternalTransactions.onOrderMake)
             } yield mantlePlaceTx = txExists
-          case constants.Blockchain.TransactionMessage.ORDER_TAKE =>
+          case schema.constants.Messages.ORDER_TAKE =>
             for {
               txExists <- checkAndProcess(mantlePlaceTx, transaction, stdMsg, blockchainTransactionTakeOrders.Service.checkExists, utilitiesExternalTransactions.onOrderTake)
             } yield mantlePlaceTx = txExists
-          case constants.Blockchain.TransactionMessage.SPLIT_SEND => utilitiesExternalTransactions.onSplitSend(splitTransactions.send.Message.parseFrom(stdMsg.getValue))
-          //          case constants.Blockchain.TransactionMessage.SPLIT_WRAP =>
-          //          case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => utilitiesExternalTransactions.onSplitUnwrap(splitTransactions.unwrap.Message.parseFrom(stdMsg.getValue))
+          case schema.constants.Messages.SPLIT_SEND => utilitiesExternalTransactions.onSplitSend(splitTransactions.send.Message.parseFrom(stdMsg.getValue))
+          //          case schema.constants.Messages.SPLIT_WRAP =>
+          //          case schema.constants.Messages.SPLIT_UNWRAP => utilitiesExternalTransactions.onSplitUnwrap(splitTransactions.unwrap.Message.parseFrom(stdMsg.getValue))
           case _ => Future()
         }
 
