@@ -107,7 +107,7 @@ jobs:
         if:  ${{ github.ref_type == 'branch' && (github.ref == 'refs/heads/staging') }}
         with:
           push: true
-          tags: ${{ steps.meta-branch.outputs.tags }}
+          tags: ${{ steps.meta-staging.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
