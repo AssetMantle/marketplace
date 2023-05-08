@@ -187,29 +187,28 @@ class Starter @Inject()(
     } yield ()
   }
 
-  def updateDecimalToNumberType(): Future[Unit] = {
-    val nftIds = masterNFTProperties.Service.getOnType("DECIMAL").map(_.map(_.nftId))
+  def correctCollectionProperties(): Future[Unit] = {
+    val collections = masterCollections.Service.fetchAll()
 
-    def collectionIds(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds).map(_.map(_.collectionId).distinct)
-
-    def collections(collectionIds: Seq[String]) = masterCollections.Service.getCollections(collectionIds)
-
-    def updateCollections(collections: Seq[Collection]) = utilitiesOperations.traverse(collections) { collection =>
-      val properties = collection.properties.get.filterNot(_.`type` == "DECIMAL") ++ collection.properties.get.filter(_.`type` == "DECIMAL").map(x => {
-        val updatedDefaultValue = if (x.defaultValue == "") 0.toString else x.defaultValue
-        x.copy(`type` = constants.NFT.Data.NUMBER, defaultValue = updatedDefaultValue)
-      })
+    def updateCollections(collections: Seq[Collection]) = utilitiesOperations.traverse(collections.filter(_.properties.get.nonEmpty)) { collection =>
+      val properties = collection.properties.get.filter(_.`type` == "DECIMAL").map(x => {
+        val updatedDefaultValue = if (x.defaultValue == "") "0.0" else x.defaultValue
+        x.copy(`type` = constants.NFT.Data.DECIMAL, defaultValue = updatedDefaultValue)
+      }) ++ collection.properties.get.filter(_.`type` == "Decimal").map(x => {
+        val updatedDefaultValue = if (x.defaultValue == "") "0.0" else x.defaultValue
+        x.copy(`type` = constants.NFT.Data.DECIMAL, defaultValue = updatedDefaultValue)
+      }) ++ collection.properties.get.filter(_.`type` == "String").map(x => {
+        x.copy(`type` = constants.NFT.Data.STRING, defaultValue = x.defaultValue)
+      }) ++ collection.properties.get.filter(_.`type` == "Boolean").map(x => {
+        val updatedDefaultValue = if (x.defaultValue == "") "false" else x.defaultValue
+        x.copy(`type` = constants.NFT.Data.BOOLEAN, defaultValue = updatedDefaultValue)
+      }) ++ collection.properties.get.filterNot(x => x.`type` == "DECIMAL" || x.`type` == "Decimal" || x.`type` == "String" || x.`type` == "Boolean")
       masterCollections.Service.update(collection.copy(properties = Option(properties)))
     }
 
-    def update = masterNFTProperties.Service.changeDecimalTypeToNumber
-
     for {
-      nftIds <- nftIds
-      collectionIds <- collectionIds(nftIds)
-      collections <- collections(collectionIds)
+      collections <- collections
       _ <- updateCollections(collections)
-      _ <- update
     } yield ()
   }
 
@@ -332,12 +331,12 @@ class Starter @Inject()(
   // Delete redundant nft tags
 
   def start(): Future[Unit] = {
-//    (for {
-//      _ <- defineOrderAndAssets()
-//    } yield ()
-//      ).recover {
-//      case exception: Exception => logger.error(exception.getLocalizedMessage)
-//    }
+    //    (for {
+    //      _ <- defineOrderAndAssets()
+    //    } yield ()
+    //      ).recover {
+    //      case exception: Exception => logger.error(exception.getLocalizedMessage)
+    //    }
     Future()
   }
 

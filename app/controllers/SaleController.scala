@@ -183,7 +183,7 @@ class SaleController @Inject()(
           def addToSale(collection: Collection, countNFts: Int, saleExistOnCollection: Boolean, collectionAnalysis: CollectionAnalysis, unmintedNFTs: Seq[String]) = {
             val maxSellNumber: Int = if (collectionAnalysis.totalNFTs <= 50) collectionAnalysis.totalNFTs.toInt else collectionAnalysis.totalNFTs.toInt / 10
             val errors = Seq(
-              if (!loginState.isGenesisCreator) Option(constants.Response.NOT_GENESIS_CREATOR) else None,
+              if (!loginState.isVerifiedCreator) Option(constants.Response.NOT_VERIFIED_CREATOR) else None,
               if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
               if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
               if (saleExistOnCollection) Option(constants.Response.CANNOT_CREATE_MORE_THAN_ONE_SALE) else None,

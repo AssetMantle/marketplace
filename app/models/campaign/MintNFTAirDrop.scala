@@ -108,17 +108,17 @@ class MintNFTAirDrops @Inject()(
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(constants.Blockchain.Campaign.AirDropWallet.address).map(_.account.toSerializableAccount)
+      val bcAccount = getAccount.Service.get(constants.Campaign.AirDropWallet.address).map(_.account.toSerializableAccount)
       val unconfirmedTxs = getUnconfirmedTxs.Service.get()
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
         val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
         val txRawBytes = utilities.BlockchainTransaction.getTxRawBytes(
-          messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = constants.Blockchain.Campaign.AirDropWallet.address, toAddress = address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)))),
+          messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = constants.Campaign.AirDropWallet.address, toAddress = address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)))),
           fee = utilities.BlockchainTransaction.getFee(gasPrice = constants.Transaction.MediumGasPrice, gasLimit = constants.Blockchain.DefaultSendCoinGasAmount),
           gasLimit = constants.Blockchain.DefaultSendCoinGasAmount,
           account = bcAccount,
-          ecKey = constants.Blockchain.Campaign.AirDropWallet.getECKey,
+          ecKey = constants.Campaign.AirDropWallet.getECKey,
           timeoutHeight = timeoutHeight,
           memo = eligibilityTxHash)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
@@ -126,7 +126,7 @@ class MintNFTAirDrops @Inject()(
         val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              mintNFTAirDrop <- blockchainTransactionCampaignSendCoins.Service.add(txHash = txHash, fromAddress = constants.Blockchain.Campaign.AirDropWallet.address, status = None, memo = Option(eligibilityTxHash), timeoutHeight = timeoutHeight)
+              mintNFTAirDrop <- blockchainTransactionCampaignSendCoins.Service.add(txHash = txHash, fromAddress = constants.Campaign.AirDropWallet.address, status = None, memo = Option(eligibilityTxHash), timeoutHeight = timeoutHeight)
               _ <- Service.updateDropTxHash(accountId = accountId, airDropTxHash = txHash)
             } yield mintNFTAirDrop
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()

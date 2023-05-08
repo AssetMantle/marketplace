@@ -2,7 +2,6 @@ package constants
 
 import org.bitcoinj.crypto.ChildNumber
 import schema.id.base._
-import utilities.{MicroNumber, Wallet}
 
 object Blockchain {
   val AccountPrefix = "mantle"
@@ -34,10 +33,6 @@ object Blockchain {
     new ChildNumber(0, false),
     new ChildNumber(0, false)
   )
-
-  object Campaign {
-    val AirDropWallet: Wallet = utilities.Wallet.getWallet("comfort broccoli urban cheap noise income ensure wheat maze cement panel clinic opinion acoustic select sentence code purchase casual dose brown fish salt coral".split(" "))
-  }
 
   val EmptyIdentityID: IdentityID = IdentityID(Array[Byte]())
 

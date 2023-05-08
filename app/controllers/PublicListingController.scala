@@ -165,7 +165,7 @@ class PublicListingController @Inject()(
           def addToPublicListing(countNFts: Int, collection: Collection, collectionAnalysis: CollectionAnalysis, unmintedNFTs: Seq[String]) = {
             val maxSellNumber: Int = if (collectionAnalysis.totalNFTs <= 50) collectionAnalysis.totalNFTs.toInt else collectionAnalysis.totalNFTs.toInt / 10
             val errors = Seq(
-              if (!loginState.isGenesisCreator) Option(constants.Response.NOT_GENESIS_CREATOR) else None,
+              if (!loginState.isVerifiedCreator) Option(constants.Response.NOT_VERIFIED_CREATOR) else None,
               if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
               if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
               if (createData.numberOfNFTs > maxSellNumber.min(countNFts)) Option(constants.Response.CANNOT_SELL_MORE_THAN_ALLOWED_LIMIT) else None,

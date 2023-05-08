@@ -4,7 +4,6 @@ import models.common.NFT.BaseNFTProperty
 import models.traits.{Entity3, GenericDaoImpl3, Logging, ModelTable3}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import schema.data.base.{BooleanData, NumberData, StringData}
 import schema.id.base.{PropertyID, StringID}
 import schema.property.base.{MesaProperty, MetaProperty}
 import slick.jdbc.H2Profile.api._
@@ -97,8 +96,6 @@ class NFTProperties @Inject()(
     def deleteByNFTId(nftId: String): Future[Int] = filterAndDelete(_.nftId === nftId)
 
     def tryGet(nftId: String, name: String): Future[NFTProperty] = tryGetById1Id2Id3(id1 = nftId, id2 = name, id3 = constants.NFT.Data.STRING)
-
-    def getOnType(`type`: String): Future[Seq[NFTProperty]] = filter(_.`type` === `type`)
 
     def changeDecimalTypeToNumber: Future[Int] = customUpdate(NFTProperties.TableQuery.filter(_.`type` === "DECIMAL").map(_.`type`).update(constants.NFT.Data.NUMBER))
 

@@ -10,9 +10,9 @@ object NFT {
 
   def getAWSKey(fileName: String): String = "nft/" + fileName
 
-  def getDefaultImmutableMetaProperties(name: String, description: String, fileHash: String, bondAmount: Long): Seq[MetaProperty] = Seq(
+  def getDefaultImmutableMetaProperties(name: String, collectionName: String, fileHash: String, bondAmount: Long): Seq[MetaProperty] = Seq(
     MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.NFT_NAME), typeID = schema.constants.Data.StringDataTypeID), data = StringData(name)),
-    //    MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.NFT_DESCRIPTION), typeID = schema.constants.Data.StringDataTypeID), data = StringData(description).toAnyData),
+    MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.COLLECTION_NAME), typeID = schema.constants.Data.StringDataTypeID), data = StringData(collectionName)),
     MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.FILE_HASH), typeID = schema.constants.Data.StringDataTypeID), data = StringData(fileHash)),
     MetaProperty(id = PropertyID(keyID = StringID(constants.Collection.DefaultProperty.BOND_AMOUNT), typeID = schema.constants.Data.NumberDataTypeID), data = NumberData(bondAmount))
   )

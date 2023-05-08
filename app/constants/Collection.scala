@@ -35,12 +35,12 @@ object Collection {
   object DefaultProperty {
     // Should be kept in lower case otherwise change in form constraints
     val NFT_NAME = "name"
-    val NFT_DESCRIPTION = "description"
+    val COLLECTION_NAME = "collectionName"
     val FILE_HASH = "fileHash"
     val CREATOR_ID = "creatorID"
     val BOND_AMOUNT = "bondAmount"
 
-    val list: Seq[String] = Seq(NFT_NAME, NFT_DESCRIPTION, FILE_HASH, CREATOR_ID)
+    val list: Seq[String] = Seq(NFT_NAME, COLLECTION_NAME, FILE_HASH, CREATOR_ID)
 
     val metaList: Seq[String] = Seq(NFT_NAME, FILE_HASH)
 
@@ -50,7 +50,7 @@ object Collection {
 
   }
 
-  val RestrictedPropertyList: Seq[String] = Seq(DefaultProperty.NFT_NAME, DefaultProperty.NFT_DESCRIPTION, DefaultProperty.FILE_HASH, DefaultProperty.BOND_AMOUNT, "supply", "burnHeight")
+  val RestrictedPropertyList: Seq[String] = Seq(DefaultProperty.NFT_NAME, DefaultProperty.COLLECTION_NAME, DefaultProperty.FILE_HASH, DefaultProperty.BOND_AMOUNT, "supply", "burnHeight")
 
   case class CollectionStatus(name: String, id: Int)
 
