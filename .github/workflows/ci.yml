@@ -21,7 +21,7 @@ jobs:
 
       - name: Test sbt dist
         uses: docker/build-push-action@v2
-        if: ${{ !(github.ref_type == 'tag' || (github.ref_type == 'branch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'))) }}
+        if: ${{ !(github.ref_type == 'tag' || (github.ref_type == 'branch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/staging'))) }}
         with:
           target: build
           push: false
@@ -31,7 +31,7 @@ jobs:
 
       - name: Test sbt dist (cached)
         uses: docker/build-push-action@v2
-        if: ${{ github.ref_type == 'tag' || (github.ref_type == 'branch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')) }}
+        if: ${{ github.ref_type == 'tag' || (github.ref_type == 'branch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/staging')) }}
         with:
           target: build
           push: false
@@ -62,9 +62,20 @@ jobs:
             type=raw,value=edge-{{sha}}-{{date 'X'}}
             type=raw,value=edge
 
+      - name: Prepare staging2 release ragas
+        id: meta-staging
+        uses: docker/metadata-action@v3
+        if: ${{ github.ref_type == 'branch' && (github.ref == 'refs/heads/staging') }}
+        with:
+          images: |
+            assetmantle/mantleplace
+          tags: |
+            type=raw,value=staging-{{sha}}-{{date 'X'}}
+            type=raw,value=staging
+
       - name: Login to docker registry
         uses: docker/login-action@v1
-        if: ${{ github.ref_type == 'tag' || (github.ref_type == 'branch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')) }}
+        if: ${{ github.ref_type == 'tag' || (github.ref_type == 'branch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/staging')) }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -83,6 +94,17 @@ jobs:
       - name: Build staging container image
         uses: docker/build-push-action@v2
         if: ${{ github.ref_type == 'branch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') }}
+        with:
+          push: true
+          tags: ${{ steps.meta-branch.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            APP_VERSION=${{ env.GITHUB_SHA_SHORT }}
+
+      - name: Build staging2 container image
+        uses: docker/build-push-action@v2
+        if:  ${{ github.ref_type == 'branch' && (github.ref == 'refs/heads/staging') }}
         with:
           push: true
           tags: ${{ steps.meta-branch.outputs.tags }}
