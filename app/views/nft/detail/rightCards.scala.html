@@ -94,7 +94,7 @@
                 <div class="separator"></div>
                 @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.AccountController.signInWithCallbackForm('/market/${collection.id}'))"), Symbol("class") -> "mt-4")
             } else {
-                <div class="analysisValue">@Messages(constants.View.NOT_ON_SALE)</div>
+                <div class="analysisValue">@Messages(constants.View.NOT_LISTED_ON_SECONDARY_MARKET)</div>
             }
         }
     </div>

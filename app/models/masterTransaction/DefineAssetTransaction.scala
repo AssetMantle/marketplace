@@ -156,7 +156,7 @@ class DefineAssetTransactions @Inject()(
     }
 
     private def defineCollections(): Future[Unit] = {
-      val collections = masterCollections.Service.fetchAllNotDefined()
+      val collections = masterCollections.Service.fetchAllDefineReady()
       val anyPendingTx = Service.checkAnyPendingTx
 
       def filterAlreadyDefined(collections: Seq[Collection]) = {

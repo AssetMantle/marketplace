@@ -115,11 +115,11 @@ class MintAssetTransactions @Inject()(
       val nftOwners = masterNFTOwners.Service.getByIds(nftIDs)
       val nftProperties = masterNFTProperties.Service.get(nftIDs)
 
-      def identityIDExists(nftOwners: Seq[NFTOwner]) = blockchainIdentities.Service.getIDsAlreadyExists(nftOwners.map(_.getOwnerIdentityID.asString))
+      def identityIDExists(nftOwners: Seq[NFTOwner]) = blockchainIdentities.Service.getIDsAlreadyExists(nftOwners.map(_.getOwnerIdentityID.asString).distinct)
 
       def collections(collectionIDs: Seq[String]) = masterCollections.Service.getCollections(collectionIDs)
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String], nfts: Seq[NFT], collections: Seq[Collection], nftOwners: Seq[NFTOwner], nftProperties: Seq[NFTProperty], identityIDExists: Seq[String]) = if (identityIDExists.length == nftOwners.length){
+      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String], nfts: Seq[NFT], collections: Seq[Collection], nftOwners: Seq[NFTOwner], nftProperties: Seq[NFTProperty], identityIDExists: Seq[String]) = if (identityIDExists.distinct.length == nftOwners.map(_.ownerId).distinct.length) {
         val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = nfts.map(nft => {

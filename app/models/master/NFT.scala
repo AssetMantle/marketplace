@@ -114,7 +114,7 @@ class NFTs @Inject()(
 
     def getByIds(ids: Seq[String]): Future[Seq[NFT]] = filter(_.id.inSet(ids))
 
-    def getForMinting: Future[Seq[NFT]] = filter(_.mintReady).map(_.take(300))
+    def getForMinting: Future[Seq[NFT]] = filter(x => x.mintReady && !x.isMinted).map(_.take(300))
 
     def deleteCollections(collectionIds: Seq[String]): Future[Int] = filterAndDelete(_.collectionId.inSet(collectionIds))
 

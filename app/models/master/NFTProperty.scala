@@ -19,7 +19,7 @@ case class NFTProperty(nftId: String, name: String, `type`: String, `value`: Str
 
   def id3: String = `type`
 
-  def getPropertyID: PropertyID = PropertyID(keyID = StringID(this.name), typeID = utilities.Data.getTypeID(this.`type`))
+  def getPropertyID: PropertyID = PropertyID(keyID = StringID(this.name.trim), typeID = utilities.Data.getTypeID(this.`type`))
 
   def toMetaProperty()(implicit module: String, logger: Logger): MetaProperty = if (this.meta) MetaProperty(id = this.getPropertyID, data = utilities.Data.getData(`type` = this.`type`, value = this.`value`)) else constants.Response.NOT_META_PROPERTY.throwBaseException()
 

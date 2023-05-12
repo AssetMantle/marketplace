@@ -11,6 +11,7 @@ case class RegularExpression(name: String, regex: Regex) {
 object RegularExpression {
   val ANY_STRING: RegularExpression = RegularExpression("ANY_STRING", """.*""".r)
   val ALL_NUMBERS_ALL_LETTERS: RegularExpression = RegularExpression("ALL_NUMBERS_ALL_LETTERS", """^[A-Za-z0-9]*$""".r)
+  val PROPERTY_ID: RegularExpression = RegularExpression("PROPERTY_ID", """[A-Za-z0-9_]{1,250}$""".r)
   val ALL_NUMBERS_ALL_CAPITAL_LETTERS: RegularExpression = RegularExpression("ALL_NUMBERS_ALL_CAPITAL_LETTERS", """^[A-Z0-9]*$""".r)
   val ALL_NUMBERS_ALL_SMALL_LETTERS: RegularExpression = RegularExpression("ALL_NUMBERS_ALL_SMALL_LETTERS", """^[a-z0-9]*$""".r)
   val MANTLE_ADDRESS: RegularExpression = RegularExpression("MANTLE_ADDRESS", """^mantle[a-z0-9]{39}$""".r)
