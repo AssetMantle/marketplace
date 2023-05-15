@@ -67,13 +67,14 @@
                                     </tr>
 @*//                                }*@
                                 <tr>
-                                    <td class="text-left tableLabel">@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_PLATFORM_COMMISSION)</td>
+                                    <td class="text-left tableLabel">
+                                        @Messages(constants.View.NFT_INVOICE_TABLE_FIELD_PLATFORM_COMMISSION)
+                                        <del>@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_PLATFORM_COMMISSION_OFF)</del>
+                                    </td>
                                     <td class="text-center tableValue">
                                         <span class="commissionRate">@(constants.Platform.Commission * 100)</span> %
                                     </td>
-                                    <td class="text-center tableValue">
-                                        <span class="quantity">00</span>
-                                    </td>
+                                    <td class="text-center tableValue"></td>
                                     <td class="text-end tableValue">
                                         <span class="commissionAmount">0.00</span> $MNTL
                                     </td>
