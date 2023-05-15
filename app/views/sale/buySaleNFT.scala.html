@@ -53,7 +53,7 @@
                                     </td>
                                 </tr>
 @*//                                @if(MINT_NFT is true) {*@
-                                    <tr>
+                                    <tr id="bondingAmountContainer">
                                         <td class="text-left tableLabel">@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_BONDING_AMOUNT)</td>
                                         <td class="text-center tableValue">
                                             <span class="BondingUnitCost">@collection.getBondAmount.toBigDecimal</span> $MNTL
