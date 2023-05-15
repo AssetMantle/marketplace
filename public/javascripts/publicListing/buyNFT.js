@@ -6,20 +6,23 @@ function showSubmitButton() {
     $(".quantity").text($("#PUBLIC_LISTING_BUY_NFT_NUMBER").val());
 }
 
-$("#PASSWORD").on("keyup",function(){
-    if($("#PASSWORD").val() !== ""){
+$("#PASSWORD").on("keyup", function () {
+    if ($("#PASSWORD").val() !== "") {
         $("#publicListingNextButton").removeClass("disable");
-    }else{
+    } else {
         $("#publicListingNextButton").addClass("disable");
     }
 });
 
-function computeInvoice(){
+function computeInvoice() {
     let quantity = parseInt($("#PUBLIC_LISTING_BUY_NFT_NUMBER").val());
-    let listedUnitCost = parseFloat($(".listedUnitCost").text().replace(",",""));
+    let listedUnitCost = parseFloat($(".listedUnitCost").text().replace(",", ""));
     let listedAmount = listedUnitCost * quantity;
-    let BondingUnitCost = parseFloat($(".BondingUnitCost").text().replace(",",""));
+    console.log($(".BondingUnitCost").text())
+    let BondingUnitCost = parseFloat($(".BondingUnitCost").text().replace(",", ""));
     let BondingAmount = BondingUnitCost * quantity;
+    console.log(BondingUnitCost);
+    console.log(BondingAmount);
     let commissionRate = parseFloat($(".commissionRate").text());
     let commissionAmount = parseFloat((listedAmount * commissionRate) / 100);
     let subTotal = listedAmount + BondingAmount + commissionAmount;

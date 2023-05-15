@@ -18,9 +18,9 @@ object Collection {
 
   def getOldNFTFileAwsKey(collectionId: String, fileName: String): String = collectionId + nfts + fileName
 
-  def getTotalBondAmount(immutables: Immutables, mutables: Mutables, bondRate: Int): Long = {
+  def getTotalBondAmount(immutables: Immutables, mutables: Mutables, bondRate: Int): BigInt = {
     val totalWeight = mutables.propertyList.properties.map(_.getBondedWeight).sum + immutables.propertyList.properties.map(_.getBondedWeight).sum
-    (totalWeight * bondRate).toLong
+    BigInt(totalWeight * bondRate)
   }
 
   // TODO BondRate from parameters
