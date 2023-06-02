@@ -4,6 +4,9 @@ function showSubmitButton() {
     $("#launchpadNextButton").hide();
     $("#formSubmitButton").show();
     $(".quantity").text($("#SALE_BUY_NFT_NUMBER").val());
+    if($("#MINT_NFT").is(":checked")){
+        $("#bondingAmountContainer").show();
+    }
 }
 
 $("#PASSWORD").on("keyup",function(){
