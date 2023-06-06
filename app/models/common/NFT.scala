@@ -13,13 +13,6 @@ object NFT {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  @deprecated
-  val SMALL_STRING = "string"
-  @deprecated
-  val SMALL_NUMBER = "number"
-  @deprecated
-  val NUMBER = "NUMBER"
-
   abstract class BaseNFTProperty {
     val name: String
     val meta: Boolean
@@ -32,25 +25,13 @@ object NFT {
     def toNFTProperty(nftId: String): NFTProperty = NFTProperty(nftId = nftId, name = this.name, `type` = this.`type`, `value` = this.valueAsString, meta = this.meta, mutable = this.mutable)
   }
 
-  implicit val baseNFTPropertyWrites: Writes[BaseNFTProperty] = {
-    case stringProperty: StringProperty => Json.toJson(stringProperty)
-    case numberProperty: NumberProperty => Json.toJson(numberProperty)
-    case booleanProperty: BooleanProperty => Json.toJson(booleanProperty)
-    case _ => constants.Response.NFT_PROPERTY_TYPE_NOT_FOUND.throwBaseException()
-  }
-
-  implicit val baseNFTPropertyReads: Reads[BaseNFTProperty] = {
-    Json.format[NumberProperty].map(x => x: BaseNFTProperty) or
-      Json.format[StringProperty].map(x => x: BaseNFTProperty) or
-      Json.format[BooleanProperty].map(x => x: BaseNFTProperty)
-  }
-
   object BaseNFTProperty {
 
     def apply(NFTProperty: NFTProperty): BaseNFTProperty = NFTProperty.`type` match {
       case constants.NFT.Data.STRING => StringProperty(name = NFTProperty.name, `value` = NFTProperty.`value`, meta = NFTProperty.meta, mutable = NFTProperty.mutable)
       case constants.NFT.Data.NUMBER => NumberProperty(name = NFTProperty.name, `value` = NFTProperty.`value`.toLong, meta = NFTProperty.meta, mutable = NFTProperty.mutable)
       case constants.NFT.Data.BOOLEAN => BooleanProperty(name = NFTProperty.name, `value` = NFTProperty.`value`.toBoolean, meta = NFTProperty.meta, mutable = NFTProperty.mutable)
+      case constants.NFT.Data.DECIMAL => DecimalProperty(name = NFTProperty.name, `value` = BigDecimal(NFTProperty.`value`), meta = NFTProperty.meta, mutable = NFTProperty.mutable)
     }
 
   }
@@ -64,6 +45,17 @@ object NFT {
   implicit val stringPropertyReads: Reads[StringProperty] = Json.reads[StringProperty]
 
   implicit val stringPropertyWrites: Writes[StringProperty] = Json.writes[StringProperty]
+
+  case class DecimalProperty(name: String, `value`: BigDecimal, meta: Boolean, mutable: Boolean) extends BaseNFTProperty {
+    def `type`: String = constants.NFT.Data.DECIMAL
+
+    def valueAsString: String = this.`value`.toString
+  }
+
+  implicit val decimalPropertyReads: Reads[DecimalProperty] = Json.reads[DecimalProperty]
+
+  implicit val decimalPropertyWrites: Writes[DecimalProperty] = Json.writes[DecimalProperty]
+
 
   case class NumberProperty(name: String, `value`: Long, meta: Boolean, mutable: Boolean) extends BaseNFTProperty {
     def `type`: String = constants.NFT.Data.NUMBER
@@ -85,18 +77,35 @@ object NFT {
 
   implicit val booleanPropertyWrites: Writes[BooleanProperty] = Json.writes[BooleanProperty]
 
+  implicit val baseNFTPropertyWrites: Writes[BaseNFTProperty] = {
+    case stringProperty: StringProperty => Json.toJson(stringProperty)
+    case numberProperty: NumberProperty => Json.toJson(numberProperty)
+    case booleanProperty: BooleanProperty => Json.toJson(booleanProperty)
+    case decimalProperty: DecimalProperty => Json.toJson(decimalProperty)
+    case _ => constants.Response.NFT_PROPERTY_TYPE_NOT_FOUND.throwBaseException()
+  }
+
+  implicit val baseNFTPropertyReads: Reads[BaseNFTProperty] = {
+    Json.format[NumberProperty].map(x => x: BaseNFTProperty) or
+      Json.format[StringProperty].map(x => x: BaseNFTProperty) or
+      Json.format[DecimalProperty].map(x => x: BaseNFTProperty) or
+      Json.format[BooleanProperty].map(x => x: BaseNFTProperty)
+  }
+
   case class Property(name: String, `type`: String, `value`: String, meta: Boolean = true, mutable: Boolean = false) {
 
     def valid: Boolean = this.`type` match {
-      case constants.NFT.Data.STRING | SMALL_STRING => true
-      case constants.NFT.Data.NUMBER | NUMBER | SMALL_NUMBER => Try(BigDecimal(this.`value`)).isSuccess
+      case constants.NFT.Data.STRING => true
+      case constants.NFT.Data.NUMBER => Try(this.`value`.toLong).isSuccess
+      case constants.NFT.Data.DECIMAL => Try(BigDecimal(this.`value`)).isSuccess
       case constants.NFT.Data.BOOLEAN => this.`value` == constants.NFT.Data.TRUE || this.`value` == constants.NFT.Data.SMALL_TRUE || this.`value` == constants.NFT.Data.FALSE || this.`value` == constants.NFT.Data.SMALL_FALSE
       case _ => constants.Response.NFT_PROPERTY_TYPE_NOT_FOUND.throwBaseException()
     }
 
     def toBaseNFTProperty: BaseNFTProperty = if (this.valid) this.`type` match {
-      case constants.NFT.Data.STRING | SMALL_STRING => StringProperty(name = this.name, `value` = this.`value`, meta = this.meta, mutable = this.mutable)
-      case constants.NFT.Data.NUMBER | NUMBER | SMALL_NUMBER => NumberProperty(name = this.name, `value` = this.`value`.toLong, meta = this.meta, mutable = this.mutable)
+      case constants.NFT.Data.STRING => StringProperty(name = this.name, `value` = this.`value`, meta = this.meta, mutable = this.mutable)
+      case constants.NFT.Data.NUMBER => NumberProperty(name = this.name, `value` = this.`value`.toLong, meta = this.meta, mutable = this.mutable)
+      case constants.NFT.Data.DECIMAL => DecimalProperty(name = this.name, `value` = BigDecimal(this.`value`), meta = this.meta, mutable = this.mutable)
       case constants.NFT.Data.BOOLEAN => BooleanProperty(name = this.name, `value` = this.`value` == constants.NFT.Data.TRUE || this.`value` == constants.NFT.Data.SMALL_TRUE, meta = this.meta, mutable = this.mutable)
       case _ => constants.Response.NFT_PROPERTY_TYPE_NOT_FOUND.throwBaseException()
     } else constants.Response.INVALID_NFT_PROPERTY.throwBaseException()

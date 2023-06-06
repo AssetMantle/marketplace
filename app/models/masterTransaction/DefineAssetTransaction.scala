@@ -123,7 +123,7 @@ class DefineAssetTransactions @Inject()(
               defineAsset <- blockchainTransactionDefineAssets.Service.add(txHash = txHash, fromAddress = constants.Wallet.DefineAssetWallet.address, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, collectionIds = collections.map(_.id))
             } yield defineAsset
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
@@ -156,7 +156,7 @@ class DefineAssetTransactions @Inject()(
     }
 
     private def defineCollections(): Future[Unit] = {
-      val collections = masterCollections.Service.fetchAllDefineReady()
+      val collections = masterCollections.Service.fetchAllForDefiningAsset()
       val anyPendingTx = Service.checkAnyPendingTx
 
       def filterAlreadyDefined(collections: Seq[Collection]) = {
@@ -209,7 +209,8 @@ class DefineAssetTransactions @Inject()(
               _ <- markDefined
             } yield ()
               ).recover {
-              case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+              case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
             }
           } else {
             val markFailed = Service.markFailed(txHash)
@@ -220,7 +221,8 @@ class DefineAssetTransactions @Inject()(
               _ <- markUndefined
             } yield ()
               ).recover {
-              case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+              case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
             }
           }
         } else Future()

@@ -143,7 +143,7 @@ class SendCoins @Inject()(
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
         for {
-          sendCoin <- if (!unconfirmedTxHashes.contains(txHash)) Service.add(accountId = accountId, txHash = txHash, fromAddress = fromAddress, toAddress = toAddress, amount = amount, status = None, memo = Option(memo), timeoutHeight = timeoutHeight) else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          sendCoin <- if (!unconfirmedTxHashes.contains(txHash)) Service.add(accountId = accountId, txHash = txHash, fromAddress = fromAddress, toAddress = toAddress, amount = amount, status = None, memo = Option(memo), timeoutHeight = timeoutHeight) else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         } yield (sendCoin, txRawBytes)
       }
 

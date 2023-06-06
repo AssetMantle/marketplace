@@ -1,10 +1,13 @@
 package models.masterTransaction
 
 import com.assetmantle.modules.assets.{transactions => assetTransactions}
+import com.assetmantle.modules.identities.{transactions => identityTransactions}
+import com.assetmantle.modules.orders.{transactions => orderTransactions}
+import com.assetmantle.modules.splits.{transactions => splitTransactions}
+import com.cosmos.authz.v1beta1.MsgExec
 import com.cosmos.bank.{v1beta1 => bankTx}
 import com.google.protobuf.{Any => protobufAny}
 import com.ibc.core.channel.{v1 => channelTx}
-import com.assetmantle.modules.splits.{transactions => splitTransactions}
 import constants.Scheduler
 import exceptions.BaseException
 import models.blockchain.Transaction
@@ -17,6 +20,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 case class LatestBlock(height: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Long] {
 
@@ -76,7 +80,7 @@ class LatestBlocks @Inject()(
 
   object Service {
 
-    def getLastChecked: Future[Long] = customQuery(LatestBlocks.TableQuery.sortBy(_.height.desc).result.headOption).map(_.fold(0L)(_.height))
+    def getLastChecked: Future[Long] = customQuery(LatestBlocks.TableQuery.sortBy(_.height.desc).result.headOption).map(_.fold(constants.Blockchain.UpgradeHeight.toLong - 1)(_.height))
 
     def update(latestHeight: Long): Future[Unit] = {
       for {
@@ -89,63 +93,54 @@ class LatestBlocks @Inject()(
 
   object Utility {
 
-    private def checkAndProcess(mantlePlaceTx: Boolean, transaction: Transaction, stdMsg: protobufAny, f1: (String) => Future[Boolean], f2: (protobufAny, Transaction) => Future[Unit]) = if (!mantlePlaceTx) {
-      val txExists = f1(transaction.hash)
-      for {
-        txExists <- txExists
-        _ <- f2(stdMsg, transaction)
-      } yield txExists
-    } else Future(mantlePlaceTx)
+    private def checkAndProcess(mantlePlaceTx: Boolean, transaction: Transaction, stdMsg: protobufAny, f1: (String) => Future[Boolean], f2: (protobufAny, Transaction) => Future[Unit]) = {
+      if (!mantlePlaceTx) {
+        val txExists = f1(transaction.hash)
+        for {
+          txExists <- txExists
+          _ <- f2(stdMsg, transaction)
+        } yield txExists
+      } else Future(mantlePlaceTx)
+    }
 
-    private def processTransaction(transaction: Transaction) = if (transaction.status) {
-      var mantlePlaceTx = false
-      val check = utilitiesOperations.traverse(transaction.getMessages) { stdMsg =>
+    private def processMsgs(msgs: Seq[protobufAny], txHash: String, txHeight: Long): Future[Seq[Unit]] = {
+      utilitiesOperations.traverse(msgs) { stdMsg =>
         stdMsg.getTypeUrl match {
           case schema.constants.Messages.SEND_COIN => utilitiesExternalTransactions.onSendCoin(bankTx.MsgSend.parseFrom(stdMsg.getValue))
           case schema.constants.Messages.RECV_PACKET => utilitiesExternalTransactions.onIBCReceive(channelTx.MsgRecvPacket.parseFrom(stdMsg.getValue))
-          case schema.constants.Messages.ASSET_BURN => utilitiesExternalTransactions.onBurnNFT(assetTransactions.burn.Message.parseFrom(stdMsg.getValue), transaction.hash)
+          case schema.constants.Messages.ASSET_BURN => utilitiesExternalTransactions.onBurnNFT(assetTransactions.burn.Message.parseFrom(stdMsg.getValue), txHash)
           case schema.constants.Messages.ASSET_MUTATE => utilitiesExternalTransactions.onMutateNFT(assetTransactions.mutate.Message.parseFrom(stdMsg.getValue))
           case schema.constants.Messages.ASSET_RENUMERATE => utilitiesExternalTransactions.onRenumerateNFT(assetTransactions.renumerate.Message.parseFrom(stdMsg.getValue))
-          case schema.constants.Messages.IDENTITY_PROVISION =>
-            for {
-              txExists <- checkAndProcess(mantlePlaceTx, transaction, stdMsg, blockchainTransactionProvisionAddresses.Service.checkExists, utilitiesExternalTransactions.onProvisionIdentity)
-            } yield mantlePlaceTx = txExists
-          case schema.constants.Messages.IDENTITY_UNPROVISION =>
-            for {
-              txExists <- checkAndProcess(mantlePlaceTx, transaction, stdMsg, blockchainTransactionUnprovisionAddresses.Service.checkExists, utilitiesExternalTransactions.onUnprovisionIdentity)
-            } yield mantlePlaceTx = txExists
-          case schema.constants.Messages.ORDER_CANCEL =>
-            for {
-              txExists <- checkAndProcess(mantlePlaceTx, transaction, stdMsg, blockchainTransactionCancelOrders.Service.checkExists, utilitiesExternalTransactions.onOrderCancel)
-            } yield mantlePlaceTx = txExists
-          case schema.constants.Messages.ORDER_MAKE =>
-            for {
-              txExists <- checkAndProcess(mantlePlaceTx, transaction, stdMsg, blockchainTransactionMakeOrders.Service.checkExists, utilitiesExternalTransactions.onOrderMake)
-            } yield mantlePlaceTx = txExists
-          case schema.constants.Messages.ORDER_TAKE =>
-            for {
-              txExists <- checkAndProcess(mantlePlaceTx, transaction, stdMsg, blockchainTransactionTakeOrders.Service.checkExists, utilitiesExternalTransactions.onOrderTake)
-            } yield mantlePlaceTx = txExists
+          case schema.constants.Messages.IDENTITY_PROVISION => utilitiesExternalTransactions.onProvisionIdentity(identityTransactions.provision.Message.parseFrom(stdMsg.getValue))
+          case schema.constants.Messages.IDENTITY_UNPROVISION => utilitiesExternalTransactions.onUnprovisionIdentity(identityTransactions.unprovision.Message.parseFrom(stdMsg.getValue))
+          case schema.constants.Messages.ORDER_CANCEL => utilitiesExternalTransactions.onOrderCancel(orderTransactions.cancel.Message.parseFrom(stdMsg.getValue))
+          case schema.constants.Messages.ORDER_MAKE => utilitiesExternalTransactions.onOrderMake(orderTransactions.make.Message.parseFrom(stdMsg.getValue), txHeight)
+          case schema.constants.Messages.ORDER_TAKE => utilitiesExternalTransactions.onOrderTake(orderTransactions.take.Message.parseFrom(stdMsg.getValue))
           case schema.constants.Messages.SPLIT_SEND => utilitiesExternalTransactions.onSplitSend(splitTransactions.send.Message.parseFrom(stdMsg.getValue))
           //          case schema.constants.Messages.SPLIT_WRAP =>
           //          case schema.constants.Messages.SPLIT_UNWRAP => utilitiesExternalTransactions.onSplitUnwrap(splitTransactions.unwrap.Message.parseFrom(stdMsg.getValue))
+          case schema.constants.Messages.EXECUTE_AUTHORIZATION => {
+            for {
+              _ <- processMsgs(MsgExec.parseFrom(stdMsg.getValue).getMsgsList.asScala.toSeq, txHash, txHeight)
+            } yield ()
+          }
           case _ => Future()
         }
 
       }
-      for {
-        _ <- check
-      } yield ()
-    } else Future()
+    }
 
     private def processBlock(height: Int): Unit = {
       val transactions = blockchainTransactions.Service.getByHeight(height)
 
-      def processAll(transactions: Seq[Transaction]) = utilitiesOperations.traverse(transactions)(x => processTransaction(x))
+      def processAll(transactions: Seq[Transaction]) = {
+        utilitiesOperations.traverse(transactions.filter(x => x.status && !utilities.BlockchainTransaction.checkMantlePlaceTransaction(x.parsedTx)))(x => processMsgs(x.getMessages, x.hash, x.height))
+      }
 
       val forComplete = for {
         transactions <- transactions
         _ <- processAll(transactions)
+        _ <- Service.update(height)
       } yield ()
 
       Await.result(forComplete, Duration.Inf)

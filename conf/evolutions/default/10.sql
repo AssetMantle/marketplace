@@ -103,11 +103,9 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."NFTMintingFee"
 (
     "txHash"               VARCHAR NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
-    "toAddress"            VARCHAR NOT NULL,
-    "amount"               VARCHAR NOT NULL,
-    "broadcasted"          BOOLEAN NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
+    "timeoutHeight"        INTEGER NOT NULL,
     "log"                  VARCHAR,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
@@ -210,7 +208,6 @@ CREATE TABLE IF NOT EXISTS CAMPAIGN."MintNFTAirDrop"
 (
     "accountId"            VARCHAR NOT NULL,
     "address"              VARCHAR NOT NULL,
-    "amount"               BIGINT  NOT NULL,
     "eligibilityTxHash"    VARCHAR NOT NULL,
     "airdropTxHash"        VARCHAR,
     "status"               BOOLEAN NOT NULL,
@@ -222,6 +219,16 @@ CREATE TABLE IF NOT EXISTS CAMPAIGN."MintNFTAirDrop"
     PRIMARY KEY ("accountId")
 );
 
+CREATE TABLE IF NOT EXISTS CAMPAIGN."IneligibleMintNFTAirDrop"
+(
+    "nftID"                VARCHAR NOT NULL,
+    "createdBy"            VARCHAR,
+    "createdOnMillisEpoch" BIGINT,
+    "updatedBy"            VARCHAR,
+    "updatedOnMillisEpoch" BIGINT,
+    PRIMARY KEY ("nftID")
+);
+
 CREATE TABLE IF NOT EXISTS HISTORY."MasterSecondaryMarket"
 (
     "id"                   VARCHAR NOT NULL,
@@ -229,11 +236,15 @@ CREATE TABLE IF NOT EXISTS HISTORY."MasterSecondaryMarket"
     "nftId"                VARCHAR NOT NULL,
     "collectionId"         VARCHAR NOT NULL,
     "sellerId"             VARCHAR NOT NULL,
-    "quantity"             INTEGER NOT NULL,
+    "quantity"             NUMERIC NOT NULL,
     "price"                NUMERIC NOT NULL,
     "denom"                VARCHAR NOT NULL,
     "endHours"             INTEGER NOT NULL,
     "externallyMade"       BOOLEAN NOT NULL,
+    "completed"            BOOLEAN NOT NULL,
+    "cancelled"            BOOLEAN NOT NULL,
+    "expired"              BOOLEAN NOT NULL,
+    "failed"               BOOLEAN NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -250,7 +261,7 @@ CREATE TABLE IF NOT EXISTS MASTER."BurntNFT"
     "collectionId"         VARCHAR NOT NULL,
     "assetId"              VARCHAR NOT NULL,
     "classificationId"     VARCHAR NOT NULL,
-    "supply"               BIGINT  NOT NULL,
+    "supply"               NUMERIC NOT NULL,
     "name"                 VARCHAR NOT NULL,
     "description"          VARCHAR NOT NULL,
     "properties"           VARCHAR NOT NULL,
@@ -270,12 +281,15 @@ CREATE TABLE IF NOT EXISTS MASTER."SecondaryMarket"
     "nftId"                VARCHAR NOT NULL,
     "collectionId"         VARCHAR NOT NULL,
     "sellerId"             VARCHAR NOT NULL,
-    "quantity"             INTEGER NOT NULL,
+    "quantity"             NUMERIC NOT NULL,
     "price"                NUMERIC NOT NULL,
     "denom"                VARCHAR NOT NULL,
     "endHours"             INTEGER NOT NULL,
     "externallyMade"       BOOLEAN NOT NULL,
-    "delete"               BOOLEAN NOT NULL,
+    "completed"            BOOLEAN NOT NULL,
+    "cancelled"            BOOLEAN NOT NULL,
+    "expired"              BOOLEAN NOT NULL,
+    "failed"               BOOLEAN NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -318,7 +332,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ExternalAsset"
     "assetId"                VARCHAR NOT NULL,
     "currentOwnerIdentityId" VARCHAR NOT NULL,
     "collectionId"           VARCHAR NOT NULL,
-    "amount"                 BIGINT  NOT NULL,
+    "amount"                 NUMERIC NOT NULL,
     "createdBy"              VARCHAR,
     "createdOnMillisEpoch"   BIGINT,
     "updatedBy"              VARCHAR,
@@ -356,8 +370,8 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."MakeOrderTransaction"
     "sellerId"             VARCHAR NOT NULL,
     "buyerId"              VARCHAR,
     "denom"                VARCHAR NOT NULL,
-    "expiresIn"            BIGINT  NOT NULL,
     "makerOwnableSplit"    NUMERIC NOT NULL,
+    "expiresIn"            BIGINT  NOT NULL,
     "takerOwnableSplit"    NUMERIC NOT NULL,
     "secondaryMarketId"    VARCHAR NOT NULL,
     "status"               BOOLEAN,
@@ -431,7 +445,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TakeOrderTransaction"
     "txHash"               VARCHAR NOT NULL,
     "nftId"                VARCHAR NOT NULL,
     "buyerId"              VARCHAR NOT NULL,
-    "quantity"             INTEGER NOT NULL,
+    "quantity"             NUMERIC NOT NULL,
     "secondaryMarketId"    VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "createdBy"            VARCHAR,
@@ -491,18 +505,32 @@ ALTER TABLE CAMPAIGN."MintNFTAirDrop"
     ADD CONSTRAINT MintNFTAirDrop_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 ALTER TABLE CAMPAIGN."MintNFTAirDrop"
     ADD CONSTRAINT MintNFTAirDrop_AirDropTxHash FOREIGN KEY ("airdropTxHash") REFERENCES BLOCKCHAIN_TRANSACTION."CampaignSendCoin" ("txHash");
+ALTER TABLE CAMPAIGN."IneligibleMintNFTAirDrop"
+    ADD CONSTRAINT IneligibleMintNFTAirDrop_NFT_ID FOREIGN KEY ("nftID") REFERENCES MASTER."NFT" ("id");
+
+INSERT INTO CAMPAIGN."IneligibleMintNFTAirDrop"("nftID")
+SELECT "nftId"
+FROM MASTER."NFTOwner"
+WHERE "ownerId" != "creatorId"
+  AND "creatorId" != 'Mint.E';
 
 ALTER TABLE MASTER."Account"
     ADD COLUMN IF NOT EXISTS "identityId" VARCHAR DEFAULT NULL UNIQUE;
 
 ALTER TABLE MASTER."Collection"
-    ADD COLUMN IF NOT EXISTS "royalty" NUMERIC NOT NULL DEFAULT 0.0;
+    ADD COLUMN IF NOT EXISTS "royalty" NUMERIC NOT NULL DEFAULT 0.02;
 ALTER TABLE MASTER."Collection"
     ADD COLUMN IF NOT EXISTS "isDefined" BOOLEAN DEFAULT false;
 ALTER TABLE MASTER."Collection"
-    ADD COLUMN IF NOT EXISTS "defineReady" BOOLEAN NOT NULL DEFAULT false;
+    ADD COLUMN IF NOT EXISTS "defineAsset" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE MASTER."Collection"
+    ADD COLUMN IF NOT EXISTS "rank" INTEGER NOT NULL DEFAULT 2147483647;
+ALTER TABLE MASTER."Collection"
+    ADD COLUMN IF NOT EXISTS "onSecondaryMarket" BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE MASTER."Collection"
     DROP COLUMN IF EXISTS "category";
+ALTER TABLE MASTER."Collection"
+    ADD COLUMN IF NOT EXISTS "showAll" BOOLEAN NOT NULL DEFAULT false;
 
 ALTER TABLE MASTER."NFT"
     ALTER COLUMN "isMinted" DROP NOT NULL;
@@ -514,11 +542,13 @@ ALTER TABLE MASTER."NFT"
     ADD COLUMN IF NOT EXISTS "mintReady" BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE MASTER."NFT"
     DROP COLUMN IF EXISTS "edition";
+ALTER TABLE MASTER."NFT"
+    DROP COLUMN IF EXISTS "ipfsLink";
+ALTER TABLE MASTER."NFT"
+    ALTER COLUMN "totalSupply" TYPE NUMERIC;
 
 ALTER TABLE MASTER."NFTOwner"
-    ADD COLUMN IF NOT EXISTS "secondaryMarketId" VARCHAR DEFAULT NULL;
-ALTER TABLE MASTER."NFTOwner"
-    ADD CONSTRAINT NFTOwner_SecondaryMarket FOREIGN KEY ("secondaryMarketId") REFERENCES MASTER."SecondaryMarket" ("id");
+    ALTER COLUMN "quantity" TYPE NUMERIC;
 
 ALTER TABLE MASTER_TRANSACTION."CollectionDraft"
     ADD COLUMN IF NOT EXISTS "royalty" NUMERIC NOT NULL DEFAULT 0.0;
@@ -684,6 +714,11 @@ CREATE TRIGGER MINT_NFT_AIRDROP_LOG
     ON CAMPAIGN."MintNFTAirDrop"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
+CREATE TRIGGER INELIGIBLE_MINT_NFT_AIRDROP_LOG
+    BEFORE INSERT OR UPDATE
+    ON CAMPAIGN."IneligibleMintNFTAirDrop"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 
 CREATE TRIGGER SECONDARY_MARKET_HISTORY_LOG
     BEFORE INSERT OR UPDATE
@@ -819,6 +854,7 @@ DROP TRIGGER IF EXISTS BT_UNWRAP_LOG ON BLOCKCHAIN_TRANSACTION."Unwrap" CASCADE;
 DROP TRIGGER IF EXISTS BT_WRAP_LOG ON BLOCKCHAIN_TRANSACTION."Wrap" CASCADE;
 
 DROP TRIGGER IF EXISTS MINT_NFT_AIRDROP_LOG ON CAMPAIGN."MintNFTAirDrop" CASCADE;
+DROP TRIGGER IF EXISTS INELIGIBLE_MINT_NFT_AIRDROP_LOG ON CAMPAIGN."IneligibleMintNFTAirDrop" CASCADE;
 
 DROP TRIGGER IF EXISTS SECONDARY_MARKET_HISTORY_LOG ON HISTORY."MasterSecondaryMarket" CASCADE;
 
@@ -854,6 +890,7 @@ DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."Unwrap" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."Wrap" CASCADE;
 
 DROP TABLE IF EXISTS CAMPAIGN."MintNFTAirDrop" CASCADE;
+DROP TABLE IF EXISTS CAMPAIGN."IneligibleMintNFTAirDrop" CASCADE;
 
 DROP TABLE IF EXISTS HISTORY."MasterSecondaryMarket" CASCADE;
 

@@ -156,7 +156,7 @@ class CollectionsAnalysis @Inject()(
 
       for {
         collectionAnalysis <- collectionAnalysis
-        _ <- Service.update(collectionAnalysis.copy(listed = totalListed, salePrice = salePrice))
+        _ <- Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed + totalListed, salePrice = salePrice))
       } yield ()
     }
 

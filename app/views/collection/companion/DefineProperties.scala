@@ -10,6 +10,7 @@ object DefineProperties {
     mapping(
       constants.FormField.COLLECTION_ID.mapping,
       constants.FormField.SAVE_COLLECTION_DRAFT.mapping,
+      constants.FormField.FRACTIONALIZED_NFT.mapping,
       constants.FormField.COLLECTION_PROPERTIES.name -> seq(
         mapping(
           constants.FormField.COLLECTION_PROPERTY_NAME.optionalMapping,
@@ -23,9 +24,13 @@ object DefineProperties {
 
   case class Property(name: Option[String], propertyType: String, defaultValue: Option[String], mutable: Boolean, hide: Boolean)
 
-  case class Data(collectionId: String, saveAsDraft: Boolean, properties: Seq[Property]) {
+  case class Data(collectionId: String, saveAsDraft: Boolean, fractionalizedNFT: Boolean, properties: Seq[Property]) {
 
-    def getSerializableProperties: Seq[commonCollection.Property] = this.properties.filter(_.name.isDefined).map(property => commonCollection.Property(name = property.name.get.trim, `type` = property.propertyType, defaultValue = property.defaultValue.getOrElse(""), mutable = property.mutable, meta = !property.hide))
+    def getSerializableProperties: Seq[commonCollection.Property] = {
+      val userDefinedProperties = this.properties.filter(_.name.isDefined).map(property => commonCollection.Property(name = property.name.get.trim, `type` = property.propertyType, defaultValue = property.defaultValue.getOrElse(""), mutable = property.mutable, meta = !property.hide))
+      if (this.fractionalizedNFT) userDefinedProperties :+ commonCollection.Property(name = "supply", `type` = constants.NFT.Data.NUMBER, defaultValue = "0", mutable = false, meta = true)
+      else userDefinedProperties
+    }
 
   }
 

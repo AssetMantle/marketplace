@@ -151,7 +151,7 @@ class PublicListingNFTTransactions @Inject()(
               nftSale <- blockchainTransactionNFTPublicListings.Service.add(txHash = txHash, fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, publicListingId = publicListingId, mintOnSuccess = mintOnSuccess)
             } yield nftSale
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
@@ -220,7 +220,8 @@ class PublicListingNFTTransactions @Inject()(
                 _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
               } yield ()
                 ).recover {
-                case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             } else {
               val boughtNFTs = Service.getByTxHash(txHash)
@@ -234,7 +235,8 @@ class PublicListingNFTTransactions @Inject()(
                 _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
               } yield ()
                 ).recover {
-                case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             }
           } else Future()

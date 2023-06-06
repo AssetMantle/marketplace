@@ -122,7 +122,7 @@ class CancelOrderTransactions @Inject()(
               cancelOrder <- blockchainTransactionCancelOrders.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, secondaryMarketId = secondaryMarket.id, sellerId = secondaryMarket.sellerId)
             } yield cancelOrder
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
@@ -165,16 +165,17 @@ class CancelOrderTransactions @Inject()(
           def onTxComplete(transaction: CancelOrder) = if (transaction.status.isDefined) {
             if (transaction.status.get) {
               val markSuccess = Service.markSuccess(cancelOrderTx.txHash)
-              val markForDeletion = masterSecondaryMarkets.Service.markForDeletion(cancelOrderTx.secondaryMarketId)
+              val markOnCancellation = masterSecondaryMarkets.Service.markOnCancellation(cancelOrderTx.secondaryMarketId)
               val sendNotifications = utilitiesNotification.send(cancelOrderTx.sellerId, constants.Notification.CANCEL_ORDER_SUCCESSFUL)("")
 
               (for {
                 _ <- markSuccess
-                _ <- markForDeletion
+                _ <- markOnCancellation
                 _ <- sendNotifications
               } yield ()
                 ).recover {
-                case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                case exception: Exception => logger.error(exception.getLocalizedMessage)
+                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             } else {
               val markMasterFailed = Service.markFailed(cancelOrderTx.txHash)
@@ -185,7 +186,8 @@ class CancelOrderTransactions @Inject()(
                 _ <- sendNotifications
               } yield ()
                 ).recover {
-                case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                case exception: Exception => logger.error(exception.getLocalizedMessage)
+                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             }
           } else Future()

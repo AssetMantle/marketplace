@@ -120,7 +120,7 @@ class WalletController @Inject()(
                 gasPrice = constants.Blockchain.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, sendCoinData.password)),
               )
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           (for {
@@ -182,7 +182,7 @@ class WalletController @Inject()(
                 gasPrice = constants.Blockchain.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, wrapTokenData.password))
               )
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           (for {
@@ -225,7 +225,7 @@ class WalletController @Inject()(
                 gasPrice = constants.Blockchain.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, unwrapTokenData.password))
               )
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           (for {

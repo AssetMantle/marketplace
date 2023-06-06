@@ -10,14 +10,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
-case class NFTOwner(nftId: String, ownerId: String, creatorId: String, collectionId: String, quantity: Long, saleId: Option[String], publicListingId: Option[String], secondaryMarketId: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] with Logging {
-  def id1: String = nftId
-
-  def id2: String = ownerId
+case class NFTOwner(nftId: String, ownerId: String, creatorId: String, collectionId: String, quantity: BigInt, saleId: Option[String], publicListingId: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def getCreatorIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.creatorId)
 
   def getOwnerIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.ownerId)
+
+  def serialize: NFTOwners.NFTOwnerSerialized = NFTOwners.NFTOwnerSerialized(nftId = this.nftId, ownerId = this.ownerId, creatorId = this.creatorId, collectionId = this.collectionId, quantity = BigDecimal(this.quantity), saleId = this.saleId, publicListingId = this.publicListingId, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 
 }
 
@@ -27,10 +26,17 @@ object NFTOwners {
 
   implicit val logger: Logger = Logger(this.getClass)
 
+  case class NFTOwnerSerialized(nftId: String, ownerId: String, creatorId: String, collectionId: String, quantity: BigDecimal, saleId: Option[String], publicListingId: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] {
+    def id1: String = nftId
 
-  class NFTOwnerTable(tag: Tag) extends Table[NFTOwner](tag, "NFTOwner") with ModelTable2[String, String] {
+    def id2: String = ownerId
 
-    def * = (nftId, ownerId, creatorId, collectionId, quantity, saleId.?, publicListingId.?, secondaryMarketId.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTOwner.tupled, NFTOwner.unapply)
+    def deserialize: NFTOwner = NFTOwner(nftId = this.nftId, ownerId = this.ownerId, creatorId = this.creatorId, collectionId = this.collectionId, quantity = this.quantity.toBigInt, saleId = this.saleId, publicListingId = this.publicListingId, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+  }
+
+  class NFTOwnerTable(tag: Tag) extends Table[NFTOwners.NFTOwnerSerialized](tag, "NFTOwner") with ModelTable2[String, String] {
+
+    def * = (nftId, ownerId, creatorId, collectionId, quantity, saleId.?, publicListingId.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTOwners.NFTOwnerSerialized.tupled, NFTOwners.NFTOwnerSerialized.unapply)
 
     def nftId = column[String]("nftId", O.PrimaryKey)
 
@@ -40,13 +46,11 @@ object NFTOwners {
 
     def collectionId = column[String]("collectionId")
 
-    def quantity = column[Long]("quantity")
+    def quantity = column[BigDecimal]("quantity")
 
     def saleId = column[String]("saleId")
 
     def publicListingId = column[String]("publicListingId")
-
-    def secondaryMarketId = column[String]("secondaryMarketId")
 
     def createdBy = column[String]("createdBy")
 
@@ -68,7 +72,7 @@ object NFTOwners {
 class NFTOwners @Inject()(
                            protected val databaseConfigProvider: DatabaseConfigProvider
                          )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl2[NFTOwners.NFTOwnerTable, NFTOwner, String, String](
+  extends GenericDaoImpl2[NFTOwners.NFTOwnerTable, NFTOwners.NFTOwnerSerialized, String, String](
     databaseConfigProvider,
     NFTOwners.TableQuery,
     executionContext,
@@ -78,20 +82,20 @@ class NFTOwners @Inject()(
 
   object Service {
 
-    def add(nftOwner: NFTOwner): Future[Unit] = create(nftOwner)
+    def add(nftOwner: NFTOwner): Future[Unit] = create(nftOwner.serialize)
 
-    def add(nftOwners: Seq[NFTOwner]): Future[Unit] = create(nftOwners)
+    def add(nftOwners: Seq[NFTOwner]): Future[Unit] = create(nftOwners.map(_.serialize))
 
-    def update(NFTOwner: NFTOwner): Future[Int] = updateById1AndId2(NFTOwner)
+    def update(NFTOwner: NFTOwner): Future[Int] = updateById1AndId2(NFTOwner.serialize)
 
     def countForCreatorForPrimarySale(collectionId: String, creatorId: String, unmintedNFTs: Seq[String]): Future[Int] = {
       val nullString: Option[String] = null
-      filterAndCount(x => x.collectionId === collectionId && x.nftId.inSet(unmintedNFTs) && x.creatorId === creatorId && x.ownerId === creatorId && x.saleId.? === nullString && x.publicListingId.? === nullString && x.secondaryMarketId.? === nullString)
+      filterAndCount(x => x.collectionId === collectionId && x.nftId.inSet(unmintedNFTs) && x.creatorId === creatorId && x.ownerId === creatorId && x.saleId.? === nullString && x.publicListingId.? === nullString)
     }
 
     def whitelistSaleRandomNFTs(collectionId: String, creatorId: String, nfts: Int, saleId: String, unmintedNFTs: Seq[String]): Future[Unit] = {
       val nullString: Option[String] = null
-      val notOnSaleNFTs = filter(x => x.ownerId === creatorId && x.creatorId === creatorId && x.nftId.inSet(unmintedNFTs) && x.collectionId === collectionId && x.saleId === nullString && x.publicListingId === nullString && x.secondaryMarketId === nullString)
+      val notOnSaleNFTs = filter(x => x.ownerId === creatorId && x.creatorId === creatorId && x.nftId.inSet(unmintedNFTs) && x.collectionId === collectionId && x.saleId === nullString && x.publicListingId === nullString)
       for {
         notOnSaleNFTs <- notOnSaleNFTs
         _ <- upsertMultiple(Random.shuffle(notOnSaleNFTs).take(nfts).map(_.copy(saleId = Option(saleId))))
@@ -100,16 +104,25 @@ class NFTOwners @Inject()(
 
     def publicListRandomNFTs(collectionId: String, creatorId: String, nfts: Int, publicListingId: String, unmintedNFTs: Seq[String]): Future[Unit] = {
       val nullString: Option[String] = null
-      val notOnSaleNFTs = filter(x => x.ownerId === creatorId && x.creatorId === creatorId && x.nftId.inSet(unmintedNFTs) && x.collectionId === collectionId && x.saleId === nullString && x.publicListingId === nullString && x.secondaryMarketId === nullString)
+      val notOnSaleNFTs = filter(x => x.ownerId === creatorId && x.creatorId === creatorId && x.nftId.inSet(unmintedNFTs) && x.collectionId === collectionId && x.saleId === nullString && x.publicListingId === nullString)
       for {
         notOnSaleNFTs <- notOnSaleNFTs
         _ <- upsertMultiple(Random.shuffle(notOnSaleNFTs).take(nfts).map(_.copy(publicListingId = Option(publicListingId))))
       } yield ()
     }
 
-    def listNFTOnSecondaryMarket(NFTOwner: NFTOwner, secondaryMarketID: String): Future[Int] = if (NFTOwner.secondaryMarketId.isEmpty && NFTOwner.publicListingId.isEmpty && NFTOwner.saleId.isEmpty) {
-      update(NFTOwner.copy(secondaryMarketId = Option(secondaryMarketID)))
-    } else constants.Response.NFT_ALREADY_ON_SALE.throwBaseException()
+    def onSecondaryMarket(nftId: String, ownerId: String, sellQuantity: BigInt): Future[Int] = {
+      val nftOwner = tryGet(nftId = nftId, ownerId = ownerId)
+
+      def checkAndUpdate(nftOwner: NFTOwner) = if (nftOwner.quantity > sellQuantity) update(nftOwner.copy(quantity = nftOwner.quantity - sellQuantity))
+      else if (nftOwner.quantity == sellQuantity) delete(nftId = nftId, ownerId = ownerId)
+      else constants.Response.INVALID_QUANTITY_FOR_NFT_SECONDARY_MARKET.throwBaseException()
+
+      for {
+        nftOwner <- nftOwner
+        result <- checkAndUpdate(nftOwner)
+      } yield result
+    }
 
     def delete(nftId: String, ownerId: String): Future[Int] = deleteById1AndId2(id1 = nftId, id2 = ownerId)
 
@@ -121,13 +134,13 @@ class NFTOwners @Inject()(
       def verifyAndUpdate(nftOwner: NFTOwner) = if (nftOwner.saleId.getOrElse("") == saleId) {
         if (nftOwner.quantity == 1) {
           val deleteOld = delete(nftId = nftOwner.nftId, ownerId = nftOwner.ownerId)
-          val addNew = create(nftOwner.copy(saleId = None, ownerId = buyerAccountId))
+          val addNew = add(nftOwner.copy(saleId = None, ownerId = buyerAccountId))
           for {
             _ <- deleteOld
             _ <- addNew
           } yield ()
-        } else constants.Response.HANDLE_MULTIPLE_NFT_QUANTITY_CASE.throwFutureBaseException()
-      } else constants.Response.NFT_NOT_ON_SALE.throwFutureBaseException()
+        } else constants.Response.HANDLE_MULTIPLE_NFT_QUANTITY_CASE.throwBaseException()
+      } else constants.Response.NFT_NOT_ON_SALE.throwBaseException()
 
       for {
         nftOwner <- nftOwner
@@ -142,10 +155,10 @@ class NFTOwners @Inject()(
         if (nftOwner.quantity == 1) {
           for {
             _ <- delete(nftId = nftOwner.nftId, ownerId = nftOwner.ownerId)
-            _ <- create(nftOwner.copy(publicListingId = None, ownerId = buyerAccountId))
+            _ <- add(nftOwner.copy(publicListingId = None, ownerId = buyerAccountId))
           } yield ()
-        } else constants.Response.HANDLE_MULTIPLE_NFT_QUANTITY_CASE.throwFutureBaseException()
-      } else constants.Response.NFT_NOT_ON_PUBLIC_LISTING.throwFutureBaseException()
+        } else constants.Response.HANDLE_MULTIPLE_NFT_QUANTITY_CASE.throwBaseException()
+      } else constants.Response.NFT_NOT_ON_PUBLIC_LISTING.throwBaseException()
 
       for {
         nftOwner <- nftOwner
@@ -153,35 +166,32 @@ class NFTOwners @Inject()(
       } yield ()
     }
 
-    def onSuccessfulTakeOrder(secondaryMarketId: String, totalSold: Int, buyerId: String): Future[NFTOwner] = {
-      val oldNFTOwner = Service.tryGetBySecondaryMarketId(secondaryMarketId)
+    def onSuccessfulTakeOrder(nftId: String, collection: Collection, totalSold: BigInt, buyerId: String): Future[Unit] = {
+      val oldNFTOwner = get(nftId = nftId, ownerId = buyerId)
 
-      def verifyAndUpdate(oldNFTOwner: NFTOwner) = {
-        if (oldNFTOwner.quantity == 1) {
-          for {
-            _ <- delete(nftId = oldNFTOwner.nftId, ownerId = oldNFTOwner.ownerId)
-            _ <- create(oldNFTOwner.copy(secondaryMarketId = None, ownerId = buyerId))
-          } yield ()
-        } else
-          for {
-            _ <- update(oldNFTOwner.copy(quantity = oldNFTOwner.quantity - totalSold))
-            _ <- create(oldNFTOwner.copy(secondaryMarketId = None, quantity = totalSold, ownerId = buyerId))
-          } yield ()
+      def verifyAndUpdate(oldNFTOwner: Option[NFTOwner]) = if (oldNFTOwner.isDefined) {
+        for {
+          _ <- update(oldNFTOwner.get.copy(quantity = oldNFTOwner.get.quantity + totalSold))
+        } yield ()
+      } else {
+        for {
+          _ <- add(NFTOwner(nftId = nftId, ownerId = buyerId, creatorId = collection.creatorId, collectionId = collection.id, quantity = totalSold, saleId = None, publicListingId = None))
+        } yield ()
       }
 
       for {
         oldNFTOwner <- oldNFTOwner
         _ <- verifyAndUpdate(oldNFTOwner)
-      } yield oldNFTOwner
+      } yield ()
     }
 
     def getSaleId(nftId: String): Future[Option[String]] = filterHead(_.nftId === nftId).map(_.saleId)
 
-    def tryGet(nftId: String, ownerId: String): Future[NFTOwner] = tryGetById1AndId2(id1 = nftId, id2 = ownerId)
+    def tryGet(nftId: String, ownerId: String): Future[NFTOwner] = tryGetById1AndId2(id1 = nftId, id2 = ownerId).map(_.deserialize)
 
-    def get(nftId: String, ownerId: String): Future[Option[NFTOwner]] = getById(id1 = nftId, id2 = ownerId)
+    def get(nftId: String, ownerId: String): Future[Option[NFTOwner]] = getById(id1 = nftId, id2 = ownerId).map(_.map(_.deserialize))
 
-    def getOwners(nftId: String): Future[Seq[NFTOwner]] = filter(_.id1 === nftId)
+    def getOwners(nftId: String): Future[Seq[NFTOwner]] = filter(_.id1 === nftId).map(_.map(_.deserialize))
 
     def getOwnersByCollectionId(collectionId: String): Future[Seq[String]] = customQuery(NFTOwners.TableQuery.filter(_.collectionId === collectionId).map(_.ownerId).result)
 
@@ -197,20 +207,26 @@ class NFTOwners @Inject()(
       customUpdate(NFTOwners.TableQuery.filter(_.publicListingId === publicListingId).map(_.publicListingId.?).update(nullString))
     }
 
-    def markSecondaryMarketNull(secondaryMarketId: String): Future[Int] = {
-      val nullString: Option[String] = null
-      customUpdate(NFTOwners.TableQuery.filter(_.secondaryMarketId === secondaryMarketId).map(_.secondaryMarketId.?).update(nullString))
-    }
+    def unlistFromSecondaryMarket(nft: NFT, collection: Collection, ownerId: String, sellQuantity: BigInt): Future[Unit] = {
+      val nftOwner = get(nftId = nft.id, ownerId = ownerId)
 
-    def tryGetBySecondaryMarketId(secondaryMarketId: String): Future[NFTOwner] = filterHead(_.secondaryMarketId === secondaryMarketId)
+      def checkAndUpdate(nftOwner: Option[NFTOwner]) = if (nftOwner.isEmpty) {
+        add(NFTOwner(nftId = nft.id, ownerId = ownerId, creatorId = collection.creatorId, collectionId = collection.id, quantity = sellQuantity, saleId = None, publicListingId = None))
+      } else update(nftOwner.get.copy(quantity = nftOwner.get.quantity + sellQuantity))
+
+      for {
+        nftOwner <- nftOwner
+        _ <- checkAndUpdate(nftOwner)
+      } yield ()
+    }
 
     def countOwnedNFTs(accountId: String): Future[Int] = filterAndCount(x => x.ownerId === accountId && x.creatorId =!= accountId)
 
     def countCollectionOwnedNFTs(accountId: String, collectionID: String): Future[Int] = filterAndCount(x => x.ownerId === accountId && x.creatorId =!= accountId && x.collectionId === collectionID)
 
-    def getRandomNFTsBySaleId(saleId: String, take: Int, creatorId: String): Future[Seq[NFTOwner]] = filter(x => x.saleId === saleId && x.ownerId === creatorId && x.creatorId === creatorId).map(x => util.Random.shuffle(x).take(take))
+    def getRandomNFTsBySaleId(saleId: String, take: Int, creatorId: String): Future[Seq[NFTOwner]] = filter(x => x.saleId === saleId && x.ownerId === creatorId && x.creatorId === creatorId).map(x => util.Random.shuffle(x).take(take)).map(_.map(_.deserialize))
 
-    def getRandomNFTsByPublicListingId(publicListingId: String, take: Int, creatorId: String): Future[Seq[NFTOwner]] = filter(x => x.publicListingId === publicListingId && x.ownerId === creatorId && x.creatorId === creatorId).map(x => util.Random.shuffle(x).take(take))
+    def getRandomNFTsByPublicListingId(publicListingId: String, take: Int, creatorId: String): Future[Seq[NFTOwner]] = filter(x => x.publicListingId === publicListingId && x.ownerId === creatorId && x.creatorId === creatorId).map(x => util.Random.shuffle(x).take(take)).map(_.map(_.deserialize))
 
     def deleteCollections(collectionIds: Seq[String]): Future[Int] = filterAndDelete(_.collectionId.inSet(collectionIds))
 
@@ -220,13 +236,11 @@ class NFTOwners @Inject()(
 
     def getSoldNFTs(collectionIDs: Seq[String]): Future[Seq[String]] = filter(x => x.ownerId =!= x.creatorId && x.collectionId.inSet(collectionIDs)).map(_.map(_.nftId))
 
-    def getByIds(nftIDs: Seq[String]): Future[Seq[NFTOwner]] = filter(_.nftId.inSet(nftIDs))
-
-    def getByMarketIDs(collectionId: String, pageNumber: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(x => x.collectionId === collectionId && x.secondaryMarketId.?.isDefined)(_.updatedOnMillisEpoch).map(_.map(_.nftId))
+    def getByIds(nftIDs: Seq[String]): Future[Seq[NFTOwner]] = filter(_.nftId.inSet(nftIDs)).map(_.map(_.deserialize))
 
     def countOwners(nftId: String): Future[Int] = filterAndCount(_.nftId === nftId)
 
-    def getByNFTID(nftId: String): Future[NFTOwner] = filterHead(_.nftId === nftId)
+    def getByNFTID(nftId: String): Future[NFTOwner] = filterHead(_.nftId === nftId).map(_.deserialize)
 
     def onSuccessfulNFTTransfer(nftId: String, fromOwnerID: String, quantity: Int, toOwnerID: String): Future[Unit] = {
       val fromNFTOwner = tryGet(nftId = nftId, ownerId = fromOwnerID)
@@ -246,7 +260,7 @@ class NFTOwners @Inject()(
       } yield ()
     }
 
-    def tryGetByNFTAndSaleId(nftId: String, saleId: String): Future[NFTOwner] = filterHead(x => x.saleId === saleId && x.nftId === nftId)
+    def tryGetByNFTAndSaleId(nftId: String, saleId: String): Future[NFTOwner] = filterHead(x => x.saleId === saleId && x.nftId === nftId).map(_.deserialize)
     //    https://scala-slick.org/doc/3.1.1/sql-to-slick.html#id21
     //    def getQuery = NFTOwners.TableQuery.filter(x => x.ownerId === "asd" && x.creatorId)
   }

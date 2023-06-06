@@ -15,7 +15,7 @@ import utilities.MicroNumber
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: Seq[SocialProfile], nsfw: Boolean, properties: Option[Seq[Property]], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, royalty: BigDecimal, isDefined: Option[Boolean], defineReady: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: Seq[SocialProfile], nsfw: Boolean, properties: Option[Seq[Property]], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, royalty: BigDecimal, isDefined: Option[Boolean], defineAsset: Boolean, rank: Int, onSecondaryMarket: Boolean, showAll: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def getBondAmount: MicroNumber = MicroNumber(utilities.Collection.getTotalBondAmount(this.getImmutables, this.getMutables, constants.Transaction.BondRate))
 
@@ -25,7 +25,7 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
 
   def getImmutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && !x.mutable).map(_.toMetaProperty()(Collections.module, Collections.logger)) ++ constants.Collection.DefaultProperty.allImmutableMetaProperties(this.name)
 
-  def getImmutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && !x.mutable).map(_.toMesaProperty()(Collections.module, Collections.logger)) ++ constants.Collection.DefaultProperty.allImmutableMesaProperties(this.getCreatorIdentityID)
+  def getImmutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && !x.mutable).map(_.toMesaProperty()(Collections.module, Collections.logger)) ++ constants.Collection.DefaultProperty.allImmutableMesaProperties(this.creatorId)
 
   def getMutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty()(Collections.module, Collections.logger))
 
@@ -36,6 +36,8 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
   def getMutables: Mutables = Mutables(PropertyList(this.getMutableMetaProperties ++ this.getMutableProperties))
 
   def getClassificationID: ClassificationID = utilities.Collection.getClassificationID(immutables = this.getImmutables, mutables = this.getMutables, bondRate = constants.Transaction.BondRate)
+
+  def isFractionalized: Boolean = this.properties.fold(false)(_.map(_.name).contains(schema.constants.Properties.SupplyProperty.id.keyID.value))
 
   def serialize(): Collections.CollectionSerialized = Collections.CollectionSerialized(
     id = this.id,
@@ -51,7 +53,10 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
     public = this.public,
     royalty = this.royalty,
     isDefined = this.isDefined,
-    defineReady = this.defineReady,
+    defineAsset = this.defineAsset,
+    rank = this.rank,
+    onSecondaryMarket = this.onSecondaryMarket,
+    showAll = this.showAll,
     createdBy = this.createdBy,
     createdOnMillisEpoch = this.createdOnMillisEpoch,
     updatedBy = this.updatedBy,
@@ -77,13 +82,13 @@ object Collections {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class CollectionSerialized(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: String, nsfw: Boolean, properties: Option[String], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, royalty: BigDecimal, isDefined: Option[Boolean], defineReady: Boolean, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize: Collection = Collection(id = id, creatorId = creatorId, classificationId = classificationId, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), nsfw = nsfw, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[Property]](_)), profileFileName = profileFileName, coverFileName = coverFileName, public = public, royalty = royalty, isDefined = isDefined, defineReady = defineReady, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class CollectionSerialized(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: String, nsfw: Boolean, properties: Option[String], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, royalty: BigDecimal, isDefined: Option[Boolean], defineAsset: Boolean, rank: Int, onSecondaryMarket: Boolean, showAll: Boolean, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
+    def deserialize: Collection = Collection(id = id, creatorId = creatorId, classificationId = classificationId, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), nsfw = nsfw, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[Property]](_)), profileFileName = profileFileName, coverFileName = coverFileName, public = public, royalty = royalty, isDefined = isDefined, defineAsset = defineAsset, rank = rank, onSecondaryMarket = onSecondaryMarket, showAll = showAll, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
   class CollectionTable(tag: Tag) extends Table[CollectionSerialized](tag, "Collection") with ModelTable[String] {
 
-    def * = (id, creatorId, classificationId.?, name, description, socialProfiles, nsfw, properties.?, profileFileName.?, coverFileName.?, public, royalty, isDefined.?, defineReady, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionSerialized.tupled, CollectionSerialized.unapply)
+    def * = (id, creatorId, classificationId.?, name, description, socialProfiles, nsfw, properties.?, profileFileName.?, coverFileName.?, public, royalty, isDefined.?, defineAsset, rank, onSecondaryMarket, showAll, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (CollectionSerialized.tupled, CollectionSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -111,7 +116,13 @@ object Collections {
 
     def isDefined = column[Boolean]("isDefined")
 
-    def defineReady = column[Boolean]("defineReady")
+    def defineAsset = column[Boolean]("defineAsset")
+
+    def rank = column[Int]("rank")
+
+    def onSecondaryMarket = column[Boolean]("onSecondaryMarket")
+
+    def showAll = column[Boolean]("showAll")
 
     def createdBy = column[String]("createdBy")
 
@@ -147,7 +158,7 @@ class Collections @Inject()(
 
     def fetchAll(): Future[Seq[Collection]] = getAll.map(_.map(_.deserialize))
 
-    def fetchAllDefineReady(): Future[Seq[Collection]] = filter(x => x.defineReady && !x.isDefined).map(_.map(_.deserialize))
+    def fetchAllForDefiningAsset(): Future[Seq[Collection]] = filter(x => x.defineAsset && !x.isDefined).map(_.map(_.deserialize))
 
     def markAsDefined(ids: Seq[String]): Future[Int] = customUpdate(Collections.TableQuery.filter(_.id.inSet(ids)).map(_.isDefined).update(true))
 
@@ -155,7 +166,11 @@ class Collections @Inject()(
 
     def markAsNotDefined(ids: Seq[String]): Future[Int] = customUpdate(Collections.TableQuery.filter(_.id.inSet(ids)).map(_.isDefined).update(false))
 
-    def fetchAllPublic(): Future[Seq[Collection]] = filter(_.public).map(_.map(_.deserialize))
+    def markListedOnSecondaryMarket(id: String): Future[Int] = customUpdate(Collections.TableQuery.filter(_.id === id).map(_.onSecondaryMarket).update(true))
+
+    def removeFromListedOnSecondaryMarket(id: String): Future[Int] = customUpdate(Collections.TableQuery.filter(_.id === id).map(_.onSecondaryMarket).update(false))
+
+    def totalOnSecondaryMarket: Future[Int] = filterAndCount(_.onSecondaryMarket)
 
     def get(id: String): Future[Option[Collection]] = getById(id).map(_.map(_.deserialize))
 
@@ -200,5 +215,8 @@ class Collections @Inject()(
     def delete(ids: Seq[String]): Future[Int] = filterAndDelete(_.id.inSet(ids))
 
     def getAllPublic: Future[Seq[Collection]] = filter(_.public).map(_.map(_.deserialize))
+
+    def getSecondaryMarketByPageNumber(pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.onSecondaryMarket)(_.rank).map(_.map(_.deserialize))
+
   }
 }

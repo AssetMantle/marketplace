@@ -94,7 +94,7 @@ class WhitelistController @Inject()(
               if (totalCreated >= constants.Whitelist.MaxAllowed) Option(constants.Response.CANNOT_CREATE_MORE_ALLOWED_WHITELISTS) else None,
             ).flatten
             if (errors.isEmpty) masterWhitelists.Service.addWhitelist(ownerId = loginState.username, name = createData.name, description = createData.description, maxMembers = createData.maxMembers, startEpoch = createData.startEpoch, endEpoch = createData.endEpoch)
-            else errors.head.throwFutureBaseException()
+            else errors.head.throwBaseException()
           }
 
           (for {
@@ -171,7 +171,7 @@ class WhitelistController @Inject()(
                 _ <- deleteWhitelist()
               } yield ()
 
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           (for {
@@ -337,7 +337,7 @@ class WhitelistController @Inject()(
           val whitelist = masterWhitelists.Service.tryGet(deleteMemberData.whitelistId)
 
           def deleteMember(whitelist: Whitelist) = if (whitelist.ownerId == loginState.username) masterWhitelistMembers.Service.delete(whitelistId = deleteMemberData.whitelistId, accountId = deleteMemberData.username)
-          else constants.Response.NOT_WHITELIST_CREATOR.throwFutureBaseException()
+          else constants.Response.NOT_WHITELIST_CREATOR.throwBaseException()
 
           (for {
             whitelist <- whitelist

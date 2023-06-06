@@ -110,7 +110,7 @@ class SettingController @Inject()(
                 _ <- addToMaster
                 _ <- doTx()
               } yield ()
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           (for {
@@ -169,7 +169,7 @@ class SettingController @Inject()(
                 _ <- addToMaster
                 _ <- doTx()
               } yield ()
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           (for {
@@ -220,7 +220,7 @@ class SettingController @Inject()(
         viewMnemonicsData => {
           val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = viewMnemonicsData.address, password = viewMnemonicsData.password)
 
-          def update(validated: Boolean, key: master.Key) = if (validated) masterKeys.Service.updateKey(key.copy(backupUsed = true)) else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+          def update(validated: Boolean, key: master.Key) = if (validated) masterKeys.Service.updateKey(key.copy(backupUsed = true)) else constants.Response.INVALID_PASSWORD.throwBaseException()
 
           (for {
             (validated, key) <- validateAndGetKey
@@ -273,7 +273,7 @@ class SettingController @Inject()(
                   _ <- deleteKey
                 } yield PartialContent(views.html.setting.keyDeletedSuccessfully())
               }
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           (for {
@@ -354,7 +354,7 @@ class SettingController @Inject()(
                 gasPrice = constants.Blockchain.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, provisionAddressData.password))
               )
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           (for {

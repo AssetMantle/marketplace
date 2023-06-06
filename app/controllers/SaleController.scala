@@ -195,7 +195,7 @@ class SaleController @Inject()(
                 saleId <- masterSales.Service.add(createData.toNewSale)
                 _ <- masterNFTOwners.Service.whitelistSaleRandomNFTs(collectionId = collection.id, nfts = createData.nftForSale, creatorId = loginState.username, saleId = saleId, unmintedNFTs = unmintedNFTs)
               } yield ()
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           def sendNotifications(whitelistMembers: Seq[String], collectionName: String): Unit = whitelistMembers.foreach { member =>
@@ -315,7 +315,7 @@ class SaleController @Inject()(
                 gasPrice = constants.Blockchain.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buySaleNFTData.password))
               )
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           (for {

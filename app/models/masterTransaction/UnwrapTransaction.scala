@@ -142,7 +142,7 @@ class UnwrapTransactions @Inject()(
               unwrap <- blockchainTransactionUnwraps.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, ownableID = ownableId, amount = amount, accountId = accountId)
             } yield unwrap
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
@@ -194,7 +194,8 @@ class UnwrapTransactions @Inject()(
               _ <- sendNotification
             } yield ()
               ).recover {
-              case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+              case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
             }
           } else {
             val markMasterFailed = Service.markFailed(unwrapTx.txHash)
@@ -210,7 +211,8 @@ class UnwrapTransactions @Inject()(
               _ <- sendNotification
             } yield ()
               ).recover {
-              case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+              case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
             }
           }
         } else Future()

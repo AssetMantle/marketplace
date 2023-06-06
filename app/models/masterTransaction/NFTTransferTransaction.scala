@@ -143,7 +143,7 @@ class NFTTransferTransactions @Inject()(
               nftTransfer <- blockchainTransactionSplitSends.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nft.id, ownerId = ownerId, quantity = quantity, toIdentityId = utilities.Identity.getMantlePlaceIdentityID(toAccountId).asString, toAccountId = toAccountId)
             } yield nftTransfer
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
@@ -204,7 +204,8 @@ class NFTTransferTransactions @Inject()(
               _ <- sendNotifications(nft)
             } yield ()
               ).recover {
-              case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+              case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
             }
           } else {
             val markFailed = Service.markFailed(nftTransferTx.txHash)
@@ -218,7 +219,8 @@ class NFTTransferTransactions @Inject()(
               _ <- sendNotifications(nft)
             } yield ()
               ).recover {
-              case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+              case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
             }
           }
 

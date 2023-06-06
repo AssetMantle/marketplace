@@ -1,7 +1,8 @@
 @import views.html.base.form._
 @import views.nft.companion.Mint
+@import models.master.Collection
 
-@(mintForm: Form[Mint.Data] = Mint.form, nftId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(mintForm: Form[Mint.Data] = Mint.form, nftId: String, collection: Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.NFT_MINT, mintForm) {
     @commonInputText(mintForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> "readonly")

@@ -4,6 +4,7 @@ import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
+import schema.data.base.AccAddressData
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
@@ -11,7 +12,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Account(address: String, accountType: Option[String], accountNumber: Int, sequence: Int, publicKey: Option[Array[Byte]]) extends Entity[String] {
 
-  def id = this.address
+  def id: String = this.address
+
+  def getAccAddressBytes: Array[Byte] = utilities.Crypto.convertAddressToAccAddressBytes(this.address)
+
+  def getAccAddressData: AccAddressData = AccAddressData(this.getAccAddressBytes)
 }
 
 

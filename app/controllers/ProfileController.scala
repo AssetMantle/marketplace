@@ -61,7 +61,7 @@ class ProfileController @Inject()(
   def loadMoreNotifications(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
-        val notifications = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwFutureBaseException()
+        val notifications = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterTransactionNotifications.Service.get(loginState.username, pageNumber)
         (for {
           notifications <- notifications

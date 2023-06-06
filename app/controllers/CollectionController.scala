@@ -371,7 +371,7 @@ class CollectionController @Inject()(
         } yield ()
       } else {
         utilities.FileOperations.deleteFile(oldFilePath)
-        constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
+        constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
       }
 
       def deleteLocalFile() = Future(utilities.FileOperations.deleteFile(oldFilePath))
@@ -379,7 +379,7 @@ class CollectionController @Inject()(
       def add = documentType match {
         case constants.Collection.File.PROFILE => masterTransactionCollectionDrafts.Service.updateProfile(id = id, fileName = newFileName)
         case constants.Collection.File.COVER => masterTransactionCollectionDrafts.Service.updateCover(id = id, fileName = newFileName)
-        case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwFutureBaseException()
+        case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwBaseException()
       }
 
       (for {
@@ -561,7 +561,7 @@ class CollectionController @Inject()(
         } yield ()
       } else {
         utilities.FileOperations.deleteFile(oldFilePath)
-        constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
+        constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
       }
 
       def deleteLocalFile() = Future(utilities.FileOperations.deleteFile(oldFilePath))
@@ -569,7 +569,7 @@ class CollectionController @Inject()(
       def updateFile = documentType match {
         case constants.Collection.File.PROFILE => masterCollections.Service.updateProfile(id = id, fileName = newFileName)
         case constants.Collection.File.COVER => masterCollections.Service.updateCover(id = id, fileName = newFileName)
-        case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwFutureBaseException()
+        case _ => constants.Response.INVALID_DOCUMENT_TYPE.throwBaseException()
       }
 
       (for {

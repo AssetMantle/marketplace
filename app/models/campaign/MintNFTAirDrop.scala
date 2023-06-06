@@ -16,7 +16,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class MintNFTAirDrop(accountId: String, address: String, amount: Long, eligibilityTxHash: String, airdropTxHash: Option[String], status: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
+case class MintNFTAirDrop(accountId: String, address: String, eligibilityTxHash: String, airdropTxHash: Option[String], status: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
   def id: String = accountId
 
 }
@@ -29,13 +29,11 @@ object MintNFTAirDrops {
 
   class MintNFTAirDropTable(tag: Tag) extends Table[MintNFTAirDrop](tag, "MintNFTAirDrop") with ModelTable[String] {
 
-    def * = (accountId, address, amount, eligibilityTxHash, airdropTxHash.?, status, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (MintNFTAirDrop.tupled, MintNFTAirDrop.unapply)
+    def * = (accountId, address, eligibilityTxHash, airdropTxHash.?, status, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (MintNFTAirDrop.tupled, MintNFTAirDrop.unapply)
 
     def accountId = column[String]("accountId", O.PrimaryKey)
 
     def address = column[String]("address")
-
-    def amount = column[Long]("amount")
 
     def eligibilityTxHash = column[String]("eligibilityTxHash")
 
@@ -80,7 +78,7 @@ class MintNFTAirDrops @Inject()(
 
   object Service {
 
-    def addForDropping(accountIdsAddressMap: Map[String, String], amount: Long, eligibilityTxHash: String): Future[Unit] = create(accountIdsAddressMap.map(x => MintNFTAirDrop(accountId = x._1, address = x._2, amount = amount, eligibilityTxHash = eligibilityTxHash, airdropTxHash = None, status = false)).toSeq)
+    def addForDropping(accountIdsAddressMap: Map[String, String], eligibilityTxHash: String): Future[Unit] = create(accountIdsAddressMap.map(x => MintNFTAirDrop(accountId = x._1, address = x._2, eligibilityTxHash = eligibilityTxHash, airdropTxHash = None, status = false)).toSeq)
 
     def updateDropTxHash(accountId: String, airDropTxHash: String): Future[Int] = customUpdate(MintNFTAirDrops.TableQuery.filter(_.accountId === accountId).map(_.airdropTxHash).update(airDropTxHash))
 
@@ -88,7 +86,7 @@ class MintNFTAirDrops @Inject()(
 
     def markSuccess(accountId: String): Future[Int] = customUpdate(MintNFTAirDrops.TableQuery.filter(_.accountId === accountId).map(_.status).update(true))
 
-    def markFailed(accountId: String): Future[Int] = customUpdate(MintNFTAirDrops.TableQuery.filter(_.accountId === accountId).map(_.status).update(false))
+    def markFailed(accountId: String): Future[Int] = customUpdate(MintNFTAirDrops.TableQuery.filter(_.accountId === accountId).map(x => (x.airdropTxHash.?, x.status)).update((None, false)))
 
     def getAllForDropping: Future[Seq[MintNFTAirDrop]] = filter(x => x.airdropTxHash.?.isEmpty && !x.status)
 
@@ -129,7 +127,7 @@ class MintNFTAirDrops @Inject()(
               mintNFTAirDrop <- blockchainTransactionCampaignSendCoins.Service.add(txHash = txHash, fromAddress = constants.Campaign.AirDropWallet.address, status = None, memo = Option(eligibilityTxHash), timeoutHeight = timeoutHeight)
               _ <- Service.updateDropTxHash(accountId = accountId, airDropTxHash = txHash)
             } yield mintNFTAirDrop
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
@@ -168,7 +166,7 @@ class MintNFTAirDrops @Inject()(
         val checkDrops = Service.getAllForUpdates
 
         def dropTokens(drops: Seq[MintNFTAirDrop]) = utilitiesOperations.traverse(drops) { drop =>
-          transaction(accountId = drop.accountId, address = drop.address, amount = MicroNumber(BigInt(drop.amount)), eligibilityTxHash = drop.eligibilityTxHash)
+          transaction(accountId = drop.accountId, address = drop.address, amount = constants.Campaign.MintNFTAirDropAmount, eligibilityTxHash = drop.eligibilityTxHash)
         }
 
         def checkAndUpdate(drops: Seq[MintNFTAirDrop]) = utilitiesOperations.traverse(drops) { drop =>
@@ -185,7 +183,8 @@ class MintNFTAirDrops @Inject()(
                 _ <- sendNotifications
               } yield ()
                 ).recover {
-                case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             } else {
               val markMasterFailed = Service.markFailed(drop.accountId)
@@ -194,7 +193,8 @@ class MintNFTAirDrops @Inject()(
                 _ <- markMasterFailed
               } yield ()
                 ).recover {
-                case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             }
           } else Future()

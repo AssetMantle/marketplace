@@ -41,7 +41,7 @@ class WithoutLoginActionAsync @Inject()(
         }
 
         def getResult(verify: Boolean, loginState: LoginState) = if (verify) f(Option(loginState))(request)
-        else constants.Response.INVALID_SESSION.throwFutureBaseException()
+        else constants.Response.INVALID_SESSION.throwBaseException()
 
         for {
           (verify, account) <- verify

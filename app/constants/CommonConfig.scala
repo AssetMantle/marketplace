@@ -46,6 +46,8 @@ object CommonConfig {
     def MediumGasPrice: Double = config.get[Double]("blockchain.mediumGasPrice")
 
     def HighGasPrice: Double = config.get[Double]("blockchain.highGasPrice")
+
+    def UpgradeHeight: Int = config.get[Int]("blockchain.upgradeHeight")
   }
 
   object Pagination {

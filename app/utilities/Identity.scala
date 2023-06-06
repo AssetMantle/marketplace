@@ -30,7 +30,7 @@ object Identity {
 
   val getBondAmountMetaProperty: Property = MetaProperty(schema.constants.Properties.BondAmountProperty.id, NumberData(2560L))
 
-  def getAuthenticationProperty(addresses: Seq[String]): Property = schema.constants.Properties.AuthenticationProperty.copy(data = ListData(addresses.map(x => AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(x)))))
+  def getAuthenticationProperty(addresses: Seq[String]): Property = schema.constants.Properties.AuthenticationProperty.copy(data = ListData(addresses.map(x => AccAddressData(x))))
 
   def getMantlePlaceIdentityID(id: String): IdentityID = {
     val immutables = Immutables(PropertyList(Seq(getOriginMetaProperty, getBondAmountMetaProperty, getIDMetaProperty(id), getExtraMesaProperty(""))))

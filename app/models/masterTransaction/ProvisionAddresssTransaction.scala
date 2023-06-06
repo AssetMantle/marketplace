@@ -125,7 +125,7 @@ class ProvisionAddressTransactions @Inject()(
               provisionAddress <- blockchainTransactionProvisionAddresses.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, accountId = accountId, toAddress = toAddress)
             } yield provisionAddress
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
@@ -176,7 +176,8 @@ class ProvisionAddressTransactions @Inject()(
                 _ <- sendNotification
               } yield ()
                 ).recover {
-                case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             } else {
               val markMasterFailed = Service.markFailed(provisionAddressTx.txHash)
@@ -189,7 +190,8 @@ class ProvisionAddressTransactions @Inject()(
                 _ <- sendNotification
               } yield ()
                 ).recover {
-                case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             }
           } else Future()

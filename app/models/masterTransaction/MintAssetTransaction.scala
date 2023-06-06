@@ -64,6 +64,7 @@ class MintAssetTransactions @Inject()(
                                        blockchainAssets: blockchain.Assets,
                                        blockchainIdentities: blockchain.Identities,
                                        campaignMintNFTAirDrops: campaign.MintNFTAirDrops,
+                                       campaignIneligibleMintNFTAirDrops: campaign.IneligibleMintNFTAirDrops,
                                        collectionsAnalysis: CollectionsAnalysis,
                                        masterKeys: master.Keys,
                                        masterNFTs: master.NFTs,
@@ -139,7 +140,7 @@ class MintAssetTransactions @Inject()(
               mintAsset <- blockchainTransactionMintAssets.Service.add(txHash = txHash, fromAddress = constants.Wallet.MintAssetWallet.address, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, nftIDs = nftIDs, minterAccountIDs = nftOwners.map(x => x.nftId -> x.ownerId).toMap)
             } yield mintAsset
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
@@ -246,15 +247,18 @@ class MintAssetTransactions @Inject()(
               }
             } else Future(Seq())
 
-            def checkAndForAirDrop = {
-              val toBeDropped = campaignMintNFTAirDrops.Service.filterExisting(mintAssetTxs.filter(_.txHash == txHash).map(_.minterAccountID))
+            def checkForAirDrop(nftIDs: Seq[String]) = {
+              val ineligibles = campaignIneligibleMintNFTAirDrops.Service.getIneligibles(nftIDs)
+
+              def toBeDropped(ineligibles: Seq[String]) = campaignMintNFTAirDrops.Service.filterExisting(mintAssetTxs.filterNot(x => ineligibles.contains(x.nftID)).filter(_.txHash == txHash).map(_.minterAccountID))
 
               def keys(toBeDropped: Seq[String]) = if (toBeDropped.nonEmpty) masterKeys.Service.getAllActiveKeys(toBeDropped) else Future(Seq())
 
-              def add(keys: Seq[Key]) = if (keys.nonEmpty) campaignMintNFTAirDrops.Service.addForDropping(accountIdsAddressMap = keys.map(x => x.accountId -> x.address).toMap, amount = constants.Campaign.MintNFTAirDropAmount, eligibilityTxHash = txHash) else Future()
+              def add(keys: Seq[Key]) = if (keys.nonEmpty) campaignMintNFTAirDrops.Service.addForDropping(accountIdsAddressMap = keys.map(x => x.accountId -> x.address).toMap, eligibilityTxHash = txHash) else Future()
 
               for {
-                toBeDropped <- toBeDropped
+                ineligibles <- ineligibles
+                toBeDropped <- toBeDropped(ineligibles)
                 keys <- keys(toBeDropped)
                 _ <- add(keys)
               } yield ()
@@ -265,9 +269,11 @@ class MintAssetTransactions @Inject()(
               _ <- updateMaster
               nfts <- nfts
               _ <- updateAnalysis(nfts)
+              _ <- checkForAirDrop(nfts.map(_.id))
             } yield ()
               ).recover {
-              case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+              case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
             }
           } else {
             val markMasterFailed = Service.markFailed(txHash)
@@ -278,7 +284,8 @@ class MintAssetTransactions @Inject()(
               _ <- updateMaster
             } yield ()
               ).recover {
-              case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+              case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
             }
           }
         } else Future()

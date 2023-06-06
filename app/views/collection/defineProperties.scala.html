@@ -11,6 +11,7 @@
 @commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm, submitDisable = false, showBackButton = true, callBackFunction = JavaScript(s"""updateExplorerContainer('${loginState.username}')""")) {
     @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionDraftId, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
     @commonCheckbox(definePropertiesForm, constants.FormField.SAVE_COLLECTION_DRAFT, Symbol("containerDivClass") -> "hidden")
+    @commonCheckbox(definePropertiesForm, constants.FormField.FRACTIONALIZED_NFT)
     <div id="basicInfoContainer" class="propertyInfoContainer">
         <div class="singleProperty">
             <div class="d-flex justify-content-between align-content-center propertyHeaderContainer">

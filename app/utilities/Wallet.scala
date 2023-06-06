@@ -13,7 +13,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import play.api.Logger
 import scodec.bits.ByteVector
 
-import java.nio.charset.StandardCharsets
 import java.security.{MessageDigest, Security}
 
 case class Wallet(address: String, hdPath: Seq[ChildNumber], publicKey: Array[Byte], privateKey: Array[Byte], mnemonics: Seq[String]) {
@@ -62,29 +61,31 @@ object Wallet {
         Script.ScriptType.P2PKH,
         hdPathAsList
       )
-
-      val address = utilities.Bech32.encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(bitcoinWallet.getKeyByPath(hdPathAsList).getPubKey))))
+      val deterministicKey = bitcoinWallet.getKeyByPath(hdPathAsList)
+      val address = utilities.Bech32.encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(deterministicKey.getPubKey))))
       Wallet(
         address = address,
         hdPath = hdPath,
-        publicKey = bitcoinWallet.getKeyByPath(hdPathAsList).getPubKey,
-        privateKey = bitcoinWallet.getKeyByPath(hdPathAsList).getPrivKeyBytes,
+        publicKey = deterministicKey.getPubKey,
+        privateKey = deterministicKey.getPrivKeyBytes,
         mnemonics = mnemonics)
     } else throw new BaseException(constants.Response.INVALID_MNEMONICS)
   }
 
   def getRandomWallet: Wallet = getWallet(Bip39.creatRandomMnemonics())
 
-  def hashAndEcdsaSign(message: String, ecKey: ECKey): Array[Byte] = {
-    val ecdsaSignature = ecKey.sign(Sha256Hash.wrap(utilities.Secrets.sha256Hash(message.getBytes(StandardCharsets.UTF_8))))
-    Utils.bigIntegerToBytes(ecdsaSignature.r, 32) ++ Utils.bigIntegerToBytes(ecdsaSignature.s, 32)
-  }
-
   def ecdsaSign(data: Array[Byte], ecKey: ECKey): Array[Byte] = try {
     val ecdsaSignature = ecKey.sign(Sha256Hash.wrap(data))
     Utils.bigIntegerToBytes(ecdsaSignature.r, 32) ++ Utils.bigIntegerToBytes(ecdsaSignature.s, 32)
   } catch {
     case exception: Exception => constants.Response.SIGNING_FAILED.throwBaseException(exception)
+  }
+
+  def validateSignature(data: Array[Byte], signature: Array[Byte], publicKey: Array[Byte]): Boolean = try {
+    ECKey.verify(data, signature, publicKey)
+  } catch {
+    case exception: Exception => logger.error(exception.getLocalizedMessage)
+      false
   }
 
 }

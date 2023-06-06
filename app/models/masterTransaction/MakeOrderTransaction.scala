@@ -159,12 +159,12 @@ class MakeOrderTransactions @Inject()(
   }
 
   object Utility {
-    def transaction(nftID: String, nftOwner: NFTOwner, quantity: Int, fromAddress: String, endHours: Int, price: MicroNumber, buyerId: Option[String], secondaryMarketId: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(nftID: String, nftOwner: NFTOwner, quantity: Long, fromAddress: String, endHours: Int, price: MicroNumber, buyerId: Option[String], secondaryMarketId: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
       // TODO
       // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
       val abciInfo = getAbciInfo.Service.get
       val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount).recover {
-        case exception: Exception => models.blockchain.Account(address = fromAddress, accountType = None, accountNumber = 0, sequence = 0, publicKey = None)
+        case _: Exception => models.blockchain.Account(address = fromAddress, accountType = None, accountNumber = 0, sequence = 0, publicKey = None)
       }
       val unconfirmedTxs = getUnconfirmedTxs.Service.get()
       val nft = masterNFTs.Service.tryGet(nftID)
@@ -200,7 +200,7 @@ class MakeOrderTransactions @Inject()(
               makeOrder <- blockchainTransactionMakeOrders.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nftID, sellerId = nftOwner.ownerId, buyerId = buyerId, denom = constants.Blockchain.StakingToken, makerOwnableSplit = quantity, expiresIn = expiresIn, takerOwnableSplit = price.value * quantity, secondaryMarketId = secondaryMarketId)
             } yield makeOrder
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
@@ -236,12 +236,12 @@ class MakeOrderTransactions @Inject()(
 
       def filterExistingOrderIds(allOrderIds: Seq[String]) = blockchainOrders.Service.filterExistingIds(allOrderIds)
 
-      def markForDeletion(orderIds: Seq[String]) = masterSecondaryMarkets.Service.markForDeletionByOrderIds(orderIds)
+      def markOnExpiry(orderIds: Seq[String]) = masterSecondaryMarkets.Service.markOnExpiry(orderIds)
 
       (for {
         allOrderIds <- allOrderIds
         existingOrderIds <- filterExistingOrderIds(allOrderIds)
-        _ <- markForDeletion(allOrderIds.diff(existingOrderIds))
+        _ <- markOnExpiry(allOrderIds.diff(existingOrderIds))
       } yield ()
         ).recover {
         case exception: Exception => logger.error(exception.getLocalizedMessage)
@@ -255,7 +255,7 @@ class MakeOrderTransactions @Inject()(
 
       def runner(): Unit = {
 
-        val markDeleteForExpiredOrders = updateForExpiredOrders()
+        val checkExpiredOrders = updateForExpiredOrders()
         val makeOrderTxs = Service.getAllPendingStatus
 
         def getTxs(hashes: Seq[String]) = blockchainTransactions.Service.getByHashes(hashes)
@@ -268,6 +268,7 @@ class MakeOrderTransactions @Inject()(
               val creationHeight = txs.find(_.hash == makeOrderTx.txHash).getOrElse(constants.Response.TRANSACTION_NOT_FOUND.throwBaseException()).height
               val markSuccess = Service.markSuccessAndCreationHeight(makeOrderTx.txHash, creationHeight)
               val nft = masterNFTs.Service.tryGet(makeOrderTx.nftId)
+              val updateNFTOwner = masterNFTOwners.Service.onSecondaryMarket(nftId = makeOrderTx.nftId, ownerId = makeOrderTx.sellerId, sellQuantity = makeOrderTx.makerOwnableSplit)
 
               def sendNotifications(nft: NFT) = utilitiesNotification.send(makeOrderTx.sellerId, constants.Notification.SECONDARY_MARKET_CREATION_SUCCESSFUL, nft.name)(s"'${nft.id}'")
 
@@ -276,35 +277,39 @@ class MakeOrderTransactions @Inject()(
                 masterSecondaryMarkets.Service.updateOrderID(makeOrderTx.secondaryMarketId, orderID)
               }
 
+              def markCollectionOnSecondaryMarket(collectionId: String) = masterCollections.Service.markListedOnSecondaryMarket(collectionId)
+
               def updateAnalytics(collectionId: String) = collectionsAnalysis.Utility.onCreateSecondaryMarket(collectionId, totalListed = makeOrderTx.getQuantity.toInt, listingPrice = makeOrderTx.getPrice)
 
               (for {
                 _ <- markSuccess
                 nft <- nft
+                _ <- updateNFTOwner
                 _ <- updateOrderId(nft)
+                _ <- markCollectionOnSecondaryMarket(nft.collectionId)
                 _ <- updateAnalytics(nft.collectionId)
                 _ <- sendNotifications(nft)
               } yield ()
                 ).recover {
-                case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                case exception: Exception => logger.error(exception.getLocalizedMessage)
+                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             } else {
               val markFailed = Service.markFailed(makeOrderTx.txHash)
-              val updateNFTOwner = masterNFTOwners.Service.markSecondaryMarketNull(secondaryMarketId = makeOrderTxs.filter(_.txHash == makeOrderTx.txHash).head.secondaryMarketId)
               val nft = masterNFTs.Service.tryGet(makeOrderTx.nftId)
-              val markMasterForDelete = masterSecondaryMarkets.Service.markForDeletion(makeOrderTxs.filter(_.txHash == makeOrderTx.txHash).map(_.secondaryMarketId))
+              val markMaster = masterSecondaryMarkets.Service.markOnOrderCreationFailed(makeOrderTxs.filter(_.txHash == makeOrderTx.txHash).map(_.secondaryMarketId))
 
               def sendNotifications(nft: NFT) = utilitiesNotification.send(makeOrderTx.sellerId, constants.Notification.SECONDARY_MARKET_CREATION_FAILED, nft.name)(s"'${nft.id}'")
 
               (for {
                 _ <- markFailed
-                _ <- updateNFTOwner
-                _ <- markMasterForDelete
+                _ <- markMaster
                 nft <- nft
                 _ <- sendNotifications(nft)
               } yield ()
                 ).recover {
-                case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                case exception: Exception => logger.error(exception.getLocalizedMessage)
+                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             }
           } else Future()
@@ -320,7 +325,7 @@ class MakeOrderTransactions @Inject()(
           makeOrderTxs <- makeOrderTxs
           txs <- getTxs(makeOrderTxs.map(_.txHash).distinct)
           _ <- checkAndUpdate(makeOrderTxs, txs)
-          _ <- markDeleteForExpiredOrders
+          _ <- checkExpiredOrders
         } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.failure.logMessage)
         }

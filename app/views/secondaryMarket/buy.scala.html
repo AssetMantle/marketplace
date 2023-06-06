@@ -10,6 +10,7 @@
     <div id="secondaryMarketForm">
         @commonInputText(buyForm, constants.FormField.NFT_ID, Symbol("value") -> secondaryMarket.nftId, Symbol("containerDivClass") -> "hidden")
         @commonInputText(buyForm, constants.FormField.SECONDARY_MARKET_ID, Symbol("value") -> secondaryMarket.id, Symbol("containerDivClass") -> "hidden")
+        @commonInputLong(buyForm, constants.FormField.BUY_QUANTITY)
         @commonInputPassword(buyForm, constants.FormField.PASSWORD)
     </div>
 

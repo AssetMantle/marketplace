@@ -276,14 +276,14 @@ class Keys @Inject()(
 
       def getWallet(key: Key) = if (key.hdPath.isDefined && key.partialMnemonics.isDefined) {
         Future(utilities.Wallet.getWallet(mnemonics = key.partialMnemonics.get ++ lastWords, hdPath = key.hdPath.get))
-      } else constants.Response.INVALID_ACTIVE_KEY.throwFutureBaseException()
+      } else constants.Response.INVALID_ACTIVE_KEY.throwBaseException()
 
       def updatePassword(key: Key, wallet: utilities.Wallet) = if (key.address == wallet.address) {
         updateById1AndId2(key.copy(
           passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = key.salt, iterations = constants.Security.DefaultIterations),
           encryptedPrivateKey = utilities.Secrets.encryptData(data = wallet.privateKey, secret = newPassword)
         ).serialize())
-      } else constants.Response.INVALID_ACTIVE_KEY.throwFutureBaseException()
+      } else constants.Response.INVALID_ACTIVE_KEY.throwBaseException()
 
       for {
         key <- key
@@ -302,8 +302,8 @@ class Keys @Inject()(
             passwordHash = utilities.Secrets.hashPassword(password = newPassword, salt = oldKey.salt, iterations = constants.Security.DefaultIterations),
             encryptedPrivateKey = utilities.Secrets.encryptData(data = decryptedPrivateKey, secret = newPassword),
           ).serialize())
-        } else constants.Response.INVALID_ACTIVE_KEY.throwFutureBaseException()
-      } else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+        } else constants.Response.INVALID_ACTIVE_KEY.throwBaseException()
+      } else constants.Response.INVALID_PASSWORD.throwBaseException()
 
       for {
         (passwordValidated, oldKey) <- validateAndOldKey
@@ -340,7 +340,7 @@ class Keys @Inject()(
       val validate = validateUsernamePasswordAndGetKey(username = accountId, address = address, password = password)
 
       def validateAndUpdate(validated: Boolean, key: Key) = if (validated) updateById1AndId2(key.copy(encryptedPrivateKey = Array[Byte](), partialMnemonics = None).serialize())
-      else constants.Response.INVALID_PASSWORD.throwFutureBaseException()
+      else constants.Response.INVALID_PASSWORD.throwBaseException()
 
       for {
         (validated, key) <- validate

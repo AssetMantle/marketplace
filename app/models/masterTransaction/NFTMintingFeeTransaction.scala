@@ -120,10 +120,10 @@ class NFTMintingFeeTransactions @Inject()(
         def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              nftSale <- blockchainTransactionNFTMintingFees.Service.add(txHash = txHash, fromAddress = fromAddress, toAddress = constants.Wallet.MintAssetWallet.address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              nftSale <- blockchainTransactionNFTMintingFees.Service.add(txHash = txHash, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(accountId = accountId, collectionId = nft.collectionId, txHash = txHash, nftId = nft.id)
             } yield nftSale
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
@@ -182,7 +182,8 @@ class NFTMintingFeeTransactions @Inject()(
                 _ <- sendNotifications(mintingNFTs.head, nft)
               } yield ()
                 ).recover {
-                case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             } else {
               val mintingNFTs = Service.getByTxHash(txHash)
@@ -198,7 +199,8 @@ class NFTMintingFeeTransactions @Inject()(
                 _ <- sendNotifications(mintingNFTs.head)
               } yield ()
                 ).recover {
-                case _: BaseException => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             }
           } else Future()

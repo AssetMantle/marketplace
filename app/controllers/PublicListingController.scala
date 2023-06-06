@@ -176,7 +176,7 @@ class PublicListingController @Inject()(
                 publicListingId <- masterPublicListings.Service.add(createData.toNewPublicListing)
                 _ <- masterNFTOwners.Service.publicListRandomNFTs(collectionId = collection.id, nfts = createData.numberOfNFTs, creatorId = loginState.username, publicListingId = publicListingId, unmintedNFTs = unmintedNFTs)
               } yield ()
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           def sendNotification(collectionName: String) = utilitiesNotification.send(loginState.username, notification = constants.Notification.PUBLIC_LISTING_ON_COLLECTION, collectionName)(s"'${createData.collectionId}'")
@@ -245,7 +245,7 @@ class PublicListingController @Inject()(
               for {
                 _ <- masterPublicListings.Service.update(publicListing.copy(maxMintPerAccount = editData.maxMintPerAccount, startTimeEpoch = editData.startEpoch, endTimeEpoch = editData.endEpoch, price = editData.price))
               } yield ()
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           def sendNotification(collection: Collection) = utilitiesNotification.send(loginState.username, notification = constants.Notification.PUBLIC_LISTING_ON_COLLECTION, collection.name)(s"'${collection.id}'")
@@ -352,7 +352,7 @@ class PublicListingController @Inject()(
                 gasPrice = constants.Blockchain.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buyNFTData.password))
               )
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           (for {

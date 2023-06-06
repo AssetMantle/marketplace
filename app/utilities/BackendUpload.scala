@@ -128,11 +128,11 @@ class BackendUpload @Inject()(
         try {
           val awsKey = utilities.NFT.getAWSKey(fileName = newFileName)
           if (!utilities.AmazonS3.exists(awsKey)) utilities.AmazonS3.uploadFile(awsKey, nftImageFile)
-          val nftOld = master.NFT(id = fileHash, collectionId = uploadCollection.id, name = nftDetails.name, description = nftDetails.description, totalSupply = 1, isMinted = Option(false), fileExtension = uploadCollection.nftFormat, ipfsLink = "", mintReady = false, assetId = None)
+          val nftOld = master.NFT(id = fileHash, collectionId = uploadCollection.id, name = nftDetails.name, description = nftDetails.description, totalSupply = 1, isMinted = Option(false), fileExtension = uploadCollection.nftFormat, mintReady = false, assetId = None)
           val assetID = nftOld.getAssetID(nftDetails.properties.map(_.toProperty(fileHash, collection)), collection)
           val nft = nftOld.copy(assetId = Option(assetID.asString))
           Await.result(masterNFTs.Service.add(nft), Duration.Inf)
-          Await.result(masterNFTOwners.Service.add(master.NFTOwner(nftId = fileHash, ownerId = uploadCollection.creatorId, creatorId = uploadCollection.creatorId, collectionId = uploadCollection.id, quantity = 1, saleId = None, publicListingId = None, secondaryMarketId = None)), Duration.Inf)
+          Await.result(masterNFTOwners.Service.add(master.NFTOwner(nftId = fileHash, ownerId = uploadCollection.creatorId, creatorId = uploadCollection.creatorId, collectionId = uploadCollection.id, quantity = 1, saleId = None, publicListingId = None)), Duration.Inf)
           Await.result(masterNFTProperties.Service.addMultiple(nftDetails.properties.map(_.toProperty(fileHash, collection))), Duration.Inf)
           Await.result(collectionsAnalysis.Utility.onNewNFT(uploadCollection.id), Duration.Inf)
           utilities.FileOperations.deleteFile(nftImageFile)
@@ -167,7 +167,7 @@ class BackendUpload @Inject()(
           if (uploadCollection.instagram != "") Option(SocialProfile(name = constants.Collection.SocialProfile.INSTAGRAM, url = uploadCollection.instagram)) else None,
           if (uploadCollection.website != "") Option(SocialProfile(name = constants.Collection.SocialProfile.WEBSITE, url = uploadCollection.website)) else None,
         ).flatten
-        val collection = Collection(id = uploadCollection.id, creatorId = uploadCollection.creatorId, classificationId = None, name = uploadCollection.name, description = uploadCollection.description, socialProfiles = socialProfiles, nsfw = false, properties = Option(uploadCollection.classificationProperties.map(_.toProperty)), profileFileName = profileFileName, coverFileName = coverFileName, public = true, royalty = 0.0, isDefined = Option(false), defineReady = false)
+        val collection = Collection(id = uploadCollection.id, creatorId = uploadCollection.creatorId, classificationId = None, name = uploadCollection.name, description = uploadCollection.description, socialProfiles = socialProfiles, nsfw = false, properties = Option(uploadCollection.classificationProperties.map(_.toProperty)), profileFileName = profileFileName, coverFileName = coverFileName, public = true, royalty = 0.0, isDefined = Option(false), defineAsset = false, rank = Int.MaxValue, onSecondaryMarket = false, showAll = false)
 
         def add = masterCollections.Service.add(collection)
 

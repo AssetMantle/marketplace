@@ -57,7 +57,7 @@ class AccountController @Inject()(
               _ <- addAccount
               _ <- deleteUnverifiedKeys
             } yield ()
-          } else constants.Response.USERNAME_UNAVAILABLE.throwFutureBaseException()
+          } else constants.Response.USERNAME_UNAVAILABLE.throwBaseException()
 
           def addKey() = masterKeys.Service.addOnSignUp(
             accountId = signUpData.username,
@@ -104,8 +104,8 @@ class AccountController @Inject()(
               for {
                 _ <- updateWallet
               } yield PartialContent(views.html.account.walletSuccess(username = key.accountId, address = walletMnemonicsData.walletAddress))
-            } else constants.Response.INVALID_MNEMONICS_OR_USERNAME.throwFutureBaseException()
-          } else constants.Response.INVALID_ACTIVE_KEY.throwFutureBaseException()
+            } else constants.Response.INVALID_MNEMONICS_OR_USERNAME.throwBaseException()
+          } else constants.Response.INVALID_ACTIVE_KEY.throwBaseException()
 
           (for {
             key <- key
@@ -155,7 +155,7 @@ class AccountController @Inject()(
                 _ <- addKey
                 _ <- updateMasterAccount()
               } yield PartialContent(views.html.account.migrateWalletToKey(MigrateWalletToKey.form, username = signInData.username, address = wallet.get.address))
-            } else constants.Response.INVALID_USERNAME_OR_PASSWORD.throwFutureBaseException()
+            } else constants.Response.INVALID_USERNAME_OR_PASSWORD.throwBaseException()
 
           } else {
             val validPassword = utilities.Secrets.verifyPassword(password = signInData.password, passwordHash = key.get.passwordHash, salt = key.get.salt, iterations = key.get.iterations)
@@ -194,7 +194,7 @@ class AccountController @Inject()(
                   } yield result
                 }
               }
-            } else constants.Response.INVALID_USERNAME_OR_PASSWORD.throwFutureBaseException()
+            } else constants.Response.INVALID_USERNAME_OR_PASSWORD.throwBaseException()
           }
 
           (for {
@@ -241,7 +241,7 @@ class AccountController @Inject()(
               _ <- updateKey(wallet)
               result <- getResult(username = migrateWalletToKeyData.username, address = wallet.address)
             } yield result
-          } else constants.Response.INVALID_USERNAME_OR_PASSWORD.throwFutureBaseException()
+          } else constants.Response.INVALID_USERNAME_OR_PASSWORD.throwBaseException()
 
           (for {
             (validated, key) <- validateAndKey

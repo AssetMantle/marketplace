@@ -17,7 +17,9 @@ import schema.id.base.{AssetID, ClassificationID, IdentityID, OrderID}
 import schema.list.PropertyList
 import schema.property.base.{MesaProperty, MetaProperty}
 import schema.types.Height
+import utilities.Wallet.BouncyHash
 
+import java.security.MessageDigest
 import scala.jdk.CollectionConverters.IterableHasAsJava
 
 object BlockchainTransaction {
@@ -52,26 +54,35 @@ object BlockchainTransaction {
   }
 
   def getTxRawBytesWithSignedMemo(messages: Seq[protoBufAny], fee: Coin, gasLimit: Int, account: models.blockchain.Account, ecKey: ECKey, timeoutHeight: Int): (Array[Byte], String) = {
-    val txRawBytesWithoutMemo = getTxRawBytes(
-      messages = messages,
-      fee = fee,
-      gasLimit = gasLimit,
-      account = account,
-      ecKey = ecKey,
-      memo = "",
-      timeoutHeight = timeoutHeight)
-    val memo = utilities.Secrets.base64URLEncoder(utilities.Wallet.ecdsaSign(utilities.Secrets.sha256Hash(txRawBytesWithoutMemo), ECKey.fromPrivate(constants.CommonConfig.MemoSignerWallet.privateKey)))
+    val signedMemo = getSignedMemo(account.address, account.sequence)
     (getTxRawBytes(
       messages = messages,
       fee = fee,
       gasLimit = gasLimit,
       account = account,
       ecKey = ecKey,
-      memo = memo,
-      timeoutHeight = timeoutHeight), memo)
+      memo = signedMemo,
+      timeoutHeight = timeoutHeight), signedMemo)
   }
 
-  def memoGenerator(memoPrefix: String): String = utilities.Secrets.base64URLEncoder(utilities.Wallet.hashAndEcdsaSign(memoPrefix, ECKey.fromPrivate(constants.CommonConfig.MemoSignerWallet.privateKey)))
+  def getSignedMemo(address: String, sequence: Long): String = {
+    val data = utilities.Secrets.sha256Hash(address + sequence.toString)
+    utilities.Secrets.base64URLEncoder(utilities.Wallet.ecdsaSign(data, ECKey.fromPrivate(constants.CommonConfig.MemoSignerWallet.privateKey)))
+  }
+
+  def checkMantlePlaceTransaction(tx: Tx): Boolean = if (tx.getBody.getMemo == "") {
+    false
+  } else {
+    try {
+      val memo = getSignedMemo(
+        utilities.Bech32.encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(PubKey.newBuilder().setKey(ByteString.copyFrom(tx.getAuthInfo.getSignerInfos(0).getPublicKey.getValue.toByteArray)).build().getKey.toByteArray))))
+        , tx.getAuthInfo.getSignerInfos(0).getSequence)
+      memo == tx.getBody.getMemo
+    } catch {
+      case _: Exception => false
+    }
+  }
+
 
   def getFee(gasPrice: BigDecimal, gasLimit: Int): Coin = Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber((gasPrice * gasLimit) / MicroNumber.factor))
 

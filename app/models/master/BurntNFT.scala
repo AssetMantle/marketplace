@@ -10,7 +10,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class BurntNFT(nftId: String, txHash: String, collectionId: String, assetId: String, classificationId: String, supply: Long, name: String, description: String, properties: Seq[BaseNFTProperty], fileExtension: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class BurntNFT(nftId: String, txHash: String, collectionId: String, assetId: String, classificationId: String, supply: BigInt, name: String, description: String, properties: Seq[BaseNFTProperty], fileExtension: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def serialize(): BurntNFTs.BurntNFTSerialized = BurntNFTs.BurntNFTSerialized(
     nftId = this.nftId,
@@ -18,7 +18,7 @@ case class BurntNFT(nftId: String, txHash: String, collectionId: String, assetId
     collectionId = collectionId,
     assetId = this.assetId,
     classificationId = this.classificationId,
-    supply = this.supply,
+    supply = BigDecimal(this.supply),
     name = this.name,
     description = this.description,
     fileExtension = this.fileExtension,
@@ -35,8 +35,8 @@ object BurntNFTs {
 
   implicit val logger: Logger = Logger(this.getClass)
 
-  case class BurntNFTSerialized(nftId: String, txHash: String, collectionId: String, assetId: String, classificationId: String, supply: Long, name: String, description: String, properties: String, fileExtension: String, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity2[String, String] {
-    def deserialize: BurntNFT = BurntNFT(nftId = nftId, collectionId = collectionId, assetId = assetId, classificationId = classificationId, supply = supply, txHash = txHash, name = name, description = description, fileExtension = fileExtension, properties = utilities.JSON.convertJsonStringToObject[Seq[BaseNFTProperty]](properties), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class BurntNFTSerialized(nftId: String, txHash: String, collectionId: String, assetId: String, classificationId: String, supply: BigDecimal, name: String, description: String, properties: String, fileExtension: String, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity2[String, String] {
+    def deserialize: BurntNFT = BurntNFT(nftId = nftId, collectionId = collectionId, assetId = assetId, classificationId = classificationId, supply = supply.toBigInt, txHash = txHash, name = name, description = description, fileExtension = fileExtension, properties = utilities.JSON.convertJsonStringToObject[Seq[BaseNFTProperty]](properties), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
     def id1 = nftId
 
@@ -57,7 +57,7 @@ object BurntNFTs {
 
     def classificationId = column[String]("classificationId")
 
-    def supply = column[Long]("supply")
+    def supply = column[BigDecimal]("supply")
 
     def name = column[String]("name")
 
@@ -99,7 +99,7 @@ class BurntNFTs @Inject()(
 
   object Service {
 
-    def add(nftId: String, txHash: String, collectionId: String, assetId: String, classificationId: String, supply: Long, name: String, description: String, properties: Seq[BaseNFTProperty], fileExtension: String): Future[Unit] = {
+    def add(nftId: String, txHash: String, collectionId: String, assetId: String, classificationId: String, supply: BigInt, name: String, description: String, properties: Seq[BaseNFTProperty], fileExtension: String): Future[Unit] = {
       val burntNFT = BurntNFT(nftId = nftId, txHash = txHash, collectionId = collectionId, assetId = assetId, classificationId = classificationId, supply = supply, name = name, description = description, properties = properties, fileExtension = fileExtension)
       create(burntNFT.serialize())
     }

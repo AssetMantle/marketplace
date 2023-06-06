@@ -132,7 +132,7 @@ class WrapTransactions @Inject()(
               wrap <- blockchainTransactionWraps.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, ownableID = coin.getDenomOwnableID, amount = coin.amount.toMicroBigDecimal, accountId = accountId)
             } yield wrap
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
@@ -184,7 +184,8 @@ class WrapTransactions @Inject()(
               _ <- sendNotification
             } yield ()
               ).recover {
-              case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+              case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
             }
           } else {
             val markMasterFailed = Service.markFailed(wrapTx.txHash)
@@ -200,7 +201,8 @@ class WrapTransactions @Inject()(
               _ <- sendNotification
             } yield ()
               ).recover {
-              case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+              case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
             }
           }
         } else Future()

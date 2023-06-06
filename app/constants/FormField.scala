@@ -28,7 +28,7 @@ object FormField {
 
   //StringFormField
   val USERNAME: StringFormField = StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
-  val TO_ACCOUNT_ID: StringFormField = StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
+  val TO_ACCOUNT_ID: StringFormField = StringFormField("TO_ACCOUNT_ID", 3, 50, RegularExpression.ACCOUNT_ID)
   val PASSWORD: StringFormField = StringFormField("PASSWORD", 5, 128)
   val WALLET_ADDRESS: StringFormField = StringFormField("WALLET_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val PUSH_NOTIFICATION_TOKEN: StringFormField = StringFormField("PUSH_NOTIFICATION_TOKEN", 0, 200)
@@ -117,7 +117,11 @@ object FormField {
   val CREATE_COLLECTION_MOU: BooleanFormField = BooleanFormField("CREATE_COLLECTION_MOU")
   val MARK_ALL_NOTIFICATION_READ: BooleanFormField = BooleanFormField("MARK_ALL_NOTIFICATION_READ")
   val MINT_NFT: BooleanFormField = BooleanFormField("MINT_NFT")
-  val SECONDARY_MARKET_SELL_ALL: BooleanFormField = BooleanFormField("SECONDARY_MARKET_SELL_ALL")
+  val FRACTIONALIZED_NFT: BooleanFormField = BooleanFormField("FRACTIONALIZED_NFT")
+
+  // LongFormField
+  val SELL_QUANTITY: LongFormField = LongFormField("SELL_QUANTITY", 1, Long.MaxValue)
+  val BUY_QUANTITY: LongFormField = LongFormField("BUY_QUANTITY", 1, Long.MaxValue)
 
   // SelectFormField
   val COLLECTION_CATEGORY: SelectFormField = SelectFormField("COLLECTION_CATEGORY", Seq(constants.Collection.Category.ART, constants.Collection.Category.PHOTOGRAPHY, constants.Collection.Category.MISCELLANEOUS))
@@ -188,6 +192,21 @@ object FormField {
     def optionalMapping: (String, Mapping[Option[String]]) = name -> optional(text)
 
     def getFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(SELECT_ERROR_PREFIX + name)
+  }
+
+  case class LongFormField(name: String, minimumValue: Long, maximumValue: Long) {
+    val placeHolder: String = PLACEHOLDER_PREFIX + name
+
+    def mapping: (String, Mapping[Long]) = name -> longNumber(min = minimumValue, max = maximumValue)
+
+    def optionalMapping: (String, Mapping[Option[Long]]) = name -> optional(longNumber(min = minimumValue, max = maximumValue))
+
+    def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_VALUE_ERROR, minimumValue)
+
+    def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_VALUE_ERROR, maximumValue)
+
+    def getCustomFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(CUSTOM_FIELD_ERROR_PREFIX + name, minimumValue, maximumValue)
+
   }
 
   case class IntFormField(name: String, minimumValue: Int, maximumValue: Int) {

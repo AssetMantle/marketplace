@@ -4,8 +4,6 @@ import exceptions.BaseException
 import play.api.Logger
 import play.api.routing.JavaScriptReverseRoute
 
-import scala.concurrent.{ExecutionContext, Future}
-
 object Response {
 
   private val PREFIX = "RESPONSE."
@@ -104,6 +102,7 @@ object Response {
   val INSUFFICIENT_NFT_BALANCE = new Failure("INSUFFICIENT_NFT_BALANCE")
   val TO_ACCOUNT_ID_DOES_NOT_EXISTS = new Failure("TO_ACCOUNT_ID_DOES_NOT_EXISTS")
   val MAXIMUM_COLLECTION_PROPERTIES_EXCEEDED = new Failure("MAXIMUM_COLLECTION_PROPERTIES_EXCEEDED")
+  val CANNOT_SEND_TO_YOURSELF = new Failure("CANNOT_SEND_TO_YOURSELF")
   val COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES = new Failure("COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES")
   val COLLECTION_PROPERTIES_CONTAINS_DUPLICATE_PROPERTIES = new Failure("COLLECTION_PROPERTIES_CONTAINS_DUPLICATE_PROPERTIES")
   val COLLECTION_PROPERTIES_CONTAINS_RESTRICTED_PROPERTIES = new Failure("COLLECTION_PROPERTIES_CONTAINS_RESTRICTED_PROPERTIES")
@@ -135,10 +134,10 @@ object Response {
   val NO_SUCH_DOCUMENT_TYPE_EXCEPTION = new Failure("NO_SUCH_DOCUMENT_TYPE_EXCEPTION")
   val NOT_COLLECTION_OWNER = new Failure("NOT_COLLECTION_OWNER")
   val NOT_NFT_OWNER = new Failure("NOT_NFT_OWNER")
+  val NOT_ENOUGH_QUANTITY = new Failure("NOT_ENOUGH_QUANTITY")
   val NFT_OWNER_NOT_FOUND = new Failure("NFT_OWNER_NOT_FOUND")
   val NFT_NOT_MINTED = new Failure("NFT_NOT_MINTED")
   val SELLING_MINT_E_COLLECTIONS_NOT_ALLOWED = new Failure("SELLING_MINT_E_COLLECTIONS_NOT_ALLOWED")
-  val NFT_CREATOR_NOT_ALLOWED_SECONDARY_SALE = new Failure("NFT_CREATOR_NOT_ALLOWED_SECONDARY_SALE")
   val CLASSIFICATION_ALREADY_DEFINED = new Failure("CLASSIFICATION_ALREADY_DEFINED")
   val FILE_SIZE_EXCEED_LIMIT = new Failure("FILE_SIZE_EXCEED_LIMIT")
   val INVALID_DOCUMENT_TYPE = new Failure("INVALID_DOCUMENT_TYPE")
@@ -183,14 +182,14 @@ object Response {
   val INVALID_IDENTITY_ISSUE_MESSAGE = new Failure("INVALID_IDENTITY_ISSUE_MESSAGE")
   val ADDRES_ALREADY_PROVISIONED = new Failure("ADDRES_ALREADY_PROVISIONED")
   val IDENTITY_DOES_NOT_EXIST_TO_MINT = new Failure("IDENTITY_DOES_NOT_EXIST_TO_MINT")
+  val TAKE_ORDER_MORE_QUANTITY = new Failure("TAKE_ORDER_MORE_QUANTITY")
+  val INVALID_QUANTITY_FOR_NFT_SECONDARY_MARKET = new Failure("INVALID_QUANTITY_FOR_NFT_SECONDARY_MARKET")
 
   class Failure(private val response: String) {
     val message: String = PREFIX + FAILURE_PREFIX + response
     val logMessage: String = LOG_PREFIX + response
 
     def throwBaseException(exception: Exception = null)(implicit module: String, logger: Logger) = throw new BaseException(this, exception)
-
-    def throwFutureBaseException(exception: Exception = null)(implicit module: String, logger: Logger, executionContext: ExecutionContext) = Future(throw new BaseException(this, exception))
   }
 
   class Warning(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

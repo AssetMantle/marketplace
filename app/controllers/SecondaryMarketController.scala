@@ -3,6 +3,7 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
+import models.blockchain.Split
 import models.master._
 import models.masterTransaction.MakeOrderTransaction
 import models.{blockchain, master, masterTransaction}
@@ -11,6 +12,7 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import schema.id.base.CoinID
 import utilities.MicroNumber
 import views.secondaryMarket.companion.{Buy, Cancel, CreateSecondaryMarket}
 
@@ -28,6 +30,7 @@ class SecondaryMarketController @Inject()(
                                            withoutLoginAction: WithoutLoginAction,
                                            collectionsAnalysis: CollectionsAnalysis,
                                            blockchainBalances: blockchain.Balances,
+                                           blockchainSplits: blockchain.Splits,
                                            masterAccounts: master.Accounts,
                                            masterKeys: master.Keys,
                                            masterWishLists: master.WishLists,
@@ -60,7 +63,7 @@ class SecondaryMarketController @Inject()(
   def collectionsSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val totalCollections = masterSecondaryMarkets.Service.total
+        val totalCollections = masterCollections.Service.totalOnSecondaryMarket
         (for {
           totalCollections <- totalCollections
         } yield Ok(views.html.secondaryMarket.collectionsSection(totalCollections))
@@ -73,15 +76,14 @@ class SecondaryMarketController @Inject()(
   def collectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val secondaryMarkets = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
-        else masterSecondaryMarkets.Service.getByPageNumber(pageNumber)
+        val secondaryMarketCollections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        else masterCollections.Service.getSecondaryMarketByPageNumber(pageNumber)
 
         def collections(ids: Seq[String]) = masterCollections.Service.getCollections(ids)
 
         (for {
-          secondaryMarkets <- secondaryMarkets
-          collections <- collections(secondaryMarkets.map(_.collectionId))
-        } yield Ok(views.html.secondaryMarket.collectionsPerPage(collections))
+          secondaryMarketCollections <- secondaryMarketCollections
+        } yield Ok(views.html.secondaryMarket.collectionsPerPage(secondaryMarketCollections))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -121,14 +123,14 @@ class SecondaryMarketController @Inject()(
         val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
         else masterCollections.Service.tryGet(id)
         val likedNFTs = optionalLoginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollection(accountId = x.username, collectionId = id))
-        val nftIds = masterNFTOwners.Service.getByMarketIDs(id, pageNumber)
+        val secondaryMarkets = masterSecondaryMarkets.Service.getByCollectionId(id, pageNumber)
 
         def nfts(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds)
 
         (for {
           collection <- collection
-          nftIds <- nftIds
-          nfts <- nfts(nftIds)
+          secondaryMarkets <- secondaryMarkets
+          nfts <- nfts(secondaryMarkets.map(_.nftId))
           likedNFTs <- likedNFTs
         } yield Ok(views.html.secondaryMarket.collection.nftsPerPage(collection, nfts, likedNFTs, pageNumber))
           ).recover {
@@ -166,8 +168,6 @@ class SecondaryMarketController @Inject()(
           val nft = masterNFTs.Service.tryGet(createData.nftId)
           val nftOwner = masterNFTOwners.Service.tryGet(nftId = createData.nftId, ownerId = loginState.username)
           val activeKey = masterKeys.Service.tryGetActive(loginState.username)
-          // TODO
-          val quantity = 1
 
           def collection(id: String) = masterCollections.Service.tryGet(id)
 
@@ -176,17 +176,17 @@ class SecondaryMarketController @Inject()(
               if (!nft.isMinted.getOrElse(false)) Option(constants.Response.NFT_NOT_MINTED) else None,
               if (nftOwner.creatorId == "Mint.E") Option(constants.Response.SELLING_MINT_E_COLLECTIONS_NOT_ALLOWED) else None,
               if (nftOwner.ownerId != loginState.username) Option(constants.Response.NOT_NFT_OWNER) else None,
-              if (nftOwner.creatorId == loginState.username) Option(constants.Response.NFT_CREATOR_NOT_ALLOWED_SECONDARY_SALE) else None,
-              if (nftOwner.saleId.isDefined || nftOwner.publicListingId.isDefined || nftOwner.secondaryMarketId.isDefined) Option(constants.Response.NFT_ALREADY_ON_SALE) else None,
+              if (createData.sellQuantity > nftOwner.quantity) Option(constants.Response.NOT_ENOUGH_QUANTITY) else None,
+              if (nftOwner.saleId.isDefined || nftOwner.publicListingId.isDefined) Option(constants.Response.NFT_ALREADY_ON_SALE) else None,
               if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
+              if (!loginState.isVerifiedCreator) Option(constants.Response.NOT_VERIFIED_CREATOR) else None,
             ).flatten
             if (errors.isEmpty) {
               for {
-                secondaryMarketId <- masterSecondaryMarkets.Service.add(createData.toNewSecondaryMarket(collectionId = nftOwner.collectionId, sellerId = loginState.username, quantity = quantity))
-                _ <- masterNFTOwners.Service.listNFTOnSecondaryMarket(NFTOwner = nftOwner, secondaryMarketID = secondaryMarketId)
-                tx <- masterTransactionMakeOrderTransactions.Utility.transaction(nftID = createData.nftId, nftOwner = nftOwner, fromAddress = loginState.address, quantity = quantity, endHours = createData.endHours, price = createData.price, buyerId = None, secondaryMarketId = secondaryMarketId, gasPrice = constants.Blockchain.DefaultGasPrice, ecKey = activeKey.getECKey(createData.password).get)
+                secondaryMarketId <- masterSecondaryMarkets.Service.add(createData.toNewSecondaryMarket(collectionId = nftOwner.collectionId, sellerId = loginState.username))
+                tx <- masterTransactionMakeOrderTransactions.Utility.transaction(nftID = createData.nftId, nftOwner = nftOwner, fromAddress = loginState.address, quantity = createData.sellQuantity, endHours = createData.endHours, price = createData.price, buyerId = None, secondaryMarketId = secondaryMarketId, gasPrice = constants.Blockchain.DefaultGasPrice, ecKey = activeKey.getECKey(createData.password).get)
               } yield tx
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           (for {
@@ -218,18 +218,16 @@ class SecondaryMarketController @Inject()(
           val secondaryMarket = masterSecondaryMarkets.Service.tryGet(cancelData.secondaryMarketId)
           val makeOrderTx = masterTransactionMakeOrderTransactions.Service.tryGetByNFTAndSecondaryMarket(nftId = cancelData.nftId, secondaryMarketId = cancelData.secondaryMarketId)
           val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = cancelData.password)
-          val nftOwner = masterNFTOwners.Service.tryGetBySecondaryMarketId(cancelData.secondaryMarketId)
-          val checkAlreadySold = masterTransactionTakeOrderTransactions.Service.checkAlreadySold(nftId = cancelData.nftId, secondaryMarketId = cancelData.secondaryMarketId)
-          // TODO
-          val quantity = 1
 
-          def validateAndTransfer(nftOwner: NFTOwner, makeOrderTx: MakeOrderTransaction, verifyPassword: Boolean, secondaryMarket: SecondaryMarket, buyerKey: Key, checkAlreadySold: Boolean) = {
+          def checkAlreadySold(secondaryMarket: SecondaryMarket) = masterTransactionTakeOrderTransactions.Utility.checkAlreadySold(nftId = cancelData.nftId, secondaryMarket = secondaryMarket)
+
+          def validateAndTransfer(makeOrderTx: MakeOrderTransaction, verifyPassword: Boolean, secondaryMarket: SecondaryMarket, buyerKey: Key, checkAlreadySold: Boolean) = {
             val errors = Seq(
-              if (nftOwner.ownerId != loginState.username) Option(constants.Response.NFT_OWNER_NOT_FOUND) else None,
+              if (secondaryMarket.sellerId != loginState.username) Option(constants.Response.NOT_NFT_OWNER) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
               if (secondaryMarket.orderId.isEmpty || !makeOrderTx.status.getOrElse(false)) Option(constants.Response.ORDER_NOT_CREATED_ON_BLOCKCHAIN) else None,
-              if (makeOrderTx.secondaryMarketId != secondaryMarket.id || makeOrderTx.nftId != cancelData.nftId || makeOrderTx.sellerId != nftOwner.ownerId || secondaryMarket.sellerId != loginState.username) Option(constants.Response.INVALID_ORDER) else None,
+              if (makeOrderTx.secondaryMarketId != secondaryMarket.id || makeOrderTx.nftId != cancelData.nftId || makeOrderTx.sellerId != secondaryMarket.sellerId || secondaryMarket.sellerId != loginState.username) Option(constants.Response.INVALID_ORDER) else None,
             ).flatten
             if (errors.isEmpty) {
               masterTransactionCancelOrderTransactions.Utility.transaction(
@@ -238,16 +236,15 @@ class SecondaryMarketController @Inject()(
                 gasPrice = constants.Blockchain.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, cancelData.password))
               )
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           (for {
             secondaryMarket <- secondaryMarket
             makeOrderTx <- makeOrderTx
-            nftOwner <- nftOwner
             (verifyPassword, buyerKey) <- verifyPassword
-            checkAlreadySold <- checkAlreadySold
-            blockchainTransaction <- validateAndTransfer(nftOwner = nftOwner, makeOrderTx = makeOrderTx, verifyPassword = verifyPassword, secondaryMarket = secondaryMarket, buyerKey = buyerKey, checkAlreadySold = checkAlreadySold)
+            checkAlreadySold <- checkAlreadySold(secondaryMarket)
+            blockchainTransaction <- validateAndTransfer(makeOrderTx = makeOrderTx, verifyPassword = verifyPassword, secondaryMarket = secondaryMarket, buyerKey = buyerKey, checkAlreadySold = checkAlreadySold)
           } yield PartialContent(views.html.transactionSuccessful(blockchainTransaction))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.secondaryMarket.cancel(Cancel.form.withGlobalError(baseException.failure.message), nftId = cancelData.nftId, secondaryMarketId = cancelData.secondaryMarketId))
@@ -292,42 +289,50 @@ class SecondaryMarketController @Inject()(
           val makeOrderTx = masterTransactionMakeOrderTransactions.Service.tryGetByNFTAndSecondaryMarket(nftId = buyData.nftId, secondaryMarketId = buyData.secondaryMarketId)
           val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = buyData.password)
           val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
-          val nftOwner = masterNFTOwners.Service.tryGetBySecondaryMarketId(buyData.secondaryMarketId)
-          val checkAlreadySold = masterTransactionTakeOrderTransactions.Service.checkAlreadySold(nftId = buyData.nftId, secondaryMarketId = buyData.secondaryMarketId)
-          // TODO
-          val quantity = 1
+          val split = blockchainSplits.Service.getByOwnerIDAndOwnableID(ownerId = utilities.Identity.getMantlePlaceIdentityID(loginState.username), ownableID = CoinID(constants.Blockchain.StakingToken))
 
-          def validateAndTransfer(nftOwner: NFTOwner, makeOrderTx: MakeOrderTransaction, verifyPassword: Boolean, secondaryMarket: SecondaryMarket, buyerKey: Key, balance: MicroNumber, checkAlreadySold: Boolean) = {
+          def collection(secondaryMarket: SecondaryMarket) = masterCollections.Service.tryGet(secondaryMarket.collectionId)
+
+          def creatorAddress(accountId: String) = masterKeys.Service.tryGetActive(accountId).map(_.address)
+
+          def checkAlreadySold(secondaryMarket: SecondaryMarket) = masterTransactionTakeOrderTransactions.Utility.checkAlreadySold(nftId = buyData.nftId, secondaryMarket = secondaryMarket)
+
+          def validateAndTransfer(makeOrderTx: MakeOrderTransaction, verifyPassword: Boolean, secondaryMarket: SecondaryMarket, buyerKey: Key, balance: MicroNumber, split: Option[Split], collection: Collection, checkAlreadySold: Boolean, creatorAddress: String) = {
+            val royaltyFees = MicroNumber((secondaryMarket.price * buyData.buyQuantity).toBigDecimal * collection.royalty)
             val errors = Seq(
-              if (nftOwner.ownerId == loginState.username) Option(constants.Response.CANNOT_SELL_TO_YOURSELF) else None,
-              if (balance == MicroNumber.zero || balance <= (secondaryMarket.price * quantity)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (secondaryMarket.sellerId == loginState.username) Option(constants.Response.CANNOT_SELL_TO_YOURSELF) else None,
+              if (balance == MicroNumber.zero || balance <= (secondaryMarket.price * buyData.buyQuantity - split.fold(MicroNumber.zero)(_.getBalanceAsMicroNumber) + royaltyFees)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
               if (secondaryMarket.orderId.isEmpty || !makeOrderTx.status.getOrElse(false)) Option(constants.Response.ORDER_NOT_CREATED_ON_BLOCKCHAIN) else None,
-              if (makeOrderTx.secondaryMarketId != secondaryMarket.id || makeOrderTx.nftId != buyData.nftId || makeOrderTx.sellerId != nftOwner.ownerId) Option(constants.Response.INVALID_ORDER) else None,
+              if (makeOrderTx.secondaryMarketId != secondaryMarket.id || makeOrderTx.nftId != buyData.nftId || makeOrderTx.sellerId != secondaryMarket.sellerId) Option(constants.Response.INVALID_ORDER) else None,
             ).flatten
             if (errors.isEmpty) {
               masterTransactionTakeOrderTransactions.Utility.transaction(
                 nftID = buyData.nftId,
-                nftOwner = nftOwner,
-                quantity = 1,
+                quantity = buyData.buyQuantity,
                 buyerId = loginState.username,
                 fromAddress = buyerKey.address,
                 secondaryMarket = secondaryMarket,
                 gasPrice = constants.Blockchain.DefaultGasPrice,
-                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buyData.password))
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buyData.password)),
+                split = split,
+                royaltyFees = royaltyFees,
+                creatorAddress = creatorAddress
               )
-            } else errors.head.throwFutureBaseException()
+            } else errors.head.throwBaseException()
           }
 
           (for {
             secondaryMarket <- secondaryMarket
             makeOrderTx <- makeOrderTx
-            nftOwner <- nftOwner
             (verifyPassword, buyerKey) <- verifyPassword
             balance <- balance
-            checkAlreadySold <- checkAlreadySold
-            blockchainTransaction <- validateAndTransfer(nftOwner = nftOwner, makeOrderTx = makeOrderTx, verifyPassword = verifyPassword, secondaryMarket = secondaryMarket, buyerKey = buyerKey, balance = balance, checkAlreadySold = checkAlreadySold)
+            split <- split
+            collection <- collection(secondaryMarket)
+            creatorAddress <- creatorAddress(collection.creatorId)
+            checkAlreadySold <- checkAlreadySold(secondaryMarket)
+            blockchainTransaction <- validateAndTransfer(makeOrderTx = makeOrderTx, verifyPassword = verifyPassword, secondaryMarket = secondaryMarket, buyerKey = buyerKey, balance = balance, split = split, collection = collection, checkAlreadySold = checkAlreadySold, creatorAddress = creatorAddress)
           } yield PartialContent(views.html.transactionSuccessful(blockchainTransaction))
             ).recover {
             case baseException: BaseException => {

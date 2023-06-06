@@ -17,7 +17,8 @@ import views.nft.companion._
 
 import java.nio.file.Files
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class NFTController @Inject()(
@@ -237,7 +238,7 @@ class NFTController @Inject()(
       def uploadToAws(collection: Collection) = if (collection.creatorId == loginState.username) Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
       else {
         utilities.FileOperations.deleteFile(oldFilePath)
-        constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
+        constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
       }
 
       def deleteLocalFile() = Future(utilities.FileOperations.deleteFile(oldFilePath))
@@ -260,7 +261,7 @@ class NFTController @Inject()(
       val isOwner = masterCollections.Service.isOwner(id = collectionId, accountId = loginState.username)
 
       def optionalNFTDraft(isOwner: Boolean) = if (isOwner) masterTransactionNFTDrafts.Service.get(nftId)
-      else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
+      else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
 
       (for {
         isOwner <- isOwner
@@ -290,7 +291,7 @@ class NFTController @Inject()(
           val isOwner = masterCollections.Service.isOwner(id = basicDetailsData.collectionId, accountId = loginState.username)
 
           def update(isOwner: Boolean) = if (isOwner) masterTransactionNFTDrafts.Service.updateNameDescription(id = basicDetailsData.nftId, name = basicDetailsData.name, description = basicDetailsData.description)
-          else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
+          else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
 
           (for {
             isOwner <- isOwner
@@ -327,7 +328,7 @@ class NFTController @Inject()(
           val collection = masterCollections.Service.tryGet(id = tagsData.collectionId)
 
           def update(collection: Collection) = if (collection.creatorId == loginState.username) masterTransactionNFTDrafts.Service.updateTagNames(id = tagsData.nftId, tagNames = tagsData.getTags)
-          else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
+          else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
 
           (for {
             collection <- collection
@@ -397,7 +398,7 @@ class NFTController @Inject()(
               draft <- updateDraft
               _ <- addToNFT(draft)
             } yield draft.toNFT(collection = collection)
-          } else constants.Response.NOT_COLLECTION_OWNER.throwFutureBaseException()
+          } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
 
           (for {
             collection <- collection
@@ -456,15 +457,32 @@ class NFTController @Inject()(
     }
   }
 
-  def mintForm(nftId: String): Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.nft.mint(nftId = nftId))
+  def mintForm(nftId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val nft = masterNFTs.Service.tryGet(nftId)
+
+      def collection(id: String) = masterCollections.Service.tryGet(id)
+
+      for {
+        nft <- nft
+        collection <- collection(nft.collectionId)
+      } yield if (!nft.isMinted.getOrElse(true)) Ok(views.html.nft.mint(nftId = nftId, collection = collection))
+      else BadRequest(constants.Response.NFT_ALREADY_MINTED.message)
   }
 
   def mint(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Mint.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.nft.mint(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, ""))))
+          val nftId = formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, "")
+          val nft = masterNFTs.Service.tryGet(nftId)
+
+          def collection(id: String) = masterCollections.Service.tryGet(id)
+
+          for {
+            nft <- nft
+            collection <- collection(nft.collectionId)
+          } yield BadRequest(views.html.nft.mint(formWithErrors, nftId, collection))
         },
         mintData => {
           val nft = masterNFTs.Service.tryGet(mintData.nftId)
@@ -499,9 +517,19 @@ class NFTController @Inject()(
             nftOwner <- nftOwner
             (verified, key) <- verifyPassword
             balance <- balance
-          } yield Ok
+            blockchainTransaction <- verifyAndTx(verifyPassword = verified, balance, key, nft, nftOwner, collection)
+          } yield PartialContent(views.html.transactionSuccessful(blockchainTransaction))
             ).recover {
-            case baseException: BaseException => BadRequest(baseException.failure.message)
+            case baseException: BaseException => {
+              try {
+                val nftToMint = Await.result(nft, Duration.Inf)
+                val collectionForBonding = Await.result(collection(nftToMint.collectionId), Duration.Inf)
+                BadRequest(views.html.nft.mint(mintForm = Mint.form.withGlobalError(baseException.failure.message), nftId = mintData.nftId, collection = collectionForBonding))
+              } catch {
+                case exception: Exception => logger.error(exception.getLocalizedMessage)
+                  BadRequest
+              }
+            }
           }
         }
       )
@@ -532,6 +560,7 @@ class NFTController @Inject()(
               if (!nft.isMinted.getOrElse(false)) Option(constants.Response.NFT_NOT_MINTED) else None,
               if (quantity > nftOwner.quantity) Option(constants.Response.INSUFFICIENT_NFT_BALANCE) else None,
               if (!toAccountExists) Option(constants.Response.TO_ACCOUNT_ID_DOES_NOT_EXISTS) else None,
+              if (transferData.toAccountId == loginState.username) Option(constants.Response.CANNOT_SEND_TO_YOURSELF) else None,
             ).flatten
 
             if (errors.isEmpty) {

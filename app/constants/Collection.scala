@@ -1,7 +1,7 @@
 package constants
 
-import schema.data.base.{IDData, StringData}
-import schema.id.base.{IdentityID, PropertyID, StringID}
+import schema.data.base.StringData
+import schema.id.base.{PropertyID, StringID}
 import schema.property.base.{MesaProperty, MetaProperty}
 
 object Collection {
@@ -48,11 +48,11 @@ object Collection {
       MetaProperty(id = PropertyID(keyID = StringID(FILE_HASH), typeID = schema.constants.Data.StringDataTypeID), data = StringData(""))
     )
 
-    def allImmutableMesaProperties(creatorID: IdentityID): Seq[MesaProperty] = Seq(MesaProperty(id = PropertyID(keyID = StringID(CREATOR_ID), typeID = schema.constants.Data.IDDataTypeID), dataID = IDData(creatorID).getDataID))
+    def allImmutableMesaProperties(creatorID: String): Seq[MesaProperty] = Seq(MesaProperty(id = PropertyID(keyID = StringID(CREATOR_ID), typeID = schema.constants.Data.StringDataTypeID), dataID = StringData(creatorID).getDataID))
 
   }
 
-  val RestrictedPropertyList: Seq[String] = Seq(DefaultProperty.NFT_NAME, DefaultProperty.COLLECTION_NAME, DefaultProperty.FILE_HASH, DefaultProperty.BOND_AMOUNT, "supply", "burnHeight")
+  val RestrictedPropertyList: Seq[String] = Seq(DefaultProperty.NFT_NAME, DefaultProperty.COLLECTION_NAME, DefaultProperty.FILE_HASH, DefaultProperty.BOND_AMOUNT, schema.constants.Properties.SupplyProperty.id.keyID.value, schema.constants.Properties.BurnHeightProperty.id.keyID.value)
 
   case class CollectionStatus(name: String, id: Int)
 

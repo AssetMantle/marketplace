@@ -127,7 +127,7 @@ class IssueIdentityTransactions @Inject()(
               issueIdentity <- blockchainTransactionIssueIdentities.Service.add(txHash = txHash, fromAddress = constants.Wallet.IssueIdentityWallet.address, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
               _ <- Service.addWithNoneStatus(txHash = txHash, accountIds = accountIdAddress.keys.toSeq)
             } yield issueIdentity
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwFutureBaseException()
+          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
@@ -215,7 +215,8 @@ class IssueIdentityTransactions @Inject()(
               _ <- updateMasterKeys
             } yield ()
               ).recover {
-              case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+              case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
             }
           } else {
             val markMasterFailed = Service.markFailed(txHash)
@@ -226,7 +227,8 @@ class IssueIdentityTransactions @Inject()(
               _ <- updateMasterKeys
             } yield ()
               ).recover {
-              case _: Exception => logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+              case exception: Exception => logger.error(exception.getLocalizedMessage)
+                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
             }
           }
         } else Future()
