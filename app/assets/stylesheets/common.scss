@@ -1257,6 +1257,9 @@ body.modal-open{
         background-color: var(--line);
         margin: 8px 0px;
       }
+      #bondingAmountContainer{
+        display: none;
+      }
     }
   }
 }
