@@ -78,6 +78,8 @@ class WithLoginAction @Inject()(
         ).recover {
         case baseException: BaseException => logger.info(baseException.failure.message, baseException)
           Results.Unauthorized(views.html.indexWithLoginFormPopup(callbackOnSessionTimeout.url)).withNewSession
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
+          BadRequest
       }
     }
   }

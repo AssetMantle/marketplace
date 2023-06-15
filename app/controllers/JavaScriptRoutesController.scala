@@ -15,6 +15,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
         routes.javascript.Assets.versioned,
+        routes.javascript.PublicResourceController.versioned,
 
         routes.javascript.IndexController.index,
 

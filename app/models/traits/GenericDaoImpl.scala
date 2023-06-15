@@ -16,16 +16,16 @@ abstract class GenericDaoImpl[
   def deleteById(id: PK): Future[Int] = db.run(tableQuery.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => new constants.Response.Failure(module + "_DELETE_FAILED").throwBaseException(psqlException)
-      case noSuchElementException: NoSuchElementException => new constants.Response.Failure(module + "_DELETE_FAILED").throwBaseException(noSuchElementException)
+      case psqlException: PSQLException => constants.Response.Failure(module + "_DELETE_FAILED").throwBaseException(psqlException)
+      case noSuchElementException: NoSuchElementException => constants.Response.Failure(module + "_DELETE_FAILED").throwBaseException(noSuchElementException)
     }
   }
 
   def deleteByIds(ids: Seq[PK]): Future[Unit] = db.run(tableQuery.filter(_.id.inSet(ids)).delete.asTry).map {
     case Success(result) => ()
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => new constants.Response.Failure(module + "_DELETE_FAILED").throwBaseException(psqlException)
-      case noSuchElementException: NoSuchElementException => new constants.Response.Failure(module + "_DELETE_FAILED").throwBaseException(noSuchElementException)
+      case psqlException: PSQLException => constants.Response.Failure(module + "_DELETE_FAILED").throwBaseException(psqlException)
+      case noSuchElementException: NoSuchElementException => constants.Response.Failure(module + "_DELETE_FAILED").throwBaseException(noSuchElementException)
     }
   }
 
@@ -38,15 +38,15 @@ abstract class GenericDaoImpl[
   def tryGetById(id: PK): Future[E] = db.run(tableQuery.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => new constants.Response.Failure(module + "_NOT_FOUND").throwBaseException(noSuchElementException)
+      case noSuchElementException: NoSuchElementException => constants.Response.Failure(module + "_NOT_FOUND").throwBaseException(noSuchElementException)
     }
   }
 
   def updateById(update: E): Future[Unit] = db.run(tableQuery.filter(_.id === update.id).update(update).asTry).map {
     case Success(result) => ()
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => new constants.Response.Failure(module + "_UPDATE_FAILED").throwBaseException(psqlException)
-      case noSuchElementException: NoSuchElementException => new constants.Response.Failure(module + "_UPDATE_FAILED").throwBaseException(noSuchElementException)
+      case psqlException: PSQLException => constants.Response.Failure(module + "_UPDATE_FAILED").throwBaseException(psqlException)
+      case noSuchElementException: NoSuchElementException => constants.Response.Failure(module + "_UPDATE_FAILED").throwBaseException(noSuchElementException)
     }
   }
 }

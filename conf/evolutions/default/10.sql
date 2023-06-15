@@ -10,16 +10,8 @@ ALTER TABLE BLOCKCHAIN_TRANSACTION."SendCoin"
     DROP COLUMN IF EXISTS "txRawBytes";
 
 ALTER TABLE MASTER_TRANSACTION."PublicListingNFTTransaction"
-    ADD COLUMN IF NOT EXISTS "amount" VARCHAR NOT NULL DEFAULT '[]';
-ALTER TABLE MASTER_TRANSACTION."PublicListingNFTTransaction"
-    ADD COLUMN IF NOT EXISTS "toAddress" VARCHAR NOT NULL DEFAULT '';
-ALTER TABLE MASTER_TRANSACTION."PublicListingNFTTransaction"
     DROP CONSTRAINT IF EXISTS "PublicListingNFTTransaction_buyerAccountId_sellerAccountId__key";
 
-ALTER TABLE MASTER_TRANSACTION."SaleNFTTransaction"
-    ADD COLUMN IF NOT EXISTS "amount" VARCHAR NOT NULL DEFAULT '[]';
-ALTER TABLE MASTER_TRANSACTION."SaleNFTTransaction"
-    ADD COLUMN IF NOT EXISTS "toAddress" VARCHAR NOT NULL DEFAULT '';
 ALTER TABLE MASTER_TRANSACTION."SaleNFTTransaction"
     DROP CONSTRAINT IF EXISTS "BuyNFTTransaction_buyerAccountId_sellerAccountId_txHash_nft_key";
 
@@ -176,7 +168,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."DefineAssetTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
+    PRIMARY KEY ("txHash", "collectionId")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ExternalAsset"
@@ -203,7 +195,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueIdentityTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
+    PRIMARY KEY ("txHash", "accountId")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."LatestBlock"
@@ -241,13 +233,13 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."MintAssetTransaction"
 (
     "txHash"               VARCHAR NOT NULL,
     "nftID"                VARCHAR NOT NULL,
-    "minterAccountID"      VARCHAR NOT NULL,
+    "toAccountID"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
+    PRIMARY KEY ("txHash", "nftID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NFTMintingFeeTransaction"
@@ -428,9 +420,6 @@ ALTER TABLE MASTER_TRANSACTION."PublicListingNFTTransaction"
 ALTER TABLE MASTER_TRANSACTION."SaleNFTTransaction"
     ADD COLUMN IF NOT EXISTS "mintOnSuccess" BOOLEAN NOT NULL DEFAULT false;
 
-ALTER TABLE BLOCKCHAIN_TRANSACTION."AdminTransaction"
-    ADD CONSTRAINT AdminTransaction_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
-
 ALTER TABLE BLOCKCHAIN_TRANSACTION."UserTransaction"
     ADD CONSTRAINT UserTransaction_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 
@@ -471,7 +460,7 @@ ALTER TABLE MASTER_TRANSACTION."MintAssetTransaction"
 ALTER TABLE MASTER_TRANSACTION."MintAssetTransaction"
     ADD CONSTRAINT MintAssetTransaction_NFTId FOREIGN KEY ("nftID") REFERENCES MASTER."NFT" ("id");
 ALTER TABLE MASTER_TRANSACTION."MintAssetTransaction"
-    ADD CONSTRAINT MintAssetTransaction_MinterAccountId FOREIGN KEY ("minterAccountID") REFERENCES MASTER."Account" ("id");
+    ADD CONSTRAINT MintAssetTransaction_ToAccountID FOREIGN KEY ("toAccountID") REFERENCES MASTER."Account" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."NFTMintingFeeTransaction"
     ADD CONSTRAINT NFTMintingFeeTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");

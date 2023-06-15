@@ -90,20 +90,13 @@ class NFTPublicListings @Inject()(
 
       def bcTxs(txHashes: Seq[String]) = blockchainTransactions.Utility.getByHashes(txHashes)
 
-      def update(allNFTPublicLsitingTxs: Seq[NFTPublicListing], publicListingNFTTxs: Seq[PublicListingNFTTransaction], txs: Seq[Transaction]) = {
-        utilitiesOperations.traverse(publicListingNFTTxs) { publicListingNFTTx =>
-          val tx = Future(allNFTPublicLsitingTxs.find(_.txHash == publicListingNFTTx.txHash).getOrElse(constants.Response.NFT_PUBLIC_LISTING_SALE_NOT_FOUND.throwBaseException()))
-
-          def updateMaster(tx: NFTPublicListing) = publicListingNFTTransactions.Service.update(publicListingNFTTx.copy(toAddress = tx.toAddress, amount = tx.amount))
-
-          def addUserTx(tx: NFTPublicListing) = userTransactions.Service.add(UserTransaction(txHash = tx.txHash, accountId = publicListingNFTTx.buyerAccountId, fromAddress = tx.fromAddress, status = tx.status, memo = tx.memo, timeoutHeight = tx.timeoutHeight, log = tx.log, txHeight = txs.find(_.hash == publicListingNFTTx.txHash).map(_.height), txType = constants.Transaction.User.PUBLIC_SALE, createdBy = tx.createdBy, createdOnMillisEpoch = tx.createdOnMillisEpoch, updatedBy = tx.updatedBy, updatedOnMillisEpoch = tx.updatedOnMillisEpoch))
-
-          for {
-            tx <- tx
-            _ <- addUserTx(tx)
-            _ <- updateMaster(tx)
-          } yield ()
+      def update(allNFTPublicListingTxs: Seq[NFTPublicListing], publicListingNFTTxs: Seq[PublicListingNFTTransaction], txs: Seq[Transaction]) = {
+        val userTxs = publicListingNFTTxs.map(_.txHash).distinct.map { publicListingNFTTxHash =>
+          val tx = allNFTPublicListingTxs.find(_.txHash == publicListingNFTTxHash).getOrElse(constants.Response.NFT_WHITELIST_SALE_NOT_FOUND.throwBaseException())
+          val nftSale = publicListingNFTTxs.find(_.txHash == publicListingNFTTxHash).get
+          UserTransaction(txHash = tx.txHash, accountId = nftSale.buyerAccountId, fromAddress = tx.fromAddress, status = tx.status, memo = tx.memo, timeoutHeight = tx.timeoutHeight, log = tx.log, txHeight = txs.find(_.hash == nftSale.txHash).map(_.height), txType = constants.Transaction.User.WHITELIST_SALE, createdBy = tx.createdBy, createdOnMillisEpoch = tx.createdOnMillisEpoch, updatedBy = tx.updatedBy, updatedOnMillisEpoch = tx.updatedOnMillisEpoch)
         }
+        userTransactions.Service.add(userTxs)
       }
 
 

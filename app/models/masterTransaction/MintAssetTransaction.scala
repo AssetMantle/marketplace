@@ -18,23 +18,25 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class MintAssetTransaction(txHash: String, nftID: String, minterAccountID: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
-  def id: String = txHash
+case class MintAssetTransaction(txHash: String, nftID: String, toAccountID: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, String] {
+  def id1: String = txHash
+
+  def id2: String = nftID
 
   def getIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.nftID)
 }
 
 private[masterTransaction] object MintAssetTransactions {
 
-  class MintAssetTransactionTable(tag: Tag) extends Table[MintAssetTransaction](tag, "MintAssetTransaction") with ModelTable[String] {
+  class MintAssetTransactionTable(tag: Tag) extends Table[MintAssetTransaction](tag, "MintAssetTransaction") with ModelTable2[String, String] {
 
-    def * = (txHash, nftID, minterAccountID, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (MintAssetTransaction.tupled, MintAssetTransaction.unapply)
+    def * = (txHash, nftID, toAccountID, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (MintAssetTransaction.tupled, MintAssetTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
     def nftID = column[String]("nftID")
 
-    def minterAccountID = column[String]("minterAccountID")
+    def toAccountID = column[String]("toAccountID")
 
     def status = column[Boolean]("status")
 
@@ -46,7 +48,9 @@ private[masterTransaction] object MintAssetTransactions {
 
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def id = txHash
+    def id1 = txHash
+
+    def id2 = nftID
 
   }
 
@@ -69,7 +73,7 @@ class MintAssetTransactions @Inject()(
                                        utilitiesNotification: utilities.Notification,
                                        adminTransactions: AdminTransactions,
                                      )(implicit val executionContext: ExecutionContext)
-  extends GenericDaoImpl[MintAssetTransactions.MintAssetTransactionTable, MintAssetTransaction, String]() {
+  extends GenericDaoImpl2[MintAssetTransactions.MintAssetTransactionTable, MintAssetTransaction, String, String]() {
 
   implicit val logger: Logger = Logger(this.getClass)
 
@@ -79,7 +83,7 @@ class MintAssetTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, nftIDs: Seq[String], minterAccountIDs: Map[String, String]): Future[Int] = create(nftIDs.map(x => MintAssetTransaction(txHash = txHash, nftID = x, minterAccountID = minterAccountIDs.getOrElse(x, constants.Response.NFT_OWNER_NOT_FOUND.throwBaseException()), status = None)))
+    def addWithNoneStatus(txHash: String, nftIDs: Seq[String], toAccountIDs: Map[String, String]): Future[Int] = create(nftIDs.map(x => MintAssetTransaction(txHash = txHash, nftID = x, toAccountID = toAccountIDs.getOrElse(x, constants.Response.NFT_OWNER_NOT_FOUND.throwBaseException()), status = None)))
 
     def getByTxHash(txHash: String): Future[Seq[MintAssetTransaction]] = filter(_.txHash === txHash)
 
@@ -122,7 +126,7 @@ class MintAssetTransactions @Inject()(
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
               adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Wallet.MintAssetWallet.address, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.MINT_ASSET)
-              _ <- Service.addWithNoneStatus(txHash = txHash, nftIDs = nftIDs, minterAccountIDs = nftOwners.map(x => x.nftId -> x.ownerId).toMap)
+              _ <- Service.addWithNoneStatus(txHash = txHash, nftIDs = nftIDs, toAccountIDs = nftOwners.map(x => x.nftId -> x.ownerId).toMap)
             } yield adminTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
@@ -220,7 +224,7 @@ class MintAssetTransactions @Inject()(
             def checkForAirDrop(nftIDs: Seq[String]) = {
               val ineligibles = campaignIneligibleMintNFTAirDrops.Service.getIneligibles(nftIDs)
 
-              def toBeDropped(ineligibles: Seq[String]) = campaignMintNFTAirDrops.Service.filterExisting(mintAssetTxs.filterNot(x => ineligibles.contains(x.nftID)).filter(_.txHash == txHash).map(_.minterAccountID))
+              def toBeDropped(ineligibles: Seq[String]) = campaignMintNFTAirDrops.Service.filterExisting(mintAssetTxs.filterNot(x => ineligibles.contains(x.nftID)).filter(_.txHash == txHash).map(_.toAccountID))
 
               def keys(toBeDropped: Seq[String]) = if (toBeDropped.nonEmpty) masterKeys.Service.getAllActiveKeys(toBeDropped) else Future(Seq())
 

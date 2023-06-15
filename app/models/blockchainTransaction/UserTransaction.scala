@@ -91,8 +91,6 @@ class UserTransactions @Inject()(
 
     def add(userTransactions: Seq[UserTransaction]): Future[Int] = create(userTransactions)
 
-    def update(userTransaction: UserTransaction): Future[Unit] = updateById(userTransaction)
-
     def tryGet(txHash: String): Future[UserTransaction] = tryGetById(txHash)
 
     def markSuccess(txHashes: Seq[String], height: Int): Future[Int] = customUpdate(tableQuery.filter(_.txHash.inSet(txHashes)).map(x => (x.status, x.txHeight)).update((true, height)))
@@ -136,14 +134,14 @@ class UserTransactions @Inject()(
       val broadcastTx = broadcastTxSync.Service.get(userTransaction.getTxRawAsHexString(txRawBytes))
 
       def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = {
-        val updatedUserTransaction = if (errorResponse.nonEmpty) userTransaction.copy(status = Option(false), log = Option(errorResponse.get.error.data))
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) userTransaction.copy(status = Option(false), log = Option(successResponse.get.result.log))
-        else userTransaction
+        val log = if (errorResponse.nonEmpty) Option(errorResponse.get.error.data)
+        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) Option(successResponse.get.result.log)
+        else None
 
-        val updateUserTransaction = if (userTransaction.status.nonEmpty) Service.update(updatedUserTransaction) else Future()
+        val updateUserTx = if (log.nonEmpty) Service.markFailedWithLog(userTransaction.txHash, log.get) else Future()
         for {
-          _ <- updateUserTransaction
-        } yield updatedUserTransaction
+          _ <- updateUserTx
+        } yield userTransaction.copy(status = Option(false), log = log)
       }
 
       for {

@@ -13,7 +13,7 @@ import service.Starter
 
 import javax.inject._
 import scala.concurrent.duration.{DAYS, Duration}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class IndexController @Inject()(
@@ -58,7 +58,7 @@ class IndexController @Inject()(
 
   implicit val module: String = constants.Module.INDEX_CONTROLLER
 
-  implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
+  implicit val callbackOnSessionTimeout: Call = routes.SecondaryMarketController.viewCollections()
 
   def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
@@ -71,52 +71,60 @@ class IndexController @Inject()(
     }
   }
 
-  Await.result(starter.fixMantleMonkeys(), Duration.Inf)
-  Await.result(starter.correctCollectionProperties(), Duration.Inf)
-  Await.result(nftPublicListings.Utility.migrate, Duration.Inf)
-  Await.result(nftSales.Utility.migrate, Duration.Inf)
-  Await.result(sendCoins.Utility.migrate, Duration.Inf)
-  starter.changeAwsKey()
+  //  try {
+  //    Await.result(starter.fixMantleMonkeys(), Duration.Inf)
+  //    Await.result(starter.correctCollectionProperties(), Duration.Inf)
+  //    Await.result(nftPublicListings.Utility.migrate, Duration.Inf)
+  //    Await.result(nftSales.Utility.migrate, Duration.Inf)
+  //    Await.result(sendCoins.Utility.migrate, Duration.Inf)
+  //  } catch {
+  //    case exception: Exception => logger.error(exception.getLocalizedMessage)
+  //  }
+  //  starter.changeAwsKey()
+  //
+  //  //  starter.start()
+  //
+  //  try {
+  //    Await.result(starter.updateIdentityIDs(), Duration.Inf)
+  //    Await.result(starter.updateAssetIDs(), Duration.Inf)
+  //    Await.result(starter.markMintReady(), Duration.Inf)
+  //    starter.fixAllMultipleActiveKeys()
+  //  } catch {
+  //    case exception: Exception => logger.error(exception.getLocalizedMessage)
+  //  }
 
-  //  starter.start()
+  //  utilities.Scheduler.startSchedulers(
+  //    // blockchain
+  //    blockchainBlocks.Utility.scheduler,
+  //    // blockchainTransaction
+  //    adminTransactions.Utility.scheduler,
+  //    userTransactions.Utility.scheduler,
+  //    // campaign
+  //    mintNFTAirDrops.Utility.scheduler,
+  //    // history
+  //    historyMasterPublicListings.Utility.scheduler,
+  //    historyMasterSales.Utility.scheduler,
+  //    historyMasterSecondaryMarkets.Utility.scheduler,
+  //    // masterTransaction
+  //    cancelOrderTransactions.Utility.scheduler,
+  //    //    defineAssetTransactions.Utility.scheduler,
+  //    //    issueIdentityTransactions.Utility.scheduler,
+  //    masterTransactionLatestBlocks.Utility.scheduler,
+  //    makeOrderTransactions.Utility.scheduler,
+  //    //    mintAssetTransactions.Utility.scheduler,
+  //    nftMintingFeeTransactions.Utility.scheduler,
+  //    nftTransferTransactions.Utility.scheduler,
+  //    provisionAddressTransactions.Utility.scheduler,
+  //    publicListingNFTTransactions.Utility.scheduler,
+  //    saleNFTTransactions.Utility.scheduler,
+  //    masterTransactionSessionTokens.Utility.scheduler,
+  //    sendCoinTransactions.Utility.scheduler,
+  //    takeOrderTransactions.Utility.scheduler,
+  //    masterTransactionTokenPrices.Utility.scheduler,
+  //    unprovisionAddressTransactions.Utility.scheduler,
+  //    unwrapTransactions.Utility.scheduler,
+  //    wrapTransactions.Utility.scheduler,
+  //  )
 
-  Await.result(starter.updateIdentityIDs(), Duration.Inf)
-  Await.result(starter.updateAssetIDs(), Duration.Inf)
-  Await.result(starter.markMintReady(), Duration.Inf)
-  starter.fixAllMultipleActiveKeys()
-
-  utilities.Scheduler.startSchedulers(
-    // blockchain
-    blockchainBlocks.Utility.scheduler,
-    // blockchainTransaction
-    adminTransactions.Utility.scheduler,
-    userTransactions.Utility.scheduler,
-    // campaign
-    mintNFTAirDrops.Utility.scheduler,
-    // history
-    historyMasterPublicListings.Utility.scheduler,
-    historyMasterSales.Utility.scheduler,
-    historyMasterSecondaryMarkets.Utility.scheduler,
-    // masterTransaction
-    cancelOrderTransactions.Utility.scheduler,
-    defineAssetTransactions.Utility.scheduler,
-    issueIdentityTransactions.Utility.scheduler,
-    masterTransactionLatestBlocks.Utility.scheduler,
-    makeOrderTransactions.Utility.scheduler,
-    mintAssetTransactions.Utility.scheduler,
-    nftMintingFeeTransactions.Utility.scheduler,
-    nftTransferTransactions.Utility.scheduler,
-    provisionAddressTransactions.Utility.scheduler,
-    publicListingNFTTransactions.Utility.scheduler,
-    saleNFTTransactions.Utility.scheduler,
-    masterTransactionSessionTokens.Utility.scheduler,
-    sendCoinTransactions.Utility.scheduler,
-    takeOrderTransactions.Utility.scheduler,
-    masterTransactionTokenPrices.Utility.scheduler,
-    unprovisionAddressTransactions.Utility.scheduler,
-    unwrapTransactions.Utility.scheduler,
-    wrapTransactions.Utility.scheduler,
-  )
-
-  coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())
+  //  coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())
 }

@@ -11,7 +11,6 @@ import models.{analytics, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.Json
 import slick.jdbc.H2Profile.api._
 import utilities.MicroNumber
 
@@ -19,7 +18,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class SaleNFTTransaction(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, mintOnSuccess: Boolean, saleId: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class SaleNFTTransaction(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, mintOnSuccess: Boolean, saleId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def serialize: SaleNFTTransactions.SaleNFTTransactionSerialize = SaleNFTTransactions.SaleNFTTransactionSerialize(
     txHash = this.txHash,
@@ -28,8 +27,6 @@ case class SaleNFTTransaction(txHash: String, nftId: String, buyerAccountId: Str
     sellerAccountId = this.sellerAccountId,
     mintOnSuccess = this.mintOnSuccess,
     saleId = this.saleId,
-    toAddress = this.toAddress,
-    amount = Json.toJson(this.amount).toString,
     status = this.status,
     createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
   )
@@ -37,7 +34,7 @@ case class SaleNFTTransaction(txHash: String, nftId: String, buyerAccountId: Str
 
 private[masterTransaction] object SaleNFTTransactions {
 
-  case class SaleNFTTransactionSerialize(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, mintOnSuccess: Boolean, saleId: String, toAddress: String, amount: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] {
+  case class SaleNFTTransactionSerialize(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, mintOnSuccess: Boolean, saleId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] {
     def id1: String = txHash
 
     def id2: String = nftId
@@ -49,8 +46,6 @@ private[masterTransaction] object SaleNFTTransactions {
       sellerAccountId = this.sellerAccountId,
       mintOnSuccess = this.mintOnSuccess,
       saleId = this.saleId,
-      toAddress = this.toAddress,
-      amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](this.amount),
       status = this.status,
       createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
     )
@@ -58,7 +53,7 @@ private[masterTransaction] object SaleNFTTransactions {
 
   class SaleNFTTransactionTable(tag: Tag) extends Table[SaleNFTTransactionSerialize](tag, "SaleNFTTransaction") with ModelTable2[String, String] {
 
-    def * = (txHash, nftId, buyerAccountId, sellerAccountId, mintOnSuccess, saleId, toAddress, amount, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SaleNFTTransactionSerialize.tupled, SaleNFTTransactionSerialize.unapply)
+    def * = (txHash, nftId, buyerAccountId, sellerAccountId, mintOnSuccess, saleId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SaleNFTTransactionSerialize.tupled, SaleNFTTransactionSerialize.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
@@ -71,10 +66,6 @@ private[masterTransaction] object SaleNFTTransactions {
     def mintOnSuccess = column[Boolean]("mintOnSuccess")
 
     def saleId = column[String]("saleId")
-
-    def toAddress = column[String]("toAddress")
-
-    def amount = column[String]("amount")
 
     def status = column[Boolean]("status")
 
@@ -114,7 +105,7 @@ class SaleNFTTransactions @Inject()(
   val tableQuery = new TableQuery(tag => new SaleNFTTransactionTable(tag))
 
   object Service {
-    def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftIds: Seq[String], saleId: String, toAddress: String, amount: Seq[Coin], mintOnSuccess: Boolean): Future[Int] = create(nftIds.map(x => SaleNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = x, saleId = saleId, toAddress = toAddress, amount = amount, status = None, mintOnSuccess = mintOnSuccess).serialize))
+    def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftIds: Seq[String], saleId: String, mintOnSuccess: Boolean): Future[Int] = create(nftIds.map(x => SaleNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = x, saleId = saleId, status = None, mintOnSuccess = mintOnSuccess).serialize))
 
     def update(saleNFTTransaction: SaleNFTTransaction): Future[Int] = updateById1AndId2(saleNFTTransaction.serialize)
 
@@ -174,7 +165,7 @@ class SaleNFTTransactions @Inject()(
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
               nftSale <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = buyerAccountId, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.User.WHITELIST_SALE)
-              _ <- Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, saleId = saleId, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), mintOnSuccess = mintOnSuccess)
+              _ <- Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, saleId = saleId, mintOnSuccess = mintOnSuccess)
             } yield nftSale
           }
           else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()

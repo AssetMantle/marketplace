@@ -26,14 +26,14 @@ abstract class CommonGenericDao[E, T <: Table[E]]()(implicit executionContext: E
   def create(entity: E): Future[E] = db.run((tableQuery returning tableQuery += entity).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => new constants.Response.Failure(module + "_INSERT_FAILED").throwBaseException(psqlException)
+      case psqlException: PSQLException => constants.Response.Failure(module + "_INSERT_FAILED").throwBaseException(psqlException)
     }
   }
 
   def create(entities: Seq[E]): Future[Int] = if (entities.nonEmpty) db.run((tableQuery ++= entities).asTry).map {
     case Success(result) => result.getOrElse(0)
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => new constants.Response.Failure(module + "_INSERT_FAILED").throwBaseException(psqlException)
+      case psqlException: PSQLException => constants.Response.Failure(module + "_INSERT_FAILED").throwBaseException(psqlException)
     }
   } else Future(0)
 
@@ -42,8 +42,8 @@ abstract class CommonGenericDao[E, T <: Table[E]]()(implicit executionContext: E
   def customQuery[C](query: DBIOAction[C, _, _]): Future[C] = db.run(query.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => new constants.Response.Failure(module + "_UPDATE_FAILED").throwBaseException(psqlException)
-      case noSuchElementException: NoSuchElementException => new constants.Response.Failure(module + "_NOT_FOUND").throwBaseException(noSuchElementException)
+      case psqlException: PSQLException => constants.Response.Failure(module + "_UPDATE_FAILED").throwBaseException(psqlException)
+      case noSuchElementException: NoSuchElementException => constants.Response.Failure(module + "_NOT_FOUND").throwBaseException(noSuchElementException)
     }
   }
 
@@ -52,15 +52,15 @@ abstract class CommonGenericDao[E, T <: Table[E]]()(implicit executionContext: E
   def customUpdate[C](updateQuery: DBIOAction[C, NoStream, Effect.Write]): Future[C] = db.run(updateQuery.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => new constants.Response.Failure(module + "_UPDATE_FAILED").throwBaseException(psqlException)
-      case noSuchElementException: NoSuchElementException => new constants.Response.Failure(module + "_UPDATE_FAILED").throwBaseException(noSuchElementException)
+      case psqlException: PSQLException => constants.Response.Failure(module + "_UPDATE_FAILED").throwBaseException(psqlException)
+      case noSuchElementException: NoSuchElementException => constants.Response.Failure(module + "_UPDATE_FAILED").throwBaseException(noSuchElementException)
     }
   }
 
   def deleteAll(): Future[Unit] = db.run(sqlu"""TRUNCATE TABLE ${tableQuery.baseTableRow.tableName} RESTART IDENTITY CASCADE""".asTry).map {
     case Success(result) => ()
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => new constants.Response.Failure(module + "_DELETE_ALL_FAILED").throwBaseException(psqlException)
+      case psqlException: PSQLException => constants.Response.Failure(module + "_DELETE_ALL_FAILED").throwBaseException(psqlException)
     }
   }
 
@@ -75,7 +75,7 @@ abstract class CommonGenericDao[E, T <: Table[E]]()(implicit executionContext: E
   def filterHead[C <: Rep[_]](expr: T => C)(implicit wt: CanBeQueryCondition[C]): Future[E] = db.run(tableQuery.filter(expr).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => new constants.Response.Failure(module + "_NOT_FOUND").throwBaseException(noSuchElementException)
+      case noSuchElementException: NoSuchElementException => constants.Response.Failure(module + "_NOT_FOUND").throwBaseException(noSuchElementException)
     }
   }
 
@@ -84,7 +84,7 @@ abstract class CommonGenericDao[E, T <: Table[E]]()(implicit executionContext: E
   def filterAndSortHead[C1 <: Rep[_], C2 <: Rep[_]](filterExpr: T => C1)(sortExpr: T => Ordered)(implicit wt: CanBeQueryCondition[C1]): Future[E] = db.run(tableQuery.filter(filterExpr).sorted(sortExpr).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => new constants.Response.Failure(module + "_NOT_FOUND").throwBaseException(noSuchElementException)
+      case noSuchElementException: NoSuchElementException => constants.Response.Failure(module + "_NOT_FOUND").throwBaseException(noSuchElementException)
     }
   }
 
@@ -95,7 +95,7 @@ abstract class CommonGenericDao[E, T <: Table[E]]()(implicit executionContext: E
   def filterAndSortWithOrderHead[C1 <: Rep[_], C2 <: Rep[_]](filterExpr: T => C1)(sortExpr: T => Ordered)(implicit wt: CanBeQueryCondition[C1]): Future[E] = db.run(tableQuery.filter(filterExpr).sorted(sortExpr).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => new constants.Response.Failure(module + "_NOT_FOUND").throwBaseException(noSuchElementException)
+      case noSuchElementException: NoSuchElementException => constants.Response.Failure(module + "_NOT_FOUND").throwBaseException(noSuchElementException)
     }
   }
 
@@ -106,14 +106,14 @@ abstract class CommonGenericDao[E, T <: Table[E]]()(implicit executionContext: E
   def upsert(entity: E): Future[Int] = db.run(tableQuery.insertOrUpdate(entity).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => new constants.Response.Failure(module + "_UPSERT_FAILED").throwBaseException(psqlException)
+      case psqlException: PSQLException => constants.Response.Failure(module + "_UPSERT_FAILED").throwBaseException(psqlException)
     }
   }
 
   def upsertMultiple(entities: Seq[E]): Future[Int] = db.run(DBIO.sequence(entities.map(entity => tableQuery.insertOrUpdate(entity))).asTry).map {
     case Success(result) => result.sum
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => new constants.Response.Failure(module + "_UPSERT_FAILED").throwBaseException(psqlException)
+      case psqlException: PSQLException => constants.Response.Failure(module + "_UPSERT_FAILED").throwBaseException(psqlException)
     }
   }
 }

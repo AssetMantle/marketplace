@@ -11,7 +11,6 @@ import models.{analytics, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.Json
 import slick.jdbc.H2Profile.api._
 import utilities.MicroNumber
 
@@ -19,7 +18,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class PublicListingNFTTransaction(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, mintOnSuccess: Boolean, publicListingId: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class PublicListingNFTTransaction(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, mintOnSuccess: Boolean, publicListingId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def serialize: PublicListingNFTTransactions.PublicListingNFTTransactionSerialize = PublicListingNFTTransactions.PublicListingNFTTransactionSerialize(
     txHash = this.txHash,
@@ -28,14 +27,12 @@ case class PublicListingNFTTransaction(txHash: String, nftId: String, buyerAccou
     sellerAccountId = this.sellerAccountId,
     mintOnSuccess = this.mintOnSuccess,
     publicListingId = this.publicListingId,
-    toAddress = this.toAddress,
-    amount = Json.toJson(this.amount).toString,
     status = this.status,
     createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
 private[masterTransaction] object PublicListingNFTTransactions {
-  case class PublicListingNFTTransactionSerialize(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, mintOnSuccess: Boolean, publicListingId: String, toAddress: String, amount: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] {
+  case class PublicListingNFTTransactionSerialize(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, mintOnSuccess: Boolean, publicListingId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] {
     def id1: String = txHash
 
     def id2: String = nftId
@@ -47,15 +44,13 @@ private[masterTransaction] object PublicListingNFTTransactions {
       sellerAccountId = this.sellerAccountId,
       mintOnSuccess = this.mintOnSuccess,
       publicListingId = this.publicListingId,
-      toAddress = this.toAddress,
-      amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](this.amount),
       status = this.status,
       createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
   }
 
   class PublicListingNFTTransactionTable(tag: Tag) extends Table[PublicListingNFTTransactionSerialize](tag, "PublicListingNFTTransaction") with ModelTable2[String, String] {
 
-    def * = (txHash, nftId, buyerAccountId, sellerAccountId, mintOnSuccess, publicListingId, toAddress, amount, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (PublicListingNFTTransactionSerialize.tupled, PublicListingNFTTransactionSerialize.unapply)
+    def * = (txHash, nftId, buyerAccountId, sellerAccountId, mintOnSuccess, publicListingId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (PublicListingNFTTransactionSerialize.tupled, PublicListingNFTTransactionSerialize.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
@@ -68,10 +63,6 @@ private[masterTransaction] object PublicListingNFTTransactions {
     def mintOnSuccess = column[Boolean]("mintOnSuccess")
 
     def publicListingId = column[String]("publicListingId")
-
-    def toAddress = column[String]("toAddress")
-
-    def amount = column[String]("amount")
 
     def status = column[Boolean]("status")
 
@@ -114,7 +105,7 @@ class PublicListingNFTTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftIds: Seq[String], publicListingId: String, toAddress: String, amount: Seq[Coin], mintOnSuccess: Boolean): Future[Int] = create(nftIds.map(x => PublicListingNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = x, publicListingId = publicListingId, toAddress = toAddress, amount = amount, status = None, mintOnSuccess = mintOnSuccess).serialize))
+    def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftIds: Seq[String], publicListingId: String, mintOnSuccess: Boolean): Future[Int] = create(nftIds.map(x => PublicListingNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = x, publicListingId = publicListingId, status = None, mintOnSuccess = mintOnSuccess).serialize))
 
     def update(publicListingNFTTransaction: PublicListingNFTTransaction): Future[Int] = updateById1AndId2(publicListingNFTTransaction.serialize)
 
@@ -170,7 +161,7 @@ class PublicListingNFTTransactions @Inject()(
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
               userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = buyerAccountId, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.User.PUBLIC_SALE)
-              _ <- Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, publicListingId = publicListingId, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), mintOnSuccess = mintOnSuccess)
+              _ <- Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, publicListingId = publicListingId, mintOnSuccess = mintOnSuccess)
             } yield userTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }

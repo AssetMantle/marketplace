@@ -91,21 +91,13 @@ class NFTSales @Inject()(
       def bcTxs(txHashes: Seq[String]) = blockchainTransactions.Utility.getByHashes(txHashes)
 
       def update(allNFTSaleTxs: Seq[NFTSale], nftSales: Seq[SaleNFTTransaction], txs: Seq[Transaction]) = {
-        utilitiesOperations.traverse(nftSales) { nftSale =>
-          val tx = Future(allNFTSaleTxs.find(_.txHash == nftSale.txHash).getOrElse(constants.Response.NFT_WHITELIST_SALE_NOT_FOUND.throwBaseException()))
-
-          def updateMaster(tx: NFTSale) = saleNFTTransactions.Service.update(nftSale.copy(toAddress = tx.toAddress, amount = tx.amount))
-
-          def addUserTx(tx: NFTSale) = userTransactions.Service.add(UserTransaction(txHash = tx.txHash, accountId = nftSale.buyerAccountId, fromAddress = tx.fromAddress, status = tx.status, memo = tx.memo, timeoutHeight = tx.timeoutHeight, log = tx.log, txHeight = txs.find(_.hash == nftSale.txHash).map(_.height), txType = constants.Transaction.User.WHITELIST_SALE, createdBy = tx.createdBy, createdOnMillisEpoch = tx.createdOnMillisEpoch, updatedBy = tx.updatedBy, updatedOnMillisEpoch = tx.updatedOnMillisEpoch))
-
-          for {
-            tx <- tx
-            _ <- addUserTx(tx)
-            _ <- updateMaster(tx)
-          } yield ()
+        val userTxs = nftSales.map(_.txHash).distinct.map { nftSaleTxHash =>
+          val tx = allNFTSaleTxs.find(_.txHash == nftSaleTxHash).getOrElse(constants.Response.NFT_WHITELIST_SALE_NOT_FOUND.throwBaseException())
+          val nftSale = nftSales.find(_.txHash == nftSaleTxHash).get
+          UserTransaction(txHash = tx.txHash, accountId = nftSale.buyerAccountId, fromAddress = tx.fromAddress, status = tx.status, memo = tx.memo, timeoutHeight = tx.timeoutHeight, log = tx.log, txHeight = txs.find(_.hash == nftSale.txHash).map(_.height), txType = constants.Transaction.User.WHITELIST_SALE, createdBy = tx.createdBy, createdOnMillisEpoch = tx.createdOnMillisEpoch, updatedBy = tx.updatedBy, updatedOnMillisEpoch = tx.updatedOnMillisEpoch)
         }
+        userTransactions.Service.add(userTxs)
       }
-
 
       (for {
         allNFTSaleTxs <- allNFTSaleTxs

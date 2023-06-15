@@ -249,11 +249,14 @@ class Starter @Inject()(
       logger.info("Copied all NFTs: " + migrated)
     }
 
-    for {
+    (for {
       nfts <- nfts
       nftDrafts <- nftDrafts
       collections <- collections
     } yield updateKey(nfts, nftDrafts, collections)
+      ).recover {
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+    }
   }
 
   def updateAssetIDs(): Future[Unit] = {

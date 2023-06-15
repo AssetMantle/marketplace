@@ -15,20 +15,22 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class DefineAssetTransaction(txHash: String, collectionId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
-  def id: String = txHash
+case class DefineAssetTransaction(txHash: String, collectionId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, String] {
+  def id1: String = txHash
+
+  def id2: String = collectionId
 
 }
 
 private[masterTransaction] object DefineAssetTransactions {
 
-  class DefineAssetTransactionTable(tag: Tag) extends Table[DefineAssetTransaction](tag, "DefineAssetTransaction") with ModelTable[String] {
+  class DefineAssetTransactionTable(tag: Tag) extends Table[DefineAssetTransaction](tag, "DefineAssetTransaction") with ModelTable2[String, String] {
 
     def * = (txHash, collectionId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (DefineAssetTransaction.tupled, DefineAssetTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
-    def collectionId = column[String]("collectionId")
+    def collectionId = column[String]("collectionId", O.PrimaryKey)
 
     def status = column[Boolean]("status")
 
@@ -40,7 +42,9 @@ private[masterTransaction] object DefineAssetTransactions {
 
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def id = txHash
+    def id1 = txHash
+
+    def id2 = collectionId
 
   }
 
@@ -55,7 +59,7 @@ class DefineAssetTransactions @Inject()(
                                          adminTransactions: AdminTransactions,
                                          masterCollections: master.Collections,
                                        )(implicit val executionContext: ExecutionContext)
-  extends GenericDaoImpl[DefineAssetTransactions.DefineAssetTransactionTable, DefineAssetTransaction, String]() {
+  extends GenericDaoImpl2[DefineAssetTransactions.DefineAssetTransactionTable, DefineAssetTransaction, String, String]() {
 
   implicit val logger: Logger = Logger(this.getClass)
 

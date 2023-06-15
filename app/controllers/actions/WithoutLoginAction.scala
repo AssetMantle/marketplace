@@ -20,6 +20,8 @@ class WithoutLoginAction @Inject()(messagesControllerComponents: MessagesControl
         f(request)
       } catch {
         case baseException: BaseException => Results.InternalServerError(views.html.index()).withNewSession
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
+          BadRequest
       }
     }
   }

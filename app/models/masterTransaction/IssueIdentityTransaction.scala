@@ -17,21 +17,23 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class IssueIdentityTransaction(txHash: String, accountId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
-  def id: String = txHash
+case class IssueIdentityTransaction(txHash: String, accountId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, String] {
+  def id1: String = txHash
+
+  def id2: String = accountId
 
   def getIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.accountId)
 }
 
 private[masterTransaction] object IssueIdentityTransactions {
 
-  class IssueIdentityTransactionTable(tag: Tag) extends Table[IssueIdentityTransaction](tag, "IssueIdentityTransaction") with ModelTable[String] {
+  class IssueIdentityTransactionTable(tag: Tag) extends Table[IssueIdentityTransaction](tag, "IssueIdentityTransaction") with ModelTable2[String, String] {
 
     def * = (txHash, accountId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (IssueIdentityTransaction.tupled, IssueIdentityTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
-    def accountId = column[String]("accountId")
+    def accountId = column[String]("accountId", O.PrimaryKey)
 
     def status = column[Boolean]("status")
 
@@ -43,7 +45,9 @@ private[masterTransaction] object IssueIdentityTransactions {
 
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def id = txHash
+    def id1 = txHash
+
+    def id2 = accountId
 
   }
 
@@ -59,7 +63,7 @@ class IssueIdentityTransactions @Inject()(
                                            utilitiesNotification: utilities.Notification,
                                            adminTransactions: AdminTransactions,
                                          )(implicit val executionContext: ExecutionContext)
-  extends GenericDaoImpl[IssueIdentityTransactions.IssueIdentityTransactionTable, IssueIdentityTransaction, String]() {
+  extends GenericDaoImpl2[IssueIdentityTransactions.IssueIdentityTransactionTable, IssueIdentityTransaction, String, String]() {
 
   implicit val logger: Logger = Logger(this.getClass)
 

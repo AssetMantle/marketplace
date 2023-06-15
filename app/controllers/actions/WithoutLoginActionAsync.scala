@@ -53,6 +53,8 @@ class WithoutLoginActionAsync @Inject()(
         result <- verifyAndGetResult(username = username, address = address, currentSessionToken = currentSessionToken)
       } yield result).recover {
         case baseException: BaseException => Results.InternalServerError(views.html.index()).withNewSession
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
+          BadRequest
       }
     }
   }
