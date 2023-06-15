@@ -10,7 +10,7 @@ object AddUnmanagedKey {
       constants.FormField.UNMANAGED_KEY_NAME.mapping,
       constants.FormField.UNMANAGED_KEY_ADDRESS.mapping,
       constants.FormField.PASSWORD.mapping,
-    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.addUnmanagedKeyConstraint))
+    )(Data.apply)(Data.unapply))
 
   case class Data(keyName: String, address: String, password: String)
 

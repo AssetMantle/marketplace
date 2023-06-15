@@ -2,45 +2,37 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.blockchainTransaction.SplitSend
+import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.master.NFT
+import models.masterTransaction.NFTTransferTransactions.NFTTransferTransactionTable
 import models.traits._
-import models.{analytics, blockchainTransaction, master}
+import models.{analytics, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
-import transactions.responses.blockchain.BroadcastTxSyncResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class NFTTransferTransaction(txHash: String, nftId: String, ownerId: String, quantity: Int, toIdentityId: String, toAccountId: Option[String], status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity3[String, String, String] {
+case class NFTTransferTransaction(txHash: String, nftId: String, fromId: String, quantity: Int, toIdentityId: String, toAccountId: Option[String], status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
 
-  def id1: String = txHash
+  def id: String = txHash
 
-  def id2: String = nftId
-
-  def id3: String = ownerId
 }
 
-object NFTTransferTransactions {
+private[masterTransaction] object NFTTransferTransactions {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  class NFTTransferTransactionTable(tag: Tag) extends Table[NFTTransferTransaction](tag, "NFTTransferTransaction") with ModelTable[String] {
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_NFT_TRANSFER_TRANSACTION
-
-
-  class NFTTransferTransactionTable(tag: Tag) extends Table[NFTTransferTransaction](tag, "NFTTransferTransaction") with ModelTable3[String, String, String] {
-
-    def * = (txHash, nftId, ownerId, quantity, toIdentityId, toAccountId.?, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTTransferTransaction.tupled, NFTTransferTransaction.unapply)
+    def * = (txHash, nftId, fromId, quantity, toIdentityId, toAccountId.?, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTTransferTransaction.tupled, NFTTransferTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
-    def nftId = column[String]("nftId", O.PrimaryKey)
+    def nftId = column[String]("nftId")
 
-    def ownerId = column[String]("ownerId", O.PrimaryKey)
+    def fromId = column[String]("fromId")
 
     def quantity = column[Int]("quantity")
 
@@ -58,27 +50,16 @@ object NFTTransferTransactions {
 
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def id1 = txHash
-
-    def id2 = nftId
-
-    def id3 = ownerId
+    def id = txHash
 
   }
-
-  val TableQuery = new TableQuery(tag => new NFTTransferTransactionTable(tag))
 
 }
 
 @Singleton
 class NFTTransferTransactions @Inject()(
-                                         protected val databaseConfigProvider: DatabaseConfigProvider,
-                                         blockchainTransactionSplitSends: blockchainTransaction.SplitSends,
-                                         broadcastTxSync: transactions.blockchain.BroadcastTxSync,
+                                         protected val dbConfigProvider: DatabaseConfigProvider,
                                          utilitiesOperations: utilities.Operations,
-                                         getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
-                                         getAccount: queries.blockchain.GetAccount,
-                                         getAbciInfo: queries.blockchain.GetABCIInfo,
                                          masterCollections: master.Collections,
                                          masterNFTs: master.NFTs,
                                          masterNFTProperties: master.NFTProperties,
@@ -86,43 +67,38 @@ class NFTTransferTransactions @Inject()(
                                          masterSecondaryMarkets: master.SecondaryMarkets,
                                          collectionsAnalysis: analytics.CollectionsAnalysis,
                                          utilitiesNotification: utilities.Notification,
-                                       )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl3[NFTTransferTransactions.NFTTransferTransactionTable, NFTTransferTransaction, String, String, String](
-    databaseConfigProvider,
-    NFTTransferTransactions.TableQuery,
-    executionContext,
-    NFTTransferTransactions.module,
-    NFTTransferTransactions.logger
-  ) {
+                                         userTransactions: UserTransactions,
+                                       )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[NFTTransferTransactions.NFTTransferTransactionTable, NFTTransferTransaction, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_NFT_TRANSFER_TRANSACTION
+
+  val tableQuery = new TableQuery(tag => new NFTTransferTransactionTable(tag))
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, nftId: String, ownerId: String, quantity: Int, toIdentityId: String, toAccountId: String): Future[Unit] = create(NFTTransferTransaction(txHash = txHash, nftId = nftId, ownerId = ownerId, quantity = quantity, toIdentityId = toIdentityId, toAccountId = Option(toAccountId), status = None))
+    def addWithNoneStatus(txHash: String, nftId: String, fromId: String, quantity: Int, toIdentityId: String, toAccountId: String): Future[String] = create(NFTTransferTransaction(txHash = txHash, nftId = nftId, fromId = fromId, quantity = quantity, toIdentityId = toIdentityId, toAccountId = Option(toAccountId), status = None)).map(_.id)
 
     def getByTxHash(txHash: String): Future[Seq[NFTTransferTransaction]] = filter(_.txHash === txHash)
 
-    def markSuccess(txHash: String): Future[Int] = customUpdate(NFTTransferTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
+    def markSuccess(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(true))
 
-    def markFailed(txHash: String): Future[Int] = customUpdate(NFTTransferTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(false))
+    def markFailed(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(false))
 
     def getAllPendingStatus: Future[Seq[NFTTransferTransaction]] = filter(_.status.?.isEmpty)
 
   }
 
   object Utility {
-    def transaction(nft: NFT, ownerId: String, quantity: Int, fromAddress: String, toAccountId: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      // TODO
-      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
-      val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount).recover {
-        case exception: Exception => models.blockchain.Account(address = fromAddress, accountType = None, accountNumber = 0, sequence = 0, publicKey = None)
-      }
-      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
+    def transaction(nft: NFT, fromId: String, quantity: Int, fromAddress: String, toAccountId: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
+        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val nftTransferMsg = utilities.BlockchainTransaction.getSplitSendMsg(
-          fromID = utilities.Identity.getMantlePlaceIdentityID(ownerId),
+          fromID = utilities.Identity.getMantlePlaceIdentityID(fromId),
           fromAddress = fromAddress,
           toID = utilities.Identity.getMantlePlaceIdentityID(toAccountId),
           assetId = nft.getAssetID,
@@ -130,51 +106,38 @@ class NFTTransferTransactions @Inject()(
         )
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(nftTransferMsg),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultNFTTransferGasLimit),
-          gasLimit = constants.Blockchain.DefaultNFTTransferGasLimit,
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultNFTTransferGasLimit),
+          gasLimit = constants.Transaction.DefaultNFTTransferGasLimit,
           account = bcAccount,
           ecKey = ecKey,
           timeoutHeight = timeoutHeight)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
-        def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
+        val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              nftTransfer <- blockchainTransactionSplitSends.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
-              _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nft.id, ownerId = ownerId, quantity = quantity, toIdentityId = utilities.Identity.getMantlePlaceIdentityID(toAccountId).asString, toAccountId = toAccountId)
+              nftTransfer <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = fromId, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.User.NFT_TRANSFER)
+              _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nft.id, fromId = fromId, quantity = quantity, toIdentityId = utilities.Identity.getMantlePlaceIdentityID(toAccountId).asString, toAccountId = toAccountId)
             } yield nftTransfer
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
-          nftTransfer <- checkAndAdd(unconfirmedTxHashes)
+          nftTransfer <- checkAndAdd
         } yield (nftTransfer, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(splitSend: SplitSend, txRawBytes: Array[Byte]) = {
-        val broadcastTx = broadcastTxSync.Service.get(splitSend.getTxRawAsHexString(txRawBytes))
-
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionSplitSends.Service.markFailedWithLog(txHashes = Seq(splitSend.txHash), log = errorResponse.get.error.data)
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionSplitSends.Service.markFailedWithLog(txHashes = Seq(splitSend.txHash), log = successResponse.get.result.log)
-        else Future(0)
-
-        for {
-          (successResponse, errorResponse) <- broadcastTx
-          _ <- update(successResponse, errorResponse)
-        } yield ()
-      }
+      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
 
       for {
-        abciInfo <- abciInfo
-        bcAccount <- bcAccount
-        unconfirmedTxs <- unconfirmedTxs
-        (nftTransfer, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        _ <- broadcastTxAndUpdate(nftTransfer, txRawBytes)
-      } yield nftTransfer
+        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
+        (userTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        updatedUserTransaction <- broadcastTxAndUpdate(userTransaction, txRawBytes)
+      } yield updatedUserTransaction
     }
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = NFTTransferTransactions.module
+      val name: String = module
 
       //      override val initialDelay: FiniteDuration = constants.Scheduler.QuarterHour
 
@@ -182,19 +145,19 @@ class NFTTransferTransactions @Inject()(
 
         val nftTransferTxs = Service.getAllPendingStatus
 
-        def getTxs(hashes: Seq[String]) = blockchainTransactionSplitSends.Service.getByHashes(hashes)
+        def getTxs(hashes: Seq[String]) = userTransactions.Service.getByHashes(hashes)
 
-        def checkAndUpdate(nftTransferTxs: Seq[NFTTransferTransaction], txs: Seq[SplitSend]) = utilitiesOperations.traverse(txs.filter(_.status.isDefined)) { tx =>
+        def checkAndUpdate(nftTransferTxs: Seq[NFTTransferTransaction], userTransactions: Seq[UserTransaction]) = utilitiesOperations.traverse(userTransactions.filter(_.status.isDefined)) { userTransaction =>
 
-          val nftTransferTx = nftTransferTxs.find(_.txHash == tx.txHash).get
-          val onTxComplete = if (tx.status.get) {
+          val nftTransferTx = nftTransferTxs.find(_.txHash == userTransaction.txHash).get
+          val onTxComplete = if (userTransaction.status.get) {
             val markSuccess = Service.markSuccess(nftTransferTx.txHash)
             val nft = masterNFTs.Service.tryGet(nftTransferTx.nftId)
-            val oldNFTOwner = if (nftTransferTx.toAccountId.isDefined) masterNFTOwners.Service.onSuccessfulNFTTransfer(nftId = nftTransferTx.nftId, fromOwnerID = nftTransferTx.ownerId, quantity = nftTransferTx.quantity, toOwnerID = nftTransferTx.toAccountId.get) else Future()
+            val oldNFTOwner = if (nftTransferTx.toAccountId.isDefined) masterNFTOwners.Service.onSuccessfulNFTTransfer(nftId = nftTransferTx.nftId, fromOwnerID = nftTransferTx.fromId, quantity = nftTransferTx.quantity, toOwnerID = nftTransferTx.toAccountId.get) else Future()
 
             def sendNotifications(nft: NFT) = {
-              utilitiesNotification.send(nftTransferTx.ownerId, constants.Notification.FROM_OWNER_NFT_TRANSFER_SUCCESSFUL, nft.name, nftTransferTx.toAccountId.getOrElse(nftTransferTx.toIdentityId))(s"${nftTransferTx.nftId}")
-              if (nftTransferTx.toAccountId.isDefined) utilitiesNotification.send(nftTransferTx.toAccountId.get, constants.Notification.TO_OWNER_NFT_TRANSFER_SUCCESSFUL, nft.name, nftTransferTx.ownerId)(s"'${nftTransferTx.nftId}'") else Future()
+              utilitiesNotification.send(nftTransferTx.fromId, constants.Notification.FROM_OWNER_NFT_TRANSFER_SUCCESSFUL, nft.name, nftTransferTx.toAccountId.getOrElse(nftTransferTx.toIdentityId))(s"${nftTransferTx.nftId}")
+              if (nftTransferTx.toAccountId.isDefined) utilitiesNotification.send(nftTransferTx.toAccountId.get, constants.Notification.TO_OWNER_NFT_TRANSFER_SUCCESSFUL, nft.name, nftTransferTx.fromId)(s"'${nftTransferTx.nftId}'") else Future()
             }
 
             (for {
@@ -211,7 +174,7 @@ class NFTTransferTransactions @Inject()(
             val markFailed = Service.markFailed(nftTransferTx.txHash)
             val nft = masterNFTs.Service.tryGet(nftTransferTx.nftId)
 
-            def sendNotifications(nft: NFT) = utilitiesNotification.send(nftTransferTx.ownerId, constants.Notification.NFT_TRANSFER_FAILED, nft.name, nftTransferTx.toAccountId.getOrElse(nftTransferTx.toIdentityId))("")
+            def sendNotifications(nft: NFT) = utilitiesNotification.send(nftTransferTx.fromId, constants.Notification.NFT_TRANSFER_FAILED, nft.name, nftTransferTx.toAccountId.getOrElse(nftTransferTx.toIdentityId))("")
 
             (for {
               _ <- markFailed

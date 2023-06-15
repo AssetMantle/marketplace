@@ -1,6 +1,5 @@
 package queries.blockchain
 
-import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.responses.blockchain.ABCIInfoResponse.Response
@@ -12,9 +11,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class GetABCIInfo @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.GET_ABCI_INFO
+  implicit val module: String = constants.Module.GET_ABCI_INFO
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   private val url = constants.Blockchain.RPCEndPoint + "/abci_info"
 
@@ -22,7 +21,7 @@ class GetABCIInfo @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   object Service {
     def get: Future[Response] = action().recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
   }
 

@@ -2,7 +2,8 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.masterTransaction.TokenPrices.TokenPriceTable
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
@@ -16,11 +17,7 @@ case class TokenPrice(serial: Int = 0, denom: String, price: Double, createdBy: 
   def id: Int = serial
 }
 
-object TokenPrices {
-  implicit val logger: Logger = Logger(this.getClass)
-
-  implicit val module: String = constants.Module.MASTER_TRANSACTION_TOKEN_PRICE
-
+private[masterTransaction] object TokenPrices {
   class TokenPriceTable(tag: Tag) extends Table[TokenPrice](tag, "TokenPrice") with ModelTable[Int] {
 
     def * = (serial, denom, price, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (TokenPrice.tupled, TokenPrice.unapply)
@@ -41,22 +38,20 @@ object TokenPrices {
 
     def id = serial
   }
-
-  val TableQuery = new TableQuery(tag => new TokenPriceTable(tag))
 }
 
 @Singleton
 class TokenPrices @Inject()(
                              @NamedDatabase("explorer")
-                             protected val databaseConfigProvider: DatabaseConfigProvider,
+                             protected val dbConfigProvider: DatabaseConfigProvider,
                            )(implicit executionContext: ExecutionContext)
-  extends GenericDaoImpl[TokenPrices.TokenPriceTable, TokenPrice, Int](
-    databaseConfigProvider,
-    TokenPrices.TableQuery,
-    executionContext,
-    TokenPrices.module,
-    TokenPrices.logger
-  ) {
+  extends GenericDaoImpl[TokenPrices.TokenPriceTable, TokenPrice, Int]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_TOKEN_PRICE
+
+  val tableQuery = new TableQuery(tag => new TokenPriceTable(tag))
 
   object Service {
 
@@ -79,7 +74,7 @@ class TokenPrices @Inject()(
   object Utility {
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = TokenPrices.module
+      val name: String = module
 
       override val fixedDelay: FiniteDuration = FiniteDuration(constants.Date.HourSeconds, SECONDS)
 

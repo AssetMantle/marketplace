@@ -2,37 +2,63 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.blockchainTransaction.NFTSale
+import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.common.Coin
 import models.master.{Collection, NFT}
+import models.masterTransaction.SaleNFTTransactions.SaleNFTTransactionTable
 import models.traits._
-import models.{analytics, blockchain, blockchainTransaction, master}
+import models.{analytics, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
 import slick.jdbc.H2Profile.api._
-import transactions.responses.blockchain.BroadcastTxSyncResponse
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class SaleNFTTransaction(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, mintOnSuccess: Boolean, saleId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, String] {
-  def id1: String = txHash
+case class SaleNFTTransaction(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, mintOnSuccess: Boolean, saleId: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def id2: String = nftId
+  def serialize: SaleNFTTransactions.SaleNFTTransactionSerialize = SaleNFTTransactions.SaleNFTTransactionSerialize(
+    txHash = this.txHash,
+    nftId = this.nftId,
+    buyerAccountId = this.buyerAccountId,
+    sellerAccountId = this.sellerAccountId,
+    mintOnSuccess = this.mintOnSuccess,
+    saleId = this.saleId,
+    toAddress = this.toAddress,
+    amount = Json.toJson(this.amount).toString,
+    status = this.status,
+    createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+  )
 }
 
-object SaleNFTTransactions {
+private[masterTransaction] object SaleNFTTransactions {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  case class SaleNFTTransactionSerialize(txHash: String, nftId: String, buyerAccountId: String, sellerAccountId: String, mintOnSuccess: Boolean, saleId: String, toAddress: String, amount: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] {
+    def id1: String = txHash
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_SALE_NFT_TRANSACTION
+    def id2: String = nftId
 
-  class SaleNFTTransactionTable(tag: Tag) extends Table[SaleNFTTransaction](tag, "SaleNFTTransaction") with ModelTable2[String, String] {
+    def deserialize()(implicit module: String, logger: Logger): SaleNFTTransaction = SaleNFTTransaction(
+      txHash = this.txHash,
+      nftId = this.nftId,
+      buyerAccountId = this.buyerAccountId,
+      sellerAccountId = this.sellerAccountId,
+      mintOnSuccess = this.mintOnSuccess,
+      saleId = this.saleId,
+      toAddress = this.toAddress,
+      amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](this.amount),
+      status = this.status,
+      createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+    )
+  }
 
-    def * = (txHash, nftId, buyerAccountId, sellerAccountId, mintOnSuccess, saleId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SaleNFTTransaction.tupled, SaleNFTTransaction.unapply)
+  class SaleNFTTransactionTable(tag: Tag) extends Table[SaleNFTTransactionSerialize](tag, "SaleNFTTransaction") with ModelTable2[String, String] {
+
+    def * = (txHash, nftId, buyerAccountId, sellerAccountId, mintOnSuccess, saleId, toAddress, amount, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SaleNFTTransactionSerialize.tupled, SaleNFTTransactionSerialize.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
@@ -45,6 +71,10 @@ object SaleNFTTransactions {
     def mintOnSuccess = column[Boolean]("mintOnSuccess")
 
     def saleId = column[String]("saleId")
+
+    def toAddress = column[String]("toAddress")
+
+    def amount = column[String]("amount")
 
     def status = column[Boolean]("status")
 
@@ -62,37 +92,31 @@ object SaleNFTTransactions {
 
   }
 
-  val TableQuery = new TableQuery(tag => new SaleNFTTransactionTable(tag))
-
 }
 
 @Singleton
 class SaleNFTTransactions @Inject()(
-                                     protected val databaseConfigProvider: DatabaseConfigProvider,
-                                     broadcastTxSync: transactions.blockchain.BroadcastTxSync,
+                                     protected val dbConfigProvider: DatabaseConfigProvider,
                                      utilitiesOperations: utilities.Operations,
-                                     getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
-                                     getAccount: queries.blockchain.GetAccount,
-                                     getAbciInfo: queries.blockchain.GetABCIInfo,
                                      masterNFTOwners: master.NFTOwners,
                                      collectionsAnalysis: analytics.CollectionsAnalysis,
                                      masterNFTs: master.NFTs,
                                      masterSales: master.Sales,
-                                     blockchainTransactionNFTSales: blockchainTransaction.NFTSales,
+                                     userTransactions: UserTransactions,
                                      utilitiesNotification: utilities.Notification,
-                                   )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl2[SaleNFTTransactions.SaleNFTTransactionTable, SaleNFTTransaction, String, String](
-    databaseConfigProvider,
-    SaleNFTTransactions.TableQuery,
-    executionContext,
-    SaleNFTTransactions.module,
-    SaleNFTTransactions.logger
-  ) {
+                                   )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl2[SaleNFTTransactions.SaleNFTTransactionTable, SaleNFTTransactions.SaleNFTTransactionSerialize, String, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_SALE_NFT_TRANSACTION
+
+  val tableQuery = new TableQuery(tag => new SaleNFTTransactionTable(tag))
 
   object Service {
-    def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftIds: Seq[String], saleId: String, mintOnSuccess: Boolean): Future[Unit] = create(nftIds.map(x => SaleNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = x, saleId = saleId, status = None, mintOnSuccess = mintOnSuccess)))
+    def addWithNoneStatus(buyerAccountId: String, sellerAccountId: String, txHash: String, nftIds: Seq[String], saleId: String, toAddress: String, amount: Seq[Coin], mintOnSuccess: Boolean): Future[Int] = create(nftIds.map(x => SaleNFTTransaction(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftId = x, saleId = saleId, toAddress = toAddress, amount = amount, status = None, mintOnSuccess = mintOnSuccess).serialize))
 
-    def tryGetBySaleIdAndBuyerAccountId(buyerAccountId: String, saleId: String): Future[Seq[SaleNFTTransaction]] = filter(x => x.saleId === saleId && x.buyerAccountId === buyerAccountId)
+    def update(saleNFTTransaction: SaleNFTTransaction): Future[Int] = updateById1AndId2(saleNFTTransaction.serialize)
 
     def checkAlreadySold(nftId: String, saleId: String): Future[Boolean] = {
       val nullStatus: Option[Boolean] = null
@@ -109,32 +133,30 @@ class SaleNFTTransactions @Inject()(
       filterAndCount(x => x.buyerAccountId === buyerAccountId && x.saleId === saleId && (x.status.? === nullStatus || x.status))
     }
 
-    def getByTxHash(txHash: String): Future[Seq[SaleNFTTransaction]] = filter(_.txHash === txHash)
+    def getByTxHash(txHash: String): Future[Seq[SaleNFTTransaction]] = filter(_.txHash === txHash).map(_.map(_.deserialize))
 
-    def markSuccess(txHash: String): Future[Int] = customUpdate(SaleNFTTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
+    def getByTxHashes(txHashes: Seq[String]): Future[Seq[SaleNFTTransaction]] = filter(_.txHash.inSet(txHashes)).map(_.map(_.deserialize))
 
-    def markFailed(txHash: String): Future[Int] = customUpdate(SaleNFTTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(false))
+    def markSuccess(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(true))
 
-    def getAllPendingStatus: Future[Seq[SaleNFTTransaction]] = filter(_.status.?.isEmpty)
+    def markFailed(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(false))
+
+    def getAllPendingStatus: Future[Seq[SaleNFTTransaction]] = filter(_.status.?.isEmpty).map(_.map(_.deserialize))
 
     def getTotalWhitelistSaleSold(saleId: String): Future[Int] = {
       val nullStatus: Option[Boolean] = null
       filterAndCount(x => x.saleId === saleId && (x.status.? === nullStatus || x.status))
     }
 
-    def checkAnyPendingTx(saleIDs: Seq[String]): Future[Seq[String]] = customQuery(SaleNFTTransactions.TableQuery.filter(x => x.saleId.inSet(saleIDs) && x.status.?.isEmpty).map(_.saleId).distinct.result)
+    def checkAnyPendingTx(saleIDs: Seq[String]): Future[Seq[String]] = customQuery(tableQuery.filter(x => x.saleId.inSet(saleIDs) && x.status.?.isEmpty).map(_.saleId).distinct.result)
   }
 
   object Utility {
     def transaction(buyerAccountId: String, sellerAccountId: String, nftIds: Seq[String], saleId: String, mintOnSuccess: Boolean, fromAddress: String, collection: Collection, toAddress: String, amount: MicroNumber, gasPrice: BigDecimal, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
-      // TODO
-      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
-      val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount)
-      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
+      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
+        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val messages = if (mintOnSuccess) Seq(
           utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount))),
           utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = constants.Wallet.FeeCollectorAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = nftIds.length * collection.getBondAmount)))
@@ -148,57 +170,43 @@ class SaleNFTTransactions @Inject()(
           timeoutHeight = timeoutHeight)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
-        def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
+        val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              nftSale <- blockchainTransactionNFTSales.Service.add(txHash = txHash, fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
-              _ <- Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, saleId = saleId, mintOnSuccess = mintOnSuccess)
+              nftSale <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = buyerAccountId, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.User.WHITELIST_SALE)
+              _ <- Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, saleId = saleId, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)), mintOnSuccess = mintOnSuccess)
             } yield nftSale
           }
           else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
-          nftSale <- checkAndAdd(unconfirmedTxHashes)
+          nftSale <- checkAndAdd
         } yield (nftSale, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(nftSale: NFTSale, txRawBytes: Array[Byte]) = {
-
-        val broadcastTx = broadcastTxSync.Service.get(nftSale.getTxRawAsHexString(txRawBytes))
-
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionNFTSales.Service.updateNFTSale(nftSale.copy(status = Option(false), log = Option(errorResponse.get.error.data)))
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionNFTSales.Service.updateNFTSale(nftSale.copy(status = Option(false), log = Option(successResponse.get.result.log)))
-        else Future(nftSale)
-
-        for {
-          (successResponse, errorResponse) <- broadcastTx
-          updatedNFTSale <- update(successResponse, errorResponse)
-        } yield updatedNFTSale
-      }
+      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
 
       for {
-        abciInfo <- abciInfo
-        bcAccount <- bcAccount
-        unconfirmedTxs <- unconfirmedTxs
-        (nftSale, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedNFTSale <- broadcastTxAndUpdate(nftSale, txRawBytes)
-      } yield updatedNFTSale
+        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
+        (nftSale, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        updatedUserTransaction <- broadcastTxAndUpdate(nftSale, txRawBytes)
+      } yield updatedUserTransaction
     }
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = SaleNFTTransactions.module
+      val name: String = module
 
       def runner(): Unit = {
         val saleNFTTxS = Service.getAllPendingStatus
 
         def checkAndUpdate(saleNFTTxs: Seq[SaleNFTTransaction]) = utilitiesOperations.traverse(saleNFTTxs.map(_.txHash).distinct) { txHash =>
-          val transaction = blockchainTransactionNFTSales.Service.tryGet(txHash)
+          val userTransaction = userTransactions.Service.tryGet(txHash)
 
-          def onTxComplete(transaction: NFTSale) = if (transaction.status.isDefined) {
-            if (transaction.status.get) {
-              val boughtNFTs = saleNFTTxs.filter(_.txHash == transaction.txHash)
-              val markMasterSuccess = Service.markSuccess(transaction.txHash)
+          def onTxComplete(userTransaction: UserTransaction) = if (userTransaction.status.isDefined) {
+            if (userTransaction.status.get) {
+              val boughtNFTs = saleNFTTxs.filter(_.txHash == userTransaction.txHash)
+              val markMasterSuccess = Service.markSuccess(userTransaction.txHash)
               val markForMinting = masterNFTs.Service.markReadyForMint(boughtNFTs.filter(_.mintOnSuccess).map(_.nftId))
               val sale = masterSales.Service.tryGet(boughtNFTs.head.saleId)
               val nft = masterNFTs.Service.tryGet(boughtNFTs.head.nftId)
@@ -225,11 +233,11 @@ class SaleNFTTransactions @Inject()(
               } yield ()
                 ).recover {
                 case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             } else {
-              val boughtNFTs = Service.getByTxHash(transaction.txHash)
-              val markMasterFailed = Service.markFailed(transaction.txHash)
+              val boughtNFTs = Service.getByTxHash(userTransaction.txHash)
+              val markMasterFailed = Service.markFailed(userTransaction.txHash)
 
               def sendNotifications(buyNFTTx: SaleNFTTransaction, count: Int) = utilitiesNotification.send(buyNFTTx.buyerAccountId, constants.Notification.BUYER_BUY_NFT_FAILED, count.toString)("")
 
@@ -240,14 +248,14 @@ class SaleNFTTransactions @Inject()(
               } yield ()
                 ).recover {
                 case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             }
           } else Future()
 
           for {
-            transaction <- transaction
-            _ <- onTxComplete(transaction)
+            userTransaction <- userTransaction
+            _ <- onTxComplete(userTransaction)
           } yield ()
         }
 

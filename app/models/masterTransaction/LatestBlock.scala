@@ -10,9 +10,10 @@ import com.google.protobuf.{Any => protobufAny}
 import com.ibc.core.channel.{v1 => channelTx}
 import constants.Scheduler
 import exceptions.BaseException
+import models.blockchain
 import models.blockchain.Transaction
+import models.masterTransaction.LatestBlocks.LatestBlockTable
 import models.traits._
-import models.{blockchain, blockchainTransaction}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -28,11 +29,7 @@ case class LatestBlock(height: Long, createdBy: Option[String] = None, createdOn
 
 }
 
-object LatestBlocks {
-
-  implicit val module: String = constants.Module.MASTER_TRANSACTION_LATEST_BLOCK
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[masterTransaction] object LatestBlocks {
 
   class LatestBlockTable(tag: Tag) extends Table[LatestBlock](tag, "LatestBlock") with ModelTable[Long] {
 
@@ -51,36 +48,27 @@ object LatestBlocks {
     def id = height
 
   }
-
-  lazy val TableQuery = new TableQuery(tag => new LatestBlockTable(tag))
 }
 
 @Singleton
 class LatestBlocks @Inject()(
-                              blockchainAssets: blockchain.Assets,
                               blockchainBlocks: blockchain.Blocks,
-                              blockchainSplits: blockchain.Splits,
                               blockchainTransactions: blockchain.Transactions,
-                              blockchainTransactionProvisionAddresses: blockchainTransaction.ProvisionAddresses,
-                              blockchainTransactionUnprovisionAddresses: blockchainTransaction.UnprovisionAddresses,
-                              blockchainTransactionCancelOrders: blockchainTransaction.CancelOrders,
-                              blockchainTransactionMakeOrders: blockchainTransaction.MakeOrders,
-                              blockchainTransactionTakeOrders: blockchainTransaction.TakeOrders,
                               utilitiesOperations: utilities.Operations,
                               utilitiesExternalTransactions: utilities.ExternalTransactions,
-                              protected val databaseConfigProvider: DatabaseConfigProvider
-                            )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[LatestBlocks.LatestBlockTable, LatestBlock, Long](
-    databaseConfigProvider,
-    LatestBlocks.TableQuery,
-    executionContext,
-    LatestBlocks.module,
-    LatestBlocks.logger
-  ) {
+                              protected val dbConfigProvider: DatabaseConfigProvider,
+                            )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[LatestBlocks.LatestBlockTable, LatestBlock, Long]() {
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_LATEST_BLOCK
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new LatestBlockTable(tag))
 
   object Service {
 
-    def getLastChecked: Future[Long] = customQuery(LatestBlocks.TableQuery.sortBy(_.height.desc).result.headOption).map(_.fold(constants.Blockchain.UpgradeHeight.toLong - 1)(_.height))
+    def getLastChecked: Future[Long] = customQuery(tableQuery.sortBy(_.height.desc).result.headOption).map(_.fold(constants.Blockchain.UpgradeHeight.toLong - 1)(_.height))
 
     def update(latestHeight: Long): Future[Unit] = {
       for {
@@ -92,16 +80,6 @@ class LatestBlocks @Inject()(
   }
 
   object Utility {
-
-    private def checkAndProcess(mantlePlaceTx: Boolean, transaction: Transaction, stdMsg: protobufAny, f1: (String) => Future[Boolean], f2: (protobufAny, Transaction) => Future[Unit]) = {
-      if (!mantlePlaceTx) {
-        val txExists = f1(transaction.hash)
-        for {
-          txExists <- txExists
-          _ <- f2(stdMsg, transaction)
-        } yield txExists
-      } else Future(mantlePlaceTx)
-    }
 
     private def processMsgs(msgs: Seq[protobufAny], txHash: String, txHeight: Long): Future[Seq[Unit]] = {
       utilitiesOperations.traverse(msgs) { stdMsg =>
@@ -131,7 +109,7 @@ class LatestBlocks @Inject()(
     }
 
     private def processBlock(height: Int): Unit = {
-      val transactions = blockchainTransactions.Service.getByHeight(height)
+      val transactions = blockchainTransactions.Utility.getByHeight(height)
 
       def processAll(transactions: Seq[Transaction]) = {
         utilitiesOperations.traverse(transactions.filter(x => x.status && !utilities.BlockchainTransaction.checkMantlePlaceTransaction(x.parsedTx)))(x => processMsgs(x.getMessages, x.hash, x.height))
@@ -148,7 +126,7 @@ class LatestBlocks @Inject()(
     }
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = LatestBlocks.module
+      val name: String = module
 
       def runner(): Unit = {
         val latestBlockchainHeight = blockchainBlocks.Service.getLatestHeight

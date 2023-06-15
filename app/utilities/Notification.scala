@@ -18,9 +18,9 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
                              messagesApi: MessagesApi,
                             )(implicit executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.UTILITIES_NOTIFICATION
+  implicit val module: String = constants.Module.UTILITIES_NOTIFICATION
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   private val CONTENT_TYPE = "Content-Type"
   private val AUTHORIZATION = "Authorization"

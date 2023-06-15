@@ -8,12 +8,11 @@ object SendCoin {
 
   val form: Form[Data] = Form(
     mapping(
-      constants.FormField.FROM_ADDRESS.mapping,
       constants.FormField.TO_ADDRESS.mapping,
       constants.FormField.SEND_COIN_AMOUNT.mapping,
       constants.FormField.PASSWORD.mapping,
-    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.sendCoinConstraint))
+    )(Data.apply)(Data.unapply))
 
-  case class Data(fromAddress: String, toAddress: String, sendCoinAmount: MicroNumber, password: String)
+  case class Data(toAddress: String, sendCoinAmount: MicroNumber, password: String)
 
 }

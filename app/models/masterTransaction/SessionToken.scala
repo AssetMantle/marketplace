@@ -2,7 +2,8 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.masterTransaction.SessionTokens.SessionTokenTable
+import models.traits._
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -16,11 +17,7 @@ case class SessionToken(accountId: String, sessionTokenHash: String, sessionToke
   def id: String = accountId
 }
 
-object SessionTokens {
-
-  implicit val module: String = constants.Module.MASTER_TRANSACTION_SESSION_TOKEN
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[masterTransaction] object SessionTokens {
 
   class SessionTokenTable(tag: Tag) extends Table[SessionToken](tag, "SessionToken") with ModelTable[String] {
 
@@ -43,21 +40,19 @@ object SessionTokens {
     override def id = accountId
   }
 
-  val TableQuery = new TableQuery(tag => new SessionTokenTable(tag))
-
 }
 
 @Singleton
 class SessionTokens @Inject()(
-                               protected val databaseConfigProvider: DatabaseConfigProvider
-                             )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[SessionTokens.SessionTokenTable, SessionToken, String](
-    databaseConfigProvider,
-    SessionTokens.TableQuery,
-    executionContext,
-    SessionTokens.module,
-    SessionTokens.logger
-  ) {
+                               protected val dbConfigProvider: DatabaseConfigProvider,
+                             )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[SessionTokens.SessionTokenTable, SessionToken, String]() {
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_SESSION_TOKEN
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new SessionTokenTable(tag))
 
   object Service {
 
@@ -93,7 +88,7 @@ class SessionTokens @Inject()(
 
   object Utility {
     val scheduler: Scheduler = new Scheduler {
-      val name: String = SessionTokens.module
+      val name: String = module
 
       def runner(): Unit = {
         val ids = Service.getTimedOutIDs

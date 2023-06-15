@@ -2,41 +2,35 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.blockchainTransaction.NFTMintingFee
+import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.common.Coin
+import models.master
 import models.master.NFT
+import models.masterTransaction.NFTMintingFeeTransactions.NFTMintingFeeTransactionTable
 import models.traits._
-import models.{blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
-import transactions.responses.blockchain.BroadcastTxSyncResponse
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class NFTMintingFeeTransaction(txHash: String, nftId: String, collectionId: String, accountId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, String] {
-  def id1: String = txHash
-
-  def id2: String = nftId
+case class NFTMintingFeeTransaction(txHash: String, nftId: String, collectionId: String, accountId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
+  def id: String = txHash
 }
 
-object NFTMintingFeeTransactions {
+private[masterTransaction] object NFTMintingFeeTransactions {
 
-  private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_NFT_MINTING_FEE_TRANSACTION
-
-  class NFTMintingFeeTransactionTable(tag: Tag) extends Table[NFTMintingFeeTransaction](tag, "NFTMintingFeeTransaction") with ModelTable2[String, String] {
+  class NFTMintingFeeTransactionTable(tag: Tag) extends Table[NFTMintingFeeTransaction](tag, "NFTMintingFeeTransaction") with ModelTable[String] {
 
     def * = (txHash, nftId, collectionId, accountId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTMintingFeeTransaction.tupled, NFTMintingFeeTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
-    def nftId = column[String]("nftId", O.PrimaryKey)
+    def nftId = column[String]("nftId")
 
     def collectionId = column[String]("collectionId")
 
@@ -52,47 +46,38 @@ object NFTMintingFeeTransactions {
 
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def id1 = txHash
-
-    def id2 = nftId
-
+    def id = txHash
   }
-
-  val TableQuery = new TableQuery(tag => new NFTMintingFeeTransactionTable(tag))
 
 }
 
 @Singleton
 class NFTMintingFeeTransactions @Inject()(
-                                           protected val databaseConfigProvider: DatabaseConfigProvider,
-                                           blockchainTransactionNFTMintingFees: blockchainTransaction.NFTMintingFees,
-                                           broadcastTxSync: transactions.blockchain.BroadcastTxSync,
+                                           protected val dbConfigProvider: DatabaseConfigProvider,
                                            utilitiesOperations: utilities.Operations,
-                                           getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
-                                           getAccount: queries.blockchain.GetAccount,
-                                           getAbciInfo: queries.blockchain.GetABCIInfo,
                                            masterCollections: master.Collections,
                                            masterNFTs: master.NFTs,
                                            masterNFTOwners: master.NFTOwners,
                                            utilitiesNotification: utilities.Notification,
-                                         )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl2[NFTMintingFeeTransactions.NFTMintingFeeTransactionTable, NFTMintingFeeTransaction, String, String](
-    databaseConfigProvider,
-    NFTMintingFeeTransactions.TableQuery,
-    executionContext,
-    NFTMintingFeeTransactions.module,
-    NFTMintingFeeTransactions.logger
-  ) {
+                                           userTransactions: UserTransactions,
+                                         )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[NFTMintingFeeTransactions.NFTMintingFeeTransactionTable, NFTMintingFeeTransaction, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_NFT_MINTING_FEE_TRANSACTION
+
+  val tableQuery = new TableQuery(tag => new NFTMintingFeeTransactionTable(tag))
 
   object Service {
 
-    def addWithNoneStatus(accountId: String, collectionId: String, txHash: String, nftId: String): Future[Unit] = create(NFTMintingFeeTransaction(txHash = txHash, nftId = nftId, status = None, collectionId = collectionId, accountId = accountId))
+    def addWithNoneStatus(accountId: String, collectionId: String, txHash: String, nftId: String): Future[String] = create(NFTMintingFeeTransaction(txHash = txHash, nftId = nftId, status = None, collectionId = collectionId, accountId = accountId)).map(_.id)
 
     def getByTxHash(txHash: String): Future[Seq[NFTMintingFeeTransaction]] = filter(_.txHash === txHash)
 
-    def markSuccess(txHash: String): Future[Int] = customUpdate(NFTMintingFeeTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
+    def markSuccess(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(true))
 
-    def markFailed(txHash: String): Future[Int] = customUpdate(NFTMintingFeeTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(false))
+    def markFailed(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(false))
 
     def getAllPendingStatus: Future[Seq[NFTMintingFeeTransaction]] = filter(_.status.?.isEmpty)
 
@@ -100,71 +85,53 @@ class NFTMintingFeeTransactions @Inject()(
 
   object Utility {
     def transaction(accountId: String, nft: NFT, fromAddress: String, amount: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      // TODO
-      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
-      val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount)
-      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
+      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
+        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = constants.Wallet.FeeCollectorAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)))),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultMintAssetGasLimit),
-          gasLimit = constants.Blockchain.DefaultMintAssetGasLimit,
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultMintAssetGasLimit),
+          gasLimit = constants.Transaction.DefaultMintAssetGasLimit,
           account = bcAccount,
           ecKey = ecKey,
           timeoutHeight = timeoutHeight)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
-        def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
+        val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              nftSale <- blockchainTransactionNFTMintingFees.Service.add(txHash = txHash, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight)
+              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = accountId, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.User.NFT_MINTING_FEE)
               _ <- Service.addWithNoneStatus(accountId = accountId, collectionId = nft.collectionId, txHash = txHash, nftId = nft.id)
-            } yield nftSale
+            } yield userTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
-          nftSale <- checkAndAdd(unconfirmedTxHashes)
-        } yield (nftSale, txRawBytes)
+          userTransaction <- checkAndAdd
+        } yield (userTransaction, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(nftMintingFee: NFTMintingFee, txRawBytes: Array[Byte]) = {
-
-        val broadcastTx = broadcastTxSync.Service.get(nftMintingFee.getTxRawAsHexString(txRawBytes))
-
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionNFTMintingFees.Service.updateNFTMintingFee(nftMintingFee.copy(status = Option(false), log = Option(errorResponse.get.error.data)))
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionNFTMintingFees.Service.updateNFTMintingFee(nftMintingFee.copy(status = Option(false), log = Option(successResponse.get.result.log)))
-        else Future(nftMintingFee)
-
-        for {
-          (successResponse, errorResponse) <- broadcastTx
-          updatedNFTSale <- update(successResponse, errorResponse)
-        } yield updatedNFTSale
-      }
+      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
 
       for {
-        abciInfo <- abciInfo
-        bcAccount <- bcAccount
-        unconfirmedTxs <- unconfirmedTxs
-        (nftSale, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedNFTSale <- broadcastTxAndUpdate(nftSale, txRawBytes)
-      } yield updatedNFTSale
+        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
+        (userTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        updatedUserTransaction <- broadcastTxAndUpdate(userTransaction, txRawBytes)
+      } yield updatedUserTransaction
     }
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = NFTMintingFeeTransactions.module
+      val name: String = module
 
       def runner(): Unit = {
         val nftMintingFeeTxs = Service.getAllPendingStatus
 
         def checkAndUpdate(nftMintingFeeTxs: Seq[NFTMintingFeeTransaction]) = utilitiesOperations.traverse(nftMintingFeeTxs.map(_.txHash).distinct) { txHash =>
-          val transaction = blockchainTransactionNFTMintingFees.Service.tryGet(txHash)
+          val transaction = userTransactions.Service.tryGet(txHash)
 
-          def onTxComplete(transaction: NFTMintingFee) = if (transaction.status.isDefined) {
-            if (transaction.status.get) {
+          def onTxComplete(userTransaction: UserTransaction) = if (userTransaction.status.isDefined) {
+            if (userTransaction.status.get) {
               val mintingNFTs = nftMintingFeeTxs.filter(_.txHash == txHash)
               val markSuccess = Service.markSuccess(txHash)
               val markMintReady = masterNFTs.Service.markReadyForMint(mintingNFTs.map(_.nftId))
@@ -183,7 +150,7 @@ class NFTMintingFeeTransactions @Inject()(
               } yield ()
                 ).recover {
                 case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             } else {
               val mintingNFTs = Service.getByTxHash(txHash)
@@ -200,7 +167,7 @@ class NFTMintingFeeTransactions @Inject()(
               } yield ()
                 ).recover {
                 case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             }
           } else Future()

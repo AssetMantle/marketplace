@@ -13,9 +13,9 @@ abstract class OwnableID extends ID {
 
 object OwnableID {
 
-  private implicit val module: String = constants.Module.SCHEMA_OWNABLE_ID
+  implicit val module: String = constants.Module.SCHEMA_OWNABLE_ID
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def apply(anyOwnableID: AnyOwnableID): OwnableID = anyOwnableID.getImplCase.getNumber match {
     case 1 => AssetID(anyOwnableID.getAssetID)

@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import models.master.NFTProperty
+@import views.html.nft.detail.secondaryMarkets
 
 @(collection: master.Collection, nft: master.NFT, nftProperties: Seq[NFTProperty], liked: Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
@@ -19,10 +20,10 @@
     <div class="mt-2 nftImagePreview">
         <a href="@nft.getS3Url" target="_blank">
             <div id="nftImage_@nft.id" class="position-relative">
-                @if(constants.File.ALL_IMAGES_WITH_GIF.contains(nft.fileExtension)) {
+                @if(nft.isImageType) {
                     <img src="@nft.getS3Url">
                 }
-                @if(constants.File.ALL_AUDIO.contains(nft.fileExtension)) {
+                @if(nft.isAudioType) {
                     @collection.getCoverFileURL.fold{
                         <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
                     }{uri =>
@@ -91,6 +92,13 @@
             </div>
         </div>
     </div>
+
+    @if(collection.isFractionalized && nft.isMinted.getOrElse(false)) {
+        <div id="marketListings"></div>
+        <script>
+                componentResource('marketListings', jsRoutes.controllers.NFTController.marketListings('@nft.id'));
+        </script>
+    }
 </div>
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/view.js")" type="text/javascript"></script>
 <script>

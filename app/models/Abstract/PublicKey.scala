@@ -1,6 +1,5 @@
 package models.Abstract
 
-import exceptions.BaseException
 import models.common.PublicKeys._
 import play.api.Logger
 import play.api.libs.functional.syntax.toAlternativeOps
@@ -16,14 +15,14 @@ abstract class PublicKey {
 }
 
 object PublicKey {
-  private implicit val module: String = constants.Module.PUBLIC_KEYS
+  implicit val module: String = constants.Module.PUBLIC_KEYS
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   implicit val publicKeyWrites: Writes[PublicKey] = {
     case singlePublicKey: SinglePublicKey => Json.toJson(singlePublicKey)
     case multiSigPublicKey: MultiSigPublicKey => Json.toJson(multiSigPublicKey)
-    case _ => throw new BaseException(constants.Response.NO_SUCH_PUBLIC_KEY_TYPE)
+    case _ => constants.Response.NO_SUCH_PUBLIC_KEY_TYPE.throwBaseException()
   }
   implicit val publicKeyReads: Reads[PublicKey] = {
     Json.format[SinglePublicKey].map(x => x: SinglePublicKey) or

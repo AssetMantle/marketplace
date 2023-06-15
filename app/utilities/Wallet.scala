@@ -2,7 +2,6 @@ package utilities
 
 import com.google.common.collect
 import com.google.common.collect.ImmutableList
-import exceptions.BaseException
 import org.bitcoinj.core.{ECKey, Sha256Hash, Utils}
 import org.bitcoinj.crypto.ChildNumber
 import org.bitcoinj.params.MainNetParams
@@ -23,9 +22,9 @@ case class Wallet(address: String, hdPath: Seq[ChildNumber], publicKey: Array[By
 
 object Wallet {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.UTILITIES_WALLET
+  implicit val module: String = constants.Module.UTILITIES_WALLET
 
   object BouncyHash {
     if (Security.getProvider("BC") == null) {
@@ -69,7 +68,7 @@ object Wallet {
         publicKey = deterministicKey.getPubKey,
         privateKey = deterministicKey.getPrivKeyBytes,
         mnemonics = mnemonics)
-    } else throw new BaseException(constants.Response.INVALID_MNEMONICS)
+    } else constants.Response.INVALID_MNEMONICS.throwBaseException()
   }
 
   def getRandomWallet: Wallet = getWallet(Bip39.creatRandomMnemonics())
@@ -79,13 +78,6 @@ object Wallet {
     Utils.bigIntegerToBytes(ecdsaSignature.r, 32) ++ Utils.bigIntegerToBytes(ecdsaSignature.s, 32)
   } catch {
     case exception: Exception => constants.Response.SIGNING_FAILED.throwBaseException(exception)
-  }
-
-  def validateSignature(data: Array[Byte], signature: Array[Byte], publicKey: Array[Byte]): Boolean = try {
-    ECKey.verify(data, signature, publicKey)
-  } catch {
-    case exception: Exception => logger.error(exception.getLocalizedMessage)
-      false
   }
 
 }

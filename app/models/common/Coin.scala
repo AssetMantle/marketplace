@@ -10,9 +10,9 @@ import utilities.MicroNumber
 
 case class Coin(denom: String, amount: MicroNumber) {
 
-  private implicit val module: String = constants.Module.COIN
+  implicit val module: String = constants.Module.COIN
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   def isIBCDenom: Boolean = denom.startsWith("ibc/") && denom.length == 68
 

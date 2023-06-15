@@ -1,0 +1,16 @@
+@import controllers.actions.LoginState
+@import models.blockchain.Block
+@import models.blockchainTransaction.UserTransaction
+
+@(userTransactions: Seq[UserTransaction], blocks: Seq[Block])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@userTransactions.map { userTransaction =>
+    <tr>
+        <td>@userTransaction.txHash</td>
+        <td>@Messages(userTransaction.txType)</td>
+        <td id="transactionTime_@userTransaction.txHash">@userTransaction.txHeight.fold(0L)(x => blocks.find(_.height == x).fold(0L)(_.time))
+            <script>epochToDateTime('transactionTime_@userTransaction.txHash');</script>
+        </td>
+        <td><a href="https://explorer.assetmantle.one/transactions/@userTransaction.txHash"></a> </td>
+    </tr>
+}

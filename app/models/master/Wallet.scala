@@ -1,6 +1,7 @@
 package models.master
 
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.master.Wallets.WalletTable
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -23,14 +24,10 @@ case class Wallet(address: String, partialMnemonics: Seq[String], accountId: Str
     updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
-object Wallets {
-
-  implicit val module: String = constants.Module.MASTER_WALLET
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[master] object Wallets {
 
   case class WalletSerialized(address: String, partialMnemonics: String, accountId: String, provisioned: Option[Boolean], verified: Option[Boolean], preference: Int, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize: Wallet = Wallet(address = address, partialMnemonics = utilities.JSON.convertJsonStringToObject[Seq[String]](partialMnemonics), accountId = accountId, provisioned = provisioned, verified = verified, preference = preference, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): Wallet = Wallet(address = address, partialMnemonics = utilities.JSON.convertJsonStringToObject[Seq[String]](partialMnemonics), accountId = accountId, provisioned = provisioned, verified = verified, preference = preference, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
     def id: String = address
   }
@@ -61,26 +58,23 @@ object Wallets {
 
     override def id = address
   }
-
-  lazy val TableQuery = new TableQuery(tag => new WalletTable(tag))
 }
 
 @Singleton
 class Wallets @Inject()(
-                         protected val databaseConfigProvider: DatabaseConfigProvider
+                         protected val dbConfigProvider: DatabaseConfigProvider,
                        )(implicit executionContext: ExecutionContext)
-  extends GenericDaoImpl[Wallets.WalletTable, Wallets.WalletSerialized, String](
-    databaseConfigProvider,
-    Wallets.TableQuery,
-    executionContext,
-    Wallets.module,
-    Wallets.logger
-  ) {
+  extends GenericDaoImpl[Wallets.WalletTable, Wallets.WalletSerialized, String]() {
 
+  implicit val module: String = constants.Module.MASTER_WALLET
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  lazy val tableQuery = new TableQuery(tag => new WalletTable(tag))
 
   object Service {
 
-    def add(address: String, partialMnemonics: Seq[String], accountId: String, provisioned: Option[Boolean], verified: Option[Boolean]): Future[String] = create(Wallet(address = address, partialMnemonics = partialMnemonics, accountId = accountId, provisioned = provisioned, verified = verified, preference = 0).serialize())
+    def add(address: String, partialMnemonics: Seq[String], accountId: String, provisioned: Option[Boolean], verified: Option[Boolean]): Future[String] = create(Wallet(address = address, partialMnemonics = partialMnemonics, accountId = accountId, provisioned = provisioned, verified = verified, preference = 0).serialize()).map(_.accountId)
 
     def tryGet(address: String): Future[Wallet] = tryGetById(address).map(_.deserialize)
 
@@ -91,8 +85,6 @@ class Wallets @Inject()(
     def getAllByAccountId(username: String): Future[Seq[Wallet]] = filter(_.accountId === username).map(_.map(_.deserialize))
 
     def getByAccountId(username: String): Future[Option[Wallet]] = filter(_.accountId === username).map(_.map(_.deserialize).headOption)
-
-    def tryGetByAccountID(accountId: String): Future[Wallet] = filterAndSortHead(_.accountId === accountId)(_.preference).map(_.deserialize)
 
     def walletExists(address: String): Future[Boolean] = exists(address)
   }

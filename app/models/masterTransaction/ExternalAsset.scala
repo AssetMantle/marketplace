@@ -1,6 +1,7 @@
 package models.masterTransaction
 
 import models.blockchain
+import models.masterTransaction.ExternalAssets.ExternalAssetTable
 import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -9,13 +10,13 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class ExternalAsset(nftId: String, lastOwnerId: String, assetId: String, currentOwnerIdentityId: String, collectionId: String, amount: BigInt, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class ExternalAsset(assetId: String, currentOwnerIdentityId: String, nftId: String, lastOwnerId: String, collectionId: String, amount: BigInt, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def serialize: ExternalAssets.ExternalAssetSerialized = ExternalAssets.ExternalAssetSerialized(
-    nftId = this.nftId,
-    lastOwnerId = this.lastOwnerId,
     assetId = this.assetId,
     currentOwnerIdentityId = this.currentOwnerIdentityId,
+    nftId = this.nftId,
+    lastOwnerId = this.lastOwnerId,
     collectionId = this.collectionId,
     amount = BigDecimal(this.amount),
     createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
@@ -23,23 +24,19 @@ case class ExternalAsset(nftId: String, lastOwnerId: String, assetId: String, cu
 
 }
 
-object ExternalAssets {
+private[masterTransaction] object ExternalAssets {
 
-  implicit val module: String = constants.Module.MASTER_TRANSACTION_EXTERNAL_ASSET
+  case class ExternalAssetSerialized(assetId: String, currentOwnerIdentityId: String, nftId: String, lastOwnerId: String, collectionId: String, amount: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] {
 
-  implicit val logger: Logger = Logger(this.getClass)
+    def id1: String = assetId
 
-  case class ExternalAssetSerialized(nftId: String, lastOwnerId: String, assetId: String, currentOwnerIdentityId: String, collectionId: String, amount: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity2[String, String] {
+    def id2: String = currentOwnerIdentityId
 
-    def id1: String = nftId
-
-    def id2: String = lastOwnerId
-
-    def deserialze: ExternalAsset = ExternalAsset(
-      nftId = this.nftId,
-      lastOwnerId = this.lastOwnerId,
+    def deserialize()(implicit module: String, logger: Logger): ExternalAsset = ExternalAsset(
       assetId = this.assetId,
       currentOwnerIdentityId = this.currentOwnerIdentityId,
+      nftId = this.nftId,
+      lastOwnerId = this.lastOwnerId,
       collectionId = this.collectionId,
       amount = this.amount.toBigInt,
       createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
@@ -49,15 +46,15 @@ object ExternalAssets {
 
   class ExternalAssetTable(tag: Tag) extends Table[ExternalAssetSerialized](tag, "ExternalAsset") with ModelTable2[String, String] {
 
-    def * = (nftId, lastOwnerId, assetId, currentOwnerIdentityId, collectionId, amount, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ExternalAssetSerialized.tupled, ExternalAssetSerialized.unapply)
+    def * = (assetId, currentOwnerIdentityId, nftId, lastOwnerId, collectionId, amount, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ExternalAssetSerialized.tupled, ExternalAssetSerialized.unapply)
 
-    def nftId = column[String]("nftId", O.PrimaryKey)
+    def assetId = column[String]("assetId", O.PrimaryKey)
 
-    def lastOwnerId = column[String]("lastOwnerId", O.PrimaryKey)
+    def currentOwnerIdentityId = column[String]("currentOwnerIdentityId", O.PrimaryKey)
 
-    def assetId = column[String]("assetId")
+    def nftId = column[String]("nftId")
 
-    def currentOwnerIdentityId = column[String]("currentOwnerIdentityId")
+    def lastOwnerId = column[String]("lastOwnerId")
 
     def collectionId = column[String]("collectionId")
 
@@ -71,37 +68,57 @@ object ExternalAssets {
 
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def id1 = nftId
+    def id1 = assetId
 
-    def id2 = lastOwnerId
+    def id2 = currentOwnerIdentityId
 
   }
-
-  lazy val TableQuery = new TableQuery(tag => new ExternalAssetTable(tag))
 }
 
 @Singleton
 class ExternalAssets @Inject()(
                                 blockchainAssets: blockchain.Assets,
                                 blockchainSplits: blockchain.Splits,
-                                protected val databaseConfigProvider: DatabaseConfigProvider
-                              )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl2[ExternalAssets.ExternalAssetTable, ExternalAssets.ExternalAssetSerialized, String, String](
-    databaseConfigProvider,
-    ExternalAssets.TableQuery,
-    executionContext,
-    ExternalAssets.module,
-    ExternalAssets.logger
-  ) {
+                                protected val dbConfigProvider: DatabaseConfigProvider,
+                              )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl2[ExternalAssets.ExternalAssetTable, ExternalAssets.ExternalAssetSerialized, String, String]() {
 
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_EXTERNAL_ASSET
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new ExternalAssetTable(tag))
 
   object Service {
 
-    def insertOrUpdate(nftId: String, lastOwnerId: String, assetId: String, currentOwnerIdentityId: String, collectionId: String, amount: BigInt): Future[Unit] = {
-      upsert(ExternalAsset(nftId = nftId, lastOwnerId = lastOwnerId, assetId = assetId, currentOwnerIdentityId = currentOwnerIdentityId, collectionId = collectionId, amount = amount).serialize)
+    def addOrUpdate(assetId: String, currentOwnerIdentityId: String, nftId: String, lastOwnerId: String, collectionId: String, amount: BigInt): Future[Unit] = {
+      val externalAsset = getById(id1 = assetId, id2 = currentOwnerIdentityId)
+
+      def checkAndUpdate(externalAsset: Option[ExternalAsset]) = if (externalAsset.isDefined) {
+        updateById1AndId2(externalAsset.get.copy(amount = externalAsset.get.amount + amount).serialize)
+      } else {
+        upsert(ExternalAsset(assetId = assetId, currentOwnerIdentityId = currentOwnerIdentityId, nftId = nftId, lastOwnerId = lastOwnerId, collectionId = collectionId, amount = amount).serialize)
+      }
+
+      for {
+        externalAsset <- externalAsset
+        _ <- checkAndUpdate(externalAsset.map(_.deserialize))
+      } yield ()
     }
 
-    def delete(nftId: String, lastOwnerId: String): Future[Int] = deleteById1AndId2(id1 = nftId, id2 = lastOwnerId)
+    def delete(assetId: String, currentOwnerIdentityId: String, amount: BigInt): Future[Unit] = {
+      val externalAsset = getById(id1 = assetId, id2 = currentOwnerIdentityId)
+
+      def checkAndUpdate(externalAsset: Option[ExternalAsset]) = if (externalAsset.isDefined) {
+        if (externalAsset.get.amount == amount) deleteById1AndId2(id1 = assetId, id2 = currentOwnerIdentityId)
+        else updateById1AndId2(externalAsset.get.copy(amount = externalAsset.get.amount - amount).serialize)
+      } else Future(0)
+
+      for {
+        externalAsset <- externalAsset
+        _ <- checkAndUpdate(externalAsset.map(_.deserialize))
+      } yield ()
+    }
 
   }
 }

@@ -21,12 +21,12 @@ class WithLoginActionAsync @Inject()(
                                       masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                     )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val module: String = constants.Module.ASYNC_ACTIONS_WITH_LOGIN
+  implicit val module: String = constants.Module.ASYNC_ACTIONS_WITH_LOGIN
 
   private def verifyAndGetLoginState(request: Request[_])(implicit logger: Logger) = {
-    val username = Future(request.session.get(constants.Session.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
-    val address = Future(request.session.get(constants.Session.ADDRESS).getOrElse(throw new BaseException(constants.Response.ADDRESS_NOT_FOUND)))
-    val currentSessionToken = Future(request.session.get(constants.Session.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
+    val username = Future(request.session.get(constants.Session.USERNAME).getOrElse(constants.Response.USERNAME_NOT_FOUND.throwBaseException()))
+    val address = Future(request.session.get(constants.Session.ADDRESS).getOrElse(constants.Response.ADDRESS_NOT_FOUND.throwBaseException()))
+    val currentSessionToken = Future(request.session.get(constants.Session.TOKEN).getOrElse(constants.Response.TOKEN_NOT_FOUND.throwBaseException()))
 
     def verify(username: String, address: String, currentSessionToken: String) = {
       val storedSessionToken = masterTransactionSessionTokens.Service.tryGet(username)

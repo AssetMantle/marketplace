@@ -100,6 +100,7 @@ GET         /nft/:id                                           controllers.NFTCo
 GET         /nftDetails                                        controllers.NFTController.details(nftId: String)
 GET         /nftDetailViewLeftCards                            controllers.NFTController.detailViewLeftCards(nftId: String)
 GET         /nftInfo                                           controllers.NFTController.info(nftId: String)
+GET         /marketListings                                    controllers.NFTController.marketListings(nftId: String, pageNumber: Int)
 GET         /nftDetailViewRightCards                           controllers.NFTController.detailViewRightCards(nftId: String)
 GET         /nftCollectionInfo                                 controllers.NFTController.collectionInfo(nftId: String)
 GET         /likesCounter                                      controllers.NFTController.likesCounter(nftId: String)
@@ -151,6 +152,8 @@ POST        /markNotificationsRead                             controllers.Profi
 GET         /profileInfoCard                                   controllers.ProfileController.profileInfoCard(accountId: String)
 GET         /profileActivityCard                               controllers.ProfileController.profileActivityCard(accountId: String)
 GET         /profileAnalysisCard                               controllers.ProfileController.profileAnalysisCard(accountId: String)
+GET         /transactionsSection                               controllers.ProfileController.transactionsSection()
+GET         /transactionsPerPage                               controllers.ProfileController.transactionsPerPage(pageNumber:Int)
 
 GET         /whitelistSection                                  controllers.WhitelistController.whitelistSection()
 GET         /createdWhitelists                                 controllers.WhitelistController.createdWhitelists()
@@ -227,7 +230,7 @@ POST        /deleteWhitelist                                   controllers.White
 
 GET         /gasTokenPrice                                     controllers.WalletController.gasTokenPrice()
 GET         /addressBalance                                    controllers.WalletController.balance(address: String)
-GET         /sendCoin                                          controllers.WalletController.sendCoinForm(fromAddress: String)
+GET         /sendCoin                                          controllers.WalletController.sendCoinForm()
 POST        /sendCoin                                          controllers.WalletController.sendCoin()
 GET         /wrapCoin                                          controllers.WalletController.wrapCoinForm()
 POST        /wrapCoin                                          controllers.WalletController.wrapCoin()

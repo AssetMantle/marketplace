@@ -3,72 +3,78 @@ package models.blockchain
 import constants.Scheduler
 import exceptions.BaseException
 import models.traits.{Entity, GenericDaoImpl, ModelTable}
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.{Configuration, Logger}
 import play.db.NamedDatabase
 import slick.jdbc.H2Profile.api._
-import utilities.Date.RFC3339
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class Block(height: Int, time: RFC3339)
+case class Block(height: Int, time: Long) extends Entity[Int] {
+  def id: Int = height
+}
 
-object Blocks {
+private[blockchain] object Blocks {
 
-  case class BlockSerialized(height: Int, time: String) extends Entity[Int] {
-    def id: Int = height
+  class BlockTable(tag: Tag) extends Table[Block](tag, "Block") with ModelTable[Int] {
 
-    def deserialize: Block = Block(height = height, time = RFC3339(time))
-  }
-
-  private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val module: String = constants.Module.BLOCKCHAIN_BLOCK
-
-  private[models] class BlockTable(tag: Tag) extends Table[BlockSerialized](tag, "Block") with ModelTable[Int] {
-
-    def * = (height, time) <> (BlockSerialized.tupled, BlockSerialized.unapply)
+    def * = (height, time) <> (Block.tupled, Block.unapply)
 
     def height = column[Int]("height", O.PrimaryKey)
 
-    def time = column[String]("time")
+    def time = column[Long]("time")
 
     def id = height
   }
-
-  val TableQuery = new TableQuery(tag => new BlockTable(tag))
-
 }
 
 @Singleton
 class Blocks @Inject()(
                         @NamedDatabase("explorer")
-                        protected val databaseConfigProvider: DatabaseConfigProvider,
-                        configuration: Configuration
+                        protected val dbConfigProvider: DatabaseConfigProvider,
+                        archiveBlocks: ArchiveBlocks,
                       )(implicit executionContext: ExecutionContext)
-  extends GenericDaoImpl[Blocks.BlockTable, Blocks.BlockSerialized, Int](
-    databaseConfigProvider,
-    Blocks.TableQuery,
-    executionContext,
-    Blocks.module,
-    Blocks.logger
-  ) {
+  extends GenericDaoImpl[Blocks.BlockTable, Block, Int]() {
 
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_BLOCK
+
+  val tableQuery = new TableQuery(tag => new Blocks.BlockTable(tag))
 
   object Service {
     private var latestBlockHeight: Int = 0
 
+    private var firstBlockHeight: Int = 0
+
     def getLatestHeight: Int = latestBlockHeight
 
-    def setLatestHeight(): Future[Unit] = {
-      val latestHeight = customQuery(Blocks.TableQuery.map(_.height).max.result)
+    def getFirstHeight: Int = firstBlockHeight
+
+    def setHeights(): Future[Unit] = {
+      val heights = customQuery(tableQuery.groupBy { _ => true }.map {
+        case (_, group) =>
+          (group.map(_.height).max, group.map(_.height).min)
+      }.result.head)
 
       for {
-        latestHeight <- latestHeight
+        (max, min) <- heights
       } yield {
-        latestBlockHeight = latestHeight.getOrElse(0)
+        firstBlockHeight = min.getOrElse(0)
+        latestBlockHeight = max.fold(0)(x => x - 1)
+      }
+    }
+
+    def getByHeights(heights: Seq[Int]): Future[Seq[Block]] = {
+      if (heights.min > getFirstHeight) filter(_.height.inSet(heights))
+      else if (heights.max < getFirstHeight) archiveBlocks.Service.get(heights)
+      else {
+        for {
+          blocks1 <- filter(_.height.inSet(heights))
+          blocks2 <- archiveBlocks.Service.get(heights)
+        } yield blocks1 ++ blocks2
       }
     }
 
@@ -77,10 +83,10 @@ class Blocks @Inject()(
   object Utility {
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = Blocks.module
+      val name: String = module
 
       def runner(): Unit = {
-        val setHeight = Service.setLatestHeight()
+        val setHeight = Service.setHeights()
 
         val forComplete = (for {
           _ <- setHeight

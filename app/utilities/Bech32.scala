@@ -5,9 +5,9 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.mutable.ArrayBuffer
 
 object Bech32 {
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private implicit val module: String = constants.Module.COMMON_UTILITIES_BECH32
+  implicit val module: String = constants.Module.COMMON_UTILITIES_BECH32
 
   type Int5 = Byte
   final val CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"

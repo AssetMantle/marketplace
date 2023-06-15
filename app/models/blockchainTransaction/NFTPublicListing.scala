@@ -1,10 +1,9 @@
 package models.blockchainTransaction
 
-import constants.Scheduler
-import exceptions.BaseException
-import models.blockchain
 import models.blockchain.Transaction
+import models.blockchainTransaction.NFTPublicListings._
 import models.common.Coin
+import models.masterTransaction.{PublicListingNFTTransaction, PublicListingNFTTransactions}
 import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -12,22 +11,17 @@ import play.api.libs.json.Json
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 case class NFTPublicListing(txHash: String, fromAddress: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
 
   def serialize(): NFTPublicListings.NFTPublicListingSerialized = NFTPublicListings.NFTPublicListingSerialized(txHash = this.txHash, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, status = this.status, memo = this.memo, timeoutHeight = this.timeoutHeight, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
-object NFTPublicListings {
-
-  private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_NFT_PUBLIC_LISTING
+private[blockchainTransaction] object NFTPublicListings {
 
   case class NFTPublicListingSerialized(txHash: String, fromAddress: String, toAddress: String, amount: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize: NFTPublicListing = NFTPublicListing(txHash = txHash, fromAddress = fromAddress, toAddress = toAddress, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), status = status, memo = memo, timeoutHeight = timeoutHeight, log = log, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): NFTPublicListing = NFTPublicListing(txHash = txHash, fromAddress = fromAddress, toAddress = toAddress, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), status = status, memo = memo, timeoutHeight = timeoutHeight, log = log, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
     def id: String = txHash
   }
@@ -63,82 +57,65 @@ object NFTPublicListings {
     def id = txHash
   }
 
-  val TableQuery = new TableQuery(tag => new NFTPublicListingTable(tag))
-
 }
 
 @Singleton
 class NFTPublicListings @Inject()(
-                                   protected val databaseConfigProvider: DatabaseConfigProvider,
+                                   protected val dbConfigProvider: DatabaseConfigProvider,
+                                   publicListingNFTTransactions: PublicListingNFTTransactions,
+                                   userTransactions: UserTransactions,
                                    blockchainTransactions: models.blockchain.Transactions,
-                                   blockchainBlocks: blockchain.Blocks,
-                                 )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[NFTPublicListings.NFTPublicListingTable, NFTPublicListings.NFTPublicListingSerialized, String](
-    databaseConfigProvider,
-    NFTPublicListings.TableQuery,
-    executionContext,
-    NFTPublicListings.module,
-    NFTPublicListings.logger
-  ) {
+                                   utilitiesOperations: utilities.Operations,
+                                 )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[NFTPublicListingTable, NFTPublicListingSerialized, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_NFT_PUBLIC_LISTING
+
+  val tableQuery = new TableQuery(tag => new NFTPublicListingTable(tag))
 
   object Service {
 
-    def add(txHash: String, fromAddress: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], memo: Option[String], timeoutHeight: Int): Future[NFTPublicListing] = {
-      val nftPublicListing = NFTPublicListing(txHash = txHash, fromAddress = fromAddress, toAddress = toAddress, amount = amount, status = status, log = None, memo = memo, timeoutHeight = timeoutHeight)
-      for {
-        _ <- create(nftPublicListing.serialize())
-      } yield nftPublicListing
-    }
-
-    def tryGet(txHash: String): Future[NFTPublicListing] = tryGetById(txHash).map(_.deserialize)
-
-    def updateNFTPublicListing(nftPublicListing: NFTPublicListing): Future[NFTPublicListing] = {
-      for {
-        _ <- updateById(nftPublicListing.serialize())
-      } yield nftPublicListing
-    }
-
-    def markSuccess(txHashes: Seq[String]): Future[Int] = customUpdate(NFTPublicListings.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(true))
-
-    def markFailed(txHashes: Seq[String]): Future[Int] = customUpdate(NFTPublicListings.TableQuery.filter(_.txHash.inSet(txHashes)).map(_.status).update(false))
-
-    def markFailedWithLog(txHashes: Seq[String], log: String): Future[Int] = customUpdate(NFTPublicListings.TableQuery.filter(_.txHash.inSet(txHashes)).map(x => (x.status, x.log)).update((false, log)))
-
-    def getAllPendingStatus: Future[Seq[NFTPublicListing]] = filter(_.status.?.isEmpty).map(_.map(_.deserialize))
+    def fetchAll: Future[Seq[NFTPublicListing]] = getAll.map(_.map(_.deserialize))
 
   }
 
   object Utility {
 
-    val scheduler: Scheduler = new Scheduler {
-      val name: String = NFTPublicListings.module
+    def migrate: Future[Unit] = {
+      val allNFTPublicLsitingTxs = Service.fetchAll
 
-      def runner(): Unit = {
-        val nftPublicListings = Service.getAllPendingStatus
+      def publicListingNFTTxs(txHashes: Seq[String]) = publicListingNFTTransactions.Service.getByTxHashes(txHashes)
 
-        def getTransactions(hashes: Seq[String]) = blockchainTransactions.Service.getByHashes(hashes)
+      def bcTxs(txHashes: Seq[String]) = blockchainTransactions.Utility.getByHashes(txHashes)
 
-        def markSuccess(hashes: Seq[String]) = if (hashes.nonEmpty) Service.markSuccess(hashes) else Future(0)
+      def update(allNFTPublicLsitingTxs: Seq[NFTPublicListing], publicListingNFTTxs: Seq[PublicListingNFTTransaction], txs: Seq[Transaction]) = {
+        utilitiesOperations.traverse(publicListingNFTTxs) { publicListingNFTTx =>
+          val tx = Future(allNFTPublicLsitingTxs.find(_.txHash == publicListingNFTTx.txHash).getOrElse(constants.Response.NFT_PUBLIC_LISTING_SALE_NOT_FOUND.throwBaseException()))
 
-        def markFailed(hashes: Seq[String]) = if (hashes.nonEmpty) Service.markFailed(hashes) else Future(0)
+          def updateMaster(tx: NFTPublicListing) = publicListingNFTTransactions.Service.update(publicListingNFTTx.copy(toAddress = tx.toAddress, amount = tx.amount))
 
-        def markFailedTimedOut(nftPublicListings: Seq[NFTPublicListing], allTxs: Seq[Transaction]) = if (nftPublicListings.nonEmpty) {
-          val notFoundTxHashes = nftPublicListings.map(_.txHash).diff(allTxs.map(_.hash))
-          val timedoutFailedTxs = nftPublicListings.filter(x => notFoundTxHashes.contains(x.txHash) && x.timeoutHeight > 0 && blockchainBlocks.Service.getLatestHeight > x.timeoutHeight).map(_.txHash)
-          if (timedoutFailedTxs.nonEmpty) Service.markFailedWithLog(timedoutFailedTxs, constants.Response.TRANSACTION_NOT_FOUND.logMessage) else Future(0)
-        } else Future(0)
+          def addUserTx(tx: NFTPublicListing) = userTransactions.Service.add(UserTransaction(txHash = tx.txHash, accountId = publicListingNFTTx.buyerAccountId, fromAddress = tx.fromAddress, status = tx.status, memo = tx.memo, timeoutHeight = tx.timeoutHeight, log = tx.log, txHeight = txs.find(_.hash == publicListingNFTTx.txHash).map(_.height), txType = constants.Transaction.User.PUBLIC_SALE, createdBy = tx.createdBy, createdOnMillisEpoch = tx.createdOnMillisEpoch, updatedBy = tx.updatedBy, updatedOnMillisEpoch = tx.updatedOnMillisEpoch))
 
-        val forComplete = (for {
-          nftPublicListings <- nftPublicListings
-          txs <- getTransactions(nftPublicListings.map(_.txHash))
-          _ <- markSuccess(txs.filter(_.status).map(_.hash))
-          _ <- markFailed(txs.filter(!_.status).map(_.hash))
-          _ <- markFailedTimedOut(nftPublicListings, txs)
-        } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          for {
+            tx <- tx
+            _ <- addUserTx(tx)
+            _ <- updateMaster(tx)
+          } yield ()
         }
+      }
 
-        Await.result(forComplete, Duration.Inf)
+
+      (for {
+        allNFTPublicLsitingTxs <- allNFTPublicLsitingTxs
+        bcTxs <- bcTxs(allNFTPublicLsitingTxs.map(_.txHash))
+        publicListingNFTTxs <- publicListingNFTTxs(allNFTPublicLsitingTxs.map(_.txHash))
+        _ <- update(allNFTPublicLsitingTxs, publicListingNFTTxs, bcTxs)
+      } yield ()
+        ).recover {
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
+          logger.error("MIGRATION_NFT_PUBLIC_LISTING_FAILED")
       }
     }
 

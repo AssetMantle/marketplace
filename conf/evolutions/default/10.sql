@@ -9,7 +9,21 @@ ALTER TABLE BLOCKCHAIN_TRANSACTION."NFTSale"
 ALTER TABLE BLOCKCHAIN_TRANSACTION."SendCoin"
     DROP COLUMN IF EXISTS "txRawBytes";
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."CampaignSendCoin"
+ALTER TABLE MASTER_TRANSACTION."PublicListingNFTTransaction"
+    ADD COLUMN IF NOT EXISTS "amount" VARCHAR NOT NULL DEFAULT '[]';
+ALTER TABLE MASTER_TRANSACTION."PublicListingNFTTransaction"
+    ADD COLUMN IF NOT EXISTS "toAddress" VARCHAR NOT NULL DEFAULT '';
+ALTER TABLE MASTER_TRANSACTION."PublicListingNFTTransaction"
+    DROP CONSTRAINT IF EXISTS "PublicListingNFTTransaction_buyerAccountId_sellerAccountId__key";
+
+ALTER TABLE MASTER_TRANSACTION."SaleNFTTransaction"
+    ADD COLUMN IF NOT EXISTS "amount" VARCHAR NOT NULL DEFAULT '[]';
+ALTER TABLE MASTER_TRANSACTION."SaleNFTTransaction"
+    ADD COLUMN IF NOT EXISTS "toAddress" VARCHAR NOT NULL DEFAULT '';
+ALTER TABLE MASTER_TRANSACTION."SaleNFTTransaction"
+    DROP CONSTRAINT IF EXISTS "BuyNFTTransaction_buyerAccountId_sellerAccountId_txHash_nft_key";
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AdminTransaction"
 (
     "txHash"               VARCHAR NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
@@ -17,6 +31,8 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."CampaignSendCoin"
     "memo"                 VARCHAR,
     "timeoutHeight"        INTEGER NOT NULL,
     "log"                  VARCHAR,
+    "txHeight"             INTEGER,
+    "txType"               VARCHAR NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -24,184 +40,23 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."CampaignSendCoin"
     PRIMARY KEY ("txHash")
 );
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."CancelOrder"
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."UserTransaction"
 (
     "txHash"               VARCHAR NOT NULL,
+    "accountId"            VARCHAR NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "memo"                 VARCHAR,
     "timeoutHeight"        INTEGER NOT NULL,
     "log"                  VARCHAR,
+    "txHeight"             INTEGER,
+    "txType"               VARCHAR NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."DefineAsset"
-(
-    "txHash"               VARCHAR NOT NULL,
-    "fromAddress"          VARCHAR NOT NULL,
-    "status"               BOOLEAN,
-    "memo"                 VARCHAR,
-    "timeoutHeight"        INTEGER NOT NULL,
-    "log"                  VARCHAR,
-    "createdBy"            VARCHAR,
-    "createdOnMillisEpoch" BIGINT,
-    "updatedBy"            VARCHAR,
-    "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueIdentity"
-(
-    "txHash"               VARCHAR NOT NULL,
-    "fromAddress"          VARCHAR NOT NULL,
-    "status"               BOOLEAN,
-    "memo"                 VARCHAR,
-    "timeoutHeight"        INTEGER NOT NULL,
-    "log"                  VARCHAR,
-    "createdBy"            VARCHAR,
-    "createdOnMillisEpoch" BIGINT,
-    "updatedBy"            VARCHAR,
-    "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."MakeOrder"
-(
-    "txHash"               VARCHAR NOT NULL,
-    "fromAddress"          VARCHAR NOT NULL,
-    "status"               BOOLEAN,
-    "memo"                 VARCHAR,
-    "timeoutHeight"        INTEGER NOT NULL,
-    "log"                  VARCHAR,
-    "createdBy"            VARCHAR,
-    "createdOnMillisEpoch" BIGINT,
-    "updatedBy"            VARCHAR,
-    "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."MintAsset"
-(
-    "txHash"               VARCHAR NOT NULL,
-    "fromAddress"          VARCHAR NOT NULL,
-    "status"               BOOLEAN,
-    "memo"                 VARCHAR,
-    "timeoutHeight"        INTEGER NOT NULL,
-    "log"                  VARCHAR,
-    "createdBy"            VARCHAR,
-    "createdOnMillisEpoch" BIGINT,
-    "updatedBy"            VARCHAR,
-    "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."NFTMintingFee"
-(
-    "txHash"               VARCHAR NOT NULL,
-    "fromAddress"          VARCHAR NOT NULL,
-    "status"               BOOLEAN,
-    "memo"                 VARCHAR,
-    "timeoutHeight"        INTEGER NOT NULL,
-    "log"                  VARCHAR,
-    "createdBy"            VARCHAR,
-    "createdOnMillisEpoch" BIGINT,
-    "updatedBy"            VARCHAR,
-    "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ProvisionAddress"
-(
-    "txHash"               VARCHAR NOT NULL,
-    "fromAddress"          VARCHAR NOT NULL,
-    "status"               BOOLEAN,
-    "memo"                 VARCHAR,
-    "timeoutHeight"        INTEGER NOT NULL,
-    "log"                  VARCHAR,
-    "createdBy"            VARCHAR,
-    "createdOnMillisEpoch" BIGINT,
-    "updatedBy"            VARCHAR,
-    "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SplitSend"
-(
-    "txHash"               VARCHAR NOT NULL,
-    "fromAddress"          VARCHAR NOT NULL,
-    "status"               BOOLEAN,
-    "memo"                 VARCHAR,
-    "timeoutHeight"        INTEGER NOT NULL,
-    "log"                  VARCHAR,
-    "createdBy"            VARCHAR,
-    "createdOnMillisEpoch" BIGINT,
-    "updatedBy"            VARCHAR,
-    "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."TakeOrder"
-(
-    "txHash"               VARCHAR NOT NULL,
-    "fromAddress"          VARCHAR NOT NULL,
-    "status"               BOOLEAN,
-    "memo"                 VARCHAR,
-    "timeoutHeight"        INTEGER NOT NULL,
-    "log"                  VARCHAR,
-    "createdBy"            VARCHAR,
-    "createdOnMillisEpoch" BIGINT,
-    "updatedBy"            VARCHAR,
-    "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."UnprovisionAddress"
-(
-    "txHash"               VARCHAR NOT NULL,
-    "fromAddress"          VARCHAR NOT NULL,
-    "status"               BOOLEAN,
-    "memo"                 VARCHAR,
-    "timeoutHeight"        INTEGER NOT NULL,
-    "log"                  VARCHAR,
-    "createdBy"            VARCHAR,
-    "createdOnMillisEpoch" BIGINT,
-    "updatedBy"            VARCHAR,
-    "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."Unwrap"
-(
-    "txHash"               VARCHAR NOT NULL,
-    "fromAddress"          VARCHAR NOT NULL,
-    "status"               BOOLEAN,
-    "memo"                 VARCHAR,
-    "timeoutHeight"        INTEGER NOT NULL,
-    "log"                  VARCHAR,
-    "createdBy"            VARCHAR,
-    "createdOnMillisEpoch" BIGINT,
-    "updatedBy"            VARCHAR,
-    "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."Wrap"
-(
-    "txHash"               VARCHAR NOT NULL,
-    "fromAddress"          VARCHAR NOT NULL,
-    "status"               BOOLEAN,
-    "memo"                 VARCHAR,
-    "timeoutHeight"        INTEGER NOT NULL,
-    "log"                  VARCHAR,
-    "createdBy"            VARCHAR,
-    "createdOnMillisEpoch" BIGINT,
-    "updatedBy"            VARCHAR,
-    "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash")
+    PRIMARY KEY ("txHash"),
+    UNIQUE ("accountId", "txHash")
 );
 
 CREATE TABLE IF NOT EXISTS CAMPAIGN."MintNFTAirDrop"
@@ -244,7 +99,7 @@ CREATE TABLE IF NOT EXISTS HISTORY."MasterSecondaryMarket"
     "completed"            BOOLEAN NOT NULL,
     "cancelled"            BOOLEAN NOT NULL,
     "expired"              BOOLEAN NOT NULL,
-    "failed"               BOOLEAN NOT NULL,
+    "status"               BOOLEAN,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -277,7 +132,7 @@ CREATE TABLE IF NOT EXISTS MASTER."BurntNFT"
 CREATE TABLE IF NOT EXISTS MASTER."SecondaryMarket"
 (
     "id"                   VARCHAR NOT NULL,
-    "orderId"              VARCHAR,
+    "orderId"              VARCHAR UNIQUE,
     "nftId"                VARCHAR NOT NULL,
     "collectionId"         VARCHAR NOT NULL,
     "sellerId"             VARCHAR NOT NULL,
@@ -289,14 +144,14 @@ CREATE TABLE IF NOT EXISTS MASTER."SecondaryMarket"
     "completed"            BOOLEAN NOT NULL,
     "cancelled"            BOOLEAN NOT NULL,
     "expired"              BOOLEAN NOT NULL,
-    "failed"               BOOLEAN NOT NULL,
+    "status"               BOOLEAN,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
     PRIMARY KEY ("id"),
-    UNIQUE ("nftId", "sellerId"),
-    UNIQUE ("id", "nftId")
+    UNIQUE ("nftId", "id"),
+    UNIQUE ("sellerId", "id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."CancelOrderTransaction"
@@ -309,8 +164,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."CancelOrderTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "secondaryMarketId"),
-    UNIQUE ("txHash", "sellerId")
+    PRIMARY KEY ("txHash")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."DefineAssetTransaction"
@@ -322,23 +176,22 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."DefineAssetTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "collectionId")
+    PRIMARY KEY ("txHash")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ExternalAsset"
 (
-    "nftId"                  VARCHAR NOT NULL,
-    "lastOwnerId"            VARCHAR NOT NULL,
     "assetId"                VARCHAR NOT NULL,
     "currentOwnerIdentityId" VARCHAR NOT NULL,
+    "nftId"                  VARCHAR NOT NULL,
+    "lastOwnerId"            VARCHAR NOT NULL,
     "collectionId"           VARCHAR NOT NULL,
     "amount"                 NUMERIC NOT NULL,
     "createdBy"              VARCHAR,
     "createdOnMillisEpoch"   BIGINT,
     "updatedBy"              VARCHAR,
     "updatedOnMillisEpoch"   BIGINT,
-    PRIMARY KEY ("nftId", "lastOwnerId"),
-    UNIQUE ("assetId", "currentOwnerIdentityId")
+    PRIMARY KEY ("assetId", "currentOwnerIdentityId")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueIdentityTransaction"
@@ -350,7 +203,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueIdentityTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "accountId")
+    PRIMARY KEY ("txHash")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."LatestBlock"
@@ -380,7 +233,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."MakeOrderTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "nftId", "sellerId"),
+    PRIMARY KEY ("txHash"),
     UNIQUE ("nftId", "secondaryMarketId")
 );
 
@@ -394,7 +247,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."MintAssetTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "nftID")
+    PRIMARY KEY ("txHash")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NFTMintingFeeTransaction"
@@ -408,7 +261,23 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NFTMintingFeeTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "nftId")
+    PRIMARY KEY ("txHash")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NFTTransferTransaction"
+(
+    "txHash"               VARCHAR NOT NULL,
+    "nftId"                VARCHAR NOT NULL,
+    "fromId"               VARCHAR NOT NULL,
+    "quantity"             INTEGER NOT NULL,
+    "toIdentityId"         VARCHAR NOT NULL,
+    "toAccountId"          VARCHAR,
+    "status"               BOOLEAN,
+    "createdBy"            VARCHAR,
+    "createdOnMillisEpoch" BIGINT,
+    "updatedBy"            VARCHAR,
+    "updatedOnMillisEpoch" BIGINT,
+    PRIMARY KEY ("txHash")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ProvisionAddressTransaction"
@@ -421,23 +290,22 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ProvisionAddressTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "accountId")
+    PRIMARY KEY ("txHash")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NFTTransferTransaction"
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SendCoinTransaction"
 (
     "txHash"               VARCHAR NOT NULL,
-    "nftId"                VARCHAR NOT NULL,
-    "ownerId"              VARCHAR NOT NULL,
-    "quantity"             INTEGER NOT NULL,
-    "toIdentityId"         VARCHAR NOT NULL,
+    "fromAccountId"        VARCHAR NOT NULL,
+    "toAddress"            VARCHAR NOT NULL,
+    "amount"               VARCHAR NOT NULL,
     "toAccountId"          VARCHAR,
     "status"               BOOLEAN,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "nftId", "ownerId")
+    PRIMARY KEY ("txHash")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TakeOrderTransaction"
@@ -452,7 +320,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TakeOrderTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "nftId", "buyerId")
+    PRIMARY KEY ("txHash")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."UnprovisionAddressTransaction"
@@ -465,7 +333,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."UnprovisionAddressTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "accountId")
+    PRIMARY KEY ("txHash")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."UnwrapTransaction"
@@ -480,7 +348,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."UnwrapTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "accountId")
+    PRIMARY KEY ("txHash")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WrapTransaction"
@@ -495,7 +363,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WrapTransaction"
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash", "accountId")
+    PRIMARY KEY ("txHash")
 );
 
 ALTER TABLE ANALYTICS."CollectionAnalysis"
@@ -504,7 +372,7 @@ ALTER TABLE ANALYTICS."CollectionAnalysis"
 ALTER TABLE CAMPAIGN."MintNFTAirDrop"
     ADD CONSTRAINT MintNFTAirDrop_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 ALTER TABLE CAMPAIGN."MintNFTAirDrop"
-    ADD CONSTRAINT MintNFTAirDrop_AirDropTxHash FOREIGN KEY ("airdropTxHash") REFERENCES BLOCKCHAIN_TRANSACTION."CampaignSendCoin" ("txHash");
+    ADD CONSTRAINT MintNFTAirDrop_AirDropTxHash FOREIGN KEY ("airdropTxHash") REFERENCES BLOCKCHAIN_TRANSACTION."AdminTransaction" ("txHash");
 ALTER TABLE CAMPAIGN."IneligibleMintNFTAirDrop"
     ADD CONSTRAINT IneligibleMintNFTAirDrop_NFT_ID FOREIGN KEY ("nftID") REFERENCES MASTER."NFT" ("id");
 
@@ -560,6 +428,12 @@ ALTER TABLE MASTER_TRANSACTION."PublicListingNFTTransaction"
 ALTER TABLE MASTER_TRANSACTION."SaleNFTTransaction"
     ADD COLUMN IF NOT EXISTS "mintOnSuccess" BOOLEAN NOT NULL DEFAULT false;
 
+ALTER TABLE BLOCKCHAIN_TRANSACTION."AdminTransaction"
+    ADD CONSTRAINT AdminTransaction_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
+
+ALTER TABLE BLOCKCHAIN_TRANSACTION."UserTransaction"
+    ADD CONSTRAINT UserTransaction_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
+
 ALTER TABLE MASTER."BurntNFT"
     ADD CONSTRAINT BurntNFT_CollectionId FOREIGN KEY ("collectionId") REFERENCES MASTER."Collection" ("id");
 
@@ -571,12 +445,12 @@ ALTER TABLE MASTER."SecondaryMarket"
     ADD CONSTRAINT SecondaryMarket_sellerId FOREIGN KEY ("sellerId") REFERENCES MASTER."Account" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."CancelOrderTransaction"
-    ADD CONSTRAINT CancelOrderTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."CancelOrder" ("txHash");
+    ADD CONSTRAINT CancelOrderTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
 ALTER TABLE MASTER_TRANSACTION."CancelOrderTransaction"
     ADD CONSTRAINT CancelOrderTransaction_SellerId FOREIGN KEY ("sellerId") REFERENCES MASTER."Account" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."DefineAssetTransaction"
-    ADD CONSTRAINT DefineAssetTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."DefineAsset" ("txHash");
+    ADD CONSTRAINT DefineAssetTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."AdminTransaction" ("txHash");
 ALTER TABLE MASTER_TRANSACTION."DefineAssetTransaction"
     ADD CONSTRAINT DefineAssetTransaction_CollectionId FOREIGN KEY ("collectionId") REFERENCES MASTER."Collection" ("id");
 
@@ -588,29 +462,29 @@ ALTER TABLE MASTER_TRANSACTION."ExternalAsset"
     ADD CONSTRAINT ExternalAsset_CollectionId FOREIGN KEY ("collectionId") REFERENCES MASTER."Collection" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."IssueIdentityTransaction"
-    ADD CONSTRAINT IssueIdentityTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."IssueIdentity" ("txHash");
+    ADD CONSTRAINT IssueIdentityTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."AdminTransaction" ("txHash");
 ALTER TABLE MASTER_TRANSACTION."IssueIdentityTransaction"
     ADD CONSTRAINT IssueIdentityTransaction_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."MintAssetTransaction"
-    ADD CONSTRAINT MintAssetTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."MintAsset" ("txHash");
+    ADD CONSTRAINT MintAssetTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."AdminTransaction" ("txHash");
 ALTER TABLE MASTER_TRANSACTION."MintAssetTransaction"
     ADD CONSTRAINT MintAssetTransaction_NFTId FOREIGN KEY ("nftID") REFERENCES MASTER."NFT" ("id");
 ALTER TABLE MASTER_TRANSACTION."MintAssetTransaction"
     ADD CONSTRAINT MintAssetTransaction_MinterAccountId FOREIGN KEY ("minterAccountID") REFERENCES MASTER."Account" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."NFTMintingFeeTransaction"
-    ADD CONSTRAINT NFTMintingFeeTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."NFTMintingFee" ("txHash");
+    ADD CONSTRAINT NFTMintingFeeTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
 ALTER TABLE MASTER_TRANSACTION."NFTMintingFeeTransaction"
     ADD CONSTRAINT NFTMintingFeeTransaction_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."ProvisionAddressTransaction"
-    ADD CONSTRAINT ProvisionAddressTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."ProvisionAddress" ("txHash");
+    ADD CONSTRAINT ProvisionAddressTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
 ALTER TABLE MASTER_TRANSACTION."ProvisionAddressTransaction"
     ADD CONSTRAINT ProvisionAddressTransaction_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."UnprovisionAddressTransaction"
-    ADD CONSTRAINT UnprovisionAddressTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UnprovisionAddress" ("txHash");
+    ADD CONSTRAINT UnprovisionAddressTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
 ALTER TABLE MASTER_TRANSACTION."UnprovisionAddressTransaction"
     ADD CONSTRAINT UnprovisionAddressTransaction_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 
@@ -619,93 +493,45 @@ ALTER TABLE MASTER_TRANSACTION."MakeOrderTransaction"
 ALTER TABLE MASTER_TRANSACTION."MakeOrderTransaction"
     ADD CONSTRAINT MakeOrderTransaction_sellerId FOREIGN KEY ("sellerId") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."MakeOrderTransaction"
-    ADD CONSTRAINT MakeOrderTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."MakeOrder" ("txHash");
+    ADD CONSTRAINT MakeOrderTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
 
 ALTER TABLE MASTER_TRANSACTION."NFTTransferTransaction"
-    ADD CONSTRAINT NFTTransferTransaction_OwnerId FOREIGN KEY ("ownerId") REFERENCES MASTER."Account" ("id");
+    ADD CONSTRAINT NFTTransferTransaction_OwnerId FOREIGN KEY ("fromId") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."NFTTransferTransaction"
     ADD CONSTRAINT NFTTransferTransaction_ToAccountId FOREIGN KEY ("toAccountId") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."NFTTransferTransaction"
-    ADD CONSTRAINT NFTTransferTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."SplitSend" ("txHash");
+    ADD CONSTRAINT NFTTransferTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
+
+ALTER TABLE MASTER_TRANSACTION."SendCoinTransaction"
+    ADD CONSTRAINT SendCoinTransaction_FromAccountId FOREIGN KEY ("fromAccountId") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."SendCoinTransaction"
+    ADD CONSTRAINT SendCoinTransaction_ToAccountId FOREIGN KEY ("toAccountId") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."SendCoinTransaction"
+    ADD CONSTRAINT SendCoinTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
 
 ALTER TABLE MASTER_TRANSACTION."TakeOrderTransaction"
     ADD CONSTRAINT TakeOrderTransaction_BuyerAccountId FOREIGN KEY ("buyerId") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."TakeOrderTransaction"
-    ADD CONSTRAINT TakeOrderTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."TakeOrder" ("txHash");
+    ADD CONSTRAINT TakeOrderTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
 
 ALTER TABLE MASTER_TRANSACTION."UnwrapTransaction"
     ADD CONSTRAINT UnwrapTransaction_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."UnwrapTransaction"
-    ADD CONSTRAINT UnwrapTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."Unwrap" ("txHash");
+    ADD CONSTRAINT UnwrapTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
 
 ALTER TABLE MASTER_TRANSACTION."WrapTransaction"
     ADD CONSTRAINT WrapTransaction_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."WrapTransaction"
-    ADD CONSTRAINT WrapTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."Wrap" ("txHash");
+    ADD CONSTRAINT WrapTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
 
-CREATE TRIGGER BT_CANCEL_ORDER_LOG
+CREATE TRIGGER BT_ADMIN_TRANSACTION_LOG
     BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."CancelOrder"
+    ON BLOCKCHAIN_TRANSACTION."AdminTransaction"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER BT_CAMPAIGN_SEND_COIN_LOG
+CREATE TRIGGER BT_USER_TRANSACTION_LOG
     BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."CampaignSendCoin"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER BT_DEFINE_ASSET_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."DefineAsset"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER BT_ISSUE_IDENTITY_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."IssueIdentity"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER BT_MINT_ASSET_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."MintAsset"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER BT_NFT_MINTING_FEE_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."NFTMintingFee"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER BT_PROVOSION_ADDRESS_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."ProvisionAddress"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER BT_MAKE_ORDER_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."MakeOrder"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER BT_SPLIT_SEND_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."SplitSend"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER BT_TAKE_ORDER_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."TakeOrder"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER BT_UNPROVOSION_ADDRESS_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."UnprovisionAddress"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER BT_UNWRAP_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."Unwrap"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER BT_WRAP_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."Wrap"
+    ON BLOCKCHAIN_TRANSACTION."UserTransaction"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 
@@ -787,6 +613,11 @@ CREATE TRIGGER PROVISION_ADDRESS_TRANSACTION_LOG
     ON MASTER_TRANSACTION."ProvisionAddressTransaction"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
+CREATE TRIGGER SEND_COIN_TRANSACTION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER_TRANSACTION."SendCoinTransaction"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 CREATE TRIGGER TAKE_ORDER_TRANSACTION_LOG
     BEFORE INSERT OR UPDATE
     ON MASTER_TRANSACTION."TakeOrderTransaction"
@@ -839,19 +670,8 @@ CREATE TRIGGER KEY_VALID
 EXECUTE PROCEDURE MASTER.KEY_VALIDATE();
 
 # --- !Downs
-DROP TRIGGER IF EXISTS BT_CANCEL_ORDER_LOG ON BLOCKCHAIN_TRANSACTION."CancelOrder" CASCADE;
-DROP TRIGGER IF EXISTS BT_CAMPAIGN_SEND_COIN_LOG ON BLOCKCHAIN_TRANSACTION."CampaignSendCoin" CASCADE;
-DROP TRIGGER IF EXISTS BT_DEFINE_ASSET_LOG ON BLOCKCHAIN_TRANSACTION."DefineAsset" CASCADE;
-DROP TRIGGER IF EXISTS BT_ISSUE_IDENTITY_LOG ON BLOCKCHAIN_TRANSACTION."IssueIdentity" CASCADE;
-DROP TRIGGER IF EXISTS BT_MINT_ASSET_LOG ON BLOCKCHAIN_TRANSACTION."MintAsset" CASCADE;
-DROP TRIGGER IF EXISTS BT_PROVOSION_ADDRESS_LOG ON BLOCKCHAIN_TRANSACTION."ProvisionAddress" CASCADE;
-DROP TRIGGER IF EXISTS BT_NFT_MINTING_FEE_LOG ON BLOCKCHAIN_TRANSACTION."NFTMintingFee" CASCADE;
-DROP TRIGGER IF EXISTS BT_MAKE_ORDER_LOG ON BLOCKCHAIN_TRANSACTION."MakeOrder" CASCADE;
-DROP TRIGGER IF EXISTS BT_SPLIT_SEND_LOG ON BLOCKCHAIN_TRANSACTION."SplitSend" CASCADE;
-DROP TRIGGER IF EXISTS BT_TAKE_ORDER_LOG ON BLOCKCHAIN_TRANSACTION."TakeOrder" CASCADE;
-DROP TRIGGER IF EXISTS BT_UNPROVOSION_ADDRESS_LOG ON BLOCKCHAIN_TRANSACTION."UnprovisionAddress" CASCADE;
-DROP TRIGGER IF EXISTS BT_UNWRAP_LOG ON BLOCKCHAIN_TRANSACTION."Unwrap" CASCADE;
-DROP TRIGGER IF EXISTS BT_WRAP_LOG ON BLOCKCHAIN_TRANSACTION."Wrap" CASCADE;
+DROP TRIGGER IF EXISTS BT_ADMIN_TRANSACTION_LOG ON BLOCKCHAIN_TRANSACTION."AdminTransaction" CASCADE;
+DROP TRIGGER IF EXISTS BT_USER_TRANSACTION_LOG ON BLOCKCHAIN_TRANSACTION."UserTransaction" CASCADE;
 
 DROP TRIGGER IF EXISTS MINT_NFT_AIRDROP_LOG ON CAMPAIGN."MintNFTAirDrop" CASCADE;
 DROP TRIGGER IF EXISTS INELIGIBLE_MINT_NFT_AIRDROP_LOG ON CAMPAIGN."IneligibleMintNFTAirDrop" CASCADE;
@@ -872,22 +692,13 @@ DROP TRIGGER IF EXISTS NFT_TRANSFER_TRANSACTION_LOG ON MASTER_TRANSACTION."NFTTr
 DROP TRIGGER IF EXISTS PROVISION_ADDRESS_TRANSACTION_LOG ON MASTER_TRANSACTION."ProvisionAddressTransaction" CASCADE;
 DROP TRIGGER IF EXISTS UNPROVISION_ADDRESS_TRANSACTION_LOG ON MASTER_TRANSACTION."UnprovisionAddressTransaction" CASCADE;
 DROP TRIGGER IF EXISTS MAKE_ORDER_TRANSACTION_LOG ON MASTER_TRANSACTION."MakeOrderTransaction" CASCADE;
+DROP TRIGGER IF EXISTS SEND_COIN_TRANSACTION_LOG ON MASTER_TRANSACTION."SendCoinTransaction" CASCADE;
 DROP TRIGGER IF EXISTS TAKE_ORDER_TRANSACTION_LOG ON MASTER_TRANSACTION."TakeOrderTransaction" CASCADE;
 DROP TRIGGER IF EXISTS UNWRAP_TRANSACTION_LOG ON MASTER_TRANSACTION."UnwrapTransaction" CASCADE;
 DROP TRIGGER IF EXISTS WRAP_TRANSACTION_LOG ON MASTER_TRANSACTION."WrapTransaction" CASCADE;
 
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."CancelOrder" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."CampaignSendCoin" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."DefineAsset" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."IssueIdentity" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."MintAsset" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."NFTMintingFee" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."ProvisionAddress" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SplitSend" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."TakeOrder" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."UnprovisionAddress" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."Unwrap" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."Wrap" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."AdminTransaction" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."UserTransaction" CASCADE;
 
 DROP TABLE IF EXISTS CAMPAIGN."MintNFTAirDrop" CASCADE;
 DROP TABLE IF EXISTS CAMPAIGN."IneligibleMintNFTAirDrop" CASCADE;
@@ -907,6 +718,7 @@ DROP TABLE IF EXISTS MASTER_TRANSACTION."NFTMintingFeeTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."NFTTransferTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."IssueIdentityTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."ProvisionAddressTransaction" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."SendCoinTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."TakeOrderTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."UnprovisionAddressTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."UnwrapTransaction" CASCADE;

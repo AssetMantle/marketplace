@@ -44,9 +44,9 @@ class CollectionController @Inject()(
                                       utilitiesNotification: utilities.Notification,
                                     )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.COLLECTION_CONTROLLER
+  implicit val module: String = constants.Module.COLLECTION_CONTROLLER
 
   implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
 
@@ -94,7 +94,7 @@ class CollectionController @Inject()(
   def collectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val collections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        val collections = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterCollections.Service.getPublicByPageNumber(pageNumber)
 
         (for {
@@ -123,7 +123,7 @@ class CollectionController @Inject()(
   def collectionNFTsPerPage(id: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit optionalLoginState =>
       implicit request =>
-        val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        val collection = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterCollections.Service.tryGet(id)
         val likedNFTs = optionalLoginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollection(accountId = x.username, collectionId = id))
 
@@ -199,7 +199,6 @@ class CollectionController @Inject()(
               collectionAnalysis.floorPrice.min(collectionAnalysis.publicListingPrice)
             } else collectionAnalysis.floorPrice
             val saleStatus = if (lowestPrice == collectionAnalysis.floorPrice) 1 else 0
-
             Ok(s"${collectionAnalysis.totalNFTs.toString}|${s"${lowestPrice.toString} (${utilities.NumericOperation.formatNumber(lowestPrice.toDouble * tokenPrice)} $$)"}|${saleStatus}")
           } else if (statusId == 1) {
             Ok(s"${collectionAnalysis.totalNFTs.toString}|${s"${collectionAnalysis.publicListingPrice.toString} (${utilities.NumericOperation.formatNumber(collectionAnalysis.publicListingPrice.toDouble * tokenPrice)} $$)"}|${publicListingStatus}")

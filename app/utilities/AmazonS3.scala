@@ -7,7 +7,6 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model._
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 import com.amazonaws.{AmazonClientException, AmazonServiceException, SdkClientException, auth}
-import exceptions.BaseException
 import play.api.Logger
 
 import java.io.{File, FileOutputStream, IOException, OutputStream}
@@ -19,9 +18,9 @@ import scala.jdk.CollectionConverters._
 
 object AmazonS3 {
 
-  private implicit val module: String = constants.Module.UTILITIES_AMAZON_S3
+  implicit val module: String = constants.Module.UTILITIES_AMAZON_S3
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   private val clientRegion: Regions = Regions.fromName(constants.CommonConfig.AmazonS3.Region)
 
@@ -57,7 +56,7 @@ object AmazonS3 {
       request
     } catch {
       case ioException: IOException => logger.error(ioException.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_UPLOAD_FAILURE)
+        constants.Response.AMAZON_S3_UPLOAD_FAILURE.throwBaseException(ioException)
     }
   }
 
@@ -66,9 +65,9 @@ object AmazonS3 {
       s3Client.putObject(getPutObjectRequestWithMetaData(objectKey = objectKey, filePath = filePath, metaData = metaData))
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
     }
   }
 
@@ -77,11 +76,11 @@ object AmazonS3 {
       s3Client.putObject(bucketName, objectKeyName, data)
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
       case ioException: IOException => logger.error(ioException.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_UPLOAD_FAILURE, ioException)
+        constants.Response.AMAZON_S3_UPLOAD_FAILURE.throwBaseException(ioException)
     }
   }
 
@@ -140,11 +139,11 @@ object AmazonS3 {
       initResponse.getUploadId
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
       case ioException: IOException => logger.error(ioException.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_UPLOAD_FAILURE, ioException)
+        constants.Response.AMAZON_S3_UPLOAD_FAILURE.throwBaseException(ioException)
     }
   }
 
@@ -154,9 +153,9 @@ object AmazonS3 {
       s3Client.listMultipartUploads(allMultipartUploadsRequest)
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
     }
   }
 
@@ -175,9 +174,9 @@ object AmazonS3 {
       s3Client.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName, objectKey, uploadID))
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
     }
   }
 
@@ -188,9 +187,9 @@ object AmazonS3 {
       s3Client.copyObject(copyObjRequest)
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
     }
   }
 
@@ -199,9 +198,9 @@ object AmazonS3 {
       s3Client.doesObjectExist(bucketName, objectKey)
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
     }
   }
 
@@ -211,9 +210,9 @@ object AmazonS3 {
       deleteObject(sourceKey)
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
     }
   }
 
@@ -227,11 +226,11 @@ object AmazonS3 {
       s3Client.getObject(request)
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
       case ioException: IOException => logger.error(ioException.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_UPLOAD_FAILURE, ioException)
+        constants.Response.AMAZON_S3_UPLOAD_FAILURE.throwBaseException(ioException)
     }
   }
 
@@ -243,11 +242,11 @@ object AmazonS3 {
       s3Object.getObjectMetadata.getUserMetadata.asScala.toMap
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
       case ioException: IOException => logger.error(ioException.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_UPLOAD_FAILURE, ioException)
+        constants.Response.AMAZON_S3_UPLOAD_FAILURE.throwBaseException(ioException)
     }
   }
 
@@ -256,9 +255,9 @@ object AmazonS3 {
       s3Client.deleteObject(new DeleteObjectRequest(bucketName, objectKey))
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
     }
   }
 
@@ -267,12 +266,12 @@ object AmazonS3 {
       val bucketVersionStatus = s3Client.getBucketVersioningConfiguration(bucketName).getStatus
       if (bucketVersionStatus == BucketVersioningConfiguration.ENABLED) {
         s3Client.deleteVersion(new DeleteVersionRequest(bucketName, objectKey, versionID))
-      } else throw new BaseException(constants.Response.AMAZON_S3_NON_VERSIONED_BUCKET)
+      } else constants.Response.AMAZON_S3_NON_VERSIONED_BUCKET.throwBaseException()
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
     }
   }
 
@@ -285,9 +284,9 @@ object AmazonS3 {
       }
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
     }
   }
 
@@ -297,11 +296,11 @@ object AmazonS3 {
       s3Client.deleteObjects(multiObjectDeleteRequest).getDeletedObjects.size
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
       case ioException: IOException => logger.error(ioException.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_UPLOAD_FAILURE, ioException)
+        constants.Response.AMAZON_S3_UPLOAD_FAILURE.throwBaseException(ioException)
     }
   }
 
@@ -312,9 +311,9 @@ object AmazonS3 {
       s3Client.listObjects(listObjects).getObjectSummaries
     } catch {
       case e: AmazonServiceException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_PROCESS_FAILURE, e)
+        constants.Response.AMAZON_S3_PROCESS_FAILURE.throwBaseException(e)
       case e: SdkClientException => logger.error(e.getLocalizedMessage)
-        throw new BaseException(constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE, e)
+        constants.Response.AMAZON_S3_CLIENT_CONNECTION_FAILURE.throwBaseException(e)
     }
   }
 

@@ -4,6 +4,7 @@ import akka.actor.CoordinatedShutdown
 import controllers.actions._
 import controllers.result.WithUsernameToken
 import models._
+import models.blockchainTransaction.{AdminTransactions, UserTransactions}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -28,21 +29,9 @@ class IndexController @Inject()(
                                  historyMasterPublicListings: history.MasterPublicListings,
                                  historyMasterSecondaryMarkets: history.MasterSecondaryMarkets,
                                  nftPublicListings: blockchainTransaction.NFTPublicListings,
-                                 defineAssets: blockchainTransaction.DefineAssets,
-                                 mintAssets: blockchainTransaction.MintAssets,
                                  sendCoins: blockchainTransaction.SendCoins,
+                                 sendCoinTransactions: masterTransaction.SendCoinTransactions,
                                  nftSales: blockchainTransaction.NFTSales,
-                                 cancelOrders: blockchainTransaction.CancelOrders,
-                                 makeOrders: blockchainTransaction.MakeOrders,
-                                 takeOrders: blockchainTransaction.TakeOrders,
-                                 issueIdentities: blockchainTransaction.IssueIdentities,
-                                 provisionAddresses: blockchainTransaction.ProvisionAddresses,
-                                 unprovisionAddresses: blockchainTransaction.UnprovisionAddresses,
-                                 campaignSendCoins: blockchainTransaction.CampaignSendCoins,
-                                 nftMintingFees: blockchainTransaction.NFTMintingFees,
-                                 splitSends: blockchainTransaction.SplitSends,
-                                 unwraps: blockchainTransaction.Unwraps,
-                                 wraps: blockchainTransaction.Wraps,
                                  mintNFTAirDrops: campaign.MintNFTAirDrops,
                                  masterTransactionLatestBlocks: masterTransaction.LatestBlocks,
                                  masterTransactionTokenPrices: masterTransaction.TokenPrices,
@@ -61,11 +50,13 @@ class IndexController @Inject()(
                                  wrapTransactions: masterTransaction.WrapTransactions,
                                  provisionAddressTransactions: masterTransaction.ProvisionAddressTransactions,
                                  unprovisionAddressTransactions: masterTransaction.UnprovisionAddressTransactions,
+                                 userTransactions: UserTransactions,
+                                 adminTransactions: AdminTransactions,
                                )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.INDEX_CONTROLLER
+  implicit val module: String = constants.Module.INDEX_CONTROLLER
 
   implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
 
@@ -82,6 +73,9 @@ class IndexController @Inject()(
 
   Await.result(starter.fixMantleMonkeys(), Duration.Inf)
   Await.result(starter.correctCollectionProperties(), Duration.Inf)
+  Await.result(nftPublicListings.Utility.migrate, Duration.Inf)
+  Await.result(nftSales.Utility.migrate, Duration.Inf)
+  Await.result(sendCoins.Utility.migrate, Duration.Inf)
   starter.changeAwsKey()
 
   //  starter.start()
@@ -95,22 +89,8 @@ class IndexController @Inject()(
     // blockchain
     blockchainBlocks.Utility.scheduler,
     // blockchainTransaction
-    campaignSendCoins.Utility.scheduler,
-    cancelOrders.Utility.scheduler,
-    defineAssets.Utility.scheduler,
-    issueIdentities.Utility.scheduler,
-    makeOrders.Utility.scheduler,
-    mintAssets.Utility.scheduler,
-    nftMintingFees.Utility.scheduler,
-    nftPublicListings.Utility.scheduler,
-    nftSales.Utility.scheduler,
-    provisionAddresses.Utility.scheduler,
-    sendCoins.Utility.scheduler,
-    splitSends.Utility.scheduler,
-    takeOrders.Utility.scheduler,
-    unprovisionAddresses.Utility.scheduler,
-    unwraps.Utility.scheduler,
-    wraps.Utility.scheduler,
+    adminTransactions.Utility.scheduler,
+    userTransactions.Utility.scheduler,
     // campaign
     mintNFTAirDrops.Utility.scheduler,
     // history
@@ -130,6 +110,7 @@ class IndexController @Inject()(
     publicListingNFTTransactions.Utility.scheduler,
     saleNFTTransactions.Utility.scheduler,
     masterTransactionSessionTokens.Utility.scheduler,
+    sendCoinTransactions.Utility.scheduler,
     takeOrderTransactions.Utility.scheduler,
     masterTransactionTokenPrices.Utility.scheduler,
     unprovisionAddressTransactions.Utility.scheduler,

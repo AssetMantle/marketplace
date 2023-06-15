@@ -14,19 +14,6 @@ object Blockchain {
   val StakingToken: String = CommonConfig.Blockchain.StakingToken
   val StakingTokenCoinID: CoinID = CoinID(StringID(StakingToken))
   val UpgradeHeight: Int = CommonConfig.Blockchain.UpgradeHeight
-  val DefaultSendCoinGasAmount = 120000
-  val DefaultIssueIdentityGasLimit = 120000
-  val DefaultDefineAssetGasLimit = 150000
-  val DefaultMintAssetGasLimit = 150000
-  val DefaultMakeOrderGasLimit = 150000
-  val DefaultUnwrapGasLimit = 120000
-  val DefaultWrapGasLimit = 120000
-  val DefaultCancelOrderGasLimit = 150000
-  val DefaultTakeOrderGasLimit = 150000
-  val DefaultGasPrice: BigDecimal = BigDecimal(0)
-  val DefaultProvisionGasLimit = 120000
-  val DefaultNFTTransferGasLimit = 120000
-  val TxTimeoutHeight: Int = 100
   val DefaultHDPath: Seq[ChildNumber] = Seq(
     new ChildNumber(44, true),
     new ChildNumber(CoinType, true),
@@ -34,7 +21,10 @@ object Blockchain {
     new ChildNumber(0, false),
     new ChildNumber(0, false)
   )
-
+  // TODO BondRate from parameters
+  val BondRate = 1
+  val MaxOrderExpiry: Int = 43210
+  val MaxOrderHours = 72
   val EmptyIdentityID: IdentityID = IdentityID(Array[Byte]())
 
   val RestEndPoint: String = CommonConfig.Blockchain.RestEndPoint

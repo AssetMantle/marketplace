@@ -2,15 +2,15 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.blockchainTransaction.CancelOrder
+import models.blockchainTransaction.UserTransaction
 import models.master.SecondaryMarket
+import models.masterTransaction.CancelOrderTransactions.CancelOrderTransactionTable
 import models.traits._
 import models.{blockchain, blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
-import transactions.responses.blockchain.BroadcastTxSyncResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
@@ -21,11 +21,7 @@ case class CancelOrderTransaction(txHash: String, secondaryMarketId: String, sel
 
 }
 
-object CancelOrderTransactions {
-
-  private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_CANCEL_ORDER_TRANSACTION
+private[masterTransaction] object CancelOrderTransactions {
 
   class CancelOrderTransactionTable(tag: Tag) extends Table[CancelOrderTransaction](tag, "CancelOrderTransaction") with ModelTable[String] {
 
@@ -33,7 +29,7 @@ object CancelOrderTransactions {
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
-    def secondaryMarketId = column[String]("secondaryMarketId", O.PrimaryKey)
+    def secondaryMarketId = column[String]("secondaryMarketId")
 
     def sellerId = column[String]("sellerId")
 
@@ -51,119 +47,93 @@ object CancelOrderTransactions {
 
   }
 
-  val TableQuery = new TableQuery(tag => new CancelOrderTransactionTable(tag))
-
 }
 
 @Singleton
 class CancelOrderTransactions @Inject()(
-                                         protected val databaseConfigProvider: DatabaseConfigProvider,
+                                         protected val dbConfigProvider: DatabaseConfigProvider,
                                          blockchainIdentities: blockchain.Identities,
-                                         broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                          masterSecondaryMarkets: master.SecondaryMarkets,
                                          masterNFTs: master.NFTs,
                                          utilitiesOperations: utilities.Operations,
-                                         getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
-                                         getAccount: queries.blockchain.GetAccount,
-                                         getAbciInfo: queries.blockchain.GetABCIInfo,
                                          utilitiesNotification: utilities.Notification,
-                                         blockchainTransactionCancelOrders: blockchainTransaction.CancelOrders,
-                                       )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[CancelOrderTransactions.CancelOrderTransactionTable, CancelOrderTransaction, String](
-    databaseConfigProvider,
-    CancelOrderTransactions.TableQuery,
-    executionContext,
-    CancelOrderTransactions.module,
-    CancelOrderTransactions.logger
-  ) {
+                                         userTransactions: blockchainTransaction.UserTransactions,
+                                       )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[CancelOrderTransactions.CancelOrderTransactionTable, CancelOrderTransaction, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_CANCEL_ORDER_TRANSACTION
+
+  val tableQuery = new TableQuery(tag => new CancelOrderTransactionTable(tag))
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, secondaryMarketId: String, sellerId: String): Future[String] = create(CancelOrderTransaction(txHash = txHash, secondaryMarketId = secondaryMarketId, sellerId = sellerId, status = None))
+    def addWithNoneStatus(txHash: String, secondaryMarketId: String, sellerId: String): Future[String] = create(CancelOrderTransaction(txHash = txHash, secondaryMarketId = secondaryMarketId, sellerId = sellerId, status = None)).map(_.id)
 
     def getByTxHash(txHash: String): Future[Seq[CancelOrderTransaction]] = filter(_.txHash === txHash)
 
-    def markSuccess(txHash: String): Future[Int] = customUpdate(CancelOrderTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
+    def markSuccess(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(true))
 
-    def markFailed(txHash: String): Future[Int] = customUpdate(CancelOrderTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(false))
+    def markFailed(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(false))
 
     def getAllPendingStatus: Future[Seq[CancelOrderTransaction]] = filter(_.status.?.isEmpty)
 
     def checkAnyPendingTx: Future[Boolean] = filterAndExists(_.status.?.isEmpty)
-
-    def getWithStatusTrueOrPending(secondaryMarketIds: Seq[String]): Future[Seq[String]] = filter(x => x.secondaryMarketId.inSet(secondaryMarketIds) && (x.status || x.status.?.isEmpty)).map(_.map(_.secondaryMarketId))
   }
 
   object Utility {
 
     def transaction(secondaryMarket: SecondaryMarket, fromAddress: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      // TODO
-      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
-      val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount)
-      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
+      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
+        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(
             utilities.BlockchainTransaction.getCancelOrderMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(secondaryMarket.sellerId), orderID = secondaryMarket.getOrderID())
           ),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultCancelOrderGasLimit),
-          gasLimit = constants.Blockchain.DefaultCancelOrderGasLimit,
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultCancelOrderGasLimit),
+          gasLimit = constants.Transaction.DefaultCancelOrderGasLimit,
           account = bcAccount,
           ecKey = ecKey,
           timeoutHeight = timeoutHeight)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
-        def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
+        val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              cancelOrder <- blockchainTransactionCancelOrders.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              userTx <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = secondaryMarket.sellerId, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.User.CANCEL_ORDER)
               _ <- Service.addWithNoneStatus(txHash = txHash, secondaryMarketId = secondaryMarket.id, sellerId = secondaryMarket.sellerId)
-            } yield cancelOrder
+            } yield userTx
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
-          cancelOrder <- checkAndAdd(unconfirmedTxHashes)
-        } yield (cancelOrder, txRawBytes)
+          userTransaction <- checkAndAdd
+        } yield (userTransaction, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(cancelOrder: CancelOrder, txRawBytes: Array[Byte]) = {
-
-        val broadcastTx = broadcastTxSync.Service.get(cancelOrder.getTxRawAsHexString(txRawBytes))
-
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionCancelOrders.Service.markFailedWithLog(txHashes = Seq(cancelOrder.txHash), log = errorResponse.get.error.data)
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionCancelOrders.Service.markFailedWithLog(txHashes = Seq(cancelOrder.txHash), log = successResponse.get.result.log)
-        else Future(0)
-
-        for {
-          (successResponse, errorResponse) <- broadcastTx
-          _ <- update(successResponse, errorResponse)
-        } yield ()
-      }
+      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
 
       for {
-        abciInfo <- abciInfo
-        bcAccount <- bcAccount
-        unconfirmedTxs <- unconfirmedTxs
-        (cancelOrder, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        _ <- broadcastTxAndUpdate(cancelOrder, txRawBytes)
-      } yield cancelOrder
+        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
+        (userTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        updatedUserTransaction <- broadcastTxAndUpdate(userTransaction, txRawBytes)
+      } yield updatedUserTransaction
     }
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = CancelOrderTransactions.module
+      val name: String = module
 
       def runner(): Unit = {
         val cancelOrderTxs = Service.getAllPendingStatus
 
         def checkAndUpdate(cancelOrderTxs: Seq[CancelOrderTransaction]) = utilitiesOperations.traverse(cancelOrderTxs) { cancelOrderTx =>
-          val transaction = blockchainTransactionCancelOrders.Service.tryGet(cancelOrderTx.txHash)
+          val transaction = userTransactions.Service.tryGet(cancelOrderTx.txHash)
 
-          def onTxComplete(transaction: CancelOrder) = if (transaction.status.isDefined) {
-            if (transaction.status.get) {
+          def onTxComplete(userTx: UserTransaction) = if (userTx.status.isDefined) {
+            if (userTx.status.get) {
               val markSuccess = Service.markSuccess(cancelOrderTx.txHash)
               val markOnCancellation = masterSecondaryMarkets.Service.markOnCancellation(cancelOrderTx.secondaryMarketId)
               val sendNotifications = utilitiesNotification.send(cancelOrderTx.sellerId, constants.Notification.CANCEL_ORDER_SUCCESSFUL)("")

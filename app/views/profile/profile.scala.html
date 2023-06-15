@@ -14,6 +14,7 @@
                         constants.View.CREATED -> (routes.javascript.CollectionController.createdSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.CREATED}')")),
                         constants.View.WHITELIST -> (routes.javascript.WhitelistController.whitelistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WHITELIST}')")),
                         constants.View.WISHLIST -> (routes.javascript.WishlistController.wishlistSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.WISHLIST}')")),
+                        constants.View.TRANSACTIONS -> (routes.javascript.ProfileController.transactionsSection, JavaScript(s"changeProfileStateOnSwitcher('$accountId', '${constants.View.TRANSACTIONS}')")),
                     ),
                     activeTab,
                     Symbol(constants.View.COLLECTED + "_PARAMETERS") -> s"'${accountId}'",

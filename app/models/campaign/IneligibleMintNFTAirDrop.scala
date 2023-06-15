@@ -1,5 +1,6 @@
 package models.campaign
 
+import models.campaign.IneligibleMintNFTAirDrops.IneligibleMintNFTAirDropTable
 import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -14,10 +15,6 @@ case class IneligibleMintNFTAirDrop(nftID: String, createdBy: Option[String] = N
 }
 
 object IneligibleMintNFTAirDrops {
-
-  private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val module: String = constants.Module.CAMPAIGN_INELIGIBLE_MINT_NFT_AIRDROP
 
   class IneligibleMintNFTAirDropTable(tag: Tag) extends Table[IneligibleMintNFTAirDrop](tag, "IneligibleMintNFTAirDrop") with ModelTable[String] {
 
@@ -37,21 +34,19 @@ object IneligibleMintNFTAirDrops {
 
   }
 
-  val TableQuery = new TableQuery(tag => new IneligibleMintNFTAirDropTable(tag))
-
 }
 
 @Singleton
 class IneligibleMintNFTAirDrops @Inject()(
-                                           protected val databaseConfigProvider: DatabaseConfigProvider,
-                                         )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[IneligibleMintNFTAirDrops.IneligibleMintNFTAirDropTable, IneligibleMintNFTAirDrop, String](
-    databaseConfigProvider,
-    IneligibleMintNFTAirDrops.TableQuery,
-    executionContext,
-    IneligibleMintNFTAirDrops.module,
-    IneligibleMintNFTAirDrops.logger
-  ) {
+                                           protected val dbConfigProvider: DatabaseConfigProvider,
+                                         )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[IneligibleMintNFTAirDropTable, IneligibleMintNFTAirDrop, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.CAMPAIGN_INELIGIBLE_MINT_NFT_AIRDROP
+
+  val tableQuery = new TableQuery(tag => new IneligibleMintNFTAirDropTable(tag))
 
   object Service {
 

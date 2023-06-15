@@ -3,8 +3,9 @@ package models.history
 import constants.Scheduler
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
+import models.history.MasterSecondaryMarkets.MasterSecondaryMarketTable
 import models.master.{Collection, NFT}
-import models.traits.{Entity, GenericDaoImpl, HistoryLogging, ModelTable}
+import models.traits._
 import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -15,7 +16,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class MasterSecondaryMarket(id: String, orderId: Option[String], nftId: String, collectionId: String, sellerId: String, quantity: BigInt, price: MicroNumber, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, failed: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends HistoryLogging {
+case class MasterSecondaryMarket(id: String, orderId: Option[String], nftId: String, collectionId: String, sellerId: String, quantity: BigInt, price: MicroNumber, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends HistoryLogging {
 
   def serialize(): MasterSecondaryMarkets.MasterSecondaryMarketSerialized = MasterSecondaryMarkets.MasterSecondaryMarketSerialized(
     id = this.id,
@@ -31,7 +32,7 @@ case class MasterSecondaryMarket(id: String, orderId: Option[String], nftId: Str
     completed = this.completed,
     cancelled = this.cancelled,
     expired = this.expired,
-    failed = this.failed,
+    status = this.status,
     createdBy = this.createdBy,
     createdOnMillisEpoch = this.createdOnMillisEpoch,
     updatedBy = this.updatedBy,
@@ -41,24 +42,20 @@ case class MasterSecondaryMarket(id: String, orderId: Option[String], nftId: Str
 
 }
 
-object MasterSecondaryMarkets {
+private[history] object MasterSecondaryMarkets {
 
-  implicit val module: String = constants.Module.HISTORY_MASTER_SECONDARY_MARKET
+  case class MasterSecondaryMarketSerialized(id: String, orderId: Option[String], nftId: String, collectionId: String, sellerId: String, quantity: BigDecimal, price: BigDecimal, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
-  implicit val logger: Logger = Logger(this.getClass)
-
-  case class MasterSecondaryMarketSerialized(id: String, orderId: Option[String], nftId: String, collectionId: String, sellerId: String, quantity: BigDecimal, price: BigDecimal, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, failed: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
-
-    def deserialize: MasterSecondaryMarket = MasterSecondaryMarket(id = id, orderId = orderId, nftId = nftId, collectionId = collectionId, sellerId = sellerId, quantity = this.quantity.toBigInt, price = MicroNumber(price), denom = denom, endHours = endHours, externallyMade = externallyMade, completed = completed, expired = expired, failed = failed, cancelled = cancelled, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch, deletedBy = this.deletedBy, deletedOnMillisEpoch = this.deletedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): MasterSecondaryMarket = MasterSecondaryMarket(id = id, orderId = orderId, nftId = nftId, collectionId = collectionId, sellerId = sellerId, quantity = this.quantity.toBigInt, price = MicroNumber(price), denom = denom, endHours = endHours, externallyMade = externallyMade, completed = completed, expired = expired, status = status, cancelled = cancelled, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch, deletedBy = this.deletedBy, deletedOnMillisEpoch = this.deletedOnMillisEpoch)
   }
 
   class MasterSecondaryMarketTable(tag: Tag) extends Table[MasterSecondaryMarketSerialized](tag, "MasterSecondaryMarket") with ModelTable[String] {
 
-    def * = (id, orderId.?, nftId, collectionId, sellerId, quantity, price, denom, endHours, externallyMade, completed, cancelled, expired, failed,createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?, deletedBy.?, deletedOnMillisEpoch.?) <> (MasterSecondaryMarketSerialized.tupled, MasterSecondaryMarketSerialized.unapply)
+    def * = (id, orderId.?, nftId, collectionId, sellerId, quantity, price, denom, endHours, externallyMade, completed, cancelled, expired, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?, deletedBy.?, deletedOnMillisEpoch.?) <> (MasterSecondaryMarketSerialized.tupled, MasterSecondaryMarketSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def orderId = column[String]("orderId")
+    def orderId = column[String]("orderId", O.Unique)
 
     def nftId = column[String]("nftId")
 
@@ -82,8 +79,7 @@ object MasterSecondaryMarkets {
 
     def expired = column[Boolean]("expired")
 
-
-    def failed = column[Boolean]("failed")
+    def status = column[Boolean]("status")
 
     def createdBy = column[String]("createdBy")
 
@@ -98,7 +94,6 @@ object MasterSecondaryMarkets {
     def deletedOnMillisEpoch = column[Long]("deletedOnMillisEpoch")
   }
 
-  val TableQuery = new TableQuery(tag => new MasterSecondaryMarketTable(tag))
 }
 
 @Singleton
@@ -111,21 +106,21 @@ class MasterSecondaryMarkets @Inject()(
                                         collectionsAnalysis: CollectionsAnalysis,
                                         masterTransactionMakeOrderTransactions: masterTransaction.MakeOrderTransactions,
                                         masterTransactionTakeOrderTransactions: masterTransaction.TakeOrderTransactions,
-                                        protected val databaseConfigProvider: DatabaseConfigProvider
-                                      )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[MasterSecondaryMarkets.MasterSecondaryMarketTable, MasterSecondaryMarkets.MasterSecondaryMarketSerialized, String](
-    databaseConfigProvider,
-    MasterSecondaryMarkets.TableQuery,
-    executionContext,
-    MasterSecondaryMarkets.module,
-    MasterSecondaryMarkets.logger
-  ) {
+                                        protected val dbConfigProvider: DatabaseConfigProvider,
+                                      )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[MasterSecondaryMarkets.MasterSecondaryMarketTable, MasterSecondaryMarkets.MasterSecondaryMarketSerialized, String]() {
+
+  implicit val module: String = constants.Module.HISTORY_MASTER_SECONDARY_MARKET
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new MasterSecondaryMarketTable(tag))
 
   object Service {
 
-    def insertOrUpdate(masterSecondaryMarket: MasterSecondaryMarket): Future[Unit] = upsert(masterSecondaryMarket.serialize())
+    def insertOrUpdate(masterSecondaryMarket: MasterSecondaryMarket): Future[Int] = upsert(masterSecondaryMarket.serialize())
 
-    def add(masterSecondaryMarkets: Seq[MasterSecondaryMarket]): Future[Unit] = create(masterSecondaryMarkets.map(_.serialize()))
+    def add(masterSecondaryMarkets: Seq[MasterSecondaryMarket]): Future[Int] = create(masterSecondaryMarkets.map(_.serialize()))
 
     def tryGet(id: String): Future[MasterSecondaryMarket] = filterHead(_.id === id).map(_.deserialize)
 
@@ -176,7 +171,7 @@ class MasterSecondaryMarkets @Inject()(
     }
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = MasterSecondaryMarkets.module
+      val name: String = module
 
       def runner(): Unit = {
         val completedOrders = masterSecondaryMarkets.Service.getCompletedOrders
@@ -206,7 +201,7 @@ class MasterSecondaryMarkets @Inject()(
           _ <- removeOrdersFromMarket(makeOrderTxWithPendingStatus ++ takeOrderTxWithPendingStatus, cancelledOrders ++ expiredOrders)
           _ <- deleteOrders(makeOrderTxWithPendingStatus ++ takeOrderTxWithPendingStatus, completedOrders ++ failedOrders)
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case _: BaseException => logger.error("FAILED_IN_" + module)
         }
 
         Await.result(forComplete, Duration.Inf)

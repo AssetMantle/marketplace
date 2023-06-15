@@ -63,22 +63,6 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val addUnmanagedKeyConstraint: Constraint[AddUnmanagedKey.Data] = Constraint("constraints.AddUnmanagedKey")({ addUnmanagedKeyData: AddUnmanagedKey.Data =>
-    val errors = Seq(
-      if (!addUnmanagedKeyData.address.startsWith("mantle") || addUnmanagedKeyData.address.length != 45) Option(ValidationError(constants.Response.INVALID_WALLET_ADDRESS.message)) else None,
-    ).flatten
-    if (errors.isEmpty) Valid else Invalid(errors)
-  })
-
-  val sendCoinConstraint: Constraint[SendCoin.Data] = Constraint("constraints.SendCoin")({ sendCoin: SendCoin.Data =>
-    val errors = Seq(
-      if (!sendCoin.fromAddress.startsWith("mantle") || sendCoin.fromAddress.length != 45) Option(ValidationError(constants.Response.INVALID_FROM_ADDRESS.message)) else None,
-      if (!sendCoin.toAddress.startsWith("mantle") || sendCoin.toAddress.length != 45) Option(ValidationError(constants.Response.INVALID_TO_ADDRESS.message)) else None,
-      if (sendCoin.fromAddress == sendCoin.toAddress) Option(ValidationError(constants.Response.FROM_AND_TO_ADDRESS_SAME.message)) else None,
-    ).flatten
-    if (errors.isEmpty) Valid else Invalid(errors)
-  })
-
   val createWhitelistInviteConstraint: Constraint[whitelist.Create.Data] = Constraint("constraints.CreateWhitelist")({ createWhitelistData: whitelist.Create.Data =>
     val errors = Seq(
       if (createWhitelistData.startEpoch >= createWhitelistData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,

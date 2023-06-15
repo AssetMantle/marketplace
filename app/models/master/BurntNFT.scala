@@ -1,6 +1,7 @@
 package models.master
 
 import models.common.NFT._
+import models.master.BurntNFTs.BurntNFTTable
 import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -29,14 +30,9 @@ case class BurntNFT(nftId: String, txHash: String, collectionId: String, assetId
     updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
-object BurntNFTs {
-
-  implicit val module: String = constants.Module.MASTER_BURNT_NFT
-
-  implicit val logger: Logger = Logger(this.getClass)
-
+private[master] object BurntNFTs {
   case class BurntNFTSerialized(nftId: String, txHash: String, collectionId: String, assetId: String, classificationId: String, supply: BigDecimal, name: String, description: String, properties: String, fileExtension: String, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity2[String, String] {
-    def deserialize: BurntNFT = BurntNFT(nftId = nftId, collectionId = collectionId, assetId = assetId, classificationId = classificationId, supply = supply.toBigInt, txHash = txHash, name = name, description = description, fileExtension = fileExtension, properties = utilities.JSON.convertJsonStringToObject[Seq[BaseNFTProperty]](properties), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): BurntNFT = BurntNFT(nftId = nftId, collectionId = collectionId, assetId = assetId, classificationId = classificationId, supply = supply.toBigInt, txHash = txHash, name = name, description = description, fileExtension = fileExtension, properties = utilities.JSON.convertJsonStringToObject[Seq[BaseNFTProperty]](properties), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
     def id1 = nftId
 
@@ -80,31 +76,28 @@ object BurntNFTs {
     def id2 = txHash
 
   }
-
-  lazy val TableQuery = new TableQuery(tag => new BurntNFTTable(tag))
 }
 
 @Singleton
 class BurntNFTs @Inject()(
-                           protected val databaseConfigProvider: DatabaseConfigProvider
-                         )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl2[BurntNFTs.BurntNFTTable, BurntNFTs.BurntNFTSerialized, String, String](
-    databaseConfigProvider,
-    BurntNFTs.TableQuery,
-    executionContext,
-    BurntNFTs.module,
-    BurntNFTs.logger
-  ) {
+                           protected val dbConfigProvider: DatabaseConfigProvider,
+                         )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl2[BurntNFTs.BurntNFTTable, BurntNFTs.BurntNFTSerialized, String, String]() {
 
+  implicit val module: String = constants.Module.MASTER_BURNT_NFT
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new BurntNFTTable(tag))
 
   object Service {
 
-    def add(nftId: String, txHash: String, collectionId: String, assetId: String, classificationId: String, supply: BigInt, name: String, description: String, properties: Seq[BaseNFTProperty], fileExtension: String): Future[Unit] = {
+    def add(nftId: String, txHash: String, collectionId: String, assetId: String, classificationId: String, supply: BigInt, name: String, description: String, properties: Seq[BaseNFTProperty], fileExtension: String): Future[String] = {
       val burntNFT = BurntNFT(nftId = nftId, txHash = txHash, collectionId = collectionId, assetId = assetId, classificationId = classificationId, supply = supply, name = name, description = description, properties = properties, fileExtension = fileExtension)
-      create(burntNFT.serialize())
+      create(burntNFT.serialize()).map(_.nftId)
     }
 
-    def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[BurntNFT]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.collectionId === collectionId)(_.createdOnMillisEpoch).map(_.map(_.deserialize))
+    def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[BurntNFT]] = filterAndSortWithPagination(_.collectionId === collectionId)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage).map(_.map(_.deserialize))
 
     def getAllForCollection(collectionId: String): Future[Seq[BurntNFT]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize))
 

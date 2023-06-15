@@ -25,9 +25,9 @@ class CollectedController @Inject()(
                                      masterNFTOwners: master.NFTOwners,
                                    )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.COLLECTED_CONTROLLER
+  implicit val module: String = constants.Module.COLLECTED_CONTROLLER
 
   implicit val callbackOnSessionTimeout: Call = routes.ProfileController.viewDefaultProfile()
 
@@ -43,7 +43,7 @@ class CollectedController @Inject()(
       implicit request =>
         val allCollectionIds = masterNFTOwners.Service.getCollectedCollection(accountId)
 
-        def allCollections(collectionIds: Seq[String]) = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        def allCollections(collectionIds: Seq[String]) = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterCollections.Service.getCollectionsByPage(collectionIds, pageNumber)
 
         (for {
@@ -80,7 +80,7 @@ class CollectedController @Inject()(
   def collectionNFTsPerPage(accountId: String, collectionId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        val collection = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterCollections.Service.tryGet(collectionId)
         val nftIds = masterNFTOwners.Service.getByCollectionAndPageNumber(accountId = accountId, collectionId = collectionId, pageNumber = pageNumber)
 

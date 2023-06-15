@@ -1,7 +1,7 @@
 package models.master
 
 import models.common.NFT.BaseNFTProperty
-import models.traits.{Entity3, GenericDaoImpl3, Logging, ModelTable3}
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.id.base.{PropertyID, StringID}
@@ -10,7 +10,6 @@ import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-
 
 case class NFTProperty(nftId: String, name: String, `type`: String, `value`: String, meta: Boolean, mutable: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity3[String, String, String] with Logging {
   def id1: String = nftId
@@ -21,20 +20,15 @@ case class NFTProperty(nftId: String, name: String, `type`: String, `value`: Str
 
   def getPropertyID: PropertyID = PropertyID(keyID = StringID(this.name.trim), typeID = utilities.Data.getTypeID(this.`type`))
 
-  def toMetaProperty()(implicit module: String, logger: Logger): MetaProperty = if (this.meta) MetaProperty(id = this.getPropertyID, data = utilities.Data.getData(`type` = this.`type`, value = this.`value`)) else constants.Response.NOT_META_PROPERTY.throwBaseException()
+  def toMetaProperty: MetaProperty = MetaProperty(id = this.getPropertyID, data = utilities.Data.getData(`type` = this.`type`, value = this.`value`))
 
-  def toMesaProperty()(implicit module: String, logger: Logger): MesaProperty = if (!this.meta) MesaProperty(id = this.getPropertyID, dataID = utilities.Data.getDataID(`type` = this.`type`, value = this.`value`)) else constants.Response.NOT_MESA_PROPERTY.throwBaseException()
+  def toMesaProperty: MesaProperty = MesaProperty(id = this.getPropertyID, dataID = utilities.Data.getDataID(`type` = this.`type`, value = this.`value`))
 
   def toBaseNFTProperty: BaseNFTProperty = BaseNFTProperty(this)
 
 }
 
-object NFTProperties {
-
-  implicit val module: String = constants.Module.MASTER_NFT_PROPERTY
-
-  implicit val logger: Logger = Logger(this.getClass)
-
+private[master] object NFTProperties {
   class NFTPropertyTable(tag: Tag) extends Table[NFTProperty](tag, "NFTProperty") with ModelTable3[String, String, String] {
 
     def * = (nftId, name, `type`, `value`, meta, mutable, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTProperty.tupled, NFTProperty.unapply)
@@ -65,27 +59,25 @@ object NFTProperties {
 
     def id3 = `type`
   }
-
-  val TableQuery = new TableQuery(tag => new NFTPropertyTable(tag))
 }
 
 @Singleton
 class NFTProperties @Inject()(
-                               protected val databaseConfigProvider: DatabaseConfigProvider
-                             )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl3[NFTProperties.NFTPropertyTable, NFTProperty, String, String, String](
-    databaseConfigProvider,
-    NFTProperties.TableQuery,
-    executionContext,
-    NFTProperties.module,
-    NFTProperties.logger
-  ) {
+                               protected val dbConfigProvider: DatabaseConfigProvider,
+                             )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl3[NFTProperties.NFTPropertyTable, NFTProperty, String, String, String]() {
+
+  implicit val module: String = constants.Module.MASTER_NFT_PROPERTY
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new NFTProperties.NFTPropertyTable(tag))
 
   object Service {
 
-    def addMultiple(properties: Seq[NFTProperty]): Future[Unit] = create(properties)
+    def addMultiple(properties: Seq[NFTProperty]): Future[Int] = create(properties)
 
-    def add(property: NFTProperty): Future[Unit] = create(property)
+    def add(property: NFTProperty): Future[String] = create(property).map(_.nftId)
 
     def get(nftIDs: Seq[String]): Future[Seq[NFTProperty]] = filter(_.nftId.inSet(nftIDs))
 
@@ -97,9 +89,7 @@ class NFTProperties @Inject()(
 
     def tryGet(nftId: String, name: String): Future[NFTProperty] = tryGetById1Id2Id3(id1 = nftId, id2 = name, id3 = constants.NFT.Data.STRING)
 
-    def changeDecimalTypeToNumber: Future[Int] = customUpdate(NFTProperties.TableQuery.filter(_.`type` === "DECIMAL").map(_.`type`).update(constants.NFT.Data.NUMBER))
-
-    def updateMultiple(properties: Seq[NFTProperty]): Future[Unit] = upsertMultiple(properties)
+    def updateMultiple(properties: Seq[NFTProperty]): Future[Int] = upsertMultiple(properties)
 
   }
 }

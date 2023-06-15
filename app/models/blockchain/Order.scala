@@ -4,7 +4,7 @@ import models.traits.{Entity, GenericDaoImpl, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
-import schema.data.base.{DecData, IDData, NumberData}
+import schema.data.base.{DecData, HeightData, IDData, NumberData}
 import schema.document.Document
 import schema.id.OwnableID
 import schema.id.base._
@@ -54,21 +54,24 @@ case class Order(id: Array[Byte], idString: String, classificationID: Array[Byte
     if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getValue else schema.constants.Data.ZeroDec
   }
 
+  def getExpiryHeight: Long = {
+    val property = this.getProperty(schema.constants.Properties.ExpiryHeightProperty.getID)
+    if (property.isDefined && property.get.isMeta) HeightData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value.value else -1
+  }
+
   def getMakerOwnableSplit: BigInt = {
     val property = this.getProperty(schema.constants.Properties.MakerOwnableSplitProperty.getID)
     if (property.isDefined && property.get.isMeta) NumberData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value else BigInt(1)
   }
 
   def mutate(properties: Seq[Property]): Order = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
+
+  def getExpiryFromNow(latestBlock: Int): Long = ((this.getExpiryHeight - latestBlock) * constants.Blockchain.MaxOrderHours) / constants.Blockchain.MaxOrderExpiry
 }
 
-object Orders {
+private[blockchain] object Orders {
 
-  implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
-
-  implicit val logger: Logger = Logger(this.getClass)
-
-  class DataTable(tag: Tag) extends Table[Order](tag, "Order") with ModelTable[Array[Byte]] {
+  class OrderTable(tag: Tag) extends Table[Order](tag, "Order") with ModelTable[Array[Byte]] {
 
     def * = (id, idString, classificationID, immutables, mutables) <> (Order.tupled, Order.unapply)
 
@@ -84,26 +87,26 @@ object Orders {
 
   }
 
-  val TableQuery = new TableQuery(tag => new DataTable(tag))
-
 }
 
 @Singleton
 class Orders @Inject()(
                         @NamedDatabase("explorer")
-                        protected val databaseConfigProvider: DatabaseConfigProvider
-                      )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Orders.DataTable, Order, Array[Byte]](
-    databaseConfigProvider,
-    Orders.TableQuery,
-    executionContext,
-    Orders.module,
-    Orders.logger
-  ) {
+                        protected val dbConfigProvider: DatabaseConfigProvider,
+                      )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Orders.OrderTable, Order, Array[Byte]]() {
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new Orders.OrderTable(tag))
 
   object Service {
 
     def get(id: String): Future[Option[Order]] = getById(utilities.Secrets.base64URLDecode(id))
+
+    def get(ids: Seq[String]): Future[Seq[Order]] = filter(_.id.inSet(ids.map(utilities.Secrets.base64URLDecode)))
 
     def get(id: Array[Byte]): Future[Option[Order]] = getById(id)
 
@@ -111,7 +114,7 @@ class Orders @Inject()(
 
     def tryGet(id: OrderID): Future[Order] = tryGetById(id.getBytes)
 
-    def filterExistingIds(ids: Seq[String]): Future[Seq[String]] = customQuery(Orders.TableQuery.filter(_.idString.inSet(ids)).map(_.idString).result)
+    def filterExistingIds(ids: Seq[String]): Future[Seq[String]] = customQuery(tableQuery.filter(_.idString.inSet(ids)).map(_.idString).result)
 
   }
 

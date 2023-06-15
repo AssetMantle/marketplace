@@ -34,16 +34,11 @@ case class Classification(id: Array[Byte], idString: String, immutables: Array[B
     val property = this.getProperty(schema.constants.Properties.BondAmountProperty.getID)
     MicroNumber((if (property.isDefined && property.get.isMeta) NumberData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes) else NumberData(0)).value)
   }
-
 }
 
-object Classifications {
+private[blockchain] object Classifications {
 
-  implicit val module: String = constants.Module.BLOCKCHAIN_CLASSIFICATION
-
-  implicit val logger: Logger = Logger(this.getClass)
-
-  class DataTable(tag: Tag) extends Table[Classification](tag, "Classification") with ModelTable[Array[Byte]] {
+  class ClassificationTable(tag: Tag) extends Table[Classification](tag, "Classification") with ModelTable[Array[Byte]] {
 
     def * = (id, idString, immutables, mutables) <> (Classification.tupled, Classification.unapply)
 
@@ -57,22 +52,20 @@ object Classifications {
 
   }
 
-  val TableQuery = new TableQuery(tag => new DataTable(tag))
-
 }
 
 @Singleton
 class Classifications @Inject()(
                                  @NamedDatabase("explorer")
-                                 protected val databaseConfigProvider: DatabaseConfigProvider
-                               )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Classifications.DataTable, Classification, Array[Byte]](
-    databaseConfigProvider,
-    Classifications.TableQuery,
-    executionContext,
-    Classifications.module,
-    Classifications.logger
-  ) {
+                                 protected val dbConfigProvider: DatabaseConfigProvider,
+                               )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Classifications.ClassificationTable, Classification, Array[Byte]]() {
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_CLASSIFICATION
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new Classifications.ClassificationTable(tag))
 
   object Service {
 

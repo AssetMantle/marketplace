@@ -2,7 +2,8 @@ package models.masterTransaction
 
 import models.common.Collection._
 import models.master.Collection
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.masterTransaction.CollectionDrafts.CollectionDraftTable
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -42,14 +43,10 @@ case class CollectionDraft(id: String, creatorId: String, name: String, descript
     updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
-object CollectionDrafts {
-
-  implicit val module: String = constants.Module.MASTER_TRANSACTION_COLLECTION_DRAFT
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[masterTransaction] object CollectionDrafts {
 
   case class CollectionDraftSerialized(id: String, creatorId: String, name: String, description: String, socialProfiles: String, nsfw: Boolean, properties: String, profileFileName: Option[String], coverFileName: Option[String], royalty: BigDecimal, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize: CollectionDraft = CollectionDraft(id = id, creatorId = creatorId, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), nsfw = nsfw, properties = utilities.JSON.convertJsonStringToObject[Seq[Property]](properties), profileFileName = profileFileName, coverFileName = coverFileName, royalty = royalty, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): CollectionDraft = CollectionDraft(id = id, creatorId = creatorId, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), nsfw = nsfw, properties = utilities.JSON.convertJsonStringToObject[Seq[Property]](properties), profileFileName = profileFileName, coverFileName = coverFileName, royalty = royalty, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
   class CollectionDraftTable(tag: Tag) extends Table[CollectionDraftSerialized](tag, "CollectionDraft") with ModelTable[String] {
@@ -84,22 +81,20 @@ object CollectionDrafts {
 
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
-
-  lazy val TableQuery = new TableQuery(tag => new CollectionDraftTable(tag))
 }
 
 @Singleton
 class CollectionDrafts @Inject()(
-                                  protected val databaseConfigProvider: DatabaseConfigProvider
-                                )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[CollectionDrafts.CollectionDraftTable, CollectionDrafts.CollectionDraftSerialized, String](
-    databaseConfigProvider,
-    CollectionDrafts.TableQuery,
-    executionContext,
-    CollectionDrafts.module,
-    CollectionDrafts.logger
-  ) {
+                                  protected val dbConfigProvider: DatabaseConfigProvider,
+                                )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[CollectionDrafts.CollectionDraftTable, CollectionDrafts.CollectionDraftSerialized, String]() {
 
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_COLLECTION_DRAFT
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new CollectionDraftTable(tag))
 
   object Service {
 
@@ -164,7 +159,7 @@ class CollectionDrafts @Inject()(
 
     def totalDrafts(creatorId: String): Future[Int] = filterAndCount(_.creatorId === creatorId)
 
-    def getByCreatorAndPage(creatorId: String, pageNumber: Int): Future[Seq[CollectionDraft]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.creatorId === creatorId)(_.createdOnMillisEpoch).map(_.map(_.deserialize))
+    def getByCreatorAndPage(creatorId: String, pageNumber: Int): Future[Seq[CollectionDraft]] = filterAndSortWithPagination(_.creatorId === creatorId)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.deserialize))
 
     def delete(id: String): Future[Int] = deleteById(id)
 

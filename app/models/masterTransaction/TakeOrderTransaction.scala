@@ -3,17 +3,17 @@ package models.masterTransaction
 import constants.Scheduler
 import exceptions.BaseException
 import models.blockchain.Split
-import models.blockchainTransaction.TakeOrder
+import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.common.Coin
 import models.master.{NFT, SecondaryMarket}
+import models.masterTransaction.TakeOrderTransactions.TakeOrderTransactionTable
 import models.traits._
-import models.{analytics, blockchainTransaction, master}
+import models.{analytics, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.data.base.NumberData
 import slick.jdbc.H2Profile.api._
-import transactions.responses.blockchain.BroadcastTxSyncResponse
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
@@ -26,33 +26,23 @@ case class TakeOrderTransaction(txHash: String, nftId: String, buyerId: String, 
 
 }
 
-object TakeOrderTransactions {
+private[masterTransaction] object TakeOrderTransactions {
+  case class TakeOrderTransactionSerialize(txHash: String, nftId: String, buyerId: String, quantity: BigDecimal, secondaryMarketId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+    def id: String = txHash
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_TAKE_ORDER_TRANSACTION
-
-  case class TakeOrderTransactionSerialize(txHash: String, nftId: String, buyerId: String, quantity: BigDecimal, secondaryMarketId: String, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity3[String, String, String] {
-
-    def id1: String = txHash
-
-    def id2: String = nftId
-
-    def id3: String = buyerId
-
-    def deserialize: TakeOrderTransaction = TakeOrderTransaction(txHash = this.txHash, nftId = this.nftId, buyerId = this.buyerId, quantity = this.quantity.toBigInt, secondaryMarketId = this.secondaryMarketId, status = this.status, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): TakeOrderTransaction = TakeOrderTransaction(txHash = this.txHash, nftId = this.nftId, buyerId = this.buyerId, quantity = this.quantity.toBigInt, secondaryMarketId = this.secondaryMarketId, status = this.status, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
   }
 
-
-  class TakeOrderTransactionTable(tag: Tag) extends Table[TakeOrderTransactionSerialize](tag, "TakeOrderTransaction") with ModelTable3[String, String, String] {
+  class TakeOrderTransactionTable(tag: Tag) extends Table[TakeOrderTransactionSerialize](tag, "TakeOrderTransaction") with ModelTable[String] {
 
     def * = (txHash, nftId, buyerId, quantity, secondaryMarketId, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (TakeOrderTransactionSerialize.tupled, TakeOrderTransactionSerialize.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
-    def nftId = column[String]("nftId", O.PrimaryKey)
+    def nftId = column[String]("nftId")
 
-    def buyerId = column[String]("buyerId", O.PrimaryKey)
+    def buyerId = column[String]("buyerId")
 
     def secondaryMarketId = column[String]("secondaryMarketId")
 
@@ -68,27 +58,16 @@ object TakeOrderTransactions {
 
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def id1 = txHash
-
-    def id2 = nftId
-
-    def id3 = buyerId
+    def id = txHash
 
   }
-
-  val TableQuery = new TableQuery(tag => new TakeOrderTransactionTable(tag))
 
 }
 
 @Singleton
 class TakeOrderTransactions @Inject()(
-                                       protected val databaseConfigProvider: DatabaseConfigProvider,
-                                       blockchainTransactionTakeOrders: blockchainTransaction.TakeOrders,
-                                       broadcastTxSync: transactions.blockchain.BroadcastTxSync,
+                                       protected val dbConfigProvider: DatabaseConfigProvider,
                                        utilitiesOperations: utilities.Operations,
-                                       getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
-                                       getAccount: queries.blockchain.GetAccount,
-                                       getAbciInfo: queries.blockchain.GetABCIInfo,
                                        masterCollections: master.Collections,
                                        masterNFTs: master.NFTs,
                                        masterNFTProperties: master.NFTProperties,
@@ -96,44 +75,37 @@ class TakeOrderTransactions @Inject()(
                                        masterSecondaryMarkets: master.SecondaryMarkets,
                                        collectionsAnalysis: analytics.CollectionsAnalysis,
                                        utilitiesNotification: utilities.Notification,
-                                     )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl3[TakeOrderTransactions.TakeOrderTransactionTable, TakeOrderTransactions.TakeOrderTransactionSerialize, String, String, String](
-    databaseConfigProvider,
-    TakeOrderTransactions.TableQuery,
-    executionContext,
-    TakeOrderTransactions.module,
-    TakeOrderTransactions.logger
-  ) {
+                                       userTransactions: UserTransactions,
+                                     )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[TakeOrderTransactions.TakeOrderTransactionTable, TakeOrderTransactions.TakeOrderTransactionSerialize, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_TAKE_ORDER_TRANSACTION
+
+  val tableQuery = new TableQuery(tag => new TakeOrderTransactionTable(tag))
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, nftId: String, buyerId: String, quantity: BigInt, secondaryMarketId: String): Future[Unit] = create(TakeOrderTransaction(txHash = txHash, nftId = nftId, buyerId = buyerId, quantity = quantity, secondaryMarketId = secondaryMarketId, status = None).serialize)
+    def addWithNoneStatus(txHash: String, nftId: String, buyerId: String, quantity: BigInt, secondaryMarketId: String): Future[String] = create(TakeOrderTransaction(txHash = txHash, nftId = nftId, buyerId = buyerId, quantity = quantity, secondaryMarketId = secondaryMarketId, status = None).serialize).map(_.id)
 
     def getByTxHash(txHash: String): Future[Seq[TakeOrderTransaction]] = filter(_.txHash === txHash).map(_.map(_.deserialize))
 
-    def markSuccess(txHash: String): Future[Int] = customUpdate(TakeOrderTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
+    def markSuccess(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(true))
 
-    def markFailed(txHash: String): Future[Int] = customUpdate(TakeOrderTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(false))
+    def markFailed(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(false))
 
     def getAllPendingStatus: Future[Seq[TakeOrderTransaction]] = filter(_.status.?.isEmpty).map(_.map(_.deserialize))
 
-    def checkAnyPendingTx(secondaryMarketIDs: Seq[String]): Future[Seq[String]] = customQuery(TakeOrderTransactions.TableQuery.filter(x => x.secondaryMarketId.inSet(secondaryMarketIDs) && x.status.?.isEmpty).map(_.secondaryMarketId).distinct.result)
-
-    def getBySecondaryMarketIDs(secondaryMarketIDs: Seq[String]): Future[Seq[TakeOrderTransaction]] = filter(_.secondaryMarketId.inSet(secondaryMarketIDs)).map(_.map(_.deserialize))
+    def checkAnyPendingTx(secondaryMarketIDs: Seq[String]): Future[Seq[String]] = customQuery(tableQuery.filter(x => x.secondaryMarketId.inSet(secondaryMarketIDs) && x.status.?.isEmpty).map(_.secondaryMarketId).distinct.result)
   }
 
   object Utility {
     def transaction(nftID: String, buyerId: String, quantity: Long, fromAddress: String, secondaryMarket: SecondaryMarket, gasPrice: BigDecimal, ecKey: ECKey, split: Option[Split], royaltyFees: MicroNumber, creatorAddress: String): Future[BlockchainTransaction] = {
-      // TODO
-      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
-      val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount).recover {
-        case _: Exception => models.blockchain.Account(address = fromAddress, accountType = None, accountNumber = 0, sequence = 0, publicKey = None)
-      }
-      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
+      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
+        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val takeOrderMsg = utilities.BlockchainTransaction.getTakeOrderMsg(
           fromAddress = fromAddress,
           fromID = utilities.Identity.getMantlePlaceIdentityID(buyerId),
@@ -151,51 +123,38 @@ class TakeOrderTransactions @Inject()(
         )
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(wrapCoinMsg, takeOrderMsg, sendCoinMsg),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultTakeOrderGasLimit),
-          gasLimit = constants.Blockchain.DefaultTakeOrderGasLimit,
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultTakeOrderGasLimit),
+          gasLimit = constants.Transaction.DefaultTakeOrderGasLimit,
           account = bcAccount,
           ecKey = ecKey,
           timeoutHeight = timeoutHeight)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
-        def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
+        val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              takeOrder <- blockchainTransactionTakeOrders.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = buyerId, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.User.TAKE_ORDER)
               _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nftID, buyerId = buyerId, quantity = quantity, secondaryMarketId = secondaryMarket.id)
-            } yield takeOrder
+            } yield userTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
-          takeOrder <- checkAndAdd(unconfirmedTxHashes)
-        } yield (takeOrder, txRawBytes)
+          userTransaction <- checkAndAdd
+        } yield (userTransaction, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(takerOrder: TakeOrder, txRawBytes: Array[Byte]) = {
-        val broadcastTx = broadcastTxSync.Service.get(takerOrder.getTxRawAsHexString(txRawBytes))
-
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionTakeOrders.Service.markFailedWithLog(txHashes = Seq(takerOrder.txHash), log = errorResponse.get.error.data)
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionTakeOrders.Service.markFailedWithLog(txHashes = Seq(takerOrder.txHash), log = successResponse.get.result.log)
-        else Future(0)
-
-        for {
-          (successResponse, errorResponse) <- broadcastTx
-          _ <- update(successResponse, errorResponse)
-        } yield ()
-      }
+      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
 
       for {
-        abciInfo <- abciInfo
-        bcAccount <- bcAccount
-        unconfirmedTxs <- unconfirmedTxs
-        (takeOrder, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        _ <- broadcastTxAndUpdate(takeOrder, txRawBytes)
-      } yield takeOrder
+        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
+        (userTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        updatedUserTransaction <- broadcastTxAndUpdate(userTransaction, txRawBytes)
+      } yield updatedUserTransaction
     }
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = TakeOrderTransactions.module
+      val name: String = module
 
       //      override val initialDelay: FiniteDuration = constants.Scheduler.QuarterHour
 
@@ -203,12 +162,12 @@ class TakeOrderTransactions @Inject()(
 
         val takeOrderTxs = Service.getAllPendingStatus
 
-        def getTxs(hashes: Seq[String]) = blockchainTransactionTakeOrders.Service.getByHashes(hashes)
+        def getTxs(hashes: Seq[String]) = userTransactions.Service.getByHashes(hashes)
 
-        def checkAndUpdate(takeOrderTxs: Seq[TakeOrderTransaction], txs: Seq[TakeOrder]) = utilitiesOperations.traverse(takeOrderTxs) { takeOrderTx =>
-          val transaction = txs.find(_.txHash == takeOrderTx.txHash).get
-          val onTxComplete = if (transaction.status.isDefined) {
-            if (transaction.status.get) {
+        def checkAndUpdate(takeOrderTxs: Seq[TakeOrderTransaction], userTransactions: Seq[UserTransaction]) = utilitiesOperations.traverse(takeOrderTxs) { takeOrderTx =>
+          val userTransaction = userTransactions.find(_.txHash == takeOrderTx.txHash).get
+          val onTxComplete = if (userTransaction.status.isDefined) {
+            if (userTransaction.status.get) {
               val markSuccess = Service.markSuccess(takeOrderTx.txHash)
               val nft = masterNFTs.Service.tryGet(takeOrderTx.nftId)
               val secondaryMarket = masterSecondaryMarkets.Service.tryGet(takeOrderTx.secondaryMarketId)

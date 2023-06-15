@@ -31,9 +31,9 @@ class WhitelistController @Inject()(
                                      masterSales: master.Sales,
                                    )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.WHITELIST_CONTROLLER
+  implicit val module: String = constants.Module.WHITELIST_CONTROLLER
 
   implicit val callbackOnSessionTimeout: Call = routes.ProfileController.viewDefaultProfile()
 

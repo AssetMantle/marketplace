@@ -47,9 +47,9 @@ class SecondaryMarketController @Inject()(
                                            utilitiesOperations: utilities.Operations,
                                          )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.SECONDARY_MARKET_CONTROLLER
+  implicit val module: String = constants.Module.SECONDARY_MARKET_CONTROLLER
 
   implicit val callbackOnSessionTimeout: Call = routes.SecondaryMarketController.viewCollections()
 
@@ -76,7 +76,7 @@ class SecondaryMarketController @Inject()(
   def collectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val secondaryMarketCollections = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        val secondaryMarketCollections = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterCollections.Service.getSecondaryMarketByPageNumber(pageNumber)
 
         def collections(ids: Seq[String]) = masterCollections.Service.getCollections(ids)
@@ -120,7 +120,7 @@ class SecondaryMarketController @Inject()(
   def collectionNFTsPerPage(id: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit optionalLoginState =>
       implicit request =>
-        val collection = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        val collection = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterCollections.Service.tryGet(id)
         val likedNFTs = optionalLoginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollection(accountId = x.username, collectionId = id))
         val secondaryMarkets = masterSecondaryMarkets.Service.getByCollectionId(id, pageNumber)
@@ -154,7 +154,13 @@ class SecondaryMarketController @Inject()(
 
   def createForm(nftId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.secondaryMarket.createSecondaryMarket(nftId = nftId)))
+      val nftOwner = masterNFTOwners.Service.tryGet(nftId = nftId, ownerId = loginState.username)
+      (for {
+        nftOwner <- nftOwner
+      } yield Ok(views.html.secondaryMarket.createSecondaryMarket(nftId = nftId, totalOwned = nftOwner.quantity))
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
   }
 
   def create(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -162,7 +168,13 @@ class SecondaryMarketController @Inject()(
       CreateSecondaryMarket.form.bindFromRequest().fold(
         formWithErrors => {
           val nftID = formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, "")
-          Future(BadRequest(views.html.secondaryMarket.createSecondaryMarket(formWithErrors, nftID)))
+          val nftOwner = masterNFTOwners.Service.tryGet(nftId = nftID, ownerId = loginState.username)
+          (for {
+            nftOwner <- nftOwner
+          } yield BadRequest(views.html.secondaryMarket.createSecondaryMarket(formWithErrors, nftID, totalOwned = nftOwner.quantity))
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
         },
         createData => {
           val nft = masterNFTs.Service.tryGet(createData.nftId)
@@ -184,7 +196,7 @@ class SecondaryMarketController @Inject()(
             if (errors.isEmpty) {
               for {
                 secondaryMarketId <- masterSecondaryMarkets.Service.add(createData.toNewSecondaryMarket(collectionId = nftOwner.collectionId, sellerId = loginState.username))
-                tx <- masterTransactionMakeOrderTransactions.Utility.transaction(nftID = createData.nftId, nftOwner = nftOwner, fromAddress = loginState.address, quantity = createData.sellQuantity, endHours = createData.endHours, price = createData.price, buyerId = None, secondaryMarketId = secondaryMarketId, gasPrice = constants.Blockchain.DefaultGasPrice, ecKey = activeKey.getECKey(createData.password).get)
+                tx <- masterTransactionMakeOrderTransactions.Utility.transaction(nftID = createData.nftId, nftOwner = nftOwner, fromAddress = loginState.address, quantity = createData.sellQuantity, endHours = createData.endHours, price = createData.price, buyerId = None, secondaryMarketId = secondaryMarketId, gasPrice = constants.Transaction.DefaultGasPrice, ecKey = activeKey.getECKey(createData.password).get)
               } yield tx
             } else errors.head.throwBaseException()
           }
@@ -197,7 +209,12 @@ class SecondaryMarketController @Inject()(
             tx <- addToSecondaryMarket(nft = nft, nftOwner = nftOwner, collection = collection, activeKey = activeKey)
           } yield PartialContent(views.html.transactionSuccessful(tx))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.secondaryMarket.createSecondaryMarket(CreateSecondaryMarket.form.withGlobalError(baseException.failure.message), createData.nftId))
+            case baseException: BaseException => try {
+              val NFTOwner = Await.result(nftOwner, Duration.Inf)
+              BadRequest(views.html.secondaryMarket.createSecondaryMarket(CreateSecondaryMarket.form.withGlobalError(baseException.failure.message), createData.nftId, NFTOwner.quantity))
+            } catch {
+              case baseException: BaseException => BadRequest(baseException.failure.message)
+            }
           }
         }
       )
@@ -233,7 +250,7 @@ class SecondaryMarketController @Inject()(
               masterTransactionCancelOrderTransactions.Utility.transaction(
                 secondaryMarket = secondaryMarket,
                 fromAddress = buyerKey.address,
-                gasPrice = constants.Blockchain.DefaultGasPrice,
+                gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, cancelData.password))
               )
             } else errors.head.throwBaseException()
@@ -264,7 +281,7 @@ class SecondaryMarketController @Inject()(
         collection <- collection(secondaryMarket.collectionId)
       } yield Ok(views.html.secondaryMarket.buy(secondaryMarket = secondaryMarket, collection = collection))
         ).recover {
-        case _: BaseException => BadRequest
+        case baseException: BaseException => BadRequest(baseException.failure.message)
       }
   }
 
@@ -314,7 +331,7 @@ class SecondaryMarketController @Inject()(
                 buyerId = loginState.username,
                 fromAddress = buyerKey.address,
                 secondaryMarket = secondaryMarket,
-                gasPrice = constants.Blockchain.DefaultGasPrice,
+                gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buyData.password)),
                 split = split,
                 royaltyFees = royaltyFees,

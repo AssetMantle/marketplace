@@ -4,7 +4,7 @@ import models.analytics.CollectionsAnalysis
 import models.common.{Collection => commonCollection}
 import models.master.{Collection, NFT}
 import models.masterTransaction.NFTDraft
-import models.{blockchainTransaction, master, masterTransaction}
+import models.{master, masterTransaction}
 import play.api.libs.json.{Json, Reads}
 import play.api.{Configuration, Logger}
 import queries.blockchain.{GetABCIInfo, GetAccount}
@@ -16,8 +16,6 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Singleton
 class Starter @Inject()(
                          broadcastTxSync: transactions.blockchain.BroadcastTxSync,
-                         blockchainTransactionDefineAssets: blockchainTransaction.DefineAssets,
-                         masterTransactionDefineAssetTxs: masterTransaction.DefineAssetTransactions,
                          collectionsAnalysis: CollectionsAnalysis,
                          getAbciInfo: GetABCIInfo,
                          getAccount: GetAccount,
@@ -32,12 +30,11 @@ class Starter @Inject()(
                          masterTransactionNotifications: masterTransaction.Notifications,
                          masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                          utilitiesOperations: utilities.Operations,
-                         blockchainTransactionSendCoins: blockchainTransaction.SendCoins
                        )(implicit exec: ExecutionContext, configuration: Configuration) {
 
-  private implicit val module: String = constants.Module.STARTER_SERVICE
+  implicit val module: String = constants.Module.STARTER_SERVICE
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   def validateAll(): Future[Unit] = {
     println("validating nfts")
@@ -203,7 +200,7 @@ class Starter @Inject()(
         val updatedDefaultValue = if (x.defaultValue == "") "false" else x.defaultValue
         x.copy(`type` = constants.NFT.Data.BOOLEAN, defaultValue = updatedDefaultValue)
       }) ++ collection.properties.get.filterNot(x => x.`type` == "DECIMAL" || x.`type` == "Decimal" || x.`type` == "String" || x.`type` == "Boolean")
-        .map(x => x.copy(name =  x.name.trim))
+        .map(x => x.copy(name = x.name.trim))
       masterCollections.Service.update(collection.copy(properties = Option(properties)))
     }
 

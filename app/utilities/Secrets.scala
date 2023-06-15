@@ -14,9 +14,9 @@ import javax.crypto.{Cipher, SecretKeyFactory}
 
 object Secrets {
 
-  private implicit val module: String = constants.Module.UTILITIES_SECRETS
+  implicit val module: String = constants.Module.UTILITIES_SECRETS
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   def encryptData(data: Array[Byte], secret: String): Array[Byte] = {
     val key = MessageDigest.getInstance("SHA-256").digest(secret.getBytes())
@@ -68,55 +68,55 @@ object Secrets {
   def base64URLDecodeToString(s: String): String = try {
     Base64.getUrlDecoder.decode(s.replace("+", "-").replace("/", "_")).map(_.toChar).mkString
   } catch {
-    case exception: Exception => throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+    case exception: Exception => constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64URLDecode(s: String): Array[Byte] = try {
     Base64.getUrlDecoder.decode(s.replace("+", "-").replace("/", "_"))
   } catch {
-    case exception: Exception => throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+    case exception: Exception => constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64URLEncoder(s: String): String = try {
     Base64.getUrlEncoder.encodeToString(s.getBytes(ISO_8859_1.INSTANCE))
   } catch {
-    case exception: Exception => throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+    case exception: Exception => constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64URLEncoder(s: Array[Byte]): String = try {
     Base64.getUrlEncoder.encodeToString(s)
   } catch {
-    case exception: Exception => throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+    case exception: Exception => constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64Encoder(s: String): Array[Byte] = try {
     Base64.getEncoder.encode(s.getBytes(ISO_8859_1.INSTANCE))
   } catch {
-    case exception: Exception => throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+    case exception: Exception => constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64Encoder(s: Array[Byte]): String = try {
     Base64.getEncoder.encodeToString(s)
   } catch {
-    case exception: Exception => throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+    case exception: Exception => constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64Decoder(s: String): Array[Byte] = try {
     Base64.getDecoder.decode(s)
   } catch {
-    case exception: Exception => throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+    case exception: Exception => constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64MimeEncoder(s: String): Array[Byte] = try {
     Base64.getMimeEncoder.encode(s.getBytes(ISO_8859_1.INSTANCE))
   } catch {
-    case exception: Exception => throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+    case exception: Exception => constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64MimeDecoder(s: String): Array[Byte] = try {
     Base64.getMimeDecoder.decode(s.replace("+", "-").replace("/", "_"))
   } catch {
-    case exception: Exception => throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+    case exception: Exception => constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
 }

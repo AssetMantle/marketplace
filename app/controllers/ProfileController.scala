@@ -2,7 +2,8 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
-import models.{master, masterTransaction}
+import models.blockchainTransaction.UserTransactions
+import models.{blockchain, master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -20,6 +21,7 @@ class ProfileController @Inject()(
                                    withLoginAction: WithLoginAction,
                                    withLoginActionAsync: WithLoginActionAsync,
                                    withoutLoginAction: WithoutLoginAction,
+                                   blockchainBlocks: blockchain.Blocks,
                                    masterAccounts: master.Accounts,
                                    masterKeys: master.Keys,
                                    masterWhitelists: master.Whitelists,
@@ -27,11 +29,12 @@ class ProfileController @Inject()(
                                    masterWhitelistMembers: master.WhitelistMembers,
                                    masterTransactionNotifications: masterTransaction.Notifications,
                                    masterNFTOwners: master.NFTOwners,
+                                   userTransactions: UserTransactions,
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.PROFILE_CONTROLLER
+  implicit val module: String = constants.Module.PROFILE_CONTROLLER
 
   implicit val callbackOnSessionTimeout: Call = routes.ProfileController.viewDefaultProfile()
 
@@ -124,7 +127,6 @@ class ProfileController @Inject()(
     }
   }
 
-
   def profileAnalysisCard(accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
@@ -136,6 +138,30 @@ class ProfileController @Inject()(
         } yield Ok(views.html.profile.profileAnalysis(totalCollected = countOwnedNFTs, totalCollectionCreated = countCreated))
           ).recover {
           case baseException: BaseException => BadRequest(baseException.failure.message)
+        }
+    }
+  }
+
+  def transactionsSection(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        Future(Ok(views.html.profile.transactions.transactionsSection()))
+    }
+  }
+
+  def transactionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val userTxs = userTransactions.Service.getByAccountIdAndPageNumber(loginState.username, pageNumber)
+
+        def blocks(heights: Seq[Int]) = blockchainBlocks.Service.getByHeights(heights)
+
+        (for {
+          userTxs <- userTxs
+          blocks <- blocks(userTxs.filter(_.txHeight.isDefined).map(_.txHeight.get))
+        } yield Ok(views.html.profile.transactions.transactionsPerPage(userTxs, blocks))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
     }
   }

@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 object Scheduler {
 
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   private var signalReceived: Boolean = false
 

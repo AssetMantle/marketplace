@@ -3,7 +3,7 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
-import models.master.{Collection, Key, NFT, NFTOwner}
+import models.master._
 import models.masterTransaction.NFTDraft
 import models.{blockchain, master, masterTransaction}
 import org.bitcoinj.core.ECKey
@@ -33,25 +33,27 @@ class NFTController @Inject()(
                                masterCollections: master.Collections,
                                masterKeys: master.Keys,
                                blockchainBalances: blockchain.Balances,
+                               blockchainBlocks: blockchain.Blocks,
+                               blockchainOrders: blockchain.Orders,
                                masterNFTs: master.NFTs,
                                masterSales: master.Sales,
                                masterNFTOwners: master.NFTOwners,
                                masterNFTProperties: master.NFTProperties,
                                masterNFTTags: master.NFTTags,
-                               masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                masterWishLists: master.WishLists,
                                masterWhitelists: master.Whitelists,
                                masterWhitelistMembers: master.WhitelistMembers,
                                masterSecondaryMarkets: master.SecondaryMarkets,
-                               masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                utilitiesNotification: utilities.Notification,
+                               masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
+                               masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                masterTransactionNFTMintingFeeTransactions: masterTransaction.NFTMintingFeeTransactions,
                                masterTransactionNFTTransferTransactions: masterTransaction.NFTTransferTransactions,
                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.NFT_CONTROLLER
+  implicit val module: String = constants.Module.NFT_CONTROLLER
 
   implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
 
@@ -89,6 +91,23 @@ class NFTController @Inject()(
     }
   }
 
+  def marketListings(nftId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val secondaryMarkets = masterSecondaryMarkets.Service.getByNFTIdAndPageNumber(nftId, pageNumber)
+
+        def orders(secondaryMarkets: Seq[SecondaryMarket]) = blockchainOrders.Service.get(secondaryMarkets.filter(_.orderId.isDefined).map(_.orderId.get))
+
+        (for {
+          secondaryMarkets <- secondaryMarkets
+          orders <- orders(secondaryMarkets)
+        } yield Ok(views.html.nft.detail.secondaryMarkets(secondaryMarkets.sortBy(_.price), orders, blockchainBlocks.Service.getLatestHeight, masterTransactionTokenPrices.Service.getLatestPrice))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
   def detailViewLeftCards(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginAction {
       implicit request =>
@@ -106,36 +125,6 @@ class NFTController @Inject()(
           nft <- nft
           liked <- liked
         } yield Ok(views.html.nft.detail.info(nft, liked))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def detailViewRightCards(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val lowestPriceSecondaryMarket = masterSecondaryMarkets.Service.getByNFTIdAndLowestPrice(nftId)
-        val userSecondaryMarket = if (loginState.isDefined) {
-          masterSecondaryMarkets.Service.getByNFTIdAndSellerId(nftId = nftId, sellerId = loginState.get.username)
-        } else Future(None)
-        val nft = masterNFTs.Service.tryGet(nftId)
-        val nftOwner: Future[Option[NFTOwner]] = if (loginState.isDefined) {
-          masterNFTOwners.Service.get(nftId = nftId, ownerId = loginState.get.username)
-        } else Future(None)
-
-        def collection(collectionId: String) = masterCollections.Service.tryGet(collectionId)
-
-        def collectionAnalysis(collectionId: String) = collectionsAnalysis.Service.tryGet(collectionId)
-
-        (for {
-          nft <- nft
-          lowestPriceSecondaryMarket <- lowestPriceSecondaryMarket
-          userSecondaryMarket <- userSecondaryMarket
-          nftOwner <- nftOwner
-          collection <- collection(nft.collectionId)
-          collectionAnalysis <- collectionAnalysis(nft.collectionId)
-        } yield Ok(views.html.nft.detail.rightCards(collection, collectionAnalysis, nft, userNFTOwner = nftOwner, lowestPriceSecondaryMarket = lowestPriceSecondaryMarket, userSecondaryMarket = userSecondaryMarket, tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -160,6 +149,32 @@ class NFTController @Inject()(
           nftOwner <- nftOwner(countOwners)
           collection <- collection(nft.collectionId)
         } yield Ok(views.html.nft.detail.collectionInfo(nft, collection, nftOwner, countOwners))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def detailViewRightCards(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val lowestPriceSecondaryMarket = masterSecondaryMarkets.Service.getByNFTIdAndLowestPrice(nftId)
+        val userSecondaryMarket = if (loginState.isDefined) masterSecondaryMarkets.Service.getByNFTIdAndSellerId(nftId = nftId, sellerId = loginState.get.username).map(_.sortBy(_.price)) else Future(Seq())
+        val nft = masterNFTs.Service.tryGet(nftId)
+        val nftOwner: Future[Option[NFTOwner]] = if (loginState.isDefined) masterNFTOwners.Service.get(nftId = nftId, ownerId = loginState.get.username) else Future(None)
+
+        def collection(collectionId: String) = masterCollections.Service.tryGet(collectionId)
+
+        def collectionAnalysis(collectionId: String) = collectionsAnalysis.Service.tryGet(collectionId)
+
+        (for {
+          nft <- nft
+          lowestPriceSecondaryMarket <- lowestPriceSecondaryMarket
+          userSecondaryMarket <- userSecondaryMarket
+          nftOwner <- nftOwner
+          collection <- collection(nft.collectionId)
+          collectionAnalysis <- collectionAnalysis(nft.collectionId)
+        } yield Ok(views.html.nft.detail.rightCards(collection, collectionAnalysis, nft, userNFTOwner = nftOwner, lowestPriceSecondaryMarket = lowestPriceSecondaryMarket, userSecondaryMarket = userSecondaryMarket.headOption, tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -320,7 +335,7 @@ class NFTController @Inject()(
 
   def tags(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      NFTTags.form.bindFromRequest().fold(
+      views.nft.companion.NFTTags.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.nft.tags(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.NFT_TAGS.name, "").split(","))))
         },
@@ -335,7 +350,7 @@ class NFTController @Inject()(
             _ <- update(collection)
           } yield PartialContent(views.html.nft.setProperties(collection = collection, nftId = tagsData.nftId))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.nft.tags(NFTTags.form.withGlobalError(baseException.failure.message), collectionId = tagsData.collectionId, nftId = tagsData.nftId, tags = tagsData.getTags))
+            case baseException: BaseException => BadRequest(views.html.nft.tags(views.nft.companion.NFTTags.form.withGlobalError(baseException.failure.message), collectionId = tagsData.collectionId, nftId = tagsData.nftId, tags = tagsData.getTags))
           }
         }
       )
@@ -505,7 +520,7 @@ class NFTController @Inject()(
                 nft = nft,
                 fromAddress = loginState.address,
                 amount = collection.getBondAmount,
-                gasPrice = constants.Blockchain.DefaultGasPrice,
+                gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, mintData.password))
               )
             } else errors.head.throwBaseException()
@@ -566,11 +581,11 @@ class NFTController @Inject()(
             if (errors.isEmpty) {
               masterTransactionNFTTransferTransactions.Utility.transaction(
                 nft = nft,
-                ownerId = loginState.username,
+                fromId = loginState.username,
                 quantity = quantity,
                 fromAddress = key.address,
                 toAccountId = transferData.toAccountId,
-                gasPrice = constants.Blockchain.DefaultGasPrice,
+                gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, transferData.password))
               )
             } else errors.head.throwBaseException()

@@ -20,12 +20,7 @@ case class Account(address: String, accountType: Option[String], accountNumber: 
 }
 
 
-object Accounts {
-
-
-  implicit val module: String = constants.Module.BLOCKCHAIN_ASSET
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[blockchain] object Accounts {
 
   class AccountTable(tag: Tag) extends Table[Account](tag, "Account") with ModelTable[String] {
 
@@ -43,22 +38,20 @@ object Accounts {
 
     def id = address
   }
-
-  val TableQuery = new TableQuery(tag => new AccountTable(tag))
 }
 
 @Singleton
 class Accounts @Inject()(
                           @NamedDatabase("explorer")
-                          protected val databaseConfigProvider: DatabaseConfigProvider
-                        )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Accounts.AccountTable, Account, String](
-    databaseConfigProvider,
-    Accounts.TableQuery,
-    executionContext,
-    Accounts.module,
-    Accounts.logger
-  ) {
+                          protected val dbConfigProvider: DatabaseConfigProvider,
+                        )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Accounts.AccountTable, Account, String]() {
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_ASSET
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new Accounts.AccountTable(tag))
 
   object Service {
     def tryGet(address: String): Future[Account] = tryGetById(address)

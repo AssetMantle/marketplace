@@ -3,16 +3,16 @@ package models.masterTransaction
 import constants.Scheduler
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
-import models.blockchainTransaction.MintAsset
+import models.blockchainTransaction.{AdminTransaction, AdminTransactions}
 import models.master._
+import models.masterTransaction.MintAssetTransactions.MintAssetTransactionTable
 import models.traits._
-import models.{blockchain, blockchainTransaction, campaign, master}
+import models.{blockchain, campaign, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.id.base.IdentityID
 import slick.jdbc.H2Profile.api._
-import transactions.responses.blockchain.BroadcastTxSyncResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
@@ -24,11 +24,7 @@ case class MintAssetTransaction(txHash: String, nftID: String, minterAccountID: 
   def getIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.nftID)
 }
 
-object MintAssetTransactions {
-
-  private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_MINT_ASSET_TRANSACTION
+private[masterTransaction] object MintAssetTransactions {
 
   class MintAssetTransactionTable(tag: Tag) extends Table[MintAssetTransaction](tag, "MintAssetTransaction") with ModelTable[String] {
 
@@ -36,7 +32,7 @@ object MintAssetTransactions {
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
-    def nftID = column[String]("nftID", O.PrimaryKey)
+    def nftID = column[String]("nftID")
 
     def minterAccountID = column[String]("minterAccountID")
 
@@ -54,13 +50,11 @@ object MintAssetTransactions {
 
   }
 
-  val TableQuery = new TableQuery(tag => new MintAssetTransactionTable(tag))
-
 }
 
 @Singleton
 class MintAssetTransactions @Inject()(
-                                       protected val databaseConfigProvider: DatabaseConfigProvider,
+                                       protected val dbConfigProvider: DatabaseConfigProvider,
                                        blockchainAssets: blockchain.Assets,
                                        blockchainIdentities: blockchain.Identities,
                                        campaignMintNFTAirDrops: campaign.MintNFTAirDrops,
@@ -71,47 +65,37 @@ class MintAssetTransactions @Inject()(
                                        masterNFTOwners: master.NFTOwners,
                                        masterNFTProperties: master.NFTProperties,
                                        masterCollections: master.Collections,
-                                       broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                        utilitiesOperations: utilities.Operations,
-                                       getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
-                                       getAccount: queries.blockchain.GetAccount,
-                                       getAbciInfo: queries.blockchain.GetABCIInfo,
                                        utilitiesNotification: utilities.Notification,
-                                       blockchainTransactionMintAssets: blockchainTransaction.MintAssets,
-                                     )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[MintAssetTransactions.MintAssetTransactionTable, MintAssetTransaction, String](
-    databaseConfigProvider,
-    MintAssetTransactions.TableQuery,
-    executionContext,
-    MintAssetTransactions.module,
-    MintAssetTransactions.logger
-  ) {
+                                       adminTransactions: AdminTransactions,
+                                     )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[MintAssetTransactions.MintAssetTransactionTable, MintAssetTransaction, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_MINT_ASSET_TRANSACTION
+
+  val tableQuery = new TableQuery(tag => new MintAssetTransactionTable(tag))
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, nftIDs: Seq[String], minterAccountIDs: Map[String, String]): Future[Unit] = create(nftIDs.map(x => MintAssetTransaction(txHash = txHash, nftID = x, minterAccountID = minterAccountIDs.getOrElse(x, constants.Response.NFT_OWNER_NOT_FOUND.throwBaseException()), status = None)))
+    def addWithNoneStatus(txHash: String, nftIDs: Seq[String], minterAccountIDs: Map[String, String]): Future[Int] = create(nftIDs.map(x => MintAssetTransaction(txHash = txHash, nftID = x, minterAccountID = minterAccountIDs.getOrElse(x, constants.Response.NFT_OWNER_NOT_FOUND.throwBaseException()), status = None)))
 
     def getByTxHash(txHash: String): Future[Seq[MintAssetTransaction]] = filter(_.txHash === txHash)
 
-    def markSuccess(txHash: String): Future[Int] = customUpdate(MintAssetTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
+    def markSuccess(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(true))
 
-    def markFailed(txHash: String): Future[Int] = customUpdate(MintAssetTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(false))
+    def markFailed(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(false))
 
     def getAllPendingStatus: Future[Seq[MintAssetTransaction]] = filter(_.status.?.isEmpty)
 
     def checkAnyPendingTx: Future[Boolean] = filterAndExists(_.status.?.isEmpty)
-
-    def getWithStatusTrueOrPending(ids: Seq[String]): Future[Seq[String]] = filter(x => x.nftID.inSet(ids) && (x.status || x.status.?.isEmpty)).map(_.map(_.nftID))
   }
 
   object Utility {
 
     private def transaction(nftIDs: Seq[String], gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      // TODO
-      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
-      val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(constants.Wallet.MintAssetWallet.address).map(_.account.toSerializableAccount)
-      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
+      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(constants.Wallet.MintAssetWallet.address)
       val nfts = masterNFTs.Service.getByIds(nftIDs)
       val nftOwners = masterNFTOwners.Service.getByIds(nftIDs)
       val nftProperties = masterNFTProperties.Service.get(nftIDs)
@@ -121,62 +105,48 @@ class MintAssetTransactions @Inject()(
       def collections(collectionIDs: Seq[String]) = masterCollections.Service.getCollections(collectionIDs)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String], nfts: Seq[NFT], collections: Seq[Collection], nftOwners: Seq[NFTOwner], nftProperties: Seq[NFTProperty], identityIDExists: Seq[String]) = if (identityIDExists.distinct.length == nftOwners.map(_.ownerId).distinct.length) {
-        val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
+        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = nfts.map(nft => {
             val collection = collections.find(_.id == nft.collectionId).getOrElse(constants.Response.COLLECTION_NOT_FOUND.throwBaseException())
             utilities.BlockchainTransaction.getMintAssetMsg(fromAddress = constants.Wallet.MintAssetWallet.address, toID = nftOwners.find(_.nftId == nft.id).getOrElse(constants.Response.NFT_NOT_FOUND.throwBaseException()).getOwnerIdentityID, classificationID = collection.getClassificationID, fromID = constants.Transaction.FromID, immutableMetas = nft.getImmutableMetaProperties(nftProperties, collection), mutableMetas = nft.getMutableMetaProperties(nftProperties), immutables = nft.getImmutableProperties(nftProperties, collection), mutables = nft.getMutableProperties(nftProperties))
           }),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultMintAssetGasLimit * nftIDs.length),
-          gasLimit = constants.Blockchain.DefaultMintAssetGasLimit * nftIDs.length,
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultMintAssetGasLimit * nftIDs.length),
+          gasLimit = constants.Transaction.DefaultMintAssetGasLimit * nftIDs.length,
           account = bcAccount,
           ecKey = ecKey,
           timeoutHeight = timeoutHeight)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
-        def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
+        val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              mintAsset <- blockchainTransactionMintAssets.Service.add(txHash = txHash, fromAddress = constants.Wallet.MintAssetWallet.address, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Wallet.MintAssetWallet.address, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.MINT_ASSET)
               _ <- Service.addWithNoneStatus(txHash = txHash, nftIDs = nftIDs, minterAccountIDs = nftOwners.map(x => x.nftId -> x.ownerId).toMap)
-            } yield mintAsset
+            } yield adminTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
-          mintAsset <- checkAndAdd(unconfirmedTxHashes)
-        } yield (mintAsset, txRawBytes)
+          adminTransaction <- checkAndAdd
+        } yield (adminTransaction, txRawBytes)
       } else {
         logger.error(s"${nftOwners.map(_.getOwnerIdentityID.asString).diff(identityIDExists).mkString(", ")} identities does not exist for minting asset")
         constants.Response.IDENTITY_DOES_NOT_EXIST_TO_MINT.throwBaseException()
       }
 
-      def broadcastTxAndUpdate(mintAsset: MintAsset, txRawBytes: Array[Byte]) = {
-
-        val broadcastTx = broadcastTxSync.Service.get(mintAsset.getTxRawAsHexString(txRawBytes))
-
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionMintAssets.Service.markFailedWithLog(txHashes = Seq(mintAsset.txHash), log = errorResponse.get.error.data)
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionMintAssets.Service.markFailedWithLog(txHashes = Seq(mintAsset.txHash), log = successResponse.get.result.log)
-        else Future(0)
-
-        for {
-          (successResponse, errorResponse) <- broadcastTx
-          _ <- update(successResponse, errorResponse)
-        } yield ()
-      }
+      def broadcastTxAndUpdate(adminTransaction: AdminTransaction, txRawBytes: Array[Byte]) = adminTransactions.Utility.broadcastTxAndUpdate(adminTransaction, txRawBytes)
 
       for {
-        abciInfo <- abciInfo
-        bcAccount <- bcAccount
-        unconfirmedTxs <- unconfirmedTxs
+        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
         nfts <- nfts
         nftOwners <- nftOwners
         identityIDExists <- identityIDExists(nftOwners)
         nftProperties <- nftProperties
         collections <- collections(nfts.map(_.collectionId).distinct)
-        (mintAsset, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase), nfts, collections, nftOwners, nftProperties, identityIDExists)
-        _ <- broadcastTxAndUpdate(mintAsset, txRawBytes)
-      } yield mintAsset
+        (adminTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase), nfts, collections, nftOwners, nftProperties, identityIDExists)
+        updatedAdminTransaction <- broadcastTxAndUpdate(adminTransaction, txRawBytes)
+      } yield updatedAdminTransaction
     }
 
     private def mintAssets(): Future[Unit] = {
@@ -229,10 +199,10 @@ class MintAssetTransactions @Inject()(
       val mintAssetTxs = Service.getAllPendingStatus
 
       def checkAndUpdate(mintAssetTxs: Seq[MintAssetTransaction]) = utilitiesOperations.traverse(mintAssetTxs.map(_.txHash).distinct) { txHash =>
-        val transaction = blockchainTransactionMintAssets.Service.tryGet(txHash)
+        val transaction = adminTransactions.Service.tryGet(txHash)
 
-        def onTxComplete(transaction: MintAsset) = if (transaction.status.isDefined) {
-          if (transaction.status.get) {
+        def onTxComplete(adminTransaction: AdminTransaction) = if (adminTransaction.status.isDefined) {
+          if (adminTransaction.status.get) {
             val markSuccess = Service.markSuccess(txHash)
             val updateMaster = masterNFTs.Service.markNFTsMinted(mintAssetTxs.filter(_.txHash == txHash).map(_.nftID))
             val nfts = masterNFTs.Service.getByIds(mintAssetTxs.filter(_.txHash == txHash).map(_.nftID))
@@ -304,7 +274,7 @@ class MintAssetTransactions @Inject()(
     }
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = MintAssetTransactions.module
+      val name: String = module
 
       //      override val initialDelay: FiniteDuration = constants.Scheduler.QuarterHour
 

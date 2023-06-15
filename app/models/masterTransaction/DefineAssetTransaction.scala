@@ -2,14 +2,14 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.blockchainTransaction.DefineAsset
+import models.blockchainTransaction.{AdminTransaction, AdminTransactions}
 import models.master.Collection
+import models.masterTransaction.DefineAssetTransactions.DefineAssetTransactionTable
 import models.traits._
-import models.{blockchain, blockchainTransaction, master}
+import models.{blockchain, master}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
-import transactions.responses.blockchain.BroadcastTxSyncResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
@@ -20,11 +20,7 @@ case class DefineAssetTransaction(txHash: String, collectionId: String, status: 
 
 }
 
-object DefineAssetTransactions {
-
-  private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_DEFINE_ASSET_TRANSACTION
+private[masterTransaction] object DefineAssetTransactions {
 
   class DefineAssetTransactionTable(tag: Tag) extends Table[DefineAssetTransaction](tag, "DefineAssetTransaction") with ModelTable[String] {
 
@@ -32,7 +28,7 @@ object DefineAssetTransactions {
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
-    def collectionId = column[String]("collectionId", O.PrimaryKey)
+    def collectionId = column[String]("collectionId")
 
     def status = column[Boolean]("status")
 
@@ -48,59 +44,47 @@ object DefineAssetTransactions {
 
   }
 
-  val TableQuery = new TableQuery(tag => new DefineAssetTransactionTable(tag))
-
 }
 
 @Singleton
 class DefineAssetTransactions @Inject()(
-                                         protected val databaseConfigProvider: DatabaseConfigProvider,
+                                         protected val dbConfigProvider: DatabaseConfigProvider,
                                          blockchainClassifications: blockchain.Classifications,
-                                         broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                          utilitiesOperations: utilities.Operations,
-                                         getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
-                                         getAccount: queries.blockchain.GetAccount,
-                                         getAbciInfo: queries.blockchain.GetABCIInfo,
                                          utilitiesNotification: utilities.Notification,
-                                         blockchainTransactionDefineAssets: blockchainTransaction.DefineAssets,
+                                         adminTransactions: AdminTransactions,
                                          masterCollections: master.Collections,
-                                       )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[DefineAssetTransactions.DefineAssetTransactionTable, DefineAssetTransaction, String](
-    databaseConfigProvider,
-    DefineAssetTransactions.TableQuery,
-    executionContext,
-    DefineAssetTransactions.module,
-    DefineAssetTransactions.logger
-  ) {
+                                       )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[DefineAssetTransactions.DefineAssetTransactionTable, DefineAssetTransaction, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_DEFINE_ASSET_TRANSACTION
+
+  val tableQuery = new TableQuery(tag => new DefineAssetTransactionTable(tag))
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, collectionIds: Seq[String]): Future[Unit] = create(collectionIds.map(x => DefineAssetTransaction(txHash = txHash, collectionId = x, status = None)))
+    def addWithNoneStatus(txHash: String, collectionIds: Seq[String]): Future[Int] = create(collectionIds.map(x => DefineAssetTransaction(txHash = txHash, collectionId = x, status = None)))
 
     def getByTxHash(txHash: String): Future[Seq[DefineAssetTransaction]] = filter(_.txHash === txHash)
 
-    def markSuccess(txHash: String): Future[Int] = customUpdate(DefineAssetTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
+    def markSuccess(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(true))
 
-    def markFailed(txHash: String): Future[Int] = customUpdate(DefineAssetTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(false))
+    def markFailed(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(false))
 
     def getAllPendingStatus: Future[Seq[DefineAssetTransaction]] = filter(_.status.?.isEmpty)
 
     def checkAnyPendingTx: Future[Boolean] = filterAndExists(_.status.?.isEmpty)
-
-    def getWithStatusTrueOrPending(collectionIds: Seq[String]): Future[Seq[String]] = filter(x => x.collectionId.inSet(collectionIds) && (x.status || x.status.?.isEmpty)).map(_.map(_.collectionId))
   }
 
   object Utility {
 
-    private def transaction(collections: Seq[Collection]): Future[DefineAsset] = {
-      // TODO
-      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
-      val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(constants.Wallet.DefineAssetWallet.address).map(_.account.toSerializableAccount)
-      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
+    private def transaction(collections: Seq[Collection]): Future[AdminTransaction] = {
+      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(constants.Wallet.DefineAssetWallet.address)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
+        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = collections.map(x => utilities.BlockchainTransaction.getDefineAssetMsg(
             fromAddress = constants.Wallet.DefineAssetWallet.address,
@@ -110,49 +94,34 @@ class DefineAssetTransactions @Inject()(
             mutableMetas = x.getMutableMetaProperties,
             mutables = x.getMutableProperties)
           ),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = 0.0001, gasLimit = constants.Blockchain.DefaultDefineAssetGasLimit * collections.size),
-          gasLimit = constants.Blockchain.DefaultDefineAssetGasLimit * collections.size,
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = 0.0001, gasLimit = constants.Transaction.DefaultDefineAssetGasLimit * collections.size),
+          gasLimit = constants.Transaction.DefaultDefineAssetGasLimit * collections.size,
           account = bcAccount,
           ecKey = constants.Wallet.DefineAssetWallet.getECKey,
           timeoutHeight = timeoutHeight)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
-        def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
+        val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              defineAsset <- blockchainTransactionDefineAssets.Service.add(txHash = txHash, fromAddress = constants.Wallet.DefineAssetWallet.address, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Wallet.DefineAssetWallet.address, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.DEFINE_ASSET)
               _ <- Service.addWithNoneStatus(txHash = txHash, collectionIds = collections.map(_.id))
-            } yield defineAsset
+            } yield adminTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
-          defineAsset <- checkAndAdd(unconfirmedTxHashes)
-        } yield (defineAsset, txRawBytes)
+          adminTransaction <- checkAndAdd
+        } yield (adminTransaction, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(defineAsset: DefineAsset, txRawBytes: Array[Byte]) = {
-
-        val broadcastTx = broadcastTxSync.Service.get(defineAsset.getTxRawAsHexString(txRawBytes))
-
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionDefineAssets.Service.markFailedWithLog(txHashes = Seq(defineAsset.txHash), log = errorResponse.get.error.data)
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionDefineAssets.Service.markFailedWithLog(txHashes = Seq(defineAsset.txHash), log = successResponse.get.result.log)
-        else Future(0)
-
-        for {
-          (successResponse, errorResponse) <- broadcastTx
-          _ <- update(successResponse, errorResponse)
-        } yield ()
-      }
+      def broadcastTxAndUpdate(adminTransaction: AdminTransaction, txRawBytes: Array[Byte]) = adminTransactions.Utility.broadcastTxAndUpdate(adminTransaction, txRawBytes)
 
       for {
-        bcAccount <- bcAccount
-        unconfirmedTxs <- unconfirmedTxs
-        abciInfo <- abciInfo
-        (defineAsset, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        _ <- broadcastTxAndUpdate(defineAsset, txRawBytes)
-      } yield defineAsset
-
+        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
+        (adminTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        updatedAdminTransaction <- broadcastTxAndUpdate(adminTransaction, txRawBytes)
+      } yield updatedAdminTransaction
     }
 
     private def defineCollections(): Future[Unit] = {
@@ -197,12 +166,12 @@ class DefineAssetTransactions @Inject()(
       val defineAssetTxs = Service.getAllPendingStatus
 
       def checkAndUpdate(defineAssetTxs: Seq[DefineAssetTransaction]) = utilitiesOperations.traverse(defineAssetTxs.map(_.txHash).distinct) { txHash =>
-        val transaction = blockchainTransactionDefineAssets.Service.tryGet(txHash)
+        val transaction = adminTransactions.Service.tryGet(txHash)
 
-        def onTxComplete(transaction: DefineAsset) = if (transaction.status.isDefined) {
-          if (transaction.status.get) {
+        def onTxComplete(adminTransaction: AdminTransaction) = if (adminTransaction.status.isDefined) {
+          if (adminTransaction.status.get) {
             val markSuccess = Service.markSuccess(txHash)
-            val markDefined = masterCollections.Service.markAsDefined(defineAssetTxs.filter(_.txHash == transaction.txHash).map(_.collectionId))
+            val markDefined = masterCollections.Service.markAsDefined(defineAssetTxs.filter(_.txHash == adminTransaction.txHash).map(_.collectionId))
 
             (for {
               _ <- markSuccess
@@ -214,7 +183,7 @@ class DefineAssetTransactions @Inject()(
             }
           } else {
             val markFailed = Service.markFailed(txHash)
-            val markUndefined = masterCollections.Service.markAsNotDefined(defineAssetTxs.filter(_.txHash == transaction.txHash).map(_.collectionId))
+            val markUndefined = masterCollections.Service.markAsNotDefined(defineAssetTxs.filter(_.txHash == adminTransaction.txHash).map(_.collectionId))
 
             (for {
               _ <- markFailed
@@ -243,7 +212,7 @@ class DefineAssetTransactions @Inject()(
     }
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = DefineAssetTransactions.module
+      val name: String = module
 
       def runner(): Unit = {
 

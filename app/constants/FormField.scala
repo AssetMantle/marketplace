@@ -45,8 +45,6 @@ object FormField {
   val CHANGE_CONFIRM_PASSWORD: StringFormField = StringFormField("CHANGE_CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SEEDS: StringFormField = StringFormField("SEEDS", 3, 500, RegularExpression.ALL_SMALL_LETTERS_WITH_SPACE, Response.INVALID_SEEDS.message)
   val CONFIRM_USERNAME: StringFormField = StringFormField("CONFIRM_USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
-  val FROM_ADDRESS: StringFormField = StringFormField("FROM_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
-  val FROM_KEPLR_ADDRESS: StringFormField = StringFormField("FROM_KEPLR_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val TO_ADDRESS: StringFormField = StringFormField("TO_ADDRESS", 45, 45, RegularExpression.MANTLE_ADDRESS)
   val WHITELIST_NAME: StringFormField = StringFormField("WHITELIST_NAME", 3, 50, RegularExpression.WHITELIST_NAME)
   val WHITELIST_DESCRIPTION: StringFormField = StringFormField("WHITELIST_DESCRIPTION", 0, 256)
@@ -89,7 +87,7 @@ object FormField {
   val PUBLIC_LISTING_MAX_MINT_PER_ACCOUNT: IntFormField = IntFormField("SALE_MAX_MINT_PER_ACCOUNT", 1, 100000)
   val SALE_BUY_NFT_NUMBER: IntFormField = IntFormField("SALE_BUY_NFT_NUMBER", 1, 100000)
   val PUBLIC_LISTING_BUY_NFT_NUMBER: IntFormField = IntFormField("PUBLIC_LISTING_BUY_NFT_NUMBER", 1, 100000)
-  val SECONDARY_MARKET_END_HOURS: IntFormField = IntFormField("SECONDARY_MARKET_END_HOURS", 1, constants.Transaction.MaxOrderHours)
+  val SECONDARY_MARKET_END_HOURS: IntFormField = IntFormField("SECONDARY_MARKET_END_HOURS", 1, constants.Blockchain.MaxOrderHours)
 
   // DoubleFormField
   val GAS_PRICE: BigDecimalFormField = BigDecimalFormField("GAS_PRICE", constants.Transaction.LowGasPrice, constants.Transaction.HighGasPrice)

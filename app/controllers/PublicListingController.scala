@@ -32,7 +32,6 @@ class PublicListingController @Inject()(
                                          masterCollections: master.Collections,
                                          masterNFTs: master.NFTs,
                                          masterPublicListings: master.PublicListings,
-                                         blockchainTransactionNFTPublicListings: blockchainTransaction.NFTPublicListings,
                                          masterNFTOwners: master.NFTOwners,
                                          masterNFTProperties: master.NFTProperties,
                                          masterTransactionPublicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
@@ -41,9 +40,9 @@ class PublicListingController @Inject()(
                                          masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                        )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.PUBLIC_LISTING_CONTROLLER
+  implicit val module: String = constants.Module.PUBLIC_LISTING_CONTROLLER
 
   implicit val callbackOnSessionTimeout: Call = routes.PublicListingController.viewCollections()
 
@@ -70,7 +69,7 @@ class PublicListingController @Inject()(
   def collectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val publicListings = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        val publicListings = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterPublicListings.Service.getByPageNumber(pageNumber)
 
         def collections(ids: Seq[String]) = masterCollections.Service.getCollections(ids)
@@ -167,6 +166,7 @@ class PublicListingController @Inject()(
             val errors = Seq(
               if (!loginState.isVerifiedCreator) Option(constants.Response.NOT_VERIFIED_CREATOR) else None,
               if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
+              if (collection.isFractionalized) Option(constants.Response.FRACTIONALIZED_COLLECTION_NOT_ALLOWED) else None,
               if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
               if (createData.numberOfNFTs > maxSellNumber.min(countNFts)) Option(constants.Response.CANNOT_SELL_MORE_THAN_ALLOWED_LIMIT) else None,
               if (createData.numberOfNFTs > countNFts) Option(constants.Response.NOT_ENOUGH_NFTS_IN_COLLECTION) else None,
@@ -348,8 +348,8 @@ class PublicListingController @Inject()(
                 collection = collection,
                 toAddress = sellerKey.address,
                 amount = publicListing.price * buyNFTData.buyNFTs,
-                gasLimit = constants.Blockchain.DefaultSendCoinGasAmount,
-                gasPrice = constants.Blockchain.DefaultGasPrice,
+                gasLimit = constants.Transaction.DefaultSendCoinGasAmount,
+                gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buyNFTData.password))
               )
             } else errors.head.throwBaseException()

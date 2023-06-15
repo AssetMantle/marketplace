@@ -9,7 +9,7 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class JavaScriptRoutesController @Inject()(messagesControllerComponents: MessagesControllerComponents)(implicit configuration: Configuration) extends AbstractController(messagesControllerComponents) {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   def javascriptRoutes: Action[AnyContent] = Action { implicit request =>
     Ok(
@@ -73,7 +73,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.NFTController.viewNFT,
         routes.javascript.NFTController.details,
-        routes.javascript.NFTController.details,
+        routes.javascript.NFTController.marketListings,
         routes.javascript.NFTController.detailViewLeftCards,
         routes.javascript.NFTController.detailViewRightCards,
         routes.javascript.NFTController.info,
@@ -115,6 +115,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ProfileController.profileInfoCard,
         routes.javascript.ProfileController.profileActivityCard,
         routes.javascript.ProfileController.profileAnalysisCard,
+        routes.javascript.ProfileController.transactionsSection,
+        routes.javascript.ProfileController.transactionsPerPage,
 
         routes.javascript.PublicListingController.viewCollections,
         routes.javascript.PublicListingController.collectionsSection,

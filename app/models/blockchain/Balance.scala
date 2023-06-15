@@ -1,7 +1,7 @@
 package models.blockchain
 
-import models.traits.{Entity, GenericDaoImpl, ModelTable}
 import models.common.Coin
+import models.traits.{Entity, GenericDaoImpl, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -18,14 +18,10 @@ case class Balance(address: String, coins: Seq[Coin]) {
 
 }
 
-object Balances {
-
-  implicit val logger: Logger = Logger(this.getClass)
-
-  implicit val module: String = constants.Module.BLOCKCHAIN_BALANCE
+private[blockchain] object Balances {
 
   case class BalanceSerialized(address: String, coins: String) extends Entity[String] {
-    def deserialize: Balance = Balance(address = address, coins = utilities.JSON.convertJsonStringToObject[Seq[Coin]](coins))
+    def deserialize()(implicit module: String, logger: Logger): Balance = Balance(address = address, coins = utilities.JSON.convertJsonStringToObject[Seq[Coin]](coins))
 
     def id: String = address
   }
@@ -41,22 +37,21 @@ object Balances {
     def id = address
   }
 
-  val TableQuery = new TableQuery(tag => new BalanceTable(tag))
-
 }
 
 @Singleton
 class Balances @Inject()(
                           @NamedDatabase("explorer")
-                          protected val databaseConfigProvider: DatabaseConfigProvider
-                        )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Balances.BalanceTable, Balances.BalanceSerialized, String](
-    databaseConfigProvider,
-    Balances.TableQuery,
-    executionContext,
-    Balances.module,
-    Balances.logger
-  ) {
+                          protected val dbConfigProvider: DatabaseConfigProvider,
+                        )(implicit executionContext: ExecutionContext, balances: Balances)
+  extends GenericDaoImpl[Balances.BalanceTable, Balances.BalanceSerialized, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_BALANCE
+
+  val tableQuery = new TableQuery(tag => new Balances.BalanceTable(tag))
+
   object Service {
 
     def tryGet(address: String): Future[Balance] = tryGetById(address).map(_.deserialize)

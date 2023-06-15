@@ -12,9 +12,9 @@ class PushNotificationActor() extends Actor with ActorLogging {
 
   private implicit val executionContext: ExecutionContext = context.dispatcher
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Actor.ACTOR_PUSH_NOTIFICATION
+  implicit val module: String = constants.Actor.ACTOR_PUSH_NOTIFICATION
 
   def receive: PartialFunction[Any, Unit] = {
     case pushNotification: PushNotification => logger.info(pushNotification.token)

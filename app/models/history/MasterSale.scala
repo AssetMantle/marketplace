@@ -2,9 +2,10 @@ package models.history
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.traits.{Entity, GenericDaoImpl, HistoryLogging, ModelTable}
 import models.analytics.CollectionsAnalysis
+import models.history.MasterSales.MasterSaleTable
 import models.master.Sales
+import models.traits._
 import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -36,15 +37,11 @@ case class MasterSale(id: String, whitelistId: String, collectionId: String, num
 
 }
 
-object MasterSales {
-
-  implicit val module: String = constants.Module.HISTORY_MASTER_SALE
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[history] object MasterSales {
 
   case class MasterSaleSerialized(id: String, whitelistId: String, collectionId: String, numberOfNFTs: Long, maxMintPerAccount: Long, price: BigDecimal, denom: String, startTimeEpoch: Long, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
-    def deserialize: MasterSale = MasterSale(id = id, whitelistId = whitelistId, collectionId = collectionId, numberOfNFTs = numberOfNFTs, maxMintPerAccount = maxMintPerAccount, price = MicroNumber(price), denom = denom, startTimeEpoch = startTimeEpoch, endTimeEpoch = endTimeEpoch, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch, deletedBy = this.deletedBy, deletedOnMillisEpoch = this.deletedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): MasterSale = MasterSale(id = id, whitelistId = whitelistId, collectionId = collectionId, numberOfNFTs = numberOfNFTs, maxMintPerAccount = maxMintPerAccount, price = MicroNumber(price), denom = denom, startTimeEpoch = startTimeEpoch, endTimeEpoch = endTimeEpoch, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch, deletedBy = this.deletedBy, deletedOnMillisEpoch = this.deletedOnMillisEpoch)
   }
 
   class MasterSaleTable(tag: Tag) extends Table[MasterSaleSerialized](tag, "MasterSale") with ModelTable[String] {
@@ -81,8 +78,6 @@ object MasterSales {
 
     def deletedOnMillisEpoch = column[Long]("deletedOnMillisEpoch")
   }
-
-  val TableQuery = new TableQuery(tag => new MasterSaleTable(tag))
 }
 
 @Singleton
@@ -92,21 +87,21 @@ class MasterSales @Inject()(
                              masterNFTOwners: master.NFTOwners,
                              collectionsAnalysis: CollectionsAnalysis,
                              SaleNFTTransactions: masterTransaction.SaleNFTTransactions,
-                             protected val databaseConfigProvider: DatabaseConfigProvider
-                           )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[MasterSales.MasterSaleTable, MasterSales.MasterSaleSerialized, String](
-    databaseConfigProvider,
-    MasterSales.TableQuery,
-    executionContext,
-    MasterSales.module,
-    MasterSales.logger
-  ) {
+                             protected val dbConfigProvider: DatabaseConfigProvider,
+                           )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[MasterSales.MasterSaleTable, MasterSales.MasterSaleSerialized, String]() {
+
+  implicit val module: String = constants.Module.HISTORY_MASTER_SALE
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new MasterSaleTable(tag))
 
   object Service {
 
-    def insertOrUpdate(masterSale: MasterSale): Future[Unit] = upsert(masterSale.serialize())
+    def insertOrUpdate(masterSale: MasterSale): Future[Int] = upsert(masterSale.serialize())
 
-    def add(masterSales: Seq[MasterSale]): Future[Unit] = create(masterSales.map(_.serialize()))
+    def add(masterSales: Seq[MasterSale]): Future[Int] = create(masterSales.map(_.serialize()))
 
     def tryGet(id: String): Future[MasterSale] = filterHead(_.id === id).map(_.deserialize)
 
@@ -121,7 +116,7 @@ class MasterSales @Inject()(
   object Utility {
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = MasterSales.module
+      val name: String = module
 
       def runner(): Unit = {
         val deleteSales = sales.Service.getForDeletion
@@ -151,7 +146,7 @@ class MasterSales @Inject()(
           salesWithPendingTx <- salesWithPendingTx(deleteSales.map(_.id))
           _ <- deleteExpiredSales(deleteSales.filterNot(x => salesWithPendingTx.contains(x.id)))
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case _: BaseException => logger.error("FAILED_IN_" + module)
         }
 
         Await.result(forComplete, Duration.Inf)

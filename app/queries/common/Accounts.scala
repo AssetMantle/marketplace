@@ -1,6 +1,5 @@
 package queries.common
 
-import exceptions.BaseException
 import models.blockchain.{Account => BlockchainAccount}
 import models.common.{Account => modelCommonAccount}
 import play.api.Logger
@@ -9,9 +8,9 @@ import queries.Abstract.Account
 
 object Accounts {
 
-  private implicit val module: String = constants.Module.ACCOUNT_RESPONSE
+  implicit val module: String = constants.Module.ACCOUNT_RESPONSE
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   case class BaseAccount(address: String, account_number: String, sequence: String) extends Account {
     def toSerializableAccount: BlockchainAccount = BlockchainAccount(address = address, accountType = Option(constants.Blockchain.Account.BASE), publicKey = None, accountNumber = account_number.toInt, sequence = sequence.toInt)
@@ -67,6 +66,6 @@ object Accounts {
     case constants.Blockchain.Account.DELAYED_VESTING => utilities.JSON.convertJsonStringToObject[DelayedVestingAccount](value.toString)
     case constants.Blockchain.Account.CONTINUOUS_VESTING => utilities.JSON.convertJsonStringToObject[ContinuousVestingAccount](value.toString)
     case constants.Blockchain.Account.PERIODIC_VESTING => utilities.JSON.convertJsonStringToObject[PeriodicVestingAccount](value.toString)
-    case _ => throw new BaseException(constants.Response.ACCOUNT_TYPE_NOT_FOUND)
+    case _ => constants.Response.ACCOUNT_TYPE_NOT_FOUND.throwBaseException()
   }
 }

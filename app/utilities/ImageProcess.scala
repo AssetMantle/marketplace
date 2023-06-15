@@ -2,7 +2,6 @@ package utilities
 
 import com.sksamuel.scrimage
 import com.sksamuel.scrimage.nio.JpegWriter
-import exceptions.BaseException
 import play.api.Logger
 
 import java.io.File
@@ -13,9 +12,9 @@ import scala.concurrent.ExecutionContext
 
 object ImageProcess {
 
-  private implicit val module: String = constants.Module.UTILITIES_IMAGE_PROCESS
+  implicit val module: String = constants.Module.UTILITIES_IMAGE_PROCESS
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   def convertToThumbnailWithWidth(filePath: String, canvasWidth: Int = 300)(implicit executionContext: ExecutionContext): Array[Byte] = {
     try {
@@ -26,11 +25,11 @@ object ImageProcess {
       Base64.getEncoder.encode(bytes)
     } catch {
       case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+        constants.Response.NO_SUCH_ELEMENT_EXCEPTION.throwBaseException(noSuchElementException)
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage)
-        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
-      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+        constants.Response.NULL_POINTER_EXCEPTION.throwBaseException(nullPointerException)
+      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message)
+        constants.Response.GENERIC_EXCEPTION.throwBaseException(e)
     }
   }
 
@@ -43,11 +42,11 @@ object ImageProcess {
       Base64.getEncoder.encode(bytes)
     } catch {
       case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+        constants.Response.NO_SUCH_ELEMENT_EXCEPTION.throwBaseException(noSuchElementException)
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage)
-        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
+        constants.Response.NULL_POINTER_EXCEPTION.throwBaseException(nullPointerException)
       case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+        constants.Response.GENERIC_EXCEPTION.throwBaseException(e)
     }
   }
 

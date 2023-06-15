@@ -19,7 +19,7 @@ class WithoutLoginActionAsync @Inject()(
                                          masterKeys: master.Keys,
                                        )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val module: String = constants.Module.ASYNC_ACTIONS_WITHOUT_LOGIN
+  implicit val module: String = constants.Module.ASYNC_ACTIONS_WITHOUT_LOGIN
 
   def apply(f: => Option[LoginState] => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLogging { implicit request =>

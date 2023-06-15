@@ -31,9 +31,9 @@ class SettingController @Inject()(
                                    masterTransactionProvisionAddressTransactions: masterTransaction.ProvisionAddressTransactions,
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.SETTING_CONTROLLER
+  implicit val module: String = constants.Module.SETTING_CONTROLLER
 
   implicit val callbackOnSessionTimeout: Call = routes.SettingController.viewSettings()
 
@@ -102,7 +102,7 @@ class SettingController @Inject()(
                 fromAddress = loginState.address,
                 accountId = loginState.username,
                 toAddress = addManagedKeyData.address,
-                gasPrice = constants.Blockchain.DefaultGasPrice,
+                gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, addManagedKeyData.password))
               )
 
@@ -161,7 +161,7 @@ class SettingController @Inject()(
                 fromAddress = loginState.address,
                 accountId = loginState.username,
                 toAddress = addUnmanagedKeyData.address,
-                gasPrice = constants.Blockchain.DefaultGasPrice,
+                gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, addUnmanagedKeyData.password))
               )
 
@@ -261,7 +261,7 @@ class SettingController @Inject()(
                   fromAddress = loginState.address,
                   accountId = loginState.username,
                   toAddress = deleteKeyData.address,
-                  gasPrice = constants.Blockchain.DefaultGasPrice,
+                  gasPrice = constants.Transaction.DefaultGasPrice,
                   ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, deleteKeyData.password))
                 )
                 for {
@@ -341,7 +341,7 @@ class SettingController @Inject()(
 
           def provision(validated: Boolean, key: master.Key, balance: MicroNumber) = {
             val errors = Seq(
-              if (key.identityIssued.getOrElse(true)) Option(constants.Response.ADDRES_ALREADY_PROVISIONED) else None,
+              if (key.identityIssued.getOrElse(true)) Option(constants.Response.ADDRESS_ALREADY_PROVISIONED) else None,
               if (!validated) Option(constants.Response.INVALID_PASSWORD) else None,
               if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
             ).flatten
@@ -351,7 +351,7 @@ class SettingController @Inject()(
                 fromAddress = loginState.address,
                 accountId = loginState.username,
                 toAddress = provisionAddressData.address,
-                gasPrice = constants.Blockchain.DefaultGasPrice,
+                gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, provisionAddressData.password))
               )
             } else errors.head.throwBaseException()

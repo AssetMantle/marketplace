@@ -1,6 +1,7 @@
 package models.master
 
-import models.traits.{Entity2, GenericDaoImpl2, Logging, ModelTable2}
+import models.master.WhitelistMembers.WhitelistMemberTable
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -14,12 +15,7 @@ case class WhitelistMember(whitelistId: String, accountId: String, createdBy: Op
   def id2: String = accountId
 }
 
-
-object WhitelistMembers {
-
-  implicit val module: String = constants.Module.MASTER_WHITELIST_MEMBER
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[master] object WhitelistMembers {
 
   class WhitelistMemberTable(tag: Tag) extends Table[WhitelistMember](tag, "WhitelistMember") with ModelTable2[String, String] {
 
@@ -41,32 +37,29 @@ object WhitelistMembers {
 
     def id2 = accountId
   }
-
-  val TableQuery = new TableQuery(tag => new WhitelistMemberTable(tag))
 }
 
 @Singleton
 class WhitelistMembers @Inject()(
-                                  protected val databaseConfigProvider: DatabaseConfigProvider
-                                )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl2[WhitelistMembers.WhitelistMemberTable, WhitelistMember, String, String](
-    databaseConfigProvider,
-    WhitelistMembers.TableQuery,
-    executionContext,
-    WhitelistMembers.module,
-    WhitelistMembers.logger
-  ) {
+                                  protected val dbConfigProvider: DatabaseConfigProvider,
+                                )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl2[WhitelistMembers.WhitelistMemberTable, WhitelistMember, String, String]() {
 
+  implicit val module: String = constants.Module.MASTER_WHITELIST_MEMBER
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new WhitelistMemberTable(tag))
 
   object Service {
 
-    def add(whitelistId: String, accountId: String): Future[Unit] = create(WhitelistMember(whitelistId = whitelistId, accountId = accountId))
+    def add(whitelistId: String, accountId: String): Future[String] = create(WhitelistMember(whitelistId = whitelistId, accountId = accountId)).map(_.whitelistId)
 
-    def add(whitelistId: String, accountIds: Seq[String]): Future[Unit] = create(accountIds.map(x => WhitelistMember(whitelistId = whitelistId, accountId = x)))
+    def add(whitelistId: String, accountIds: Seq[String]): Future[Int] = create(accountIds.map(x => WhitelistMember(whitelistId = whitelistId, accountId = x)))
 
     def getAllForWhitelist(whitelistId: String): Future[Seq[String]] = filter(_.whitelistId === whitelistId).map(_.map(_.accountId))
 
-    def getAllForMember(accountId: String, pageNumber: Int, perPage: Int): Future[Seq[String]] = filterAndSortWithPagination((pageNumber - 1) * perPage, limit = perPage)(_.accountId === accountId)(_.createdOnMillisEpoch).map(_.map(_.whitelistId))
+    def getAllForMember(accountId: String, pageNumber: Int, perPage: Int): Future[Seq[String]] = filterAndSortWithPagination(_.accountId === accountId)(_.createdOnMillisEpoch)((pageNumber - 1) * perPage, limit = perPage).map(_.map(_.whitelistId))
 
     def getAllForMember(accountId: String): Future[Seq[String]] = filter(_.accountId === accountId).map(_.map(_.whitelistId))
 

@@ -22,11 +22,7 @@ case class Transaction(hash: String, height: Int, code: Int, log: Option[String]
   def getMessages: Seq[protoAny] = parsedTx.getBody.getMessagesList.asScala.toSeq
 }
 
-object Transactions {
-
-  private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION
+private[blockchain] object Transactions {
 
   class TransactionTable(tag: Tag) extends Table[Transaction](tag, "Transaction") with ModelTable[String] {
 
@@ -49,32 +45,61 @@ object Transactions {
     def id = hash
   }
 
-  val TableQuery = new TableQuery(tag => new TransactionTable(tag))
-
 }
 
 @Singleton
 class Transactions @Inject()(
                               @NamedDatabase("explorer")
-                              protected val databaseConfigProvider: DatabaseConfigProvider
-                            )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Transactions.TransactionTable, Transaction, String](
-    databaseConfigProvider,
-    Transactions.TableQuery,
-    executionContext,
-    Transactions.module,
-    Transactions.logger
-  ) {
+                              protected val dbConfigProvider: DatabaseConfigProvider,
+                              archiveTransactions: ArchiveTransactions,
+                              blockchainBlocks: Blocks,
+                            )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Transactions.TransactionTable, Transaction, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION
+
+  val tableQuery = new TableQuery(tag => new Transactions.TransactionTable(tag))
 
   object Service {
 
     def get(hash: String): Future[Option[Transaction]] = getById(hash)
 
-    def getStatus(hash: String): Future[Option[Boolean]] = getById(hash).map(_.map(_.code == 0))
-
-    def getByHashes(hashes: Seq[String]): Future[Seq[Transaction]] = if (hashes.nonEmpty) filter(_.hash.inSet(hashes)) else Future(Seq[Transaction]())
+    def getByHashes(hashes: Seq[String]): Future[Seq[Transaction]] = if (hashes.nonEmpty) filter(_.hash.inSet(hashes)) else Future(Seq())
 
     def getByHeight(height: Int): Future[Seq[Transaction]] = filter(_.height === height)
 
   }
+
+  object Utility {
+    def get(hash: String): Future[Option[Transaction]] = {
+      val tx1 = Service.get(hash)
+
+      def getArchiveTx(tx: Option[Transaction]) = if (tx.isEmpty) archiveTransactions.Service.get(hash).map(_.map(_.toTx)) else Future(tx)
+
+      for {
+        tx1 <- tx1
+        tx2 <- getArchiveTx(tx1)
+      } yield tx2
+    }
+
+    def getByHashes(hashes: Seq[String]): Future[Seq[Transaction]] = if (hashes.nonEmpty) {
+      val tx1 = Service.getByHashes(hashes)
+      val tx2 = archiveTransactions.Service.getByHashes(hashes).map(_.map(_.toTx))
+
+      for {
+        tx1 <- tx1
+        tx2 <- tx2
+      } yield tx1 ++ tx2
+
+    } else Future(Seq[Transaction]())
+
+    def getByHeight(height: Int): Future[Seq[Transaction]] = if (height < blockchainBlocks.Service.getFirstHeight) {
+      archiveTransactions.Service.getByHeight(height).map(_.map(_.toTx))
+    } else {
+      Service.getByHeight(height)
+    }
+  }
+
 }

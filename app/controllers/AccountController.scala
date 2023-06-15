@@ -29,9 +29,9 @@ class AccountController @Inject()(
                                    utilitiesNotification: utilities.Notification,
                                  )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
+  implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
 
   implicit val callbackOnSessionTimeout: Call = routes.SettingController.viewSettings()
 

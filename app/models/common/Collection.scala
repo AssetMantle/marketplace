@@ -1,6 +1,5 @@
 package models.common
 
-import play.api.Logger
 import play.api.libs.json.{Json, OFormat, Reads, Writes}
 import schema.id.base.{PropertyID, StringID}
 import schema.property.base.{MesaProperty, MetaProperty}
@@ -11,9 +10,9 @@ object Collection {
 
     def getPropertyID: PropertyID = PropertyID(keyID = StringID(this.name), typeID = utilities.Data.getTypeID(this.`type`))
 
-    def toMetaProperty()(implicit module: String, logger: Logger): MetaProperty = if (this.meta) MetaProperty(id = this.getPropertyID, data = utilities.Data.getData(`type` = this.`type`, value = this.defaultValue)) else constants.Response.NOT_META_PROPERTY.throwBaseException()
+    def toMetaProperty: MetaProperty = MetaProperty(id = this.getPropertyID, data = utilities.Data.getData(`type` = this.`type`, value = this.defaultValue))
 
-    def toMesaProperty()(implicit module: String, logger: Logger): MesaProperty = if (!this.meta) MesaProperty(id = this.getPropertyID, dataID = utilities.Data.getDataID(`type` = this.`type`, value = this.defaultValue)) else constants.Response.NOT_MESA_PROPERTY.throwBaseException()
+    def toMesaProperty: MesaProperty = MesaProperty(id = this.getPropertyID, dataID = utilities.Data.getDataID(`type` = this.`type`, value = this.defaultValue))
 
   }
 

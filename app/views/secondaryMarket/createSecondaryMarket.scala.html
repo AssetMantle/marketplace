@@ -2,11 +2,16 @@
 @import views.html.base.form._
 @import views.secondaryMarket.companion.CreateSecondaryMarket
 
-@(createSecondaryMarketForm: Form[CreateSecondaryMarket.Data] = CreateSecondaryMarket.form, nftId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(createSecondaryMarketForm: Form[CreateSecondaryMarket.Data] = CreateSecondaryMarket.form, nftId: String, totalOwned: BigInt)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonForm(constants.Form.CREATE_SECONDARY_MARKET, createSecondaryMarketForm) {
     @commonInputText(createSecondaryMarketForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden")
-    @commonInputLong(createSecondaryMarketForm, constants.FormField.SELL_QUANTITY)
+    @if(totalOwned > 1) {
+        @totalOwned
+        @commonInputLong(createSecondaryMarketForm, constants.FormField.SELL_QUANTITY)
+    } else {
+        @commonInputLong(createSecondaryMarketForm, constants.FormField.SELL_QUANTITY, Symbol("value") -> 1, Symbol("containerDivClass") -> "hidden")
+    }
     @commonInputMicroNumber(createSecondaryMarketForm, constants.FormField.SECONDARY_MARKET_PRICE)
     @commonInputInt(createSecondaryMarketForm, constants.FormField.SECONDARY_MARKET_END_HOURS, Symbol("value") -> 72)
     @commonInputPassword(createSecondaryMarketForm, constants.FormField.PASSWORD)

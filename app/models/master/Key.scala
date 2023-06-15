@@ -1,5 +1,6 @@
 package models.master
 
+import models.master.Keys.KeyTable
 import models.traits._
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.ChildNumber
@@ -41,14 +42,10 @@ case class Key(accountId: String, address: String, lowercaseId: String, hdPath: 
   else None
 }
 
-object Keys {
-
-  implicit val module: String = constants.Module.MASTER_KEY
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[master] object Keys {
 
   case class KeySerialized(accountId: String, address: String, lowercaseId: String, hdPath: Option[String], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, encryptedPrivateKey: Array[Byte], partialMnemonics: Option[String], name: Option[String], retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean], identityIssued: Option[Boolean], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity2[String, String] {
-    def deserialize: Key = Key(
+    def deserialize()(implicit module: String, logger: Logger): Key = Key(
       accountId = accountId,
       address = address,
       lowercaseId = lowercaseId,
@@ -117,26 +114,23 @@ object Keys {
 
     override def id2 = address
   }
-
-  val TableQuery = new TableQuery(tag => new KeyTable(tag))
 }
 
 @Singleton
 class Keys @Inject()(
-                      protected val databaseConfigProvider: DatabaseConfigProvider
+                      protected val dbConfigProvider: DatabaseConfigProvider,
                     )(implicit executionContext: ExecutionContext)
-  extends GenericDaoImpl2[Keys.KeyTable, Keys.KeySerialized, String, String](
-    databaseConfigProvider,
-    Keys.TableQuery,
-    executionContext,
-    Keys.module,
-    Keys.logger
-  ) {
+  extends GenericDaoImpl2[Keys.KeyTable, Keys.KeySerialized, String, String]() {
 
+  implicit val module: String = constants.Module.MASTER_KEY
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new KeyTable(tag))
 
   object Service {
 
-    def addOnSignUp(accountId: String, address: String, hdPath: Seq[ChildNumber], partialMnemonics: Seq[String], name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
+    def addOnSignUp(accountId: String, address: String, hdPath: Seq[ChildNumber], partialMnemonics: Seq[String], name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[String] = {
       val salt = utilities.Secrets.getNewSalt
       val key = Key(
         accountId = accountId,
@@ -155,10 +149,10 @@ class Keys @Inject()(
         verified = verified,
         identityIssued = Option(false),
       )
-      create(key.serialize())
+      create(key.serialize()).map(_.accountId)
     }
 
-    def addManagedKey(accountId: String, address: String, hdPath: Seq[ChildNumber], password: String, privateKey: Array[Byte], partialMnemonics: Option[Seq[String]], name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
+    def addManagedKey(accountId: String, address: String, hdPath: Seq[ChildNumber], password: String, privateKey: Array[Byte], partialMnemonics: Option[Seq[String]], name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[String] = {
       val salt = utilities.Secrets.getNewSalt
       create(Key(
         accountId = accountId,
@@ -176,10 +170,10 @@ class Keys @Inject()(
         backupUsed = backupUsed,
         verified = verified,
         identityIssued = Option(false),
-      ).serialize())
+      ).serialize()).map(_.accountId)
     }
 
-    def addUnmanagedKey(accountId: String, address: String, password: String, name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
+    def addUnmanagedKey(accountId: String, address: String, password: String, name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[String] = {
       val salt = utilities.Secrets.getNewSalt
       create(Key(
         accountId = accountId,
@@ -197,10 +191,10 @@ class Keys @Inject()(
         backupUsed = backupUsed,
         verified = verified,
         identityIssued = Option(false),
-      ).serialize())
+      ).serialize()).map(_.accountId)
     }
 
-    def addOnMigration(accountId: String, address: String, hdPath: Seq[ChildNumber], partialMnemonics: Seq[String], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[Unit] = {
+    def addOnMigration(accountId: String, address: String, hdPath: Seq[ChildNumber], partialMnemonics: Seq[String], passwordHash: Array[Byte], salt: Array[Byte], iterations: Int, name: String, retryCounter: Int, active: Boolean, backupUsed: Boolean, verified: Option[Boolean]): Future[String] = {
       create(Key(
         accountId = accountId,
         address = address,
@@ -217,7 +211,7 @@ class Keys @Inject()(
         backupUsed = backupUsed,
         verified = verified,
         identityIssued = Option(false),
-      ).serialize())
+      ).serialize()).map(_.accountId)
     }
 
     def updateOnVerifyMnemonics(key: Key, password: String, privateKey: Array[Byte]): Future[Int] = updateKey(key.copy(
@@ -355,21 +349,21 @@ class Keys @Inject()(
       filterAndDelete(x => x.accountId === accountId && x.verified.? === verified)
     }
 
-    def insertOrUpdateMultiple(keys: Seq[Keys.KeySerialized]): Future[Unit] = upsertMultiple(keys)
+    def insertOrUpdateMultiple(keys: Seq[Keys.KeySerialized]): Future[Int] = upsertMultiple(keys)
 
     def fetchAllActive: Future[Seq[Keys.KeySerialized]] = filter(_.active)
 
-    def getNotIssuedIdentityAccountIDs: Future[Seq[String]] = filterAndSortWithPagination(offset = 0, limit = 500)(x => !x.identityIssued && x.verified && x.active)(_.accountId).map(_.map(_.accountId))
+    def getNotIssuedIdentityAccountIDs: Future[Seq[String]] = filterAndSortWithPagination(x => !x.identityIssued && x.verified && x.active)(_.accountId)(offset = 0, limit = 50).map(_.map(_.accountId))
 
-    def markIdentityIssuePending(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(_.accountId.inSet(accountIds)).map(_.identityIssued.?).update(null))
+    def markIdentityIssuePending(accountIds: Seq[String]): Future[Int] = customUpdate(tableQuery.filter(_.accountId.inSet(accountIds)).map(_.identityIssued.?).update(null))
 
-    def markIdentityIssued(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(_.accountId.inSet(accountIds)).map(_.identityIssued).update(true))
+    def markIdentityIssued(accountIds: Seq[String]): Future[Int] = customUpdate(tableQuery.filter(_.accountId.inSet(accountIds)).map(_.identityIssued).update(true))
 
-    def markIdentityFailed(accountIds: Seq[String]): Future[Int] = customUpdate(Keys.TableQuery.filter(_.accountId.inSet(accountIds)).map(_.identityIssued).update(false))
+    def markIdentityFailed(accountIds: Seq[String]): Future[Int] = customUpdate(tableQuery.filter(_.accountId.inSet(accountIds)).map(_.identityIssued).update(false))
 
-    def markAddressProvisioned(accountId: String, address: String): Future[Int] = customUpdate(Keys.TableQuery.filter(x => x.accountId === accountId && x.address === address).map(_.identityIssued).update(true))
+    def markAddressProvisioned(accountId: String, address: String): Future[Int] = customUpdate(tableQuery.filter(x => x.accountId === accountId && x.address === address).map(_.identityIssued).update(true))
 
-    def markAddressProvisionFailed(accountId: String, address: String): Future[Int] = customUpdate(Keys.TableQuery.filter(x => x.accountId === accountId && x.address === address).map(_.identityIssued).update(false))
+    def markAddressProvisionFailed(accountId: String, address: String): Future[Int] = customUpdate(tableQuery.filter(x => x.accountId === accountId && x.address === address).map(_.identityIssued).update(false))
 
     def getKeysByAddresses(addresses: Seq[String]): Future[Seq[Key]] = filter(_.address.inSet(addresses)).map(_.map(_.deserialize))
 

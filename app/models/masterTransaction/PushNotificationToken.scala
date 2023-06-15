@@ -1,6 +1,7 @@
 package models.masterTransaction
 
-import models.traits.{Entity, GenericDaoImpl, Logged, ModelTable}
+import models.masterTransaction.PushNotificationTokens.PushNotificationTokenTable
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -13,12 +14,7 @@ case class PushNotificationToken(accountId: String, token: String, createdBy: Op
   def id: String = accountId
 }
 
-object PushNotificationTokens {
-
-  implicit val module: String = constants.Module.MASTER_TRANSACTION_PUSH_NOTIFICATION_TOKEN
-
-  implicit val logger: Logger = Logger(this.getClass)
-
+private[masterTransaction] object PushNotificationTokens {
   class PushNotificationTokenTable(tag: Tag) extends Table[PushNotificationToken](tag, "PushNotificationToken") with ModelTable[String] {
 
     def * = (accountId, token, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (PushNotificationToken.tupled, PushNotificationToken.unapply)
@@ -41,21 +37,19 @@ object PushNotificationTokens {
 
     def id = accountId
   }
-
-  val TableQuery = new TableQuery(tag => new PushNotificationTokenTable(tag))
 }
 
 @Singleton
 class PushNotificationTokens @Inject()(
-                               protected val databaseConfigProvider: DatabaseConfigProvider
-                             )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[PushNotificationTokens.PushNotificationTokenTable, PushNotificationToken, String](
-    databaseConfigProvider,
-    PushNotificationTokens.TableQuery,
-    executionContext,
-    PushNotificationTokens.module,
-    PushNotificationTokens.logger
-  ) {
+                                        protected val dbConfigProvider: DatabaseConfigProvider,
+                                      )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[PushNotificationTokens.PushNotificationTokenTable, PushNotificationToken, String]() {
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_PUSH_NOTIFICATION_TOKEN
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new PushNotificationTokenTable(tag))
 
   object Service {
 

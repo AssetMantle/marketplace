@@ -5,7 +5,7 @@ import exceptions.BaseException
 import models.blockchain.Split
 import models.common.Coin
 import models.master.Key
-import models.{blockchain, blockchainTransaction, master, masterTransaction}
+import models.{blockchain, master, masterTransaction}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.cache.Cached
@@ -30,7 +30,7 @@ class WalletController @Inject()(
                                   masterNFTs: master.NFTs,
                                   masterNFTProperties: master.NFTProperties,
                                   blockchainBalances: blockchain.Balances,
-                                  blockchainTransactionSendCoins: blockchainTransaction.SendCoins,
+                                  sendCoinTransactions: masterTransaction.SendCoinTransactions,
                                   masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                   masterKeys: master.Keys,
                                   masterTransactionUnwrapTransactions: masterTransaction.UnwrapTransactions,
@@ -39,9 +39,9 @@ class WalletController @Inject()(
                                   utilitiesOperations: utilities.Operations,
                                 )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.WALLET_CONTROLLER
+  implicit val module: String = constants.Module.WALLET_CONTROLLER
 
   implicit val callbackOnSessionTimeout: Call = routes.ProfileController.viewDefaultProfile()
 
@@ -84,14 +84,14 @@ class WalletController @Inject()(
     }
   }
 
-  def sendCoinForm(fromAddress: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def sendCoinForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val balance = blockchainBalances.Service.get(fromAddress)
+      val balance = blockchainBalances.Service.get(loginState.address)
       (for {
         balance <- balance
-      } yield Ok(views.html.wallet.sendCoin(fromAddress = fromAddress, balance = balance.fold(MicroNumber.zero)(_.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount))))
+      } yield Ok(views.html.wallet.sendCoin(balance = balance.fold(MicroNumber.zero)(_.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount))))
         ).recover {
-        case _: BaseException => Ok(views.html.wallet.sendCoin(SendCoin.form.withGlobalError(constants.Response.BALANCE_FETCH_FAILED.message), fromAddress = fromAddress, balance = MicroNumber.zero))
+        case _: BaseException => Ok(views.html.wallet.sendCoin(SendCoin.form.withGlobalError(constants.Response.BALANCE_FETCH_FAILED.message), balance = MicroNumber.zero))
       }
   }
 
@@ -99,25 +99,26 @@ class WalletController @Inject()(
     implicit request =>
       SendCoin.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.wallet.sendCoin(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.FROM_ADDRESS.name, ""), formWithErrors.data.get(constants.FormField.SEND_COIN_AMOUNT.name).fold(MicroNumber.zero)(MicroNumber(_)))))
+          Future(BadRequest(views.html.wallet.sendCoin(formWithErrors, formWithErrors.data.get(constants.FormField.SEND_COIN_AMOUNT.name).fold(MicroNumber.zero)(MicroNumber(_)))))
         },
         sendCoinData => {
-          val balance = blockchainBalances.Service.getTokenBalance(sendCoinData.fromAddress)
-          val validateAndKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = sendCoinData.fromAddress, password = sendCoinData.password)
+          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
+          val validateAndKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = sendCoinData.password)
 
           def validateAndBroadcast(balance: MicroNumber, validatePassword: Boolean, key: master.Key) = {
             val errors = Seq(
+              if (loginState.address == sendCoinData.toAddress) Option(constants.Response.FROM_AND_TO_ADDRESS_SAME) else None,
               if (balance == MicroNumber.zero || balance <= sendCoinData.sendCoinAmount) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if (!validatePassword) Option(constants.Response.INVALID_PASSWORD) else None
             ).flatten
             if (errors.isEmpty) {
-              blockchainTransactionSendCoins.Utility.transaction(
-                accountId = loginState.username,
-                fromAddress = sendCoinData.fromAddress,
+              sendCoinTransactions.Utility.transaction(
+                fromAccountId = loginState.username,
+                fromAddress = loginState.address,
                 toAddress = sendCoinData.toAddress,
                 amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = sendCoinData.sendCoinAmount)),
-                gasLimit = constants.Blockchain.DefaultSendCoinGasAmount,
-                gasPrice = constants.Blockchain.DefaultGasPrice,
+                gasLimit = constants.Transaction.DefaultSendCoinGasAmount,
+                gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, sendCoinData.password)),
               )
             } else errors.head.throwBaseException()
@@ -129,7 +130,7 @@ class WalletController @Inject()(
             blockchainTransaction <- validateAndBroadcast(balance, validatePassword, key)
           } yield PartialContent(views.html.transactionSuccessful(blockchainTransaction))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.wallet.sendCoin(SendCoin.form.withGlobalError(baseException.failure.message), sendCoinData.fromAddress, sendCoinData.sendCoinAmount))
+            case baseException: BaseException => BadRequest(views.html.wallet.sendCoin(SendCoin.form.withGlobalError(baseException.failure.message), sendCoinData.sendCoinAmount))
           }
         }
       )
@@ -179,7 +180,7 @@ class WalletController @Inject()(
                 fromAddress = key.address,
                 accountId = loginState.username,
                 coin = Coin(denom = constants.Blockchain.StakingToken, amount = wrapTokenData.wrapCoinAmount),
-                gasPrice = constants.Blockchain.DefaultGasPrice,
+                gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, wrapTokenData.password))
               )
             } else errors.head.throwBaseException()
@@ -222,7 +223,7 @@ class WalletController @Inject()(
                 accountId = loginState.username,
                 amount = split.value,
                 ownableId = constants.Blockchain.StakingTokenCoinID,
-                gasPrice = constants.Blockchain.DefaultGasPrice,
+                gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, unwrapTokenData.password))
               )
             } else errors.head.throwBaseException()

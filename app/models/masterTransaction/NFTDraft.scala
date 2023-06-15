@@ -2,7 +2,8 @@ package models.masterTransaction
 
 import models.common.NFT._
 import models.master._
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.masterTransaction.NFTDrafts.NFTDraftTable
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -38,14 +39,10 @@ case class NFTDraft(id: String, collectionId: String, name: Option[String], desc
     updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
-object NFTDrafts {
-
-  implicit val module: String = constants.Module.MASTER_TRANSACTION_NFT_DRAFT
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[masterTransaction] object NFTDrafts {
 
   case class NFTDraftSerialized(id: String, collectionId: String, name: Option[String], description: Option[String], fileExtension: String, properties: Option[String], tagNames: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize: NFTDraft = NFTDraft(id = id, collectionId = collectionId, name = name, description = description, fileExtension = fileExtension, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[BaseNFTProperty]](_)), tagNames = tagNames.map(utilities.JSON.convertJsonStringToObject[Seq[String]](_)), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): NFTDraft = NFTDraft(id = id, collectionId = collectionId, name = name, description = description, fileExtension = fileExtension, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[BaseNFTProperty]](_)), tagNames = tagNames.map(utilities.JSON.convertJsonStringToObject[Seq[String]](_)), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
 
   }
 
@@ -76,22 +73,19 @@ object NFTDrafts {
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
   }
-
-  lazy val TableQuery = new TableQuery(tag => new NFTDraftTable(tag))
 }
 
 @Singleton
 class NFTDrafts @Inject()(
-                           protected val databaseConfigProvider: DatabaseConfigProvider
-                         )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[NFTDrafts.NFTDraftTable, NFTDrafts.NFTDraftSerialized, String](
-    databaseConfigProvider,
-    NFTDrafts.TableQuery,
-    executionContext,
-    NFTDrafts.module,
-    NFTDrafts.logger
-  ) {
+                           protected val dbConfigProvider: DatabaseConfigProvider,
+                         )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[NFTDrafts.NFTDraftTable, NFTDrafts.NFTDraftSerialized, String]() {
 
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_NFT_DRAFT
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new NFTDraftTable(tag))
 
   object Service {
 
@@ -105,12 +99,12 @@ class NFTDrafts @Inject()(
         properties = None,
         tagNames = None,
       )
-      create(nft.serialize())
+      create(nft.serialize()).map(_.id)
     }
 
     def tryGet(id: String): Future[NFTDraft] = tryGetById(id).map(_.deserialize)
 
-    def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[NFTDraft]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage)(_.collectionId === collectionId)(_.createdOnMillisEpoch).map(_.map(_.deserialize))
+    def getByPageNumber(collectionId: String, pageNumber: Int): Future[Seq[NFTDraft]] = filterAndSortWithPagination(_.collectionId === collectionId)(_.updatedOnMillisEpoch.desc)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage).map(_.map(_.deserialize))
 
     def getAllForCollection(collectionId: String): Future[Seq[NFTDraft]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize))
 

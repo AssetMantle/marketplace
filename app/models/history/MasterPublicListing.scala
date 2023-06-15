@@ -2,8 +2,9 @@ package models.history
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.traits.{Entity, GenericDaoImpl, HistoryLogging, ModelTable}
 import models.analytics.CollectionsAnalysis
+import models.history.MasterPublicListings.MasterPublicListingTable
+import models.traits._
 import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -34,15 +35,11 @@ case class MasterPublicListing(id: String, collectionId: String, numberOfNFTs: L
 
 }
 
-object MasterPublicListings {
-
-  implicit val module: String = constants.Module.HISTORY_MASTER_PUBLIC_LISTING
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[history] object MasterPublicListings {
 
   case class MasterPublicListingSerialized(id: String, collectionId: String, numberOfNFTs: Long, maxMintPerAccount: Long, price: BigDecimal, denom: String, startTimeEpoch: Long, endTimeEpoch: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
-    def deserialize: MasterPublicListing = MasterPublicListing(id = id, collectionId = collectionId, numberOfNFTs = numberOfNFTs, maxMintPerAccount = maxMintPerAccount, price = MicroNumber(price), denom = denom, startTimeEpoch = startTimeEpoch, endTimeEpoch = endTimeEpoch, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch, deletedBy = this.deletedBy, deletedOnMillisEpoch = this.deletedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): MasterPublicListing = MasterPublicListing(id = id, collectionId = collectionId, numberOfNFTs = numberOfNFTs, maxMintPerAccount = maxMintPerAccount, price = MicroNumber(price), denom = denom, startTimeEpoch = startTimeEpoch, endTimeEpoch = endTimeEpoch, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch, deletedBy = this.deletedBy, deletedOnMillisEpoch = this.deletedOnMillisEpoch)
   }
 
   class MasterPublicListingTable(tag: Tag) extends Table[MasterPublicListingSerialized](tag, "MasterPublicListing") with ModelTable[String] {
@@ -77,8 +74,6 @@ object MasterPublicListings {
 
     def deletedOnMillisEpoch = column[Long]("deletedOnMillisEpoch")
   }
-
-  val TableQuery = new TableQuery(tag => new MasterPublicListingTable(tag))
 }
 
 @Singleton
@@ -88,21 +83,21 @@ class MasterPublicListings @Inject()(
                                       masterNFTOwners: master.NFTOwners,
                                       collectionsAnalysis: CollectionsAnalysis,
                                       masterTransactionPublicListingNFTTransactions: masterTransaction.PublicListingNFTTransactions,
-                                      protected val databaseConfigProvider: DatabaseConfigProvider
-                                    )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[MasterPublicListings.MasterPublicListingTable, MasterPublicListings.MasterPublicListingSerialized, String](
-    databaseConfigProvider,
-    MasterPublicListings.TableQuery,
-    executionContext,
-    MasterPublicListings.module,
-    MasterPublicListings.logger
-  ) {
+                                      protected val dbConfigProvider: DatabaseConfigProvider,
+                                    )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[MasterPublicListings.MasterPublicListingTable, MasterPublicListings.MasterPublicListingSerialized, String]() {
+
+  implicit val module: String = constants.Module.HISTORY_MASTER_PUBLIC_LISTING
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new MasterPublicListingTable(tag))
 
   object Service {
 
-    def insertOrUpdate(masterPublicListing: MasterPublicListing): Future[Unit] = upsert(masterPublicListing.serialize())
+    def insertOrUpdate(masterPublicListing: MasterPublicListing): Future[Int] = upsert(masterPublicListing.serialize())
 
-    def add(masterPublicListings: Seq[MasterPublicListing]): Future[Unit] = create(masterPublicListings.map(_.serialize()))
+    def add(masterPublicListings: Seq[MasterPublicListing]): Future[Int] = create(masterPublicListings.map(_.serialize()))
 
     def tryGet(id: String): Future[MasterPublicListing] = filterHead(_.id === id).map(_.deserialize)
 
@@ -113,7 +108,7 @@ class MasterPublicListings @Inject()(
   object Utility {
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = MasterPublicListings.module
+      val name: String = module
 
       def runner(): Unit = {
         val deletePublicListings = masterPublicListings.Service.getForDeletion
@@ -143,7 +138,7 @@ class MasterPublicListings @Inject()(
           publicListingsWithPendingTx <- publicListingsWithPendingTx(deletePublicListings.map(_.id))
           _ <- deleteExpiredPublicListings(deletePublicListings.filterNot(x => publicListingsWithPendingTx.contains(x.id)))
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case _: BaseException => logger.error("FAILED_IN_" + module)
         }
 
         Await.result(forComplete, Duration.Inf)

@@ -1,6 +1,7 @@
 package models.master
 
-import models.traits.{Entity2, GenericDaoImpl2, Logging, ModelTable2}
+import models.master.NFTTags.NFTTagTable
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -15,11 +16,7 @@ case class NFTTag(tagName: String, nftId: String, createdBy: Option[String] = No
   def id2: String = nftId
 }
 
-object NFTTags {
-
-  implicit val module: String = constants.Module.MASTER_NFT_TAG
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[master] object NFTTags {
 
   class NFTTagTable(tag: Tag) extends Table[NFTTag](tag, "NFTTag") with ModelTable2[String, String] {
 
@@ -41,27 +38,25 @@ object NFTTags {
 
     def id2 = nftId
   }
-
-  val TableQuery = new TableQuery(tag => new NFTTagTable(tag))
 }
 
 @Singleton
 class NFTTags @Inject()(
-                         protected val databaseConfigProvider: DatabaseConfigProvider
-                       )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl2[NFTTags.NFTTagTable, NFTTag, String, String](
-    databaseConfigProvider,
-    NFTTags.TableQuery,
-    executionContext,
-    NFTTags.module,
-    NFTTags.logger
-  ) {
+                         protected val dbConfigProvider: DatabaseConfigProvider,
+                       )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl2[NFTTags.NFTTagTable, NFTTag, String, String]() {
+
+  implicit val module: String = constants.Module.MASTER_NFT_TAG
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new NFTTagTable(tag))
 
   object Service {
 
-    def add(tagName: String, nftId: String): Future[Unit] = create(NFTTag(tagName = tagName, nftId = nftId))
+    def add(tagName: String, nftId: String): Future[String] = create(NFTTag(tagName = tagName, nftId = nftId)).map(_.nftId)
 
-    def add(nftTags: Seq[NFTTag]): Future[Unit] = create(nftTags)
+    def add(nftTags: Seq[NFTTag]): Future[Int] = create(nftTags)
 
     def getByTagName(tagName: String): Future[Seq[String]] = filter(_.tagName === tagName).map(_.map(_.nftId))
 

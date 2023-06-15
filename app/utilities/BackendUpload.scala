@@ -4,7 +4,7 @@ import models.analytics.CollectionsAnalysis
 import models.common.Collection.SocialProfile
 import models.common.{Collection => commonCollection}
 import models.master.Collection
-import models.{blockchainTransaction, master, masterTransaction}
+import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.libs.json.{Json, Reads}
 
@@ -28,12 +28,11 @@ class BackendUpload @Inject()(
                                masterTransactionNotifications: masterTransaction.Notifications,
                                masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                utilitiesOperations: utilities.Operations,
-                               blockchainTransactionSendCoins: blockchainTransaction.SendCoins
                              )(implicit exec: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.UTILITIES_BACKEND_UPLOAD
+  implicit val module: String = constants.Module.UTILITIES_BACKEND_UPLOAD
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   private val uploadCollectionFilePath = constants.CommonConfig.Files.CollectionPath + "/upload.json"
 

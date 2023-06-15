@@ -10,7 +10,11 @@
     <div id="secondaryMarketForm">
         @commonInputText(buyForm, constants.FormField.NFT_ID, Symbol("value") -> secondaryMarket.nftId, Symbol("containerDivClass") -> "hidden")
         @commonInputText(buyForm, constants.FormField.SECONDARY_MARKET_ID, Symbol("value") -> secondaryMarket.id, Symbol("containerDivClass") -> "hidden")
-        @commonInputLong(buyForm, constants.FormField.BUY_QUANTITY)
+        @if(secondaryMarket.quantity > 1) {
+            @commonInputLong(buyForm, constants.FormField.BUY_QUANTITY)
+        } else {
+            @commonInputLong(buyForm, constants.FormField.BUY_QUANTITY, Symbol("value") -> 1, Symbol("containerDivClass") -> "hidden")
+        }
         @commonInputPassword(buyForm, constants.FormField.PASSWORD)
     </div>
 

@@ -2,14 +2,14 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.blockchainTransaction.UnprovisionAddress
+import models.blockchainTransaction.{UserTransaction, UserTransactions}
+import models.master
+import models.masterTransaction.UnprovisionAddressTransactions.UnprovisionAddressTransactionTable
 import models.traits._
-import models.{blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
-import transactions.responses.blockchain.BroadcastTxSyncResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
@@ -20,20 +20,14 @@ case class UnprovisionAddressTransaction(txHash: String, accountId: String, toAd
 
 }
 
-object UnprovisionAddressTransactions {
-
-  private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_UNPROVISION_ADDRESS_TRANSACTION
-
-
+private[masterTransaction] object UnprovisionAddressTransactions {
   class UnprovisionAddressTransactionTable(tag: Tag) extends Table[UnprovisionAddressTransaction](tag, "UnprovisionAddressTransaction") with ModelTable[String] {
 
     def * = (txHash, accountId, toAddress, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (UnprovisionAddressTransaction.tupled, UnprovisionAddressTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
-    def accountId = column[String]("accountId", O.PrimaryKey)
+    def accountId = column[String]("accountId")
 
     def toAddress = column[String]("toAddress")
 
@@ -51,121 +45,93 @@ object UnprovisionAddressTransactions {
 
   }
 
-  val TableQuery = new TableQuery(tag => new UnprovisionAddressTransactionTable(tag))
-
 }
 
 @Singleton
 class UnprovisionAddressTransactions @Inject()(
-                                                protected val databaseConfigProvider: DatabaseConfigProvider,
-                                                blockchainTransactionUnprovisionAddresses: blockchainTransaction.UnprovisionAddresses,
-                                                broadcastTxSync: transactions.blockchain.BroadcastTxSync,
+                                                protected val dbConfigProvider: DatabaseConfigProvider,
                                                 utilitiesOperations: utilities.Operations,
-                                                getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
-                                                getAccount: queries.blockchain.GetAccount,
-                                                getAbciInfo: queries.blockchain.GetABCIInfo,
                                                 masterKeys: master.Keys,
                                                 utilitiesNotification: utilities.Notification,
-                                              )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[UnprovisionAddressTransactions.UnprovisionAddressTransactionTable, UnprovisionAddressTransaction, String](
-    databaseConfigProvider,
-    UnprovisionAddressTransactions.TableQuery,
-    executionContext,
-    UnprovisionAddressTransactions.module,
-    UnprovisionAddressTransactions.logger
-  ) {
+                                                userTransactions: UserTransactions,
+                                              )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[UnprovisionAddressTransactions.UnprovisionAddressTransactionTable, UnprovisionAddressTransaction, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_UNPROVISION_ADDRESS_TRANSACTION
+
+  val tableQuery = new TableQuery(tag => new UnprovisionAddressTransactionTable(tag))
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, accountId: String, toAddress: String): Future[String] = create(UnprovisionAddressTransaction(txHash = txHash, accountId = accountId, toAddress = toAddress, status = None))
+    def addWithNoneStatus(txHash: String, accountId: String, toAddress: String): Future[String] = create(UnprovisionAddressTransaction(txHash = txHash, accountId = accountId, toAddress = toAddress, status = None)).map(_.id)
 
     def getByTxHash(txHash: String): Future[Seq[UnprovisionAddressTransaction]] = filter(_.txHash === txHash)
 
-    def markSuccess(txHash: String): Future[Int] = customUpdate(UnprovisionAddressTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
+    def markSuccess(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(true))
 
-    def markFailed(txHash: String): Future[Int] = customUpdate(UnprovisionAddressTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(false))
+    def markFailed(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(false))
 
     def getAllPendingStatus: Future[Seq[UnprovisionAddressTransaction]] = filter(_.status.?.isEmpty)
 
     def checkAnyPendingTx: Future[Boolean] = filterAndExists(_.status.?.isEmpty)
-
-    def getWithStatusTrueOrPending(accountIds: Seq[String]): Future[Seq[String]] = filter(x => x.accountId.inSet(accountIds) && (x.status || x.status.?.isEmpty)).map(_.map(_.accountId))
-
   }
 
   object Utility {
 
     def transaction(fromAddress: String, accountId: String, toAddress: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      // TODO
-      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
-      val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(fromAddress).map(_.account.toSerializableAccount).recover {
-        case exception: Exception => models.blockchain.Account(address = fromAddress, accountType = None, accountNumber = 0, sequence = 0, publicKey = None)
-      }
-      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
+      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
+        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(utilities.BlockchainTransaction.getUnprovisionMsg(
             fromAddress = fromAddress,
             fromID = utilities.Identity.getMantlePlaceIdentityID(accountId),
             toAddress = toAddress
           )),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultProvisionGasLimit),
-          gasLimit = constants.Blockchain.DefaultProvisionGasLimit,
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultProvisionGasLimit),
+          gasLimit = constants.Transaction.DefaultProvisionGasLimit,
           account = bcAccount,
           ecKey = ecKey,
           timeoutHeight = timeoutHeight)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
-        def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
+        val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              unprovisionAddress <- blockchainTransactionUnprovisionAddresses.Service.add(txHash = txHash, fromAddress = fromAddress, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = accountId, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.User.UNPROVISION_ADDRESS)
               _ <- Service.addWithNoneStatus(txHash = txHash, accountId = accountId, toAddress = toAddress)
-            } yield unprovisionAddress
+            } yield userTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
-          unprovisionAddress <- checkAndAdd(unconfirmedTxHashes)
-        } yield (unprovisionAddress, txRawBytes)
+          userTransaction <- checkAndAdd
+        } yield (userTransaction, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(unprovisionAddress: UnprovisionAddress, txRawBytes: Array[Byte]) = {
-        val broadcastTx = broadcastTxSync.Service.get(unprovisionAddress.getTxRawAsHexString(txRawBytes))
-
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionUnprovisionAddresses.Service.markFailedWithLog(txHashes = Seq(unprovisionAddress.txHash), log = errorResponse.get.error.data)
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionUnprovisionAddresses.Service.markFailedWithLog(txHashes = Seq(unprovisionAddress.txHash), log = successResponse.get.result.log)
-        else Future(0)
-
-        for {
-          (successResponse, errorResponse) <- broadcastTx
-          _ <- update(successResponse, errorResponse)
-        } yield ()
-      }
+      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
 
       for {
-        abciInfo <- abciInfo
-        bcAccount <- bcAccount
-        unconfirmedTxs <- unconfirmedTxs
-        (unprovisionAddress, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        _ <- broadcastTxAndUpdate(unprovisionAddress, txRawBytes)
-      } yield unprovisionAddress
+        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
+        (unprovisionAddress, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        updatedUserTransaction <- broadcastTxAndUpdate(unprovisionAddress, txRawBytes)
+      } yield updatedUserTransaction
     }
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = UnprovisionAddressTransactions.module
+      val name: String = module
 
       def runner(): Unit = {
         val unprovisionAddressTxs = Service.getAllPendingStatus
 
         def checkAndUpdate(unprovisionAddressTxs: Seq[UnprovisionAddressTransaction]) = utilitiesOperations.traverse(unprovisionAddressTxs) { unprovisionAddressTx =>
-          val transaction = blockchainTransactionUnprovisionAddresses.Service.tryGet(unprovisionAddressTx.txHash)
+          val transaction = userTransactions.Service.tryGet(unprovisionAddressTx.txHash)
 
-          def onTxComplete(transaction: UnprovisionAddress) = if (transaction.status.isDefined) {
-            if (transaction.status.get) {
+          def onTxComplete(userTransaction: UserTransaction) = if (userTransaction.status.isDefined) {
+            if (userTransaction.status.get) {
               val markSuccess = Service.markSuccess(unprovisionAddressTx.txHash)
               val deletKey = masterKeys.Service.delete(accountId = unprovisionAddressTx.accountId, address = unprovisionAddressTx.toAddress)
               val sendNotification = utilitiesNotification.send(accountID = unprovisionAddressTx.accountId, notification = constants.Notification.ADDRESS_UNPROVISIONED_SUCCESSFULLY, unprovisionAddressTx.toAddress)("")
@@ -177,7 +143,7 @@ class UnprovisionAddressTransactions @Inject()(
               } yield ()
                 ).recover {
                 case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             } else {
               val markMasterFailed = Service.markFailed(unprovisionAddressTx.txHash)
@@ -189,7 +155,7 @@ class UnprovisionAddressTransactions @Inject()(
               } yield ()
                 ).recover {
                 case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
               }
             }
           } else Future()

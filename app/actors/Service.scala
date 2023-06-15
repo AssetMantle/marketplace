@@ -9,7 +9,7 @@ object Service {
 
   implicit val actorSystem: ActorSystem = ActorSystem(constants.Actor.PRIMARY_ACTOR, ConfigFactory.load)
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   implicit val materializer: Materializer = Materializer(actorSystem)
 

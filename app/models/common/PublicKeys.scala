@@ -6,9 +6,9 @@ import play.api.libs.json.{Json, OWrites, Reads, Writes}
 
 object PublicKeys {
 
-  private implicit val module: String = constants.Module.PUBLIC_KEYS
+  implicit val module: String = constants.Module.PUBLIC_KEYS
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   case class SinglePublicKey(publicKeyType: String, key: String) extends PublicKey {
     val value: String = key
@@ -30,6 +30,6 @@ object PublicKeys {
   //    case constants.Blockchain.PublicKey.SINGLE => utilities.JSON.convertJsonStringToObject[SinglePublicKey](value.toString)
   //    case constants.Blockchain.PublicKey.MULTI_SIG => utilities.JSON.convertJsonStringToObject[MultiSigPublicKey](value.toString)
   //    case constants.Blockchain.PublicKey.VALIDATOR => utilities.JSON.convertJsonStringToObject[SinglePublicKey](value.toString)
-  //    case _ => throw new BaseException(constants.Response.NO_SUCH_PUBLIC_KEY_TYPE)
+  //    case _ => constants.Response.NO_SUCH_PUBLIC_KEY_TYPE.throwBaseException()
   //  }
 }

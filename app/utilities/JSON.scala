@@ -2,7 +2,6 @@ package utilities
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
-import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSResponse
@@ -11,25 +10,28 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object JSON {
 
+  private def logJsonError(jsonString: String, jsErrors: JsError*)(implicit module: String, logger: Logger): Unit = {
+    jsErrors.foreach(jsError => logger.error(s"JSON_PARSE_ERROR: ${jsError.errors.zipWithIndex.map { case (x, index) => s"[${index}] ${x._1}: ${x._2.map(_.message).mkString(",")}" }.mkString("; ")}"))
+    logger.error(jsonString)
+  }
+
   def convertJsonStringToObject[T](jsonString: String)(implicit module: String, logger: Logger, reads: Reads[T]): T = {
     try {
       Json.fromJson[T](Json.parse(jsonString)) match {
         case JsSuccess(value: T, _: JsPath) => value
-        case errors: JsError =>
-          logger.error(errors.errors.map(_.toString()).mkString(", "))
-          logger.error(jsonString)
+        case jsError: JsError => logJsonError(jsonString, jsError)
           constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
       }
     } catch {
       case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
-        throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
+        constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
       case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
-        throw new BaseException(constants.Response.JSON_MAPPING_EXCEPTION)
+        constants.Response.JSON_MAPPING_EXCEPTION.throwBaseException(jsonMappingException)
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
         logger.error("Check order of case class definitions")
-        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
+        constants.Response.NULL_POINTER_EXCEPTION.throwBaseException(nullPointerException)
       case exception: Exception => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+        constants.Response.GENERIC_EXCEPTION.throwBaseException(exception)
     }
   }
 
@@ -37,8 +39,7 @@ object JSON {
     response.map { response =>
       Json.fromJson[T](response.json) match {
         case JsSuccess(value: T, _: JsPath) => value
-        case jsError: JsError => logger.error(response.json.toString())
-          logger.error(jsError.toString)
+        case jsError: JsError => logJsonError(response.json.toString(), jsError)
           constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
       }
     }.recover {
@@ -46,7 +47,6 @@ object JSON {
         constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
       case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
         constants.Response.JSON_MAPPING_EXCEPTION.throwBaseException(jsonMappingException)
-      case baseException: BaseException => throw baseException
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
         logger.error("Check order of case class definitions")
         constants.Response.NULL_POINTER_EXCEPTION.throwBaseException(nullPointerException)
@@ -55,26 +55,29 @@ object JSON {
     }
   }
 
-  def getResponseFromJson[T1, T2](wsResponse: Future[WSResponse])(implicit exec: ExecutionContext, logger: Logger, module: String, reads1: Reads[T1], reads2: Reads[T2]): Future[(Option[T1], Option[T2])] = {
+  def getSuccessErrorResponseFromJson[Success, Error](wsResponse: Future[WSResponse])(implicit exec: ExecutionContext, logger: Logger, module: String, reads1: Reads[Success], reads2: Reads[Error]): Future[(Option[Success], Option[Error])] = {
     wsResponse.map { response =>
-      Json.fromJson[T1](response.json) match {
-        case JsSuccess(value: T1, _: JsPath) => (Option(value), None)
-        case error: JsError => logger.error(response.json.toString())
-          logger.error(error.toString)
-          constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
+      Json.fromJson[Success](response.json) match {
+        case JsSuccess(value: Success, _: JsPath) => (Option(value), None)
+        case successJsError: JsError => {
+          Json.fromJson[Error](response.json) match {
+            case JsSuccess(value: Error, _: JsPath) => (None, Option(value))
+            case errorJsError: JsError => logJsonError(response.json.toString(), successJsError, errorJsError)
+              constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
+          }
+        }
       }
+    }.recover {
+      case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
+        constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
+      case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
+        constants.Response.JSON_MAPPING_EXCEPTION.throwBaseException(jsonMappingException)
+      case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
+        logger.error("Check order of case class definitions")
+        constants.Response.NULL_POINTER_EXCEPTION.throwBaseException(nullPointerException)
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        constants.Response.GENERIC_JSON_EXCEPTION.throwBaseException(exception)
     }
-  }.recover {
-    case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
-      constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
-    case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
-      constants.Response.JSON_MAPPING_EXCEPTION.throwBaseException(jsonMappingException)
-    case baseException: BaseException => throw baseException
-    case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
-      logger.error("Check order of case class definitions")
-      constants.Response.NULL_POINTER_EXCEPTION.throwBaseException(nullPointerException)
-    case exception: Exception => logger.error(exception.getLocalizedMessage)
-      constants.Response.GENERIC_JSON_EXCEPTION.throwBaseException(exception)
   }
 
 }

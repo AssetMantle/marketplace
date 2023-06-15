@@ -12,9 +12,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class GetTransaction @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.GET_TRANSACTION
+  implicit val module: String = constants.Module.GET_TRANSACTION
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   private val url = constants.Blockchain.RestEndPoint + "/cosmos/tx/v1beta1/txs/"
 
@@ -24,7 +24,7 @@ class GetTransaction @Inject()()(implicit wsClient: WSClient, configuration: Con
   object Service {
 
     def get(txHash: String): Future[Response] = action(txHash).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
 
   }

@@ -1,0 +1,14 @@
+@import controllers.actions.LoginState
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+<div>
+    <tr>
+        <th>@Messages(constants.View.TRANSACTION_HASH)</th>
+        <th>@Messages(constants.View.TRANSACTION_TYPE)</th>
+        <th>@Messages(constants.View.TRANSACTION_TIME)</th>
+        <th></th>
+    </tr>
+    <div id="userTransactionsPerPage"></div>
+</div>
+    <script>componentResource('userTransactionsPerPage', jsRoutes.controllers.ProfileController.transactionsPerPage(1))</script>

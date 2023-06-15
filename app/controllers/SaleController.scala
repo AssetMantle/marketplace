@@ -4,7 +4,7 @@ import controllers.actions._
 import exceptions.BaseException
 import models.analytics.{CollectionAnalysis, CollectionsAnalysis}
 import models.master._
-import models.{blockchain, blockchainTransaction, master, masterTransaction}
+import models.{blockchain, master, masterTransaction}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.cache.Cached
@@ -38,14 +38,13 @@ class SaleController @Inject()(
                                 masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                 masterWhitelistMembers: master.WhitelistMembers,
                                 masterTransactionSaleNFTTransactions: masterTransaction.SaleNFTTransactions,
-                                blockchainTransactionNFTSales: blockchainTransaction.NFTSales,
                                 utilitiesNotification: utilities.Notification,
                                 utilitiesOperations: utilities.Operations,
                               )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.SALE_CONTROLLER
+  implicit val module: String = constants.Module.SALE_CONTROLLER
 
   implicit val callbackOnSessionTimeout: Call = routes.SaleController.viewCollections()
 
@@ -72,7 +71,7 @@ class SaleController @Inject()(
   def collectionsPerPage(pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val sales = if (pageNumber < 1) Future(throw new BaseException(constants.Response.INVALID_PAGE_NUMBER))
+        val sales = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterSales.Service.getByPageNumber(pageNumber)
 
         def collections(ids: Seq[String]) = masterCollections.Service.getCollections(ids)
@@ -186,6 +185,7 @@ class SaleController @Inject()(
               if (!loginState.isVerifiedCreator) Option(constants.Response.NOT_VERIFIED_CREATOR) else None,
               if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
               if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
+              if (collection.isFractionalized) Option(constants.Response.FRACTIONALIZED_COLLECTION_NOT_ALLOWED) else None,
               if (saleExistOnCollection) Option(constants.Response.CANNOT_CREATE_MORE_THAN_ONE_SALE) else None,
               if (createData.nftForSale > maxSellNumber.min(countNFts)) Option(constants.Response.CANNOT_SELL_MORE_THAN_ALLOWED_LIMIT) else None,
               if (createData.nftForSale > countNFts) Option(constants.Response.NOT_ENOUGH_NFTS_IN_COLLECTION) else None,
@@ -311,8 +311,8 @@ class SaleController @Inject()(
                 collection = collection,
                 toAddress = sellerKey.address,
                 amount = sale.price * buySaleNFTData.buyNFTs,
-                gasLimit = constants.Blockchain.DefaultSendCoinGasAmount,
-                gasPrice = constants.Blockchain.DefaultGasPrice,
+                gasLimit = constants.Transaction.DefaultSendCoinGasAmount,
+                gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buySaleNFTData.password))
               )
             } else errors.head.throwBaseException()

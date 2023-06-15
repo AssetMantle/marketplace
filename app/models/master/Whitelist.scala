@@ -1,6 +1,7 @@
 package models.master
 
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.master.Whitelists.WhitelistTable
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -10,12 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Whitelist(id: String, ownerId: String, name: String, description: String, maxMembers: Int, startEpoch: Int, endEpoch: Int, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String]
 
-
-object Whitelists {
-
-  implicit val module: String = constants.Module.MASTER_WHITELIST
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[master] object Whitelists {
 
   class WhitelistTable(tag: Tag) extends Table[Whitelist](tag, "Whitelist") with ModelTable[String] {
 
@@ -44,28 +40,25 @@ object Whitelists {
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
   }
-
-  val TableQuery = new TableQuery(tag => new WhitelistTable(tag))
 }
 
 @Singleton
 class Whitelists @Inject()(
-                            protected val databaseConfigProvider: DatabaseConfigProvider
-                          )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Whitelists.WhitelistTable, Whitelist, String](
-    databaseConfigProvider,
-    Whitelists.TableQuery,
-    executionContext,
-    Whitelists.module,
-    Whitelists.logger
-  ) {
+                            protected val dbConfigProvider: DatabaseConfigProvider,
+                          )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Whitelists.WhitelistTable, Whitelist, String]() {
 
+  implicit val module: String = constants.Module.MASTER_WHITELIST
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new WhitelistTable(tag))
 
   object Service {
 
     def addWhitelist(ownerId: String, name: String, description: String, maxMembers: Int, startEpoch: Int, endEpoch: Int): Future[String] = {
       val id = utilities.IdGenerator.getRandomHexadecimal
-      create(Whitelist(id = id, ownerId = ownerId, name = name, description = description, maxMembers = maxMembers, startEpoch = startEpoch, endEpoch = endEpoch))
+      create(Whitelist(id = id, ownerId = ownerId, name = name, description = description, maxMembers = maxMembers, startEpoch = startEpoch, endEpoch = endEpoch)).map(_.id)
     }
 
     def edit(id: String, name: String, description: String, maxMembers: Int, startEpoch: Int, endEpoch: Int): Future[Unit] = {
@@ -78,7 +71,7 @@ class Whitelists @Inject()(
 
     def tryGet(id: String): Future[Whitelist] = tryGetById(id)
 
-    def getByOwner(ownerId: String, pageNumber: Int): Future[Seq[Whitelist]] = filterAndSortWithPagination((pageNumber - 1) * constants.CommonConfig.Pagination.WhitelistPerPage, limit = constants.CommonConfig.Pagination.WhitelistPerPage)(_.ownerId === ownerId)(_.startEpoch)
+    def getByOwner(ownerId: String, pageNumber: Int): Future[Seq[Whitelist]] = filterAndSortWithPagination(_.ownerId === ownerId)(_.startEpoch)((pageNumber - 1) * constants.CommonConfig.Pagination.WhitelistPerPage, limit = constants.CommonConfig.Pagination.WhitelistPerPage)
 
     def totalWhitelistsByOwner(ownerId: String): Future[Int] = filterAndCount(_.ownerId === ownerId)
 

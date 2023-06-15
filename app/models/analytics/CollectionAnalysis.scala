@@ -1,7 +1,7 @@
 package models.analytics
 
 import models.master._
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -35,11 +35,11 @@ case class CollectionAnalysis(id: String, totalNFTs: Long, totalMinted: Long, to
 
 }
 
-object CollectionsAnalysis {
+private[analytics] object CollectionsAnalysis {
 
   case class CollectionAnalysisSerialized(id: String, totalNFTs: Long, totalMinted: Long, totalBurnt: Long, totalSold: Long, totalTraded: Long, floorPrice: BigDecimal, salePrice: BigDecimal, publicListingPrice: BigDecimal, totalVolumeTraded: BigDecimal, bestOffer: BigDecimal, listed: Long, owners: Long, uniqueOwners: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] with Logging {
 
-    def deserialize: CollectionAnalysis = CollectionAnalysis(
+    def deserialize()(implicit module: String, logger: Logger): CollectionAnalysis = CollectionAnalysis(
       id = this.id,
       totalNFTs = this.totalNFTs,
       totalMinted = this.totalMinted,
@@ -61,10 +61,6 @@ object CollectionsAnalysis {
     )
 
   }
-
-  implicit val module: String = constants.Module.ANALYTICS_COLLECTION
-
-  implicit val logger: Logger = Logger(this.getClass)
 
   class CollectionAnalysisTable(tag: Tag) extends Table[CollectionAnalysisSerialized](tag, "CollectionAnalysis") with ModelTable[String] {
 
@@ -107,29 +103,27 @@ object CollectionsAnalysis {
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
   }
-
-  val TableQuery = new TableQuery(tag => new CollectionAnalysisTable(tag))
 }
 
 @Singleton
 class CollectionsAnalysis @Inject()(
                                      masterCollections: Collections,
                                      masterNFTs: NFTs,
-                                     protected val databaseConfigProvider: DatabaseConfigProvider
-                                   )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[CollectionsAnalysis.CollectionAnalysisTable, CollectionsAnalysis.CollectionAnalysisSerialized, String](
-    databaseConfigProvider,
-    CollectionsAnalysis.TableQuery,
-    executionContext,
-    CollectionsAnalysis.module,
-    CollectionsAnalysis.logger
-  ) {
+                                     protected val dbConfigProvider: DatabaseConfigProvider,
+                                   )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[CollectionsAnalysis.CollectionAnalysisTable, CollectionsAnalysis.CollectionAnalysisSerialized, String]() {
+
+  implicit val module: String = constants.Module.ANALYTICS_COLLECTION
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new CollectionsAnalysis.CollectionAnalysisTable(tag))
 
   object Service {
 
-    def add(collectionAnalysis: CollectionAnalysis): Future[String] = create(collectionAnalysis.serialize)
+    def add(collectionAnalysis: CollectionAnalysis): Future[String] = create(collectionAnalysis.serialize).map(_.id)
 
-    def add(collectionsAnalysis: Seq[CollectionAnalysis]): Future[Unit] = create(collectionsAnalysis.map(_.serialize))
+    def add(collectionsAnalysis: Seq[CollectionAnalysis]): Future[Int] = create(collectionsAnalysis.map(_.serialize))
 
     def tryGet(id: String): Future[CollectionAnalysis] = filterHead(_.id === id).map(_.deserialize)
 

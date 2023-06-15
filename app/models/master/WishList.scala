@@ -1,6 +1,7 @@
 package models.master
 
-import models.traits.{Entity2, GenericDaoImpl2, Logging, ModelTable2}
+import models.master.WishLists.WishListTable
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -16,11 +17,7 @@ case class WishList(accountId: String, nftId: String, collectionId: String, crea
 
 }
 
-object WishLists {
-
-  implicit val module: String = constants.Module.MASTER_WISHLIST
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[master] object WishLists {
 
   class WishListTable(tag: Tag) extends Table[WishList](tag, "WishList") with ModelTable2[String, String] {
 
@@ -44,30 +41,27 @@ object WishLists {
 
     def id2 = nftId
   }
-
-  val TableQuery = new TableQuery(tag => new WishListTable(tag))
 }
 
 @Singleton
 class WishLists @Inject()(
-                           protected val databaseConfigProvider: DatabaseConfigProvider
-                         )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl2[WishLists.WishListTable, WishList, String, String](
-    databaseConfigProvider,
-    WishLists.TableQuery,
-    executionContext,
-    WishLists.module,
-    WishLists.logger
-  ) {
+                           protected val dbConfigProvider: DatabaseConfigProvider,
+                         )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl2[WishLists.WishListTable, WishList, String, String]() {
 
+  implicit val module: String = constants.Module.MASTER_WISHLIST
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new WishListTable(tag))
 
   object Service {
 
-    def add(accountId: String, nftId: String, collectionId: String): Future[Unit] = create(WishList(accountId = accountId, nftId = nftId, collectionId = collectionId))
+    def add(accountId: String, nftId: String, collectionId: String): Future[String] = create(WishList(accountId = accountId, nftId = nftId, collectionId = collectionId)).map(_.nftId)
 
     def getByCollection(accountId: String, collectionId: String): Future[Seq[String]] = filter(x => x.accountId === accountId && x.collectionId === collectionId).map(_.map(_.nftId))
 
-    def getByCollectionAndPageNumber(accountId: String, collectionId: String, pageNumber: Int, perPage: Int): Future[Seq[String]] = filterAndSortWithPagination(offset = (pageNumber - 1) * perPage, limit = perPage)(x => x.accountId === accountId && x.collectionId === collectionId)(_.createdOnMillisEpoch).map(_.map(_.nftId))
+    def getByCollectionAndPageNumber(accountId: String, collectionId: String, pageNumber: Int, perPage: Int): Future[Seq[String]] = filterAndSortWithPagination(x => x.accountId === accountId && x.collectionId === collectionId)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * perPage, limit = perPage).map(_.map(_.nftId))
 
     def getCollections(accountId: String): Future[Seq[String]] = filter(_.accountId === accountId).map(_.map(_.collectionId).distinct)
 

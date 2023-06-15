@@ -1,7 +1,8 @@
 package models.master
 
 import models.common.Collection._
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.master.Collections.CollectionTable
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -17,25 +18,25 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: Seq[SocialProfile], nsfw: Boolean, properties: Option[Seq[Property]], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, royalty: BigDecimal, isDefined: Option[Boolean], defineAsset: Boolean, rank: Int, onSecondaryMarket: Boolean, showAll: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def getBondAmount: MicroNumber = MicroNumber(utilities.Collection.getTotalBondAmount(this.getImmutables, this.getMutables, constants.Transaction.BondRate))
+  def getBondAmount: MicroNumber = MicroNumber(utilities.Collection.getTotalBondAmount(this.getImmutables, this.getMutables, constants.Blockchain.BondRate))
 
   def getRoyaltyFee: BigDecimal = this.royalty
 
   def getCreatorIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.creatorId)
 
-  def getImmutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && !x.mutable).map(_.toMetaProperty()(Collections.module, Collections.logger)) ++ constants.Collection.DefaultProperty.allImmutableMetaProperties(this.name)
+  def getImmutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && !x.mutable).map(_.toMetaProperty) ++ constants.Collection.DefaultProperty.allImmutableMetaProperties(this.name)
 
-  def getImmutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && !x.mutable).map(_.toMesaProperty()(Collections.module, Collections.logger)) ++ constants.Collection.DefaultProperty.allImmutableMesaProperties(this.creatorId)
+  def getImmutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && !x.mutable).map(_.toMesaProperty) ++ constants.Collection.DefaultProperty.allImmutableMesaProperties(this.creatorId)
 
-  def getMutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty()(Collections.module, Collections.logger))
+  def getMutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty)
 
-  def getMutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && x.mutable).map(_.toMesaProperty()(Collections.module, Collections.logger))
+  def getMutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && x.mutable).map(_.toMesaProperty)
 
   def getImmutables: Immutables = Immutables(PropertyList(this.getImmutableMetaProperties ++ this.getImmutableProperties))
 
   def getMutables: Mutables = Mutables(PropertyList(this.getMutableMetaProperties ++ this.getMutableProperties))
 
-  def getClassificationID: ClassificationID = utilities.Collection.getClassificationID(immutables = this.getImmutables, mutables = this.getMutables, bondRate = constants.Transaction.BondRate)
+  def getClassificationID: ClassificationID = utilities.Collection.getClassificationID(immutables = this.getImmutables, mutables = this.getMutables, bondRate = constants.Blockchain.BondRate)
 
   def isFractionalized: Boolean = this.properties.fold(false)(_.map(_.name).contains(schema.constants.Properties.SupplyProperty.id.keyID.value))
 
@@ -76,14 +77,10 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
 
 }
 
-object Collections {
-
-  implicit val module: String = constants.Module.MASTER_COLLECTION
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[master] object Collections {
 
   case class CollectionSerialized(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: String, nsfw: Boolean, properties: Option[String], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, royalty: BigDecimal, isDefined: Option[Boolean], defineAsset: Boolean, rank: Int, onSecondaryMarket: Boolean, showAll: Boolean, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize: Collection = Collection(id = id, creatorId = creatorId, classificationId = classificationId, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), nsfw = nsfw, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[Property]](_)), profileFileName = profileFileName, coverFileName = coverFileName, public = public, royalty = royalty, isDefined = isDefined, defineAsset = defineAsset, rank = rank, onSecondaryMarket = onSecondaryMarket, showAll = showAll, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): Collection = Collection(id = id, creatorId = creatorId, classificationId = classificationId, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), nsfw = nsfw, properties = properties.map(utilities.JSON.convertJsonStringToObject[Seq[Property]](_)), profileFileName = profileFileName, coverFileName = coverFileName, public = public, royalty = royalty, isDefined = isDefined, defineAsset = defineAsset, rank = rank, onSecondaryMarket = onSecondaryMarket, showAll = showAll, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
   class CollectionTable(tag: Tag) extends Table[CollectionSerialized](tag, "Collection") with ModelTable[String] {
@@ -134,25 +131,23 @@ object Collections {
 
 
   }
-
-  lazy val TableQuery = new TableQuery(tag => new CollectionTable(tag))
 }
 
 @Singleton
 class Collections @Inject()(
-                             protected val databaseConfigProvider: DatabaseConfigProvider
-                           )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Collections.CollectionTable, Collections.CollectionSerialized, String](
-    databaseConfigProvider,
-    Collections.TableQuery,
-    executionContext,
-    Collections.module,
-    Collections.logger
-  ) {
+                             protected val dbConfigProvider: DatabaseConfigProvider,
+                           )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Collections.CollectionTable, Collections.CollectionSerialized, String]() {
+
+  implicit val module: String = constants.Module.MASTER_COLLECTION
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new CollectionTable(tag))
 
   object Service {
 
-    def add(collection: Collection): Future[String] = create(collection.serialize())
+    def add(collection: Collection): Future[String] = create(collection.serialize()).map(_.id)
 
     def update(collection: Collection): Future[Unit] = updateById(collection.serialize())
 
@@ -160,15 +155,15 @@ class Collections @Inject()(
 
     def fetchAllForDefiningAsset(): Future[Seq[Collection]] = filter(x => x.defineAsset && !x.isDefined).map(_.map(_.deserialize))
 
-    def markAsDefined(ids: Seq[String]): Future[Int] = customUpdate(Collections.TableQuery.filter(_.id.inSet(ids)).map(_.isDefined).update(true))
+    def markAsDefined(ids: Seq[String]): Future[Int] = customUpdate(tableQuery.filter(_.id.inSet(ids)).map(_.isDefined).update(true))
 
-    def markAsDefinePending(ids: Seq[String]): Future[Int] = customUpdate(Collections.TableQuery.filter(_.id.inSet(ids)).map(_.isDefined.?).update(None))
+    def markAsDefinePending(ids: Seq[String]): Future[Int] = customUpdate(tableQuery.filter(_.id.inSet(ids)).map(_.isDefined.?).update(None))
 
-    def markAsNotDefined(ids: Seq[String]): Future[Int] = customUpdate(Collections.TableQuery.filter(_.id.inSet(ids)).map(_.isDefined).update(false))
+    def markAsNotDefined(ids: Seq[String]): Future[Int] = customUpdate(tableQuery.filter(_.id.inSet(ids)).map(_.isDefined).update(false))
 
-    def markListedOnSecondaryMarket(id: String): Future[Int] = customUpdate(Collections.TableQuery.filter(_.id === id).map(_.onSecondaryMarket).update(true))
+    def markListedOnSecondaryMarket(id: String): Future[Int] = customUpdate(tableQuery.filter(_.id === id).map(_.onSecondaryMarket).update(true))
 
-    def removeFromListedOnSecondaryMarket(id: String): Future[Int] = customUpdate(Collections.TableQuery.filter(_.id === id).map(_.onSecondaryMarket).update(false))
+    def removeFromListedOnSecondaryMarket(id: String): Future[Int] = customUpdate(tableQuery.filter(_.id === id).map(_.onSecondaryMarket).update(false))
 
     def totalOnSecondaryMarket: Future[Int] = filterAndCount(_.onSecondaryMarket)
 
@@ -176,9 +171,9 @@ class Collections @Inject()(
 
     def tryGet(id: String): Future[Collection] = tryGetById(id).map(_.deserialize)
 
-    def getPublicByPageNumber(pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.public)(_.createdOnMillisEpoch).map(_.map(_.deserialize))
+    def getPublicByPageNumber(pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(_.public)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.deserialize))
 
-    def getCollectionsByPage(collectionIds: Seq[String], pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.id.inSet(collectionIds))(_.createdOnMillisEpoch).map(_.map(_.deserialize))
+    def getCollectionsByPage(collectionIds: Seq[String], pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(_.id.inSet(collectionIds))(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.deserialize))
 
     def getCollections(collectionIds: Seq[String]): Future[Seq[Collection]] = filter(_.id.inSet(collectionIds)).map(_.map(_.deserialize))
 
@@ -186,7 +181,7 @@ class Collections @Inject()(
 
     def countPublicCollections: Future[Int] = filterAndCount(_.public)
 
-    def getByCreatorAndPage(creatorId: String, pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.creatorId === creatorId)(_.createdOnMillisEpoch).map(_.map(_.deserialize))
+    def getByCreatorAndPage(creatorId: String, pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(_.creatorId === creatorId)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.deserialize))
 
     def getByCreator(creatorId: String): Future[Seq[(String, String)]] = filterAndSort(_.creatorId === creatorId)(_.name).map(_.map(x => x.id -> x.name))
 
@@ -216,7 +211,7 @@ class Collections @Inject()(
 
     def getAllPublic: Future[Seq[Collection]] = filter(_.public).map(_.map(_.deserialize))
 
-    def getSecondaryMarketByPageNumber(pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage)(_.onSecondaryMarket)(_.rank).map(_.map(_.deserialize))
+    def getSecondaryMarketByPageNumber(pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(_.onSecondaryMarket)(_.rank)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.deserialize))
 
   }
 }

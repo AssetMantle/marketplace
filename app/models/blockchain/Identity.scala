@@ -48,13 +48,8 @@ case class Identity(id: Array[Byte], idString: String, classificationID: Array[B
 
 }
 
-object Identities {
-
-  implicit val module: String = constants.Module.BLOCKCHAIN_IDENTITY
-
-  implicit val logger: Logger = Logger(this.getClass)
-
-  class DataTable(tag: Tag) extends Table[Identity](tag, "Identity") with ModelTable[Array[Byte]] {
+private[blockchain] object Identities {
+  class IdentityTable(tag: Tag) extends Table[Identity](tag, "Identity") with ModelTable[Array[Byte]] {
 
     def * = (id, idString, classificationID, immutables, mutables) <> (Identity.tupled, Identity.unapply)
 
@@ -69,22 +64,20 @@ object Identities {
     def mutables = column[Array[Byte]]("mutables")
   }
 
-  val TableQuery = new TableQuery(tag => new DataTable(tag))
-
 }
 
 @Singleton
 class Identities @Inject()(
                             @NamedDatabase("explorer")
-                            protected val databaseConfigProvider: DatabaseConfigProvider
-                          )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Identities.DataTable, Identity, Array[Byte]](
-    databaseConfigProvider,
-    Identities.TableQuery,
-    executionContext,
-    Identities.module,
-    Identities.logger
-  ) {
+                            protected val dbConfigProvider: DatabaseConfigProvider,
+                          )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Identities.IdentityTable, Identity, Array[Byte]]() {
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_IDENTITY
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new Identities.IdentityTable(tag))
 
   object Service {
 

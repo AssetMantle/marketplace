@@ -13,9 +13,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class GetUnconfirmedTxs @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.UNCONFIRMED_TXS
+  implicit val module: String = constants.Module.UNCONFIRMED_TXS
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   private val path1 = "/unconfirmed_txs"
 
@@ -31,11 +31,11 @@ class GetUnconfirmedTxs @Inject()()(implicit wsClient: WSClient, configuration: 
 
   object Service {
     def get(): Future[UnconfirmedTxsResponse.Response] = action().recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
 
     def get(limit: Int): Future[UnconfirmedTxsResponse.Response] = actionWithLimit(limit).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
   }
 

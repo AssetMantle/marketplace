@@ -1,6 +1,7 @@
 package models.master
 
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.master.Accounts.AccountTable
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.i18n.Lang
@@ -21,11 +22,7 @@ case class Account(id: String, lowercaseId: String, passwordHash: Array[Byte], s
   def isVerifiedCreator: Boolean = utilities.Account.isVerifiedCreator(this.accountType)
 }
 
-object Accounts {
-
-  implicit val module: String = constants.Module.MASTER_ACCOUNT
-
-  implicit val logger: Logger = Logger(this.getClass)
+private[master] object Accounts {
 
   class AccountTable(tag: Tag) extends Table[Account](tag, "Account") with ModelTable[String] {
 
@@ -56,22 +53,19 @@ object Accounts {
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
   }
-
-  val TableQuery = new TableQuery(tag => new AccountTable(tag))
 }
 
 @Singleton
 class Accounts @Inject()(
-                          protected val databaseConfigProvider: DatabaseConfigProvider
-                        )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Accounts.AccountTable, Account, String](
-    databaseConfigProvider,
-    Accounts.TableQuery,
-    executionContext,
-    Accounts.module,
-    Accounts.logger
-  ) {
+                          protected val dbConfigProvider: DatabaseConfigProvider,
+                        )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Accounts.AccountTable, Account, String]() {
 
+  implicit val module: String = constants.Module.MASTER_ACCOUNT
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new AccountTable(tag))
 
   object Service {
 
@@ -115,9 +109,9 @@ class Accounts @Inject()(
 
     def get(username: String): Future[Option[Account]] = getById(username)
 
-    def getEmptyIdentityID: Future[Seq[String]] = customQuery(Accounts.TableQuery.filter(_.identityId.?.isEmpty).map(_.id).result)
+    def getEmptyIdentityID: Future[Seq[String]] = customQuery(tableQuery.filter(_.identityId.?.isEmpty).map(_.id).result)
 
-    def updateIdentityId(accountId: String): Future[Int] = customUpdate(Accounts.TableQuery.filter(_.id === accountId).map(_.identityId).update(utilities.Identity.getMantlePlaceIdentityID(accountId).asString))
+    def updateIdentityId(accountId: String): Future[Int] = customUpdate(tableQuery.filter(_.id === accountId).map(_.identityId).update(utilities.Identity.getMantlePlaceIdentityID(accountId).asString))
 
     def getByIdentityId(identityID: IdentityID): Future[Option[Account]] = filter(_.identityId === identityID.asString).map(_.headOption)
   }

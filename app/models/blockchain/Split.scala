@@ -25,7 +25,7 @@ case class Split(ownerID: Array[Byte], ownableID: Array[Byte], protoOwnableID: A
   def getBalanceAsMicroNumber: MicroNumber = MicroNumber(this.value)
 }
 
-object Splits {
+private[blockchain] object Splits {
 
   case class SplitSerialized(ownerID: Array[Byte], ownableID: Array[Byte], protoOwnableID: Array[Byte], ownerIDString: String, ownableIDString: String, value: BigDecimal) extends Entity2[Array[Byte], Array[Byte]] {
 
@@ -33,7 +33,7 @@ object Splits {
 
     def id2: Array[Byte] = this.ownableID
 
-    def deserialize: Split = Split(
+    def deserialize()(implicit module: String, logger: Logger): Split = Split(
       ownerID = this.ownerID,
       ownableID = this.ownableID,
       protoOwnableID = this.protoOwnableID,
@@ -44,11 +44,7 @@ object Splits {
 
   }
 
-  implicit val module: String = constants.Module.BLOCKCHAIN_SPLIT
-
-  implicit val logger: Logger = Logger(this.getClass)
-
-  class DataTable(tag: Tag) extends Table[SplitSerialized](tag, "Split") with ModelTable2[Array[Byte], Array[Byte]] {
+  class SplitTable(tag: Tag) extends Table[SplitSerialized](tag, "Split") with ModelTable2[Array[Byte], Array[Byte]] {
 
     def * = (ownerID, ownableID, protoOwnableID, ownerIDString, ownableIDString, value) <> (SplitSerialized.tupled, SplitSerialized.unapply)
 
@@ -78,23 +74,22 @@ object Splits {
 
   }
 
-  val TableQuery = new TableQuery(tag => new DataTable(tag))
-
 }
 
 
 @Singleton
 class Splits @Inject()(
                         @NamedDatabase("explorer")
-                        protected val databaseConfigProvider: DatabaseConfigProvider
-                      )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl2[Splits.DataTable, Splits.SplitSerialized, Array[Byte], Array[Byte]](
-    databaseConfigProvider,
-    Splits.TableQuery,
-    executionContext,
-    Splits.module,
-    Splits.logger
-  ) {
+                        protected val dbConfigProvider: DatabaseConfigProvider,
+                      )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl2[Splits.SplitTable, Splits.SplitSerialized, Array[Byte], Array[Byte]]() {
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_SPLIT
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new Splits.SplitTable(tag))
+
   object Service {
 
     def getByOwnerID(ownerId: IdentityID): Future[Seq[Split]] = filter(_.ownerID === ownerId.getBytes).map(_.map(_.deserialize))

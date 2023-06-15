@@ -51,13 +51,8 @@ case class Asset(id: Array[Byte], idString: String, classificationID: Array[Byte
   def mutate(properties: Seq[Property]): Asset = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
 }
 
-object Assets {
-
-  implicit val module: String = constants.Module.BLOCKCHAIN_ASSET
-
-  implicit val logger: Logger = Logger(this.getClass)
-
-  class DataTable(tag: Tag) extends Table[Asset](tag, "Asset") with ModelTable[Array[Byte]] {
+private[blockchain] object Assets {
+  class AssetTable(tag: Tag) extends Table[Asset](tag, "Asset") with ModelTable[Array[Byte]] {
 
     def * = (id, idString, classificationID, immutables, mutables) <> (Asset.tupled, Asset.unapply)
 
@@ -73,22 +68,20 @@ object Assets {
 
   }
 
-  val TableQuery = new TableQuery(tag => new DataTable(tag))
-
 }
 
 @Singleton
 class Assets @Inject()(
                         @NamedDatabase("explorer")
-                        protected val databaseConfigProvider: DatabaseConfigProvider
-                      )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Assets.DataTable, Asset, Array[Byte]](
-    databaseConfigProvider,
-    Assets.TableQuery,
-    executionContext,
-    Assets.module,
-    Assets.logger
-  ) {
+                        protected val dbConfigProvider: DatabaseConfigProvider,
+                      )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Assets.AssetTable, Asset, Array[Byte]]() {
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_ASSET
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new Assets.AssetTable(tag))
 
   object Service {
 

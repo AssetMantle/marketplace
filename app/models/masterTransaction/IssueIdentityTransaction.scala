@@ -2,16 +2,16 @@ package models.masterTransaction
 
 import constants.Scheduler
 import exceptions.BaseException
-import models.blockchainTransaction.IssueIdentity
+import models.blockchainTransaction.{AdminTransaction, AdminTransactions}
 import models.master.Key
+import models.masterTransaction.IssueIdentityTransactions.IssueIdentityTransactionTable
 import models.traits._
-import models.{blockchain, blockchainTransaction, master}
+import models.{blockchain, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.id.base.IdentityID
 import slick.jdbc.H2Profile.api._
-import transactions.responses.blockchain.BroadcastTxSyncResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
@@ -23,11 +23,7 @@ case class IssueIdentityTransaction(txHash: String, accountId: String, status: O
   def getIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.accountId)
 }
 
-object IssueIdentityTransactions {
-
-  private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_ISSUE_IDENTITY_TRANSACTION
+private[masterTransaction] object IssueIdentityTransactions {
 
   class IssueIdentityTransactionTable(tag: Tag) extends Table[IssueIdentityTransaction](tag, "IssueIdentityTransaction") with ModelTable[String] {
 
@@ -35,7 +31,7 @@ object IssueIdentityTransactions {
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
-    def accountId = column[String]("accountId", O.PrimaryKey)
+    def accountId = column[String]("accountId")
 
     def status = column[Boolean]("status")
 
@@ -51,60 +47,48 @@ object IssueIdentityTransactions {
 
   }
 
-  val TableQuery = new TableQuery(tag => new IssueIdentityTransactionTable(tag))
-
 }
 
 @Singleton
 class IssueIdentityTransactions @Inject()(
-                                           protected val databaseConfigProvider: DatabaseConfigProvider,
+                                           protected val dbConfigProvider: DatabaseConfigProvider,
                                            blockchainIdentities: blockchain.Identities,
                                            masterAccounts: master.Accounts,
                                            masterKeys: master.Keys,
-                                           broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                            utilitiesOperations: utilities.Operations,
-                                           getUnconfirmedTxs: queries.blockchain.GetUnconfirmedTxs,
-                                           getAccount: queries.blockchain.GetAccount,
-                                           getAbciInfo: queries.blockchain.GetABCIInfo,
                                            utilitiesNotification: utilities.Notification,
-                                           blockchainTransactionIssueIdentities: blockchainTransaction.IssueIdentities,
-                                         )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[IssueIdentityTransactions.IssueIdentityTransactionTable, IssueIdentityTransaction, String](
-    databaseConfigProvider,
-    IssueIdentityTransactions.TableQuery,
-    executionContext,
-    IssueIdentityTransactions.module,
-    IssueIdentityTransactions.logger
-  ) {
+                                           adminTransactions: AdminTransactions,
+                                         )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[IssueIdentityTransactions.IssueIdentityTransactionTable, IssueIdentityTransaction, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.MASTER_TRANSACTION_ISSUE_IDENTITY_TRANSACTION
+
+  val tableQuery = new TableQuery(tag => new IssueIdentityTransactionTable(tag))
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, accountIds: Seq[String]): Future[Unit] = create(accountIds.map(x => IssueIdentityTransaction(txHash = txHash, accountId = x, status = None)))
+    def addWithNoneStatus(txHash: String, accountIds: Seq[String]): Future[Int] = create(accountIds.map(x => IssueIdentityTransaction(txHash = txHash, accountId = x, status = None)))
 
     def getByTxHash(txHash: String): Future[Seq[IssueIdentityTransaction]] = filter(_.txHash === txHash)
 
-    def markSuccess(txHash: String): Future[Int] = customUpdate(IssueIdentityTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(true))
+    def markSuccess(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(true))
 
-    def markFailed(txHash: String): Future[Int] = customUpdate(IssueIdentityTransactions.TableQuery.filter(_.txHash === txHash).map(_.status).update(false))
+    def markFailed(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(false))
 
     def getAllPendingStatus: Future[Seq[IssueIdentityTransaction]] = filter(_.status.?.isEmpty)
 
     def checkAnyPendingTx: Future[Boolean] = filterAndExists(_.status.?.isEmpty)
-
-    def getWithStatusTrueOrPending(ids: Seq[String]): Future[Seq[String]] = filter(x => x.accountId.inSet(ids) && (x.status || x.status.?.isEmpty)).map(_.map(_.accountId))
   }
 
   object Utility {
 
     def transaction(accountIdAddress: Map[String, Seq[String]], gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      // TODO
-      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
-      val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(constants.Wallet.IssueIdentityWallet.address).map(_.account.toSerializableAccount)
-      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
+      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(constants.Wallet.IssueIdentityWallet.address)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Blockchain.TxTimeoutHeight
+        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = accountIdAddress.keys.map(x => utilities.BlockchainTransaction.getMantlePlaceIssueIdentityMsgWithAuthentication(
             id = x,
@@ -114,48 +98,34 @@ class IssueIdentityTransactions @Inject()(
             fromID = constants.Transaction.FromID,
             addresses = accountIdAddress.getOrElse(x, Seq())
           )).toSeq,
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Blockchain.DefaultIssueIdentityGasLimit * accountIdAddress.size),
-          gasLimit = constants.Blockchain.DefaultIssueIdentityGasLimit * accountIdAddress.size,
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultIssueIdentityGasLimit * accountIdAddress.size),
+          gasLimit = constants.Transaction.DefaultIssueIdentityGasLimit * accountIdAddress.size,
           account = bcAccount,
           ecKey = ecKey,
           timeoutHeight = timeoutHeight)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
-        def checkAndAdd(unconfirmedTxHashes: Seq[String]) = {
+        val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              issueIdentity <- blockchainTransactionIssueIdentities.Service.add(txHash = txHash, fromAddress = constants.Wallet.IssueIdentityWallet.address, status = None, memo = Option(memo), timeoutHeight = timeoutHeight)
+              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Wallet.IssueIdentityWallet.address, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.ISSUE_IDENTITY)
               _ <- Service.addWithNoneStatus(txHash = txHash, accountIds = accountIdAddress.keys.toSeq)
-            } yield issueIdentity
+            } yield adminTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
 
         for {
-          issueIdentity <- checkAndAdd(unconfirmedTxHashes)
-        } yield (issueIdentity, txRawBytes)
+          adminTransaction <- checkAndAdd
+        } yield (adminTransaction, txRawBytes)
       }
 
-      def broadcastTxAndUpdate(issueIdentity: IssueIdentity, txRawBytes: Array[Byte]) = {
-
-        val broadcastTx = broadcastTxSync.Service.get(issueIdentity.getTxRawAsHexString(txRawBytes))
-
-        def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = if (errorResponse.nonEmpty) blockchainTransactionIssueIdentities.Service.markFailedWithLog(txHashes = Seq(issueIdentity.txHash), log = errorResponse.get.error.data)
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) blockchainTransactionIssueIdentities.Service.markFailedWithLog(txHashes = Seq(issueIdentity.txHash), log = successResponse.get.result.log)
-        else Future(0)
-
-        for {
-          (successResponse, errorResponse) <- broadcastTx
-          _ <- update(successResponse, errorResponse)
-        } yield ()
-      }
+      def broadcastTxAndUpdate(adminTransaction: AdminTransaction, txRawBytes: Array[Byte]) = adminTransactions.Utility.broadcastTxAndUpdate(adminTransaction, txRawBytes)
 
       for {
-        abciInfo <- abciInfo
-        bcAccount <- bcAccount
-        unconfirmedTxs <- unconfirmedTxs
-        (issueIdentity, txRawBytes) <- checkMempoolAndAddTx(bcAccount, abciInfo.result.response.last_block_height.toInt, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        _ <- broadcastTxAndUpdate(issueIdentity, txRawBytes)
-      } yield issueIdentity
+        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
+        (adminTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+        updatedAdminTransaction <- broadcastTxAndUpdate(adminTransaction, txRawBytes)
+      } yield updatedAdminTransaction
     }
 
     private def issueIdentities(): Future[Unit] = {
@@ -194,7 +164,7 @@ class IssueIdentityTransactions @Inject()(
         keys <- getKeys(anyPendingTx, issueIdentities)
         txHash <- doTx(issueIdentities, keys)
       } yield if (txHash != "") logger.info("ISSUE_IDENTITY: " + txHash + " ( " + keys.map(x => x.accountId -> x.address).toMap.toString() + " )")
-        ).recover{
+        ).recover {
         case _: BaseException => logger.error("UNABLE_TO_ISSUE_IDENTITIES")
       }
     }
@@ -203,10 +173,10 @@ class IssueIdentityTransactions @Inject()(
       val issueIdentityTxs = Service.getAllPendingStatus
 
       def checkAndUpdate(issueIdentityTxs: Seq[IssueIdentityTransaction]) = utilitiesOperations.traverse(issueIdentityTxs.map(_.txHash).distinct) { txHash =>
-        val transaction = blockchainTransactionIssueIdentities.Service.tryGet(txHash)
+        val transaction = adminTransactions.Service.tryGet(txHash)
 
-        def onTxComplete(transaction: IssueIdentity) = if (transaction.status.isDefined) {
-          if (transaction.status.get) {
+        def onTxComplete(adminTransaction: AdminTransaction) = if (adminTransaction.status.isDefined) {
+          if (adminTransaction.status.get) {
             val markSuccess = Service.markSuccess(txHash)
             val updateMasterKeys = masterKeys.Service.markIdentityIssued(issueIdentityTxs.filter(_.txHash == txHash).map(_.accountId))
 
@@ -247,7 +217,7 @@ class IssueIdentityTransactions @Inject()(
     }
 
     val scheduler: Scheduler = new Scheduler {
-      val name: String = IssueIdentityTransactions.module
+      val name: String = module
 
       //      override val initialDelay: FiniteDuration = constants.Scheduler.FiveMinutes
 

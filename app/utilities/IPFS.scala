@@ -1,6 +1,5 @@
 package utilities
 
-import exceptions.BaseException
 import okhttp3._
 import okio.{BufferedSink, Okio}
 import org.json.JSONObject
@@ -14,9 +13,9 @@ import javax.net.ssl.HttpsURLConnection
 // https://github.com/zinebfadili/pinata-java-sdk/blob/main/src/main/java/pinata/Pinata.java
 object IPFS {
 
-  private implicit val module: String = constants.Module.UTILITIES_IPFS
+  implicit val module: String = constants.Module.UTILITIES_IPFS
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   case class Success(IpfsHash: String, PinSize: Int, Timestamp: String, isDuplicate: Option[Boolean])
 
@@ -66,7 +65,7 @@ object IPFS {
       utilities.JSON.convertJsonStringToObject[Success](response.body().string())
     } else {
       logger.error(response.body().string())
-      throw new BaseException(constants.Response.IPFS_UPLOAD_FAILED)
+      constants.Response.IPFS_UPLOAD_FAILED.throwBaseException()
     }
   }
 
