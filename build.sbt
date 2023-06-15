@@ -6,7 +6,7 @@ libraryDependencies ++= Seq(
   guice,
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
 )
-scalaVersion := "2.13.10"
+scalaVersion := "2.13.11"
 
 version := sys.env.getOrElse("APP_VERSION", "dev")
 
