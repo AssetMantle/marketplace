@@ -632,19 +632,16 @@ CREATE OR REPLACE FUNCTION MASTER.KEY_VALIDATE() RETURNS TRIGGER AS
 $$
 BEGIN
     IF (TG_OP = 'INSERT') THEN
-        IF (EXISTS(SELECT * FROM MASTER."Key" WHERE "accountId" = new."accountId" AND "active" = true)
-            AND new."active" = true) THEN
+        IF (new."active" = true AND
+            EXISTS(SELECT * FROM MASTER."Key" WHERE "accountId" = new."accountId" AND "active" = true)) THEN
             RAISE EXCEPTION 'MULTIPLE_ACTIVE_KEYS';;
         END IF;;
     ELSEIF (TG_OP = 'UPDATE') THEN
         -- allow all keys to be in false state to change active state
-        IF (EXISTS(SELECT *
+        IF (new."active" = true AND
+            EXISTS(SELECT *
                    FROM MASTER."Key"
-                   WHERE "accountId" = new."accountId"
-                     AND "address" = new."address"
-                     AND "active" = false) AND
-            new."active" = true AND
-            EXISTS(SELECT * FROM MASTER."Key" WHERE "accountId" = new."accountId" AND "active" = true)) THEN
+                   WHERE "accountId" = new."accountId" AND "address" != new."address" AND "active" = true)) THEN
             RAISE EXCEPTION 'MULTIPLE_ACTIVE_KEYS';;
         END IF;;
     END IF;;
