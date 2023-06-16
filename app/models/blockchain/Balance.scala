@@ -43,7 +43,7 @@ private[blockchain] object Balances {
 class Balances @Inject()(
                           @NamedDatabase("explorer")
                           protected val dbConfigProvider: DatabaseConfigProvider,
-                        )(implicit executionContext: ExecutionContext, balances: Balances)
+                        )(implicit executionContext: ExecutionContext)
   extends GenericDaoImpl[Balances.BalanceTable, Balances.BalanceSerialized, String]() {
 
   implicit val logger: Logger = Logger(this.getClass)
