@@ -6,7 +6,7 @@
 
 @userTransactions.map { userTransaction =>
     <tr>
-        <td>@userTransaction.txHash</td>
+        <td><a target=”_blank” href="https://explorer.assetmantle.one/transactions/@userTransaction.txHash">@userTransaction.txHash</a></td>
         <td>@Messages(userTransaction.txType)</td>
         <td id="transactionTime_@userTransaction.txHash">@userTransaction.txHeight.fold(0L)(x => blocks.find(_.height == x).fold(0L)(_.time))
             <script>epochToDateTime('transactionTime_@userTransaction.txHash');</script>
