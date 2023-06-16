@@ -66,7 +66,7 @@ object BlockchainTransaction {
   }
 
   def getSignedMemo(address: String, sequence: Long): String = {
-    val data = utilities.Secrets.sha256Hash(address + sequence.toString)
+    val data = utilities.Secrets.sha256Hash(address + "/" + sequence.toString)
     utilities.Secrets.base64URLEncoder(utilities.Wallet.ecdsaSign(data, ECKey.fromPrivate(constants.CommonConfig.MemoSignerWallet.privateKey)))
   }
 
