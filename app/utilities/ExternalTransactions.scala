@@ -128,11 +128,11 @@ class ExternalTransactions @Inject()(
     def updateProperties(nft: Option[NFT]) = if (nft.isDefined) {
       val metaProperties = PropertyList(msg.getMutableMetaProperties).getProperties.map(x => {
         val metaProperty = x.asInstanceOf[MetaProperty]
-        utilities.NFT.metaPropertyToNFTProperty(nftId = nft.get.id, metaProperty = metaProperty, mutable = true)
+        utilities.Properties.metaPropertyToNFTProperty(nftId = nft.get.id, metaProperty = metaProperty, mutable = true)
       })
       val mesaProperties = PropertyList(msg.getMutableProperties).getProperties.map(x => {
         val mesaProperty = x.asInstanceOf[MesaProperty]
-        utilities.NFT.mesaPropertyToNFTProperty(nftId = nft.get.id, mesaProperty = mesaProperty, mutable = true)
+        utilities.Properties.mesaPropertyToNFTProperty(nftId = nft.get.id, mesaProperty = mesaProperty, mutable = true)
       })
       masterNFTProperties.Service.updateMultiple(metaProperties ++ mesaProperties)
     } else Future()

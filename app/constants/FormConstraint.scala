@@ -99,10 +99,10 @@ object FormConstraint {
     val userDefinedPropertiesName = definePropertiesData.properties.flatMap(_.name)
     val definedPropertiesNames = if (!definePropertiesData.fractionalizedNFT) userDefinedPropertiesName else (userDefinedPropertiesName :+ "supply")
     val errors = Seq(
-      if ((definedPropertiesNames.length + constants.Collection.DefaultProperty.list.length) > constants.Blockchain.MaximumProperties) Option(ValidationError(constants.Response.MAXIMUM_COLLECTION_PROPERTIES_EXCEEDED.message)) else None,
-      if (definedPropertiesNames.map(_.toLowerCase).intersect(constants.Collection.DefaultProperty.list.map(_.toLowerCase)).nonEmpty) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES.message)) else None,
+      if ((definedPropertiesNames.length + constants.Properties.DefaultProperty.list.length) > constants.Blockchain.MaximumProperties) Option(ValidationError(constants.Response.MAXIMUM_COLLECTION_PROPERTIES_EXCEEDED.message)) else None,
+      if (definedPropertiesNames.map(_.toLowerCase).intersect(constants.Properties.DefaultProperty.list.map(_.toLowerCase)).nonEmpty) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES.message)) else None,
       if (definedPropertiesNames.distinct.length != definedPropertiesNames.length) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DUPLICATE_PROPERTIES.message)) else None,
-      if (userDefinedPropertiesName.map(_.toLowerCase).intersect(constants.Collection.RestrictedPropertyList.map(_.toLowerCase)).nonEmpty) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_RESTRICTED_PROPERTIES.message)) else None,
+      if (userDefinedPropertiesName.map(_.toLowerCase).intersect(constants.Properties.RestrictedPropertyList.map(_.toLowerCase)).nonEmpty) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_RESTRICTED_PROPERTIES.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })

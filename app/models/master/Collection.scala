@@ -24,9 +24,9 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
 
   def getCreatorIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.creatorId)
 
-  def getImmutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && !x.mutable).map(_.toMetaProperty) ++ constants.Collection.DefaultProperty.allImmutableMetaProperties(this.name)
+  def getImmutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && !x.mutable).map(_.toMetaProperty) ++ utilities.Properties.getCollectionDefaultImmutableMetaProperties(collectionName = this.name, creatorID = this.creatorId)
 
-  def getImmutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && !x.mutable).map(_.toMesaProperty) ++ constants.Collection.DefaultProperty.allImmutableMesaProperties(this.creatorId)
+  def getImmutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && !x.mutable).map(_.toMesaProperty)
 
   def getMutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty)
 

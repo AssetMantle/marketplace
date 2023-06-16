@@ -11,18 +11,18 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class NFTProperty(nftId: String, name: String, `type`: String, `value`: String, meta: Boolean, mutable: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity3[String, String, String] with Logging {
+case class NFTProperty(nftId: String, name: String, `type`: String, value: String, meta: Boolean, mutable: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity3[String, String, String] with Logging {
   def id1: String = nftId
 
   def id2: String = name
 
   def id3: String = `type`
 
-  def getPropertyID: PropertyID = PropertyID(keyID = StringID(this.name.trim), typeID = utilities.Data.getTypeID(this.`type`))
+  def getPropertyID: PropertyID = PropertyID(keyID = StringID(this.name.trim), typeID = utilities.Properties.getTypeID(this.`type`))
 
-  def toMetaProperty: MetaProperty = MetaProperty(id = this.getPropertyID, data = utilities.Data.getData(`type` = this.`type`, value = this.`value`))
+  def toMetaProperty: MetaProperty = MetaProperty(id = this.getPropertyID, data = utilities.Properties.getData(`type` = this.`type`, value = this.value))
 
-  def toMesaProperty: MesaProperty = MesaProperty(id = this.getPropertyID, dataID = utilities.Data.getDataID(`type` = this.`type`, value = this.`value`))
+  def toMesaProperty: MesaProperty = MesaProperty(id = this.getPropertyID, dataID = utilities.Properties.getDataID(`type` = this.`type`, value = this.value))
 
   def toBaseNFTProperty: BaseNFTProperty = BaseNFTProperty(this)
 
@@ -31,7 +31,7 @@ case class NFTProperty(nftId: String, name: String, `type`: String, `value`: Str
 private[master] object NFTProperties {
   class NFTPropertyTable(tag: Tag) extends Table[NFTProperty](tag, "NFTProperty") with ModelTable3[String, String, String] {
 
-    def * = (nftId, name, `type`, `value`, meta, mutable, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTProperty.tupled, NFTProperty.unapply)
+    def * = (nftId, name, `type`, value, meta, mutable, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTProperty.tupled, NFTProperty.unapply)
 
     def nftId = column[String]("nftId", O.PrimaryKey)
 
@@ -39,7 +39,7 @@ private[master] object NFTProperties {
 
     def `type` = column[String]("type", O.PrimaryKey)
 
-    def `value` = column[String]("value")
+    def value = column[String]("value")
 
     def meta = column[Boolean]("meta")
 

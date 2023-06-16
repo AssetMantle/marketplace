@@ -4,13 +4,17 @@
 
 @(userTransactions: Seq[UserTransaction], blocks: Seq[Block])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-@userTransactions.map { userTransaction =>
-    <tr>
-        <td><a target=”_blank” href="https://explorer.assetmantle.one/transactions/@userTransaction.txHash">@userTransaction.txHash</a></td>
-        <td>@Messages(userTransaction.txType)</td>
-        <td id="transactionTime_@userTransaction.txHash">@userTransaction.txHeight.fold(0L)(x => blocks.find(_.height == x).fold(0L)(_.time))
-            <script>epochToDateTime('transactionTime_@userTransaction.txHash');</script>
-        </td>
-        <td><a href="https://explorer.assetmantle.one/transactions/@userTransaction.txHash"></a> </td>
-    </tr>
-}
+    @userTransactions.map { userTransaction =>
+        <tr>
+            <td><a target=”_blank” href="https://explorer.assetmantle.one/transactions/@userTransaction.txHash">@userTransaction.txHash</a></td>
+            <td>@Messages(userTransaction.txType)</td>
+            <td id="transactionTime_@userTransaction.txHash">@userTransaction.txHeight.fold(0L)(x => blocks.find(_.height == x).fold(0L)(_.time))
+                <script>epochToDateTime('transactionTime_@userTransaction.txHash');</script>
+            </td>
+            <td>@if(userTransaction.status.isEmpty) {
+
+            } else {
+                @userTransaction.status.get
+            }</td>
+        </tr>
+    }

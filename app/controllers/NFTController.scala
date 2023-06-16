@@ -35,6 +35,7 @@ class NFTController @Inject()(
                                blockchainBalances: blockchain.Balances,
                                blockchainBlocks: blockchain.Blocks,
                                blockchainOrders: blockchain.Orders,
+                               blockchainAssets: blockchain.Assets,
                                masterNFTs: master.NFTs,
                                masterSales: master.Sales,
                                masterNFTOwners: master.NFTOwners,

@@ -27,9 +27,9 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + this.getAwsKey
 
-  def getImmutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && !x.mutable && x.nftId == this.id).map(_.toMetaProperty) ++ utilities.NFT.getDefaultImmutableMetaProperties(name = this.name, collectionName = collection.name, fileHash = this.getFileHash, bondAmount = collection.getBondAmount.value.toLong)
+  def getImmutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && !x.mutable && x.nftId == this.id).map(_.toMetaProperty) ++ utilities.Properties.getNFTDefaultImmutableMetaProperties(name = this.name, collectionName = collection.name, fileHash = this.getFileHash, bondAmount = collection.getBondAmount.value.toLong, creatorID = collection.creatorId)
 
-  def getImmutableProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && !x.mutable && x.nftId == this.id).map(_.toMesaProperty) ++ constants.Collection.DefaultProperty.allImmutableMesaProperties(collection.creatorId)
+  def getImmutableProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && !x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 
   def getMutableMetaProperties(nftProperties: Seq[NFTProperty]): Seq[MetaProperty] = nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty)
 

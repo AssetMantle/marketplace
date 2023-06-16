@@ -97,6 +97,7 @@ class Assets @Inject()(
 
     def tryGet(id: String): Future[Asset] = tryGetById(utilities.Secrets.base64URLDecode(id))
 
+    def checkExists(id: AssetID): Future[Boolean] = exists(id.getBytes)
 
   }
 

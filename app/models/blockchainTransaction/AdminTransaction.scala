@@ -132,7 +132,7 @@ class AdminTransactions @Inject()(
         val updateUserTx = if (log.nonEmpty) Service.markFailedWithLog(adminTransaction.txHash, log.get) else Future()
         for {
           _ <- updateUserTx
-        } yield adminTransaction.copy(status = Option(false), log = log)
+        } yield adminTransaction.copy(status = if (log.isDefined) Option(false) else None, log = log)
       }
 
       for {

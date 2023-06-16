@@ -75,12 +75,12 @@
         </div>
         <div class="propertyListContainer">
             <div class="d-flex flex-row flex-wrap gap-3 propertyList">
-            @nftProperties.filter(_.`value` != "").map { property =>
+            @nftProperties.filter(_.value != "").map { property =>
                 <div class="singleProperty">
                     <div class="propertyName">@property.name</div>
                     <div class="mt-2 propertyValue">
                     @if(property.meta){
-                        @defining(property.`value`) { propertyValue =>
+                        @defining(property.value) { propertyValue =>
                             @propertyValue
                         }
                     } else {

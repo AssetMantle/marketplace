@@ -160,12 +160,12 @@ class Starter @Inject()(
         def add(properties: Seq[models.master.NFTProperty]) = {
           if (properties.map(_.name).contains("Special")) {
             masterNFTProperties.Service.addMultiple(Seq(
-              properties.head.copy(name = "Body", `value` = ""),
-              properties.head.copy(name = "Face", `value` = ""),
-              properties.head.copy(name = "Hat", `value` = "")
+              properties.head.copy(name = "Body", value = ""),
+              properties.head.copy(name = "Face", value = ""),
+              properties.head.copy(name = "Hat", value = "")
             ))
           } else {
-            masterNFTProperties.Service.add(properties.head.copy(name = "Special", `value` = ""))
+            masterNFTProperties.Service.add(properties.head.copy(name = "Special", value = ""))
           }
         }
 

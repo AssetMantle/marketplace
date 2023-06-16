@@ -141,7 +141,7 @@ class UserTransactions @Inject()(
         val updateUserTx = if (log.nonEmpty) Service.markFailedWithLog(userTransaction.txHash, log.get) else Future()
         for {
           _ <- updateUserTx
-        } yield userTransaction.copy(status = Option(false), log = log)
+        } yield userTransaction.copy(status = if (log.isDefined) Option(false) else None, log = log)
       }
 
       for {

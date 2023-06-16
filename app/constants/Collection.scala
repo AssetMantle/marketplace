@@ -1,9 +1,5 @@
 package constants
 
-import schema.data.base.StringData
-import schema.id.base.{PropertyID, StringID}
-import schema.property.base.{MesaProperty, MetaProperty}
-
 object Collection {
 
   var GenesisCollectionIDs: Seq[String] = Seq(
@@ -31,28 +27,6 @@ object Collection {
     val PHOTOGRAPHY = "PHOTOGRAPHY"
     val MISCELLANEOUS = "MISCELLANEOUS"
   }
-
-  object DefaultProperty {
-    // Should be kept in lower case otherwise change in form constraints
-    val NFT_NAME = "name"
-    val COLLECTION_NAME = "collectionName"
-    val FILE_HASH = "fileHash"
-    val CREATOR_ID = "creatorID"
-    val BOND_AMOUNT = "bondAmount"
-
-    val list: Seq[String] = Seq(NFT_NAME, COLLECTION_NAME, FILE_HASH, CREATOR_ID)
-
-    def allImmutableMetaProperties(collectionName: String): Seq[MetaProperty] = Seq(
-      MetaProperty(id = PropertyID(keyID = StringID(NFT_NAME), typeID = schema.constants.Data.StringDataTypeID), data = StringData("")),
-      MetaProperty(id = PropertyID(keyID = StringID(COLLECTION_NAME), typeID = schema.constants.Data.StringDataTypeID), data = StringData(collectionName)),
-      MetaProperty(id = PropertyID(keyID = StringID(FILE_HASH), typeID = schema.constants.Data.StringDataTypeID), data = StringData(""))
-    )
-
-    def allImmutableMesaProperties(creatorID: String): Seq[MesaProperty] = Seq(MesaProperty(id = PropertyID(keyID = StringID(CREATOR_ID), typeID = schema.constants.Data.StringDataTypeID), dataID = StringData(creatorID).getDataID))
-
-  }
-
-  val RestrictedPropertyList: Seq[String] = Seq(DefaultProperty.NFT_NAME, DefaultProperty.COLLECTION_NAME, DefaultProperty.FILE_HASH, DefaultProperty.BOND_AMOUNT, schema.constants.Properties.SupplyProperty.id.keyID.value, schema.constants.Properties.BurnHeightProperty.id.keyID.value)
 
   case class CollectionStatus(name: String, id: Int)
 

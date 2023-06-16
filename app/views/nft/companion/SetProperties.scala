@@ -32,7 +32,7 @@ object SetProperties {
 
     def getNFTProperties(collectionProperties: Seq[collectionProperty])(implicit logger: Logger, module: String): Seq[BaseNFTProperty] = if (this.validate(collectionProperties)) this.properties.map { x =>
       val collectionProperty = collectionProperties.find(_.name == x.name).getOrElse(constants.Response.NFT_PROPERTY_NOT_FOUND.throwBaseException())
-      nftProperty(name = x.name, `type` = collectionProperty.`type`, `value` = x.value, meta = collectionProperty.meta, mutable = collectionProperty.mutable).toBaseNFTProperty
+      nftProperty(name = x.name, `type` = collectionProperty.`type`, value = x.value, meta = collectionProperty.meta, mutable = collectionProperty.mutable).toBaseNFTProperty
     } else constants.Response.INVALID_NFT_PROPERTY.throwBaseException()
 
   }
