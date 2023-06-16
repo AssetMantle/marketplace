@@ -87,8 +87,6 @@ class Notifications @Inject()(protected val dbConfigProvider: DatabaseConfigProv
 
     def getNumberOfUnread(accountID: String): Future[Int] = filterAndCount(x => x.accountID === accountID && !x.read)
 
-    def getClickableNotifications: Future[Seq[Notification]] = filter(_.jsRoute =!= "").map(_.map(_.deserialize()))
-
     def update(notification: Notification): Future[Unit] = updateById(notification.serialize())
 
     def markNotificationRead(notificationId: String, accountId: String): Future[Int] = {
