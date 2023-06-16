@@ -67,7 +67,7 @@ class Blocks @Inject()(
       }
     }
 
-    def getByHeights(heights: Seq[Int]): Future[Seq[Block]] = {
+    def getByHeights(heights: Seq[Int]): Future[Seq[Block]] = if (heights.nonEmpty) {
       if (heights.min > getFirstHeight) filter(_.height.inSet(heights))
       else if (heights.max < getFirstHeight) archiveBlocks.Service.get(heights)
       else {
@@ -76,7 +76,7 @@ class Blocks @Inject()(
           blocks2 <- archiveBlocks.Service.get(heights)
         } yield blocks1 ++ blocks2
       }
-    }
+    } else Future(Seq())
 
   }
 

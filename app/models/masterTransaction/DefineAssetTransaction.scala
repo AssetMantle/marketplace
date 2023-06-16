@@ -85,13 +85,13 @@ class DefineAssetTransactions @Inject()(
   object Utility {
 
     private def transaction(collections: Seq[Collection]): Future[AdminTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(constants.Wallet.DefineAssetWallet.address)
+      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(constants.Transaction.Wallet.DefineAssetWallet.address)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
         val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = collections.map(x => utilities.BlockchainTransaction.getDefineAssetMsg(
-            fromAddress = constants.Wallet.DefineAssetWallet.address,
+            fromAddress = constants.Transaction.Wallet.DefineAssetWallet.address,
             fromID = constants.Transaction.FromID,
             immutableMetas = x.getImmutableMetaProperties,
             immutables = x.getImmutableProperties,
@@ -101,14 +101,14 @@ class DefineAssetTransactions @Inject()(
           fee = utilities.BlockchainTransaction.getFee(gasPrice = 0.0001, gasLimit = constants.Transaction.DefaultDefineAssetGasLimit * collections.size),
           gasLimit = constants.Transaction.DefaultDefineAssetGasLimit * collections.size,
           account = bcAccount,
-          ecKey = constants.Wallet.DefineAssetWallet.getECKey,
+          ecKey = constants.Transaction.Wallet.DefineAssetWallet.getECKey,
           timeoutHeight = timeoutHeight)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
 
         val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Wallet.DefineAssetWallet.address, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.DEFINE_ASSET)
+              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Transaction.Wallet.DefineAssetWallet.address, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.DEFINE_ASSET)
               _ <- Service.addWithNoneStatus(txHash = txHash, collectionIds = collections.map(_.id))
             } yield adminTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
