@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="userBalance walletBalance_@loginState.address"></div>
+            <div class="userBalance" id="walletTradeBalance">0 $MNTL</div>
             <div class="d-flex gap-2">
                 <div class="primaryIconButton">
                     <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.WRAP_COIN.get, ""))" class="p-0">
@@ -61,7 +61,7 @@
             </div>
         </div>
         <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="userBalance" id="walletTradeBalance">0 $MNTL</div>
+            <div class="userBalance walletBalance_@loginState.address"></div>
             <div class="d-flex gap-2">
                 <div class="primaryIconButton">
                     <a href="https://wallet.assetmantle.one/?toAddress=@loginState.address" target="_blank" class="p-0">
