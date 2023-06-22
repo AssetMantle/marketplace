@@ -9,8 +9,8 @@
     <div class="card rightInfoCard">
         @if(optionalLoginState.isDefined) {
             @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId) {
-                <div class="analysisValue mb-2">@Messages(constants.View.QUANTITY_OWNED)</div>
-                <div class="d-flex flex-row gap-1 priceHolder">
+                <div class="analysisTitle">@Messages(constants.View.QUANTITY_OWNED)</div>
+                <div class="analysisValue">
                     @userNFTOwner.get.quantity
                 </div>
             }
@@ -84,6 +84,7 @@
                         @commonPrimaryButton(Messages(constants.View.MINT_NFT), JavaScript(s"getForm(jsRoutes.controllers.NFTController.mintForm('${nft.id}'))"))
                     }
                 } else {
+                    <div class="separator"></div>
                     <div class="analysisValue">@Messages(constants.View.CANNOT_BE_SOLD)</div>
                 }
             }
