@@ -6,15 +6,18 @@
 
     @userTransactions.map { userTransaction =>
         <tr>
-            <td><a target=”_blank” href="https://explorer.assetmantle.one/transactions/@userTransaction.txHash">@userTransaction.txHash</a></td>
-            <td>@Messages(userTransaction.txType)</td>
-            <td id="transactionTime_@userTransaction.txHash">@userTransaction.txHeight.fold(0L)(x => blocks.find(_.height == x).fold(0L)(_.time))
-                <script>epochToDateTime('transactionTime_@userTransaction.txHash');</script>
-            </td>
-            <td>@if(userTransaction.status.isEmpty) {
+            <td class="tableFieldHash"><a target=”_blank” href="https://explorer.assetmantle.one/transactions/@userTransaction.txHash">@userTransaction.txHash</a></td>
+            <td class="text-center tableFieldType">@Messages(userTransaction.txType)</td>
+            <td class="text-center tableFieldStatus">@if(userTransaction.status.isEmpty) {
 
             } else {
-                @userTransaction.status.get
+                @if(userTransaction.status.get){
+                    <i class="bi bi-check-circle iconSuccess iconSmall"></i>
+                }else{
+                    <i class="bi bi-x-circle iconError iconSmall"></i>
+                }
             }</td>
+            <td id="transactionTime_@userTransaction.txHash">@userTransaction.txHeight.fold(0L)(x => blocks.find(_.height == x).fold(0L)(_.time))</td>
+            <script>epochToDateTime('transactionTime_@userTransaction.txHash');</script>
         </tr>
     }
