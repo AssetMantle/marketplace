@@ -139,6 +139,12 @@
           &:focus{
             outline: none;
           }
+          &.activeKey{
+            border-color: var(--default);
+            &::before{
+              transform: scale(1);
+            }
+          }
         }
       }
       &.active{
