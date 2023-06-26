@@ -7,7 +7,7 @@
         <div class="row">
             <div class="col-sm-12 col-md-12">
                 <div class="table-responsive">
-                    <table class="table contentTable">
+                    <table class="table contentTable mb-0">
                         <thead>
                             <tr>
                                 <th class="tableFieldHash">@Messages(constants.View.TRANSACTION_HASH)</th>
@@ -24,4 +24,5 @@
         </div>
     </div>
 </div>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/profile/transactions/transactions.js")"></script>
     <script>componentResource('userTransactionsPerPage', jsRoutes.controllers.ProfileController.transactionsPerPage(1))</script>

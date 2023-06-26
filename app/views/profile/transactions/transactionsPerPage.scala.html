@@ -1,9 +1,10 @@
 @import controllers.actions.LoginState
 @import models.blockchain.Block
 @import models.blockchainTransaction.UserTransaction
+@import views.html.base.buttons._
 
 @(userTransactions: Seq[UserTransaction], blocks: Seq[Block])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
-
+@if(userTransactions.nonEmpty){
     @userTransactions.map { userTransaction =>
         <tr>
             <td class="tableFieldHash"><a target=”_blank” href="https://explorer.assetmantle.one/transactions/@userTransaction.txHash">@userTransaction.txHash</a></td>
@@ -21,3 +22,19 @@
             <script>epochToDateTime('transactionTime_@userTransaction.txHash');</script>
         </tr>
     }
+    <tr>
+        <th colspan="4" class="border-0">
+            <div id="userTransactionPagination" class="mt-0 horizontal-align">
+                @commonPaginationButton(constants.View.BACK, JavaScript(s"userTransactionPaginationOnBack()"), icon = "bi-chevron-left", size = "small", iconFirst = true, Symbol("id") -> "userTransactionPaginationBack")
+                @commonPaginationButton(constants.View.NEXT, JavaScript(s"userTransactionPaginationOnNext()"), icon = "bi-chevron-right", size = "small", iconFirst = false, Symbol("id") -> "userTransactionPaginationNext")
+                <script>hideBackButtonOnFirstLoad();</script>
+            </div>
+        </th>
+    </tr>
+}else{
+    <tr>
+        <td colspan="4" class="text-center">
+            @Messages(constants.View.NO_TRANSACTION_FOUND)
+        </td>
+    </tr>
+}
