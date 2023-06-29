@@ -28,7 +28,7 @@ object DefineProperties {
 
     def getSerializableProperties: Seq[commonCollection.Property] = {
       val userDefinedProperties = this.properties.filter(_.name.isDefined).map(property => commonCollection.Property(name = property.name.get.trim, `type` = property.propertyType, defaultValue = property.defaultValue.getOrElse(""), mutable = property.mutable, meta = !property.hide))
-      if (this.fractionalizedNFT) userDefinedProperties :+ commonCollection.Property(name = "supply", `type` = constants.NFT.Data.NUMBER, defaultValue = "0", mutable = false, meta = true)
+      if (this.fractionalizedNFT) userDefinedProperties :+ commonCollection.Property(name = schema.constants.Properties.SupplyProperty.id.keyID.value, `type` = constants.NFT.Data.NUMBER, defaultValue = "0", mutable = false, meta = true)
       else userDefinedProperties
     }
 

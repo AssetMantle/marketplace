@@ -6,6 +6,7 @@ import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSResponse
 
+import java.net.ConnectException
 import scala.concurrent.{ExecutionContext, Future}
 
 object JSON {
@@ -30,6 +31,7 @@ object JSON {
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
         logger.error("Check order of case class definitions")
         constants.Response.NULL_POINTER_EXCEPTION.throwBaseException(nullPointerException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
       case exception: Exception => logger.error(exception.getLocalizedMessage)
         constants.Response.GENERIC_EXCEPTION.throwBaseException(exception)
     }
@@ -50,6 +52,7 @@ object JSON {
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
         logger.error("Check order of case class definitions")
         constants.Response.NULL_POINTER_EXCEPTION.throwBaseException(nullPointerException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
       case exception: Exception => logger.error(exception.getLocalizedMessage)
         constants.Response.GENERIC_JSON_EXCEPTION.throwBaseException(exception)
     }
