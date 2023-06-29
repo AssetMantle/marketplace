@@ -12,6 +12,14 @@
         <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3">
             <div class="card border-0">
             }
+    @if(collection.isFractionalized) {
+        <div class="fractionelisedBadge">
+            <div class="badgeContent">
+                <i class="bi bi-puzzle-fill iconDefault iconSmall"></i>
+                <span>m/n</span>
+            </div>
+        </div>
+    }
     <div class="card-img rounded-0 skeletonLoadContainer">
         <span onclick="@onClickFunction" style="cursor: pointer;">
             @if(constants.File.ALL_IMAGES_WITH_GIF.contains(nft.fileExtension)) {
@@ -52,7 +60,7 @@
             </div>
         }
     </div>
-    <div class="nft-detail p-3">
+    <div class="nft-detail p-3 pb-2">
         <div class="d-flex flex-row gap-2 nft-creator-detail">
             <div class="creator-profile skeletonLoadContainer">
                 <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
@@ -109,6 +117,22 @@
                 }
             </div>
         }
+        <div class="nftCardSeparator"></div>
+        <div class="px-1">
+            <div class="d-flex justify-content-end">
+            @if(nft.isMinted.getOrElse(false)) {
+                <div class="iconTooltip">
+                    <span class="tooltipText top">@Messages(constants.View.NFT_STATUS_MINTED)</span>
+                    <i class="bi bi-link-45deg iconDefault iconSize24"></i>
+                </div>
+            }else{
+                <div class="iconTooltip">
+                    <span class="tooltipText top">@Messages(constants.View.NFT_STATUS_NOT_MINTED)</span>
+                    <i class="bi bi-link-45deg iconGray iconSize24"></i>
+                </div>
+            }
+            </div>
+        </div>
     </div>
 </div>
 </div>
