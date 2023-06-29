@@ -38,7 +38,7 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
 
   def getClassificationID: ClassificationID = utilities.Collection.getClassificationID(immutables = this.getImmutables, mutables = this.getMutables, bondRate = constants.Blockchain.BondRate)
 
-  def isFractionalized: Boolean = this.properties.fold(false)(_.map(_.name).contains(schema.constants.Properties.SupplyProperty.id.keyID.value))
+  def isFractionalized: Boolean = this.properties.fold(false)(_.exists(_.name == schema.constants.Properties.SupplyProperty.id.keyID.value))
 
   def serialize(): Collections.CollectionSerialized = Collections.CollectionSerialized(
     id = this.id,

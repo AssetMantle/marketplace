@@ -1,142 +1,145 @@
 @import controllers.actions.LoginState
 @import helper.{form, _}
+@import models.master.NFTOwner
 @import views.html.base.commonStringValue
 @import views.html.base.form._
+@(collection: master.Collection, nft: master.NFT, liked: Option[Boolean], onClickFunction: JavaScript, nftOwner: Option[NFTOwner], draft: Boolean = false)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
-@(collection: master.Collection, nft: master.NFT, liked: Option[Boolean], onClickFunction: JavaScript, draft: Boolean = false)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@if(draft) {
+    <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 draftNft">
+        <div class="card border-0 h-100">
+        } else {
+    <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3">
+        <div class="card border-0">
+        }
+@if(collection.isFractionalized) {
+    <div class="fractionelisedBadge">
+        <div class="badgeContent">
+            <i class="bi bi-puzzle-fill iconDefault iconSmall"></i>
+            <span>m/n</span>
+        </div>
+    </div>
+}
+<div class="card-img rounded-0 skeletonLoadContainer">
+    <span onclick="@onClickFunction" style="cursor: pointer;">
+    @if(constants.File.ALL_IMAGES_WITH_GIF.contains(nft.fileExtension)) {
+        <img src="@nft.getS3Url"/>
+    }
+    </span>
+    @if(constants.File.ALL_AUDIO.contains(nft.fileExtension)) {
+        <span onclick="@onClickFunction" style="cursor: pointer;">
+        @collection.getCoverFileURL.fold {
+            <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
+        } { uri =>
+            <img src="@uri"/>
+        }
+        </span>
 
-    @if(draft) {
-        <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 draftNft">
-            <div class="card border-0 h-100">
-            } else {
-        <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3">
-            <div class="card border-0">
-            }
-    @if(collection.isFractionalized) {
-        <div class="fractionelisedBadge">
-            <div class="badgeContent">
-                <i class="bi bi-puzzle-fill iconDefault iconSmall"></i>
-                <span>m/n</span>
+        <div class="audioNftContainer">
+            <audio controls class="audioPlayer">
+                <source src="@nft.getS3Url">
+            </audio>
+
+            <div class="controls">
+                <div class="playButtonContainer">
+                    <div class="playButton" onclick="playToggle(this)">
+                        <i class="bi bi-play"></i>
+                    </div>
+                </div>
+
+                <div class="volumeContainer">
+                    <div class="volumeButton" onclick="muteVolume(this)">
+                        <i class="bi bi-volume-up"></i>
+                    </div>
+
+                    <div class="volumeSlider" onclick="setVolume(this)">
+                        <div class="volumePercentage"></div>
+                    </div>
+                </div>
             </div>
         </div>
     }
-    <div class="card-img rounded-0 skeletonLoadContainer">
-        <span onclick="@onClickFunction" style="cursor: pointer;">
-            @if(constants.File.ALL_IMAGES_WITH_GIF.contains(nft.fileExtension)) {
-                <img src="@nft.getS3Url"/>
-            }
-        </span>
-            @if(constants.File.ALL_AUDIO.contains(nft.fileExtension)) {
-                <span onclick="@onClickFunction" style="cursor: pointer;">
-                    @collection.getCoverFileURL.fold{
-                        <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
-                    }{uri =>
-                        <img src="@uri"/>
-                    }
+</div>
+@if(nftOwner.isDefined) {
+    @nftOwner.get.quantity / @nft.totalSupply
+}
+<div class="nft-detail p-3 pb-2">
+    <div class="d-flex flex-row gap-2 nft-creator-detail">
+        <div class="creator-profile skeletonLoadContainer">
+            <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
+        </div>
+        <div class="d-flex flex-column justify-content-center">
+            @if(nft.name) {
+                <span class="nft-name mb-1">
+                @commonStringValue(message = nft.name, id = utilities.IdGenerator.getRandomHexadecimal, length = 15)
                 </span>
-
-            <div class="audioNftContainer">
-                <audio controls class="audioPlayer">
-                    <source src="@nft.getS3Url">
-                </audio>
-
-                <div class="controls">
-                    <div class="playButtonContainer">
-                        <div class="playButton" onclick="playToggle(this)">
-                            <i class="bi bi-play"></i>
-                        </div>
-                    </div>
-
-                    <div class="volumeContainer">
-                        <div class="volumeButton" onclick="muteVolume(this)">
-                            <i class="bi bi-volume-up"></i>
-                        </div>
-
-                        <div class="volumeSlider" onclick="setVolume(this)">
-                            <div class="volumePercentage"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-    <div class="nft-detail p-3 pb-2">
-        <div class="d-flex flex-row gap-2 nft-creator-detail">
-            <div class="creator-profile skeletonLoadContainer">
-                <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
-            </div>
-            <div class="d-flex flex-column justify-content-center">
-                @if(nft.name) {
-                    <span class="nft-name mb-1">
-                    @commonStringValue(message = nft.name, id = utilities.IdGenerator.getRandomHexadecimal, length = 15)
-                    </span>
-                }
-                <span class="creator-collection-name">@collection.name</span>
-            </div>
+            }
+            <span class="creator-collection-name">@collection.name</span>
         </div>
-        @if(draft) {
-            <div class="d-flex gap-2 justify-content-end pt-4">
-                <i class="bi bi-pencil iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.basicDetailsForm('@nft.collectionId', '@nft.id'))"></i>
-                <i class="bi bi-trash iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.deleteDraftForm('@nft.id', '@nft.getFileHash'))"></i>
-                <div id="deleteNftDraft_@nft.getFileHash" class="hidden">
-                @defining(views.nft.companion.DeleteDraft.form) { deleteDraftForm =>
-                    @form(routes.NFTController.deleteDraft()) {
-                        @CSRF.formField
-                        @commonInputText(deleteDraftForm, constants.FormField.NFT_ID, Symbol("value") -> nft.id, Symbol("readonly") -> "readonly")
-                    }
+    </div>
+    @if(draft) {
+        <div class="d-flex gap-2 justify-content-end pt-4">
+            <i class="bi bi-pencil iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.basicDetailsForm('@nft.collectionId', '@nft.id'))"></i>
+            <i class="bi bi-trash iconDefault" onclick="getForm(jsRoutes.controllers.NFTController.deleteDraftForm('@nft.id', '@nft.getFileHash'))"></i>
+            <div id="deleteNftDraft_@nft.getFileHash" class="hidden">
+            @defining(views.nft.companion.DeleteDraft.form) { deleteDraftForm =>
+                @form(routes.NFTController.deleteDraft()) {
+                    @CSRF.formField
+                    @commonInputText(deleteDraftForm, constants.FormField.NFT_ID, Symbol("value") -> nft.id, Symbol("readonly") -> "readonly")
                 }
-                </div>
-            </div>
-        } else {
-            <div class="d-flex justify-content-between">
-                <div class="d-flex flex-row gap-1 align-items-center mt-3">
-                    <div class=""><img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/></div>
-                    <div id="price_@nft.getFileHash" class="nft-mantle-price">--</div>
-                    <div id="dollarPrice_@nft.getFileHash" class="nft-dollar-price">($--)</div>
-                </div>
-                @if(loginState.nonEmpty) {
-                    <div class="d-flex align-items-center gap-1 mt-3">
-                        <div id="addToWishlistContainer_@nft.getFileHash" class="hidden">
-                        @views.html.nft.addToWishlist(nft)
-                        </div>
-                        <div id="deleteFromWishlistContainer_@nft.getFileHash" class="hidden">
-                        @views.html.nft.deleteFromWishlist(nft)
-                        </div>
-                        <span onclick="addRemoveWishlist(this, '@nft.getFileHash', '@Messages(constants.View.ADDED_TO_WISHLIST)', '@Messages(constants.View.REMOVED_FROM_WISHLIST)')">
-                        @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
-                        </span>
-                        <div class="nft-likes" data-id="@nft.id">00</div>
-                    </div>
-                } else {
-                    <div class="d-flex align-items-center gap-1 mt-3" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN_WITH_CALLBACK.get, s"'/collection/${collection.id}'"))">
-                        <span>
-                        @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
-                        </span>
-                        <div class="nft-likes" data-id="@nft.id">00</div>
-                    </div>
-                }
-            </div>
-        }
-        <div class="nftCardSeparator"></div>
-        <div class="px-1">
-            <div class="d-flex justify-content-end">
-            @if(nft.isMinted.getOrElse(false)) {
-                <div class="iconTooltip">
-                    <span class="tooltipText top">@Messages(constants.View.NFT_STATUS_MINTED)</span>
-                    <i class="bi bi-link-45deg iconDefault iconSize24"></i>
-                </div>
-            }else{
-                <div class="iconTooltip">
-                    <span class="tooltipText top">@Messages(constants.View.NFT_STATUS_NOT_MINTED)</span>
-                    <i class="bi bi-link-45deg iconGray iconSize24"></i>
-                </div>
             }
             </div>
         </div>
+    } else {
+        <div class="d-flex justify-content-between">
+            <div class="d-flex flex-row gap-1 align-items-center mt-3">
+                <div class=""><img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/></div>
+                <div id="price_@nft.getFileHash" class="nft-mantle-price">--</div>
+                <div id="dollarPrice_@nft.getFileHash" class="nft-dollar-price">($--)</div>
+            </div>
+            @if(loginState.nonEmpty) {
+                <div class="d-flex align-items-center gap-1 mt-3">
+                    <div id="addToWishlistContainer_@nft.getFileHash" class="hidden">
+                    @views.html.nft.addToWishlist(nft)
+                    </div>
+                    <div id="deleteFromWishlistContainer_@nft.getFileHash" class="hidden">
+                    @views.html.nft.deleteFromWishlist(nft)
+                    </div>
+                    <span onclick="addRemoveWishlist(this, '@nft.getFileHash', '@Messages(constants.View.ADDED_TO_WISHLIST)', '@Messages(constants.View.REMOVED_FROM_WISHLIST)')">
+                    @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
+                    </span>
+                    <div class="nft-likes" data-id="@nft.id">00</div>
+                </div>
+            } else {
+                <div class="d-flex align-items-center gap-1 mt-3" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN_WITH_CALLBACK.get, s"'/collection/${collection.id}'"))">
+                    <span>
+                    @views.html.nft.commonCardWishlistButton(liked.getOrElse(false))
+                    </span>
+                    <div class="nft-likes" data-id="@nft.id">00</div>
+                </div>
+            }
+        </div>
+    }
+    <div class="nftCardSeparator"></div>
+    <div class="px-1">
+        <div class="d-flex justify-content-end">
+        @if(nft.isMinted.getOrElse(false)) {
+            <div class="iconTooltip">
+                <span class="tooltipText top">@Messages(constants.View.NFT_STATUS_MINTED)</span>
+                <i class="bi bi-link-45deg iconDefault iconSize24"></i>
+            </div>
+        }else{
+            <div class="iconTooltip">
+                <span class="tooltipText top">@Messages(constants.View.NFT_STATUS_NOT_MINTED)</span>
+                <i class="bi bi-link-45deg iconGray iconSize24"></i>
+            </div>
+        }
+        </div>
     </div>
+</div>
 </div>
 </div>
 <script>
-    getNFTPrice('@nft.id');
-    showLoader();
+        getNFTPrice('@nft.id');
+        showLoader();
 </script>

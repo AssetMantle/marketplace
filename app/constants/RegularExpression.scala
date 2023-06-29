@@ -29,4 +29,5 @@ object RegularExpression {
   val TRANSACTION_HASH: RegularExpression = RegularExpression("TRANSACTION_HASH", """[A-F0-9]{64}""".r)
   val TWITTER_USERNAME: RegularExpression = RegularExpression("TWITTER_USERNAME", """^[A-Za-z0-9_]*$""".r)
   val INSTAGRAM_USERNAME: RegularExpression = RegularExpression("INSTAGRAM_USERNAME", """^[A-Za-z0-9._]*$""".r)
+  val NFT_TAGS: RegularExpression = RegularExpression("NFT_TAGS", """^[A-Za-z0-9._!-]*$""".r)
 }
