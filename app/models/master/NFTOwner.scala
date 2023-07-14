@@ -229,11 +229,13 @@ class NFTOwners @Inject()(
 
     def getCollectedCollection(accountId: String): Future[Seq[String]] = filter(x => x.ownerId === accountId && x.creatorId =!= accountId).map(_.map(_.collectionId).distinct)
 
-    def getByCollectionAndPageNumber(accountId: String, collectionId: String, pageNumber: Int): Future[Seq[String]] = filterAndSortWithPagination(x => x.ownerId === accountId && x.creatorId =!= accountId && x.collectionId === collectionId)(_.updatedOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage).map(_.map(_.nftId))
+    def getByCollectionAndPageNumber(accountId: String, collectionId: String, pageNumber: Int): Future[Seq[NFTOwner]] = filterAndSortWithPagination(x => x.ownerId === accountId && x.creatorId =!= accountId && x.collectionId === collectionId)(_.updatedOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage).map(_.map(_.deserialize()))
 
     def getSoldNFTs(collectionIDs: Seq[String]): Future[Seq[String]] = filter(x => x.ownerId =!= x.creatorId && x.collectionId.inSet(collectionIDs)).map(_.map(_.nftId))
 
     def getByIds(nftIDs: Seq[String]): Future[Seq[NFTOwner]] = filter(_.nftId.inSet(nftIDs)).map(_.map(_.deserialize))
+
+    def getByOwnerAndIds(ownerId: String, nftIDs: Seq[String]): Future[Seq[NFTOwner]] = filter(x => x.ownerId === ownerId && x.nftId.inSet(nftIDs)).map(_.map(_.deserialize))
 
     def countOwners(nftId: String): Future[Int] = filterAndCount(_.nftId === nftId)
 

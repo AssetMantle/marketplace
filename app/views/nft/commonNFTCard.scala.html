@@ -16,7 +16,11 @@
     <div class="fractionelisedBadge">
         <div class="badgeContent">
             <i class="bi bi-puzzle-fill iconDefault iconSmall"></i>
-            <span>m/n</span>
+            @if(nftOwner.isDefined) {
+                <span>@nftOwner.get.quantity/@nft.totalSupply</span>
+            } else {
+                -/@nft.totalSupply
+            }
         </div>
     </div>
 }
@@ -60,9 +64,6 @@
         </div>
     }
 </div>
-@if(nftOwner.isDefined) {
-    @nftOwner.get.quantity / @nft.totalSupply
-}
 <div class="nft-detail p-3 pb-2">
     <div class="d-flex flex-row gap-2 nft-creator-detail">
         <div class="creator-profile skeletonLoadContainer">
@@ -128,7 +129,7 @@
                 <span class="tooltipText top">@Messages(constants.View.NFT_STATUS_MINTED)</span>
                 <i class="bi bi-link-45deg iconDefault iconSize24"></i>
             </div>
-        }else{
+        } else {
             <div class="iconTooltip">
                 <span class="tooltipText top">@Messages(constants.View.NFT_STATUS_NOT_MINTED)</span>
                 <i class="bi bi-link-45deg iconGray iconSize24"></i>

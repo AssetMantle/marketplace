@@ -122,17 +122,26 @@ class SecondaryMarketController @Inject()(
       implicit request =>
         val collection = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterCollections.Service.tryGet(id)
-        val likedNFTs = optionalLoginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollection(accountId = x.username, collectionId = id))
         val secondaryMarkets = masterSecondaryMarkets.Service.getByCollectionId(id, pageNumber)
 
         def nfts(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds)
+
+        def getOwnersAndLiked(nftIds: Seq[String]) = if (optionalLoginState.isDefined && nftIds.nonEmpty) {
+          val nftOwners = masterNFTOwners.Service.getByOwnerAndIds(ownerId = optionalLoginState.get.username, nftIDs = nftIds)
+          val nftLiked = masterWishLists.Service.getByNFTIds(accountId = optionalLoginState.get.username, nftIDs = nftIds)
+
+          for {
+            nftOwners <- nftOwners
+            nftLiked <- nftLiked
+          } yield (nftOwners, nftLiked)
+        } else Future(Seq(), Seq())
 
         (for {
           collection <- collection
           secondaryMarkets <- secondaryMarkets
           nfts <- nfts(secondaryMarkets.map(_.nftId))
-          likedNFTs <- likedNFTs
-        } yield Ok(views.html.secondaryMarket.collection.nftsPerPage(collection, nfts, likedNFTs, pageNumber))
+          (nftOwners, likedNFTs) <- getOwnersAndLiked(secondaryMarkets.map(_.nftId))
+        } yield Ok(views.html.base.commonNFTsPerPage(collection, nfts, nftOwners, likedNFTs, Seq(), pageNumber))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
