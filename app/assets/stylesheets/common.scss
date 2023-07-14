@@ -1153,6 +1153,35 @@ body.modal-open{
           }
         }
       }
+      .nftCardSeparator{
+        height: 2px;
+        width: calc(100% + 32px);
+        background-color: #21211E;
+        margin: 16px -16px 12px -16px;
+      }
+    }
+    .fractionelisedBadge{
+      position: relative;
+      .badgeContent{
+        background-color: var(--popup-bg);
+        border: 1px solid var(--default);
+        padding: 4px 8px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap:6px;
+        position: absolute;
+        left: 16px;
+        top: 16px;
+        z-index: 99;
+        i{
+          line-height: 12px;
+          transform: rotate(-15deg);
+        }
+        span{
+          @include setFont(var(--font-type-2), normal, 400, 12px, 12px, var(--mantle-off-white));
+        }
+      }
     }
   }
 }
