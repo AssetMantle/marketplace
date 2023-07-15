@@ -7,15 +7,15 @@
 
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
-        <div class="analysisValue mb-2">@Messages(constants.View.TOTAL_OWNERS)</div>
-        <div class="d-flex flex-row gap-1 priceHolder">
-        @totalOwners
+        <div class="d-flex flex-column gap-1">
+            <div class="analysisTitle">@Messages(constants.View.TOTAL_OWNERS)</div>
+            <div class="analysisValue">@totalOwners</div>
         </div>
         @if(optionalLoginState.isDefined) {
             @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId) {
-                <div class="analysisValue mb-2">@Messages(constants.View.QUANTITY_OWNED)</div>
-                <div class="d-flex flex-row gap-1 priceHolder">
-                @userNFTOwner.get.quantity
+                <div class="d-flex flex-column gap-1 mt-3">
+                    <div class="analysisTitle">@Messages(constants.View.QUANTITY_OWNED)</div>
+                    <div class="analysisValue">@userNFTOwner.get.quantity</div>
                 </div>
             }
             @if(lowestPriceSecondaryMarket.isDefined && userSecondaryMarket.isEmpty) {
@@ -89,7 +89,8 @@
                         <div class="separator"></div>
                         @commonSecondaryButton(Messages(constants.View.TRANSFER_NFT), JavaScript(s"getForm(jsRoutes.controllers.NFTController.transferForm('${nft.id}'))"), Symbol("class") -> "mt-4")
                     } else {
-                        @commonPrimaryButton(Messages(constants.View.MINT_NFT), JavaScript(s"getForm(jsRoutes.controllers.NFTController.mintForm('${nft.id}'))"))
+                        <div class="separator"></div>
+                        @commonPrimaryButton(Messages(constants.View.MINT_NFT), JavaScript(s"getForm(jsRoutes.controllers.NFTController.mintForm('${nft.id}'))"), Symbol("class") -> "mt-4")
                     }
                 } else {
                     <div class="analysisValue">@Messages(constants.View.CANNOT_BE_SOLD)</div>
