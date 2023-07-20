@@ -276,7 +276,7 @@ class ExternalTransactions @Inject()(
         else if (quantity < nftOwner.get.quantity) masterNFTOwners.Service.update(nftOwner.get.copy(quantity = nftOwner.get.quantity - quantity))
         else Future()
 
-        def transfer = masterTransactionExternalAssets.Service.addOrUpdate(nftId = nft.get.id, lastOwnerId = nftOwner.get.ownerId, assetId = nft.get.assetId.get, currentOwnerIdentityId = schema.constants.ID.OrderIdentityID.asString, collectionId = nft.get.collectionId, amount = quantity)
+        def transfer = masterTransactionExternalAssets.Service.addOrUpdate(nftId = nft.get.id, lastOwnerId = nftOwner.get.ownerId, assetId = nft.get.assetId.get, currentOwnerIdentityId = schema.constants.Document.OrderIdentityID.asString, collectionId = nft.get.collectionId, amount = quantity)
 
         for {
           _ <- updateOrDeleteNFTOwner

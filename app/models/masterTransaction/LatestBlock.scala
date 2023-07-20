@@ -12,6 +12,7 @@ import constants.Scheduler
 import exceptions.BaseException
 import models.blockchain
 import models.blockchain.Transaction
+import models.blockchainTransaction.UserTransactions
 import models.masterTransaction.LatestBlocks.LatestBlockTable
 import models.traits._
 import play.api.Logger
@@ -53,6 +54,7 @@ private[masterTransaction] object LatestBlocks {
 @Singleton
 class LatestBlocks @Inject()(
                               blockchainBlocks: blockchain.Blocks,
+                              userTransactions: UserTransactions,
                               blockchainTransactions: blockchain.Transactions,
                               utilitiesOperations: utilities.Operations,
                               utilitiesExternalTransactions: utilities.ExternalTransactions,
@@ -111,13 +113,16 @@ class LatestBlocks @Inject()(
     private def processBlock(height: Int): Unit = {
       val transactions = blockchainTransactions.Utility.getByHeight(height)
 
+      def userTxs(hashes: Seq[String]) = userTransactions.Service.getByHashes(hashes).map(_.map(_.txHash))
+
       def processAll(transactions: Seq[Transaction]) = {
-        utilitiesOperations.traverse(transactions.filter(x => x.status && !utilities.BlockchainTransaction.checkMantlePlaceTransaction(x.parsedTx)))(x => processMsgs(x.getMessages, x.hash, x.height))
+        utilitiesOperations.traverse(transactions.filter(x => x.status))(x => processMsgs(x.getMessages, x.hash, x.height))
       }
 
       val forComplete = for {
         transactions <- transactions
-        _ <- processAll(transactions)
+        userTxHashes <- userTxs(transactions.map(_.hash))
+        _ <- processAll(transactions.filterNot(x => userTxHashes.contains(x.hash)))
         _ <- Service.update(height)
       } yield ()
 
@@ -133,7 +138,7 @@ class LatestBlocks @Inject()(
         val lastChecked = Service.getLastChecked
 
         def processBlocks(latestBlockchainHeight: Int, lastCheckedHeight: Long): Unit = if (latestBlockchainHeight > lastCheckedHeight) {
-          (lastCheckedHeight + 1).to(latestBlockchainHeight).foreach(x => processBlock(x.toInt))
+          (lastCheckedHeight + 1).to(latestBlockchainHeight - 2).foreach(x => processBlock(x.toInt))
         }
 
         val forComplete = (for {

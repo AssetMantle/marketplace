@@ -90,7 +90,7 @@ class NFTMintingFeeTransactions @Inject()(
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
         val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = constants.Transaction.Wallet.FeeCollectorAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)))),
+          messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = constants.Transaction.Wallet.MintAssetWallet.address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)))),
           fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultMintAssetGasLimit),
           gasLimit = constants.Transaction.DefaultMintAssetGasLimit,
           account = bcAccount,

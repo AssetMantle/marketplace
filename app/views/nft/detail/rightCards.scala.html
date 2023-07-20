@@ -3,15 +3,19 @@
 @import models.master.{Collection, NFT, NFTOwner, SecondaryMarket}
 @import views.html.base.buttons._
 
-@(collection: Collection, collectionAnalysis: CollectionAnalysis, nft: NFT, userNFTOwner: Option[NFTOwner], lowestPriceSecondaryMarket: Option[SecondaryMarket], userSecondaryMarket: Option[SecondaryMarket], tokenPrice: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+@(collection: Collection, collectionAnalysis: CollectionAnalysis, nft: NFT, userNFTOwner: Option[NFTOwner], lowestPriceSecondaryMarket: Option[SecondaryMarket], userSecondaryMarket: Option[SecondaryMarket], tokenPrice: Double, totalOwners: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
 
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
+        <div class="analysisValue mb-2">@Messages(constants.View.TOTAL_OWNERS)</div>
+        <div class="d-flex flex-row gap-1 priceHolder">
+        @totalOwners
+        </div>
         @if(optionalLoginState.isDefined) {
             @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId) {
-                <div class="analysisTitle">@Messages(constants.View.QUANTITY_OWNED)</div>
-                <div class="analysisValue">
-                    @userNFTOwner.get.quantity
+                <div class="analysisValue mb-2">@Messages(constants.View.QUANTITY_OWNED)</div>
+                <div class="d-flex flex-row gap-1 priceHolder">
+                @userNFTOwner.get.quantity
                 </div>
             }
             @if(lowestPriceSecondaryMarket.isDefined && userSecondaryMarket.isEmpty) {
@@ -20,7 +24,8 @@
                     <img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/>
                     <div class="d-flex gap-1 align-items-center flex-wrap">
                         <div class="nft-mantle-price">@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price) @Messages(constants.View.NFT_SALE_TOKEN_UNITS) </div>
-                        <div class="nft-dollar-price">(@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
+                        <div class="nft-dollar-price">
+                            (@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
                     </div>
                 </div>
                 <div class="separator"></div>
@@ -45,7 +50,8 @@
                         <img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/>
                         <div class="d-flex gap-1 align-items-center flex-wrap">
                             <div class="nft-mantle-price">@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price) @Messages(constants.View.NFT_SALE_TOKEN_UNITS)</div>
-                            <div class="nft-dollar-price">(@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
+                            <div class="nft-dollar-price">
+                                (@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
                         </div>
                     </div>
                     <div class="separator"></div>
@@ -56,7 +62,8 @@
                         <img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/>
                         <div class="d-flex gap-1 align-items-center flex-wrap">
                             <div class="nft-mantle-price">@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price) @Messages(constants.View.NFT_SALE_TOKEN_UNITS)</div>
-                            <div class="nft-dollar-price">(@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
+                            <div class="nft-dollar-price">
+                                (@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
                         </div>
                     </div>
                     <div class="separator"></div>
@@ -67,7 +74,8 @@
                         <img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/>
                         <div class="d-flex gap-1 align-items-center flex-wrap">
                             <div class="nft-mantle-price">@utilities.NumericOperation.formatNumber(userSecondaryMarket.get.price) @Messages(constants.View.NFT_SALE_TOKEN_UNITS)</div>
-                            <div class="nft-dollar-price">(@utilities.NumericOperation.formatNumber(userSecondaryMarket.get.price * tokenPrice) $)</div>
+                            <div class="nft-dollar-price">
+                                (@utilities.NumericOperation.formatNumber(userSecondaryMarket.get.price * tokenPrice) $)</div>
                         </div>
                     </div>
                     <div class="separator"></div>
@@ -75,7 +83,7 @@
                 }
             }
             @if(lowestPriceSecondaryMarket.isEmpty && userSecondaryMarket.isEmpty) {
-                @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId && userNFTOwner.get.creatorId != optionalLoginState.get.username && userNFTOwner.get.creatorId != "Mint.E") {
+                @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId && userNFTOwner.get.creatorId != "Mint.E") {
                     @if(nft.isMinted.getOrElse(false)) {
                         @commonPrimaryButton(Messages(constants.View.SELL_NFT), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.createForm('${nft.id}'))"))
                         <div class="separator"></div>
@@ -95,7 +103,8 @@
                     <img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/>
                     <div class="d-flex gap-1 align-items-center flex-wrap">
                         <div class="nft-mantle-price">@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price) @Messages(constants.View.NFT_SALE_TOKEN_UNITS)</div>
-                        <div class="nft-dollar-price">(@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
+                        <div class="nft-dollar-price">
+                            (@utilities.NumericOperation.formatNumber(lowestPriceSecondaryMarket.get.price * tokenPrice) $)</div>
                     </div>
                 </div>
                 <div class="separator"></div>

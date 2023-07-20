@@ -61,14 +61,13 @@ class WishLists @Inject()(
 
     def getByCollection(accountId: String, collectionId: String): Future[Seq[String]] = filter(x => x.accountId === accountId && x.collectionId === collectionId).map(_.map(_.nftId))
 
-    def getByCollectionAndPageNumber(accountId: String, collectionId: String, pageNumber: Int, perPage: Int): Future[Seq[String]] = filterAndSortWithPagination(x => x.accountId === accountId && x.collectionId === collectionId)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * perPage, limit = perPage).map(_.map(_.nftId))
+    def getByNFTIds(accountId: String, nftIDs: Seq[String]): Future[Seq[String]] = filter(x => x.accountId === accountId && x.nftId.inSet(nftIDs)).map(_.map(_.nftId))
 
-    def getCollections(accountId: String): Future[Seq[String]] = filter(_.accountId === accountId).map(_.map(_.collectionId).distinct)
+    def getByCollectionAndPageNumber(accountId: String, collectionId: String, pageNumber: Int, perPage: Int): Future[Seq[String]] = filterAndSortWithPagination(x => x.accountId === accountId && x.collectionId === collectionId)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * perPage, limit = perPage).map(_.map(_.nftId))
 
     def get(accountId: String, nftIds: Seq[String]): Future[Seq[WishList]] = filter(x => x.accountId === accountId && x.nftId.inSet(nftIds))
 
-    // TODO
-    //    def getCollections(accountId: String): Future[Seq[String]] = customQuery[Seq[String]](WishLists.TableQuery.filter(_.accountId === accountId).map(_.collectionId).distinct.result)
+    def getCollections(accountId: String): Future[Seq[String]] = customQuery[Seq[String]](tableQuery.filter(_.accountId === accountId).map(_.collectionId).distinct.result)
 
     def delete(accountId: String, nftId: String): Future[Int] = deleteById1AndId2(id1 = accountId, id2 = nftId)
 

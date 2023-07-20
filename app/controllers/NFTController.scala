@@ -160,6 +160,7 @@ class NFTController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val lowestPriceSecondaryMarket = masterSecondaryMarkets.Service.getByNFTIdAndLowestPrice(nftId)
+        val totalOwners = masterNFTOwners.Service.countOwners(nftId)
         val userSecondaryMarket = if (loginState.isDefined) masterSecondaryMarkets.Service.getByNFTIdAndSellerId(nftId = nftId, sellerId = loginState.get.username).map(_.sortBy(_.price)) else Future(Seq())
         val nft = masterNFTs.Service.tryGet(nftId)
         val nftOwner: Future[Option[NFTOwner]] = if (loginState.isDefined) masterNFTOwners.Service.get(nftId = nftId, ownerId = loginState.get.username) else Future(None)
@@ -172,10 +173,11 @@ class NFTController @Inject()(
           nft <- nft
           lowestPriceSecondaryMarket <- lowestPriceSecondaryMarket
           userSecondaryMarket <- userSecondaryMarket
+          totalOwners <- totalOwners
           nftOwner <- nftOwner
           collection <- collection(nft.collectionId)
           collectionAnalysis <- collectionAnalysis(nft.collectionId)
-        } yield Ok(views.html.nft.detail.rightCards(collection, collectionAnalysis, nft, userNFTOwner = nftOwner, lowestPriceSecondaryMarket = lowestPriceSecondaryMarket, userSecondaryMarket = userSecondaryMarket.headOption, tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice))
+        } yield Ok(views.html.nft.detail.rightCards(collection, collectionAnalysis, nft, userNFTOwner = nftOwner, lowestPriceSecondaryMarket = lowestPriceSecondaryMarket, userSecondaryMarket = userSecondaryMarket.headOption, tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice, totalOwners = totalOwners))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -442,12 +444,15 @@ class NFTController @Inject()(
 
           def collection(collectionId: String) = masterCollections.Service.tryGet(id = collectionId)
 
-          def delete(isOwner: Boolean) = masterTransactionNFTDrafts.Service.delete(deleteDraftData.nftFileName)
+          def delete(isOwner: Boolean, nftDraft: NFTDraft) = if (isOwner) {
+            utilities.AmazonS3.deleteObject(utilities.NFT.getAWSKey(nftDraft.getFileName))
+            masterTransactionNFTDrafts.Service.delete(deleteDraftData.nftFileName)
+          } else constants.Response.NOT_NFT_OWNER.throwBaseException()
 
           (for {
             nftDraft <- nftDraft
             collection <- collection(nftDraft.collectionId)
-            _ <- delete(collection.creatorId == loginState.username)
+            _ <- delete(collection.creatorId == loginState.username, nftDraft)
           } yield Ok
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
@@ -510,6 +515,7 @@ class NFTController @Inject()(
 
           def verifyAndTx(verifyPassword: Boolean, balance: MicroNumber, key: Key, nft: NFT, nftOwner: NFTOwner, collection: Collection) = {
             val errors = Seq(
+              if (nftOwner.saleId.nonEmpty || nftOwner.publicListingId.nonEmpty) Option(constants.Response.NFT_ON_SALE_CANNOT_BE_MINTED) else None,
               if (balance <= collection.getBondAmount) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (nft.isMinted.getOrElse(true)) Option(constants.Response.NFT_ALREADY_MINTED) else None,
