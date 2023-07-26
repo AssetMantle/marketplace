@@ -200,7 +200,6 @@ class SecondaryMarketController @Inject()(
               if (createData.sellQuantity > nftOwner.quantity) Option(constants.Response.NOT_ENOUGH_QUANTITY) else None,
               if (nftOwner.saleId.isDefined || nftOwner.publicListingId.isDefined) Option(constants.Response.NFT_ALREADY_ON_SALE) else None,
               if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
-              if (!loginState.isVerifiedCreator) Option(constants.Response.NOT_VERIFIED_CREATOR) else None,
             ).flatten
             if (errors.isEmpty) {
               for {

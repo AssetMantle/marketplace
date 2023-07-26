@@ -142,6 +142,18 @@
                                                             </div>
                                                         </div>
                                                     }
+                                                    @if(collectionDraft.get.properties(index).`type` == constants.NFT.Data.DECIMAL) {
+                                                        <div class="propertyType number active">
+                                                            <div class="mb-0 commonInputInt w-100">
+                                                                <div class="fieldContainer">
+                                                                    <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+                                                                    <dd>
+                                                                        <input type="number" id="fieldValue_@index" name="fieldValue_@index" class="propertyTypeField am-input" onkeyup="setNonBooleanValue(@index, event)" value="@collectionDraft.get.properties(index).defaultValue"/>
+                                                                    </dd>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
                                                     @if(collectionDraft.get.properties(index).`type` == constants.NFT.Data.BOOLEAN) {
                                                         <div class="propertyType boolean active">
                                                             <div class="mb-0 commonInputInt w-100">

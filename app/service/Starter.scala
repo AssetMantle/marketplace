@@ -128,8 +128,10 @@ class Starter @Inject()(
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = value)
       } else if (propertyType == constants.NFT.Data.BOOLEAN) {
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = value.toBoolean.toString)
-      } else if (propertyType == constants.NFT.Data.NUMBER) {
+      } else if (propertyType == constants.NFT.Data.DECIMAL) {
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = BigDecimal(value).toString)
+      } else if (propertyType == constants.NFT.Data.NUMBER) {
+        commonCollection.Property(name = name, `type` = propertyType, defaultValue = BigInt(value).toString)
       } else constants.Response.INVALID_NFT_PROPERTY.throwBaseException()
     }
   }

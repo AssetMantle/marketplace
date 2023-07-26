@@ -28,7 +28,7 @@ object NFT {
 
     def apply(NFTProperty: NFTProperty): BaseNFTProperty = NFTProperty.`type` match {
       case constants.NFT.Data.STRING => StringProperty(name = NFTProperty.name, value = NFTProperty.value, meta = NFTProperty.meta, mutable = NFTProperty.mutable)
-      case constants.NFT.Data.NUMBER => NumberProperty(name = NFTProperty.name, value = NFTProperty.value.toLong, meta = NFTProperty.meta, mutable = NFTProperty.mutable)
+      case constants.NFT.Data.NUMBER => NumberProperty(name = NFTProperty.name, value = BigInt(NFTProperty.value), meta = NFTProperty.meta, mutable = NFTProperty.mutable)
       case constants.NFT.Data.BOOLEAN => BooleanProperty(name = NFTProperty.name, value = NFTProperty.value.toBoolean, meta = NFTProperty.meta, mutable = NFTProperty.mutable)
       case constants.NFT.Data.DECIMAL => DecimalProperty(name = NFTProperty.name, value = BigDecimal(NFTProperty.value), meta = NFTProperty.meta, mutable = NFTProperty.mutable)
     }
@@ -56,7 +56,7 @@ object NFT {
   implicit val decimalPropertyWrites: Writes[DecimalProperty] = Json.writes[DecimalProperty]
 
 
-  case class NumberProperty(name: String, value: Long, meta: Boolean, mutable: Boolean) extends BaseNFTProperty {
+  case class NumberProperty(name: String, value: BigInt, meta: Boolean, mutable: Boolean) extends BaseNFTProperty {
     def `type`: String = constants.NFT.Data.NUMBER
 
     def valueAsString: String = this.value.toString
@@ -97,7 +97,7 @@ object NFT {
 
     def toBaseNFTProperty: BaseNFTProperty = if (this.valid) this.`type` match {
       case constants.NFT.Data.STRING => StringProperty(name = this.name, value = this.value, meta = this.meta, mutable = this.mutable)
-      case constants.NFT.Data.NUMBER => NumberProperty(name = this.name, value = this.value.toLong, meta = this.meta, mutable = this.mutable)
+      case constants.NFT.Data.NUMBER => NumberProperty(name = this.name, value = BigInt(this.value), meta = this.meta, mutable = this.mutable)
       case constants.NFT.Data.DECIMAL => DecimalProperty(name = this.name, value = BigDecimal(this.value), meta = this.meta, mutable = this.mutable)
       case constants.NFT.Data.BOOLEAN => BooleanProperty(name = this.name, value = this.value == constants.NFT.Data.TRUE || this.value == constants.NFT.Data.SMALL_TRUE, meta = this.meta, mutable = this.mutable)
       case _ => constants.Response.NFT_PROPERTY_TYPE_NOT_FOUND.throwBaseException()

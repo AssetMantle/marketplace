@@ -51,18 +51,16 @@
                         <div class="me-3 align-self-start fieldValue walletBalance text-nowrap">
                             <span class="walletBalance_@key.address"></span>
                         </div>
-                        @if(key.encryptedPrivateKey.nonEmpty) {
+                        @if(key.encryptedPrivateKey.nonEmpty && key.identityIssued.getOrElse(false)) {
                             @if(key.active) {
                                 <input type="radio" name="walletAddress" class='activeKey' id="@key.address" onclick="changeActive('@key.address')"/>
                             } else {
-                                @if(key.identityIssued.getOrElse(false)) {
-                                    <input type="radio" name="walletAddress" id="@key.address" onclick="changeActive('@key.address')"/>
-                                } else {
-                                    @commonFormButton(constants.Form.PROVISION_ADDRESS, Symbol("class") -> "primaryButton mw-100 p-2", Symbol("parameters") -> s"'${key.address}'")
-                                }
+                                <input type="radio" name="walletAddress" id="@key.address" onclick="changeActive('@key.address')"/>
                             }
                         } else {
-                            <input type="radio" name="walletAddress" style="visibility: hidden;"/>
+                            @if(!key.identityIssued.getOrElse(false)) {
+                                @commonFormButton(constants.Form.PROVISION_ADDRESS, Symbol("class") -> "primaryButton mw-100 p-2", Symbol("parameters") -> s"'${key.address}'")
+                            }
                         }
                         <div class="me-3 iconContainer menuToolTip">
                             <img src="@routes.Assets.versioned("images/icon/kebabMenuYellow.png")" class="ms-3" width="5px" height="20px"/>

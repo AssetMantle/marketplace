@@ -10,7 +10,7 @@ object Transaction {
   val MediumGasPrice: Double = CommonConfig.Blockchain.MediumGasPrice
   val HighGasPrice: Double = CommonConfig.Blockchain.HighGasPrice
   val IdentityClassificationID: ClassificationID = ClassificationID(utilities.Secrets.base64URLDecode("IoTaHkXLe_NVFxz11-BhmxQZZX52EfmuAq5QM6DBR3k="))
-  val FromID: IdentityID = IdentityID(utilities.Secrets.base64URLDecode("YJu7-vpLARPfNs5_yiuDLb8xkKcNYjqH6Yq4IfqubTY="))
+  val FromID: IdentityID = IdentityID(utilities.Secrets.base64URLDecode("4lbk0EzCO2uIabkLYh9O50uwFwcZcKFQFbhYnupH0zo="))
   val OrderClassificationID: ClassificationID = ClassificationID(utilities.Secrets.base64URLDecode("4B5zFNBG5qXcnL-rcMFHdz_tnMurpOS3349aJlj10f0="))
 
   val DefaultSendCoinGasAmount = 120000
