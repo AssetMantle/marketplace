@@ -24,7 +24,7 @@ function onMessage(event) {
     let receivedData = JSON.parse(event.data);
     switch (receivedData.messageType) {
         case 'NOTIFICATION':
-            showSnackbar('', receivedData.message, '');
+            showSnackbar('', receivedData.messageValue, '');
             break;
         default :
             console.log("Unknown Message Type");
