@@ -273,9 +273,12 @@ class AccountController @Inject()(
             _ <- pushNotificationTokenDelete
             _ <- deleteSessionToken
             _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.LOG_OUT)()
-          } yield Ok(views.html.index()).withNewSession
+          } yield {
+            actors.Service.AppWebSocketActor ! actors.Message.RemoveActor(loginState.username)
+            Ok(views.html.index()).withNewSession
+          }
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index())
+            case _: BaseException => InternalServerError(views.html.index())
           }
         }
       )

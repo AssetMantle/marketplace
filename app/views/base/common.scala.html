@@ -59,6 +59,7 @@
         <script src="@routes.Assets.versioned("javascripts/library/swiperBundle.min.js")" type="text/javascript"></script>
         <script src="@utilities.PublicResource.getVersionedRoute("javascripts/common.js")" type="text/javascript"></script>
         <script src="@utilities.PublicResource.getVersionedRoute("javascripts/componentResource.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/webSocket/connection.js")" type="text/javascript"></script>
         <script src="@utilities.PublicResource.getVersionedRoute("javascripts/views/page.js")" type="text/javascript"></script>
         <script src="@utilities.PublicResource.getVersionedRoute("javascripts/views/checkAndPushState.js")" type="text/javascript"></script>
         <script src="@utilities.PublicResource.getVersionedRoute("javascripts/views/backButtonCapture.js")" type="text/javascript"></script>
@@ -159,117 +160,6 @@
                                 </li>
                             </ul>
                         </li>
-                        @optionalLoginState match {
-                            case Some(loginState) => {
-                                <div class="hiddenMenu">
-                                    <li>
-                                        <div class="walletPopupContainer">
-                                            <div class="cardContainer">
-                                                <div class="d-flex justify-content-between">
-                                                    <div class="label">@Messages(constants.View.MANTLEPLACE_IDENTITY)</div>
-                                                    <div class="lh-1">
-                                                        <a href="@routes.SettingController.viewSettings()" class="p-0 lh-1">
-                                                            <i class="bi bi-gear iconDefault"></i>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex gap-2 align-items-center flex-grow-1 userDetails">
-                                                    <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="40" height="40"/>
-                                                    <div class="ms-2 d-flex flex-column justify-content-between">
-                                                        <a href="@routes.ProfileController.viewProfile(loginState.username, constants.View.COLLECTED)" class="p-0 profileItemLink">
-                                                            <div class="userName">
-                                                            @views.html.base.commonStringValue(message = loginState.username, id = utilities.IdGenerator.getRandomHexadecimal, length = 15, showToolTip = false)
-                                                            </div>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                                    <div class="userBalance walletBalance_@loginState.address"></div>
-                                                    <div class="d-flex gap-2">
-                                                        <a href="https://wallet.assetmantle.one/?toAddress=@loginState.address" target="_blank" class="p-0 lh-1">
-                                                            <div class="primaryIconButton">
-                                                                <i class="bi bi-arrow-down-left"></i>
-                                                            </div>
-                                                        </a>
-                                                        <a class="p-0 lh-1" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SEND_COIN.get, ""))">
-                                                            <div class="secondaryIconButton">
-                                                                <i class="bi bi-arrow-up-right"></i>
-                                                            </div>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="cardContainer mt-2">
-                                                <div class="d-flex justify-content-between">
-                                                    <div class="label">@Messages(constants.View.ACTIVE_ADDRESS)</div>
-                                                </div>
-                                                <div class="d-flex gap-2 align-items-center flex-grow-1 userDetails">
-                                                    <div class="d-flex flex-grow-1 justify-content-between align-items-center userAddressBox">
-                                                        <span class="username-data" data-value="@loginState.address"></span>
-                                                        <div class="flex-grow-1 p-0 userAddressData" onclick="copyToClipboard(this);
-                                                        showSnackbar('', '@Messages(constants.View.ADDRESS_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
-                                                        @views.html.base.commonAddressValue(message = loginState.address, id = utilities.IdGenerator.getRandomHexadecimal, length = 10)
-                                                        </div>
-                                                        <div class="text-end copyIcon" onclick="copyToClipboard(this);
-                                                        showSnackbar('', '@Messages(constants.View.ADDRESS_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
-                                                            <i id="openWalletMenu" class="bi bi-files iconDefault iconMedium"></i>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                                    <div class="userBalance" id="walletTradeBalance">0 $MNTL</div>
-                                                    <div class="d-flex gap-2">
-                                                        <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.UNWRAP_TOKEN.get, ""))" class="p-0 lh-1">
-                                                            <div class="primaryIconButton">
-                                                                <i class="bi bi-arrow-down-left"></i>
-                                                            </div>
-                                                        </a>
-                                                        <a class="p-0 lh-1" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SEND_COIN.get, ""))">
-                                                            <div class="secondaryIconButton">
-                                                                <i class="bi bi-arrow-up-right"></i>
-                                                            </div>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="mt-3 px-3">
-                                                <a href="@routes.ProfileController.viewProfile(loginState.username, constants.View.COLLECTED)" class="p-0 lh-1">
-                                                    <div class="py-2 primaryIconButton">
-                                                        <div class="d-flex gap-2 justify-content-center align-items-center">
-                                                            <i class="bi bi-wallet2"></i>
-                                                            @Messages(constants.View.MY_ASSETS)
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            </div>
-
-                                            <div class="innerSeparator"></div>
-
-                                            <div class="d-flex justify-content-end me-3 mb-2">
-                                                <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_OUT.get, ""))" class="p-0 lh-1 tertiaryButton">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <i class="bi bi-box-arrow-right iconDefault icon"></i>
-                                                        <div class="profileMenuLabel">@Messages(constants.View.LOGOUT)</div>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                        </div>
-
-                                        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/settings/settings.js")" type="text/javascript"></script>
-                                        <script>
-                                                fetchBalance('@loginState.address');
-                                                fetchWrappedTokenBalance();
-                                        </script>
-                                    </li>
-                                </div>
-                            }
-                            case _ => {
-                                <li class="hiddenMenu"><a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_UP.get, ""))">@Messages(constants.View.SIGN_UP)</a></li>
-                                <li class="hiddenMenu"><a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.SIGN_IN_WITH_CALLBACK.get, ""))">@Messages(constants.View.SIGN_IN)</a></li>
-                            }
-                        }
                     </ul>
                 </div>
 

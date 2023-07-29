@@ -11,6 +11,7 @@ GET         /firebase-messaging-sw.js                          controllers.Asset
 # Index
 GET         /                                                  controllers.IndexController.index()
 GET         /sitemap.xml                                       controllers.IndexController.sitemap()
+GET         /websocket                                         controllers.WebSocketController.connect()
 
 GET         /signUp                                            controllers.AccountController.signUpForm()
 POST        /signUp                                            controllers.AccountController.signUp()

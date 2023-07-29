@@ -1,6 +1,6 @@
 package actors
 
-import actors.Message._
+import actors.Message.PushNotification
 import akka.actor.{Actor, ActorLogging}
 import play.api.Logger
 

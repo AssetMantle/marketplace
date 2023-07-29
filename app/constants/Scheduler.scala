@@ -19,7 +19,7 @@ abstract class Scheduler extends Runnable {
 
   def start()(implicit schedulerExecutionContext: ExecutionContext, logger: Logger): Cancellable = {
     logger.info("Starting thread: " + this.name)
-    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = initialDelay, delay = fixedDelay)(this)(schedulerExecutionContext)
+    actors.Service.PrimaryActorSystem.scheduler.scheduleWithFixedDelay(initialDelay = initialDelay, delay = fixedDelay)(this)(schedulerExecutionContext)
   }
 }
 

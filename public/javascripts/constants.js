@@ -8,5 +8,13 @@ firebaseConfig = {
     appId: "1:635356272218:web:cee7016208ed605a4e2a63",
 };
 
+ws = {
+    url: 'wss://' + $(location).attr('host') + '/websocket',
+    start: 'START',
+};
+if ($(location).attr('host') === "localhost:9000") {
+    ws.url = 'ws://' + $(location).attr('host') + '/websocket'
+}
+
 addState = true
 microFactor = 1000000;
