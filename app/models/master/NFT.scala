@@ -29,18 +29,18 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getImmutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && !x.mutable && x.nftId == this.id).map(_.toMetaProperty) ++ utilities.Properties.getNFTDefaultImmutableMetaProperties(name = this.name, collectionName = collection.name, fileHash = this.getFileHash, bondAmount = collection.getBondAmount.value.toLong, creatorID = collection.creatorId)
 
-  def getImmutableProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && !x.mutable && x.nftId == this.id).map(_.toMesaProperty)
+  def getImmutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && !x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 
   def getMutableMetaProperties(nftProperties: Seq[NFTProperty]): Seq[MetaProperty] = nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty)
 
   def getMutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 
-  def getImmutables(nftProperties: Seq[NFTProperty], collection: Collection): Immutables = Immutables(PropertyList(this.getImmutableMetaProperties(nftProperties, collection) ++ this.getImmutableProperties(nftProperties, collection)))
+  def getImmutables(nftProperties: Seq[NFTProperty], collection: Collection): Immutables = Immutables(PropertyList(this.getImmutableMetaProperties(nftProperties, collection) ++ this.getImmutableProperties(nftProperties)))
 
   def getMutables(nftProperties: Seq[NFTProperty]): Mutables = Mutables(PropertyList(this.getMutableMetaProperties(nftProperties) ++ this.getMutableProperties(nftProperties)))
 
   def serialize: NFTs.NFTSerialized = NFTs.NFTSerialized(
-    id = this.id, assetId = this.assetId, collectionId = this.collectionId, name = this.name, description = this.description, totalSupply = BigDecimal(this.totalSupply), isMinted = this.isMinted, mintReady = this.mintReady, fileExtension = this.fileExtension, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+    id = this.id, assetId = this.assetId, collectionId = this.collectionId, name = this.name, description = this.description, totalSupply = BigDecimal(this.totalSupply), isMinted = this.isMinted, mintReady = this.mintReady, fileExtension = this.fileExtension.toLowerCase, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
   )
 
   def isImageType: Boolean = constants.File.ALL_IMAGES_WITH_GIF.contains(this.fileExtension)

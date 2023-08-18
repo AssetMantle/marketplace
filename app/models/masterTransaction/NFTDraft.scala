@@ -36,7 +36,7 @@ case class NFTDraft(id: String, collectionId: String, name: Option[String], desc
     collectionId = collectionId,
     name = this.name,
     description = this.description,
-    fileExtension = this.fileExtension,
+    fileExtension = this.fileExtension.toLowerCase,
     properties = this.properties.map(Json.toJson(_).toString()),
     tagNames = this.tagNames.map(Json.toJson(_).toString()),
     createdBy = this.createdBy,

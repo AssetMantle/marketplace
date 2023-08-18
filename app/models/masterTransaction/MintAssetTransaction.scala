@@ -113,7 +113,7 @@ class MintAssetTransactions @Inject()(
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = nfts.map(nft => {
             val collection = collections.find(_.id == nft.collectionId).getOrElse(constants.Response.COLLECTION_NOT_FOUND.throwBaseException())
-            utilities.BlockchainTransaction.getMintAssetMsg(fromAddress = constants.Transaction.Wallet.MintAssetWallet.address, toID = nftOwners.find(_.nftId == nft.id).getOrElse(constants.Response.NFT_NOT_FOUND.throwBaseException()).getOwnerIdentityID, classificationID = collection.getClassificationID, fromID = constants.Transaction.FromID, immutableMetas = nft.getImmutableMetaProperties(nftProperties, collection), mutableMetas = nft.getMutableMetaProperties(nftProperties), immutables = nft.getImmutableProperties(nftProperties, collection), mutables = nft.getMutableProperties(nftProperties))
+            utilities.BlockchainTransaction.getMintAssetMsg(fromAddress = constants.Transaction.Wallet.MintAssetWallet.address, toID = nftOwners.find(_.nftId == nft.id).getOrElse(constants.Response.NFT_NOT_FOUND.throwBaseException()).getOwnerIdentityID, classificationID = collection.getClassificationID, fromID = constants.Transaction.FromID, immutableMetas = nft.getImmutableMetaProperties(nftProperties, collection), mutableMetas = nft.getMutableMetaProperties(nftProperties), immutables = nft.getImmutableProperties(nftProperties), mutables = nft.getMutableProperties(nftProperties))
           }),
           fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultMintAssetGasLimit * nftIDs.length),
           gasLimit = constants.Transaction.DefaultMintAssetGasLimit * nftIDs.length,

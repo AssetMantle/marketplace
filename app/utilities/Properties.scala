@@ -3,7 +3,7 @@ package utilities
 import models.master.NFTProperty
 import play.api.Logger
 import schema.data.Data
-import schema.data.base.{BooleanData, DecData, NumberData, StringData}
+import schema.data.base._
 import schema.id.base.{DataID, PropertyID, StringID}
 import schema.property.base.{MesaProperty, MetaProperty}
 
@@ -50,8 +50,8 @@ object Properties {
   def getCollectionDefaultImmutableMetaProperties(collectionName: String, creatorID: String, nftName: String = "", fileHash: String = ""): Seq[MetaProperty] = Seq(
     MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.NFT_NAME), typeID = schema.data.constants.StringDataTypeID), data = StringData(nftName)),
     MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.COLLECTION_NAME), typeID = schema.data.constants.StringDataTypeID), data = StringData(collectionName)),
-    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.FILE_HASH), typeID = schema.data.constants.StringDataTypeID), data = StringData(fileHash)),
-    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.CREATOR_ID), typeID = schema.data.constants.StringDataTypeID), data = StringData(creatorID)) // Should be id not identityID for web3 to find the value.
+    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.FILE_RESOURCE), typeID = schema.data.constants.StringDataTypeID), data = StringData(fileHash)),
+    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.CREATOR_ID), typeID = schema.id.constants.IdentityIDType), data = IDData(utilities.Identity.getMantlePlaceIdentityID(creatorID)))
   )
 
   def getNFTDefaultImmutableMetaProperties(name: String, collectionName: String, fileHash: String, bondAmount: Long, creatorID: String): Seq[MetaProperty] = {
