@@ -6,14 +6,30 @@
     <div class="profileCover">
         <div class="profileCoverContainer skeletonLoadContainer" id="collectionUncompressedCoverImage_@collection.id">
             @if(loginState.fold("")(_.username) == collection.creatorId) {
+                <div class="customTooltip" style="position: absolute;
+                    bottom: 12px;
+                    right: 24px;
+                    z-index: 99;
+                    cursor: pointer;">
+                    <span class="tooltipText">Expected banner size 920x300</span>
+                    <i class="bi bi-info-circle iconDefault" style="opacity: 0.5;"></i>
+                </div>
                 <div class="editCollectionCover" onclick="getForm(jsRoutes.controllers.CollectionController.uploadCollectionFilesForm('@collection.id'))">
                     <i class="bi bi-pencil iconDefault"></i>
                 </div>
             }
             @collection.getCoverFileURL.fold {
-                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
+@*                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>*@
+
+                <div class="coverWithBg">
+                    <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")" class="bg"/>
+                    <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")" class="main"/>
+                </div>
             } { uri =>
-                <img src="@uri">
+                <div class="coverWithBg">
+                    <img src="@uri" class="bg"/>
+                    <img src="@uri" class="main"/>
+                </div>
                 <script>
                         setSharableLink("@uri");
                 </script>

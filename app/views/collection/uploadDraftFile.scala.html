@@ -14,7 +14,7 @@
                 &times;
     </button>
 </div>
-
+@views.html.base.modal.multiStepNavigator(Seq("Basic Data","Image Data","Properties"),defaultSelected = 1)
 <div class="d-flex gap-3 flex-column flex-sm-row">
     @commonUploadFile(fileUploadForm = constants.File.COLLECTION_DRAFT_FILE_FORM, id = collectionDraft.id, documentType = constants.Collection.File.PROFILE, label = constants.View.COLLECTION_PROFILE_IMAGE_TITLE, fileUrl = collectionDraft.getProfileFileURL)
     @commonUploadFile(fileUploadForm = constants.File.COLLECTION_DRAFT_FILE_FORM, id = collectionDraft.id, documentType = constants.Collection.File.COVER, label = constants.View.COLLECTION_COVER_IMAGE_TITLE, fileUrl = collectionDraft.getCoverFileURL)

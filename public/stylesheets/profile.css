@@ -718,7 +718,7 @@ profileContainer .item-sticky .profile-card{
 .profileCoverContainer .editCollectionCover{
     position: absolute;
     bottom: 12px;
-    right: 12px;
+    right: 52px;
     z-index: 99;
     cursor: pointer;
     opacity: 0.5;

@@ -1,9 +1,9 @@
-@(options: Seq[String])
+@(options: Seq[String], defaultSelected: Number = 0)
 <div class="steperContainer">
     <div class="linearLine"></div>
     <ul>
         @options.zipWithIndex.map { case (option, index) =>
-          @if(index == 0){
+          @if(index == defaultSelected){
               <li class="active"><span>@option</span></li>
           }else{
               <li><span>@option</span></li>

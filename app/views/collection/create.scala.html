@@ -7,6 +7,7 @@
 @if(totalDrafts < constants.CommonConfig.MaxCollectionDrafts) {
     <div id="createCollectionForm">
     @commonForm(constants.Form.CREATE_COLLECTION, createForm) {
+        @views.html.base.modal.multiStepNavigator(Seq("Basic Data","Image Data","Properties"))
         @commonInputText(createForm, constants.FormField.COLLECTION_NAME)
         @commonDescriptionText(createForm, constants.FormField.COLLECTION_DESCRIPTION)
         @commonToggleButton(createForm, constants.FormField.NSFW_COLLECTION)

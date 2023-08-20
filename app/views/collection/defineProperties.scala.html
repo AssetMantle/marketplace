@@ -9,10 +9,11 @@
 @(definePropertiesForm: Form[DefineProperties.Data] = DefineProperties.form, collectionDraftId: String, collectionDraft: Option[CollectionDraft])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm, submitDisable = false, showBackButton = true, callBackFunction = JavaScript(s"""updateExplorerContainer('${loginState.username}')""")) {
+    @views.html.base.modal.multiStepNavigator(Seq("Basic Data","Image Data","Properties"),defaultSelected = 2)
     @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionDraftId, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
     @commonCheckbox(definePropertiesForm, constants.FormField.SAVE_COLLECTION_DRAFT, Symbol("containerDivClass") -> "hidden")
-    @commonToggleButton(definePropertiesForm, constants.FormField.FRACTIONALIZED_NFT)
-    <span>@Messages(constants.View.FRACTIONALIZED_NFT_WARNING)</span>
+@*//    @commonToggleButton(definePropertiesForm, constants.FormField.FRACTIONALIZED_NFT)*@
+@*    <span>@Messages(constants.View.FRACTIONALIZED_NFT_WARNING)</span>*@
     <div id="basicInfoContainer" class="propertyInfoContainer">
         <div class="singleProperty">
             <div class="d-flex justify-content-between align-content-center propertyHeaderContainer">
