@@ -9,7 +9,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Transaction(hash: String, height: Int, code: Int, memo: String) {
+case class Transaction(hash: String, height: Int, code: Int) {
 
   def status: Boolean = code == 0
 
@@ -23,23 +23,21 @@ object Transactions {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION
 
-  case class TransactionSerialized(hash: String, height: Int, code: Int, memo: String) extends Entity[String] {
-    def deserialize: Transaction = Transaction(hash = hash, height = height, code = code, memo = memo)
+  case class TransactionSerialized(hash: String, height: Int, code: Int) extends Entity[String] {
+    def deserialize: Transaction = Transaction(hash = hash, height = height, code = code)
 
     def id: String = hash
   }
 
   class TransactionTable(tag: Tag) extends Table[TransactionSerialized](tag, "Transaction") with ModelTable[String] {
 
-    def * = (hash, height, code, memo) <> (TransactionSerialized.tupled, TransactionSerialized.unapply)
+    def * = (hash, height, code) <> (TransactionSerialized.tupled, TransactionSerialized.unapply)
 
     def hash = column[String]("hash", O.PrimaryKey)
 
     def height = column[Int]("height")
 
     def code = column[Int]("code")
-
-    def memo = column[String]("memo")
 
     def id = hash
   }
