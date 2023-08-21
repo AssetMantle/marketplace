@@ -4,7 +4,7 @@ import actors.Message._
 import akka.actor._
 
 object UserWebSocketActor {
-  def props(username: String, addToPublic: Boolean, out: ActorRef) = Props(new UserWebSocketActor(username, addToPublic, out))
+  def props(username: String, addToPublic: Boolean, out: ActorRef): Props = Props(new UserWebSocketActor(username, addToPublic, out))
 }
 
 class UserWebSocketActor(username: String, addToPublic: Boolean, out: ActorRef) extends Actor {

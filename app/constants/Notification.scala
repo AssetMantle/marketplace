@@ -2,15 +2,18 @@ package constants
 
 import constants.Notification._
 import controllers.routes
+import play.api.i18n.{Lang, MessagesApi}
 import play.api.routing.JavaScriptReverseRoute
 
-case class Notification(name: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean, route: Option[JavaScriptReverseRoute] = None) {
+case class Notification(name: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean, sendToClient: Boolean = false, route: Option[JavaScriptReverseRoute] = None) {
 
   def email: Option[Email] = if (sendEmail) Option(Email(name)) else None
 
   def pushNotification: Option[PushNotification] = if (sendPushNotification) Option(PushNotification(name)) else None
 
   def sms: Option[SMS] = if (sendSMS) Option(SMS(name)) else None
+
+  def toClientMessage(toUser: String, notificationID: String, messagesApi: MessagesApi, messagesParameters: String*)(implicit lang: Lang): actors.Message.Notification = actors.Message.Notification(toUser = toUser, id = notificationID, message = messagesApi(name, messagesParameters), `type` = this.name)
 
 }
 

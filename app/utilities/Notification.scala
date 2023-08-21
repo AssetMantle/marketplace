@@ -1,5 +1,6 @@
 package utilities
 
+import actors.Message.PublicMessage
 import exceptions.BaseException
 import models.{master, masterTransaction}
 import play.api.Logger
@@ -59,6 +60,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   // routeParameters should be given as s"'${some.value}', 94, '${name}'"
   def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(routeParameters: String = ""): Future[Unit] = {
     //    val language = masterAccounts.Service.getLanguage(accountID)
+    val language = Lang("en")
     val notificationID = masterTransactionNotifications.Service.add(accountID = accountID, notification = notification, messagesParameters: _*)(routeParameters)
 
     def pushNotification(implicit language: Lang): Future[Unit] = notification.pushNotification.fold(Future())(pushNotification => sendPushNotification(accountID = accountID, pushNotification = pushNotification, messageParameters = messagesParameters: _*))
@@ -67,10 +69,12 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
       //      language <- language
       notificationID <- notificationID
       //      _ <- pushNotification(language)
-    } yield ()
+    } yield if (notification.sendToClient) actors.Service.sendPrivateMessage(notification.toClientMessage(toUser = accountID, notificationID = notificationID, messagesApi = messagesApi, messagesParameters: _*)(language))
       ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
     }
   }
+
+  def sendClientMessageToAll(publicMessage: PublicMessage): Unit = actors.Service.broadcastToAll(publicMessage, actors.Service.AppWebSocketActor)
 
 }

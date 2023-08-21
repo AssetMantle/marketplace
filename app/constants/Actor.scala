@@ -13,6 +13,7 @@ object Actor {
   object MessageType {
     val PING = "PING"
     val PONG = "PONG"
+    val PUBLIC_MESSAGE = "PUBLIC_MESSAGE"
     val CHAT = "CHAT"
     val ASSET = "ASSET"
     val NOTIFICATION = "NOTIFICATION"
