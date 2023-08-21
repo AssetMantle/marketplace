@@ -11,7 +11,7 @@ import slick.jdbc.H2Profile.api._
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 case class Account(address: String, username: String, accountType: Option[String], publicKey: Option[PublicKey], accountNumber: Int, sequence: Int, vestingParameters: Option[VestingParameters], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
 
@@ -80,15 +80,5 @@ class Accounts @Inject()(
     Accounts.module,
     Accounts.logger
   ) {
-
-  object Service {
-
-    def tryGet(address: String): Future[Account] = tryGetById(address).map(_.deserialize)
-
-    def get(address: String): Future[Option[Account]] = getById(address).map(_.map(_.deserialize))
-
-    def checkAccountExists(address: String): Future[Boolean] = exists(address)
-
-  }
 
 }

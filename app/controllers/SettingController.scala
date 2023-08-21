@@ -262,10 +262,10 @@ class SettingController @Inject()(
   def walletBalance(address: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val balance = blockchainBalances.Service.tryGet(address)
+        val balance = blockchainBalances.Service.getTokenBalance(address)
         (for {
           balance <- balance
-        } yield Ok(views.html.base.info.commonMicroNumber(balance.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount), constants.View.STAKING_TOKEN_UNITS))
+        } yield Ok(views.html.base.info.commonMicroNumber(balance, constants.View.STAKING_TOKEN_UNITS))
           ).recover {
           case _: BaseException => BadRequest(views.html.base.info.commonMicroNumber(MicroNumber.zero, constants.View.STAKING_TOKEN_UNITS))
         }

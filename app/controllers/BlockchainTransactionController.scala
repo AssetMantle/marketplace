@@ -60,10 +60,10 @@ class BlockchainTransactionController @Inject()(
 
   def sendCoinForm(fromAddress: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val balance = blockchainBalances.Service.get(fromAddress)
+      val balance = blockchainBalances.Service.getTokenBalance(fromAddress)
       (for {
         balance <- balance
-      } yield Ok(views.html.blockchainTransaction.sendCoin(fromAddress = fromAddress, balance = balance.fold(MicroNumber.zero)(_.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount))))
+      } yield Ok(views.html.blockchainTransaction.sendCoin(fromAddress = fromAddress, balance = balance))
         ).recover {
         case _: BaseException => Ok(views.html.blockchainTransaction.sendCoin(SendCoin.form.withGlobalError(constants.Response.BALANCE_FETCH_FAILED.message), fromAddress = fromAddress, balance = MicroNumber.zero))
       }

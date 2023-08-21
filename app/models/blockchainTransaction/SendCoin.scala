@@ -80,7 +80,6 @@ object SendCoins {
 @Singleton
 class SendCoins @Inject()(
                            protected val databaseConfigProvider: DatabaseConfigProvider,
-                           blockchainAccounts: models.blockchain.Accounts,
                            blockchainTransactions: models.blockchain.Transactions,
                            broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                            utilitiesOperations: utilities.Operations,
