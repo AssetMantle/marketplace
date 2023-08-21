@@ -1,6 +1,6 @@
 package models.blockchain
 
-import models.Trait.{Entity, GenericDaoImpl, Logged, ModelTable}
+import models.Trait.{Entity, GenericDaoImpl, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
@@ -12,9 +12,6 @@ import scala.concurrent.{ExecutionContext, Future}
 case class Transaction(hash: String, height: Int, code: Int) {
 
   def status: Boolean = code == 0
-
-  def serialize(transaction: Transaction): Transactions.TransactionSerialized = Transactions.TransactionSerialized(hash = transaction.hash, height = transaction.height, code = transaction.code, memo = transaction.memo)
-
 }
 
 object Transactions {

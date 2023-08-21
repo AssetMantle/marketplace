@@ -67,7 +67,6 @@ object PublicListingNFTTransactions {
 @Singleton
 class PublicListingNFTTransactions @Inject()(
                                               protected val databaseConfigProvider: DatabaseConfigProvider,
-                                              blockchainAccounts: blockchain.Accounts,
                                               blockchainTransactionNFTPublicListings: blockchainTransaction.NFTPublicListings,
                                               broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                               utilitiesOperations: utilities.Operations,

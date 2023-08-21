@@ -67,7 +67,6 @@ object SaleNFTTransactions {
 @Singleton
 class SaleNFTTransactions @Inject()(
                                      protected val databaseConfigProvider: DatabaseConfigProvider,
-                                     blockchainAccounts: blockchain.Accounts,
                                      blockchainTransactions: blockchain.Transactions,
                                      broadcastTxSync: transactions.blockchain.BroadcastTxSync,
                                      utilitiesOperations: utilities.Operations,
