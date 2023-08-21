@@ -7,33 +7,28 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import play.db.NamedDatabase
 import slick.jdbc.H2Profile.api._
-import utilities.Date.RFC3339
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class Block(height: Int, time: RFC3339)
+case class Block(height: Int, time: Long) extends Entity[Int] {
+  def id: Int = height
+}
 
 object Blocks {
-
-  case class BlockSerialized(height: Int, time: String) extends Entity[Int] {
-    def id: Int = height
-
-    def deserialize: Block = Block(height = height, time = RFC3339(time))
-  }
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_BLOCK
 
-  private[models] class BlockTable(tag: Tag) extends Table[BlockSerialized](tag, "Block") with ModelTable[Int] {
+  private[models] class BlockTable(tag: Tag) extends Table[Block](tag, "Block") with ModelTable[Int] {
 
-    def * = (height, time) <> (BlockSerialized.tupled, BlockSerialized.unapply)
+    def * = (height, time) <> (Block.tupled, Block.unapply)
 
     def height = column[Int]("height", O.PrimaryKey)
 
-    def time = column[String]("time")
+    def time = column[Long]("time")
 
     def id = height
   }
@@ -48,7 +43,7 @@ class Blocks @Inject()(
                         protected val databaseConfigProvider: DatabaseConfigProvider,
                         configuration: Configuration
                       )(implicit executionContext: ExecutionContext)
-  extends GenericDaoImpl[Blocks.BlockTable, Blocks.BlockSerialized, Int](
+  extends GenericDaoImpl[Blocks.BlockTable, Block, Int](
     databaseConfigProvider,
     Blocks.TableQuery,
     executionContext,
