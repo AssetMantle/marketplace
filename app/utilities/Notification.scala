@@ -69,7 +69,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
       //      language <- language
       masterNotification <- masterNotification
       //      _ <- pushNotification(language)
-    } yield if (notification.sendToClient) actors.Service.sendPrivateMessage(masterNotification.toClientMessage(toUser = accountID, messagesApi = messagesApi)(language))
+    } yield if (notification.sendToClient) actors.Service.sendPrivateMessage(masterNotification.toClientMessage(toUser = accountID, messagesApi = messagesApi, notificationType = notification.notificationType)(language))
       ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
     }

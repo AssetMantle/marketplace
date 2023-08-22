@@ -41,7 +41,7 @@ object Message {
 
   implicit val assetWrites: OWrites[Asset] = Json.writes[Asset]
 
-  case class Notification(toUser: String, id: String, message: String, title: String) extends PrivateMessage {
+  case class Notification(toUser: String, id: String, message: String, title: String, notificationType: String) extends PrivateMessage {
     def getMessageType: String = constants.Actor.MessageType.NOTIFICATION
   }
 

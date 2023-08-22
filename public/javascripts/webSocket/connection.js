@@ -24,7 +24,8 @@ function onOpen(event) {
 }
 
 function onClose(event) {
-    console.log("closed websocket")
+    console.log("closed websocket");
+    webSocketRetries = webSocketRetries + 1;
 }
 
 function onError(event) {
@@ -34,10 +35,9 @@ function onError(event) {
 
 function onMessage(event) {
     let receivedData = JSON.parse(event.data);
-    console.log(receivedData);
     switch (receivedData.messageType) {
         case 'NOTIFICATION':
-            showSnackbar(receivedData.messageValue.title, receivedData.messageValue.message, '');
+            showSnackbar(receivedData.messageValue.title, receivedData.messageValue.message, receivedData.messageValue.notificationType);
             break;
         default :
             console.log("Unknown Message Type");

@@ -20,7 +20,7 @@ case class Notification(id: String, accountID: Option[String], title: String, me
 
   def isClickable: Boolean = this.jsRoute.isDefined
 
-  def toClientMessage(toUser: String, messagesApi: MessagesApi)(implicit lang: Lang): actors.Message.Notification = actors.Message.Notification(toUser = toUser, id = this.id, message = messagesApi(this.message, this.messageParameters: _*), title = messagesApi(this.getTitle))
+  def toClientMessage(toUser: String, messagesApi: MessagesApi, notificationType: String)(implicit lang: Lang): actors.Message.Notification = actors.Message.Notification(toUser = toUser, id = this.id, message = messagesApi(this.message, this.messageParameters: _*), title = messagesApi(this.getTitle), notificationType = notificationType)
 
 }
 
