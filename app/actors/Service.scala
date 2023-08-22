@@ -1,6 +1,6 @@
 package actors
 
-import actors.Message.{AddActor, PrivateMessage, PublicMessage}
+import actors.Message.{PrivateMessage, PublicMessage}
 import akka.actor.{ActorRef, ActorSystem, PoisonPill, Props}
 import akka.routing.{BroadcastRoutingLogic, Router}
 import akka.stream.Materializer
@@ -21,24 +21,26 @@ object Service {
 
   private var publicRouter: Router = Router(BroadcastRoutingLogic(), Vector.empty)
 
-  private var privateActorMap = Map[String, ActorRef]()
+  private var privateActorMap = Map[String, UserWebSocketActor]()
 
   def closeUserActor(username: String): Unit = {
-    privateActorMap.get(username).foreach(userActor => {
-      userActor ! PoisonPill
-      publicRouter = publicRouter.removeRoutee(userActor)
+    logger.debug("Closing actor for: " + username)
+    privateActorMap.get(username).foreach(userWebSocketActor => {
+      userWebSocketActor.self ! PoisonPill
+      publicRouter = publicRouter.removeRoutee(userWebSocketActor.getOutActorRef)
     })
     privateActorMap -= username
   }
 
-  def addOrUpdateUserActor(addActor: AddActor): Unit = {
-    closeUserActor(addActor.username)
-    if (addActor.addToPublic) publicRouter = publicRouter.addRoutee(addActor.actorRef)
-    privateActorMap += (addActor.username -> addActor.actorRef)
+  def addOrUpdateUserActor(userWebSocketActor: UserWebSocketActor): Unit = {
+    logger.debug("Adding actor for: " + userWebSocketActor.getUsername)
+    closeUserActor(userWebSocketActor.getUsername)
+    if (userWebSocketActor.getAddToPublic) publicRouter = publicRouter.addRoutee(userWebSocketActor.getOutActorRef)
+    privateActorMap += (userWebSocketActor.getUsername -> userWebSocketActor)
   }
 
   def sendPrivateMessage(privateMessage: PrivateMessage): Unit = privateActorMap.get(privateMessage.toUser) match {
-    case Some(actorRef) => actorRef ! privateMessage.toClientMessageString
+    case Some(userWebSocketActor) => userWebSocketActor.getOutActorRef ! privateMessage.toClientMessageString
     case None => logger.info(privateMessage.toUser + ": " + constants.Actor.ACTOR_NOT_FOUND)
   }
 

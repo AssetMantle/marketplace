@@ -18,7 +18,7 @@ class AppWebSocketActor extends Actor {
   def getSender: ActorRef = sender()
 
   def receive = {
-    case addActor: AddActor => Service.addOrUpdateUserActor(addActor)
+    case addActor: AddActor => Service.addOrUpdateUserActor(addActor.userWebSocketActor)
     case removeActor: RemoveActor => Service.closeUserActor(removeActor.username)
     case _ => logger.error(constants.Actor.UNKNOWN_MESSAGE_TYPE)
   }

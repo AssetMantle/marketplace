@@ -1,13 +1,12 @@
 package actors
 
-import akka.actor.ActorRef
 import play.api.libs.json.{Json, OWrites, Writes}
 
 object Message {
 
   case class PushNotification(token: String, pushNotification: constants.Notification.PushNotification, messageParameters: Seq[String])
 
-  case class AddActor(username: String, addToPublic: Boolean, actorRef: ActorRef)
+  case class AddActor(userWebSocketActor: UserWebSocketActor)
 
   case class RemoveActor(username: String)
 
