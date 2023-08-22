@@ -351,14 +351,14 @@ class Starter @Inject()(
 
   // Delete redundant nft tags
   def start(): Future[Unit] = {
-    addBugBountyNFT()
-    (for {
-      _ <- changeAwsKey()
-    } yield ()
-      ).recover {
-      case exception: Exception => logger.error(exception.getLocalizedMessage)
-    }
-    //    Future()
+    //    addBugBountyNFT()
+    //    (for {
+    //      _ <- changeAwsKey()
+    //    } yield ()
+    //      ).recover {
+    //      case exception: Exception => logger.error(exception.getLocalizedMessage)
+    //    }
+    Future()
   }
 
 }
