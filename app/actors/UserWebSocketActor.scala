@@ -10,8 +10,8 @@ object UserWebSocketActor {
 class UserWebSocketActor(username: String, addToPublic: Boolean, out: ActorRef) extends Actor {
 
   def receive = {
-    case msg: String => if (msg == "START") actors.Service.AppWebSocketActor ! AddActor(username = username, addToPublic = addToPublic, actorRef = out)
+    case msg: String => if (msg == "START") actors.Service.addOrUpdateUserActor(AddActor(username = username, addToPublic = addToPublic, actorRef = out))
   }
 
-  override def postStop(): Unit = actors.Service.AppWebSocketActor ! RemoveActor(username)
+  override def postStop(): Unit = actors.Service.closeUserActor(username)
 }

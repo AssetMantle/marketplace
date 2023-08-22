@@ -61,15 +61,15 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(routeParameters: String = ""): Future[Unit] = {
     //    val language = masterAccounts.Service.getLanguage(accountID)
     val language = Lang("en")
-    val notificationID = masterTransactionNotifications.Service.add(accountID = accountID, notification = notification, messagesParameters: _*)(routeParameters)
+    val masterNotification = masterTransactionNotifications.Service.add(accountID = accountID, notification = notification, messagesParameters: _*)(routeParameters)
 
     def pushNotification(implicit language: Lang): Future[Unit] = notification.pushNotification.fold(Future())(pushNotification => sendPushNotification(accountID = accountID, pushNotification = pushNotification, messageParameters = messagesParameters: _*))
 
     (for {
       //      language <- language
-      notificationID <- notificationID
+      masterNotification <- masterNotification
       //      _ <- pushNotification(language)
-    } yield if (notification.sendToClient) actors.Service.sendPrivateMessage(notification.toClientMessage(toUser = accountID, notificationID = notificationID, messagesApi = messagesApi, messagesParameters: _*)(language))
+    } yield if (notification.sendToClient) actors.Service.sendPrivateMessage(masterNotification.toClientMessage(toUser = accountID, messagesApi = messagesApi)(language))
       ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
     }

@@ -15,6 +15,6 @@ ws = {
 if ($(location).attr('host') === "localhost:9000") {
     ws.url = 'ws://' + $(location).attr('host') + '/websocket'
 }
-
-addState = true
+maxWebSocket = 5;
+addState = true;
 microFactor = 1000000;

@@ -13,8 +13,6 @@ case class Notification(name: String, sendEmail: Boolean, sendPushNotification: 
 
   def sms: Option[SMS] = if (sendSMS) Option(SMS(name)) else None
 
-  def toClientMessage(toUser: String, notificationID: String, messagesApi: MessagesApi, messagesParameters: String*)(implicit lang: Lang): actors.Message.Notification = actors.Message.Notification(toUser = toUser, id = notificationID, message = messagesApi(name, messagesParameters), `type` = this.name)
-
 }
 
 object Notification {
@@ -84,5 +82,7 @@ object Notification {
   val NFT_TRANSFER_FAILED: Notification = Notification("NFT_TRANSFER_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = None)
 
   val MINT_NFT_AIR_DROP_SUCCESSFUL: Notification = Notification("MINT_NFT_AIR_DROP_SUCCESSFUL", sendEmail = false, sendPushNotification = false, sendSMS = false, route = None)
+
+  val TEST: Notification = Notification("TEST", sendEmail = false, sendPushNotification = false, sendSMS = false, sendToClient = true, route = None)
 
 }

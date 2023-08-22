@@ -1095,3 +1095,5 @@ FRACTIONALIZED_NFT_WARNING=Fractionalization here means dividing a single NFT in
 RESPONSE.FAILURE.COLLECTION_PROPERTIES_CONTAINS_RESTRICTED_PROPERTIES=Restricted properties cannot be used.
 REGEX_ERROR.NFT_TAGS=Only A-Z, a-z,0-9, and ._!- are allowed
 TOTAL_OWNERS=Total Owners
+NOTIFICATION.TEST.TITLE=Test Notif
+NOTIFICATION.TEST.MESSAGE=Hello {0}, How are you?

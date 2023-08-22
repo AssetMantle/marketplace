@@ -1,30 +1,43 @@
 webSocket = {};
+webSocketRetries = 0;
 
 function webSocketInit() {
-    webSocket = new WebSocket(ws.url);
-    webSocket.onopen = onOpen;
-    webSocket.onclose = onClose;
-    webSocket.onmessage = onMessage;
-    webSocket.onerror = onError;
+    if (webSocketRetries <= maxWebSocket) {
+        console.log("init websocket");
+        try {
+            webSocket.close();
+        } catch (e) {
+        }
+        webSocket = new WebSocket(ws.url);
+        webSocket.onopen = onOpen;
+        webSocket.onclose = onClose;
+        webSocket.onmessage = onMessage;
+        webSocket.onerror = onError;
+    } else {
+        console.log('max webSocketRetries reached')
+    }
 }
 
 function onOpen(event) {
+    console.log("Sending START websocket msg: ")
     webSocket.send(ws.start);
 }
 
 function onClose(event) {
+    console.log("closed websocket")
 }
 
 function onError(event) {
     webSocket.close();
-    setTimeout(webSocketInit, 1000);
+    setTimeout(webSocketInit, 2000);
 }
 
 function onMessage(event) {
     let receivedData = JSON.parse(event.data);
+    console.log(receivedData);
     switch (receivedData.messageType) {
         case 'NOTIFICATION':
-            showSnackbar('', receivedData.messageValue, '');
+            showSnackbar(receivedData.messageValue.title, receivedData.messageValue.message, '');
             break;
         default :
             console.log("Unknown Message Type");
