@@ -11,9 +11,15 @@
                 </div>
             }
             @collection.getCoverFileURL.fold {
-                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
+                <div class="coverWithBg">
+                    <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")" class="bg"/>
+                    <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")" class="main"/>
+                </div>
             } { uri =>
-                <img src="@uri">
+                <div class="coverWithBg">
+                    <img src="@uri" class="bg"/>
+                    <img src="@uri" class="main"/>
+                </div>
                 <script>
                         setSharableLink("@uri");
                 </script>
