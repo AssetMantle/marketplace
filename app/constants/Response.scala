@@ -100,6 +100,7 @@ object Response {
   val NOT_WHITELIST_CREATOR: Failure = Failure("NOT_WHITELIST_CREATOR")
   val NOT_COLLECTION_OWNER: Failure = Failure("NOT_COLLECTION_OWNER")
   val NOT_NFT_OWNER: Failure = Failure("NOT_NFT_OWNER")
+  val FILE_SIZE_GREATER_THAN_ALLOWED: Failure = Failure("FILE_SIZE_GREATER_THAN_ALLOWED")
   val NOT_ENOUGH_QUANTITY: Failure = Failure("NOT_ENOUGH_QUANTITY")
   val NFT_OWNER_NOT_FOUND: Failure = Failure("NFT_OWNER_NOT_FOUND")
   val NFT_NOT_MINTED: Failure = Failure("NFT_NOT_MINTED")

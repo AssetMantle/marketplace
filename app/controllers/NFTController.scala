@@ -15,6 +15,7 @@ import utilities.MicroNumber
 import views.base.companion.UploadFile
 import views.nft.companion._
 
+import java.io.File
 import java.nio.file.Files
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
@@ -251,7 +252,11 @@ class NFTController @Inject()(
       val fileExtension = utilities.FileOperations.fileExtensionFromName(name)
       val newFileName = nftId + "." + fileExtension
       val awsKey = utilities.NFT.getAWSKey(fileName = newFileName)
-      val collection = masterCollections.Service.tryGet(id = collectionId)
+      val collection = if (new File(oldFilePath).length() <= constants.File.NFT_FILE_FORM.maxFileSize) masterCollections.Service.tryGet(id = collectionId)
+      else {
+        utilities.FileOperations.deleteFile(oldFilePath)
+        constants.Response.FILE_SIZE_GREATER_THAN_ALLOWED.throwBaseException()
+      }
 
       def uploadToAws(collection: Collection) = if (collection.creatorId == loginState.username) Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
       else {

@@ -14,6 +14,7 @@ import utilities.MicroNumber
 import views.base.companion.UploadFile
 import views.collection.companion._
 
+import java.io.File
 import java.nio.file.Files
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -359,8 +360,12 @@ class CollectionController @Inject()(
 
   def uploadCollectionDraftFile(id: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id = id)
       val oldFilePath = utilities.Collection.getFilePath(id) + name
+      val collectionDraft = if (new File(oldFilePath).length() <= constants.File.COLLECTION_DRAFT_FILE_FORM.maxFileSize) masterTransactionCollectionDrafts.Service.tryGet(id = id)
+      else {
+        utilities.FileOperations.deleteFile(oldFilePath)
+        constants.Response.FILE_SIZE_GREATER_THAN_ALLOWED.throwBaseException()
+      }
       val newFileName = utilities.FileOperations.getFileHash(oldFilePath) + "." + utilities.FileOperations.fileExtensionFromName(name)
       val awsKey = utilities.Collection.getOthersFileAwsKey(collectionId = id, fileName = newFileName)
 
@@ -549,8 +554,12 @@ class CollectionController @Inject()(
 
   def uploadCollectionFile(id: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val collection = masterCollections.Service.tryGet(id = id)
       val oldFilePath = utilities.Collection.getFilePath(id) + name
+      val collection = if (new File(oldFilePath).length() <= constants.File.COLLECTION_FILE_FORM.maxFileSize) masterCollections.Service.tryGet(id = id)
+      else {
+        utilities.FileOperations.deleteFile(oldFilePath)
+        constants.Response.FILE_SIZE_GREATER_THAN_ALLOWED.throwBaseException()
+      }
       val newFileName = utilities.FileOperations.getFileHash(oldFilePath) + "." + utilities.FileOperations.fileExtensionFromName(name)
       val awsKey = utilities.Collection.getOthersFileAwsKey(collectionId = id, fileName = newFileName)
 

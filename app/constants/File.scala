@@ -39,12 +39,13 @@ object File {
   }
 
   val DefaultFileSize: Long = 10485760 // in Bytes
+  val MaxCollectionFileSize: Long = DefaultFileSize
   val MaxNFTSize: Long = 104857600 // in Bytes
 
   case class FileUploadForm(name: String, get: JavaScriptReverseRoute, store: JavaScriptReverseRoute, upload: JavaScriptReverseRoute, fileTypes: Seq[String], maxFileSize: Long)
 
-  val COLLECTION_DRAFT_FILE_FORM: FileUploadForm = FileUploadForm("COLLECTION_DRAFT_FILE_FORM", get = routes.javascript.CollectionController.uploadCollectionDraftFileForm, store = routes.javascript.CollectionController.storeCollectionDraftFile, upload = routes.javascript.CollectionController.uploadCollectionDraftFile, fileTypes = ALL_IMAGES_WITH_GIF, maxFileSize = DefaultFileSize)
-  val COLLECTION_FILE_FORM: FileUploadForm = FileUploadForm("COLLECTION_FILE_FORM", get = routes.javascript.CollectionController.uploadCollectionFileForm, store = routes.javascript.CollectionController.storeCollectionFile, upload = routes.javascript.CollectionController.uploadCollectionFile, fileTypes = ALL_IMAGES_WITH_GIF, maxFileSize = DefaultFileSize)
+  val COLLECTION_DRAFT_FILE_FORM: FileUploadForm = FileUploadForm("COLLECTION_DRAFT_FILE_FORM", get = routes.javascript.CollectionController.uploadCollectionDraftFileForm, store = routes.javascript.CollectionController.storeCollectionDraftFile, upload = routes.javascript.CollectionController.uploadCollectionDraftFile, fileTypes = ALL_IMAGES_WITH_GIF, maxFileSize = MaxCollectionFileSize)
+  val COLLECTION_FILE_FORM: FileUploadForm = FileUploadForm("COLLECTION_FILE_FORM", get = routes.javascript.CollectionController.uploadCollectionFileForm, store = routes.javascript.CollectionController.storeCollectionFile, upload = routes.javascript.CollectionController.uploadCollectionFile, fileTypes = ALL_IMAGES_WITH_GIF, maxFileSize = MaxCollectionFileSize)
   val NFT_FILE_FORM: FileUploadForm = FileUploadForm("NFT_FILE_FORM", get = routes.javascript.NFTController.uploadNFTFileForm, store = routes.javascript.NFTController.storeNFTFile, upload = routes.javascript.NFTController.uploadNFTFile, fileTypes = NFT_TYPES, maxFileSize = MaxNFTSize)
 
 }
