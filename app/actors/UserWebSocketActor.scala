@@ -1,5 +1,6 @@
 package actors
 
+import actors.Message.{PrivateMessage, PublicMessage}
 import akka.actor._
 
 object UserWebSocketActor {
@@ -12,11 +13,11 @@ class UserWebSocketActor(username: String, addToPublic: Boolean, out: ActorRef) 
 
   def getAddToPublic: Boolean = this.addToPublic
 
-  def getOutActorRef: ActorRef = this.out
-
   def receive = {
-    case msg: String => if (msg == "START") actors.Service.addOrUpdateUserActor(this)
+    case msg: String => if (msg == "START") Service.AppWebSocketActor ! Message.AddActor(this)
+    case publicMessage: PublicMessage => this.out ! publicMessage.toClientMessageString
+    case privateMessage: PrivateMessage => this.out ! privateMessage.toClientMessageString
   }
 
-  override def postStop(): Unit = actors.Service.closeUserActor(username)
+  override def postStop(): Unit = Service.AppWebSocketActor ! Message.RemoveActor(this.username)
 }

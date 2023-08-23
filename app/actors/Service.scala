@@ -23,27 +23,31 @@ object Service {
 
   private var privateActorMap = Map[String, UserWebSocketActor]()
 
+  // Should always be called using AppWebSocketActor mechanism otherwise queuing is lost
   def closeUserActor(username: String): Unit = {
     logger.debug("Closing actor for: " + username)
     privateActorMap.get(username).foreach(userWebSocketActor => {
       userWebSocketActor.self ! PoisonPill
-      publicRouter = publicRouter.removeRoutee(userWebSocketActor.getOutActorRef)
+      publicRouter = publicRouter.removeRoutee(userWebSocketActor.self)
     })
     privateActorMap -= username
   }
 
+  // Should always be called using AppWebSocketActor mechanism otherwise queuing is lost
   def addOrUpdateUserActor(userWebSocketActor: UserWebSocketActor): Unit = {
     logger.debug("Adding actor for: " + userWebSocketActor.getUsername)
     closeUserActor(userWebSocketActor.getUsername)
-    if (userWebSocketActor.getAddToPublic) publicRouter = publicRouter.addRoutee(userWebSocketActor.getOutActorRef)
+    if (userWebSocketActor.getAddToPublic) publicRouter = publicRouter.addRoutee(userWebSocketActor.self)
     privateActorMap += (userWebSocketActor.getUsername -> userWebSocketActor)
   }
 
+  // Can be handled via AppWebSocketActor but is there any advantage?
   def sendPrivateMessage(privateMessage: PrivateMessage): Unit = privateActorMap.get(privateMessage.toUser) match {
-    case Some(userWebSocketActor) => userWebSocketActor.getOutActorRef ! privateMessage.toClientMessageString
+    case Some(userWebSocketActor) => userWebSocketActor.self ! privateMessage
     case None => logger.info(privateMessage.toUser + ": " + constants.Actor.ACTOR_NOT_FOUND)
   }
 
-  def broadcastToAll(publicMessage: PublicMessage, sender: ActorRef): Unit = publicRouter.route(publicMessage.toClientMessageString, sender)
+  // Can be handled via AppWebSocketActor but is there any advantage?
+  def broadcastToAll(publicMessage: PublicMessage, sender: ActorRef = AppWebSocketActor): Unit = publicRouter.route(publicMessage, sender)
 
 }

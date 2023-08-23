@@ -75,6 +75,6 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
     }
   }
 
-  def sendClientMessageToAll(publicMessage: PublicMessage): Unit = actors.Service.broadcastToAll(publicMessage, actors.Service.AppWebSocketActor)
+  def sendClientMessageToAll(publicMessage: PublicMessage): Unit = actors.Service.broadcastToAll(publicMessage)
 
 }
