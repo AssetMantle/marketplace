@@ -232,7 +232,7 @@ class NFTController @Inject()(
           try {
             request.body.file(constants.File.KEY_FILE) match {
               case None => BadRequest(constants.View.BAD_REQUEST)
-              case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.COLLECTION_DRAFT_FILE_FORM.maxFileSize) {
+              case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.NFT_FILE_FORM.maxFileSize) {
                 utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, utilities.Collection.getNFTFilePath(collectionId))
                 Ok
               } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
