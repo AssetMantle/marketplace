@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base.buttons._
+@import views.html.base.modal._
 
 @(collectionId: String, totalNftDrafts: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
@@ -15,6 +16,7 @@
                     &times;
         </button>
     </div>
+    @multiStepNavigator(Seq(Messages(constants.View.COLLECTION_STEPPER_IMAGE_UPLOAD),Messages(constants.View.COLLECTION_STEPPER_BASIC_INFORMATION) ,Messages(constants.View.COLLECTION_STEPPER_CAPABILITIES), Messages(constants.View.COLLECTION_STEPPER_PROPERTIES)))
 
     <div class="hidden" id="nftFileHashName"></div>
 
