@@ -16,12 +16,11 @@
         @repeatWithIndex(setPropertiesForm(constants.FormField.NFT_PROPERTIES.name), min = collection.properties.fold(0)(_.length)) { (propertyField, index) =>
             @defining(Option(propertyField)) { implicit sequentialFormField =>
                 @if(collection.properties.fold(0)(_.length) > 0) {
-                    <div class="d-flex gap-3">
-                        @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_NAME, Symbol("value") -> collection.properties.get(index).name, Symbol("readonly") -> true)
+                    <div>
                         <div class="hidden">
                         @commonInputText(setPropertiesForm, constants.FormField.NFT_PROPERTY_VALUE, Symbol("value") -> collection.properties.get(index).defaultValue)
                         </div>
-                        @commonValueField(collection.properties.get(index).`type`, collection.properties.get(index).defaultValue, index)
+                        @commonValueField(collection.properties.get(index).`type`, collection.properties.get(index).defaultValue, index, label = collection.properties.get(index).name)
                     </div>
                 }
             }
