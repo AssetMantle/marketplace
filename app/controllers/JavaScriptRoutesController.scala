@@ -55,6 +55,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.deleteDraft,
         routes.javascript.CollectionController.countForCreatorNotForSell,
         routes.javascript.CollectionController.genesisTypeForm,
+        routes.javascript.CollectionController.defineCapabilitiesForm,
 
         routes.javascript.CollectedController.collectedSection,
         routes.javascript.CollectedController.collectionPerPage,

@@ -65,6 +65,7 @@ POST        /defineProperties                                  controllers.Colle
 GET         /deleteCollectionDraft                             controllers.CollectionController.deleteDraftForm(collectionId: String)
 POST        /deleteCollectionDraft                             controllers.CollectionController.deleteDraft()
 GET         /genesisTypeForm                                   controllers.CollectionController.genesisTypeForm()
+GET         /defineCapabilitiesForm                            controllers.CollectionController.defineCapabilitiesForm()
 
 GET         /uploadCollectionDraftFilesForm                    controllers.CollectionController.uploadCollectionDraftFilesForm(id: String)
 GET         /uploadCollectionDraftFileForm                     controllers.CollectionController.uploadCollectionDraftFileForm(id: String, documentType: String)

@@ -604,4 +604,9 @@ class CollectionController @Inject()(
     implicit request =>
       Future(Ok(views.html.base.genesisTypeForm()))
   }
+
+  def defineCapabilitiesForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.collection.defineCapabilities()))
+  }
 }

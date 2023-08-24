@@ -340,7 +340,7 @@
 .steperContainer {
   position: relative;
   margin-top: 16px;
-  margin-bottom: 32px !important;
+  margin-bottom: 48px !important;
 
   .linearLine {
     height: 2px;
@@ -806,5 +806,113 @@
   }
   input{
     display: none !important;
+  }
+}
+
+// Create Collection
+.capabilityInfoContainer{
+  .capabilityAdvancedDetail{
+    .bodyHeading{
+      @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--default));
+      text-transform: capitalize;
+    }
+    .singleCapability{
+      .innerSeparator{
+        margin: 6px 0px;
+      }
+      .capabilityHeader,
+      .singleOption{
+        height: 30px;
+        .optionTitle{
+          @include setFont(var(--font-type-2), normal, 700, 14px, 17px, var(--inactive-gray));
+          text-transform: capitalize;
+        }
+        .options{
+          display: flex;
+          padding: 0;
+          .buttonset{
+            display: flex;
+            input[type="radio"]{
+              //margin-right: 4px;
+
+              &:checked,
+              &:not(:checked) {
+                position: absolute;
+                left: -9999px;
+              }
+              &:checked + label,
+              &:not(:checked) + label
+              {
+                position: relative;
+                padding-left: 28px;
+                cursor: pointer;
+                line-height: 20px;
+                display: inline-block;
+                color: #666;
+              }
+              &:checked + label:before,
+              &:not(:checked) + label:before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 18px;
+                height: 18px;
+                border: 1px solid var(--default);
+                border-radius: 100%;
+                background: transparent;
+              }
+              &:checked + label:after,
+              &:not(:checked) + label:after {
+                content: '';
+                width: 10px;
+                height: 10px;
+                background: var(--default);
+                position: absolute;
+                top: 4px;
+                left: 4px;
+                border-radius: 100%;
+                -webkit-transition: all 0.2s ease;
+                transition: all 0.2s ease;
+              }
+              &:not(:checked) + label:after {
+                opacity: 0;
+                -webkit-transform: scale(0);
+                transform: scale(0);
+              }
+              &:checked + label:after {
+                opacity: 1;
+                -webkit-transform: scale(1);
+                transform: scale(1);
+              }
+            }
+            label{
+              width: 120px;
+              &:first-of-type {
+                margin-right: 80px;
+              }
+            }
+          }
+          .toggleButtonContainer{
+            .toggleButtonLabel{
+              display: none;
+            }
+          }
+        }
+      }
+      .propertyAdvancedDetail{
+        padding: 0 4px;
+        .advancedDetailOption{
+          display: none;
+        }
+        .dropdownIcon {
+          transition: transform 0.3s ease;
+          cursor: pointer;
+          &.active {
+            transform: rotate(180deg);
+          }
+        }
+      }
+    }
   }
 }
