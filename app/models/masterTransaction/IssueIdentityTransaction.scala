@@ -89,14 +89,14 @@ class IssueIdentityTransactions @Inject()(
   object Utility {
 
     def transaction(accountIdAddress: Map[String, Seq[String]], gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(constants.Transaction.Wallet.IssueIdentityWallet.address)
+      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(constants.Secret.getIssueIdentityWallet.address)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
         val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = accountIdAddress.keys.map(x => utilities.BlockchainTransaction.getMantlePlaceIssueIdentityMsgWithAuthentication(
             id = x,
-            fromAddress = constants.Transaction.Wallet.IssueIdentityWallet.address,
+            fromAddress = constants.Secret.getIssueIdentityWallet.address,
             toAddress = accountIdAddress.getOrElse(x, Seq()).headOption.getOrElse(""),
             classificationID = constants.Transaction.IdentityClassificationID,
             fromID = constants.Transaction.FromID,
@@ -112,7 +112,7 @@ class IssueIdentityTransactions @Inject()(
         val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Transaction.Wallet.IssueIdentityWallet.address, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.ISSUE_IDENTITY)
+              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Secret.getIssueIdentityWallet.address, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.ISSUE_IDENTITY)
               _ <- Service.addWithNoneStatus(txHash = txHash, accountIds = accountIdAddress.keys.toSeq)
             } yield adminTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
@@ -151,7 +151,7 @@ class IssueIdentityTransactions @Inject()(
       def getKeys(anyPendingTx: Boolean, ids: Seq[String]) = if (!anyPendingTx && ids.nonEmpty) masterKeys.Service.getAllKeys(ids) else Future(Seq())
 
       def doTx(ids: Seq[String], keys: Seq[Key]) = if (keys.nonEmpty) {
-        val tx = transaction(accountIdAddress = ids.map(x => x -> keys.filter(_.accountId == x).map(_.address)).toMap, gasPrice = 0.0001, ecKey = constants.Transaction.Wallet.IssueIdentityWallet.getECKey)
+        val tx = transaction(accountIdAddress = ids.map(x => x -> keys.filter(_.accountId == x).map(_.address)).toMap, gasPrice = 0.0001, ecKey = constants.Secret.getIssueIdentityWallet.getECKey)
 
         def updateMasterKeys() = masterKeys.Service.markIdentityIssuePending(keys.map(_.accountId).distinct)
 

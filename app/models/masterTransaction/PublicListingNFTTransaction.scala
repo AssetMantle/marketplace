@@ -145,7 +145,7 @@ class PublicListingNFTTransactions @Inject()(
         val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val messages = if (mintOnSuccess) Seq(
           utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount))),
-          utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = constants.Transaction.Wallet.FeeCollectorAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = nftIds.length * collection.getBondAmount)))
+          utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = constants.Secret.getMintAssetWallet.address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = nftIds.length * collection.getBondAmount)))
         ) else Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount))))
 
         val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(

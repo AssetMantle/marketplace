@@ -16,7 +16,7 @@ object CommonConfig {
   val PushNotificationURL: String = config.get[String]("webApp.pushNotification.url")
   val PushNotificationAuthorizationKey: String = config.get[String]("webApp.pushNotification.authorizationKey")
   val AppVersion: String = config.get[String]("app.version")
-  val MemoSignerWallet: Wallet = utilities.Wallet.getWallet(config.get[String]("blockchain.memoSignerMnemonics").split(" "))
+  val AppSecret: Array[Byte] = config.get[String]("app.secret").getBytes()
 
   val SessionTokenTimeout: Int = config.get[Int]("play.http.session.token.timeout")
 
