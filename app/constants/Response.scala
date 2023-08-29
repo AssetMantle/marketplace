@@ -146,6 +146,8 @@ object Response {
   val TRANSACTION_HEIGHT_NOT_FOUND: Failure = Failure("TRANSACTION_HEIGHT_NOT_FOUND")
   val NFT_ON_SALE_CANNOT_BE_MINTED: Failure = Failure("NFT_ON_SALE_CANNOT_BE_MINTED")
 
+  val SECRET_KEY_ID_NOT_FOUND: Failure = Failure("SECRET_KEY_ID_NOT_FOUND")
+
   case class Failure(private val response: String) {
     def message: String = PREFIX + FAILURE_PREFIX + response
 

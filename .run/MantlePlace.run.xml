@@ -30,12 +30,12 @@
         <entry key="IPFS_UPLOAD_END_POINT" value="https://api.pinata.cloud/pinning/pinFileToIPFS" />
         <entry key="KEY_STORE_PASSWORD" value="123123123" />
         <entry key="KEY_STORE_PATH" value="$USER_HOME$/AssetMantleKeyStore" />
-        <entry key="MEMO_SIGNER_MNEMONICS" value="strike innocent material choose bike season outdoor alone choice pretty ladder stage lawsuit equal van zone rather narrow erase lyrics health cloud plunge coin" />
         <entry key="POSTGRES_DB" value="mantlePlace" />
         <entry key="POSTGRES_PASSWORD" value="mantlePlace" />
         <entry key="POSTGRES_URL" value="localhost:5432" />
         <entry key="POSTGRES_USER" value="mantlePlace" />
         <entry key="ROOT_FILE_PATH" value="$USER_HOME$/" />
+        <entry key="SECRET" value="Jj%Sr!xrC9G!xKS5^yF!UPYa!DkWo@N*R^xjF6vC@nAL@zaD24WqHfbTZ^QbYFsj^^j9LExb3@Rt9Yfj!4amcHY%5$bC#SU$DorA6Hv6h2i%bh%M$XFfDVVpW!fJd" />
         <entry key="SITE_URL" value="http://localhost:9000" />
       </map>
     </option>
