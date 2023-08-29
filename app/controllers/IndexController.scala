@@ -43,8 +43,8 @@ class IndexController @Inject()(
                                  nftTransferTransactions: masterTransaction.NFTTransferTransactions,
                                  saleNFTTransactions: masterTransaction.SaleNFTTransactions,
                                  masterTransactionSessionTokens: masterTransaction.SessionTokens,
-                                 makeOrderTransactions: masterTransaction.MakeOrderTransactions,
-                                 takeOrderTransactions: masterTransaction.TakeOrderTransactions,
+                                 secondaryMarketSellTransactions: masterTransaction.SecondaryMarketSellTransactions,
+                                 secondaryMarketBuyTransactions: masterTransaction.SecondaryMarketBuyTransactions,
                                  cancelOrderTransactions: masterTransaction.CancelOrderTransactions,
                                  unwrapTransactions: masterTransaction.UnwrapTransactions,
                                  wrapTransactions: masterTransaction.WrapTransactions,
@@ -74,9 +74,10 @@ class IndexController @Inject()(
 
   try {
     Await.result(masterSecrets.Utility.setAll(), Duration.Inf)
-    println(constants.Secret.getIssueIdentityWallet.address)
-    println(constants.Secret.getDefineAssetWallet.address)
-    println(constants.Secret.getMintAssetWallet.address)
+    println(constants.Secret.issueIdentityWallet.address)
+    println(constants.Secret.defineAssetWallet.address)
+    println(constants.Secret.mintAssetWallet.address)
+    println(constants.Secret.nftAirDropWallet.address)
     Await.result(starter.fixMantleMonkeys(), Duration.Inf)
     Await.result(starter.correctCollectionProperties(), Duration.Inf)
     Await.result(nftPublicListings.Utility.migrate, Duration.Inf)
@@ -99,36 +100,36 @@ class IndexController @Inject()(
   }
 
   utilities.Scheduler.startSchedulers(
-    //    // blockchain
-    //    blockchainBlocks.Utility.scheduler,
-    //    // blockchainTransaction
-    //    adminTransactions.Utility.scheduler,
-    //    userTransactions.Utility.scheduler,
-    //    // campaign
-    //    mintNFTAirDrops.Utility.scheduler,
-    //    // history
-    //    historyMasterPublicListings.Utility.scheduler,
-    //    historyMasterSales.Utility.scheduler,
-    //    historyMasterSecondaryMarkets.Utility.scheduler,
-    //    // masterTransaction
-    //    cancelOrderTransactions.Utility.scheduler,
-    //    defineAssetTransactions.Utility.scheduler,
-    //    issueIdentityTransactions.Utility.scheduler,
-    //    masterTransactionLatestBlocks.Utility.scheduler,
-    //    makeOrderTransactions.Utility.scheduler,
-    //    mintAssetTransactions.Utility.scheduler,
-    //    nftMintingFeeTransactions.Utility.scheduler,
-    //    nftTransferTransactions.Utility.scheduler,
-    //    provisionAddressTransactions.Utility.scheduler,
-    //    publicListingNFTTransactions.Utility.scheduler,
-    //    saleNFTTransactions.Utility.scheduler,
-    //    masterTransactionSessionTokens.Utility.scheduler,
-    //    sendCoinTransactions.Utility.scheduler,
-    //    takeOrderTransactions.Utility.scheduler,
-    //    masterTransactionTokenPrices.Utility.scheduler,
-    //    unprovisionAddressTransactions.Utility.scheduler,
-    //    unwrapTransactions.Utility.scheduler,
-    //    wrapTransactions.Utility.scheduler,
+    // blockchain
+    blockchainBlocks.Utility.scheduler,
+    // blockchainTransaction
+    adminTransactions.Utility.scheduler,
+    userTransactions.Utility.scheduler,
+    // campaign
+    mintNFTAirDrops.Utility.scheduler,
+    // history
+    historyMasterPublicListings.Utility.scheduler,
+    historyMasterSales.Utility.scheduler,
+    historyMasterSecondaryMarkets.Utility.scheduler,
+    // masterTransaction
+    cancelOrderTransactions.Utility.scheduler,
+    defineAssetTransactions.Utility.scheduler,
+    issueIdentityTransactions.Utility.scheduler,
+    masterTransactionLatestBlocks.Utility.scheduler,
+    mintAssetTransactions.Utility.scheduler,
+    nftMintingFeeTransactions.Utility.scheduler,
+    nftTransferTransactions.Utility.scheduler,
+    provisionAddressTransactions.Utility.scheduler,
+    publicListingNFTTransactions.Utility.scheduler,
+    saleNFTTransactions.Utility.scheduler,
+    masterTransactionSessionTokens.Utility.scheduler,
+    secondaryMarketBuyTransactions.Utility.scheduler,
+    secondaryMarketSellTransactions.Utility.scheduler,
+    sendCoinTransactions.Utility.scheduler,
+    masterTransactionTokenPrices.Utility.scheduler,
+    unprovisionAddressTransactions.Utility.scheduler,
+    unwrapTransactions.Utility.scheduler,
+    wrapTransactions.Utility.scheduler,
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())

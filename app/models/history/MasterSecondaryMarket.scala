@@ -16,7 +16,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class MasterSecondaryMarket(id: String, orderId: Option[String], nftId: String, collectionId: String, sellerId: String, quantity: BigInt, price: MicroNumber, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends HistoryLogging {
+case class MasterSecondaryMarket(id: String, orderId: String, nftId: String, collectionId: String, sellerId: String, quantity: BigInt, price: MicroNumber, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends HistoryLogging {
 
   def serialize(): MasterSecondaryMarkets.MasterSecondaryMarketSerialized = MasterSecondaryMarkets.MasterSecondaryMarketSerialized(
     id = this.id,
@@ -44,14 +44,14 @@ case class MasterSecondaryMarket(id: String, orderId: Option[String], nftId: Str
 
 private[history] object MasterSecondaryMarkets {
 
-  case class MasterSecondaryMarketSerialized(id: String, orderId: Option[String], nftId: String, collectionId: String, sellerId: String, quantity: BigDecimal, price: BigDecimal, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
+  case class MasterSecondaryMarketSerialized(id: String, orderId: String, nftId: String, collectionId: String, sellerId: String, quantity: BigDecimal, price: BigDecimal, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None, deletedBy: Option[String] = None, deletedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
     def deserialize()(implicit module: String, logger: Logger): MasterSecondaryMarket = MasterSecondaryMarket(id = id, orderId = orderId, nftId = nftId, collectionId = collectionId, sellerId = sellerId, quantity = this.quantity.toBigInt, price = MicroNumber(price), denom = denom, endHours = endHours, externallyMade = externallyMade, completed = completed, expired = expired, status = status, cancelled = cancelled, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch, deletedBy = this.deletedBy, deletedOnMillisEpoch = this.deletedOnMillisEpoch)
   }
 
   class MasterSecondaryMarketTable(tag: Tag) extends Table[MasterSecondaryMarketSerialized](tag, "MasterSecondaryMarket") with ModelTable[String] {
 
-    def * = (id, orderId.?, nftId, collectionId, sellerId, quantity, price, denom, endHours, externallyMade, completed, cancelled, expired, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?, deletedBy.?, deletedOnMillisEpoch.?) <> (MasterSecondaryMarketSerialized.tupled, MasterSecondaryMarketSerialized.unapply)
+    def * = (id, orderId, nftId, collectionId, sellerId, quantity, price, denom, endHours, externallyMade, completed, cancelled, expired, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?, deletedBy.?, deletedOnMillisEpoch.?) <> (MasterSecondaryMarketSerialized.tupled, MasterSecondaryMarketSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -104,8 +104,8 @@ class MasterSecondaryMarkets @Inject()(
                                         masterNFTs: master.NFTs,
                                         masterNFTOwners: master.NFTOwners,
                                         collectionsAnalysis: CollectionsAnalysis,
-                                        masterTransactionMakeOrderTransactions: masterTransaction.MakeOrderTransactions,
-                                        masterTransactionTakeOrderTransactions: masterTransaction.TakeOrderTransactions,
+                                        secondaryMarketSellTransactions: masterTransaction.SecondaryMarketSellTransactions,
+                                        secondaryMarketBuyTransactions: masterTransaction.SecondaryMarketBuyTransactions,
                                         protected val dbConfigProvider: DatabaseConfigProvider,
                                       )(implicit val executionContext: ExecutionContext)
   extends GenericDaoImpl[MasterSecondaryMarkets.MasterSecondaryMarketTable, MasterSecondaryMarkets.MasterSecondaryMarketSerialized, String]() {
@@ -179,9 +179,9 @@ class MasterSecondaryMarkets @Inject()(
         val expiredOrders = masterSecondaryMarkets.Service.getExpiredOrders
         val failedOrders = masterSecondaryMarkets.Service.getFailedOrders
 
-        def makeOrderTxWithPendingStatus(ids: Seq[String]) = masterTransactionMakeOrderTransactions.Service.checkAnyPendingTx(ids)
+        def sellTxWithPendingStatus(orderIds: Seq[String]) = secondaryMarketSellTransactions.Service.checkAnyPendingTx(orderIds)
 
-        def takeOrderTxWithPendingStatus(ids: Seq[String]) = masterTransactionTakeOrderTransactions.Service.checkAnyPendingTx(ids)
+        def buyTxWithPendingStatus(orderIds: Seq[String]) = secondaryMarketBuyTransactions.Service.checkAnyPendingTx(orderIds)
 
         def removeOrdersFromMarket(txWithPendingStatus: Seq[String], unfilteredDeleteSecondaryMarkets: Seq[master.SecondaryMarket]) = utilitiesOperations.traverse(unfilteredDeleteSecondaryMarkets.filterNot(x => txWithPendingStatus.contains(x.id))) { secondaryMarket =>
           removeFromSecondaryMarket(secondaryMarket)
@@ -196,10 +196,10 @@ class MasterSecondaryMarkets @Inject()(
           cancelledOrders <- cancelledOrders
           expiredOrders <- expiredOrders
           failedOrders <- failedOrders
-          makeOrderTxWithPendingStatus <- makeOrderTxWithPendingStatus(completedOrders.map(_.id) ++ cancelledOrders.map(_.id) ++ expiredOrders.map(_.id) ++ failedOrders.map(_.id))
-          takeOrderTxWithPendingStatus <- takeOrderTxWithPendingStatus(completedOrders.map(_.id) ++ cancelledOrders.map(_.id) ++ expiredOrders.map(_.id) ++ failedOrders.map(_.id))
-          _ <- removeOrdersFromMarket(makeOrderTxWithPendingStatus ++ takeOrderTxWithPendingStatus, cancelledOrders ++ expiredOrders)
-          _ <- deleteOrders(makeOrderTxWithPendingStatus ++ takeOrderTxWithPendingStatus, completedOrders ++ failedOrders)
+          sellTxWithPendingStatus <- sellTxWithPendingStatus(completedOrders.map(_.orderId) ++ cancelledOrders.map(_.orderId) ++ expiredOrders.map(_.orderId) ++ failedOrders.map(_.orderId))
+          buyTxWithPendingStatus <- buyTxWithPendingStatus(completedOrders.map(_.orderId) ++ cancelledOrders.map(_.orderId) ++ expiredOrders.map(_.orderId) ++ failedOrders.map(_.orderId))
+          _ <- removeOrdersFromMarket(sellTxWithPendingStatus ++ buyTxWithPendingStatus, cancelledOrders ++ expiredOrders)
+          _ <- deleteOrders(sellTxWithPendingStatus ++ buyTxWithPendingStatus, completedOrders ++ failedOrders)
         } yield ()).recover {
           case _: BaseException => logger.error("FAILED_IN_" + module)
         }

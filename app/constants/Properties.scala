@@ -16,7 +16,8 @@ object Properties {
 
   val RestrictedPropertyList: Seq[String] = DefaultProperty.list ++ Seq(
     schema.constants.Properties.SupplyProperty.id.keyID.value,
-    schema.constants.Properties.BurnHeightProperty.id.keyID.value
+    schema.constants.Properties.BurnHeightProperty.id.keyID.value,
+    schema.constants.Properties.LockHeightProperty.id.keyID.value
   )
 
 }

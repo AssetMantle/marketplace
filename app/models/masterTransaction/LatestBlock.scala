@@ -3,7 +3,6 @@ package models.masterTransaction
 import com.assetmantle.modules.assets.{transactions => assetTransactions}
 import com.assetmantle.modules.identities.{transactions => identityTransactions}
 import com.assetmantle.modules.orders.{transactions => orderTransactions}
-import com.assetmantle.modules.splits.{transactions => splitTransactions}
 import com.cosmos.authz.v1beta1.MsgExec
 import com.cosmos.bank.{v1beta1 => bankTx}
 import com.google.protobuf.{Any => protobufAny}
@@ -91,12 +90,12 @@ class LatestBlocks @Inject()(
           case schema.constants.Messages.ASSET_BURN => utilitiesExternalTransactions.onBurnNFT(assetTransactions.burn.Message.parseFrom(stdMsg.getValue), txHash)
           case schema.constants.Messages.ASSET_MUTATE => utilitiesExternalTransactions.onMutateNFT(assetTransactions.mutate.Message.parseFrom(stdMsg.getValue))
           case schema.constants.Messages.ASSET_RENUMERATE => utilitiesExternalTransactions.onRenumerateNFT(assetTransactions.renumerate.Message.parseFrom(stdMsg.getValue))
+          case schema.constants.Messages.ASSET_SEND => utilitiesExternalTransactions.onAssetSend(assetTransactions.send.Message.parseFrom(stdMsg.getValue))
           case schema.constants.Messages.IDENTITY_PROVISION => utilitiesExternalTransactions.onProvisionIdentity(identityTransactions.provision.Message.parseFrom(stdMsg.getValue))
           case schema.constants.Messages.IDENTITY_UNPROVISION => utilitiesExternalTransactions.onUnprovisionIdentity(identityTransactions.unprovision.Message.parseFrom(stdMsg.getValue))
           case schema.constants.Messages.ORDER_CANCEL => utilitiesExternalTransactions.onOrderCancel(orderTransactions.cancel.Message.parseFrom(stdMsg.getValue))
-          case schema.constants.Messages.ORDER_MAKE => utilitiesExternalTransactions.onOrderMake(orderTransactions.make.Message.parseFrom(stdMsg.getValue), txHeight)
-          case schema.constants.Messages.ORDER_TAKE => utilitiesExternalTransactions.onOrderTake(orderTransactions.take.Message.parseFrom(stdMsg.getValue))
-          case schema.constants.Messages.SPLIT_SEND => utilitiesExternalTransactions.onSplitSend(splitTransactions.send.Message.parseFrom(stdMsg.getValue))
+          case schema.constants.Messages.ORDER_PUT => utilitiesExternalTransactions.onPutOrder(orderTransactions.put.Message.parseFrom(stdMsg.getValue), txHeight)
+          case schema.constants.Messages.ORDER_GET => utilitiesExternalTransactions.onGetOrder(orderTransactions.get.Message.parseFrom(stdMsg.getValue))
           //          case schema.constants.Messages.SPLIT_WRAP =>
           //          case schema.constants.Messages.SPLIT_UNWRAP => utilitiesExternalTransactions.onSplitUnwrap(splitTransactions.unwrap.Message.parseFrom(stdMsg.getValue))
           case schema.constants.Messages.EXECUTE_AUTHORIZATION => {

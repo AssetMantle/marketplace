@@ -28,7 +28,7 @@
                         <td>@secondaryMarket.quantity</td>
                         <td>@Coin(denom = secondaryMarket.denom, amount = secondaryMarket.price).getAmountWithNormalizedDenom()</td>
                         <td><a href="/profile/@secondaryMarket.sellerId">@secondaryMarket.sellerId</a></td>
-                        <td>@orders.find(_.idString == secondaryMarket.orderId.getOrElse("")).fold(0L)(_.getExpiryFromNow(latestBlock)) </td>
+                        <td>@orders.find(_.idString == secondaryMarket.orderId).fold(0L)(_.getExpiryFromNow(latestBlock)) </td>
                         <td>
                             @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.buyForm('${secondaryMarket.id}'))"), Symbol("class") -> "mt-4")
                             @if(loginState.isDefined && loginState.get.username == secondaryMarket.sellerId) {

@@ -1,5 +1,6 @@
 package models.master
 
+import com.google.protobuf.ByteString
 import models.master.NFTs.NFTTable
 import models.traits._
 import play.api.Logger
@@ -17,6 +18,8 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getFileHash: String = id
 
+  def getFileHashID: HashID = HashID(ByteString.fromHex(this.id).toByteArray)
+
   def getFileName: String = this.id + "." + this.fileExtension
 
   def getAssetID: AssetID = AssetID(HashID(utilities.Secrets.base64URLDecode(this.assetId.getOrElse("UNKNOWN_ASSET_ID"))))
@@ -27,7 +30,10 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + this.getAwsKey
 
-  def getImmutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && !x.mutable && x.nftId == this.id).map(_.toMetaProperty) ++ utilities.Properties.getNFTDefaultImmutableMetaProperties(name = this.name, collectionName = collection.name, fileHash = this.getFileHash, bondAmount = collection.getBondAmount.value.toLong, creatorID = collection.creatorId)
+  def getServiceEndPoint: String = if (constants.CommonConfig.WebAppUrl.endsWith("/")) constants.CommonConfig.WebAppUrl + "nftResource/" + this.id
+  else constants.CommonConfig.WebAppUrl + "/nftResource/" + this.id
+
+  def getImmutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && !x.mutable && x.nftId == this.id).map(_.toMetaProperty) ++ utilities.Properties.getNFTDefaultImmutableMetaProperties(name = this.name, collectionName = collection.name, fileHash = this.getFileHashID, bondAmount = collection.getBondAmount.value.toLong, creatorID = collection.creatorId, fileExtension = this.fileExtension, endPoint = this.getServiceEndPoint)
 
   def getImmutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && !x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 

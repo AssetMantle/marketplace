@@ -97,14 +97,14 @@ class NFTTransferTransactions @Inject()(
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
         val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val nftTransferMsg = utilities.BlockchainTransaction.getSplitSendMsg(
+        val nftTransferMsg = utilities.BlockchainTransaction.getAssetSendMsg(
           fromID = utilities.Identity.getMantlePlaceIdentityID(fromId),
           fromAddress = fromAddress,
           toID = utilities.Identity.getMantlePlaceIdentityID(toAccountId),
           assetId = nft.getAssetID,
           amount = quantity,
         )
-        val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
+        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(nftTransferMsg),
           fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultNFTTransferGasLimit),
           gasLimit = constants.Transaction.DefaultNFTTransferGasLimit,
@@ -116,7 +116,7 @@ class NFTTransferTransactions @Inject()(
         val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              nftTransfer <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = fromId, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.User.NFT_TRANSFER)
+              nftTransfer <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = fromId, fromAddress = fromAddress, timeoutHeight = timeoutHeight, txType = constants.Transaction.User.NFT_TRANSFER)
               _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nft.id, fromId = fromId, quantity = quantity, toIdentityId = utilities.Identity.getMantlePlaceIdentityID(toAccountId).asString, toAccountId = toAccountId)
             } yield nftTransfer
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()

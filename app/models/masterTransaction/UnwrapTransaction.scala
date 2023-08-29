@@ -4,12 +4,12 @@ import constants.Scheduler
 import exceptions.BaseException
 import models.blockchain
 import models.blockchainTransaction.{UserTransaction, UserTransactions}
+import models.common.Coin
 import models.masterTransaction.UnwrapTransactions.UnwrapTransactionTable
 import models.traits._
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import schema.id.OwnableID
 import schema.id.base._
 import slick.jdbc.H2Profile.api._
 import utilities.MicroNumber
@@ -18,36 +18,34 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class UnwrapTransaction(txHash: String, accountId: String, ownableId: String, isCoin: Boolean, amount: BigInt, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class UnwrapTransaction(txHash: String, accountId: String, assetId: String, amount: BigInt, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
   def getIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.accountId)
 
-  def getOwnableID: OwnableID = if (this.ownableId == constants.Blockchain.StakingToken) CoinID(StringID(this.ownableId)) else AssetID(HashID(utilities.Secrets.base64URLDecode(this.ownableId)))
+  def getAssetID: AssetID = AssetID(HashID(utilities.Secrets.base64URLDecode(this.assetId)))
 
   def serialize: UnwrapTransactions.UnwrapTransactionSerialized = UnwrapTransactions.UnwrapTransactionSerialized(
-    txHash = this.txHash, accountId = this.accountId, ownableId = this.ownableId, isCoin = this.isCoin, amount = BigDecimal(this.amount), status = this.status, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+    txHash = this.txHash, accountId = this.accountId, assetId = this.assetId, amount = BigDecimal(this.amount), status = this.status, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
   )
 }
 
 private[masterTransaction] object UnwrapTransactions {
-  case class UnwrapTransactionSerialized(txHash: String, accountId: String, ownableId: String, isCoin: Boolean, amount: BigDecimal, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
+  case class UnwrapTransactionSerialized(txHash: String, accountId: String, assetId: String, amount: BigDecimal, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
     def id: String = txHash
 
     def deserialize()(implicit module: String, logger: Logger): UnwrapTransaction = UnwrapTransaction(
-      txHash = this.txHash, accountId = this.accountId, ownableId = this.ownableId, isCoin = this.isCoin, amount = this.amount.toBigInt, status = this.status, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+      txHash = this.txHash, accountId = this.accountId, assetId = this.assetId, amount = this.amount.toBigInt, status = this.status, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
     )
   }
 
   class UnwrapTransactionTable(tag: Tag) extends Table[UnwrapTransactionSerialized](tag, "UnwrapTransaction") with ModelTable[String] {
 
-    def * = (txHash, accountId, ownableId, isCoin, amount, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (UnwrapTransactionSerialized.tupled, UnwrapTransactionSerialized.unapply)
+    def * = (txHash, accountId, assetId, amount, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (UnwrapTransactionSerialized.tupled, UnwrapTransactionSerialized.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
     def accountId = column[String]("accountId")
 
-    def ownableId = column[String]("ownableId")
-
-    def isCoin = column[Boolean]("isCoin")
+    def assetId = column[String]("assetId")
 
     def amount = column[BigDecimal]("amount")
 
@@ -85,7 +83,7 @@ class UnwrapTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, ownableID: OwnableID, amount: BigInt, accountId: String): Future[String] = create(UnwrapTransaction(txHash = txHash, ownableId = ownableID.asString, isCoin = ownableID.isCoinId, amount = amount, accountId = accountId, status = None).serialize).map(_.id)
+    def addWithNoneStatus(txHash: String, assetId: AssetID, amount: BigInt, accountId: String): Future[String] = create(UnwrapTransaction(txHash = txHash, assetId = assetId.asString, amount = amount, accountId = accountId, status = None).serialize).map(_.id)
 
     def getByTxHash(txHash: String): Future[Seq[UnwrapTransaction]] = filter(_.txHash === txHash).map(_.map(_.deserialize))
 
@@ -100,17 +98,16 @@ class UnwrapTransactions @Inject()(
 
   object Utility {
 
-    def transaction(fromAddress: String, accountId: String, amount: BigInt, ownableId: OwnableID, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(fromAddress: String, accountId: String, amount: BigInt, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
       val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
         val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
+        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(utilities.BlockchainTransaction.getUnwrapTokenMsg(
             fromAddress = fromAddress,
             fromID = utilities.Identity.getMantlePlaceIdentityID(accountId),
-            ownableID = ownableId,
-            amount = amount,
+            coins = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber(amount))),
           )),
           fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultUnwrapGasLimit),
           gasLimit = constants.Transaction.DefaultUnwrapGasLimit,
@@ -122,8 +119,8 @@ class UnwrapTransactions @Inject()(
         val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = accountId, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.User.UNWRAP)
-              _ <- Service.addWithNoneStatus(txHash = txHash, ownableID = ownableId, amount = amount, accountId = accountId)
+              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = accountId, fromAddress = fromAddress, timeoutHeight = timeoutHeight, txType = constants.Transaction.User.UNWRAP)
+              _ <- Service.addWithNoneStatus(txHash = txHash, assetId = constants.Blockchain.StakingTokenAssetID, amount = amount, accountId = accountId)
             } yield userTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
         }
@@ -152,9 +149,7 @@ class UnwrapTransactions @Inject()(
           if (userTransaction.status.get) {
             val markSuccess = Service.markSuccess(unwrapTx.txHash)
             val sendNotification = {
-              val param = if (unwrapTx.getOwnableID.isCoinId) {
-                s"${unwrapTx.amount / MicroNumber.factor} MNTL"
-              } else ""
+              val param = s"${unwrapTx.amount / MicroNumber.factor} MNTL"
               utilitiesNotification.send(unwrapTx.accountId, constants.Notification.UNWRAPPED_TOKEN_SUCCESSFULLY, param)()
             }
 
@@ -169,10 +164,7 @@ class UnwrapTransactions @Inject()(
           } else {
             val markMasterFailed = Service.markFailed(unwrapTx.txHash)
             val sendNotification = {
-              val param = if (unwrapTx.getOwnableID.isCoinId) {
-                s"${unwrapTx.amount / MicroNumber.factor} MNTL"
-              } else ""
-              utilitiesNotification.send(unwrapTx.accountId, constants.Notification.UNWRAPPED_TOKEN_FAILED, param)()
+              utilitiesNotification.send(unwrapTx.accountId, constants.Notification.UNWRAPPED_TOKEN_FAILED, s"${unwrapTx.amount / MicroNumber.factor} MNTL")()
             }
 
             (for {

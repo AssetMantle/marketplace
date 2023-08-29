@@ -16,6 +16,8 @@ import scala.concurrent.{ExecutionContext, Future}
 case class NFTSale(txHash: String, fromAddress: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
 
   def serialize(): NFTSales.NFTSaleSerialized = NFTSales.NFTSaleSerialized(txHash = this.txHash, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, status = this.status, memo = this.memo, timeoutHeight = this.timeoutHeight, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+
+  val txHeight: Option[Int] = None
 }
 
 private[blockchainTransaction] object NFTSales {
@@ -86,16 +88,19 @@ class NFTSales @Inject()(
     def migrate: Future[Unit] = {
       val allNFTSaleTxs = Service.fetchAll
 
-      def nftSales(txHashes: Seq[String]) = saleNFTTransactions.Service.getByTxHashes(txHashes)
-
       def bcTxs(txHashes: Seq[String]) = blockchainTransactions.Utility.getByHashes(txHashes)
 
+      def nftSales(txHashes: Seq[String]) = saleNFTTransactions.Service.getByTxHashes(txHashes)
+
       def update(allNFTSaleTxs: Seq[NFTSale], nftSales: Seq[SaleNFTTransaction], txs: Seq[Transaction]) = {
+        println("C: " + allNFTSaleTxs.length)
+        println("D: " + allNFTSaleTxs.map(_.txHash).distinct.length)
         val userTxs = nftSales.map(_.txHash).distinct.map { nftSaleTxHash =>
           val tx = allNFTSaleTxs.find(_.txHash == nftSaleTxHash).getOrElse(constants.Response.NFT_WHITELIST_SALE_NOT_FOUND.throwBaseException())
           val nftSale = nftSales.find(_.txHash == nftSaleTxHash).get
-          UserTransaction(txHash = tx.txHash, accountId = nftSale.buyerAccountId, fromAddress = tx.fromAddress, status = tx.status, memo = tx.memo, timeoutHeight = tx.timeoutHeight, log = tx.log, txHeight = txs.find(_.hash == nftSale.txHash).map(_.height), txType = constants.Transaction.User.WHITELIST_SALE, createdBy = tx.createdBy, createdOnMillisEpoch = tx.createdOnMillisEpoch, updatedBy = tx.updatedBy, updatedOnMillisEpoch = tx.updatedOnMillisEpoch)
+          UserTransaction(txHash = tx.txHash, accountId = nftSale.buyerAccountId, fromAddress = tx.fromAddress, status = tx.status, timeoutHeight = tx.timeoutHeight, log = tx.log, txHeight = txs.find(_.hash == nftSale.txHash).map(_.height), txType = constants.Transaction.User.WHITELIST_SALE, createdBy = tx.createdBy, createdOnMillisEpoch = tx.createdOnMillisEpoch, updatedBy = tx.updatedBy, updatedOnMillisEpoch = tx.updatedOnMillisEpoch)
         }
+        println("E: " + userTxs.length)
         userTransactions.Service.add(userTxs)
       }
 

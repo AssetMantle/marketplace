@@ -1,9 +1,8 @@
 package utilities
 
-import com.assetmantle.modules.assets.transactions.{define => assetDefine, mint => mintAsset}
+import com.assetmantle.modules.assets.transactions.{unwrap, wrap, define => assetDefine, mint => mintAsset, send => assetSend}
 import com.assetmantle.modules.identities.transactions.{issue, provision, unprovision}
-import com.assetmantle.modules.orders.transactions.{cancel => orderCancel, define => ordersDefine, make => ordersMake, take => ordersTake}
-import com.assetmantle.modules.splits.transactions.{unwrap, wrap, send => splitSend}
+import com.assetmantle.modules.orders.transactions.{get, put, cancel => orderCancel}
 import com.cosmos.bank.v1beta1.MsgSend
 import com.cosmos.crypto.secp256k1.PubKey
 import com.cosmos.tx.v1beta1._
@@ -12,12 +11,10 @@ import models.common.Coin
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import schema.data.base.NumberData
-import schema.id.OwnableID
 import schema.id.base.{AssetID, ClassificationID, IdentityID, OrderID}
 import schema.list.PropertyList
 import schema.property.base.{MesaProperty, MetaProperty}
 import schema.types.Height
-import utilities.Wallet.BouncyHash
 
 import java.security.MessageDigest
 import scala.jdk.CollectionConverters.IterableHasAsJava
@@ -48,7 +45,7 @@ object BlockchainTransaction {
     val txRaw = TxRaw.newBuilder()
       .setBodyBytes(txBody.toByteString)
       .setAuthInfoBytes(authInfo.toByteString)
-      .addSignatures(ByteString.copyFrom(Wallet.ecdsaSign(utilities.Secrets.sha256Hash(signDoc.toByteArray), ecKey)))
+      .addSignatures(ByteString.copyFrom(Wallet.ecdsaSign(Secrets.sha256Hash(signDoc.toByteArray), ecKey)))
       .build()
     txRaw.toByteArray
   }
@@ -66,8 +63,8 @@ object BlockchainTransaction {
   }
 
   def getSignedMemo(address: String, sequence: Long): String = {
-    val data = utilities.Secrets.sha256Hash(address + "/" + sequence.toString)
-    utilities.Secrets.base64URLEncoder(utilities.Wallet.ecdsaSign(data, ECKey.fromPrivate(constants.Secret.getMemoSignerWallet.privateKey)))
+    val data = Secrets.sha256Hash(address + "/" + sequence.toString)
+    Secrets.base64URLEncoder(Wallet.ecdsaSign(data, ECKey.fromPrivate(constants.Secret.memoSignerWallet.privateKey)))
   }
 
   def checkMantlePlaceTransaction(tx: Tx): Boolean = if (tx.getBody.getMemo == "") {
@@ -75,7 +72,7 @@ object BlockchainTransaction {
   } else {
     try {
       val memo = getSignedMemo(
-        utilities.Bech32.encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(PubKey.newBuilder().setKey(ByteString.copyFrom(tx.getAuthInfo.getSignerInfos(0).getPublicKey.getValue.toByteArray)).build().getKey.toByteArray))))
+        Bech32.encode(constants.Blockchain.AccountPrefix, Bech32.to5Bit(Wallet.BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(PubKey.newBuilder().setKey(ByteString.copyFrom(tx.getAuthInfo.getSignerInfos(0).getPublicKey.getValue.toByteArray)).build().getKey.toByteArray))))
         , tx.getAuthInfo.getSignerInfos(0).getSequence)
       memo == tx.getBody.getMemo
     } catch {
@@ -96,22 +93,6 @@ object BlockchainTransaction {
       .build().toByteString)
     .build()
 
-
-  def getMantlePlaceIssueIdentityMsg(id: String, fromAddress: String, fromID: IdentityID, toAddress: String, classificationID: ClassificationID): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(schema.constants.Messages.IDENTITY_ISSUE)
-    .setValue(issue
-      .Message.newBuilder()
-      .setFrom(fromAddress)
-      .setFromID(fromID.asProtoIdentityID)
-      .setTo(toAddress)
-      .setClassificationID(classificationID.asProtoClassificationID)
-      .setImmutableMetaProperties(PropertyList(Seq(utilities.Identity.getOriginMetaProperty, utilities.Identity.getBondAmountMetaProperty, utilities.Identity.getIDMetaProperty(id))).asProtoPropertyList)
-      .setImmutableProperties(PropertyList(Seq(utilities.Identity.getExtraMesaProperty(""))).asProtoPropertyList)
-      .setMutableMetaProperties(PropertyList(Seq(utilities.Identity.getTwitterMetaProperty(""), utilities.Identity.getNote1MetaProperty(""))).asProtoPropertyList)
-      .setMutableProperties(PropertyList(Seq(utilities.Identity.getNote2MesaProperty(""))).asProtoPropertyList)
-      .build().toByteString)
-    .build()
-
   def getMantlePlaceIssueIdentityMsgWithAuthentication(id: String, fromAddress: String, fromID: IdentityID, toAddress: String, classificationID: ClassificationID, addresses: Seq[String])(implicit module: String, logger: Logger): protoBufAny = {
     if (!addresses.contains(toAddress)) constants.Response.INVALID_IDENTITY_ISSUE_MESSAGE.throwBaseException()
     protoBufAny.newBuilder()
@@ -120,12 +101,11 @@ object BlockchainTransaction {
         .Message.newBuilder()
         .setFrom(fromAddress)
         .setFromID(fromID.asProtoIdentityID)
-        .setTo(toAddress)
         .setClassificationID(classificationID.asProtoClassificationID)
-        .setImmutableMetaProperties(PropertyList(Seq(utilities.Identity.getOriginMetaProperty, utilities.Identity.getBondAmountMetaProperty, utilities.Identity.getIDMetaProperty(id))).asProtoPropertyList)
-        .setImmutableProperties(PropertyList(Seq(utilities.Identity.getExtraMesaProperty(""))).asProtoPropertyList)
-        .setMutableMetaProperties(PropertyList(Seq(utilities.Identity.getTwitterMetaProperty(""), utilities.Identity.getNote1MetaProperty(""), utilities.Identity.getAuthenticationProperty(addresses))).asProtoPropertyList)
-        .setMutableProperties(PropertyList(Seq(utilities.Identity.getNote2MesaProperty(""))).asProtoPropertyList)
+        .setImmutableMetaProperties(PropertyList(Seq(Identity.getOriginMetaProperty, Identity.getBondAmountMetaProperty, Identity.getIDMetaProperty(id))).asProtoPropertyList)
+        .setImmutableProperties(PropertyList(Seq(Identity.getExtraMesaProperty(""))).asProtoPropertyList)
+        .setMutableMetaProperties(PropertyList(Seq(Identity.getTwitterMetaProperty(""), Identity.getNote1MetaProperty(""), Identity.getAuthenticationProperty(addresses))).asProtoPropertyList)
+        .setMutableProperties(PropertyList(Seq(Identity.getNote2MesaProperty(""))).asProtoPropertyList)
         .build().toByteString)
       .build()
   }
@@ -133,19 +113,6 @@ object BlockchainTransaction {
   def getDefineAssetMsg(fromAddress: String, fromID: IdentityID, immutableMetas: Seq[MetaProperty], immutables: Seq[MesaProperty], mutableMetas: Seq[MetaProperty], mutables: Seq[MesaProperty]): protoBufAny = protoBufAny.newBuilder()
     .setTypeUrl(schema.constants.Messages.ASSET_DEFINE)
     .setValue(assetDefine
-      .Message.newBuilder()
-      .setFrom(fromAddress)
-      .setFromID(fromID.asProtoIdentityID)
-      .setImmutableMetaProperties(PropertyList(immutableMetas).asProtoPropertyList)
-      .setImmutableProperties(PropertyList(immutables).asProtoPropertyList)
-      .setMutableMetaProperties(PropertyList(mutableMetas).asProtoPropertyList)
-      .setMutableProperties(PropertyList(mutables).asProtoPropertyList)
-      .build().toByteString)
-    .build()
-
-  def getDefineOrderMsg(fromAddress: String, fromID: IdentityID, immutableMetas: Seq[MetaProperty], immutables: Seq[MesaProperty], mutableMetas: Seq[MetaProperty], mutables: Seq[MesaProperty]): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(schema.constants.Messages.ORDER_DEFINE)
-    .setValue(ordersDefine
       .Message.newBuilder()
       .setFrom(fromAddress)
       .setFromID(fromID.asProtoIdentityID)
@@ -171,28 +138,8 @@ object BlockchainTransaction {
       .build().toByteString)
     .build()
 
-  def getMakeOrderMsg(fromAddress: String, fromID: IdentityID, classificationID: ClassificationID, takerID: IdentityID, makerOwnableID: OwnableID, makerOwnableSplit: NumberData, expiresIn: Long, takerOwnableID: OwnableID, takerOwnableSplit: NumberData, immutableMetas: Seq[MetaProperty], immutables: Seq[MesaProperty], mutableMetas: Seq[MetaProperty], mutables: Seq[MesaProperty]): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(schema.constants.Messages.ORDER_MAKE)
-    .setValue(ordersMake
-      .Message.newBuilder()
-      .setFrom(fromAddress)
-      .setFromID(fromID.asProtoIdentityID)
-      .setClassificationID(classificationID.asProtoClassificationID)
-      .setTakerID(takerID.asProtoIdentityID)
-      .setMakerOwnableID(makerOwnableID.toAnyOwnableID)
-      .setTakerOwnableID(takerOwnableID.toAnyOwnableID)
-      .setExpiresIn(Height(expiresIn).asProtoHeight)
-      .setMakerOwnableSplit(makerOwnableSplit.value.toString())
-      .setTakerOwnableSplit(takerOwnableSplit.value.toString())
-      .setImmutableMetaProperties(PropertyList(immutableMetas).asProtoPropertyList)
-      .setImmutableProperties(PropertyList(immutables).asProtoPropertyList)
-      .setMutableMetaProperties(PropertyList(mutableMetas).asProtoPropertyList)
-      .setMutableProperties(PropertyList(mutables).asProtoPropertyList)
-      .build().toByteString)
-    .build()
-
   def getWrapTokenMsg(fromAddress: String, fromID: IdentityID, coins: Seq[Coin]): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(schema.constants.Messages.SPLIT_WRAP)
+    .setTypeUrl(schema.constants.Messages.ASSET_WRAP)
     .setValue(wrap
       .Message.newBuilder()
       .setFrom(fromAddress)
@@ -201,24 +148,36 @@ object BlockchainTransaction {
       .build().toByteString)
     .build()
 
-  def getUnwrapTokenMsg(fromAddress: String, fromID: IdentityID, ownableID: OwnableID, amount: BigInt): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(schema.constants.Messages.SPLIT_UNWRAP)
+  def getUnwrapTokenMsg(fromAddress: String, fromID: IdentityID, coins: Seq[Coin]): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(schema.constants.Messages.ASSET_UNWRAP)
     .setValue(unwrap
       .Message.newBuilder()
       .setFrom(fromAddress)
       .setFromID(fromID.asProtoIdentityID)
-      .setOwnableID(ownableID.toAnyOwnableID)
-      .setValue(amount.toString())
+      .addAllCoins(coins.map(_.toProtoCoin).asJava)
       .build().toByteString)
     .build()
 
-  def getTakeOrderMsg(fromAddress: String, fromID: IdentityID, takerOwnableSplit: NumberData, orderID: OrderID): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(schema.constants.Messages.ORDER_TAKE)
-    .setValue(ordersTake
+  def getPutOrderMsg(fromAddress: String, fromID: IdentityID, makerAssetID: AssetID, makerSplit: NumberData, expiryHeight: Long, takerAssetID: AssetID, takerSplit: NumberData): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(schema.constants.Messages.ORDER_PUT)
+    .setValue(put
       .Message.newBuilder()
       .setFrom(fromAddress)
       .setFromID(fromID.asProtoIdentityID)
-      .setTakerOwnableSplit(takerOwnableSplit.value.toString())
+      .setMakerSplit(makerSplit.value.toString())
+      .setExpiryHeight(Height(expiryHeight).asProtoHeight)
+      .setMakerAssetID(makerAssetID.asProtoAssetID)
+      .setTakerAssetID(takerAssetID.asProtoAssetID)
+      .setTakerSplit(takerSplit.value.toString())
+      .build().toByteString)
+    .build()
+
+  def getGetOrderMsg(fromAddress: String, fromID: IdentityID, orderID: OrderID): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(schema.constants.Messages.ORDER_GET)
+    .setValue(get
+      .Message.newBuilder()
+      .setFrom(fromAddress)
+      .setFromID(fromID.asProtoIdentityID)
       .setOrderID(orderID.asProtoOrderID)
       .build().toByteString)
     .build()
@@ -253,14 +212,14 @@ object BlockchainTransaction {
       .build().toByteString)
     .build()
 
-  def getSplitSendMsg(fromID: IdentityID, fromAddress: String, toID: IdentityID, assetId: AssetID, amount: BigInt): protoBufAny = protoBufAny.newBuilder()
-    .setTypeUrl(schema.constants.Messages.SPLIT_SEND)
-    .setValue(splitSend
+  def getAssetSendMsg(fromID: IdentityID, fromAddress: String, toID: IdentityID, assetId: AssetID, amount: BigInt): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(schema.constants.Messages.ASSET_SEND)
+    .setValue(assetSend
       .Message.newBuilder()
       .setFrom(fromAddress)
       .setFromID(fromID.asProtoIdentityID)
       .setToID(toID.asProtoIdentityID)
-      .setOwnableID(assetId.toAnyOwnableID)
+      .setAssetID(assetId.asProtoAssetID)
       .setValue(amount.toString())
       .build().toByteString)
     .build()

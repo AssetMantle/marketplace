@@ -98,7 +98,7 @@ class NFTController @Inject()(
       implicit request =>
         val secondaryMarkets = masterSecondaryMarkets.Service.getByNFTIdAndPageNumber(nftId, pageNumber)
 
-        def orders(secondaryMarkets: Seq[SecondaryMarket]) = blockchainOrders.Service.get(secondaryMarkets.filter(_.orderId.isDefined).map(_.orderId.get))
+        def orders(secondaryMarkets: Seq[SecondaryMarket]) = blockchainOrders.Service.get(secondaryMarkets.map(_.orderId))
 
         (for {
           secondaryMarkets <- secondaryMarkets
@@ -249,7 +249,7 @@ class NFTController @Inject()(
     implicit request =>
       val oldFilePath = utilities.Collection.getNFTFilePath(collectionId) + name
       val nftId = utilities.FileOperations.getFileHash(oldFilePath)
-      val fileExtension = utilities.FileOperations.fileExtensionFromName(name)
+      val fileExtension = utilities.FileOperations.fileExtensionFromName(name).toLowerCase
       val newFileName = nftId + "." + fileExtension
       val awsKey = utilities.NFT.getAWSKey(fileName = newFileName)
       val collection = if (new File(oldFilePath).length() <= constants.File.NFT_FILE_FORM.maxFileSize) masterCollections.Service.tryGet(id = collectionId)
@@ -616,6 +616,12 @@ class NFTController @Inject()(
           }
         }
       )
+  }
+
+  def resource(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginAction { implicit request =>
+      Redirect(constants.CommonConfig.AmazonS3.s3BucketURL + utilities.NFT.getAWSKey(id))
+    }
   }
 
 }

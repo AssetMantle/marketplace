@@ -12,7 +12,7 @@ object Blockchain {
   val MaximumProperties = 22
   val ChainId: String = CommonConfig.Blockchain.ChainId
   val StakingToken: String = CommonConfig.Blockchain.StakingToken
-  val StakingTokenCoinID: CoinID = CoinID(StringID(StakingToken))
+  val StakingTokenAssetID: AssetID = schema.document.CoinAsset.getCoinAssetID(StakingToken)
   val UpgradeHeight: Int = CommonConfig.Blockchain.UpgradeHeight
   val DefaultHDPath: Seq[ChildNumber] = Seq(
     new ChildNumber(44, true),

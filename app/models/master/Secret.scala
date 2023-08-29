@@ -56,6 +56,8 @@ class Secrets @Inject()(
 
   private val mantlePlaceKey = "MANTLE_PLACE"
 
+  private val mintNFTCampaignWallet = "MINT_NFT_AIR_DROP"
+
   private object Service {
 
     def fetchAll: Future[Seq[Secret]] = getAll
@@ -68,7 +70,8 @@ class Secrets @Inject()(
 
     private def set(allKeys: Seq[Secret]): Unit = constants.Secret.setSecrets(
       memoSignerSeeds = getKeyValue(allKeys, memoKey).split(" "),
-      mantlePlaceSeeds = getKeyValue(allKeys, mantlePlaceKey).split(" ")
+      mantlePlaceSeeds = getKeyValue(allKeys, mantlePlaceKey).split(" "),
+      mintNFTCampaignSeeds = getKeyValue(allKeys, mintNFTCampaignWallet).split(" "),
     )
 
     def setAll(): Future[Unit] = {

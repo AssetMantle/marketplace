@@ -44,8 +44,8 @@ case class Asset(id: Array[Byte], idString: String, classificationID: Array[Byte
   }
 
   def getLockHeight: HeightData = {
-    val lock = this.getProperty(schema.constants.Properties.LockProperty.getID)
-    HeightData((if (lock.isDefined) MetaProperty(lock.get.getProtoBytes) else schema.constants.Properties.LockProperty).getData.getProtoBytes)
+    val lock = this.getProperty(schema.constants.Properties.LockHeightProperty.getID)
+    HeightData((if (lock.isDefined) MetaProperty(lock.get.getProtoBytes) else schema.constants.Properties.LockHeightProperty).getData.getProtoBytes)
   }
 
   def mutate(properties: Seq[Property]): Asset = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)

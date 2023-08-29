@@ -91,16 +91,17 @@ class MintNFTAirDrops @Inject()(
   object Utility {
 
     private def transaction(accountId: String, address: String, amount: MicroNumber, eligibilityTxHash: String): Future[AdminTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(constants.Campaign.AirDropWallet.address)
+      val airDropWallet = constants.Secret.nftAirDropWallet
+      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(airDropWallet.address)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
         val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
         val txRawBytes = utilities.BlockchainTransaction.getTxRawBytes(
-          messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = constants.Campaign.AirDropWallet.address, toAddress = address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)))),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = constants.Transaction.MediumGasPrice, gasLimit = constants.Transaction.DefaultSendCoinGasAmount),
+          messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = airDropWallet.address, toAddress = address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)))),
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = constants.Transaction.AdminTxGasPrice, gasLimit = constants.Transaction.DefaultSendCoinGasAmount),
           gasLimit = constants.Transaction.DefaultSendCoinGasAmount,
           account = bcAccount,
-          ecKey = constants.Campaign.AirDropWallet.getECKey,
+          ecKey = airDropWallet.getECKey,
           timeoutHeight = timeoutHeight,
           memo = eligibilityTxHash)
         val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
@@ -108,7 +109,7 @@ class MintNFTAirDrops @Inject()(
         val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Campaign.AirDropWallet.address, memo = Option(eligibilityTxHash), timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.Campaign.MINT_NFT_AIRDROP)
+              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = airDropWallet.address, timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.Campaign.MINT_NFT_AIRDROP)
               _ <- Service.updateDropTxHash(accountId = accountId, airDropTxHash = txHash)
             } yield adminTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()

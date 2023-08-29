@@ -16,6 +16,8 @@ import scala.concurrent.{ExecutionContext, Future}
 case class NFTPublicListing(txHash: String, fromAddress: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
 
   def serialize(): NFTPublicListings.NFTPublicListingSerialized = NFTPublicListings.NFTPublicListingSerialized(txHash = this.txHash, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, status = this.status, memo = this.memo, timeoutHeight = this.timeoutHeight, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+
+  val txHeight: Option[Int] = None
 }
 
 private[blockchainTransaction] object NFTPublicListings {
@@ -84,27 +86,30 @@ class NFTPublicListings @Inject()(
   object Utility {
 
     def migrate: Future[Unit] = {
-      val allNFTPublicLsitingTxs = Service.fetchAll
-
-      def publicListingNFTTxs(txHashes: Seq[String]) = publicListingNFTTransactions.Service.getByTxHashes(txHashes)
+      val allNFTPublicListingTxs = Service.fetchAll
 
       def bcTxs(txHashes: Seq[String]) = blockchainTransactions.Utility.getByHashes(txHashes)
 
+      def publicListingNFTTxs(txHashes: Seq[String]) = publicListingNFTTransactions.Service.getByTxHashes(txHashes)
+
       def update(allNFTPublicListingTxs: Seq[NFTPublicListing], publicListingNFTTxs: Seq[PublicListingNFTTransaction], txs: Seq[Transaction]) = {
+        println("A: " + publicListingNFTTxs.length)
+        println("B: " + publicListingNFTTxs.map(_.txHash).distinct.length)
         val userTxs = publicListingNFTTxs.map(_.txHash).distinct.map { publicListingNFTTxHash =>
-          val tx = allNFTPublicListingTxs.find(_.txHash == publicListingNFTTxHash).getOrElse(constants.Response.NFT_WHITELIST_SALE_NOT_FOUND.throwBaseException())
-          val nftSale = publicListingNFTTxs.find(_.txHash == publicListingNFTTxHash).get
-          UserTransaction(txHash = tx.txHash, accountId = nftSale.buyerAccountId, fromAddress = tx.fromAddress, status = tx.status, memo = tx.memo, timeoutHeight = tx.timeoutHeight, log = tx.log, txHeight = txs.find(_.hash == nftSale.txHash).map(_.height), txType = constants.Transaction.User.WHITELIST_SALE, createdBy = tx.createdBy, createdOnMillisEpoch = tx.createdOnMillisEpoch, updatedBy = tx.updatedBy, updatedOnMillisEpoch = tx.updatedOnMillisEpoch)
+          val tx = allNFTPublicListingTxs.find(_.txHash == publicListingNFTTxHash).getOrElse(constants.Response.NFT_PUBLIC_LISTING_SALE_NOT_FOUND.throwBaseException())
+          val publicListing = publicListingNFTTxs.find(_.txHash == publicListingNFTTxHash).get
+          UserTransaction(txHash = tx.txHash, accountId = publicListing.buyerAccountId, fromAddress = tx.fromAddress, status = tx.status, timeoutHeight = tx.timeoutHeight, log = tx.log, txHeight = txs.find(_.hash == publicListing.txHash).map(_.height), txType = constants.Transaction.User.PUBLIC_SALE, createdBy = tx.createdBy, createdOnMillisEpoch = tx.createdOnMillisEpoch, updatedBy = tx.updatedBy, updatedOnMillisEpoch = tx.updatedOnMillisEpoch)
         }
+        println("F: " + userTxs.length)
         userTransactions.Service.add(userTxs)
       }
 
 
       (for {
-        allNFTPublicLsitingTxs <- allNFTPublicLsitingTxs
-        bcTxs <- bcTxs(allNFTPublicLsitingTxs.map(_.txHash))
-        publicListingNFTTxs <- publicListingNFTTxs(allNFTPublicLsitingTxs.map(_.txHash))
-        _ <- update(allNFTPublicLsitingTxs, publicListingNFTTxs, bcTxs)
+        allNFTPublicListingTxs <- allNFTPublicListingTxs
+        bcTxs <- bcTxs(allNFTPublicListingTxs.map(_.txHash))
+        publicListingNFTTxs <- publicListingNFTTxs(allNFTPublicListingTxs.map(_.txHash))
+        _ <- update(allNFTPublicListingTxs, publicListingNFTTxs, bcTxs)
       } yield ()
         ).recover {
         case exception: Exception => logger.error(exception.getLocalizedMessage)

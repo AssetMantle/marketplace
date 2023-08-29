@@ -17,7 +17,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class AdminTransaction(txHash: String, fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], txHeight: Option[Int], txType: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
+case class AdminTransaction(txHash: String, fromAddress: String, status: Option[Boolean], timeoutHeight: Int, log: Option[String], txHeight: Option[Int], txType: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
 
   def id: String = txHash
 }
@@ -26,15 +26,13 @@ private[blockchainTransaction] object AdminTransactions {
 
   class AdminTransactionTable(tag: Tag) extends Table[AdminTransaction](tag, "AdminTransaction") with ModelTable[String] {
 
-    def * = (txHash, fromAddress, status.?, memo.?, timeoutHeight, log.?, txHeight.?, txType, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (AdminTransaction.tupled, AdminTransaction.unapply)
+    def * = (txHash, fromAddress, status.?, timeoutHeight, log.?, txHeight.?, txType, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (AdminTransaction.tupled, AdminTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
     def fromAddress = column[String]("fromAddress")
 
     def status = column[Boolean]("status")
-
-    def memo = column[String]("memo")
 
     def timeoutHeight = column[Int]("timeoutHeight")
 
@@ -78,8 +76,8 @@ class AdminTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, fromAddress: String, memo: Option[String], timeoutHeight: Int, txType: String): Future[AdminTransaction] = {
-      val tx = AdminTransaction(txHash = txHash, fromAddress = fromAddress, status = None, log = None, memo = memo, timeoutHeight = timeoutHeight, txHeight = None, txType = txType)
+    def addWithNoneStatus(txHash: String, fromAddress: String, timeoutHeight: Int, txType: String): Future[AdminTransaction] = {
+      val tx = AdminTransaction(txHash = txHash, fromAddress = fromAddress, status = None, log = None, timeoutHeight = timeoutHeight, txHeight = None, txType = txType)
       for {
         _ <- create(tx)
       } yield tx

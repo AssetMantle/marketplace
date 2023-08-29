@@ -89,10 +89,8 @@ class CancelOrderTransactions @Inject()(
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
         val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = Seq(
-            utilities.BlockchainTransaction.getCancelOrderMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(secondaryMarket.sellerId), orderID = secondaryMarket.getOrderID())
-          ),
+        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
+          messages = Seq(utilities.BlockchainTransaction.getCancelOrderMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(secondaryMarket.sellerId), orderID = secondaryMarket.getOrderID)),
           fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultCancelOrderGasLimit),
           gasLimit = constants.Transaction.DefaultCancelOrderGasLimit,
           account = bcAccount,
@@ -103,7 +101,7 @@ class CancelOrderTransactions @Inject()(
         val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              userTx <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = secondaryMarket.sellerId, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.User.CANCEL_ORDER)
+              userTx <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = secondaryMarket.sellerId, fromAddress = fromAddress, timeoutHeight = timeoutHeight, txType = constants.Transaction.User.CANCEL_ORDER)
               _ <- Service.addWithNoneStatus(txHash = txHash, secondaryMarketId = secondaryMarket.id, sellerId = secondaryMarket.sellerId)
             } yield userTx
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()

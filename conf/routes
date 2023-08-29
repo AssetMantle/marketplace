@@ -13,6 +13,9 @@ GET         /                                                  controllers.Index
 GET         /sitemap.xml                                       controllers.IndexController.sitemap()
 GET         /websocket                                         controllers.WebSocketController.connect()
 
+# DO NOT CHANGE
+GET         /nftResource/:id                                   controllers.NFTController.resource(id: String)
+
 GET         /signUp                                            controllers.AccountController.signUpForm()
 POST        /signUp                                            controllers.AccountController.signUp()
 

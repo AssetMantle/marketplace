@@ -130,6 +130,7 @@ object Response {
   val EARLY_ACCESS_ENDED: Failure = Failure("EARLY_ACCESS_ENDED")
   val NFT_NOT_ON_SALE: Failure = Failure("NFT_NOT_ON_SALE")
   val NFT_WHITELIST_SALE_NOT_FOUND: Failure = Failure("NFT_WHITELIST_SALE_NOT_FOUND")
+  val NFT_PUBLIC_LISTING_SALE_NOT_FOUND: Failure = Failure("NFT_PUBLIC_LISTING_SALE_NOT_FOUND")
   val NFT_NOT_ON_PUBLIC_LISTING: Failure = Failure("NFT_NOT_ON_PUBLIC_LISTING")
   val NFT_ALREADY_MINTED: Failure = Failure("NFT_ALREADY_MINTED")
   val NFT_TOTAL_SUPPLY_AND_OWNED_DIFFERENT: Failure = Failure("NFT_TOTAL_SUPPLY_AND_OWNED_DIFFERENT")
@@ -153,7 +154,7 @@ object Response {
 
     def logMessage: String = LOG_PREFIX + response
 
-    def throwBaseException(exception: Exception = null)(implicit module: String, logger: Logger) = throw new BaseException(this, exception)
+    def throwBaseException(exception: Exception = null)(implicit logger: Logger) = throw new BaseException(this, exception)
   }
 
   class Warning(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

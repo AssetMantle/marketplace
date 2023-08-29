@@ -9,6 +9,8 @@ object Secret {
 
   private var mantlePlaceMnemonics: Seq[String] = Seq()
 
+  private var mintNFTCampaignMnemonics: Seq[String] = Seq()
+
   private var Sealed: Boolean = false
 
   private val IssueIdentityHDPath: Seq[ChildNumber] = Seq(
@@ -35,23 +37,25 @@ object Secret {
     new ChildNumber(3, false)
   )
 
-  def getMemoSignerWallet: Wallet = if (memoSignerMnemonics.nonEmpty) utilities.Wallet.getWallet(memoSignerMnemonics)
+  def memoSignerWallet: Wallet = if (memoSignerMnemonics.nonEmpty) utilities.Wallet.getWallet(memoSignerMnemonics)
   else throw new IllegalArgumentException("MEMO_SIGNER_MNEMONICS_EMPTY")
 
-  def getIssueIdentityWallet: Wallet = if (mantlePlaceMnemonics.nonEmpty) utilities.Wallet.getWallet(mantlePlaceMnemonics, hdPath = IssueIdentityHDPath)
+  def issueIdentityWallet: Wallet = if (mantlePlaceMnemonics.nonEmpty) utilities.Wallet.getWallet(mantlePlaceMnemonics, hdPath = IssueIdentityHDPath)
   else throw new IllegalArgumentException("MANTLE_PLACE_MNEMONICS_EMPTY")
 
-  def getDefineAssetWallet: Wallet = if (mantlePlaceMnemonics.nonEmpty) utilities.Wallet.getWallet(mantlePlaceMnemonics, hdPath = DefineAssetHDPath)
+  def defineAssetWallet: Wallet = if (mantlePlaceMnemonics.nonEmpty) utilities.Wallet.getWallet(mantlePlaceMnemonics, hdPath = DefineAssetHDPath)
   else throw new IllegalArgumentException("MANTLE_PLACE_MNEMONICS_EMPTY")
 
-  def getMintAssetWallet: Wallet = if (mantlePlaceMnemonics.nonEmpty) utilities.Wallet.getWallet(mantlePlaceMnemonics, hdPath = MintAssetHDPath)
+  def mintAssetWallet: Wallet = if (mantlePlaceMnemonics.nonEmpty) utilities.Wallet.getWallet(mantlePlaceMnemonics, hdPath = MintAssetHDPath)
   else throw new IllegalArgumentException("MANTLE_PLACE_MNEMONICS_EMPTY")
 
-  def secretsSet: Boolean = memoSignerMnemonics.nonEmpty && mantlePlaceMnemonics.nonEmpty
+  def nftAirDropWallet: Wallet = if (mintNFTCampaignMnemonics.nonEmpty) utilities.Wallet.getWallet(mintNFTCampaignMnemonics)
+  else throw new IllegalArgumentException("MINT_NFT_CAMPAIGN_MNEMONICS_EMPTY")
 
-  def setSecrets(memoSignerSeeds: Seq[String], mantlePlaceSeeds: Seq[String]): Unit = if (!Sealed) {
+  def setSecrets(memoSignerSeeds: Seq[String], mantlePlaceSeeds: Seq[String], mintNFTCampaignSeeds: Seq[String]): Unit = if (!Sealed) {
     memoSignerMnemonics = memoSignerSeeds
     mantlePlaceMnemonics = mantlePlaceSeeds
+    mintNFTCampaignMnemonics = mintNFTCampaignSeeds
     Sealed = true
   }
 

@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AdminTransaction"
     "txHash"               VARCHAR NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
-    "memo"                 VARCHAR,
     "timeoutHeight"        INTEGER NOT NULL,
     "log"                  VARCHAR,
     "txHeight"             INTEGER,
@@ -38,7 +37,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."UserTransaction"
     "accountId"            VARCHAR NOT NULL,
     "fromAddress"          VARCHAR NOT NULL,
     "status"               BOOLEAN,
-    "memo"                 VARCHAR,
     "timeoutHeight"        INTEGER NOT NULL,
     "log"                  VARCHAR,
     "txHeight"             INTEGER,
@@ -58,7 +56,6 @@ CREATE TABLE IF NOT EXISTS CAMPAIGN."MintNFTAirDrop"
     "eligibilityTxHash"    VARCHAR NOT NULL,
     "airdropTxHash"        VARCHAR,
     "status"               BOOLEAN NOT NULL,
-    "log"                  VARCHAR,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -124,7 +121,7 @@ CREATE TABLE IF NOT EXISTS MASTER."BurntNFT"
 CREATE TABLE IF NOT EXISTS MASTER."SecondaryMarket"
 (
     "id"                   VARCHAR NOT NULL,
-    "orderId"              VARCHAR UNIQUE,
+    "orderId"              VARCHAR NOT NULL UNIQUE,
     "nftId"                VARCHAR NOT NULL,
     "collectionId"         VARCHAR NOT NULL,
     "sellerId"             VARCHAR NOT NULL,
@@ -220,27 +217,6 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."LatestBlock"
     PRIMARY KEY ("height")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."MakeOrderTransaction"
-(
-    "txHash"               VARCHAR NOT NULL,
-    "nftId"                VARCHAR NOT NULL,
-    "sellerId"             VARCHAR NOT NULL,
-    "buyerId"              VARCHAR,
-    "denom"                VARCHAR NOT NULL,
-    "makerOwnableSplit"    NUMERIC NOT NULL,
-    "expiresIn"            BIGINT  NOT NULL,
-    "takerOwnableSplit"    NUMERIC NOT NULL,
-    "secondaryMarketId"    VARCHAR NOT NULL,
-    "status"               BOOLEAN,
-    "creationHeight"       INTEGER,
-    "createdBy"            VARCHAR,
-    "createdOnMillisEpoch" BIGINT,
-    "updatedBy"            VARCHAR,
-    "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("txHash"),
-    UNIQUE ("nftId", "secondaryMarketId")
-);
-
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."MintAssetTransaction"
 (
     "txHash"               VARCHAR NOT NULL,
@@ -297,13 +273,12 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ProvisionAddressTransaction"
     PRIMARY KEY ("txHash")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SendCoinTransaction"
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SecondaryMarketBuyTransaction"
 (
     "txHash"               VARCHAR NOT NULL,
-    "fromAccountId"        VARCHAR NOT NULL,
-    "toAddress"            VARCHAR NOT NULL,
-    "amount"               VARCHAR NOT NULL,
-    "toAccountId"          VARCHAR,
+    "nftId"                VARCHAR NOT NULL,
+    "buyerId"              VARCHAR NOT NULL,
+    "secondaryMarketId"    VARCHAR NOT NULL,
     "status"               BOOLEAN,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
@@ -312,13 +287,34 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SendCoinTransaction"
     PRIMARY KEY ("txHash")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TakeOrderTransaction"
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SecondaryMarketSellTransaction"
 (
     "txHash"               VARCHAR NOT NULL,
     "nftId"                VARCHAR NOT NULL,
-    "buyerId"              VARCHAR NOT NULL,
+    "sellerId"             VARCHAR NOT NULL,
+    "orderId"              VARCHAR NOT NULL UNIQUE,
     "quantity"             NUMERIC NOT NULL,
-    "secondaryMarketId"    VARCHAR NOT NULL,
+    "expiryHeight"         BIGINT  NOT NULL,
+    "denom"                VARCHAR NOT NULL,
+    "receiveAmount"        NUMERIC NOT NULL,
+    "status"               BOOLEAN,
+    "createdBy"            VARCHAR,
+    "createdOnMillisEpoch" BIGINT,
+    "updatedBy"            VARCHAR,
+    "updatedOnMillisEpoch" BIGINT,
+    PRIMARY KEY ("txHash"),
+    UNIQUE ("nftId", "orderId"),
+    UNIQUE ("sellerId", "orderId"),
+    UNIQUE ("txHash", "sellerId")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SendCoinTransaction"
+(
+    "txHash"               VARCHAR NOT NULL,
+    "fromAccountId"        VARCHAR NOT NULL,
+    "toAddress"            VARCHAR NOT NULL,
+    "amount"               VARCHAR NOT NULL,
+    "toAccountId"          VARCHAR,
     "status"               BOOLEAN,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
@@ -344,8 +340,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."UnwrapTransaction"
 (
     "txHash"               VARCHAR NOT NULL,
     "accountId"            VARCHAR NOT NULL,
-    "ownableId"            VARCHAR NOT NULL,
-    "isCoin"               BOOLEAN NOT NULL,
+    "assetId"              VARCHAR NOT NULL,
     "amount"               NUMERIC NOT NULL,
     "status"               BOOLEAN,
     "createdBy"            VARCHAR,
@@ -359,8 +354,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WrapTransaction"
 (
     "txHash"               VARCHAR NOT NULL,
     "accountId"            VARCHAR NOT NULL,
-    "ownableId"            VARCHAR NOT NULL,
-    "isCoin"               BOOLEAN NOT NULL,
+    "denom"                VARCHAR NOT NULL,
     "amount"               NUMERIC NOT NULL,
     "status"               BOOLEAN,
     "createdBy"            VARCHAR,
@@ -489,12 +483,10 @@ ALTER TABLE MASTER_TRANSACTION."UnprovisionAddressTransaction"
 ALTER TABLE MASTER_TRANSACTION."UnprovisionAddressTransaction"
     ADD CONSTRAINT UnprovisionAddressTransaction_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
 
-ALTER TABLE MASTER_TRANSACTION."MakeOrderTransaction"
-    ADD CONSTRAINT MakeOrderTransaction_BuyerAccountId FOREIGN KEY ("buyerId") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."MakeOrderTransaction"
-    ADD CONSTRAINT MakeOrderTransaction_sellerId FOREIGN KEY ("sellerId") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."MakeOrderTransaction"
-    ADD CONSTRAINT MakeOrderTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
+ALTER TABLE MASTER_TRANSACTION."SecondaryMarketSellTransaction"
+    ADD CONSTRAINT SecondaryMarketSellTransaction_sellerId FOREIGN KEY ("sellerId") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."SecondaryMarketSellTransaction"
+    ADD CONSTRAINT SecondaryMarketSellTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
 
 ALTER TABLE MASTER_TRANSACTION."NFTTransferTransaction"
     ADD CONSTRAINT NFTTransferTransaction_OwnerId FOREIGN KEY ("fromId") REFERENCES MASTER."Account" ("id");
@@ -510,10 +502,10 @@ ALTER TABLE MASTER_TRANSACTION."SendCoinTransaction"
 ALTER TABLE MASTER_TRANSACTION."SendCoinTransaction"
     ADD CONSTRAINT SendCoinTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
 
-ALTER TABLE MASTER_TRANSACTION."TakeOrderTransaction"
-    ADD CONSTRAINT TakeOrderTransaction_BuyerAccountId FOREIGN KEY ("buyerId") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."TakeOrderTransaction"
-    ADD CONSTRAINT TakeOrderTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
+ALTER TABLE MASTER_TRANSACTION."SecondaryMarketBuyTransaction"
+    ADD CONSTRAINT SecondaryMarketBuyTransaction_BuyerAccountId FOREIGN KEY ("buyerId") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."SecondaryMarketBuyTransaction"
+    ADD CONSTRAINT SecondaryMarketBuyTransaction_TxHash FOREIGN KEY ("txHash") REFERENCES BLOCKCHAIN_TRANSACTION."UserTransaction" ("txHash");
 
 ALTER TABLE MASTER_TRANSACTION."UnwrapTransaction"
     ADD CONSTRAINT UnwrapTransaction_AccountId FOREIGN KEY ("accountId") REFERENCES MASTER."Account" ("id");
@@ -599,9 +591,9 @@ CREATE TRIGGER MINT_ASSET_TRANSACTION_LOG
     ON MASTER_TRANSACTION."MintAssetTransaction"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER MAKE_ORDER_TRANSACTION_LOG
+CREATE TRIGGER SECONDARY_MARKET_SELL_TRANSACTION_LOG
     BEFORE INSERT OR UPDATE
-    ON MASTER_TRANSACTION."MakeOrderTransaction"
+    ON MASTER_TRANSACTION."SecondaryMarketSellTransaction"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 CREATE TRIGGER NFT_MINTING_FEE_TRANSACTION_LOG
@@ -624,9 +616,9 @@ CREATE TRIGGER SEND_COIN_TRANSACTION_LOG
     ON MASTER_TRANSACTION."SendCoinTransaction"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER TAKE_ORDER_TRANSACTION_LOG
+CREATE TRIGGER SECONDARY_MARKET_BUY_TRANSACTION_LOG
     BEFORE INSERT OR UPDATE
-    ON MASTER_TRANSACTION."TakeOrderTransaction"
+    ON MASTER_TRANSACTION."SecondaryMarketBuyTransaction"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 CREATE TRIGGER UNPROVISION_ADDRESS_TRANSACTION_LOG
@@ -684,6 +676,11 @@ VALUES ('MANTLE_PLACE',
         '6MSNoTkLjY4uDONEIzGkvScwI7a6Et5P7QGIayQOBXjiwGDVHoUIdeYR3ow6fFTOE/dnXquNvShPy1FrSnkaeOtlG1lpUPe1Xxi105JybO+eiN4/eCTqNpUR2mA6NHPypGCozfnjlXgmIk4hMzfGGZbPwHDcrhjSMwYD6u5AHhDJwoRzMtS2izEUj/Wq/Dih/nIepC5NnUhcQMFLKwxDOs24q4b49J4VZOrwQcNRKi4=',
         'YSFEa1dvQE4qUl54akY2dkNAbkFMQHphRDI0V3FIZmJUWg==');
 
+INSERT INTO MASTER."Secret" ("id", "secret", "salt")
+VALUES ('MINT_NFT_AIR_DROP',
+        '6MSNoTkLjY4uDONEIzGkvScwI7a6Et5P7QGIayQOBXjiwGDVHoUIdeYR3ow6fFTOE/dnXquNvShPy1FrSnkaeOtlG1lpUPe1Xxi105JybO+eiN4/eCTqNpUR2mA6NHPypGCozfnjlXgmIk4hMzfGGZbPwHDcrhjSMwYD6u5AHhDJwoRzMtS2izEUj/Wq/Dih/nIepC5NnUhcQMFLKwxDOs24q4b49J4VZOrwQcNRKi4=',
+        'YSFEa1dvQE4qUl54akY2dkNAbkFMQHphRDI0V3FIZmJUWg==');
+
 
 # --- !Downs
 DROP TRIGGER IF EXISTS BT_ADMIN_TRANSACTION_LOG ON BLOCKCHAIN_TRANSACTION."AdminTransaction" CASCADE;
@@ -708,9 +705,9 @@ DROP TRIGGER IF EXISTS NFT_MINTING_FEE_TRANSACTION_LOG ON MASTER_TRANSACTION."NF
 DROP TRIGGER IF EXISTS NFT_TRANSFER_TRANSACTION_LOG ON MASTER_TRANSACTION."NFTTransferTransaction" CASCADE;
 DROP TRIGGER IF EXISTS PROVISION_ADDRESS_TRANSACTION_LOG ON MASTER_TRANSACTION."ProvisionAddressTransaction" CASCADE;
 DROP TRIGGER IF EXISTS UNPROVISION_ADDRESS_TRANSACTION_LOG ON MASTER_TRANSACTION."UnprovisionAddressTransaction" CASCADE;
-DROP TRIGGER IF EXISTS MAKE_ORDER_TRANSACTION_LOG ON MASTER_TRANSACTION."MakeOrderTransaction" CASCADE;
+DROP TRIGGER IF EXISTS SECONDARY_MARKET_BUY_TRANSACTION_LOG ON MASTER_TRANSACTION."SecondaryMarketBuyTransaction" CASCADE;
+DROP TRIGGER IF EXISTS SECONDARY_MARKET_SELL_TRANSACTION_LOG ON MASTER_TRANSACTION."SecondaryMarketSellTransaction" CASCADE;
 DROP TRIGGER IF EXISTS SEND_COIN_TRANSACTION_LOG ON MASTER_TRANSACTION."SendCoinTransaction" CASCADE;
-DROP TRIGGER IF EXISTS TAKE_ORDER_TRANSACTION_LOG ON MASTER_TRANSACTION."TakeOrderTransaction" CASCADE;
 DROP TRIGGER IF EXISTS UNWRAP_TRANSACTION_LOG ON MASTER_TRANSACTION."UnwrapTransaction" CASCADE;
 DROP TRIGGER IF EXISTS WRAP_TRANSACTION_LOG ON MASTER_TRANSACTION."WrapTransaction" CASCADE;
 
@@ -730,14 +727,14 @@ DROP TABLE IF EXISTS MASTER_TRANSACTION."CancelOrderTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."DefineAssetTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."ExternalAsset" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."LatestBlock" CASCADE;
-DROP TABLE IF EXISTS MASTER_TRANSACTION."MakeOrderTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."MintAssetTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."NFTMintingFeeTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."NFTTransferTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."IssueIdentityTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."ProvisionAddressTransaction" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."SecondaryMarketBuyTransaction" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."SecondaryMarketSellTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SendCoinTransaction" CASCADE;
-DROP TABLE IF EXISTS MASTER_TRANSACTION."TakeOrderTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."UnprovisionAddressTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."UnwrapTransaction" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."WrapTransaction" CASCADE;

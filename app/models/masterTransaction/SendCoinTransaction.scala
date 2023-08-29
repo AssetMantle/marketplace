@@ -111,7 +111,7 @@ class SendCoinTransactions @Inject()(
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
         val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
+        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = amount)),
           fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = gasLimit),
           gasLimit = gasLimit,
@@ -124,7 +124,7 @@ class SendCoinTransactions @Inject()(
         val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = fromAccountId, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.User.SEND_COIN)
+              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = fromAccountId, fromAddress = fromAddress, timeoutHeight = timeoutHeight, txType = constants.Transaction.User.SEND_COIN)
               _ <- Service.addWithNoneStatus(txHash = txHash, fromAccountId = fromAccountId, toAddress = toAddress, toAccountId = None, amount = amount)
             } yield userTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()

@@ -139,7 +139,7 @@ class WalletController @Inject()(
   def wrappedTokenBalance(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
-        val split = blockchainSplits.Service.getByOwnerIDAndOwnableID(ownerId = utilities.Identity.getMantlePlaceIdentityID(loginState.username), ownableID = constants.Blockchain.StakingTokenCoinID)
+        val split = blockchainSplits.Service.getByOwnerIDAndAssetID(ownerId = utilities.Identity.getMantlePlaceIdentityID(loginState.username), assetID = constants.Blockchain.StakingTokenAssetID)
         (for {
           split <- split
         } yield Ok(s"${utilities.NumericOperation.formatNumber(split.fold(MicroNumber.zero)(_.getBalanceAsMicroNumber))} $$MNTL")
@@ -210,7 +210,7 @@ class WalletController @Inject()(
           Future(BadRequest(views.html.wallet.unwrapToken(formWithErrors)))
         },
         unwrapTokenData => {
-          val split = blockchainSplits.Service.tryGetByOwnerIDAndOwnableID(ownerId = utilities.Identity.getMantlePlaceIdentityID(loginState.username), ownableID = constants.Blockchain.StakingTokenCoinID)
+          val split = blockchainSplits.Service.tryGetByOwnerIDAndAssetID(ownerId = utilities.Identity.getMantlePlaceIdentityID(loginState.username), assetID = constants.Blockchain.StakingTokenAssetID)
           val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = unwrapTokenData.password)
 
           def validateAndTransfer(split: Split, verifyPassword: Boolean, key: Key) = {
@@ -222,7 +222,6 @@ class WalletController @Inject()(
                 fromAddress = key.address,
                 accountId = loginState.username,
                 amount = split.value,
-                ownableId = constants.Blockchain.StakingTokenCoinID,
                 gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, unwrapTokenData.password))
               )

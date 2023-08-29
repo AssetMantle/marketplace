@@ -4,8 +4,7 @@ import com.cosmos.base.v1beta1.{Coin => protoCoin}
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Json, Reads, Writes}
-import schema.id.OwnableID
-import schema.id.base.{CoinID, StringID}
+import schema.id.base.AssetID
 import utilities.MicroNumber
 
 case class Coin(denom: String, amount: MicroNumber) {
@@ -45,9 +44,7 @@ case class Coin(denom: String, amount: MicroNumber) {
 
   def toProtoCoin: protoCoin = protoCoin.newBuilder().setDenom(this.denom).setAmount(this.amount.toMicroString).build()
 
-  def getDenomCoinID: CoinID = CoinID(StringID(this.denom))
-
-  def getDenomOwnableID: OwnableID = CoinID(StringID(this.denom))
+  def getDenomAssetID: AssetID = schema.document.CoinAsset.getCoinAssetID(this.denom)
 }
 
 object Coin {

@@ -98,8 +98,8 @@ class MintAssetTransactions @Inject()(
 
   object Utility {
 
-    private def transaction(nftIDs: Seq[String], gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(constants.Secret.getMintAssetWallet.address)
+    private def transaction(nftIDs: Seq[String], ecKey: ECKey): Future[BlockchainTransaction] = {
+      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(constants.Secret.mintAssetWallet.address)
       val nfts = masterNFTs.Service.getByIds(nftIDs)
       val nftOwners = masterNFTOwners.Service.getByIds(nftIDs)
       val nftProperties = masterNFTProperties.Service.get(nftIDs)
@@ -110,12 +110,12 @@ class MintAssetTransactions @Inject()(
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String], nfts: Seq[NFT], collections: Seq[Collection], nftOwners: Seq[NFTOwner], nftProperties: Seq[NFTProperty], identityIDExists: Seq[String]) = if (identityIDExists.distinct.length == nftOwners.map(_.ownerId).distinct.length) {
         val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
+        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
           messages = nfts.map(nft => {
             val collection = collections.find(_.id == nft.collectionId).getOrElse(constants.Response.COLLECTION_NOT_FOUND.throwBaseException())
-            utilities.BlockchainTransaction.getMintAssetMsg(fromAddress = constants.Secret.getMintAssetWallet.address, toID = nftOwners.find(_.nftId == nft.id).getOrElse(constants.Response.NFT_NOT_FOUND.throwBaseException()).getOwnerIdentityID, classificationID = collection.getClassificationID, fromID = constants.Transaction.FromID, immutableMetas = nft.getImmutableMetaProperties(nftProperties, collection), mutableMetas = nft.getMutableMetaProperties(nftProperties), immutables = nft.getImmutableProperties(nftProperties), mutables = nft.getMutableProperties(nftProperties))
+            utilities.BlockchainTransaction.getMintAssetMsg(fromAddress = constants.Secret.mintAssetWallet.address, toID = nftOwners.find(_.nftId == nft.id).getOrElse(constants.Response.NFT_NOT_FOUND.throwBaseException()).getOwnerIdentityID, classificationID = collection.getClassificationID, fromID = constants.Transaction.FromID, immutableMetas = nft.getImmutableMetaProperties(nftProperties, collection), mutableMetas = nft.getMutableMetaProperties(nftProperties), immutables = nft.getImmutableProperties(nftProperties), mutables = nft.getMutableProperties(nftProperties))
           }),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultMintAssetGasLimit * nftIDs.length),
+          fee = utilities.BlockchainTransaction.getFee(gasPrice = constants.Transaction.AdminTxGasPrice, gasLimit = constants.Transaction.DefaultMintAssetGasLimit * nftIDs.length),
           gasLimit = constants.Transaction.DefaultMintAssetGasLimit * nftIDs.length,
           account = bcAccount,
           ecKey = ecKey,
@@ -125,7 +125,7 @@ class MintAssetTransactions @Inject()(
         val checkAndAdd = {
           if (!unconfirmedTxHashes.contains(txHash)) {
             for {
-              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Secret.getMintAssetWallet.address, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.MINT_ASSET)
+              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Secret.mintAssetWallet.address, timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.MINT_ASSET)
               _ <- Service.addWithNoneStatus(txHash = txHash, nftIDs = nftIDs, toAccountIDs = nftOwners.map(x => x.nftId -> x.ownerId).toMap)
             } yield adminTransaction
           } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
@@ -181,7 +181,7 @@ class MintAssetTransactions @Inject()(
       }
 
       def doTx(nfts: Seq[NFT], anyPendingTx: Boolean) = if (nfts.nonEmpty && !anyPendingTx) {
-        val tx = transaction(nftIDs = nfts.map(_.id), gasPrice = 0.0001, ecKey = constants.Secret.getMintAssetWallet.getECKey)
+        val tx = transaction(nftIDs = nfts.map(_.id), ecKey = constants.Secret.mintAssetWallet.getECKey)
 
         def updateMasterKeys() = masterNFTs.Service.markNFTsMintPending(nfts.map(_.id))
 

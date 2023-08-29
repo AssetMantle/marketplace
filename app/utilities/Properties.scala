@@ -1,10 +1,11 @@
 package utilities
 
+import com.google.protobuf.ByteString
 import models.master.NFTProperty
 import play.api.Logger
 import schema.data.Data
 import schema.data.base._
-import schema.id.base.{DataID, PropertyID, StringID}
+import schema.id.base.{DataID, HashID, PropertyID, StringID}
 import schema.property.base.{MesaProperty, MetaProperty}
 
 import scala.util.Try
@@ -47,15 +48,15 @@ object Properties {
     case _ => throw new IllegalArgumentException(s"INVALID_DATA: ${`type`} + $value")
   }
 
-  def getCollectionDefaultImmutableMetaProperties(collectionName: String, creatorID: String, nftName: String = "", fileHash: String = ""): Seq[MetaProperty] = Seq(
+  def getCollectionDefaultImmutableMetaProperties(collectionName: String, creatorID: String, nftName: String = "", fileHashID: HashID = HashID(Array[Byte]()), fileExtension: String = "", serviceEndpoint: String = ""): Seq[MetaProperty] = Seq(
     MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.NFT_NAME), typeID = schema.data.constants.StringDataTypeID), data = StringData(nftName)),
     MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.COLLECTION_NAME), typeID = schema.data.constants.StringDataTypeID), data = StringData(collectionName)),
-    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.FILE_RESOURCE), typeID = schema.data.constants.StringDataTypeID), data = StringData(fileHash)),
+    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.FILE_RESOURCE), typeID = schema.data.constants.LinkedDataTypeID), data = LinkedData(resourceID = fileHashID, extensionID = StringID(fileExtension), serviceEndpoint = serviceEndpoint)),
     MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.CREATOR_ID), typeID = schema.id.constants.IdentityIDType), data = IDData(utilities.Identity.getMantlePlaceIdentityID(creatorID)))
   )
 
-  def getNFTDefaultImmutableMetaProperties(name: String, collectionName: String, fileHash: String, bondAmount: Long, creatorID: String): Seq[MetaProperty] = {
-    getCollectionDefaultImmutableMetaProperties(collectionName = collectionName, creatorID = creatorID, nftName = name, fileHash = fileHash) :+
+  def getNFTDefaultImmutableMetaProperties(name: String, collectionName: String, fileHash: HashID, bondAmount: Long, creatorID: String, fileExtension: String, endPoint: String): Seq[MetaProperty] = {
+    getCollectionDefaultImmutableMetaProperties(collectionName = collectionName, creatorID = creatorID, nftName = name, fileHashID = fileHash, fileExtension = fileExtension, serviceEndpoint = endPoint) :+
       MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.BOND_AMOUNT), typeID = schema.data.constants.NumberDataTypeID), data = NumberData(bondAmount))
   }
 

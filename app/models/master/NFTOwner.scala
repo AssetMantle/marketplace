@@ -163,7 +163,7 @@ class NFTOwners @Inject()(
       } yield ()
     }
 
-    def onSuccessfulTakeOrder(nftId: String, collection: Collection, totalSold: BigInt, buyerId: String): Future[Unit] = {
+    def onSuccessfulBuyFromSecondaryMarket(nftId: String, collection: Collection, totalSold: BigInt, buyerId: String): Future[Unit] = {
       val oldNFTOwner = get(nftId = nftId, ownerId = buyerId)
 
       def verifyAndUpdate(oldNFTOwner: Option[NFTOwner]) = if (oldNFTOwner.isDefined) {
