@@ -517,6 +517,9 @@
               width: 70px;
             }
           }
+          .sortBtn{
+            @include setFont(var(--font-type-2), normal, 700, 14px, 16px, var(--mantle-off-white));
+          }
         }
       }
       .contentBody{
@@ -777,6 +780,30 @@
               td{
                 &.tableFieldName{
                   cursor: pointer;
+                }
+              }
+            }
+          }
+        }
+        #tradeSellOrders,
+        #tradeYourOrders{
+          .tableFieldAction{min-width: 60px;}
+          .tableFieldName{min-width: 335px; max-width: 335px;}
+          .tableFieldPrice{min-width: 140px;}
+          .tableFieldAmount{min-width: 140px;}
+          .tableFieldTotal{min-width: 140px;}
+          tbody{
+            tr {
+              td{
+                padding: 8px 8px 8px 0px !important;
+                &.tableFieldAction{
+                  padding-left: 20px !important;
+                }
+                &.tableFieldName{
+                  color: var(--gray);
+                }
+                &.tableFieldPrice{
+                  color: var(--error);
                 }
               }
             }

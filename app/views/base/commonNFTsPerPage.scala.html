@@ -29,9 +29,9 @@
 @if(nfts.nonEmpty) {
     @nfts.map { nft =>
         @if(loginState.isEmpty) {
-            @commonNFTCard(collection, nft, None, JavaScript(s"viewNFT('${nft.id}')"), nftOwners.find(_.nftId == nft.id))
+            @commonNFTCard(collection, nft, None, JavaScript(s"viewNFT('${nft.id}','${loginState.fold("")(_.username)}', '${constants.View.OVERVIEW}')"), nftOwners.find(_.nftId == nft.id))
         } else {
-            @commonNFTCard(collection, nft, Option(likedNFTIds.contains(nft.id)), JavaScript(s"viewNFT('${nft.id}')"), nftOwners.find(_.nftId == nft.id))
+            @commonNFTCard(collection, nft, Option(likedNFTIds.contains(nft.id)), JavaScript(s"viewNFT('${nft.id}','${loginState.fold("")(_.username)}', '${constants.View.OVERVIEW}')"), nftOwners.find(_.nftId == nft.id))
         }
     }
 } else {

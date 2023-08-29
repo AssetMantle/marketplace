@@ -1,0 +1,41 @@
+@import controllers.actions.LoginState
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+
+<div class="contentBody">
+    <div class="container contentTableContainer" id="tradeYourOrders">
+        <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <div class="table-responsive">
+                    <table class="table contentTable">
+                        <thead>
+                            <tr>
+                                <th class="tableFieldAction"></th>
+                                <th class="tableFieldName">@Messages(constants.View.TRADE_TABLE_TITLE_NAME)</th>
+                                <th class="text-center tableFieldPrice">@Messages(constants.View.TRADE_TABLE_TITLE_PRICE)</th>
+                                <th class="text-center tableFieldAmount">@Messages(constants.View.TRADE_TABLE_TITLE_AMOUNT)</th>
+                                <th class="text-center tableFieldTotal">@Messages(constants.View.TRADE_TABLE_TITLE_TOTAL)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tradeSellOrdersTableBody">
+                            <tr>
+                                <td class="tableFieldAction">
+                                    <input type="checkbox" class="am-checkbox"/>
+                                </td>
+                                <td class="tableFieldName">
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="35" height="35"/>
+                                        Lorem ipsum dolor sit
+                                    </div>
+                                </td>
+                                <td class="text-center tableFieldPrice">0000.000000</td>
+                                <td class="text-center tableFieldAmount">0000.000000</td>
+                                <td class="text-center tableFieldTotal">0000.000000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
