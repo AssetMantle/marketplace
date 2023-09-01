@@ -1,5 +1,6 @@
 timer = 0;
 timeoutFlag = true;
+reCaptchaFlag = false;
 
 function checkUsernameAvailable(source, usernameAvailableCheckBoxID) {
     if (timeoutFlag) {
@@ -116,7 +117,7 @@ function checkNewPassword() {
 
 function activeButton() {
     let termsCondition = document.getElementById("termsCondition");
-    if (termsCondition.checked === true) {
+    if (termsCondition.checked === true && reCaptchaFlag === true) {
         $("#FORM_SIGN_UP_SUBMIT").removeClass("disable");
     } else {
         $("#FORM_SIGN_UP_SUBMIT").addClass("disable");
@@ -132,3 +133,15 @@ $(document).ready(function () {
     $('#FORM_SIGN_UP_SUBMIT').addClass("disable");
 })
 
+
+// Google reCaptcha
+var onSubmit = function(token) {
+    reCaptchaFlag = true;
+    activeButton();
+};
+
+function CaptchaCallback() {
+    if ( $('#myRecaptcha').length ) {
+        grecaptcha.render('myRecaptcha', {'sitekey' : '6LfhFrwnAAAAAKKOVgEAdCHHtgalQj0PosHPn8Xu','callback' : onSubmit});
+    }
+}
