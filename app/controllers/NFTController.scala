@@ -15,6 +15,7 @@ import utilities.MicroNumber
 import views.base.companion.UploadFile
 import views.nft.companion._
 
+import java.io.File
 import java.nio.file.Files
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
@@ -58,17 +59,22 @@ class NFTController @Inject()(
 
   implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
 
-  def viewNFT(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def viewNFT(nftId: String, activeTab: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val nft = masterNFTs.Service.tryGet(nftId)
         (for {
           nft <- nft
-        } yield Ok(views.html.nft.viewNft(nft))
+        } yield Ok(views.html.nft.viewNft(nft, activeTab))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
     }
+  }
+
+  def overview(nftId: String, activeTab: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.nft.detail.view(nftId = nftId, activeTab = activeTab)))
   }
 
   def details(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
@@ -85,11 +91,26 @@ class NFTController @Inject()(
           nftProperties <- nftProperties
           liked <- liked
           collection <- getCollection(nft.collectionId)
-        } yield Ok(views.html.nft.detail.view(collection, nft, nftProperties, liked))
+        } yield Ok(views.html.nft.detail.overview(collection, nft, nftProperties, liked))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
     }
+  }
+
+  def trade(nftId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.nft.detail.trade(nftId = nftId)))
+  }
+
+  def sellOrders(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.nft.detail.sellOrders()))
+  }
+
+  def yourOrders(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.nft.detail.yourOrders()))
   }
 
   def marketListings(nftId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
@@ -97,7 +118,7 @@ class NFTController @Inject()(
       implicit request =>
         val secondaryMarkets = masterSecondaryMarkets.Service.getByNFTIdAndPageNumber(nftId, pageNumber)
 
-        def orders(secondaryMarkets: Seq[SecondaryMarket]) = blockchainOrders.Service.get(secondaryMarkets.filter(_.orderId.isDefined).map(_.orderId.get))
+        def orders(secondaryMarkets: Seq[SecondaryMarket]) = blockchainOrders.Service.get(secondaryMarkets.map(_.orderId))
 
         (for {
           secondaryMarkets <- secondaryMarkets
@@ -160,6 +181,7 @@ class NFTController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val lowestPriceSecondaryMarket = masterSecondaryMarkets.Service.getByNFTIdAndLowestPrice(nftId)
+        val totalOwners = masterNFTOwners.Service.countOwners(nftId)
         val userSecondaryMarket = if (loginState.isDefined) masterSecondaryMarkets.Service.getByNFTIdAndSellerId(nftId = nftId, sellerId = loginState.get.username).map(_.sortBy(_.price)) else Future(Seq())
         val nft = masterNFTs.Service.tryGet(nftId)
         val nftOwner: Future[Option[NFTOwner]] = if (loginState.isDefined) masterNFTOwners.Service.get(nftId = nftId, ownerId = loginState.get.username) else Future(None)
@@ -172,10 +194,11 @@ class NFTController @Inject()(
           nft <- nft
           lowestPriceSecondaryMarket <- lowestPriceSecondaryMarket
           userSecondaryMarket <- userSecondaryMarket
+          totalOwners <- totalOwners
           nftOwner <- nftOwner
           collection <- collection(nft.collectionId)
           collectionAnalysis <- collectionAnalysis(nft.collectionId)
-        } yield Ok(views.html.nft.detail.rightCards(collection, collectionAnalysis, nft, userNFTOwner = nftOwner, lowestPriceSecondaryMarket = lowestPriceSecondaryMarket, userSecondaryMarket = userSecondaryMarket.headOption, tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice))
+        } yield Ok(views.html.nft.detail.rightCards(collection, collectionAnalysis, nft, userNFTOwner = nftOwner, lowestPriceSecondaryMarket = lowestPriceSecondaryMarket, userSecondaryMarket = userSecondaryMarket.headOption, tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice, totalOwners = totalOwners))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -230,7 +253,7 @@ class NFTController @Inject()(
           try {
             request.body.file(constants.File.KEY_FILE) match {
               case None => BadRequest(constants.View.BAD_REQUEST)
-              case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.COLLECTION_DRAFT_FILE_FORM.maxFileSize) {
+              case Some(file) => if (fileUploadInfo.resumableTotalSize <= constants.File.NFT_FILE_FORM.maxFileSize) {
                 utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, utilities.Collection.getNFTFilePath(collectionId))
                 Ok
               } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
@@ -246,10 +269,14 @@ class NFTController @Inject()(
     implicit request =>
       val oldFilePath = utilities.Collection.getNFTFilePath(collectionId) + name
       val nftId = utilities.FileOperations.getFileHash(oldFilePath)
-      val fileExtension = utilities.FileOperations.fileExtensionFromName(name)
+      val fileExtension = utilities.FileOperations.fileExtensionFromName(name).toLowerCase
       val newFileName = nftId + "." + fileExtension
       val awsKey = utilities.NFT.getAWSKey(fileName = newFileName)
-      val collection = masterCollections.Service.tryGet(id = collectionId)
+      val collection = if (new File(oldFilePath).length() <= constants.File.NFT_FILE_FORM.maxFileSize) masterCollections.Service.tryGet(id = collectionId)
+      else {
+        utilities.FileOperations.deleteFile(oldFilePath)
+        constants.Response.FILE_SIZE_GREATER_THAN_ALLOWED.throwBaseException()
+      }
 
       def uploadToAws(collection: Collection) = if (collection.creatorId == loginState.username) Future(utilities.AmazonS3.uploadFile(objectKey = awsKey, filePath = oldFilePath))
       else {
@@ -442,12 +469,15 @@ class NFTController @Inject()(
 
           def collection(collectionId: String) = masterCollections.Service.tryGet(id = collectionId)
 
-          def delete(isOwner: Boolean) = masterTransactionNFTDrafts.Service.delete(deleteDraftData.nftFileName)
+          def delete(isOwner: Boolean, nftDraft: NFTDraft) = if (isOwner) {
+            utilities.AmazonS3.deleteObject(utilities.NFT.getAWSKey(nftDraft.getFileName))
+            masterTransactionNFTDrafts.Service.delete(deleteDraftData.nftFileName)
+          } else constants.Response.NOT_NFT_OWNER.throwBaseException()
 
           (for {
             nftDraft <- nftDraft
             collection <- collection(nftDraft.collectionId)
-            _ <- delete(collection.creatorId == loginState.username)
+            _ <- delete(collection.creatorId == loginState.username, nftDraft)
           } yield Ok
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
@@ -510,6 +540,7 @@ class NFTController @Inject()(
 
           def verifyAndTx(verifyPassword: Boolean, balance: MicroNumber, key: Key, nft: NFT, nftOwner: NFTOwner, collection: Collection) = {
             val errors = Seq(
+              if (nftOwner.saleId.nonEmpty || nftOwner.publicListingId.nonEmpty) Option(constants.Response.NFT_ON_SALE_CANNOT_BE_MINTED) else None,
               if (balance <= collection.getBondAmount) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (nft.isMinted.getOrElse(true)) Option(constants.Response.NFT_ALREADY_MINTED) else None,
@@ -605,6 +636,12 @@ class NFTController @Inject()(
           }
         }
       )
+  }
+
+  def resource(id: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginAction { implicit request =>
+      Redirect(constants.CommonConfig.AmazonS3.s3BucketURL + utilities.NFT.getAWSKey(id))
+    }
   }
 
 }

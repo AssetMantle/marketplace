@@ -11,4 +11,8 @@ object Account {
     val USER = "USER"
   }
 
+  object Key {
+    val DEFAULT_NAME = "DEFAULT"
+  }
+
 }

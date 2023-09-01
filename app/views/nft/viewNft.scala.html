@@ -1,9 +1,9 @@
 @import controllers.actions.LoginState
 
-@(nft: master.NFT)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(nft: master.NFT, activeTab: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 @views.html.base.common(constants.View.NFT)
 
 <script>
-        viewNFT('@nft.id');
+        viewNFT('@nft.id','@activeTab');
 </script>

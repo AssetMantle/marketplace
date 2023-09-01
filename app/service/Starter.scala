@@ -128,14 +128,15 @@ class Starter @Inject()(
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = value)
       } else if (propertyType == constants.NFT.Data.BOOLEAN) {
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = value.toBoolean.toString)
-      } else if (propertyType == constants.NFT.Data.NUMBER) {
+      } else if (propertyType == constants.NFT.Data.DECIMAL) {
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = BigDecimal(value).toString)
+      } else if (propertyType == constants.NFT.Data.NUMBER) {
+        commonCollection.Property(name = name, `type` = propertyType, defaultValue = BigInt(value).toString)
       } else constants.Response.INVALID_NFT_PROPERTY.throwBaseException()
     }
   }
 
   implicit val CollectionPropertyReads: Reads[CollectionProperty] = Json.reads[CollectionProperty]
-
 
   def fixMantleMonkeys(): Future[Unit] = {
     val classificationProperties = Seq(
@@ -200,7 +201,11 @@ class Starter @Inject()(
         val updatedDefaultValue = if (x.defaultValue == "") "false" else x.defaultValue
         x.copy(`type` = constants.NFT.Data.BOOLEAN, defaultValue = updatedDefaultValue)
       }) ++ collection.properties.get.filterNot(x => x.`type` == "DECIMAL" || x.`type` == "Decimal" || x.`type` == "String" || x.`type` == "Boolean")
-        .map(x => x.copy(name = x.name.trim))
+        .map(x => x.copy(name = x.name.trim
+          .replaceAll("-", "")
+          .replaceAll(" ", "_")
+          .replaceAll("/", "of")
+          .replaceAll("No.", "Number")))
       masterCollections.Service.update(collection.copy(properties = Option(properties)))
     }
 

@@ -7,6 +7,8 @@ import schema.property.Property
 
 case class MesaProperty(id: PropertyID, dataID: DataID) extends Property {
 
+  require(this.id.typeID.value == this.dataID.typeID.value, "MESA_PROPERTY_TYPE_ID_AND_DATA_ID_TYPE_MISMATCH")
+
   def getID: PropertyID = this.id
 
   def getDataID: DataID = this.dataID
@@ -19,6 +21,8 @@ case class MesaProperty(id: PropertyID, dataID: DataID) extends Property {
 
   def isMeta: Boolean = false
 
+  def isMesa: Boolean = true
+
   def asProtoMesaProperty: protoMesaProperty = protoMesaProperty.newBuilder().setID(this.id.asProtoPropertyID).setDataID(this.dataID.asProtoDataID).build()
 
   def toAnyProperty: AnyProperty = AnyProperty.newBuilder().setMesaProperty(this.asProtoMesaProperty).build()
@@ -26,6 +30,8 @@ case class MesaProperty(id: PropertyID, dataID: DataID) extends Property {
   def getProtoBytes: Array[Byte] = this.asProtoMesaProperty.toByteString.toByteArray
 
   def scrub(): MesaProperty = this
+
+  def mutate(data: Data): Property = MesaProperty(id = this.id, dataID = data.getDataID)
 }
 
 object MesaProperty {
@@ -35,5 +41,7 @@ object MesaProperty {
   def apply(protoBytes: Array[Byte]): MesaProperty = MesaProperty(protoMesaProperty.parseFrom(protoBytes))
 
   def apply(id: PropertyID, data: Data): MesaProperty = MesaProperty(id, data.getDataID)
+
+  def apply(keyID: StringID, data: Data): MesaProperty = MesaProperty(id = PropertyID(keyID = keyID, typeID = data.getType), data.getDataID)
 
 }

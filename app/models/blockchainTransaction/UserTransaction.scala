@@ -8,7 +8,6 @@ import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import queries.blockchain._
-import queries.responses.blockchain.UnconfirmedTxsResponse
 import slick.jdbc.H2Profile.api._
 import transactions.blockchain._
 import transactions.responses.blockchain.BroadcastTxSyncResponse
@@ -17,7 +16,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class UserTransaction(txHash: String, accountId: String, fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], txHeight: Option[Int], txType: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
+case class UserTransaction(txHash: String, accountId: String, fromAddress: String, status: Option[Boolean], timeoutHeight: Int, log: Option[String], txHeight: Option[Int], txType: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
 
   def id: String = txHash
 }
@@ -26,7 +25,7 @@ private[blockchainTransaction] object UserTransactions {
 
   class UserTransactionTable(tag: Tag) extends Table[UserTransaction](tag, "UserTransaction") with ModelTable[String] {
 
-    def * = (txHash, accountId, fromAddress, status.?, memo.?, timeoutHeight, log.?, txHeight.?, txType, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (UserTransaction.tupled, UserTransaction.unapply)
+    def * = (txHash, accountId, fromAddress, status.?, timeoutHeight, log.?, txHeight.?, txType, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (UserTransaction.tupled, UserTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
@@ -35,8 +34,6 @@ private[blockchainTransaction] object UserTransactions {
     def fromAddress = column[String]("fromAddress")
 
     def status = column[Boolean]("status")
-
-    def memo = column[String]("memo")
 
     def timeoutHeight = column[Int]("timeoutHeight")
 
@@ -80,8 +77,8 @@ class UserTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, accountId: String, fromAddress: String, memo: Option[String], timeoutHeight: Int, txType: String): Future[UserTransaction] = {
-      val tx = UserTransaction(txHash = txHash, accountId = accountId, fromAddress = fromAddress, status = None, log = None, memo = memo, timeoutHeight = timeoutHeight, txHeight = None, txType = txType)
+    def addWithNoneStatus(txHash: String, accountId: String, fromAddress: String, timeoutHeight: Int, txType: String): Future[UserTransaction] = {
+      val tx = UserTransaction(txHash = txHash, accountId = accountId, fromAddress = fromAddress, status = None, log = None, timeoutHeight = timeoutHeight, txHeight = None, txType = txType)
       for {
         _ <- create(tx)
       } yield tx
@@ -112,22 +109,6 @@ class UserTransactions @Inject()(
   }
 
   object Utility {
-
-    def getLatestHeightAccountAndUnconfirmedTxs(address: String): Future[(Int, Account, UnconfirmedTxsResponse.Response)] = {
-      // TODO
-      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
-      val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(address).map(_.account.toSerializableAccount).recover {
-        case _: Exception => models.blockchain.Account(address = address, accountType = None, accountNumber = 0, sequence = 0, publicKey = None)
-      }
-      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
-
-      for {
-        abciInfo <- abciInfo
-        bcAccount <- bcAccount
-        unconfirmedTxs <- unconfirmedTxs
-      } yield (abciInfo.result.response.last_block_height.toInt, bcAccount, unconfirmedTxs)
-    }
 
     def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]): Future[UserTransaction] = {
 

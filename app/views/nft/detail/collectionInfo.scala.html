@@ -2,7 +2,6 @@
 @import models.master.Collection
 @import views.html.base.commonStringValue
 @import models.master.NFTOwner
-@import views.html.base.buttons.commonPrimaryButton
 
 @(nft: master.NFT, collection: Collection, nftOwner: Option[NFTOwner], numberOfOwners: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <div class="sticky-top item-sticky">

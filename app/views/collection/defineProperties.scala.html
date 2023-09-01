@@ -5,10 +5,12 @@
 @import views.html.base.form._
 @import views.html.collection.commonPropertyBox
 @import views.html.helper.repeatWithIndex
+@import views.html.base.modal._
 
 @(definePropertiesForm: Form[DefineProperties.Data] = DefineProperties.form, collectionDraftId: String, collectionDraft: Option[CollectionDraft])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonForm(constants.Form.DEFINE_COLLECTION_PROPERTIES, definePropertiesForm, submitDisable = false, showBackButton = true, callBackFunction = JavaScript(s"""updateExplorerContainer('${loginState.username}')""")) {
+    @multiStepNavigator(Seq(Messages(constants.View.COLLECTION_STEPPER_BASIC_INFORMATION),Messages(constants.View.COLLECTION_STEPPER_IMAGE_UPLOAD),Messages(constants.View.COLLECTION_STEPPER_CAPABILITIES),Messages(constants.View.COLLECTION_STEPPER_PROPERTIES)),defaultSelected = 3)
     @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionDraftId, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
     @commonCheckbox(definePropertiesForm, constants.FormField.SAVE_COLLECTION_DRAFT, Symbol("containerDivClass") -> "hidden")
     @commonToggleButton(definePropertiesForm, constants.FormField.FRACTIONALIZED_NFT)
@@ -39,7 +41,7 @@
                 </div>
             </div>
             <div class="propertyDetail">
-                @commonPropertyBox(index = 3, label = constants.Properties.DefaultProperty.FILE_HASH, value = "", visibility = true, requirement = true)
+                @commonPropertyBox(index = 3, label = constants.Properties.DefaultProperty.FILE_RESOURCE, value = "", visibility = true, requirement = true)
                 @commonPropertyBox(index = 4, label = constants.Properties.DefaultProperty.CREATOR_ID, value = "", visibility = true, requirement = true)
             </div>
             <div class="separator"></div>
@@ -58,7 +60,7 @@
                             </div>
                             <div class="d-flex gap-4">
                             @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length) {
-                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collectionDraft.get.properties(index).name, Symbol("required") -> false)
+                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collectionDraft.get.properties(index).name, Symbol("required") -> true)
                                 @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("value") -> collectionDraft.get.properties(index).`type`, Symbol("data-index") -> index, Symbol("class") -> "custom-select sources filledSelect")
                             } else {
                                 @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("required") -> false)
@@ -131,6 +133,18 @@
                                                         </div>
                                                     }
                                                     @if(collectionDraft.get.properties(index).`type` == constants.NFT.Data.NUMBER) {
+                                                        <div class="propertyType number active">
+                                                            <div class="mb-0 commonInputInt w-100">
+                                                                <div class="fieldContainer">
+                                                                    <dt><label for="fieldValue_@index">@Messages(constants.View.NFT_PROPERTY_VALUE)</label></dt>
+                                                                    <dd>
+                                                                        <input type="number" id="fieldValue_@index" name="fieldValue_@index" class="propertyTypeField am-input" onkeyup="setNonBooleanValue(@index, event)" value="@collectionDraft.get.properties(index).defaultValue"/>
+                                                                    </dd>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    @if(collectionDraft.get.properties(index).`type` == constants.NFT.Data.DECIMAL) {
                                                         <div class="propertyType number active">
                                                             <div class="mb-0 commonInputInt w-100">
                                                                 <div class="fieldContainer">

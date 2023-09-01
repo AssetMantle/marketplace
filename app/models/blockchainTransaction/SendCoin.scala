@@ -16,6 +16,8 @@ import scala.concurrent.{ExecutionContext, Future}
 case class SendCoin(accountId: String, txHash: String, fromAddress: String, toAddress: String, amount: Seq[Coin], status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction {
 
   def serialize(): SendCoins.SendCoinSerialized = SendCoins.SendCoinSerialized(accountId = this.accountId, txHash = this.txHash, fromAddress = this.fromAddress, toAddress = this.toAddress, amount = Json.toJson(this.amount).toString, status = this.status, memo = this.memo, timeoutHeight = this.timeoutHeight, log = this.log, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+
+  val txHeight: Option[Int] = None
 }
 
 private[blockchainTransaction] object SendCoins {
@@ -94,7 +96,7 @@ class SendCoins @Inject()(
       def bcTxs(txHashes: Seq[String]) = blockchainTransactions.Utility.getByHashes(txHashes)
 
       def update(allSendCoinTxs: Seq[SendCoin], txs: Seq[Transaction]) = {
-        val updateUserTx = userTransactions.Service.add(allSendCoinTxs.map(sendCoinTx => UserTransaction(txHash = sendCoinTx.txHash, accountId = sendCoinTx.accountId, fromAddress = sendCoinTx.fromAddress, status = sendCoinTx.status, memo = sendCoinTx.memo, timeoutHeight = sendCoinTx.timeoutHeight, log = sendCoinTx.log, txHeight = txs.find(_.hash == sendCoinTx.txHash).map(_.height), txType = constants.Transaction.User.SEND_COIN, createdBy = sendCoinTx.createdBy, createdOnMillisEpoch = sendCoinTx.createdOnMillisEpoch, updatedBy = sendCoinTx.updatedBy, updatedOnMillisEpoch = sendCoinTx.updatedOnMillisEpoch)))
+        val updateUserTx = userTransactions.Service.add(allSendCoinTxs.map(sendCoinTx => UserTransaction(txHash = sendCoinTx.txHash, accountId = sendCoinTx.accountId, fromAddress = sendCoinTx.fromAddress, status = sendCoinTx.status, timeoutHeight = sendCoinTx.timeoutHeight, log = sendCoinTx.log, txHeight = txs.find(_.hash == sendCoinTx.txHash).map(_.height), txType = constants.Transaction.User.SEND_COIN, createdBy = sendCoinTx.createdBy, createdOnMillisEpoch = sendCoinTx.createdOnMillisEpoch, updatedBy = sendCoinTx.updatedBy, updatedOnMillisEpoch = sendCoinTx.updatedOnMillisEpoch)))
 
         def updateMaster() = sendCoinTransactions.Service.add(allSendCoinTxs.map(sendCoinTx => SendCoinTransaction(txHash = sendCoinTx.txHash, fromAccountId = sendCoinTx.accountId, toAddress = sendCoinTx.toAddress, amount = sendCoinTx.amount, toAccountId = None, status = sendCoinTx.status, createdBy = sendCoinTx.createdBy, createdOnMillisEpoch = sendCoinTx.createdOnMillisEpoch, updatedBy = sendCoinTx.updatedBy, updatedOnMillisEpoch = sendCoinTx.updatedOnMillisEpoch)))
 

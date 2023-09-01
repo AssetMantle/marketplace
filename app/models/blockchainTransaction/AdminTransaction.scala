@@ -8,7 +8,6 @@ import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import queries.blockchain._
-import queries.responses.blockchain.UnconfirmedTxsResponse
 import slick.jdbc.H2Profile.api._
 import transactions.blockchain._
 import transactions.responses.blockchain.BroadcastTxSyncResponse
@@ -17,7 +16,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class AdminTransaction(txHash: String, fromAddress: String, status: Option[Boolean], memo: Option[String], timeoutHeight: Int, log: Option[String], txHeight: Option[Int], txType: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
+case class AdminTransaction(txHash: String, fromAddress: String, status: Option[Boolean], timeoutHeight: Int, log: Option[String], txHeight: Option[Int], txType: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
 
   def id: String = txHash
 }
@@ -26,15 +25,13 @@ private[blockchainTransaction] object AdminTransactions {
 
   class AdminTransactionTable(tag: Tag) extends Table[AdminTransaction](tag, "AdminTransaction") with ModelTable[String] {
 
-    def * = (txHash, fromAddress, status.?, memo.?, timeoutHeight, log.?, txHeight.?, txType, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (AdminTransaction.tupled, AdminTransaction.unapply)
+    def * = (txHash, fromAddress, status.?, timeoutHeight, log.?, txHeight.?, txType, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (AdminTransaction.tupled, AdminTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
     def fromAddress = column[String]("fromAddress")
 
     def status = column[Boolean]("status")
-
-    def memo = column[String]("memo")
 
     def timeoutHeight = column[Int]("timeoutHeight")
 
@@ -78,8 +75,8 @@ class AdminTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, fromAddress: String, memo: Option[String], timeoutHeight: Int, txType: String): Future[AdminTransaction] = {
-      val tx = AdminTransaction(txHash = txHash, fromAddress = fromAddress, status = None, log = None, memo = memo, timeoutHeight = timeoutHeight, txHeight = None, txType = txType)
+    def addWithNoneStatus(txHash: String, fromAddress: String, timeoutHeight: Int, txType: String): Future[AdminTransaction] = {
+      val tx = AdminTransaction(txHash = txHash, fromAddress = fromAddress, status = None, log = None, timeoutHeight = timeoutHeight, txHeight = None, txType = txType)
       for {
         _ <- create(tx)
       } yield tx
@@ -102,22 +99,6 @@ class AdminTransactions @Inject()(
   }
 
   object Utility {
-
-    def getLatestHeightAccountAndUnconfirmedTxs(address: String): Future[(Int, Account, UnconfirmedTxsResponse.Response)] = {
-      // TODO
-      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
-      val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(address).map(_.account.toSerializableAccount).recover {
-        case _: Exception => models.blockchain.Account(address = address, accountType = None, accountNumber = 0, sequence = 0, publicKey = None)
-      }
-      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
-
-      for {
-        abciInfo <- abciInfo
-        bcAccount <- bcAccount
-        unconfirmedTxs <- unconfirmedTxs
-      } yield (abciInfo.result.response.last_block_height.toInt, bcAccount, unconfirmedTxs)
-    }
 
 
     def broadcastTxAndUpdate(adminTransaction: AdminTransaction, txRawBytes: Array[Byte]): Future[AdminTransaction] = {
@@ -156,6 +137,7 @@ class AdminTransactions @Inject()(
 
         def markFailed(txs: Seq[Transaction]) = if (txs.nonEmpty) {
           val txsGroup = txs.groupBy(_.height)
+          // Intentionally left log empty to save space as the log is stored in explorer db
           utilitiesOperations.traverse(txsGroup.keys.toSeq)(txHeight => Service.markFailed(txHashes = txsGroup.getOrElse(txHeight, Seq()).map(_.hash), height = txHeight)).map(_.sum)
         } else Future(0)
 

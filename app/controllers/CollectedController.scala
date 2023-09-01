@@ -23,6 +23,7 @@ class CollectedController @Inject()(
                                      masterCollections: master.Collections,
                                      masterNFTs: master.NFTs,
                                      masterNFTOwners: master.NFTOwners,
+                                     masterWishLists: master.WishLists,
                                    )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   implicit val logger: Logger = Logger(this.getClass)
@@ -82,22 +83,25 @@ class CollectedController @Inject()(
       implicit request =>
         val collection = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterCollections.Service.tryGet(collectionId)
-        val nftIds = masterNFTOwners.Service.getByCollectionAndPageNumber(accountId = accountId, collectionId = collectionId, pageNumber = pageNumber)
+        val nftOwners = masterNFTOwners.Service.getByCollectionAndPageNumber(accountId = accountId, collectionId = collectionId, pageNumber = pageNumber)
 
         def getNFTs(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds)
 
+        def getNFTsLiked(nftIds: Seq[String]) = if (nftIds.nonEmpty) masterWishLists.Service.getByNFTIds(accountId = accountId, nftIDs = nftIds) else Future(Seq())
+
         (for {
           collection <- collection
-          nftIds <- nftIds
-          nfts <- getNFTs(nftIds)
-        } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts, nfts.map(_.id), Seq(), pageNumber))
+          nftOwners <- nftOwners
+          nfts <- getNFTs(nftOwners.map(_.nftId))
+          nftsLiked <- getNFTsLiked(nftOwners.map(_.nftId))
+        } yield Ok(views.html.base.commonNFTsPerPage(collection, nfts, nftOwners, nftsLiked, Seq(), pageNumber))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
     }
   }
 
-  def commonCardInfo(collectionID: String, accountID: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionCardInfo(collectionID: String, accountID: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val totalOwned = masterNFTOwners.Service.countCollectionOwnedNFTs(accountId = accountID, collectionID = collectionID)
@@ -113,7 +117,7 @@ class CollectedController @Inject()(
     }
   }
 
-  def topRightCard(collectionID: String, accountID: String): Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
+  def sectionTopRightCard(collectionID: String, accountID: String): Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
     implicit request =>
       val totalOwned = masterNFTOwners.Service.countCollectionOwnedNFTs(accountId = accountID, collectionID = collectionID)
 

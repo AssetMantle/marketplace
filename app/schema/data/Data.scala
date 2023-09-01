@@ -1,7 +1,6 @@
 package schema.data
 
 import com.assetmantle.schema.data.base.AnyData
-import schema.constants
 import schema.data.base._
 import schema.id.base.{DataID, HashID, StringID}
 
@@ -9,7 +8,7 @@ abstract class Data {
 
   def getType: StringID
 
-  def getDataID: DataID
+  def getDataID: DataID = DataID(typeID = this.getType, hashID = this.generateHashID)
 
   def zeroValue: Data
 
@@ -37,21 +36,12 @@ object Data {
     case 4 => HeightData(anyData.getHeightData)
     case 5 => IDData(anyData.getIDData)
     case 6 => ListData(anyData.getListData)
-    case 7 => NumberData(anyData.getNumberData)
-    case 8 => StringData(anyData.getStringData)
+    case 7 => LinkedData(anyData.getLinkedData)
+    case 8 => NumberData(anyData.getNumberData)
+    case 9 => StringData(anyData.getStringData)
     case _ => throw new IllegalArgumentException("INVALID_DATA_IMPL_CASE_NUMBER: " + anyData.getImplCase.getNumber.toString)
   }
 
-  def apply(dataType: String, protoBytes: Array[Byte]): Data = dataType match {
-    case constants.Data.AccAddressDataTypeID.value => AccAddressData.fromProtoBytes(protoBytes)
-    case constants.Data.BooleanDataTypeID.value => BooleanData(protoBytes)
-    case constants.Data.DecDataTypeID.value => DecData(protoBytes)
-    case constants.Data.HeightDataTypeID.value => HeightData(protoBytes)
-    case constants.Data.IDDataTypeID.value => IDData(protoBytes)
-    case constants.Data.ListDataTypeID.value => ListData(protoBytes)
-    case constants.Data.NumberDataTypeID.value => NumberData(protoBytes)
-    case constants.Data.StringDataTypeID.value => StringData(protoBytes)
-    case _ => throw new IllegalArgumentException("INVALID_DATA_TYPE: " + dataType)
-  }
+  def apply(protoBytes: Array[Byte]): Data = Data(AnyData.parseFrom(protoBytes))
 
 }

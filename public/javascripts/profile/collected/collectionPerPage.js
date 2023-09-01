@@ -5,7 +5,7 @@ function checkNoCollection() {
 }
 
 function collectedCollectionCardInfo(collectionId, accountID) {
-    let route = jsRoutes.controllers.CollectedController.commonCardInfo(collectionId, accountID);
+    let route = jsRoutes.controllers.CollectedController.collectionCardInfo(collectionId, accountID);
     $.ajax({
         url: route.url,
         type: route.type,

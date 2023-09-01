@@ -57,8 +57,8 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.amazonaws" % "aws-java-sdk-s3" % "1.12.429",
-  "com.amazonaws" % "aws-java-sdk" % "1.12.429"
+  "com.amazonaws" % "aws-java-sdk-s3" % "1.12.470",
+  "com.amazonaws" % "aws-java-sdk" % "1.12.470"
 )
 
 libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.22.2"

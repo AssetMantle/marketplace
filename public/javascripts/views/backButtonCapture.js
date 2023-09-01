@@ -34,6 +34,9 @@ window.addEventListener('popstate', e => {
         case "collectedCollection":
             viewCollectedCollection(lastPart);
             break;
+        case "listedCollection":
+            viewListedCollection(lastPart);
+            break;
         case "nft":
             viewNFT(lastPart);
             break;

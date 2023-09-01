@@ -5,36 +5,46 @@ import schema.id.base.{IdentityID, PropertyID, StringID}
 import schema.list.PropertyList
 import schema.property.Property
 import schema.property.base.{MesaProperty, MetaProperty}
-import schema.qualified.Immutables
+import schema.qualified.{Immutables, Mutables}
 
 object Identity {
 
-  private val idPropertyID = PropertyID(keyID = StringID("id"), typeID = schema.constants.Data.StringDataTypeID)
-  private val originPropertyID = PropertyID(keyID = StringID("origin"), typeID = schema.constants.Data.StringDataTypeID)
-  private val twitterPropertyID = PropertyID(keyID = StringID("twitter"), typeID = schema.constants.Data.StringDataTypeID)
-  private val note1PropertyID = PropertyID(keyID = StringID("note1"), typeID = schema.constants.Data.StringDataTypeID)
-  private val note2PropertyID = PropertyID(keyID = StringID("note2"), typeID = schema.constants.Data.StringDataTypeID)
-  private val extraPropertyID = PropertyID(keyID = StringID("extra"), typeID = schema.constants.Data.StringDataTypeID)
-
-  val getOriginMetaProperty: Property = MetaProperty(originPropertyID, StringData("MantlePlace"))
+  private val idPropertyID = PropertyID(keyID = StringID("id"), typeID = schema.data.constants.StringDataTypeID)
+  private val originPropertyID = PropertyID(keyID = StringID("origin"), typeID = schema.data.constants.StringDataTypeID)
+  private val note1PropertyID = PropertyID(keyID = StringID("note1"), typeID = schema.data.constants.StringDataTypeID)
+  private val note2PropertyID = PropertyID(keyID = StringID("note2"), typeID = schema.data.constants.StringDataTypeID)
+  private val note3PropertyID = PropertyID(keyID = StringID("note3"), typeID = schema.data.constants.StringDataTypeID)
+  private val note4PropertyID = PropertyID(keyID = StringID("note4"), typeID = schema.data.constants.StringDataTypeID)
+  private val originMetaProperty: Property = MetaProperty(originPropertyID, StringData("MantlePlace"))
 
   def getIDMetaProperty(value: String): Property = MetaProperty(idPropertyID, StringData(value))
 
-  def getTwitterMetaProperty(value: String): Property = MetaProperty(twitterPropertyID, StringData(value))
-
   def getNote1MetaProperty(value: String): Property = MetaProperty(note1PropertyID, StringData(value))
 
-  def getNote2MesaProperty(value: String): Property = MesaProperty(note2PropertyID, StringData(value).getDataID)
+  def getNote2MetaProperty(value: String): Property = MetaProperty(note2PropertyID, StringData(value))
 
-  def getExtraMesaProperty(value: String): Property = MesaProperty(extraPropertyID, StringData(value).getDataID)
+  def getNote3MesaProperty(value: String): Property = MesaProperty(note3PropertyID, StringData(value).getDataID)
 
-  val getBondAmountMetaProperty: Property = MetaProperty(schema.constants.Properties.BondAmountProperty.id, NumberData(2560L))
+  def getNote4MesaProperty(value: String): Property = MesaProperty(note4PropertyID, StringData(value).getDataID)
+
+  val bondAmountMetaProperty: Property = MetaProperty(schema.constants.Properties.BondAmountProperty.id, NumberData(4096L))
+
+  def getImmutableMetas(id: String): Immutables = Immutables(PropertyList(Seq(originMetaProperty, getIDMetaProperty(id))))
+
+  def getImmutableMesas: Immutables = Immutables(Seq())
+
+  def getImmutables(id: String): Immutables = Immutables(getImmutableMetas(id).propertyList.properties ++ getImmutableMesas.propertyList.properties)
 
   def getAuthenticationProperty(addresses: Seq[String]): Property = schema.constants.Properties.AuthenticationProperty.copy(data = ListData(addresses.map(x => AccAddressData(x))))
 
+  def getMutableMetas(addresses: Seq[String]): Mutables = Mutables(PropertyList(Seq(bondAmountMetaProperty, getAuthenticationProperty(addresses), getNote1MetaProperty(""), getNote2MetaProperty(""))))
+
+  def getMutableMesas: Mutables = Mutables(PropertyList(Seq(getNote3MesaProperty(""), getNote4MesaProperty(""))))
+
+  def getMutables(addresses: Seq[String]): Mutables = Mutables(getMutableMetas(addresses).propertyList.properties ++ getMutableMesas.propertyList.properties)
+
   def getMantlePlaceIdentityID(id: String): IdentityID = {
-    val immutables = Immutables(PropertyList(Seq(getOriginMetaProperty, getBondAmountMetaProperty, getIDMetaProperty(id), getExtraMesaProperty(""))))
-    schema.utilities.ID.getIdentityID(classificationID = constants.Transaction.IdentityClassificationID, immutables = immutables)
+    schema.utilities.ID.getIdentityID(classificationID = constants.Transaction.IdentityClassificationID, immutables = getImmutables(id))
   }
 
 }

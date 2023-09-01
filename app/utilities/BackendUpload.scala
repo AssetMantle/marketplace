@@ -55,8 +55,10 @@ class BackendUpload @Inject()(
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = value)
       } else if (propertyType == constants.NFT.Data.BOOLEAN) {
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = value.toBoolean.toString)
-      } else if (propertyType == constants.NFT.Data.NUMBER) {
+      } else if (propertyType == constants.NFT.Data.DECIMAL) {
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = BigDecimal(value).toString)
+      } else if (propertyType == constants.NFT.Data.NUMBER) {
+        commonCollection.Property(name = name, `type` = propertyType, defaultValue = BigInt(value).toString)
       } else constants.Response.INVALID_NFT_PROPERTY.throwBaseException()
     }
 
@@ -70,7 +72,8 @@ class BackendUpload @Inject()(
       val propertyType = collection.properties.getOrElse(constants.Response.INVALID_NFT_PROPERTY.throwBaseException()).find(_.name == this.name).getOrElse(constants.Response.INVALID_NFT_PROPERTY.throwBaseException()).`type`
       val conversionTry = propertyType match {
         case constants.NFT.Data.STRING => true
-        case constants.NFT.Data.NUMBER => Try(BigDecimal(this.value)).isSuccess
+        case constants.NFT.Data.DECIMAL => Try(BigDecimal(this.value)).isSuccess
+        case constants.NFT.Data.NUMBER => Try(BigInt(this.value)).isSuccess
         case constants.NFT.Data.BOOLEAN => Try(this.value.toBoolean).isSuccess || (this.value == constants.NFT.Data.TRUE || this.value == constants.NFT.Data.FALSE)
         case _ => false
       }
@@ -100,7 +103,8 @@ class BackendUpload @Inject()(
       val d = nft.properties.map(x => {
         val e = collection.properties.get.find(_.name == x.name)
         e.fold(false)(y => {
-          if (y.`type` == constants.NFT.Data.NUMBER) Try(BigDecimal(x.value)).isSuccess
+          if (y.`type` == constants.NFT.Data.DECIMAL) Try(BigDecimal(x.value)).isSuccess
+          else if (y.`type` == constants.NFT.Data.NUMBER) Try(BigInt(x.value)).isSuccess
           else if (y.`type` == constants.NFT.Data.BOOLEAN) (x.value == constants.NFT.Data.SMALL_TRUE || x.value == constants.NFT.Data.TRUE || x.value == constants.NFT.Data.SMALL_FALSE || x.value == constants.NFT.Data.FALSE)
           else if (y.`type` == constants.NFT.Data.STRING) true
           else false

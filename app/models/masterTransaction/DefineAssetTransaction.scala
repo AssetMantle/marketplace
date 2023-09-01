@@ -1,6 +1,7 @@
 package models.masterTransaction
 
 import constants.Scheduler
+import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.{AdminTransaction, AdminTransactions}
 import models.master.Collection
@@ -56,6 +57,7 @@ class DefineAssetTransactions @Inject()(
                                          blockchainClassifications: blockchain.Classifications,
                                          utilitiesOperations: utilities.Operations,
                                          utilitiesNotification: utilities.Notification,
+                                         utilitiesTransaction: utilities.Transaction,
                                          adminTransactions: AdminTransactions,
                                          masterCollections: master.Collections,
                                        )(implicit val executionContext: ExecutionContext)
@@ -69,7 +71,7 @@ class DefineAssetTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, collectionIds: Seq[String]): Future[Int] = create(collectionIds.map(x => DefineAssetTransaction(txHash = txHash, collectionId = x, status = None)))
+    def addWithNoneStatus(txHash: String, collectionIds: Seq[String]): Future[String] = create(collectionIds.map(x => DefineAssetTransaction(txHash = txHash, collectionId = x, status = None))).map(_.toString)
 
     def getByTxHash(txHash: String): Future[Seq[DefineAssetTransaction]] = filter(_.txHash === txHash)
 
@@ -83,49 +85,25 @@ class DefineAssetTransactions @Inject()(
   }
 
   object Utility {
+    implicit val txUtil: TxUtil = TxUtil("DEFINE_ASSET", 150000)
 
     private def transaction(collections: Seq[Collection]): Future[AdminTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(constants.Transaction.Wallet.DefineAssetWallet.address)
+      val messages = collections.map(x => utilities.BlockchainTransaction.getDefineAssetMsg(
+        fromAddress = constants.Secret.defineAssetWallet.address,
+        fromID = constants.Transaction.MantlePlaceIdentityID,
+        immutableMetas = x.getImmutableMetaProperties,
+        immutables = x.getImmutableProperties,
+        mutableMetas = x.getMutableMetaProperties,
+        mutables = x.getMutableProperties)
+      )
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = collections.map(x => utilities.BlockchainTransaction.getDefineAssetMsg(
-            fromAddress = constants.Transaction.Wallet.DefineAssetWallet.address,
-            fromID = constants.Transaction.FromID,
-            immutableMetas = x.getImmutableMetaProperties,
-            immutables = x.getImmutableProperties,
-            mutableMetas = x.getMutableMetaProperties,
-            mutables = x.getMutableProperties)
-          ),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = 0.0001, gasLimit = constants.Transaction.DefaultDefineAssetGasLimit * collections.size),
-          gasLimit = constants.Transaction.DefaultDefineAssetGasLimit * collections.size,
-          account = bcAccount,
-          ecKey = constants.Transaction.Wallet.DefineAssetWallet.getECKey,
-          timeoutHeight = timeoutHeight)
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, collectionIds = collections.map(_.id))
 
-        val checkAndAdd = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Transaction.Wallet.DefineAssetWallet.address, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.DEFINE_ASSET)
-              _ <- Service.addWithNoneStatus(txHash = txHash, collectionIds = collections.map(_.id))
-            } yield adminTransaction
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
-        }
-
-        for {
-          adminTransaction <- checkAndAdd
-        } yield (adminTransaction, txRawBytes)
-      }
-
-      def broadcastTxAndUpdate(adminTransaction: AdminTransaction, txRawBytes: Array[Byte]) = adminTransactions.Utility.broadcastTxAndUpdate(adminTransaction, txRawBytes)
+      val adminTx = utilitiesTransaction.doAdminTx(messages = messages, wallet = constants.Secret.defineAssetWallet, masterTxFunction = masterTxFunc)
 
       for {
-        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-        (adminTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedAdminTransaction <- broadcastTxAndUpdate(adminTransaction, txRawBytes)
-      } yield updatedAdminTransaction
+        (adminTx, _) <- adminTx
+      } yield adminTx
     }
 
     private def defineCollections(): Future[Unit] = {
@@ -155,15 +133,13 @@ class DefineAssetTransactions @Inject()(
         } yield tx.txHash
       } else Future("")
 
-      (for {
+      for {
         collections <- collections
         defineCollections <- filterAlreadyDefined(collections)
         anyPendingTx <- anyPendingTx
         txHash <- doTx(anyPendingTx, defineCollections)
-      } yield if (txHash != "") logger.info("DEFINE_ASSET: " + txHash + " ( " + defineCollections.map(x => x.id -> x.getClassificationID.asString).toMap.toString() + " )")
-        ).recover {
-        case _: BaseException => logger.error("UNABLE_TO_DEFINE_ASSETS")
-      }
+      } yield if (txHash != "") logger.info("DEFINE_ASSET: " + txHash + " ( " + defineCollections.map(x => x.id -> x.getClassificationID.asString).toMap.toString() + " )") else ()
+
     }
 
     private def checkTransactions(): Future[Unit] = {
@@ -177,26 +153,18 @@ class DefineAssetTransactions @Inject()(
             val markSuccess = Service.markSuccess(txHash)
             val markDefined = masterCollections.Service.markAsDefined(defineAssetTxs.filter(_.txHash == adminTransaction.txHash).map(_.collectionId))
 
-            (for {
+            for {
               _ <- markSuccess
               _ <- markDefined
             } yield ()
-              ).recover {
-              case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-            }
           } else {
             val markFailed = Service.markFailed(txHash)
             val markUndefined = masterCollections.Service.markAsNotDefined(defineAssetTxs.filter(_.txHash == adminTransaction.txHash).map(_.collectionId))
 
-            (for {
+            for {
               _ <- markFailed
               _ <- markUndefined
             } yield ()
-              ).recover {
-              case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-            }
           }
         } else Future()
 
@@ -204,15 +172,12 @@ class DefineAssetTransactions @Inject()(
           transaction <- transaction
           _ <- onTxComplete(transaction)
         } yield ()
-
       }
 
-      (for {
+      for {
         defineAssetTxs <- defineAssetTxs
         _ <- checkAndUpdate(defineAssetTxs)
-      } yield ()).recover {
-        case baseException: BaseException => logger.error(baseException.failure.logMessage)
-      }
+      } yield ()
     }
 
     val scheduler: Scheduler = new Scheduler {
@@ -223,7 +188,10 @@ class DefineAssetTransactions @Inject()(
         val forComplete = (for {
           _ <- defineCollections()
           _ <- checkTransactions()
-        } yield ())
+        } yield ()).recover {
+          case baseException: BaseException => baseException.notifyLog("[PANIC]")
+            logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
+        }
 
         Await.result(forComplete, Duration.Inf)
       }

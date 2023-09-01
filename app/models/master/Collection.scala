@@ -6,8 +6,8 @@ import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
+import schema.data.base.NumberData
 import schema.id.base.{ClassificationID, IdentityID}
-import schema.list.PropertyList
 import schema.property.base.{MesaProperty, MetaProperty}
 import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
@@ -24,21 +24,25 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
 
   def getCreatorIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.creatorId)
 
+  private def getMutableMetaPropertiesWithoutBond: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty)
+
+  def getTotalWeight: Long = this.getImmutables.getTotalBondWeight + Mutables(this.getMutableMetaPropertiesWithoutBond ++ this.getMutableProperties).getTotalBondWeight + schema.constants.Properties.BondAmountProperty.getBondedWeight
+
   def getImmutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && !x.mutable).map(_.toMetaProperty) ++ utilities.Properties.getCollectionDefaultImmutableMetaProperties(collectionName = this.name, creatorID = this.creatorId)
 
   def getImmutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && !x.mutable).map(_.toMesaProperty)
 
-  def getMutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty)
+  def getMutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty) ++ Seq(schema.constants.Properties.BondAmountProperty.mutate(NumberData(this.getTotalWeight * constants.Blockchain.BondRate)).asInstanceOf[MetaProperty])
 
   def getMutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && x.mutable).map(_.toMesaProperty)
 
-  def getImmutables: Immutables = Immutables(PropertyList(this.getImmutableMetaProperties ++ this.getImmutableProperties))
+  def getImmutables: Immutables = Immutables(this.getImmutableMetaProperties ++ this.getImmutableProperties)
 
-  def getMutables: Mutables = Mutables(PropertyList(this.getMutableMetaProperties ++ this.getMutableProperties))
+  def getMutables: Mutables = Mutables(this.getMutableMetaProperties ++ this.getMutableProperties)
 
-  def getClassificationID: ClassificationID = utilities.Collection.getClassificationID(immutables = this.getImmutables, mutables = this.getMutables, bondRate = constants.Blockchain.BondRate)
+  def getClassificationID: ClassificationID = utilities.Collection.getClassificationID(immutables = this.getImmutables, mutables = this.getMutables)
 
-  def isFractionalized: Boolean = this.properties.fold(false)(_.map(_.name).contains(schema.constants.Properties.SupplyProperty.id.keyID.value))
+  def isFractionalized: Boolean = this.properties.fold(false)(_.exists(_.name == schema.constants.Properties.SupplyProperty.id.keyID.value))
 
   def serialize(): Collections.CollectionSerialized = Collections.CollectionSerialized(
     id = this.id,

@@ -1,6 +1,7 @@
 package models.masterTransaction
 
 import constants.Scheduler
+import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.analytics.CollectionsAnalysis
 import models.blockchainTransaction.{AdminTransaction, AdminTransactions}
@@ -8,7 +9,6 @@ import models.master._
 import models.masterTransaction.MintAssetTransactions.MintAssetTransactionTable
 import models.traits._
 import models.{blockchain, campaign, master}
-import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.id.base.IdentityID
@@ -70,6 +70,7 @@ class MintAssetTransactions @Inject()(
                                        masterNFTProperties: master.NFTProperties,
                                        masterCollections: master.Collections,
                                        utilitiesOperations: utilities.Operations,
+                                       utilitiesTransaction: utilities.Transaction,
                                        utilitiesNotification: utilities.Notification,
                                        adminTransactions: AdminTransactions,
                                      )(implicit val executionContext: ExecutionContext)
@@ -83,7 +84,7 @@ class MintAssetTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, nftIDs: Seq[String], toAccountIDs: Map[String, String]): Future[Int] = create(nftIDs.map(x => MintAssetTransaction(txHash = txHash, nftID = x, toAccountID = toAccountIDs.getOrElse(x, constants.Response.NFT_OWNER_NOT_FOUND.throwBaseException()), status = None)))
+    def addWithNoneStatus(txHash: String, nftIDs: Seq[String], toAccountIDs: Map[String, String]): Future[String] = create(nftIDs.map(x => MintAssetTransaction(txHash = txHash, nftID = x, toAccountID = toAccountIDs.getOrElse(x, constants.Response.NFT_OWNER_NOT_FOUND.throwBaseException()), status = None))).map(_.toString)
 
     def getByTxHash(txHash: String): Future[Seq[MintAssetTransaction]] = filter(_.txHash === txHash)
 
@@ -98,59 +99,54 @@ class MintAssetTransactions @Inject()(
 
   object Utility {
 
-    private def transaction(nftIDs: Seq[String], gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(constants.Transaction.Wallet.MintAssetWallet.address)
+    implicit val txUtil: TxUtil = TxUtil("MINT_ASSET", 150000)
+
+    private def transaction(nftIDs: Seq[String]): Future[BlockchainTransaction] = {
       val nfts = masterNFTs.Service.getByIds(nftIDs)
       val nftOwners = masterNFTOwners.Service.getByIds(nftIDs)
       val nftProperties = masterNFTProperties.Service.get(nftIDs)
 
-      def identityIDExists(nftOwners: Seq[NFTOwner]) = blockchainIdentities.Service.getIDsAlreadyExists(nftOwners.map(_.getOwnerIdentityID.asString).distinct)
-
       def collections(collectionIDs: Seq[String]) = masterCollections.Service.getCollections(collectionIDs)
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String], nfts: Seq[NFT], collections: Seq[Collection], nftOwners: Seq[NFTOwner], nftProperties: Seq[NFTProperty], identityIDExists: Seq[String]) = if (identityIDExists.distinct.length == nftOwners.map(_.ownerId).distinct.length) {
-        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = nfts.map(nft => {
-            val collection = collections.find(_.id == nft.collectionId).getOrElse(constants.Response.COLLECTION_NOT_FOUND.throwBaseException())
-            utilities.BlockchainTransaction.getMintAssetMsg(fromAddress = constants.Transaction.Wallet.MintAssetWallet.address, toID = nftOwners.find(_.nftId == nft.id).getOrElse(constants.Response.NFT_NOT_FOUND.throwBaseException()).getOwnerIdentityID, classificationID = collection.getClassificationID, fromID = constants.Transaction.FromID, immutableMetas = nft.getImmutableMetaProperties(nftProperties, collection), mutableMetas = nft.getMutableMetaProperties(nftProperties), immutables = nft.getImmutableProperties(nftProperties, collection), mutables = nft.getMutableProperties(nftProperties))
-          }),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultMintAssetGasLimit * nftIDs.length),
-          gasLimit = constants.Transaction.DefaultMintAssetGasLimit * nftIDs.length,
-          account = bcAccount,
-          ecKey = ecKey,
-          timeoutHeight = timeoutHeight)
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+      def identityIDExists(nftOwners: Seq[NFTOwner]) = blockchainIdentities.Service.getIDsAlreadyExists(nftOwners.map(_.getOwnerIdentityID.asString).distinct)
 
-        val checkAndAdd = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Transaction.Wallet.MintAssetWallet.address, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.MINT_ASSET)
-              _ <- Service.addWithNoneStatus(txHash = txHash, nftIDs = nftIDs, toAccountIDs = nftOwners.map(x => x.nftId -> x.ownerId).toMap)
-            } yield adminTransaction
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
-        }
+      def doTx(nfts: Seq[NFT], collections: Seq[Collection], nftOwners: Seq[NFTOwner], nftProperties: Seq[NFTProperty], identityIDExists: Seq[String]) = if (identityIDExists.distinct.length == nftOwners.map(_.ownerId).distinct.length) {
+        val messages = nfts.map(nft => {
+          val collection = collections.find(_.id == nft.collectionId).getOrElse(constants.Response.COLLECTION_NOT_FOUND.throwBaseException())
+          utilities.BlockchainTransaction.getMintAssetMsg(
+            fromAddress = constants.Secret.mintAssetWallet.address,
+            toID = nftOwners.find(_.nftId == nft.id).getOrElse(constants.Response.NFT_NOT_FOUND.throwBaseException()).getOwnerIdentityID,
+            classificationID = collection.getClassificationID,
+            fromID = constants.Transaction.MantlePlaceIdentityID,
+            immutableMetas = nft.getImmutableMetaProperties(nftProperties, collection),
+            mutableMetas = nft.getMutableMetaProperties(nftProperties, collection),
+            immutables = nft.getImmutableProperties(nftProperties),
+            mutables = nft.getMutableProperties(nftProperties))
+        })
+
+        def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, nftIDs = nftIDs, toAccountIDs = nftOwners.map(x => x.nftId -> x.ownerId).toMap)
+
+        val adminTx = utilitiesTransaction.doAdminTx(messages = messages, wallet = constants.Secret.mintAssetWallet, masterTxFunction = masterTxFunc)
 
         for {
-          adminTransaction <- checkAndAdd
-        } yield (adminTransaction, txRawBytes)
+          (adminTx, _) <- adminTx
+        } yield adminTx
+
       } else {
         logger.error(s"${nftOwners.map(_.getOwnerIdentityID.asString).diff(identityIDExists).mkString(", ")} identities does not exist for minting asset")
         constants.Response.IDENTITY_DOES_NOT_EXIST_TO_MINT.throwBaseException()
       }
 
-      def broadcastTxAndUpdate(adminTransaction: AdminTransaction, txRawBytes: Array[Byte]) = adminTransactions.Utility.broadcastTxAndUpdate(adminTransaction, txRawBytes)
 
       for {
-        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
         nfts <- nfts
+        collections <- collections(nfts.map(_.collectionId))
         nftOwners <- nftOwners
         identityIDExists <- identityIDExists(nftOwners)
         nftProperties <- nftProperties
-        collections <- collections(nfts.map(_.collectionId).distinct)
-        (adminTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase), nfts, collections, nftOwners, nftProperties, identityIDExists)
-        updatedAdminTransaction <- broadcastTxAndUpdate(adminTransaction, txRawBytes)
-      } yield updatedAdminTransaction
+        adminTx <- doTx(nfts = nfts, collections = collections, nftOwners = nftOwners, nftProperties = nftProperties, identityIDExists = identityIDExists)
+      } yield adminTx
+
     }
 
     private def mintAssets(): Future[Unit] = {
@@ -181,7 +177,7 @@ class MintAssetTransactions @Inject()(
       }
 
       def doTx(nfts: Seq[NFT], anyPendingTx: Boolean) = if (nfts.nonEmpty && !anyPendingTx) {
-        val tx = transaction(nftIDs = nfts.map(_.id), gasPrice = 0.0001, ecKey = constants.Transaction.Wallet.MintAssetWallet.getECKey)
+        val tx = transaction(nftIDs = nfts.map(_.id))
 
         def updateMasterKeys() = masterNFTs.Service.markNFTsMintPending(nfts.map(_.id))
 
@@ -238,29 +234,21 @@ class MintAssetTransactions @Inject()(
               } yield ()
             }
 
-            (for {
+            for {
               _ <- markSuccess
               _ <- updateMaster
               nfts <- nfts
               _ <- updateAnalysis(nfts)
               _ <- checkForAirDrop(nfts.map(_.id))
             } yield ()
-              ).recover {
-              case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-            }
           } else {
             val markMasterFailed = Service.markFailed(txHash)
             val updateMaster = masterNFTs.Service.markNFTsMintFailed(mintAssetTxs.filter(_.txHash == txHash).map(_.nftID))
 
-            (for {
+            for {
               _ <- markMasterFailed
               _ <- updateMaster
             } yield ()
-              ).recover {
-              case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-            }
           }
         } else Future()
 
@@ -289,7 +277,8 @@ class MintAssetTransactions @Inject()(
           _ <- doMintAssets
           _ <- checkTransactions()
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case baseException: BaseException => baseException.notifyLog("[PANIC]")
+            logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
         }
 
         Await.result(forComplete, Duration.Inf)

@@ -6,7 +6,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
 import schema.data.base.{DecData, HeightData, IDData, NumberData}
 import schema.document.Document
-import schema.id.OwnableID
 import schema.id.base._
 import schema.property.Property
 import schema.property.base.MetaProperty
@@ -39,19 +38,19 @@ case class Order(id: Array[Byte], idString: String, classificationID: Array[Byte
     if (property.isDefined && property.get.isMeta) IdentityID(IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getAnyID.getIdentityID) else IdentityID(HashID(Array[Byte]()))
   }
 
-  def getMakerOwnableID: OwnableID = {
-    val property = this.getProperty(schema.constants.Properties.MakerOwnableIDProperty.getID)
-    if (property.isDefined && property.get.isMeta) OwnableID(IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getProtoBytes) else OwnableID(IDData(StringID("")).getProtoBytes)
+  def getMakerAssetID: AssetID = {
+    val property = this.getProperty(schema.constants.Properties.MakerAssetIDProperty.getID)
+    if (property.isDefined && property.get.isMeta) IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getID.asInstanceOf[AssetID] else AssetID(IDData(StringID("")).getProtoBytes)
   }
 
-  def getTakerOwnableID: OwnableID = {
-    val property = this.getProperty(schema.constants.Properties.TakerOwnableIDProperty.getID)
-    if (property.isDefined && property.get.isMeta) OwnableID(IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getProtoBytes) else OwnableID(IDData(StringID("")).getProtoBytes)
+  def getTakerAssetID: AssetID = {
+    val property = this.getProperty(schema.constants.Properties.TakerAssetIDProperty.getID)
+    if (property.isDefined && property.get.isMeta) IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getID.asInstanceOf[AssetID] else AssetID(IDData(StringID("")).getProtoBytes)
   }
 
-  def getExchangeRate: BigDecimal = {
-    val property = this.getProperty(schema.constants.Properties.ExchangeRateProperty.getID)
-    if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getValue else schema.constants.Data.ZeroDec
+  def getBondAmount: NumberData = {
+    val value = this.getMutables.getProperty(schema.constants.Properties.BondAmountProperty.getID)
+    NumberData((if (value.isDefined) MetaProperty(value.get.getProtoBytes) else schema.constants.Properties.BondAmountProperty).getData.getProtoBytes)
   }
 
   def getExpiryHeight: Long = {
@@ -59,12 +58,11 @@ case class Order(id: Array[Byte], idString: String, classificationID: Array[Byte
     if (property.isDefined && property.get.isMeta) HeightData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value.value else -1
   }
 
-  def getMakerOwnableSplit: BigInt = {
-    val property = this.getProperty(schema.constants.Properties.MakerOwnableSplitProperty.getID)
+  def getMakerSplit: BigInt = {
+    val property = this.getProperty(schema.constants.Properties.MakerSplitProperty.getID)
     if (property.isDefined && property.get.isMeta) NumberData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value else BigInt(1)
   }
 
-  def mutate(properties: Seq[Property]): Order = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
 
   def getExpiryFromNow(latestBlock: Int): Long = ((this.getExpiryHeight - latestBlock) * constants.Blockchain.MaxOrderHours) / constants.Blockchain.MaxOrderExpiry
 }

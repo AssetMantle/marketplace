@@ -1,0 +1,43 @@
+@import controllers.actions.LoginState
+
+@(nftId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+
+<div id="tradeContainer">
+    <div class="d-flex justify-content-between align-items-center mt-3 contentTitle">
+        <div class="d-flex gap-2 align-items-center justify-content-between title" style="width: 138px;">
+            <div class="titleLabel"></div>
+            <div class="hoverMenu">
+                <ul class="d-flex flex-row gap-2 mb-0 links">
+                    <li class="menuItem">
+                        <a class="desktop-link" target="_blank">
+                            <i class="bi bi-chevron-down iconGray iconSmall"></i>
+                        </a>
+                        <div class="subMenu">
+                            <div class="subMenuList">
+                                <div class="subMenuItem">
+                                    <a onclick="showTradeScreen('sellOrder')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
+                                        <div class="subMenuItemLabel">@Messages(constants.View.SELL_ORDERS)</div>
+                                    </a>
+                                </div>
+                                <div class="subMenuItem">
+                                    <a onclick="showTradeScreen('yourOrder')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
+                                        <div class="subMenuItemLabel">@Messages(constants.View.YOUR_ORDERS)</div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="titleMenu">
+            <div class="d-flex gap-2 align-items-center sortBtn">
+                <i class="bi bi-arrow-down-up iconDefault iconMedium"></i>
+                @Messages(constants.View.SORT)
+            </div>
+        </div>
+    </div>
+    <div id="tradeSectionContent"></div>
+</div>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/trade.js")"></script>
+<script>showTradeScreen('sellOrder');</script>

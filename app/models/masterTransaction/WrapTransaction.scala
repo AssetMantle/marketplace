@@ -1,6 +1,7 @@
 package models.masterTransaction
 
 import constants.Scheduler
+import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchain
 import models.blockchainTransaction.{UserTransaction, UserTransactions}
@@ -10,7 +11,6 @@ import models.traits._
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import schema.id.OwnableID
 import schema.id.base._
 import slick.jdbc.H2Profile.api._
 import utilities.MicroNumber
@@ -19,26 +19,24 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class WrapTransaction(txHash: String, accountId: String, ownableId: String, isCoin: Boolean, amount: BigDecimal, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
+case class WrapTransaction(txHash: String, accountId: String, denom: String, amount: BigDecimal, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
   def id: String = txHash
 
   def getIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.accountId)
 
-  def getOwnableID: OwnableID = if (this.ownableId == constants.Blockchain.StakingToken) CoinID(StringID(this.ownableId)) else AssetID(HashID(utilities.Secrets.base64URLDecode(this.ownableId)))
+  def getAssetId: AssetID = schema.document.CoinAsset.getCoinAssetID(this.denom)
 }
 
 private[masterTransaction] object WrapTransactions {
   class WrapTransactionTable(tag: Tag) extends Table[WrapTransaction](tag, "WrapTransaction") with ModelTable[String] {
 
-    def * = (txHash, accountId, ownableId, isCoin, amount, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (WrapTransaction.tupled, WrapTransaction.unapply)
+    def * = (txHash, accountId, denom, amount, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (WrapTransaction.tupled, WrapTransaction.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
     def accountId = column[String]("accountId")
 
-    def ownableId = column[String]("ownableId")
-
-    def isCoin = column[Boolean]("isCoin")
+    def denom = column[String]("denom")
 
     def amount = column[BigDecimal]("amount")
 
@@ -65,6 +63,7 @@ class WrapTransactions @Inject()(
                                   utilitiesOperations: utilities.Operations,
                                   utilitiesNotification: utilities.Notification,
                                   userTransactions: UserTransactions,
+                                  utilitiesTransaction: utilities.Transaction,
                                 )(implicit val executionContext: ExecutionContext)
   extends GenericDaoImpl[WrapTransactions.WrapTransactionTable, WrapTransaction, String]() {
 
@@ -76,7 +75,7 @@ class WrapTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, ownableID: OwnableID, amount: BigDecimal, accountId: String): Future[String] = create(WrapTransaction(txHash = txHash, ownableId = ownableID.asString, isCoin = ownableID.isCoinId, amount = amount, accountId = accountId, status = None)).map(_.id)
+    def addWithNoneStatus(txHash: String, denom: String, amount: BigDecimal, accountId: String): Future[String] = create(WrapTransaction(txHash = txHash, denom = denom, amount = amount, accountId = accountId, status = None)).map(_.id)
 
     def getByTxHash(txHash: String): Future[Seq[WrapTransaction]] = filter(_.txHash === txHash)
 
@@ -90,46 +89,18 @@ class WrapTransactions @Inject()(
   }
 
   object Utility {
+    implicit val txUtil: TxUtil = TxUtil("WRAP", 150000)
 
     def transaction(fromAddress: String, accountId: String, coin: Coin, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
+      val messages = Seq(utilities.BlockchainTransaction.getWrapTokenMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(accountId), coins = Seq(coin)))
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val (txRawBytes, memo) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = Seq(utilities.BlockchainTransaction.getWrapTokenMsg(
-            fromAddress = fromAddress,
-            fromID = utilities.Identity.getMantlePlaceIdentityID(accountId),
-            coins = Seq(coin),
-          )),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultWrapGasLimit),
-          gasLimit = constants.Transaction.DefaultWrapGasLimit,
-          account = bcAccount,
-          ecKey = ecKey,
-          timeoutHeight = timeoutHeight)
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, denom = coin.denom, amount = coin.amount.toMicroBigDecimal, accountId = accountId)
 
-        val checkAndAdd = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = accountId, fromAddress = fromAddress, memo = Option(memo), timeoutHeight = timeoutHeight, txType = constants.Transaction.User.WRAP)
-              _ <- Service.addWithNoneStatus(txHash = txHash, ownableID = coin.getDenomOwnableID, amount = coin.amount.toMicroBigDecimal, accountId = accountId)
-            } yield userTransaction
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
-        }
-
-        for {
-          userTransaction <- checkAndAdd
-        } yield (userTransaction, txRawBytes)
-      }
-
-      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
+      val userTx = utilitiesTransaction.doUserTx(messages = messages, gasPrice = gasPrice, accountId = accountId, fromAddress = fromAddress, ecKey = ecKey, masterTxFunction = masterTxFunc)
 
       for {
-        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-        (userTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedUserTransaction <- broadcastTxAndUpdate(userTransaction, txRawBytes)
-      } yield updatedUserTransaction
+        (userTx, _) <- userTx
+      } yield userTx
     }
 
     private def checkTransactions() = {
@@ -142,37 +113,25 @@ class WrapTransactions @Inject()(
           if (userTransaction.status.get) {
             val markSuccess = Service.markSuccess(wrapTx.txHash)
             val sendNotification = {
-              val param = if (wrapTx.isCoin) {
-                s"${wrapTx.amount / MicroNumber.factor} MNTL"
-              } else ""
+              val param = s"${wrapTx.amount / MicroNumber.factor} MNTL"
               utilitiesNotification.send(wrapTx.accountId, constants.Notification.WRAPPED_TOKEN_SUCCESSFULLY, param)()
             }
 
-            (for {
+            for {
               _ <- markSuccess
               _ <- sendNotification
             } yield ()
-              ).recover {
-              case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-            }
           } else {
             val markMasterFailed = Service.markFailed(wrapTx.txHash)
             val sendNotification = {
-              val param = if (wrapTx.getOwnableID.isCoinId) {
-                s"${wrapTx.amount / MicroNumber.factor} MNTL"
-              } else ""
+              val param = s"${wrapTx.amount / MicroNumber.factor} MNTL"
               utilitiesNotification.send(wrapTx.accountId, constants.Notification.WRAPPED_TOKEN_FAILED, param)()
             }
 
-            (for {
+            for {
               _ <- markMasterFailed
               _ <- sendNotification
             } yield ()
-              ).recover {
-              case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-            }
           }
         } else Future()
 
@@ -199,7 +158,8 @@ class WrapTransactions @Inject()(
         val forComplete = (for {
           _ <- checkTransactions()
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case baseException: BaseException => baseException.notifyLog("[PANIC]")
+            logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
         }
 
         Await.result(forComplete, Duration.Inf)

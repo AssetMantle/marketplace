@@ -1,8 +1,6 @@
 package utilities
 
-import schema.data.base.NumberData
 import schema.id.base.ClassificationID
-import schema.list.PropertyList
 import schema.qualified.{Immutables, Mutables}
 
 object Collection {
@@ -24,10 +22,5 @@ object Collection {
   }
 
   // TODO BondRate from parameters
-  def getClassificationID(immutables: Immutables, mutables: Mutables, bondRate: Int): ClassificationID = {
-    val totalWeight = mutables.propertyList.properties.map(_.getBondedWeight).sum + immutables.propertyList.properties.map(_.getBondedWeight).sum
-
-    val updatedImmutables = Immutables(PropertyList(immutables.propertyList.properties ++ Seq(schema.constants.Properties.BondAmountProperty.copy(data = NumberData(totalWeight * bondRate)))))
-    schema.utilities.ID.getClassificationID(immutables = updatedImmutables, mutables = mutables)
-  }
+  def getClassificationID(immutables: Immutables, mutables: Mutables): ClassificationID = schema.utilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
 }

@@ -95,10 +95,12 @@ class SessionTokens @Inject()(
 
         def deleteSessionTokens(ids: Seq[String]) = Service.deleteMultiple(ids)
 
+        def deleteActors(ids: Seq[String]): Unit = ids.foreach(id => actors.Service.AppWebSocketActor ! actors.Message.RemoveActor(id))
+
         val forComplete = (for {
           ids <- ids
           _ <- deleteSessionTokens(ids)
-        } yield ()).recover {
+        } yield deleteActors(ids)).recover {
           case baseException: BaseException => logger.error(baseException.failure.message)
         }
         Await.result(forComplete, Duration.Inf)

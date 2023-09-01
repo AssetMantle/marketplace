@@ -45,6 +45,7 @@
                 </div>
             </div>
         </div>
+        <div id="myRecaptcha" class="g-recaptcha"></div>
     }
 </div>
 
@@ -53,3 +54,4 @@
 </div>
 
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/account/signUp.js")" type="text/javascript"></script>
+<script src="https://www.google.com/recaptcha/api.js?onload=CaptchaCallback&render=explicit" async defer></script>

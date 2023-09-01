@@ -14,12 +14,18 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class NFTDraft(id: String, collectionId: String, name: Option[String], description: Option[String], properties: Option[Seq[BaseNFTProperty]], tagNames: Option[Seq[String]], fileExtension: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def toNFT(totalSupply: Int = 1, collection: Collection): NFT = {
-    val nft = NFT(id = id, assetId = None, fileExtension = fileExtension, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), totalSupply = totalSupply, isMinted = Option(false), mintReady = false)
+  def getSupply: Long = this.properties.fold(1L)(_.find(_.name == schema.constants.Properties.SupplyProperty.id.keyID.value).fold(1L)(_.valueAsString.toLong))
+
+  def getFileHash: String = id
+
+  def getFileName: String = this.id + "." + this.fileExtension
+
+  def toNFT(collection: Collection): NFT = {
+    val nft = NFT(id = id, assetId = None, fileExtension = fileExtension, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), totalSupply = this.getSupply, isMinted = Option(false), mintReady = false)
     nft.copy(assetId = Option(nft.getAssetID(this.getNFTProperties, collection).asString))
   }
 
-  def toNFTOwner(ownerID: String, creatorId: String, quantity: Int = 1): NFTOwner = NFTOwner(nftId = id, ownerId = ownerID, creatorId = creatorId, collectionId = collectionId, quantity = quantity, saleId = None, publicListingId = None)
+  def toNFTOwner(ownerID: String, creatorId: String): NFTOwner = NFTOwner(nftId = id, ownerId = ownerID, creatorId = creatorId, collectionId = collectionId, quantity = this.getSupply, saleId = None, publicListingId = None)
 
   def getNFTProperties: Seq[NFTProperty] = this.properties.fold[Seq[NFTProperty]](Seq())(x => x.map(_.toNFTProperty(this.id)))
 
@@ -30,7 +36,7 @@ case class NFTDraft(id: String, collectionId: String, name: Option[String], desc
     collectionId = collectionId,
     name = this.name,
     description = this.description,
-    fileExtension = this.fileExtension,
+    fileExtension = this.fileExtension.toLowerCase,
     properties = this.properties.map(Json.toJson(_).toString()),
     tagNames = this.tagNames.map(Json.toJson(_).toString()),
     createdBy = this.createdBy,
@@ -140,7 +146,7 @@ class NFTDrafts @Inject()(
       val draft = tryGet(id)
       for {
         draft <- draft
-        _ <- updateById(draft.copy(tagNames = Option(tagNames)).serialize())
+        _ <- updateById(draft.copy(tagNames = if (tagNames.nonEmpty) Option(tagNames) else None).serialize())
       } yield ()
     }
 

@@ -65,9 +65,18 @@ function viewCollectedCollection(lastPart) {
     $('#bannerContent').html('');
     componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
     componentResource('centerContent', jsRoutes.controllers.CollectedController.collectionNFTs(accountId, collectionId));
-    componentResource('rightContent', jsRoutes.controllers.CollectedController.topRightCard(collectionId, accountId));
+    componentResource('rightContent', jsRoutes.controllers.CollectedController.sectionTopRightCard(collectionId, accountId));
 }
 
+function viewListedCollection(lastPart) {
+    console.log('viewListedCollection')
+    let accountId = lastPart.split("/")[0];
+    let collectionId = lastPart.split("/")[2];
+    $('#bannerContent').html('');
+    componentResource('leftContent', jsRoutes.controllers.CollectionController.info(collectionId));
+    componentResource('centerContent', jsRoutes.controllers.SecondaryMarketController.listedCollectionNFTs(accountId, collectionId));
+    componentResource('rightContent', jsRoutes.controllers.SecondaryMarketController.listedSectionCollectionTopRightCard(collectionId, accountId));
+}
 
 function viewWishListCollection(lastPart) {
     let accountId = lastPart.split("/")[0];
@@ -86,12 +95,12 @@ function viewCreatedCollection(lastPart) {
     componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs(accountId, collectionId));
 }
 
-function viewNFT(nftId) {
+function viewNFT(nftId, activeTab) {
     $('#bannerContent').html('');
     componentResource('leftContent', jsRoutes.controllers.NFTController.detailViewLeftCards(nftId));
-    componentResource('centerContent', jsRoutes.controllers.NFTController.details(nftId));
+    componentResource('centerContent', jsRoutes.controllers.NFTController.overview(nftId, activeTab));
     componentResource('rightContent', jsRoutes.controllers.NFTController.detailViewRightCards(nftId));
-    checkAndPushState(jsRoutes.controllers.NFTController.viewNFT(nftId).url, nftId, "nft");
+    // checkAndPushState(jsRoutes.controllers.NFTController.viewNFT(nftId).url, nftId, "nft");
 }
 
 function viewSetting() {
@@ -113,4 +122,8 @@ function viewProfile(lastPart) {
 
 function changeProfileStateOnSwitcher(accountId, section) {
     checkAndPushState(jsRoutes.controllers.ProfileController.viewProfile(accountId, section).url, (accountId + '/' + section), 'profile');
+}
+
+function changeNFTStateOnSwitcher(nftId, section) {
+    checkAndPushState(jsRoutes.controllers.NFTController.viewNFT(nftId, section).url, (nftId + '/' + section), 'nft');
 }

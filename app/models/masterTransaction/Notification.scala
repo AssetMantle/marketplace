@@ -4,6 +4,7 @@ import models.masterTransaction.Notifications.NotificationTable
 import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.json.Json
 import slick.jdbc.H2Profile.api._
 
@@ -18,6 +19,8 @@ case class Notification(id: String, accountID: Option[String], title: String, me
   def serialize(): Notifications.NotificationSerializable = Notifications.NotificationSerializable(id = this.id, accountID = this.accountID, title = title, messageParameters = Json.toJson(this.messageParameters).toString, jsRoute = this.jsRoute, read = this.read, createdOnMillisEpoch = this.createdOnMillisEpoch, createdBy = this.createdBy, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 
   def isClickable: Boolean = this.jsRoute.isDefined
+
+  def toClientMessage(toUser: String, messagesApi: MessagesApi, notificationType: String)(implicit lang: Lang): actors.Message.Notification = actors.Message.Notification(toUser = toUser, id = this.id, message = messagesApi(this.message, this.messageParameters: _*), title = messagesApi(this.getTitle), notificationType = notificationType)
 
 }
 
@@ -70,7 +73,12 @@ class Notifications @Inject()(protected val dbConfigProvider: DatabaseConfigProv
 
   object Service {
 
-    def add(accountID: String, notification: constants.Notification, parameters: String*)(routeParameters: String = ""): Future[String] = create(Notification(id = utilities.IdGenerator.getRandomHexadecimal, accountID = Option(accountID), title = notification.name, messageParameters = parameters, jsRoute = notification.route.fold[Option[String]](None)(x => Option(utilities.JsRoutes.getJsRouteString(x, routeParameters)))).serialize()).map(_.id)
+    def add(accountID: String, notification: constants.Notification, parameters: String*)(routeParameters: String = ""): Future[Notification] = {
+      val masterNotification = Notification(id = utilities.IdGenerator.getRandomHexadecimal, accountID = Option(accountID), title = notification.name, messageParameters = parameters, jsRoute = notification.route.fold[Option[String]](None)(x => Option(utilities.JsRoutes.getJsRouteString(x, routeParameters))))
+      for {
+        _ <- create(masterNotification.serialize())
+      } yield masterNotification
+    }
 
     def addPublic(notification: constants.Notification, parameters: String*)(routeParameters: String = ""): Future[String] = create(Notification(id = utilities.IdGenerator.getRandomHexadecimal, accountID = None, title = notification.name, messageParameters = parameters, jsRoute = notification.route.fold[Option[String]](None)(x => Option(utilities.JsRoutes.getJsRouteString(x, routeParameters)))).serialize()).map(_.id)
 

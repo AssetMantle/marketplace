@@ -1,7 +1,7 @@
 package schema.property
 
 import com.assetmantle.schema.properties.base.AnyProperty
-import org.slf4j.{Logger, LoggerFactory}
+import schema.data.Data
 import schema.id.base.{DataID, PropertyID, StringID}
 import schema.property.base.{MesaProperty, MetaProperty}
 
@@ -19,23 +19,24 @@ abstract class Property {
 
   def isMeta: Boolean
 
+  def isMesa: Boolean
+
   def toAnyProperty: AnyProperty
 
   def getProtoBytes: Array[Byte]
 
   def scrub(): MesaProperty
 
+  def mutate(data: Data): Property
+
 }
 
 object Property {
-
-  implicit val module: String = constants.Module.SCHEMA_PROPERTY
-
-  implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
-
   def apply(anyProperty: AnyProperty): Property = anyProperty.getImplCase.getNumber match {
     case 1 => MesaProperty(anyProperty.getMesaProperty)
     case 2 => MetaProperty(anyProperty.getMetaProperty)
     case _ => throw new IllegalArgumentException("INVALID_PROPERTY_IMPL_CASE_NUMBER: " + anyProperty.getImplCase.getNumber.toString)
   }
+
+  def apply(protoBytes: Array[Byte]): Property = Property(AnyProperty.parseFrom(protoBytes))
 }

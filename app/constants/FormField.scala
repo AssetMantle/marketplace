@@ -59,13 +59,13 @@ object FormField {
   val COLLECTION_NAME: StringFormField = StringFormField("COLLECTION_NAME", 3, 30)
   val COLLECTION_DESCRIPTION: StringFormField = StringFormField("COLLECTION_DESCRIPTION", 3, 256)
   val COLLECTION_ID: StringFormField = StringFormField("COLLECTION_ID", 16, 16)
-  val COLLECTION_PROPERTY_NAME: StringFormField = StringFormField("COLLECTION_PROPERTY_NAME", 1, 30, RegularExpression.PROPERTY_ID)
+  val COLLECTION_PROPERTY_NAME: StringFormField = StringFormField("COLLECTION_PROPERTY_NAME", 1, 30, RegularExpression.PROPERTY_ID, RegularExpression.PROPERTY_ID.getError)
   val COLLECTION_PROPERTY_DEFAULT_VALUE: StringFormField = StringFormField("COLLECTION_PROPERTY_DEFAULT_VALUE", 1, 30)
   val NFT_NAME: StringFormField = StringFormField("NFT_NAME", 3, 50)
   val NFT_DESCRIPTION: StringFormField = StringFormField("NFT_DESCRIPTION", 3, 256)
   val NFT_ID: StringFormField = StringFormField("NFT_ID", 64, 64)
   val NFT_ID_LIST: StringFormField = StringFormField("NFT_ID_LIST", 64, 6500)
-  val NFT_TAGS: StringFormField = StringFormField("NFT_TAGS", 0, (constants.NFT.Tags.MaximumLength + 1) * constants.NFT.Tags.MaximumAllowed)
+  val NFT_TAGS: StringFormField = StringFormField("NFT_TAGS", 0, (constants.NFT.Tags.MaximumLength + 1) * constants.NFT.Tags.MaximumAllowed, RegularExpression.NFT_TAGS)
   val NFT_PROPERTY_NAME: StringFormField = StringFormField("NFT_PROPERTY_NAME", 1, 30, RegularExpression.PROPERTY_ID)
   val NFT_PROPERTY_VALUE: StringFormField = StringFormField("NFT_PROPERTY_VALUE", 1, 30)
   val COLLECTION_TWITTER: StringFormField = StringFormField("COLLECTION_TWITTER", 1, 15, RegularExpression.TWITTER_USERNAME)
@@ -116,14 +116,16 @@ object FormField {
   val MARK_ALL_NOTIFICATION_READ: BooleanFormField = BooleanFormField("MARK_ALL_NOTIFICATION_READ")
   val MINT_NFT: BooleanFormField = BooleanFormField("MINT_NFT")
   val FRACTIONALIZED_NFT: BooleanFormField = BooleanFormField("FRACTIONALIZED_NFT")
+  val COLLECTION_CAPABILITY_FRACTIONALISABLE: BooleanFormField = BooleanFormField("COLLECTION_CAPABILITY_FRACTIONALISABLE")
+  val COLLECTION_CAPABILITY_LOCKABLE: BooleanFormField = BooleanFormField("COLLECTION_CAPABILITY_LOCKABLE")
+  val COLLECTION_CAPABILITY_BURNABLE: BooleanFormField = BooleanFormField("COLLECTION_CAPABILITY_BURNABLE")
 
   // LongFormField
   val SELL_QUANTITY: LongFormField = LongFormField("SELL_QUANTITY", 1, Long.MaxValue)
   val BUY_QUANTITY: LongFormField = LongFormField("BUY_QUANTITY", 1, Long.MaxValue)
 
   // SelectFormField
-  val COLLECTION_CATEGORY: SelectFormField = SelectFormField("COLLECTION_CATEGORY", Seq(constants.Collection.Category.ART, constants.Collection.Category.PHOTOGRAPHY, constants.Collection.Category.MISCELLANEOUS))
-  val COLLECTION_PROPERTY_TYPE: SelectFormField = SelectFormField("COLLECTION_PROPERTY_TYPE", Seq(constants.NFT.Data.STRING, constants.NFT.Data.NUMBER, constants.NFT.Data.BOOLEAN))
+  val COLLECTION_PROPERTY_TYPE: SelectFormField = SelectFormField("COLLECTION_PROPERTY_TYPE", Seq(constants.NFT.Data.STRING, constants.NFT.Data.NUMBER, constants.NFT.Data.DECIMAL, constants.NFT.Data.BOOLEAN))
 
   // CustomSelect
   val SELECT_WHITELIST_ID: CustomSelectFormField = CustomSelectFormField("SELECT_WHITELIST_ID")
@@ -145,21 +147,21 @@ object FormField {
   // BigDecimalFormField
   val COLLECTION_ROYALTY: BigDecimalFormField = BigDecimalFormField("COLLECTION_ROYALTY", 0.0, constants.NFT.Sale.MaxCreatorFee)
 
-  case class StringFormField(name: String, minimumLength: Int, maximumLength: Int, regularExpression: RegularExpression = RegularExpression.ANY_STRING, errorMessage: String = "Regular expression validation failed!") {
+  case class StringFormField(name: String, minimumLength: Int, maximumLength: Int, regularExpression: RegularExpression = RegularExpression.ANY_STRING, errorMessage: String = "REGULAR_EXPRESSION_VALIDATION_FAILED") {
     val placeHolder: String = PLACEHOLDER_PREFIX + name
 
-    def mapping: (String, Mapping[String]) = name -> text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regex, name = regularExpression.regex.pattern.toString, error = errorMessage))
+    def mapping: (String, Mapping[String]) = name -> text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regularExp, name = regularExpression.regularExp.pattern.toString, error = errorMessage))
 
     // TODO
     //  def ignoredMapping: (String, Mapping[String]) = name -> ignored[String]("defaultValue")
 
-    def optionalMapping: (String, Mapping[Option[String]]) = name -> optional(text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regex, name = regularExpression.regex.pattern.toString, error = errorMessage)))
+    def optionalMapping: (String, Mapping[Option[String]]) = name -> optional(text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regularExp, name = regularExpression.regularExp.pattern.toString, error = errorMessage)))
 
     def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_LENGTH_ERROR, minimumLength)
 
     def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_LENGTH_ERROR, maximumLength)
 
-    def getRegexErrorMessage()(implicit messagesProvider: MessagesProvider): String = regularExpression.getRegExErrorMessage()
+    def getRegexErrorMessage()(implicit messagesProvider: MessagesProvider): String = regularExpression.getErrorMessage()
   }
 
   case class RadioFormField(name: String, options: Seq[(String, String)], errorMessage: String = "Option not found") {

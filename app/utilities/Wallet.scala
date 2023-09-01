@@ -2,7 +2,7 @@ package utilities
 
 import com.google.common.collect
 import com.google.common.collect.ImmutableList
-import org.bitcoinj.core.{ECKey, Sha256Hash, Utils}
+import org.bitcoinj.core.{Context, ECKey, Sha256Hash, Utils}
 import org.bitcoinj.crypto.ChildNumber
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.script.Script
@@ -25,6 +25,8 @@ object Wallet {
   implicit val logger: Logger = Logger(this.getClass)
 
   implicit val module: String = constants.Module.UTILITIES_WALLET
+
+  private val context = new Context(MainNetParams.get())
 
   object BouncyHash {
     if (Security.getProvider("BC") == null) {
@@ -54,6 +56,7 @@ object Wallet {
     val words = mnemonics.mkString(" ")
     val hdPathAsList = collect.ImmutableList.copyOf(scala.jdk.CollectionConverters.SeqHasAsJava(hdPath).asJava)
     if (Bip39.validate(mnemonics)) {
+      Context.propagate(context)
       val bitcoinWallet = bitcoinjWallet.fromSeed(
         MainNetParams.get(),
         new DeterministicSeed(words, Bip39.toSeed(words, bip39Passphrase), "", System.currentTimeMillis()),

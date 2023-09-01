@@ -3,8 +3,8 @@ package utilities
 import models.master.NFTProperty
 import play.api.Logger
 import schema.data.Data
-import schema.data.base.{BooleanData, DecData, NumberData, StringData}
-import schema.id.base.{DataID, PropertyID, StringID}
+import schema.data.base._
+import schema.id.base.{DataID, HashID, PropertyID, StringID}
 import schema.property.base.{MesaProperty, MetaProperty}
 
 import scala.util.Try
@@ -24,10 +24,10 @@ object Properties {
   }
 
   def getTypeID(`type`: String): StringID = `type` match {
-    case constants.NFT.Data.STRING => schema.constants.Data.StringDataTypeID
-    case constants.NFT.Data.BOOLEAN => schema.constants.Data.BooleanDataTypeID
-    case constants.NFT.Data.NUMBER => schema.constants.Data.NumberDataTypeID
-    case constants.NFT.Data.DECIMAL => schema.constants.Data.DecDataTypeID
+    case constants.NFT.Data.STRING => schema.data.constants.StringDataTypeID
+    case constants.NFT.Data.BOOLEAN => schema.data.constants.BooleanDataTypeID
+    case constants.NFT.Data.NUMBER => schema.data.constants.NumberDataTypeID
+    case constants.NFT.Data.DECIMAL => schema.data.constants.DecDataTypeID
     case _ => throw new IllegalArgumentException(s"INVALID_DATA_TYPE: ${`type`}")
   }
 
@@ -47,31 +47,30 @@ object Properties {
     case _ => throw new IllegalArgumentException(s"INVALID_DATA: ${`type`} + $value")
   }
 
-  def getCollectionDefaultImmutableMetaProperties(collectionName: String, creatorID: String, nftName: String = "", fileHash: String = ""): Seq[MetaProperty] = Seq(
-    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.NFT_NAME), typeID = schema.constants.Data.StringDataTypeID), data = StringData(nftName)),
-    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.COLLECTION_NAME), typeID = schema.constants.Data.StringDataTypeID), data = StringData(collectionName)),
-    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.FILE_HASH), typeID = schema.constants.Data.StringDataTypeID), data = StringData(fileHash)),
-    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.CREATOR_ID), typeID = schema.constants.Data.StringDataTypeID), data = StringData(creatorID)) // Should be id not identityID for web3 to find the value.
+  def getCollectionDefaultImmutableMetaProperties(collectionName: String, creatorID: String, nftName: String = "", fileHashID: HashID = HashID(Array[Byte]()), fileExtension: String = "", serviceEndpoint: String = ""): Seq[MetaProperty] = Seq(
+    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.NFT_NAME), typeID = schema.data.constants.StringDataTypeID), data = StringData(nftName)),
+    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.COLLECTION_NAME), typeID = schema.data.constants.StringDataTypeID), data = StringData(collectionName)),
+    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.FILE_RESOURCE), typeID = schema.data.constants.LinkedDataTypeID), data = LinkedData(resourceID = fileHashID, extensionID = StringID(fileExtension), serviceEndpoint = serviceEndpoint)),
+    MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.CREATOR_ID), typeID = schema.id.constants.IdentityIDType), data = IDData(utilities.Identity.getMantlePlaceIdentityID(creatorID)))
   )
 
-  def getNFTDefaultImmutableMetaProperties(name: String, collectionName: String, fileHash: String, bondAmount: Long, creatorID: String): Seq[MetaProperty] = {
-    getCollectionDefaultImmutableMetaProperties(collectionName = collectionName, creatorID = creatorID, nftName = name, fileHash = fileHash) :+
-      MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.BOND_AMOUNT), typeID = schema.constants.Data.NumberDataTypeID), data = NumberData(bondAmount))
+  def getNFTDefaultImmutableMetaProperties(name: String, collectionName: String, fileHash: HashID, creatorID: String, fileExtension: String, endPoint: String): Seq[MetaProperty] = {
+    getCollectionDefaultImmutableMetaProperties(collectionName = collectionName, creatorID = creatorID, nftName = name, fileHashID = fileHash, fileExtension = fileExtension, serviceEndpoint = endPoint)
   }
 
   def metaPropertyToNFTProperty(nftId: String, metaProperty: MetaProperty, mutable: Boolean): NFTProperty = metaProperty.getData.getType.value match {
-    case schema.constants.Data.BooleanDataTypeID.value => NFTProperty(nftId = nftId, name = metaProperty.id.keyID.value, `type` = constants.NFT.Data.BOOLEAN, value = BooleanData(metaProperty.getData.getProtoBytes).value.toString, meta = true, mutable = mutable)
-    case schema.constants.Data.StringDataTypeID.value => NFTProperty(nftId = nftId, name = metaProperty.id.keyID.value, `type` = constants.NFT.Data.STRING, value = StringData(metaProperty.getData.getProtoBytes).value, meta = true, mutable = mutable)
-    case schema.constants.Data.NumberDataTypeID.value => NFTProperty(nftId = nftId, name = metaProperty.id.keyID.value, `type` = constants.NFT.Data.NUMBER, value = NumberData(metaProperty.getData.getProtoBytes).value.toString, meta = true, mutable = mutable)
-    case schema.constants.Data.DecDataTypeID.value => NFTProperty(nftId = nftId, name = metaProperty.id.keyID.value, `type` = constants.NFT.Data.DECIMAL, value = DecData(metaProperty.getData.getProtoBytes).value.toString, meta = true, mutable = mutable)
+    case schema.data.constants.BooleanDataTypeID.value => NFTProperty(nftId = nftId, name = metaProperty.id.keyID.value, `type` = constants.NFT.Data.BOOLEAN, value = BooleanData(metaProperty.getData.getProtoBytes).value.toString, meta = true, mutable = mutable)
+    case schema.data.constants.StringDataTypeID.value => NFTProperty(nftId = nftId, name = metaProperty.id.keyID.value, `type` = constants.NFT.Data.STRING, value = StringData(metaProperty.getData.getProtoBytes).value, meta = true, mutable = mutable)
+    case schema.data.constants.NumberDataTypeID.value => NFTProperty(nftId = nftId, name = metaProperty.id.keyID.value, `type` = constants.NFT.Data.NUMBER, value = NumberData(metaProperty.getData.getProtoBytes).value.toString, meta = true, mutable = mutable)
+    case schema.data.constants.DecDataTypeID.value => NFTProperty(nftId = nftId, name = metaProperty.id.keyID.value, `type` = constants.NFT.Data.DECIMAL, value = DecData(metaProperty.getData.getProtoBytes).value.toString, meta = true, mutable = mutable)
     case _ => throw new IllegalArgumentException("NFT_PROPERTY_UNKNOWN_DATA_TYPE")
   }
 
   def mesaPropertyToNFTProperty(nftId: String, mesaProperty: MesaProperty, mutable: Boolean): NFTProperty = mesaProperty.getType.value match {
-    case schema.constants.Data.BooleanDataTypeID.value => NFTProperty(nftId = nftId, name = mesaProperty.id.keyID.value, `type` = constants.NFT.Data.BOOLEAN, value = mesaProperty.getDataID.getHashIDString, meta = false, mutable = mutable)
-    case schema.constants.Data.StringDataTypeID.value => NFTProperty(nftId = nftId, name = mesaProperty.id.keyID.value, `type` = constants.NFT.Data.STRING, value = mesaProperty.getDataID.getHashIDString, meta = false, mutable = mutable)
-    case schema.constants.Data.NumberDataTypeID.value => NFTProperty(nftId = nftId, name = mesaProperty.id.keyID.value, `type` = constants.NFT.Data.NUMBER, value = mesaProperty.getDataID.getHashIDString, meta = false, mutable = mutable)
-    case schema.constants.Data.DecDataTypeID.value => NFTProperty(nftId = nftId, name = mesaProperty.id.keyID.value, `type` = constants.NFT.Data.DECIMAL, value = mesaProperty.getDataID.getHashIDString, meta = false, mutable = mutable)
+    case schema.data.constants.BooleanDataTypeID.value => NFTProperty(nftId = nftId, name = mesaProperty.id.keyID.value, `type` = constants.NFT.Data.BOOLEAN, value = mesaProperty.getDataID.getHashIDString, meta = false, mutable = mutable)
+    case schema.data.constants.StringDataTypeID.value => NFTProperty(nftId = nftId, name = mesaProperty.id.keyID.value, `type` = constants.NFT.Data.STRING, value = mesaProperty.getDataID.getHashIDString, meta = false, mutable = mutable)
+    case schema.data.constants.NumberDataTypeID.value => NFTProperty(nftId = nftId, name = mesaProperty.id.keyID.value, `type` = constants.NFT.Data.NUMBER, value = mesaProperty.getDataID.getHashIDString, meta = false, mutable = mutable)
+    case schema.data.constants.DecDataTypeID.value => NFTProperty(nftId = nftId, name = mesaProperty.id.keyID.value, `type` = constants.NFT.Data.DECIMAL, value = mesaProperty.getDataID.getHashIDString, meta = false, mutable = mutable)
     case _ => throw new IllegalArgumentException("NFT_PROPERTY_UNKNOWN_DATA_TYPE")
   }
 }

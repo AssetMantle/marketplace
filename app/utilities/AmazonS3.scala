@@ -42,7 +42,7 @@ object AmazonS3 {
 
   private val maxMultiPartUploadTime: Int = constants.CommonConfig.AmazonS3.MaxMultiPartUploadTime * 24 * 60 * 60
 
-  private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actors.Service.PrimaryActorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private def getPutObjectRequestWithMetaData(objectKey: String, filePath: String, metaData: Map[String, String]): PutObjectRequest = {
     try {
@@ -92,7 +92,7 @@ object AmazonS3 {
         request.setGeneralProgressListener(new ProgressListener() {
           @Override
           def progressChanged(progressEvent: ProgressEvent): Unit = {
-            println("Transferred bytes: " + progressEvent.getBytesTransferred)
+            logger.debug("Transferred bytes: " + progressEvent.getBytesTransferred)
           }
         })
       }
@@ -167,7 +167,7 @@ object AmazonS3 {
     }
   }
 
-  actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 10000.second, delay = maxMultiPartUploadTime.second)(awsS3Runnable)(schedulerExecutionContext)
+  actors.Service.PrimaryActorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 10000.second, delay = maxMultiPartUploadTime.second)(awsS3Runnable)(schedulerExecutionContext)
 
   def lowLevelAbortMultipartUploads(uploadID: String, objectKey: String): Unit = {
     try {

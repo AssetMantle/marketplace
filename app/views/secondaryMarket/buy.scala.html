@@ -10,11 +10,11 @@
     <div id="secondaryMarketForm">
         @commonInputText(buyForm, constants.FormField.NFT_ID, Symbol("value") -> secondaryMarket.nftId, Symbol("containerDivClass") -> "hidden")
         @commonInputText(buyForm, constants.FormField.SECONDARY_MARKET_ID, Symbol("value") -> secondaryMarket.id, Symbol("containerDivClass") -> "hidden")
-        @if(secondaryMarket.quantity > 1) {
-            @commonInputLong(buyForm, constants.FormField.BUY_QUANTITY)
-        } else {
-            @commonInputLong(buyForm, constants.FormField.BUY_QUANTITY, Symbol("value") -> 1, Symbol("containerDivClass") -> "hidden")
-        }
+@*//        @if(secondaryMarket.quantity > 1) {*@
+@*//            @commonInputLong(buyForm, constants.FormField.BUY_QUANTITY)*@
+@*//        } else {*@
+@*//            @commonInputLong(buyForm, constants.FormField.BUY_QUANTITY, Symbol("value") -> 1, Symbol("containerDivClass") -> "hidden")*@
+@*//        }*@
         @commonInputPassword(buyForm, constants.FormField.PASSWORD)
     </div>
 
@@ -57,7 +57,7 @@
                                         <del>@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_PLATFORM_COMMISSION_OFF)</del>
                                     </td>
                                     <td class="text-center tableValue">
-                                        <span class="commissionRate">@(constants.Platform.Commission * 100)</span> %
+                                        <span class="commissionRate">@(constants.Transaction.Commission * 100)</span> %
                                     </td>
                                     <td class="text-center tableValue"></td>
                                     <td class="text-end tableValue">

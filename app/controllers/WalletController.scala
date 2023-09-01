@@ -71,19 +71,6 @@ class WalletController @Inject()(
     }
   }
 
-  def balance(address: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val balance = blockchainBalances.Service.getTokenBalance(address)
-        (for {
-          balance <- balance
-        } yield Ok(balance.toString)
-          ).recover {
-          case _: BaseException => BadRequest("0")
-        }
-    }
-  }
-
   def sendCoinForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val balance = blockchainBalances.Service.get(loginState.address)
@@ -117,7 +104,6 @@ class WalletController @Inject()(
                 fromAddress = loginState.address,
                 toAddress = sendCoinData.toAddress,
                 amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = sendCoinData.sendCoinAmount)),
-                gasLimit = constants.Transaction.DefaultSendCoinGasAmount,
                 gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, sendCoinData.password)),
               )
@@ -136,13 +122,26 @@ class WalletController @Inject()(
       )
   }
 
+  def balance(address: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val balance = blockchainBalances.Service.tryGet(address)
+        (for {
+          balance <- balance
+        } yield Ok(views.html.base.info.commonMicroNumber(balance.coins.find(_.denom == constants.Blockchain.StakingToken).fold(MicroNumber.zero)(_.amount), constants.View.STAKING_TOKEN_UNITS))
+          ).recover {
+          case _: BaseException => BadRequest(views.html.base.info.commonMicroNumber(MicroNumber.zero, constants.View.STAKING_TOKEN_UNITS))
+        }
+    }
+  }
+
   def wrappedTokenBalance(): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withLoginActionAsync { implicit loginState =>
       implicit request =>
-        val split = blockchainSplits.Service.getByOwnerIDAndOwnableID(ownerId = utilities.Identity.getMantlePlaceIdentityID(loginState.username), ownableID = constants.Blockchain.StakingTokenCoinID)
+        val split = blockchainSplits.Service.getByOwnerIDAndAssetID(ownerId = utilities.Identity.getMantlePlaceIdentityID(loginState.username), assetID = constants.Blockchain.StakingTokenAssetID)
         (for {
           split <- split
-        } yield Ok(s"${utilities.NumericOperation.formatNumber(split.fold(MicroNumber.zero)(_.getBalanceAsMicroNumber))} $$MNTL")
+        } yield Ok(s"${utilities.NumericOperation.formatNumber(split.fold(MicroNumber.zero)(_.getBalanceAsMicroNumber))} wMNTL")
           ).recover {
           case _: BaseException => BadRequest("0")
         }
@@ -210,7 +209,7 @@ class WalletController @Inject()(
           Future(BadRequest(views.html.wallet.unwrapToken(formWithErrors)))
         },
         unwrapTokenData => {
-          val split = blockchainSplits.Service.tryGetByOwnerIDAndOwnableID(ownerId = utilities.Identity.getMantlePlaceIdentityID(loginState.username), ownableID = constants.Blockchain.StakingTokenCoinID)
+          val split = blockchainSplits.Service.tryGetByOwnerIDAndAssetID(ownerId = utilities.Identity.getMantlePlaceIdentityID(loginState.username), assetID = constants.Blockchain.StakingTokenAssetID)
           val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = unwrapTokenData.password)
 
           def validateAndTransfer(split: Split, verifyPassword: Boolean, key: Key) = {
@@ -222,7 +221,6 @@ class WalletController @Inject()(
                 fromAddress = key.address,
                 accountId = loginState.username,
                 amount = split.value,
-                ownableId = constants.Blockchain.StakingTokenCoinID,
                 gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, unwrapTokenData.password))
               )

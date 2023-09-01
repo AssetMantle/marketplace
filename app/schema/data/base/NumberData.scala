@@ -1,15 +1,21 @@
 package schema.data.base
 
 import com.assetmantle.schema.data.base.{AnyData, AnyListableData, NumberData => protoNumberData}
-import schema.data.{Data, ListableData}
-import schema.id.base.{DataID, HashID, StringID}
+import schema.data._
+import schema.id.base.{HashID, StringID}
 
 case class NumberData(value: BigInt) extends ListableData {
-  def getType: StringID = schema.constants.Data.NumberDataTypeID
 
-  def getBondWeight: Int = schema.constants.Data.NumberDataWeight
+  def getType: StringID = constants.NumberDataTypeID
 
-  def getDataID: DataID = DataID(typeID = schema.constants.Data.NumberDataTypeID, hashID = this.generateHashID)
+  def getBondWeight: Int = constants.NumberDataWeight
+
+  def compare(listableData: ListableData): Int = {
+    val difference = this.value - listableData.asInstanceOf[NumberData].value
+    if (difference == 0) 0
+    else if (difference > 0) 1
+    else -1
+  }
 
   def zeroValue: Data = NumberData(0)
 

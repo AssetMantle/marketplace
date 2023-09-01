@@ -12,9 +12,11 @@ import utilities.MicroNumber
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class SecondaryMarket(id: String, orderId: Option[String], nftId: String, collectionId: String, sellerId: String, quantity: BigInt, price: MicroNumber, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class SecondaryMarket(id: String, orderId: String, nftId: String, collectionId: String, sellerId: String, quantity: BigInt, price: MicroNumber, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def getOrderID()(implicit module: String, logger: Logger): OrderID = OrderID(HashID(utilities.Secrets.base64URLDecode(this.orderId.getOrElse(constants.Response.ORDER_ID_NOT_FOUND.throwBaseException()))))
+  def getOrderID: OrderID = OrderID(HashID(utilities.Secrets.base64URLDecode(this.orderId)))
+
+  def getReceiveAmount: BigInt = this.quantity * this.price.value
 
   def serialize(): SecondaryMarkets.SecondaryMarketSerialized = SecondaryMarkets.SecondaryMarketSerialized(
     id = this.id,
@@ -58,14 +60,14 @@ case class SecondaryMarket(id: String, orderId: Option[String], nftId: String, c
 }
 
 private[master] object SecondaryMarkets {
-  case class SecondaryMarketSerialized(id: String, orderId: Option[String], nftId: String, collectionId: String, sellerId: String, quantity: BigDecimal, price: BigDecimal, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
+  case class SecondaryMarketSerialized(id: String, orderId: String, nftId: String, collectionId: String, sellerId: String, quantity: BigDecimal, price: BigDecimal, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
     def deserialize()(implicit module: String, logger: Logger): SecondaryMarket = SecondaryMarket(id = id, orderId = orderId, nftId = nftId, collectionId = collectionId, sellerId = sellerId, quantity = this.quantity.toBigInt, price = MicroNumber(price), denom = denom, endHours = endHours, externallyMade = externallyMade, completed = completed, cancelled = cancelled, expired = expired, status = status, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
   class SecondaryMarketTable(tag: Tag) extends Table[SecondaryMarketSerialized](tag, "SecondaryMarket") with ModelTable[String] {
 
-    def * = (id, orderId.?, nftId, collectionId, sellerId, quantity, price, denom, endHours, externallyMade, completed, cancelled, expired, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SecondaryMarketSerialized.tupled, SecondaryMarketSerialized.unapply)
+    def * = (id, orderId, nftId, collectionId, sellerId, quantity, price, denom, endHours, externallyMade, completed, cancelled, expired, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SecondaryMarketSerialized.tupled, SecondaryMarketSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -127,7 +129,7 @@ class SecondaryMarkets @Inject()(
 
     def get(ids: Seq[String]): Future[Seq[SecondaryMarket]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
 
-    def updateOrderID(secondaryMarketID: String, orderID: OrderID): Future[Int] = customUpdate(tableQuery.filter(_.id === secondaryMarketID).map(_.orderId).update(orderID.asString))
+    def updateOrderID(secondaryMarketID: String, orderId: OrderID): Future[Int] = customUpdate(tableQuery.filter(_.id === secondaryMarketID).map(_.orderId).update(orderId.asString))
 
     def getByNFTIdAndLowestPrice(nftId: String): Future[Option[SecondaryMarket]] = filterAndSort(x => x.nftId === nftId && !x.completed && !x.cancelled && !x.expired && x.status)(_.price).map(_.headOption.map(_.deserialize))
 
@@ -143,7 +145,7 @@ class SecondaryMarkets @Inject()(
 
     def total: Future[Int] = countTotal()
 
-    def markOnOrderCreationFailed(ids: Seq[String]): Future[Int] = customUpdate(tableQuery.filter(_.id.inSet(ids)).map(_.status).update(false))
+    def markOnOrderCreationFailed(orderIDs: Seq[OrderID]): Future[Int] = customUpdate(tableQuery.filter(_.orderId.inSet(orderIDs.map(_.asString))).map(_.status).update(false))
 
     def getFailedOrders: Future[Seq[SecondaryMarket]] = filter(!_.status).map(_.map(_.deserialize))
 
@@ -161,9 +163,17 @@ class SecondaryMarkets @Inject()(
 
     def getByPageNumber(pageNumber: Int): Future[Seq[SecondaryMarket]] = sortWithPagination(_.endHours)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.deserialize))
 
-    def getAllOrderIDs: Future[Seq[String]] = customQuery(tableQuery.filter(_.orderId.?.nonEmpty).map(_.orderId).result)
+    def getAllOrderIDs: Future[Seq[String]] = customQuery(tableQuery.map(_.orderId).result)
 
-    def getByOrderId(orderID: OrderID): Future[Option[SecondaryMarket]] = filter(_.orderId === orderID.asString).map(_.headOption.map(_.deserialize))
+    def getByOrderId(orderId: OrderID): Future[Option[SecondaryMarket]] = filter(_.orderId === orderId.asString).map(_.headOption.map(_.deserialize))
+
+    def getCollectionBySeller(sellerId: String, pageNumber: Int): Future[Seq[String]] = filterAndSortWithPagination(_.sellerId === sellerId)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.collectionId))
+
+    def totalOnSellBySeller(sellerId: String): Future[Int] = filterAndCount(_.sellerId === sellerId)
+
+    def totalOnSellBySellerAndCollection(sellerId: String, collectionId: String): Future[Int] = filterAndCount(x => x.sellerId === sellerId && x.collectionId === collectionId)
+
+    def getByCollectionSellerAndPageNumber(sellerId: String, collectionId: String, pageNumber: Int): Future[Seq[SecondaryMarket]] = filterAndSortWithPagination(x => x.sellerId === sellerId && x.collectionId === collectionId)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage).map(_.map(_.deserialize()))
   }
 
 }

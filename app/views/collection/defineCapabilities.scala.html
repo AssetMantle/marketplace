@@ -1,0 +1,180 @@
+@import controllers.actions.LoginState
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@* @commonForm(constants.Form.DEFINE_COLLECTION_CAPABILITIES, definePropertiesForm, showBackButton = true) {*@
+@*    @multiStepNavigator(Seq(Messages(constants.View.COLLECTION_STEPPER_BASIC_INFORMATION), Messages(constants.View.COLLECTION_STEPPER_IMAGE_UPLOAD), Messages(constants.View.COLLECTION_STEPPER_CAPABILITIES), Messages(constants.View.COLLECTION_STEPPER_PROPERTIES)), defaultSelected = 2)*@
+@*    <div class="capabilityInfoContainer">*@
+@*        <div class="capabilityAdvancedDetail">*@
+@*            <div class="singleCapability">*@
+@*                <div class="d-flex justify-content-between align-items-center capabilityHeader">*@
+@*                    <div class="d-flex gap-2 align-items-center optionTitle">*@
+@*                        <i class="bi bi-puzzle iconDefault" style="transform: rotate(-35deg)"></i>*@
+@*                        <span>@Messages(constants.View.COLLECTION_CAPABILITY_FRACTIONALISABLE)</span>*@
+@*                        <div class="customTooltip">*@
+@*                            <span class="tooltipText" style="z-index: 999;">@Messages(constants.View.COLLECTION_CAPABILITY_FRACTIONALISABLE)</span>*@
+@*                            <i class="bi bi-info-circle iconDefault iconSmall"></i>*@
+@*                        </div>*@
+@*                    </div>*@
+@*                    <div class="options">*@
+@*                        @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_CAPABILITY_FRACTIONALISABLE)*@
+@*                    </div>*@
+@*                </div>*@
+@*                <div class="capabilityBody" style="display: none;">*@
+@*                    <div class="propertyAdvancedDetail">*@
+@*                        <div class="d-flex gap-2 align-content-center mt-2">*@
+@*                            <div class="bodyHeading">@Messages(constants.View.PROPERTY_ADVANCED_OPTIONS)</div>*@
+@*                            <i class="bi bi-chevron-down iconDefault iconSmall dropdownIcon" onclick="openPropertyAdvancedOption(this)"></i>*@
+@*                        </div>*@
+@*                        <div class="advancedDetailOption">*@
+@*                            <div class="d-flex justify-content-between align-items-center singleOption">*@
+@*                                <div class="d-flex gap-2 optionTitle">*@
+@*                                    <i class="bi bi-pencil iconDefault iconSmall me-1" style="transform: rotate(-90deg)"></i>*@
+@*                                    <span>@Messages(constants.View.ADVANCED_PROPERTY_MUTABILITY)</span>*@
+@*                                </div>*@
+@*                                <div class="options">*@
+@*                                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)*@
+@*                                </div>*@
+@*                            </div>*@
+@*                            <div class="d-flex justify-content-between align-items-center singleOption">*@
+@*                                <div class="d-flex gap-2 optionTitle">*@
+@*                                    <i class="bi bi-eye iconDefault iconSmall me-1"></i>*@
+@*                                    <span>@Messages(constants.View.ADVANCED_PROPERTY_HIDE)</span>*@
+@*                                </div>*@
+@*                                <div class="options">*@
+@*                                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE)*@
+@*                                </div>*@
+@*                            </div>*@
+@*                            <div class="d-flex justify-content-between align-items-center singleOption requirementOption">*@
+@*                                <div class="d-flex gap-2 optionTitle">*@
+@*                                    <i class="bi bi-asterisk iconDefault iconSmall me-1"></i>*@
+@*                                    <span>@Messages(constants.View.ADVANCED_PROPERTY_REQUIREMENT)</span>*@
+@*                                </div>*@
+@*                                <div class="options">*@
+@*                                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_SET_DEFAULT_VALUE)*@
+@*                                </div>*@
+@*                            </div>*@
+@*                            <div class="mb-3 optionInputField" style="display: none;">*@
+@*                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_DEFAULT_VALUE, Symbol("required") -> false, Symbol("class") -> "fixedValueField")*@
+@*                            </div>*@
+@*                        </div>*@
+@*                    </div>*@
+@*                </div>*@
+@*                <div class="innerSeparator"></div>*@
+@*            </div>*@
+@*            <div class="singleCapability">*@
+@*                <div class="d-flex justify-content-between align-items-center capabilityHeader">*@
+@*                    <div class="d-flex gap-2 align-items-center optionTitle">*@
+@*                        <i class="bi bi-lock iconDefault"></i>*@
+@*                        <span>@Messages(constants.View.COLLECTION_CAPABILITY_LOCKABLE)</span>*@
+@*                        <div class="customTooltip">*@
+@*                            <span class="tooltipText" style="z-index: 999;">@Messages(constants.View.COLLECTION_CAPABILITY_LOCKABLE)</span>*@
+@*                            <i class="bi bi-info-circle iconDefault iconSmall"></i>*@
+@*                        </div>*@
+@*                    </div>*@
+@*                    <div class="options">*@
+@*                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_CAPABILITY_LOCKABLE)*@
+@*                    </div>*@
+@*                </div>*@
+@*                <div class="capabilityBody" style="display: none;">*@
+@*                    <div class="propertyAdvancedDetail">*@
+@*                        <div class="d-flex gap-2 align-content-center mt-2">*@
+@*                            <div class="bodyHeading">@Messages(constants.View.PROPERTY_ADVANCED_OPTIONS)</div>*@
+@*                            <i class="bi bi-chevron-down iconDefault iconSmall dropdownIcon" onclick="openPropertyAdvancedOption(this)"></i>*@
+@*                        </div>*@
+@*                        <div class="advancedDetailOption">*@
+@*                            <div class="d-flex justify-content-between align-items-center singleOption">*@
+@*                                <div class="d-flex gap-2 optionTitle">*@
+@*                                    <i class="bi bi-pencil iconDefault iconSmall me-1" style="transform: rotate(-90deg)"></i>*@
+@*                                    <span>@Messages(constants.View.ADVANCED_PROPERTY_MUTABILITY)</span>*@
+@*                                </div>*@
+@*                                <div class="options">*@
+@*                                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)*@
+@*                                </div>*@
+@*                            </div>*@
+@*                            <div class="d-flex justify-content-between align-items-center singleOption">*@
+@*                                <div class="d-flex gap-2 optionTitle">*@
+@*                                    <i class="bi bi-eye iconDefault iconSmall me-1"></i>*@
+@*                                    <span>@Messages(constants.View.ADVANCED_PROPERTY_HIDE)</span>*@
+@*                                </div>*@
+@*                                <div class="options">*@
+@*                                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE)*@
+@*                                </div>*@
+@*                            </div>*@
+@*                            <div class="d-flex justify-content-between align-items-center singleOption requirementOption">*@
+@*                                <div class="d-flex gap-2 optionTitle">*@
+@*                                    <i class="bi bi-asterisk iconDefault iconSmall me-1"></i>*@
+@*                                    <span>@Messages(constants.View.ADVANCED_PROPERTY_REQUIREMENT)</span>*@
+@*                                </div>*@
+@*                                <div class="options">*@
+@*                                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_SET_DEFAULT_VALUE)*@
+@*                                </div>*@
+@*                            </div>*@
+@*                            <div class="mb-3 optionInputField" style="display: none;">*@
+@*                            @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_DEFAULT_VALUE, Symbol("required") -> false, Symbol("class") -> "fixedValueField")*@
+@*                            </div>*@
+@*                        </div>*@
+@*                    </div>*@
+@*                </div>*@
+@*                <div class="innerSeparator"></div>*@
+@*            </div>*@
+@*            <div class="singleCapability">*@
+@*                <div class="d-flex justify-content-between align-items-center capabilityHeader">*@
+@*                    <div class="d-flex gap-2 align-items-center optionTitle">*@
+@*                        <i class="bi bi-trash iconDefault"></i>*@
+@*                        <span>@Messages(constants.View.COLLECTION_CAPABILITY_BURNABLE)</span>*@
+@*                        <div class="customTooltip">*@
+@*                            <span class="tooltipText" style="z-index: 999;">@Messages(constants.View.COLLECTION_CAPABILITY_BURNABLE)</span>*@
+@*                            <i class="bi bi-info-circle iconDefault iconSmall"></i>*@
+@*                        </div>*@
+@*                    </div>*@
+@*                    <div class="options">*@
+@*                    @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_CAPABILITY_BURNABLE)*@
+@*                    </div>*@
+@*                </div>*@
+@*                <div class="capabilityBody" style="display: none;">*@
+@*                    <div class="propertyAdvancedDetail">*@
+@*                        <div class="d-flex gap-2 align-content-center mt-2">*@
+@*                            <div class="bodyHeading">@Messages(constants.View.PROPERTY_ADVANCED_OPTIONS)</div>*@
+@*                            <i class="bi bi-chevron-down iconDefault iconSmall dropdownIcon" onclick="openPropertyAdvancedOption(this)"></i>*@
+@*                        </div>*@
+@*                        <div class="advancedDetailOption">*@
+@*                            <div class="d-flex justify-content-between align-items-center singleOption">*@
+@*                                <div class="d-flex gap-2 optionTitle">*@
+@*                                    <i class="bi bi-pencil iconDefault iconSmall me-1" style="transform: rotate(-90deg)"></i>*@
+@*                                    <span>@Messages(constants.View.ADVANCED_PROPERTY_MUTABILITY)</span>*@
+@*                                </div>*@
+@*                                <div class="options">*@
+@*                                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_MUTABLE)*@
+@*                                </div>*@
+@*                            </div>*@
+@*                            <div class="d-flex justify-content-between align-items-center singleOption">*@
+@*                                <div class="d-flex gap-2 optionTitle">*@
+@*                                    <i class="bi bi-eye iconDefault iconSmall me-1"></i>*@
+@*                                    <span>@Messages(constants.View.ADVANCED_PROPERTY_HIDE)</span>*@
+@*                                </div>*@
+@*                                <div class="options">*@
+@*                                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_HIDE)*@
+@*                                </div>*@
+@*                            </div>*@
+@*                            <div class="d-flex justify-content-between align-items-center singleOption requirementOption">*@
+@*                                <div class="d-flex gap-2 optionTitle">*@
+@*                                    <i class="bi bi-asterisk iconDefault iconSmall me-1"></i>*@
+@*                                    <span>@Messages(constants.View.ADVANCED_PROPERTY_REQUIREMENT)</span>*@
+@*                                </div>*@
+@*                                <div class="options">*@
+@*                                @commonToggleButton(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_SET_DEFAULT_VALUE)*@
+@*                                </div>*@
+@*                            </div>*@
+@*                            <div class="mb-3 optionInputField" style="display: none;">*@
+@*                            @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_DEFAULT_VALUE, Symbol("required") -> false, Symbol("class") -> "fixedValueField")*@
+@*                            </div>*@
+@*                        </div>*@
+@*                    </div>*@
+@*                </div>*@
+@*                <div class="innerSeparator"></div>*@
+@*            </div>*@
+@*        </div>*@
+@*    </div>*@
+@*}*@
+@*<script src="@utilities.PublicResource.getVersionedRoute("javascripts/collections/createCollection.js")"></script>*@

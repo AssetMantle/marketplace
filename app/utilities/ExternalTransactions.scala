@@ -3,7 +3,6 @@ package utilities
 import com.assetmantle.modules.assets.{transactions => assetTransactions}
 import com.assetmantle.modules.identities.{transactions => identityTransactions}
 import com.assetmantle.modules.orders.{transactions => orderTransactions}
-import com.assetmantle.modules.splits.{transactions => splitTransactions}
 import com.cosmos.bank.{v1beta1 => bankTx}
 import com.ibc.applications.transfer.v2.FungibleTokenPacketData
 import com.ibc.core.channel.{v1 => channelTx}
@@ -13,7 +12,7 @@ import models.common.Coin
 import models.master._
 import models.{blockchain, master, masterTransaction}
 import play.api.Configuration
-import schema.id.OwnableID
+import schema.data.base.{HeightData, NumberData}
 import schema.id.base._
 import schema.list.PropertyList
 import schema.property.base.{MesaProperty, MetaProperty}
@@ -44,7 +43,7 @@ class ExternalTransactions @Inject()(
                                     (implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private def updateNFTOwner(nft: Option[NFT], account: Option[Account]) = if (nft.isDefined && account.isDefined) {
-    val split = blockchainSplits.Service.tryGetByOwnerIDAndOwnableID(ownerId = account.get.getIdentityID, ownableID = nft.get.getAssetID)
+    val split = blockchainSplits.Service.tryGetByOwnerIDAndAssetID(ownerId = account.get.getIdentityID, assetID = nft.get.getAssetID)
     val nftOwner = masterNFTOwners.Service.get(nftId = nft.get.id, ownerId = account.get.id)
     val collection = masterCollections.Service.tryGet(nft.get.collectionId)
 
@@ -146,7 +145,7 @@ class ExternalTransactions @Inject()(
   def onRenumerateNFT(msg: assetTransactions.renumerate.Message): Future[Unit] = {
     val nft = masterNFTs.Service.getByAssetId(AssetID(msg.getAssetID))
     val account = masterAccounts.Service.getByIdentityId(IdentityID(msg.getFromID))
-    val split = blockchainSplits.Service.tryGetByOwnerIDAndOwnableID(ownerId = IdentityID(msg.getFromID), ownableID = AssetID(msg.getAssetID))
+    val split = blockchainSplits.Service.tryGetByOwnerIDAndAssetID(ownerId = IdentityID(msg.getFromID), assetID = AssetID(msg.getAssetID))
 
     def updateSupply(nft: Option[NFT]) = if (nft.isDefined) {
       val totalSupply = blockchainSplits.Service.getTotalSupply(AssetID(msg.getAssetID))
@@ -235,21 +234,18 @@ class ExternalTransactions @Inject()(
     } yield ()
   }
 
-  def onOrderMake(msg: orderTransactions.make.Message, txHeight: Long): Future[Unit] = {
-    val orderClassificationId = ClassificationID(msg.getClassificationID)
-    val nft = masterNFTs.Service.getByAssetId(OwnableID(msg.getMakerOwnableID).asString)
+  def onPutOrder(msg: orderTransactions.put.Message, txHeight: Long): Future[Unit] = {
+    val nft = masterNFTs.Service.getByAssetId(AssetID(msg.getMakerAssetID).asString)
     val account = masterAccounts.Service.getByIdentityId(IdentityID(msg.getFromID))
+    val takerAssetID = AssetID(msg.getTakerAssetID)
 
     val orderID = utilities.Order.getOrderID(
-      classificationID = constants.Transaction.OrderClassificationID,
-      properties = constants.Orders.ImmutableMetas,
       makerID = IdentityID(msg.getFromID),
-      makerOwnableID = OwnableID(msg.getMakerOwnableID),
-      makerOwnableSplit = BigInt(msg.getMakerOwnableSplit),
-      creationHeight = txHeight,
-      takerID = IdentityID(msg.getTakerID),
-      takerOwnableID = constants.Blockchain.StakingTokenCoinID,
-      takerOwnableSplit = BigInt(msg.getTakerOwnableSplit)
+      makerAssetID = AssetID(msg.getMakerAssetID),
+      makerSplit = NumberData(BigInt(msg.getMakerSplit)),
+      expiryHeight = HeightData(msg.getExpiryHeight.getValue),
+      takerAssetID = takerAssetID,
+      takerSplit = NumberData(BigInt(msg.getTakerSplit))
     )
     val blockchainOrder = blockchainOrders.Service.get(orderID.getBytes)
 
@@ -257,32 +253,18 @@ class ExternalTransactions @Inject()(
       masterNFTOwners.Service.tryGet(nftId = nft.get.id, ownerId = account.get.id).map(Option(_))
     } else Future(None)
 
-    def update(nft: Option[NFT], account: Option[Account], nftOwner: Option[NFTOwner], blockchainOrder: Option[Order]) = if (nft.isDefined && account.isDefined && nftOwner.isDefined && OwnableID(msg.getTakerOwnableID).asString == constants.Blockchain.StakingTokenCoinID.asString && blockchainOrder.isDefined) {
-      if (orderClassificationId.asString == constants.Transaction.OrderClassificationID.asString) {
-        val secondaryMarketId = utilities.IdGenerator.getRandomHexadecimal
-        val endHours = (msg.getExpiresIn.getValue * constants.Blockchain.MaxOrderHours) / constants.Blockchain.MaxOrderExpiry
-        val secondaryMarket = SecondaryMarket(id = secondaryMarketId, orderId = Option(orderID.asString), nftId = nft.get.id, collectionId = nft.get.collectionId, sellerId = account.get.id, quantity = msg.getMakerOwnableSplit.toInt, price = MicroNumber(BigDecimal(msg.getTakerOwnableSplit).toBigInt + 1), denom = constants.Blockchain.StakingToken, endHours = endHours.toInt, externallyMade = true, completed = false, cancelled = false, expired = false, status = Option(true))
-        val add = masterSecondaryMarkets.Service.add(secondaryMarket)
+    def update(nft: Option[NFT], account: Option[Account], nftOwner: Option[NFTOwner], blockchainOrder: Option[Order]) = if (nft.isDefined && account.isDefined && nftOwner.isDefined && AssetID(msg.getTakerAssetID).asString == constants.Blockchain.StakingTokenAssetID.asString && blockchainOrder.isDefined && constants.SecondaryMarket.AssetTokensAllowed.map(_.asString).contains(takerAssetID.asString)) {
+      val secondaryMarketId = utilities.IdGenerator.getRandomHexadecimal
+      val endHours = ((msg.getExpiryHeight.getValue - txHeight) * constants.Blockchain.MaxOrderHours) / constants.Blockchain.MaxOrderExpiry
+      val secondaryMarket = SecondaryMarket(id = secondaryMarketId, orderId = orderID.asString, nftId = nft.get.id, collectionId = nft.get.collectionId, sellerId = account.get.id, quantity = BigInt(msg.getMakerSplit), price = MicroNumber(BigDecimal(msg.getTakerSplit).toBigInt), denom = constants.Blockchain.StakingToken, endHours = endHours.toInt, externallyMade = true, completed = false, cancelled = false, expired = false, status = Option(true))
+      val add = masterSecondaryMarkets.Service.add(secondaryMarket)
 
-        def updateOwner() = masterNFTOwners.Service.onSecondaryMarket(nftOwner.get.nftId, secondaryMarketId, sellQuantity = BigInt(msg.getMakerOwnableSplit))
+      def updateOwner() = masterNFTOwners.Service.onSecondaryMarket(nftOwner.get.nftId, secondaryMarketId, sellQuantity = BigInt(msg.getMakerSplit))
 
-        for {
-          _ <- add
-          _ <- updateOwner()
-        } yield ()
-      } else {
-        val quantity = BigInt(msg.getMakerOwnableSplit)
-        val updateOrDeleteNFTOwner = if (quantity == nftOwner.get.quantity) masterNFTOwners.Service.delete(nftId = nftOwner.get.nftId, ownerId = nftOwner.get.ownerId)
-        else if (quantity < nftOwner.get.quantity) masterNFTOwners.Service.update(nftOwner.get.copy(quantity = nftOwner.get.quantity - quantity))
-        else Future()
-
-        def transfer = masterTransactionExternalAssets.Service.addOrUpdate(nftId = nft.get.id, lastOwnerId = nftOwner.get.ownerId, assetId = nft.get.assetId.get, currentOwnerIdentityId = schema.constants.ID.OrderIdentityID.asString, collectionId = nft.get.collectionId, amount = quantity)
-
-        for {
-          _ <- updateOrDeleteNFTOwner
-          _ <- transfer
-        } yield ()
-      }
+      for {
+        _ <- add
+        _ <- updateOwner()
+      } yield ()
     } else Future(0)
 
     for {
@@ -294,22 +276,22 @@ class ExternalTransactions @Inject()(
     } yield ()
   }
 
-  def onOrderTake(msg: orderTransactions.take.Message): Future[Unit] = {
+  def onGetOrder(msg: orderTransactions.get.Message): Future[Unit] = {
     val blockchainOrder = blockchainOrders.Service.tryGet(OrderID(msg.getOrderID))
     val account = masterAccounts.Service.getByIdentityId(IdentityID(msg.getFromID))
 
-    def nft(ownableID: OwnableID, account: Option[Account]) = if (account.isDefined) masterNFTs.Service.getByAssetId(ownableID.asString) else Future(None)
+    def nft(assetID: AssetID, account: Option[Account]) = if (account.isDefined) masterNFTs.Service.getByAssetId(assetID.asString) else Future(None)
 
     for {
       blockchainOrder <- blockchainOrder
       account <- account
-      nft <- nft(blockchainOrder.getMakerOwnableID, account)
+      nft <- nft(blockchainOrder.getMakerAssetID, account)
       _ <- updateNFTOwner(nft, account)
     } yield ()
   }
 
-  def onSplitSend(msg: splitTransactions.send.Message): Future[Unit] = {
-    val nft = masterNFTs.Service.getByAssetId(OwnableID(msg.getOwnableID).asString)
+  def onAssetSend(msg: assetTransactions.send.Message): Future[Unit] = {
+    val nft = masterNFTs.Service.getByAssetId(AssetID(msg.getAssetID).asString)
     val fromAccount = masterAccounts.Service.getByIdentityId(IdentityID(msg.getFromID))
     val toAccount = masterAccounts.Service.getByIdentityId(IdentityID(msg.getToID))
 

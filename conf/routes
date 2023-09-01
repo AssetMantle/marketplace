@@ -11,6 +11,10 @@ GET         /firebase-messaging-sw.js                          controllers.Asset
 # Index
 GET         /                                                  controllers.IndexController.index()
 GET         /sitemap.xml                                       controllers.IndexController.sitemap()
+GET         /websocket                                         controllers.WebSocketController.connect()
+
+# DO NOT CHANGE
+GET         /nftResource/:id                                   controllers.NFTController.resource(id: String)
 
 GET         /signUp                                            controllers.AccountController.signUpForm()
 POST        /signUp                                            controllers.AccountController.signUp()
@@ -40,6 +44,7 @@ POST        /changeActiveKey                                   controllers.Accou
 
 GET         /walletPopup                                       controllers.WalletController.walletPopup()
 GET         /wrappedTokenBalance                               controllers.WalletController.wrappedTokenBalance()
+GET         /walletBalance                                     controllers.WalletController.balance(address: String)
 GET         /walletPopupKeys                                   controllers.WalletController.walletPopupKeys()
 
 GET         /collections                                       controllers.CollectionController.viewCollections()
@@ -80,8 +85,8 @@ GET         /collectedCollectionPerPage                        controllers.Colle
 GET         /collectedCollectionNFTs                           controllers.CollectedController.collectionNFTs(accountId: String, collectionId: String)
 GET         /profile/:accountId/COLLECTED/:collectionId        controllers.CollectedController.viewCollectionNFTs(accountId: String, collectionId: String)
 GET         /collectedNFTsPerPage                              controllers.CollectedController.collectionNFTsPerPage(accountId: String, collectionId: String, pageNumber: Int)
-GET         /collectedCardInfo                                 controllers.CollectedController.commonCardInfo(collectionID: String, accountID: String)
-GET         /collectedCollectionTopRightCard                   controllers.CollectedController.topRightCard(collectionID: String, accountID: String)
+GET         /collectedCardInfo                                 controllers.CollectedController.collectionCardInfo(collectionID: String, accountID: String)
+GET         /collectedCollectionTopRightCard                   controllers.CollectedController.sectionTopRightCard(collectionID: String, accountID: String)
 
 GET         /wishlistSection                                   controllers.WishlistController.wishlistSection(accountId: String)
 GET         /wishListCollectionPerPage                         controllers.WishlistController.collectionPerPage(accountId: String, pageNumber: Int)
@@ -92,7 +97,9 @@ GET         /wishListNFTsPerPage                               controllers.Wishl
 POST        /addToWishList                                     controllers.WishlistController.add()
 POST        /deleteFromWishList                                controllers.WishlistController.delete()
 
-GET         /nft/:id                                           controllers.NFTController.viewNFT(id: String)
+#GET         /nft/:id                                           controllers.NFTController.viewNFT(id: String)
+GET         /nft/:id/:activeTab                                controllers.NFTController.viewNFT(id: String, activeTab: String)
+GET         /nft/:id                                           controllers.NFTController.viewNFT(id: String, activeTab: String ?= "OVERVIEW")
 GET         /nftDetails                                        controllers.NFTController.details(nftId: String)
 GET         /nftDetailViewLeftCards                            controllers.NFTController.detailViewLeftCards(nftId: String)
 GET         /nftInfo                                           controllers.NFTController.info(nftId: String)
@@ -119,6 +126,10 @@ GET         /mintNFT                                           controllers.NFTCo
 POST        /mintNFT                                           controllers.NFTController.mint()
 GET         /transferNFT                                       controllers.NFTController.transferForm(nftId: String)
 POST        /transferNFT                                       controllers.NFTController.transfer()
+GET         /overviewSection                                   controllers.NFTController.overview(nftId: String, activeTab: String)
+GET         /tradeSection                                      controllers.NFTController.trade(nftId: String)
+GET         /sellOrders                                        controllers.NFTController.sellOrders()
+GET         /yourOrders                                        controllers.NFTController.yourOrders()
 
 GET         /settings                                          controllers.SettingController.viewSettings()
 GET         /profileSettings                                   controllers.SettingController.settings()
@@ -133,7 +144,6 @@ GET         /viewMnemonics                                     controllers.Setti
 POST        /viewMnemonics                                     controllers.SettingController.viewMnemonics()
 GET         /deleteKey                                         controllers.SettingController.deleteKeyForm(address: String)
 POST        /deleteKey                                         controllers.SettingController.deleteKey()
-GET         /walletBalance                                     controllers.SettingController.walletBalance(address: String)
 GET         /provisionAddress                                  controllers.SettingController.provisionAddressForm(address: String)
 POST        /provisionAddress                                  controllers.SettingController.provisionAddress()
 
@@ -206,6 +216,15 @@ POST        /cancelSecondaryMarket                             controllers.Secon
 GET         /buySecondaryMarket                                controllers.SecondaryMarketController.buyForm(secondaryMarketId: String)
 POST        /buySecondaryMarket                                controllers.SecondaryMarketController.buy()
 
+GET         /listedSection                                     controllers.SecondaryMarketController.listedSection(accountId: String)
+GET         /listedCollectionPerPage                           controllers.SecondaryMarketController.listedCollectionPerPage(accountId: String, pageNumber: Int)
+GET         /listedCollectionNFTs                              controllers.SecondaryMarketController.listedCollectionNFTs(accountId: String, collectionId: String)
+GET         /profile/:accountId/LISTED/:collectionId           controllers.SecondaryMarketController.viewListedCollectionNFTs(accountId: String, collectionId: String)
+GET         /listedNFTsPerPage                                 controllers.SecondaryMarketController.listedCollectionNFTsPerPage(accountId: String, collectionId: String, pageNumber: Int)
+GET         /listedCardInfo                                    controllers.SecondaryMarketController.listedCollectionCardInfo(collectionID: String, accountID: String)
+GET         /listedSectionCollectionTopRightCard               controllers.SecondaryMarketController.listedSectionCollectionTopRightCard(collectionID: String, accountID: String)
+
+
 GET         /unwrapToken                                       controllers.WalletController.unwrapTokenForm()
 POST        /unwrapToken                                       controllers.WalletController.unwrapToken()
 
@@ -225,7 +244,6 @@ POST        /deleteWhitelist                                   controllers.White
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()
 
 GET         /gasTokenPrice                                     controllers.WalletController.gasTokenPrice()
-GET         /addressBalance                                    controllers.WalletController.balance(address: String)
 GET         /sendCoin                                          controllers.WalletController.sendCoinForm()
 POST        /sendCoin                                          controllers.WalletController.sendCoin()
 GET         /wrapCoin                                          controllers.WalletController.wrapCoinForm()

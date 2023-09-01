@@ -47,7 +47,7 @@ function fetchBalances(walletAddresses) {
 }
 
 function fetchBalance(address) {
-    let route = jsRoutes.controllers.SettingController.walletBalance(address);
+    let route = jsRoutes.controllers.WalletController.balance(address);
     $.ajax({
         url: route.url,
         type: route.type,
@@ -114,7 +114,6 @@ function fetchWrappedTokenBalance() {
         async: true,
         statusCode: {
             200: function (data) {
-                console.log(data)
                 $('#walletTradeBalance').html(data);
             },
             400: function (data) {

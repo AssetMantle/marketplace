@@ -1,10 +1,12 @@
 @import views.html.base.form._
 @import models.masterTransaction.CollectionDraft
 @import views.collection.companion.Edit
+@import views.html.base.modal._
 
 @(editForm: Form[Edit.Data] = Edit.form, collectionDraft: Option[CollectionDraft])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.EDIT_COLLECTION, editForm, submitDisable = false) {
+    @multiStepNavigator(Seq(Messages(constants.View.COLLECTION_STEPPER_BASIC_INFORMATION),Messages(constants.View.COLLECTION_STEPPER_IMAGE_UPLOAD),Messages(constants.View.COLLECTION_STEPPER_CAPABILITIES),Messages(constants.View.COLLECTION_STEPPER_PROPERTIES)))
     @commonInputText(editForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionDraft.fold("")(_.id), Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
     @commonInputText(editForm, constants.FormField.COLLECTION_NAME, Symbol("value") -> collectionDraft.fold("")(_.name))
     @commonDescriptionText(editForm, constants.FormField.COLLECTION_DESCRIPTION, Symbol("value") -> collectionDraft.fold("")(_.description))

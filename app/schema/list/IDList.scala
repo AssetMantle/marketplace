@@ -2,12 +2,15 @@ package schema.list
 
 import com.assetmantle.schema.ids.base.AnyID
 import com.assetmantle.schema.lists.base.{IDList => protoIDList}
+import schema.data.base.{IDData, ListData}
 import schema.id.ID
-import schema.utilities.ID.byteArraysCompare
+import schema.utilities.common.byteArraysCompare
 
 import scala.jdk.CollectionConverters._
 
 case class IDList(idList: Seq[ID]) {
+
+  require(this.idList.map(_.getType.value).forall(_ == this.idList.head.getType.value), "ID_LIST_DOES_NOT_CONTAINS_SAME_ELEMENT_TYPE")
 
   def getIDs: Seq[ID] = this.idList
 
@@ -17,27 +20,32 @@ case class IDList(idList: Seq[ID]) {
 
   def getProtoBytes: Array[Byte] = this.asProtoIDList.toByteString.toByteArray
 
-  def add(ids: Seq[ID]): IDList = {
-    var updatedList = this.idList
-    ids.foreach(x => {
-      val xBytes = x.getBytes
-      val index = this.idList.indexWhere(_.getBytes.sameElements(xBytes))
+  def add(addIDs: Seq[ID]): IDList = {
+    var updatedList = this.sort.idList
+    val elementType = if (updatedList.nonEmpty) updatedList.head.getType else if (addIDs.nonEmpty) addIDs.head.getType else schema.id.base.StringID("")
+    addIDs.filter(_.getType.compare(elementType) == 0).foreach(x => {
+      val index = updatedList.indexWhere(_.getBytes.sameElements(x.getBytes))
       if (index == -1) updatedList = updatedList :+ x
     })
-    new IDList(idList = updatedList)
+    IDList(idList = updatedList).sort
   }
+
+  def add(id: ID): IDList = this.add(Seq(id))
 
   def remove(ids: Seq[ID]): IDList = {
-    var updatedList = this.idList
+    var updatedList = this.sort.idList
     ids.foreach(x => {
-      val xBytes = x.getBytes
-      val index = this.idList.indexWhere(_.getBytes.sameElements(xBytes))
+      val index = this.idList.indexWhere(_.getBytes.sameElements(x.getBytes))
       if (index != -1) updatedList = updatedList.zipWithIndex.filter(_._2 != index).map(_._1)
     })
-    new IDList(idList = updatedList)
+    IDList(idList = updatedList)
   }
 
+  def remove(id: ID): IDList = this.remove(Seq(id))
+
   def sort: IDList = IDList(this.idList.sortWith((x, y) => byteArraysCompare(x.getBytes, y.getBytes) < 0))
+
+  def toListData: ListData = ListData(this.sort.idList.map(x => IDData(x)))
 }
 
 object IDList {

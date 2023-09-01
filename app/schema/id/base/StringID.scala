@@ -3,6 +3,7 @@ package schema.id.base
 import com.assetmantle.schema.ids.base.{AnyID, StringID => protoStringID}
 import schema.id.ID
 
+// Should always be case class (not class) otherwise equality will fail
 case class StringID(value: String) extends ID {
 
   def getBytes: Array[Byte] = this.value.getBytes
@@ -17,6 +18,8 @@ case class StringID(value: String) extends ID {
   def toAnyID: AnyID = AnyID.newBuilder().setStringID(this.asProtoStringID).build()
 
   def getProtoBytes: Array[Byte] = this.asProtoStringID.toByteString.toByteArray
+
+  def compare(id: ID): Int = this.value.compare(id.asInstanceOf[StringID].value)
 }
 
 object StringID {

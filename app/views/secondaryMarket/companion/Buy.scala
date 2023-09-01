@@ -8,9 +8,8 @@ object Buy {
     mapping(
       constants.FormField.NFT_ID.mapping,
       constants.FormField.SECONDARY_MARKET_ID.mapping,
-      constants.FormField.BUY_QUANTITY.mapping,
       constants.FormField.PASSWORD.mapping,
     )(Data.apply)(Data.unapply))
 
-  case class Data(nftId: String, secondaryMarketId: String, buyQuantity: Long, password: String)
+  case class Data(nftId: String, secondaryMarketId: String, password: String)
 }

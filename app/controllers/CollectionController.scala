@@ -14,6 +14,7 @@ import utilities.MicroNumber
 import views.base.companion.UploadFile
 import views.collection.companion._
 
+import java.io.File
 import java.nio.file.Files
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -125,18 +126,27 @@ class CollectionController @Inject()(
       implicit request =>
         val collection = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterCollections.Service.tryGet(id)
-        val likedNFTs = optionalLoginState.fold[Future[Seq[String]]](Future(Seq()))(x => masterWishLists.Service.getByCollection(accountId = x.username, collectionId = id))
 
         def getNFTs(creatorId: String) = if (optionalLoginState.fold("")(_.username) == creatorId || pageNumber == 1) masterNFTs.Service.getByPageNumber(id, pageNumber) else Future(Seq())
 
         def nftDrafts(collection: Collection) = if (optionalLoginState.fold("")(_.username) == collection.creatorId) masterTransactionNFTDrafts.Service.getAllForCollection(id) else Future(Seq())
 
+        def getOwnersAndLiked(nftIds: Seq[String]) = if (optionalLoginState.isDefined && nftIds.nonEmpty) {
+          val nftOwners = masterNFTOwners.Service.getByOwnerAndIds(ownerId = optionalLoginState.get.username, nftIDs = nftIds)
+          val nftLiked = masterWishLists.Service.getByNFTIds(accountId = optionalLoginState.get.username, nftIDs = nftIds)
+
+          for {
+            nftOwners <- nftOwners
+            nftLiked <- nftLiked
+          } yield (nftOwners, nftLiked)
+        } else Future(Seq(), Seq())
+
         (for {
           collection <- collection
           nfts <- getNFTs(collection.creatorId)
+          (nftOwners, likedNFTs) <- getOwnersAndLiked(nfts.map(_.id))
           nftDrafts <- nftDrafts(collection)
-          likedNFTs <- likedNFTs
-        } yield Ok(views.html.collection.details.nftsPerPage(collection, nfts, likedNFTs, nftDrafts, pageNumber))
+        } yield Ok(views.html.base.commonNFTsPerPage(collection, nfts, nftOwners, likedNFTs, nftDrafts, pageNumber))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -350,8 +360,12 @@ class CollectionController @Inject()(
 
   def uploadCollectionDraftFile(id: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id = id)
       val oldFilePath = utilities.Collection.getFilePath(id) + name
+      val collectionDraft = if (new File(oldFilePath).length() <= constants.File.COLLECTION_DRAFT_FILE_FORM.maxFileSize) masterTransactionCollectionDrafts.Service.tryGet(id = id)
+      else {
+        utilities.FileOperations.deleteFile(oldFilePath)
+        constants.Response.FILE_SIZE_GREATER_THAN_ALLOWED.throwBaseException()
+      }
       val newFileName = utilities.FileOperations.getFileHash(oldFilePath) + "." + utilities.FileOperations.fileExtensionFromName(name)
       val awsKey = utilities.Collection.getOthersFileAwsKey(collectionId = id, fileName = newFileName)
 
@@ -540,8 +554,12 @@ class CollectionController @Inject()(
 
   def uploadCollectionFile(id: String, documentType: String, name: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val collection = masterCollections.Service.tryGet(id = id)
       val oldFilePath = utilities.Collection.getFilePath(id) + name
+      val collection = if (new File(oldFilePath).length() <= constants.File.COLLECTION_FILE_FORM.maxFileSize) masterCollections.Service.tryGet(id = id)
+      else {
+        utilities.FileOperations.deleteFile(oldFilePath)
+        constants.Response.FILE_SIZE_GREATER_THAN_ALLOWED.throwBaseException()
+      }
       val newFileName = utilities.FileOperations.getFileHash(oldFilePath) + "." + utilities.FileOperations.fileExtensionFromName(name)
       val awsKey = utilities.Collection.getOthersFileAwsKey(collectionId = id, fileName = newFileName)
 
