@@ -7,6 +7,12 @@
 @(nft: master.NFT, collection: Collection, nftOwner: Option[NFTOwner], numberOfOwners: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
+        <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_FRACTIONALIZATION_TITLE)</div>
+        <div class="d-flex gap-2 align-items-center badgeImageText" style="cursor: unset;">
+            <i class="bi bi-puzzle iconDefault" style="transform: rotate(-15deg);"></i>
+            <div class="badgeText">00 @Messages(constants.View.NFT_DETAIL_CARD_FRACTIONALIZATION_LABEL)</div>
+        </div>
+        <div class="separator"></div>
         <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_COLLECTION_TITLE)</div>
         <div class="d-flex gap-2 align-items-center badgeImageText" onclick="viewCollection('@collection.id')">
             @collection.getProfileFileURL.fold {

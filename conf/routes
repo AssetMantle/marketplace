@@ -68,6 +68,7 @@ POST        /defineProperties                                  controllers.Colle
 GET         /deleteCollectionDraft                             controllers.CollectionController.deleteDraftForm(collectionId: String)
 POST        /deleteCollectionDraft                             controllers.CollectionController.deleteDraft()
 GET         /genesisTypeForm                                   controllers.CollectionController.genesisTypeForm()
+GET         /defineCapabilitiesForm                            controllers.CollectionController.defineCapabilitiesForm()
 
 GET         /uploadCollectionDraftFilesForm                    controllers.CollectionController.uploadCollectionDraftFilesForm(id: String)
 GET         /uploadCollectionDraftFileForm                     controllers.CollectionController.uploadCollectionDraftFileForm(id: String, documentType: String)
@@ -96,7 +97,10 @@ GET         /wishListNFTsPerPage                               controllers.Wishl
 POST        /addToWishList                                     controllers.WishlistController.add()
 POST        /deleteFromWishList                                controllers.WishlistController.delete()
 
-GET         /nft/:id                                           controllers.NFTController.viewNFT(id: String)
+#GET         /nft/:id                                           controllers.NFTController.viewNFT(id: String)
+GET         /nft/:id                                           controllers.NFTController.viewNFT(id: String, accountId = "", activeTab = "OVERVIEW")
+GET         /nft/:id/:accountId/:activeTab                     controllers.NFTController.viewNFT(id: String, accountId: String, activeTab: String)
+GET         /nft/:id/:accountId                                controllers.NFTController.viewNFT(id: String, accountId: String, activeTab: String ?= "OVERVIEW")
 GET         /nftDetails                                        controllers.NFTController.details(nftId: String)
 GET         /nftDetailViewLeftCards                            controllers.NFTController.detailViewLeftCards(nftId: String)
 GET         /nftInfo                                           controllers.NFTController.info(nftId: String)
@@ -123,6 +127,10 @@ GET         /mintNFT                                           controllers.NFTCo
 POST        /mintNFT                                           controllers.NFTController.mint()
 GET         /transferNFT                                       controllers.NFTController.transferForm(nftId: String)
 POST        /transferNFT                                       controllers.NFTController.transfer()
+GET         /overviewSection                                   controllers.NFTController.overview(nftId: String, accountId: String, activeTab: String)
+GET         /tradeSection                                      controllers.NFTController.trade(nftId: String)
+GET         /sellOrders                                        controllers.NFTController.sellOrders()
+GET         /yourOrders                                        controllers.NFTController.yourOrders()
 
 GET         /settings                                          controllers.SettingController.viewSettings()
 GET         /profileSettings                                   controllers.SettingController.settings()

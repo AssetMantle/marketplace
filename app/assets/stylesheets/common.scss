@@ -1617,3 +1617,35 @@ body.modal-open{
     }
   }
 }
+// Collection Cover
+.coverWithBg{
+  min-width: 320px;
+  min-height: 200px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  height: 100%;
+  img{
+    max-width: 100%;
+    width: auto !important;
+    display: block;
+    max-height: 300px;
+    &.bg{
+      filter: blur(10px);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 120% !important;
+      height: 120%;
+      object-fit: fill;
+    }
+    &.main{
+      height: auto !important;
+      //position: absolute;
+      //left: 0;
+      //top: 0;
+      //transform: translate(-50%, -50%);
+    }
+  }
+}

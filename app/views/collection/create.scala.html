@@ -1,12 +1,14 @@
 @import views.collection.companion.Create
 @import views.html.base.form._
 @import controllers.actions.LoginState
+@import views.html.base.modal._
 
 @(createForm: Form[Create.Data] = Create.form, totalDrafts: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @if(totalDrafts < constants.CommonConfig.MaxCollectionDrafts) {
     <div id="createCollectionForm">
     @commonForm(constants.Form.CREATE_COLLECTION, createForm) {
+        @multiStepNavigator(Seq(Messages(constants.View.COLLECTION_STEPPER_BASIC_INFORMATION),Messages(constants.View.COLLECTION_STEPPER_IMAGE_UPLOAD),Messages(constants.View.COLLECTION_STEPPER_CAPABILITIES),Messages(constants.View.COLLECTION_STEPPER_PROPERTIES)))
         @commonInputText(createForm, constants.FormField.COLLECTION_NAME)
         @commonDescriptionText(createForm, constants.FormField.COLLECTION_DESCRIPTION)
         @commonToggleButton(createForm, constants.FormField.NSFW_COLLECTION)

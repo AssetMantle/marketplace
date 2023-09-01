@@ -2,6 +2,7 @@
 @import views.html.base.buttons._
 @import controllers.actions.LoginState
 @import models.masterTransaction.CollectionDraft
+@import views.html.base.modal._
 
 @(collectionDraft: CollectionDraft)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
@@ -14,7 +15,7 @@
                 &times;
     </button>
 </div>
-
+@multiStepNavigator(Seq(Messages(constants.View.COLLECTION_STEPPER_BASIC_INFORMATION),Messages(constants.View.COLLECTION_STEPPER_IMAGE_UPLOAD),Messages(constants.View.COLLECTION_STEPPER_CAPABILITIES),Messages(constants.View.COLLECTION_STEPPER_PROPERTIES)),defaultSelected = 1)
 <div class="d-flex gap-3 flex-column flex-sm-row">
     @commonUploadFile(fileUploadForm = constants.File.COLLECTION_DRAFT_FILE_FORM, id = collectionDraft.id, documentType = constants.Collection.File.PROFILE, label = constants.View.COLLECTION_PROFILE_IMAGE_TITLE, fileUrl = collectionDraft.getProfileFileURL)
     @commonUploadFile(fileUploadForm = constants.File.COLLECTION_DRAFT_FILE_FORM, id = collectionDraft.id, documentType = constants.Collection.File.COVER, label = constants.View.COLLECTION_COVER_IMAGE_TITLE, fileUrl = collectionDraft.getCoverFileURL)
