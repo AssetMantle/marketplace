@@ -8,7 +8,6 @@ import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import queries.blockchain._
-import queries.responses.blockchain.UnconfirmedTxsResponse
 import slick.jdbc.H2Profile.api._
 import transactions.blockchain._
 import transactions.responses.blockchain.BroadcastTxSyncResponse
@@ -110,22 +109,6 @@ class UserTransactions @Inject()(
   }
 
   object Utility {
-
-    def getLatestHeightAccountAndUnconfirmedTxs(address: String): Future[(Int, Account, UnconfirmedTxsResponse.Response)] = {
-      // TODO
-      // val bcAccount = blockchainAccounts.Service.tryGet(fromAddress)
-      val abciInfo = getAbciInfo.Service.get
-      val bcAccount = getAccount.Service.get(address).map(_.account.toSerializableAccount).recover {
-        case _: Exception => models.blockchain.Account(address = address, accountType = None, accountNumber = 0, sequence = 0, publicKey = None)
-      }
-      val unconfirmedTxs = getUnconfirmedTxs.Service.get()
-
-      for {
-        abciInfo <- abciInfo
-        bcAccount <- bcAccount
-        unconfirmedTxs <- unconfirmedTxs
-      } yield (abciInfo.result.response.last_block_height.toInt, bcAccount, unconfirmedTxs)
-    }
 
     def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]): Future[UserTransaction] = {
 

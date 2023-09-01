@@ -59,7 +59,7 @@ object FormField {
   val COLLECTION_NAME: StringFormField = StringFormField("COLLECTION_NAME", 3, 30)
   val COLLECTION_DESCRIPTION: StringFormField = StringFormField("COLLECTION_DESCRIPTION", 3, 256)
   val COLLECTION_ID: StringFormField = StringFormField("COLLECTION_ID", 16, 16)
-  val COLLECTION_PROPERTY_NAME: StringFormField = StringFormField("COLLECTION_PROPERTY_NAME", 1, 30, RegularExpression.PROPERTY_ID)
+  val COLLECTION_PROPERTY_NAME: StringFormField = StringFormField("COLLECTION_PROPERTY_NAME", 1, 30, RegularExpression.PROPERTY_ID, RegularExpression.PROPERTY_ID.getError)
   val COLLECTION_PROPERTY_DEFAULT_VALUE: StringFormField = StringFormField("COLLECTION_PROPERTY_DEFAULT_VALUE", 1, 30)
   val NFT_NAME: StringFormField = StringFormField("NFT_NAME", 3, 50)
   val NFT_DESCRIPTION: StringFormField = StringFormField("NFT_DESCRIPTION", 3, 256)
@@ -144,21 +144,21 @@ object FormField {
   // BigDecimalFormField
   val COLLECTION_ROYALTY: BigDecimalFormField = BigDecimalFormField("COLLECTION_ROYALTY", 0.0, constants.NFT.Sale.MaxCreatorFee)
 
-  case class StringFormField(name: String, minimumLength: Int, maximumLength: Int, regularExpression: RegularExpression = RegularExpression.ANY_STRING, errorMessage: String = "Regular expression validation failed!") {
+  case class StringFormField(name: String, minimumLength: Int, maximumLength: Int, regularExpression: RegularExpression = RegularExpression.ANY_STRING, errorMessage: String = "REGULAR_EXPRESSION_VALIDATION_FAILED") {
     val placeHolder: String = PLACEHOLDER_PREFIX + name
 
-    def mapping: (String, Mapping[String]) = name -> text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regex, name = regularExpression.regex.pattern.toString, error = errorMessage))
+    def mapping: (String, Mapping[String]) = name -> text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regularExp, name = regularExpression.regularExp.pattern.toString, error = errorMessage))
 
     // TODO
     //  def ignoredMapping: (String, Mapping[String]) = name -> ignored[String]("defaultValue")
 
-    def optionalMapping: (String, Mapping[Option[String]]) = name -> optional(text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regex, name = regularExpression.regex.pattern.toString, error = errorMessage)))
+    def optionalMapping: (String, Mapping[Option[String]]) = name -> optional(text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regularExpression.regularExp, name = regularExpression.regularExp.pattern.toString, error = errorMessage)))
 
     def getMinimumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MINIMUM_LENGTH_ERROR, minimumLength)
 
     def getMaximumFieldErrorMessage()(implicit messagesProvider: MessagesProvider): String = Messages(MAXIMUM_LENGTH_ERROR, maximumLength)
 
-    def getRegexErrorMessage()(implicit messagesProvider: MessagesProvider): String = regularExpression.getRegExErrorMessage()
+    def getRegexErrorMessage()(implicit messagesProvider: MessagesProvider): String = regularExpression.getErrorMessage()
   }
 
   case class RadioFormField(name: String, options: Seq[(String, String)], errorMessage: String = "Option not found") {

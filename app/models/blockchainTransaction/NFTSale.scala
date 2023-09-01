@@ -93,14 +93,11 @@ class NFTSales @Inject()(
       def nftSales(txHashes: Seq[String]) = saleNFTTransactions.Service.getByTxHashes(txHashes)
 
       def update(allNFTSaleTxs: Seq[NFTSale], nftSales: Seq[SaleNFTTransaction], txs: Seq[Transaction]) = {
-        println("C: " + allNFTSaleTxs.length)
-        println("D: " + allNFTSaleTxs.map(_.txHash).distinct.length)
         val userTxs = nftSales.map(_.txHash).distinct.map { nftSaleTxHash =>
           val tx = allNFTSaleTxs.find(_.txHash == nftSaleTxHash).getOrElse(constants.Response.NFT_WHITELIST_SALE_NOT_FOUND.throwBaseException())
           val nftSale = nftSales.find(_.txHash == nftSaleTxHash).get
           UserTransaction(txHash = tx.txHash, accountId = nftSale.buyerAccountId, fromAddress = tx.fromAddress, status = tx.status, timeoutHeight = tx.timeoutHeight, log = tx.log, txHeight = txs.find(_.hash == nftSale.txHash).map(_.height), txType = constants.Transaction.User.WHITELIST_SALE, createdBy = tx.createdBy, createdOnMillisEpoch = tx.createdOnMillisEpoch, updatedBy = tx.updatedBy, updatedOnMillisEpoch = tx.updatedOnMillisEpoch)
         }
-        println("E: " + userTxs.length)
         userTransactions.Service.add(userTxs)
       }
 

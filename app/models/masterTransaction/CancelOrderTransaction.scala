@@ -1,6 +1,7 @@
 package models.masterTransaction
 
 import constants.Scheduler
+import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.UserTransaction
 import models.master.SecondaryMarket
@@ -57,6 +58,7 @@ class CancelOrderTransactions @Inject()(
                                          masterNFTs: master.NFTs,
                                          utilitiesOperations: utilities.Operations,
                                          utilitiesNotification: utilities.Notification,
+                                         utilitiesTransaction: utilities.Transaction,
                                          userTransactions: blockchainTransaction.UserTransactions,
                                        )(implicit val executionContext: ExecutionContext)
   extends GenericDaoImpl[CancelOrderTransactions.CancelOrderTransactionTable, CancelOrderTransaction, String]() {
@@ -84,41 +86,18 @@ class CancelOrderTransactions @Inject()(
 
   object Utility {
 
+    implicit val txUtil: TxUtil = TxUtil("CANCEL_ORDER", 150000)
+
     def transaction(secondaryMarket: SecondaryMarket, fromAddress: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
+      val messages = Seq(utilities.BlockchainTransaction.getCancelOrderMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(secondaryMarket.sellerId), orderID = secondaryMarket.getOrderID))
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = Seq(utilities.BlockchainTransaction.getCancelOrderMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(secondaryMarket.sellerId), orderID = secondaryMarket.getOrderID)),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultCancelOrderGasLimit),
-          gasLimit = constants.Transaction.DefaultCancelOrderGasLimit,
-          account = bcAccount,
-          ecKey = ecKey,
-          timeoutHeight = timeoutHeight)
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, secondaryMarketId = secondaryMarket.id, sellerId = secondaryMarket.sellerId)
 
-        val checkAndAdd = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              userTx <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = secondaryMarket.sellerId, fromAddress = fromAddress, timeoutHeight = timeoutHeight, txType = constants.Transaction.User.CANCEL_ORDER)
-              _ <- Service.addWithNoneStatus(txHash = txHash, secondaryMarketId = secondaryMarket.id, sellerId = secondaryMarket.sellerId)
-            } yield userTx
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
-        }
-
-        for {
-          userTransaction <- checkAndAdd
-        } yield (userTransaction, txRawBytes)
-      }
-
-      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
+      val userTx = utilitiesTransaction.doUserTx(messages = messages, gasPrice = gasPrice, accountId = secondaryMarket.sellerId, fromAddress = fromAddress, ecKey = ecKey, masterTxFunction = masterTxFunc)
 
       for {
-        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-        (userTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedUserTransaction <- broadcastTxAndUpdate(userTransaction, txRawBytes)
-      } yield updatedUserTransaction
+        (userTx, _) <- userTx
+      } yield userTx
     }
 
     val scheduler: Scheduler = new Scheduler {
@@ -136,27 +115,20 @@ class CancelOrderTransactions @Inject()(
               val markOnCancellation = masterSecondaryMarkets.Service.markOnCancellation(cancelOrderTx.secondaryMarketId)
               val sendNotifications = utilitiesNotification.send(cancelOrderTx.sellerId, constants.Notification.CANCEL_ORDER_SUCCESSFUL)("")
 
-              (for {
+              for {
                 _ <- markSuccess
                 _ <- markOnCancellation
                 _ <- sendNotifications
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
+
             } else {
               val markMasterFailed = Service.markFailed(cancelOrderTx.txHash)
               val sendNotifications = utilitiesNotification.send(cancelOrderTx.sellerId, constants.Notification.CANCEL_ORDER_FAILED)("")
 
-              (for {
+              for {
                 _ <- markMasterFailed
                 _ <- sendNotifications
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
             }
           } else Future()
 
@@ -171,7 +143,8 @@ class CancelOrderTransactions @Inject()(
           cancelOrderTxs <- cancelOrderTxs
           _ <- checkAndUpdate(cancelOrderTxs)
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case baseException: BaseException => baseException.notifyLog("[PANIC]")
+            logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
         }
 
         Await.result(forComplete, Duration.Inf)

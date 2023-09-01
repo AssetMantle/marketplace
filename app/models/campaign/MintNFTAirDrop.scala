@@ -1,6 +1,7 @@
 package models.campaign
 
 import constants.Scheduler
+import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.{AdminTransaction, AdminTransactions}
 import models.campaign.MintNFTAirDrops.MintNFTAirDropTable
@@ -54,6 +55,7 @@ class MintNFTAirDrops @Inject()(
                                  protected val dbConfigProvider: DatabaseConfigProvider,
                                  utilitiesOperations: utilities.Operations,
                                  adminTransactions: AdminTransactions,
+                                 utilitiesTransaction: utilities.Transaction,
                                  utilitiesNotification: utilities.Notification,
                                )(implicit val executionContext: ExecutionContext)
   extends GenericDaoImpl[MintNFTAirDrops.MintNFTAirDropTable, MintNFTAirDrop, String]() {
@@ -68,7 +70,7 @@ class MintNFTAirDrops @Inject()(
 
     def addForDropping(accountIdsAddressMap: Map[String, String], eligibilityTxHash: String): Future[Int] = create(accountIdsAddressMap.map(x => MintNFTAirDrop(accountId = x._1, address = x._2, eligibilityTxHash = eligibilityTxHash, airdropTxHash = None, status = false)).toSeq)
 
-    def updateDropTxHash(accountId: String, airDropTxHash: String): Future[Int] = customUpdate(tableQuery.filter(_.accountId === accountId).map(_.airdropTxHash).update(airDropTxHash))
+    def updateDropTxHash(accountId: String, airDropTxHash: String): Future[String] = customUpdate(tableQuery.filter(_.accountId === accountId).map(_.airdropTxHash).update(airDropTxHash)).map(_.toString)
 
     def getByAirDropTxHash(txHash: String): Future[Seq[MintNFTAirDrop]] = filter(_.airdropTxHash === txHash)
 
@@ -90,43 +92,18 @@ class MintNFTAirDrops @Inject()(
 
   object Utility {
 
+    implicit val txUtil: TxUtil = TxUtil("MINT_NFT_AIRDROP", 150000)
+
     private def transaction(accountId: String, address: String, amount: MicroNumber, eligibilityTxHash: String): Future[AdminTransaction] = {
-      val airDropWallet = constants.Secret.nftAirDropWallet
-      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(airDropWallet.address)
+      val messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = constants.Secret.nftAirDropWallet.address, toAddress = address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount))))
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val txRawBytes = utilities.BlockchainTransaction.getTxRawBytes(
-          messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = airDropWallet.address, toAddress = address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)))),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = constants.Transaction.AdminTxGasPrice, gasLimit = constants.Transaction.DefaultSendCoinGasAmount),
-          gasLimit = constants.Transaction.DefaultSendCoinGasAmount,
-          account = bcAccount,
-          ecKey = airDropWallet.getECKey,
-          timeoutHeight = timeoutHeight,
-          memo = eligibilityTxHash)
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+      def masterTxFunc(txHash: String) = Service.updateDropTxHash(accountId = accountId, airDropTxHash = txHash)
 
-        val checkAndAdd = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = airDropWallet.address, timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.Campaign.MINT_NFT_AIRDROP)
-              _ <- Service.updateDropTxHash(accountId = accountId, airDropTxHash = txHash)
-            } yield adminTransaction
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
-        }
-
-        for {
-          adminTransaction <- checkAndAdd
-        } yield (adminTransaction, txRawBytes)
-      }
-
-      def broadcastTxAndUpdate(adminTransaction: AdminTransaction, txRawBytes: Array[Byte]) = adminTransactions.Utility.broadcastTxAndUpdate(adminTransaction, txRawBytes)
+      val adminTx = utilitiesTransaction.doAdminTx(messages = messages, wallet = constants.Secret.nftAirDropWallet, masterTxFunction = masterTxFunc)
 
       for {
-        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-        (adminTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedAdminTransaction <- broadcastTxAndUpdate(adminTransaction, txRawBytes)
-      } yield updatedAdminTransaction
+        (adminTx, _) <- adminTx
+      } yield adminTx
     }
 
     val scheduler: Scheduler = new Scheduler {
@@ -149,24 +126,16 @@ class MintNFTAirDrops @Inject()(
               val markSuccess = Service.markSuccess(drop.accountId)
               val sendNotifications = utilitiesNotification.send(drop.accountId, constants.Notification.MINT_NFT_AIR_DROP_SUCCESSFUL)("")
 
-              (for {
+              for {
                 _ <- markSuccess
                 _ <- sendNotifications
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
             } else {
               val markMasterFailed = Service.markFailed(drop.accountId)
 
-              (for {
+              for {
                 _ <- markMasterFailed
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
             }
           } else Future()
 
@@ -183,7 +152,8 @@ class MintNFTAirDrops @Inject()(
           _ <- checkAndUpdate(checkDrops)
           _ <- dropTokens(toBeDropped)
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case baseException: BaseException => baseException.notifyLog("[PANIC]")
+            logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
         }
 
         Await.result(forComplete, Duration.Inf)

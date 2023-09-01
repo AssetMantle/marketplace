@@ -154,7 +154,9 @@ object Response {
 
     def logMessage: String = LOG_PREFIX + response
 
-    def throwBaseException(exception: Exception = null)(implicit logger: Logger) = throw new BaseException(this, exception)
+    def getBaseException(exception: Exception = null)(implicit module: String, logger: Logger) = new BaseException(this, exception)
+
+    def throwBaseException(exception: Exception = null)(implicit module: String, logger: Logger) = throw this.getBaseException(exception)
   }
 
   class Warning(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

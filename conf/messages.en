@@ -1097,3 +1097,4 @@ REGEX_ERROR.NFT_TAGS=Only A-Z, a-z,0-9, and ._!- are allowed
 TOTAL_OWNERS=Total Owners
 NOTIFICATION.TEST.TITLE=Test Notif
 NOTIFICATION.TEST.MESSAGE=Hello {0}, How are you?
+REGULAR_EXPRESSION_VALIDATION_FAILED=Regular expression validation failed.

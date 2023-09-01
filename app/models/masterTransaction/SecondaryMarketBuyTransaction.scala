@@ -1,6 +1,7 @@
 package models.masterTransaction
 
 import constants.Scheduler
+import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchain.Split
 import models.blockchainTransaction.{UserTransaction, UserTransactions}
@@ -70,6 +71,7 @@ class SecondaryMarketBuyTransactions @Inject()(
                                                 masterNFTOwners: master.NFTOwners,
                                                 masterSecondaryMarkets: master.SecondaryMarkets,
                                                 collectionsAnalysis: analytics.CollectionsAnalysis,
+                                                utilitiesTransaction: utilities.Transaction,
                                                 utilitiesNotification: utilities.Notification,
                                                 userTransactions: UserTransactions,
                                               )(implicit val executionContext: ExecutionContext)
@@ -97,55 +99,22 @@ class SecondaryMarketBuyTransactions @Inject()(
   }
 
   object Utility {
+    implicit val txUtil: TxUtil = TxUtil("SECONDARY_MARKET_BUY", 300000)
+
     def transaction(nftID: String, buyerId: String, fromAddress: String, secondaryMarket: SecondaryMarket, gasPrice: BigDecimal, ecKey: ECKey, split: Option[Split], royaltyFees: MicroNumber, creatorAddress: String): Future[BlockchainTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val secondaryMarketBuyMsg = utilities.BlockchainTransaction.getGetOrderMsg(
-          fromAddress = fromAddress,
-          fromID = utilities.Identity.getMantlePlaceIdentityID(buyerId),
-          orderID = secondaryMarket.getOrderID)
-        val wrapCoinMsg = utilities.BlockchainTransaction.getWrapTokenMsg(
-          fromAddress = fromAddress,
-          fromID = utilities.Identity.getMantlePlaceIdentityID(buyerId),
-          coins = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber(secondaryMarket.price.value * secondaryMarket.quantity) - split.fold(MicroNumber.zero)(_.getBalanceAsMicroNumber)))
-        )
-        val sendCoinMsg = utilities.BlockchainTransaction.getSendCoinMsgAsAny(
-          fromAddress = fromAddress,
-          toAddress = creatorAddress,
-          amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = royaltyFees))
-        )
-        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = Seq(wrapCoinMsg, secondaryMarketBuyMsg, sendCoinMsg),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultGetOrderGasLimit),
-          gasLimit = constants.Transaction.DefaultGetOrderGasLimit,
-          account = bcAccount,
-          ecKey = ecKey,
-          timeoutHeight = timeoutHeight)
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+      val messages = Seq(
+        utilities.BlockchainTransaction.getWrapTokenMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(buyerId), coins = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber(secondaryMarket.price.value * secondaryMarket.quantity) - split.fold(MicroNumber.zero)(_.getBalanceAsMicroNumber)))),
+        utilities.BlockchainTransaction.getGetOrderMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(buyerId), orderID = secondaryMarket.getOrderID),
+        utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = creatorAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = royaltyFees))))
 
-        val checkAndAdd = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = buyerId, fromAddress = fromAddress, timeoutHeight = timeoutHeight, txType = constants.Transaction.User.SECONDARY_MARKET_BUY)
-              _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nftID, buyerId = buyerId, secondaryMarketId = secondaryMarket.id)
-            } yield userTransaction
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
-        }
+      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, nftId = nftID, buyerId = buyerId, secondaryMarketId = secondaryMarket.id)
 
-        for {
-          userTransaction <- checkAndAdd
-        } yield (userTransaction, txRawBytes)
-      }
-
-      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
+      val userTx = utilitiesTransaction.doUserTx(messages = messages, gasPrice = gasPrice, accountId = buyerId, fromAddress = fromAddress, ecKey = ecKey, masterTxFunction = masterTxFunc)
 
       for {
-        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-        (userTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedUserTransaction <- broadcastTxAndUpdate(userTransaction, txRawBytes)
-      } yield updatedUserTransaction
+        (userTx, _) <- userTx
+      } yield userTx
     }
 
     val scheduler: Scheduler = new Scheduler {
@@ -178,7 +147,7 @@ class SecondaryMarketBuyTransactions @Inject()(
                 utilitiesNotification.send(secondaryMarketBuyTx.buyerId, constants.Notification.BUYER_TAKE_ORDER_SUCCESSFUL, nft.name)(s"'${secondaryMarketBuyTx.buyerId}', '${constants.View.COLLECTED}'")
               }
 
-              (for {
+              for {
                 _ <- markSuccess
                 nft <- nft
                 secondaryMarket <- secondaryMarket
@@ -187,25 +156,17 @@ class SecondaryMarketBuyTransactions @Inject()(
                 _ <- updateSecondaryMarket()
                 _ <- sendNotifications(secondaryMarket.sellerId, nft)
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
             } else {
               val markFailed = Service.markFailed(secondaryMarketBuyTx.txHash)
               val nft = masterNFTs.Service.tryGet(secondaryMarketBuyTx.nftId)
 
               def sendNotifications(nft: NFT) = utilitiesNotification.send(secondaryMarketBuyTx.buyerId, constants.Notification.BUYER_TAKE_ORDER_FAILED, nft.name)("")
 
-              (for {
+              for {
                 _ <- markFailed
                 nft <- nft
                 _ <- sendNotifications(nft)
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
             }
           } else Future()
 
@@ -220,7 +181,8 @@ class SecondaryMarketBuyTransactions @Inject()(
           txs <- getTxs(secondaryMarketBuyTxs.map(_.txHash).distinct)
           _ <- checkAndUpdate(secondaryMarketBuyTxs, txs)
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case baseException: BaseException => baseException.notifyLog("[PANIC]")
+            logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
         }
 
         Await.result(forComplete, Duration.Inf)

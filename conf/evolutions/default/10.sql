@@ -15,6 +15,24 @@ ALTER TABLE MASTER_TRANSACTION."PublicListingNFTTransaction"
 ALTER TABLE MASTER_TRANSACTION."SaleNFTTransaction"
     DROP CONSTRAINT IF EXISTS "BuyNFTTransaction_buyerAccountId_sellerAccountId_txHash_nft_key";
 
+UPDATE MASTER."NFTProperty"
+SET "name" = regexp_replace("name", '-', '', 'g');
+
+UPDATE MASTER."NFTProperty"
+SET "name" = regexp_replace("name", ' ', '_', 'g');
+
+UPDATE MASTER."NFTProperty"
+SET "name" = regexp_replace("name", '/', 'of', 'g');
+
+UPDATE MASTER."NFTProperty"
+SET "name" = regexp_replace("name", 'No.', 'Number', 'g');
+
+
+SELECT *
+FROM MASTER."NFTProperty"
+WHERE "name" NOT SIMILAR TO $$[A-Za-z0-9_]{1,30}$$;
+
+
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AdminTransaction"
 (
     "txHash"               VARCHAR NOT NULL,

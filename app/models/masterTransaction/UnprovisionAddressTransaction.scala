@@ -1,6 +1,7 @@
 package models.masterTransaction
 
 import constants.Scheduler
+import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.master
@@ -53,6 +54,7 @@ class UnprovisionAddressTransactions @Inject()(
                                                 utilitiesOperations: utilities.Operations,
                                                 masterKeys: master.Keys,
                                                 utilitiesNotification: utilities.Notification,
+                                                utilitiesTransaction: utilities.Transaction,
                                                 userTransactions: UserTransactions,
                                               )(implicit val executionContext: ExecutionContext)
   extends GenericDaoImpl[UnprovisionAddressTransactions.UnprovisionAddressTransactionTable, UnprovisionAddressTransaction, String]() {
@@ -80,45 +82,18 @@ class UnprovisionAddressTransactions @Inject()(
 
   object Utility {
 
+    implicit val txUtil: TxUtil = TxUtil("UNPROVISION_ADDRESS", 150000)
+
     def transaction(fromAddress: String, accountId: String, toAddress: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
+      val messages = Seq(utilities.BlockchainTransaction.getUnprovisionMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(accountId), toAddress = toAddress))
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = Seq(utilities.BlockchainTransaction.getUnprovisionMsg(
-            fromAddress = fromAddress,
-            fromID = utilities.Identity.getMantlePlaceIdentityID(accountId),
-            toAddress = toAddress
-          )),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultProvisionGasLimit),
-          gasLimit = constants.Transaction.DefaultProvisionGasLimit,
-          account = bcAccount,
-          ecKey = ecKey,
-          timeoutHeight = timeoutHeight)
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, accountId = accountId, toAddress = toAddress)
 
-        val checkAndAdd = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = accountId, fromAddress = fromAddress, timeoutHeight = timeoutHeight, txType = constants.Transaction.User.UNPROVISION_ADDRESS)
-              _ <- Service.addWithNoneStatus(txHash = txHash, accountId = accountId, toAddress = toAddress)
-            } yield userTransaction
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
-        }
-
-        for {
-          userTransaction <- checkAndAdd
-        } yield (userTransaction, txRawBytes)
-      }
-
-      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
+      val userTx = utilitiesTransaction.doUserTx(messages = messages, gasPrice = gasPrice, accountId = accountId, fromAddress = fromAddress, ecKey = ecKey, masterTxFunction = masterTxFunc)
 
       for {
-        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-        (unprovisionAddress, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedUserTransaction <- broadcastTxAndUpdate(unprovisionAddress, txRawBytes)
-      } yield updatedUserTransaction
+        (userTx, _) <- userTx
+      } yield userTx
     }
 
     val scheduler: Scheduler = new Scheduler {
@@ -136,27 +111,19 @@ class UnprovisionAddressTransactions @Inject()(
               val deletKey = masterKeys.Service.delete(accountId = unprovisionAddressTx.accountId, address = unprovisionAddressTx.toAddress)
               val sendNotification = utilitiesNotification.send(accountID = unprovisionAddressTx.accountId, notification = constants.Notification.ADDRESS_UNPROVISIONED_SUCCESSFULLY, unprovisionAddressTx.toAddress)("")
 
-              (for {
+              for {
                 _ <- markSuccess
                 _ <- deletKey
                 _ <- sendNotification
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
             } else {
               val markMasterFailed = Service.markFailed(unprovisionAddressTx.txHash)
               val sendNotification = utilitiesNotification.send(accountID = unprovisionAddressTx.accountId, notification = constants.Notification.ADDRESS_UNPROVISIONED_FAILED, unprovisionAddressTx.toAddress)("")
 
-              (for {
+              for {
                 _ <- markMasterFailed
                 _ <- sendNotification
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
             }
           } else Future()
 
@@ -171,7 +138,8 @@ class UnprovisionAddressTransactions @Inject()(
           unprovisionAddressTxs <- unprovisionAddressTxs
           _ <- checkAndUpdate(unprovisionAddressTxs)
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case baseException: BaseException => baseException.notifyLog("[PANIC]")
+            logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
         }
 
         Await.result(forComplete, Duration.Inf)

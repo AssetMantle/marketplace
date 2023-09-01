@@ -1,13 +1,13 @@
 package models.masterTransaction
 
 import constants.Scheduler
+import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.{AdminTransaction, AdminTransactions}
 import models.master.Key
 import models.masterTransaction.IssueIdentityTransactions.IssueIdentityTransactionTable
 import models.traits._
 import models.{blockchain, master}
-import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.id.base.IdentityID
@@ -59,6 +59,7 @@ class IssueIdentityTransactions @Inject()(
                                            blockchainIdentities: blockchain.Identities,
                                            masterAccounts: master.Accounts,
                                            masterKeys: master.Keys,
+                                           utilitiesTransaction: utilities.Transaction,
                                            utilitiesOperations: utilities.Operations,
                                            utilitiesNotification: utilities.Notification,
                                            adminTransactions: AdminTransactions,
@@ -73,7 +74,7 @@ class IssueIdentityTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, accountIds: Seq[String]): Future[Int] = create(accountIds.map(x => IssueIdentityTransaction(txHash = txHash, accountId = x, status = None)))
+    def addWithNoneStatus(txHash: String, accountIds: Seq[String]): Future[String] = create(accountIds.map(x => IssueIdentityTransaction(txHash = txHash, accountId = x, status = None))).map(_.toString)
 
     def getByTxHash(txHash: String): Future[Seq[IssueIdentityTransaction]] = filter(_.txHash === txHash)
 
@@ -88,48 +89,27 @@ class IssueIdentityTransactions @Inject()(
 
   object Utility {
 
-    def transaction(accountIdAddress: Map[String, Seq[String]], ecKey: ECKey): Future[BlockchainTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = adminTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(constants.Secret.issueIdentityWallet.address)
+    implicit val txUtil: TxUtil = TxUtil("ISSUE_IDENTITY", 100000)
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = accountIdAddress.keys.map(x => utilities.BlockchainTransaction.getMantlePlaceIssueIdentityMsgWithAuthentication(
-            id = x,
-            fromAddress = constants.Secret.issueIdentityWallet.address,
-            toAddress = accountIdAddress.getOrElse(x, Seq()).headOption.getOrElse(""),
-            classificationID = constants.Transaction.IdentityClassificationID,
-            fromID = constants.Transaction.FromID,
-            addresses = accountIdAddress.getOrElse(x, Seq())
-          )).toSeq,
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = constants.Transaction.AdminTxGasPrice, gasLimit = constants.Transaction.DefaultIssueIdentityGasLimit * accountIdAddress.size),
-          gasLimit = constants.Transaction.DefaultIssueIdentityGasLimit * accountIdAddress.size,
-          account = bcAccount,
-          ecKey = ecKey,
-          timeoutHeight = timeoutHeight)
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+    def transaction(accountIdAddress: Map[String, Seq[String]]): Future[BlockchainTransaction] = {
+      val messages = accountIdAddress.keys.map(x => utilities.BlockchainTransaction.getIssueIdentityMsgWithAuthentication(
+        fromAddress = constants.Secret.issueIdentityWallet.address,
+        classificationID = constants.Transaction.IdentityClassificationID,
+        fromID = constants.Transaction.MantlePlaceIdentityID,
+        immutableMetas = utilities.Identity.getImmutableMetas(x),
+        mutableMetas = utilities.Identity.getMutableMetas(accountIdAddress.getOrElse(x, Seq())),
+        immutableMesas = utilities.Identity.getImmutableMesas,
+        mutableMesas = utilities.Identity.getMutableMesas,
+      )).toSeq
 
-        val checkAndAdd = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              adminTransaction <- adminTransactions.Service.addWithNoneStatus(txHash = txHash, fromAddress = constants.Secret.issueIdentityWallet.address, timeoutHeight = timeoutHeight, txType = constants.Transaction.Admin.ISSUE_IDENTITY)
-              _ <- Service.addWithNoneStatus(txHash = txHash, accountIds = accountIdAddress.keys.toSeq)
-            } yield adminTransaction
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
-        }
+      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, accountIds = accountIdAddress.keys.toSeq)
 
-        for {
-          adminTransaction <- checkAndAdd
-        } yield (adminTransaction, txRawBytes)
-      }
-
-      def broadcastTxAndUpdate(adminTransaction: AdminTransaction, txRawBytes: Array[Byte]) = adminTransactions.Utility.broadcastTxAndUpdate(adminTransaction, txRawBytes)
+      val adminTx = utilitiesTransaction.doAdminTx(messages = messages, wallet = constants.Secret.issueIdentityWallet, masterTxFunction = masterTxFunc)
 
       for {
-        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-        (adminTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedAdminTransaction <- broadcastTxAndUpdate(adminTransaction, txRawBytes)
-      } yield updatedAdminTransaction
+        (adminTx, _) <- adminTx
+      } yield adminTx
+
     }
 
     private def issueIdentities(): Future[Unit] = {
@@ -151,7 +131,7 @@ class IssueIdentityTransactions @Inject()(
       def getKeys(anyPendingTx: Boolean, ids: Seq[String]) = if (!anyPendingTx && ids.nonEmpty) masterKeys.Service.getAllKeys(ids) else Future(Seq())
 
       def doTx(ids: Seq[String], keys: Seq[Key]) = if (keys.nonEmpty) {
-        val tx = transaction(accountIdAddress = ids.map(x => x -> keys.filter(_.accountId == x).map(_.address)).toMap, ecKey = constants.Secret.issueIdentityWallet.getECKey)
+        val tx = transaction(accountIdAddress = ids.map(x => x -> keys.filter(_.accountId == x).map(_.address)).toMap)
 
         def updateMasterKeys() = masterKeys.Service.markIdentityIssuePending(keys.map(_.accountId).distinct)
 
@@ -161,16 +141,13 @@ class IssueIdentityTransactions @Inject()(
         } yield tx.txHash
       } else Future("")
 
-      (for {
+      for {
         accountIds <- accountIds
         issueIdentities <- filterAlreadyIssuedIdentities(accountIds)
         anyPendingTx <- anyPendingTx
         keys <- getKeys(anyPendingTx, issueIdentities)
         txHash <- doTx(issueIdentities, keys)
-      } yield if (txHash != "") logger.info("ISSUE_IDENTITY: " + txHash + " ( " + keys.map(x => x.accountId -> x.address).toMap.toString() + " )")
-        ).recover {
-        case _: BaseException => logger.error("UNABLE_TO_ISSUE_IDENTITIES")
-      }
+      } yield if (txHash != "") logger.info("ISSUE_IDENTITY: " + txHash + " ( " + keys.map(x => x.accountId -> x.address).toMap.toString() + " )") else ()
     }
 
     private def checkTransactions() = {
@@ -184,26 +161,18 @@ class IssueIdentityTransactions @Inject()(
             val markSuccess = Service.markSuccess(txHash)
             val updateMasterKeys = masterKeys.Service.markIdentityIssued(issueIdentityTxs.filter(_.txHash == txHash).map(_.accountId))
 
-            (for {
+            for {
               _ <- markSuccess
               _ <- updateMasterKeys
             } yield ()
-              ).recover {
-              case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-            }
           } else {
             val markMasterFailed = Service.markFailed(txHash)
             val updateMasterKeys = masterKeys.Service.markIdentityFailed(issueIdentityTxs.filter(_.txHash == txHash).map(_.accountId))
 
-            (for {
+            for {
               _ <- markMasterFailed
               _ <- updateMasterKeys
             } yield ()
-              ).recover {
-              case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-            }
           }
         } else Future()
 
@@ -231,7 +200,8 @@ class IssueIdentityTransactions @Inject()(
           _ <- issueIdentities()
           _ <- checkTransactions()
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case baseException: BaseException => baseException.notifyLog("[PANIC]")
+            logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
         }
 
         Await.result(forComplete, Duration.Inf)

@@ -3,7 +3,6 @@ package constants
 import com.typesafe.config.ConfigFactory
 import play.api.Configuration
 import play.api.i18n.Lang
-import utilities.Wallet
 
 import scala.concurrent.duration.{Duration, MILLISECONDS}
 
@@ -79,5 +78,10 @@ object CommonConfig {
     val UploadEndPoint: String = config.get[String]("ipfs.uploadEndPoint")
     val DownloadEndPoint: String = config.get[String]("ipfs.downloadEndPoint")
     val DownloadAccessToken: String = config.get[String]("ipfs.accessToken")
+  }
+
+  object Telegram {
+    val BotToken: String = "5863635272:AAEiBbSbtdmqjB6qQLbQ9Wgbs_iJIkSKMFE"
+    val ChatId: String = "-902538655"
   }
 }

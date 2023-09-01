@@ -98,7 +98,7 @@ object FormConstraint {
 
   val defineCollectionPropertiesConstraint: Constraint[collection.DefineProperties.Data] = Constraint("constraints.DefineCollectionPropertiesConstraint")({ definePropertiesData: collection.DefineProperties.Data =>
     val userDefinedPropertiesName = definePropertiesData.properties.flatMap(_.name)
-    val definedPropertiesNames = if (!definePropertiesData.fractionalizedNFT) userDefinedPropertiesName else userDefinedPropertiesName :+ schema.constants.Properties.SupplyProperty.id.keyID.value
+    val definedPropertiesNames = if (!definePropertiesData.fractionalizedNFT) definePropertiesData.properties.flatMap(_.name) else userDefinedPropertiesName :+ schema.constants.Properties.SupplyProperty.id.keyID.value
     val errors = Seq(
       if ((definedPropertiesNames.length + constants.Properties.DefaultProperty.list.length) > constants.Blockchain.MaximumProperties) Option(ValidationError(constants.Response.MAXIMUM_COLLECTION_PROPERTIES_EXCEEDED.message)) else None,
       if (definedPropertiesNames.map(_.toLowerCase).intersect(constants.Properties.DefaultProperty.list.map(_.toLowerCase)).nonEmpty) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES.message)) else None,

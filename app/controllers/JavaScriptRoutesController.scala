@@ -101,7 +101,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SettingController.changeKeyNameForm,
         routes.javascript.SettingController.viewMnemonicsForm,
         routes.javascript.SettingController.deleteKeyForm,
-        routes.javascript.SettingController.walletBalance,
         routes.javascript.SettingController.provisionAddressForm,
 
         //        routes.javascript.ProfileController.viewOffers,
@@ -173,8 +172,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WalletController.unwrapTokenForm,
         routes.javascript.WalletController.sendCoinForm,
         routes.javascript.WalletController.gasTokenPrice,
-        routes.javascript.WalletController.balance,
         routes.javascript.WalletController.wrapCoinForm,
+        routes.javascript.WalletController.balance,
 
       )
     ).as("text/javascript")

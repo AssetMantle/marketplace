@@ -14,6 +14,7 @@ import schema.data.base.NumberData
 import schema.id.base.{AssetID, ClassificationID, IdentityID, OrderID}
 import schema.list.PropertyList
 import schema.property.base.{MesaProperty, MetaProperty}
+import schema.qualified.{Immutables, Mutables}
 import schema.types.Height
 
 import java.security.MessageDigest
@@ -93,8 +94,7 @@ object BlockchainTransaction {
       .build().toByteString)
     .build()
 
-  def getMantlePlaceIssueIdentityMsgWithAuthentication(id: String, fromAddress: String, fromID: IdentityID, toAddress: String, classificationID: ClassificationID, addresses: Seq[String])(implicit module: String, logger: Logger): protoBufAny = {
-    if (!addresses.contains(toAddress)) constants.Response.INVALID_IDENTITY_ISSUE_MESSAGE.throwBaseException()
+  def getIssueIdentityMsgWithAuthentication(fromAddress: String, fromID: IdentityID, classificationID: ClassificationID, immutableMetas: Immutables, mutableMetas: Mutables, immutableMesas: Immutables, mutableMesas: Mutables)(implicit module: String, logger: Logger): protoBufAny = {
     protoBufAny.newBuilder()
       .setTypeUrl(schema.constants.Messages.IDENTITY_ISSUE)
       .setValue(issue
@@ -102,10 +102,10 @@ object BlockchainTransaction {
         .setFrom(fromAddress)
         .setFromID(fromID.asProtoIdentityID)
         .setClassificationID(classificationID.asProtoClassificationID)
-        .setImmutableMetaProperties(PropertyList(Seq(Identity.getOriginMetaProperty, Identity.getBondAmountMetaProperty, Identity.getIDMetaProperty(id))).asProtoPropertyList)
-        .setImmutableProperties(PropertyList(Seq(Identity.getExtraMesaProperty(""))).asProtoPropertyList)
-        .setMutableMetaProperties(PropertyList(Seq(Identity.getTwitterMetaProperty(""), Identity.getNote1MetaProperty(""), Identity.getAuthenticationProperty(addresses))).asProtoPropertyList)
-        .setMutableProperties(PropertyList(Seq(Identity.getNote2MesaProperty(""))).asProtoPropertyList)
+        .setImmutableMetaProperties(immutableMetas.propertyList.asProtoPropertyList)
+        .setImmutableProperties(immutableMesas.propertyList.asProtoPropertyList)
+        .setMutableMetaProperties(mutableMetas.propertyList.asProtoPropertyList)
+        .setMutableProperties(mutableMesas.propertyList.asProtoPropertyList)
         .build().toByteString)
       .build()
   }

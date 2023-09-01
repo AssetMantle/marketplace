@@ -58,7 +58,7 @@
                             </div>
                             <div class="d-flex gap-4">
                             @if(collectionDraft.fold(false)(_.properties.nonEmpty) && index < collectionDraft.get.properties.length) {
-                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collectionDraft.get.properties(index).name, Symbol("required") -> false)
+                                @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("value") -> collectionDraft.get.properties(index).name, Symbol("required") -> true)
                                 @commonSelect(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_TYPE, Symbol("value") -> collectionDraft.get.properties(index).`type`, Symbol("data-index") -> index, Symbol("class") -> "custom-select sources filledSelect")
                             } else {
                                 @commonInputText(definePropertiesForm, constants.FormField.COLLECTION_PROPERTY_NAME, Symbol("required") -> false)

@@ -138,7 +138,6 @@ class Starter @Inject()(
 
   implicit val CollectionPropertyReads: Reads[CollectionProperty] = Json.reads[CollectionProperty]
 
-
   def fixMantleMonkeys(): Future[Unit] = {
     val classificationProperties = Seq(
       CollectionProperty(name = "Background", `type` = constants.NFT.Data.STRING, value = ""),
@@ -202,7 +201,11 @@ class Starter @Inject()(
         val updatedDefaultValue = if (x.defaultValue == "") "false" else x.defaultValue
         x.copy(`type` = constants.NFT.Data.BOOLEAN, defaultValue = updatedDefaultValue)
       }) ++ collection.properties.get.filterNot(x => x.`type` == "DECIMAL" || x.`type` == "Decimal" || x.`type` == "String" || x.`type` == "Boolean")
-        .map(x => x.copy(name = x.name.trim))
+        .map(x => x.copy(name = x.name.trim
+          .replaceAll("-", "")
+          .replaceAll(" ", "_")
+          .replaceAll("/", "of")
+          .replaceAll("No.", "Number")))
       masterCollections.Service.update(collection.copy(properties = Option(properties)))
     }
 

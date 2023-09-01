@@ -1,6 +1,7 @@
 package models.masterTransaction
 
 import constants.Scheduler
+import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.master.NFT
@@ -66,6 +67,7 @@ class NFTTransferTransactions @Inject()(
                                          masterNFTOwners: master.NFTOwners,
                                          masterSecondaryMarkets: master.SecondaryMarkets,
                                          collectionsAnalysis: analytics.CollectionsAnalysis,
+                                         utilitiesTransaction: utilities.Transaction,
                                          utilitiesNotification: utilities.Notification,
                                          userTransactions: UserTransactions,
                                        )(implicit val executionContext: ExecutionContext)
@@ -92,48 +94,19 @@ class NFTTransferTransactions @Inject()(
   }
 
   object Utility {
+
+    implicit val txUtil: TxUtil = TxUtil("NFT_TRANSFER", 150000)
+
     def transaction(nft: NFT, fromId: String, quantity: Int, fromAddress: String, toAccountId: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
+      val messages = Seq(utilities.BlockchainTransaction.getAssetSendMsg(fromID = utilities.Identity.getMantlePlaceIdentityID(fromId), fromAddress = fromAddress, toID = utilities.Identity.getMantlePlaceIdentityID(toAccountId), assetId = nft.getAssetID, amount = quantity))
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val nftTransferMsg = utilities.BlockchainTransaction.getAssetSendMsg(
-          fromID = utilities.Identity.getMantlePlaceIdentityID(fromId),
-          fromAddress = fromAddress,
-          toID = utilities.Identity.getMantlePlaceIdentityID(toAccountId),
-          assetId = nft.getAssetID,
-          amount = quantity,
-        )
-        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = Seq(nftTransferMsg),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultNFTTransferGasLimit),
-          gasLimit = constants.Transaction.DefaultNFTTransferGasLimit,
-          account = bcAccount,
-          ecKey = ecKey,
-          timeoutHeight = timeoutHeight)
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, nftId = nft.id, fromId = fromId, quantity = quantity, toIdentityId = utilities.Identity.getMantlePlaceIdentityID(toAccountId).asString, toAccountId = toAccountId)
 
-        val checkAndAdd = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              nftTransfer <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = fromId, fromAddress = fromAddress, timeoutHeight = timeoutHeight, txType = constants.Transaction.User.NFT_TRANSFER)
-              _ <- Service.addWithNoneStatus(txHash = txHash, nftId = nft.id, fromId = fromId, quantity = quantity, toIdentityId = utilities.Identity.getMantlePlaceIdentityID(toAccountId).asString, toAccountId = toAccountId)
-            } yield nftTransfer
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
-        }
-
-        for {
-          nftTransfer <- checkAndAdd
-        } yield (nftTransfer, txRawBytes)
-      }
-
-      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
+      val userTx = utilitiesTransaction.doUserTx(messages = messages, gasPrice = gasPrice, accountId = fromId, fromAddress = fromAddress, ecKey = ecKey, masterTxFunction = masterTxFunc)
 
       for {
-        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-        (userTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedUserTransaction <- broadcastTxAndUpdate(userTransaction, txRawBytes)
-      } yield updatedUserTransaction
+        (userTx, _) <- userTx
+      } yield userTx
     }
 
     val scheduler: Scheduler = new Scheduler {
@@ -160,31 +133,23 @@ class NFTTransferTransactions @Inject()(
               if (nftTransferTx.toAccountId.isDefined) utilitiesNotification.send(nftTransferTx.toAccountId.get, constants.Notification.TO_OWNER_NFT_TRANSFER_SUCCESSFUL, nft.name, nftTransferTx.fromId)(s"'${nftTransferTx.nftId}'") else Future()
             }
 
-            (for {
+            for {
               _ <- markSuccess
               nft <- nft
               oldNFTOwner <- oldNFTOwner
               _ <- sendNotifications(nft)
             } yield ()
-              ).recover {
-              case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-            }
           } else {
             val markFailed = Service.markFailed(nftTransferTx.txHash)
             val nft = masterNFTs.Service.tryGet(nftTransferTx.nftId)
 
             def sendNotifications(nft: NFT) = utilitiesNotification.send(nftTransferTx.fromId, constants.Notification.NFT_TRANSFER_FAILED, nft.name, nftTransferTx.toAccountId.getOrElse(nftTransferTx.toIdentityId))("")
 
-            (for {
+            for {
               _ <- markFailed
               nft <- nft
               _ <- sendNotifications(nft)
             } yield ()
-              ).recover {
-              case exception: Exception => logger.error(exception.getLocalizedMessage)
-                logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-            }
           }
 
           for {
@@ -198,7 +163,8 @@ class NFTTransferTransactions @Inject()(
           txs <- getTxs(nftTransferTxs.map(_.txHash).distinct)
           _ <- checkAndUpdate(nftTransferTxs, txs)
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case baseException: BaseException => baseException.notifyLog("[PANIC]")
+            logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
         }
 
         Await.result(forComplete, Duration.Inf)

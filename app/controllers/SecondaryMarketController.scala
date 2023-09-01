@@ -203,8 +203,8 @@ class SecondaryMarketController @Inject()(
             if (errors.isEmpty) {
               for {
                 // This can throw failed to create failed to create SecondaryMarketSellTx due to unique order id constraint, key already exists only when node connected is not generating blocks
-                (tx, buyTx) <- secondaryMarketSellTxs.Utility.transaction(nftID = createData.nftId, nftOwner = nftOwner, fromAddress = loginState.address, quantity = createData.sellQuantity, endHours = createData.endHours, price = createData.price, gasPrice = constants.Transaction.DefaultGasPrice, ecKey = activeKey.getECKey(createData.password).get)
-                secondaryMarketId <- masterSecondaryMarkets.Service.add(createData.toNewSecondaryMarket(collectionId = nftOwner.collectionId, sellerId = loginState.username, orderID = buyTx.orderId))
+                (tx, orderId) <- secondaryMarketSellTxs.Utility.transaction(nft = nft, nftOwner = nftOwner, fromAddress = loginState.address, quantity = createData.sellQuantity, endHours = createData.endHours, price = createData.price, gasPrice = constants.Transaction.DefaultGasPrice, ecKey = activeKey.getECKey(createData.password).get)
+                secondaryMarketId <- masterSecondaryMarkets.Service.add(createData.toNewSecondaryMarket(collectionId = nftOwner.collectionId, sellerId = loginState.username, orderId = orderId))
               } yield tx
             } else errors.head.throwBaseException()
           }

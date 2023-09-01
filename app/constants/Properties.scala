@@ -8,7 +8,7 @@ object Properties {
     val COLLECTION_NAME = "collectionName"
     val FILE_RESOURCE = "fileResource"
     val CREATOR_ID = "creatorID"
-    val BOND_AMOUNT = "bondAmount"
+    val BOND_AMOUNT: String = schema.constants.Properties.BondAmountProperty.id.keyID.value
 
     val list: Seq[String] = Seq(NFT_NAME, COLLECTION_NAME, FILE_RESOURCE, CREATOR_ID, BOND_AMOUNT)
 

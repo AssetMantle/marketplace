@@ -4,7 +4,7 @@ import controllers.actions._
 import exceptions.BaseException
 import models.analytics.{CollectionAnalysis, CollectionsAnalysis}
 import models.master._
-import models.{blockchain, blockchainTransaction, master, masterTransaction}
+import models.{blockchain, master, masterTransaction}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.cache.Cached
@@ -348,7 +348,6 @@ class PublicListingController @Inject()(
                 collection = collection,
                 toAddress = sellerKey.address,
                 amount = publicListing.price * buyNFTData.buyNFTs,
-                gasLimit = constants.Transaction.DefaultSendCoinGasAmount,
                 gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buyNFTData.password))
               )

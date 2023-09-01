@@ -1,6 +1,7 @@
 package models.masterTransaction
 
 import constants.Scheduler
+import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.common.Coin
@@ -76,6 +77,7 @@ private[masterTransaction] object SendCoinTransactions {
 @Singleton
 class SendCoinTransactions @Inject()(
                                       protected val dbConfigProvider: DatabaseConfigProvider,
+                                      utilitiesTransaction: utilities.Transaction,
                                       utilitiesOperations: utilities.Operations,
                                       userTransactions: UserTransactions,
                                       utilitiesNotification: utilities.Notification,
@@ -106,42 +108,18 @@ class SendCoinTransactions @Inject()(
 
   object Utility {
 
-    def transaction(fromAccountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: BigDecimal, gasLimit: Int, ecKey: ECKey): Future[BlockchainTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
+    implicit val txUtil: TxUtil = TxUtil("SEND_COIN", 120000)
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = amount)),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = gasLimit),
-          gasLimit = gasLimit,
-          account = bcAccount,
-          ecKey = ecKey,
-          timeoutHeight = timeoutHeight
-        )
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+    def transaction(fromAccountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+      val messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = amount))
 
-        val checkAndAdd = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = fromAccountId, fromAddress = fromAddress, timeoutHeight = timeoutHeight, txType = constants.Transaction.User.SEND_COIN)
-              _ <- Service.addWithNoneStatus(txHash = txHash, fromAccountId = fromAccountId, toAddress = toAddress, toAccountId = None, amount = amount)
-            } yield userTransaction
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
-        }
+      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, fromAccountId = fromAccountId, toAddress = toAddress, toAccountId = None, amount = amount)
 
-        for {
-          userTransaction <- checkAndAdd
-        } yield (userTransaction, txRawBytes)
-      }
-
-      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
+      val userTx = utilitiesTransaction.doUserTx(messages = messages, gasPrice = gasPrice, accountId = fromAccountId, fromAddress = fromAddress, ecKey = ecKey, masterTxFunction = masterTxFunc)
 
       for {
-        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-        (userTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedUserTransaction <- broadcastTxAndUpdate(userTransaction, txRawBytes)
-      } yield updatedUserTransaction
+        (userTx, _) <- userTx
+      } yield userTx
     }
 
     val scheduler: Scheduler = new Scheduler {
@@ -186,7 +164,8 @@ class SendCoinTransactions @Inject()(
           sendCoins <- sendCoins
           _ <- checkAndUpdate(sendCoins)
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case baseException: BaseException => baseException.notifyLog("[PANIC]")
+            logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
         }
 
         Await.result(forComplete, Duration.Inf)

@@ -1,6 +1,5 @@
 package utilities
 
-import com.google.protobuf.ByteString
 import models.master.NFTProperty
 import play.api.Logger
 import schema.data.Data
@@ -55,9 +54,8 @@ object Properties {
     MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.CREATOR_ID), typeID = schema.id.constants.IdentityIDType), data = IDData(utilities.Identity.getMantlePlaceIdentityID(creatorID)))
   )
 
-  def getNFTDefaultImmutableMetaProperties(name: String, collectionName: String, fileHash: HashID, bondAmount: Long, creatorID: String, fileExtension: String, endPoint: String): Seq[MetaProperty] = {
-    getCollectionDefaultImmutableMetaProperties(collectionName = collectionName, creatorID = creatorID, nftName = name, fileHashID = fileHash, fileExtension = fileExtension, serviceEndpoint = endPoint) :+
-      MetaProperty(id = PropertyID(keyID = StringID(constants.Properties.DefaultProperty.BOND_AMOUNT), typeID = schema.data.constants.NumberDataTypeID), data = NumberData(bondAmount))
+  def getNFTDefaultImmutableMetaProperties(name: String, collectionName: String, fileHash: HashID, creatorID: String, fileExtension: String, endPoint: String): Seq[MetaProperty] = {
+    getCollectionDefaultImmutableMetaProperties(collectionName = collectionName, creatorID = creatorID, nftName = name, fileHashID = fileHash, fileExtension = fileExtension, serviceEndpoint = endPoint)
   }
 
   def metaPropertyToNFTProperty(nftId: String, metaProperty: MetaProperty, mutable: Boolean): NFTProperty = metaProperty.getData.getType.value match {

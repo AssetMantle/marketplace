@@ -93,14 +93,11 @@ class NFTPublicListings @Inject()(
       def publicListingNFTTxs(txHashes: Seq[String]) = publicListingNFTTransactions.Service.getByTxHashes(txHashes)
 
       def update(allNFTPublicListingTxs: Seq[NFTPublicListing], publicListingNFTTxs: Seq[PublicListingNFTTransaction], txs: Seq[Transaction]) = {
-        println("A: " + publicListingNFTTxs.length)
-        println("B: " + publicListingNFTTxs.map(_.txHash).distinct.length)
         val userTxs = publicListingNFTTxs.map(_.txHash).distinct.map { publicListingNFTTxHash =>
           val tx = allNFTPublicListingTxs.find(_.txHash == publicListingNFTTxHash).getOrElse(constants.Response.NFT_PUBLIC_LISTING_SALE_NOT_FOUND.throwBaseException())
           val publicListing = publicListingNFTTxs.find(_.txHash == publicListingNFTTxHash).get
           UserTransaction(txHash = tx.txHash, accountId = publicListing.buyerAccountId, fromAddress = tx.fromAddress, status = tx.status, timeoutHeight = tx.timeoutHeight, log = tx.log, txHeight = txs.find(_.hash == publicListing.txHash).map(_.height), txType = constants.Transaction.User.PUBLIC_SALE, createdBy = tx.createdBy, createdOnMillisEpoch = tx.createdOnMillisEpoch, updatedBy = tx.updatedBy, updatedOnMillisEpoch = tx.updatedOnMillisEpoch)
         }
-        println("F: " + userTxs.length)
         userTransactions.Service.add(userTxs)
       }
 

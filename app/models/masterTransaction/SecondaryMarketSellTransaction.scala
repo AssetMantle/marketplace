@@ -1,6 +1,7 @@
 package models.masterTransaction
 
 import constants.Scheduler
+import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.master.{NFT, NFTOwner}
@@ -105,6 +106,7 @@ class SecondaryMarketSellTransactions @Inject()(
                                                  masterNFTProperties: master.NFTProperties,
                                                  masterNFTOwners: master.NFTOwners,
                                                  masterSecondaryMarkets: master.SecondaryMarkets,
+                                                 utilitiesTransaction: utilities.Transaction,
                                                  collectionsAnalysis: analytics.CollectionsAnalysis,
                                                  utilitiesNotification: utilities.Notification,
                                                  userTransactions: UserTransactions,
@@ -119,7 +121,7 @@ class SecondaryMarketSellTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, nft: NFT, sellerId: String, quantity: BigInt, denom: String, receiveAmount: BigInt, expiryHeight: Long): Future[SecondaryMarketSellTransaction] = {
+    def addWithNoneStatus(txHash: String, nft: NFT, sellerId: String, quantity: BigInt, denom: String, receiveAmount: BigInt, expiryHeight: Long): Future[String] = {
       val orderId = utilities.Order.getOrderID(
         makerID = utilities.Identity.getMantlePlaceIdentityID(sellerId),
         makerAssetID = nft.getAssetID,
@@ -128,7 +130,7 @@ class SecondaryMarketSellTransactions @Inject()(
         takerAssetID = schema.document.CoinAsset.getCoinAssetID(denom),
         takerSplit = NumberData(receiveAmount)
       )
-      create(SecondaryMarketSellTransaction(txHash = txHash, nftId = nft.id, sellerId = sellerId, orderId = orderId, quantity = quantity, expiryHeight = expiryHeight, denom = denom, receiveAmount = receiveAmount, status = None).serialize).map(_.deserialize())
+      create(SecondaryMarketSellTransaction(txHash = txHash, nftId = nft.id, sellerId = sellerId, orderId = orderId, quantity = quantity, expiryHeight = expiryHeight, denom = denom, receiveAmount = receiveAmount, status = None).serialize).map(_.orderId)
     }
 
     def getByTxHash(txHash: String): Future[Seq[SecondaryMarketSellTransaction]] = filter(_.txHash === txHash).map(_.map(_.deserialize))
@@ -145,56 +147,30 @@ class SecondaryMarketSellTransactions @Inject()(
   }
 
   object Utility {
-    def transaction(nftID: String, nftOwner: NFTOwner, quantity: Long, fromAddress: String, endHours: Int, price: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[(BlockchainTransaction, SecondaryMarketSellTransaction)] = {
-      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
-      val nft = masterNFTs.Service.tryGet(nftID)
+    implicit val txUtil: TxUtil = TxUtil("SECONDARY_MARKET_SELL", 300000)
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String], nft: NFT, nftOwner: NFTOwner) = {
-        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val expiryHeight = ((constants.Blockchain.MaxOrderExpiry * endHours) / constants.Blockchain.MaxOrderHours).toLong
-        val makerID = utilities.Identity.getMantlePlaceIdentityID(nftOwner.ownerId)
-        val takerAssetID = constants.Blockchain.StakingTokenAssetID
-        val receiveAmount = price.value * quantity
+    def transaction(nft: NFT, nftOwner: NFTOwner, quantity: Long, fromAddress: String, endHours: Int, price: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[(BlockchainTransaction, String)] = {
+      val expiryHeight = ((constants.Blockchain.MaxOrderExpiry * endHours) / constants.Blockchain.MaxOrderHours).toLong
+      val makerID = utilities.Identity.getMantlePlaceIdentityID(nftOwner.ownerId)
+      val takerAssetID = constants.Blockchain.StakingTokenAssetID
+      val receiveAmount = price.value * quantity
+      val messages = Seq(utilities.BlockchainTransaction.getPutOrderMsg(
+        fromAddress = fromAddress,
+        fromID = makerID,
+        makerAssetID = nft.getAssetID,
+        makerSplit = NumberData(quantity),
+        expiryHeight = expiryHeight,
+        takerAssetID = takerAssetID,
+        takerSplit = NumberData(receiveAmount),
+      ))
 
-        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = Seq(utilities.BlockchainTransaction.getPutOrderMsg(
-            fromAddress = fromAddress,
-            fromID = makerID,
-            makerAssetID = nft.getAssetID,
-            makerSplit = NumberData(quantity),
-            expiryHeight = expiryHeight,
-            takerAssetID = takerAssetID,
-            takerSplit = NumberData(receiveAmount),
-          )),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultPutOrderGasLimit),
-          gasLimit = constants.Transaction.DefaultPutOrderGasLimit,
-          account = bcAccount,
-          ecKey = ecKey,
-          timeoutHeight = timeoutHeight)
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, nft = nft, sellerId = nftOwner.ownerId, quantity = quantity, denom = constants.Blockchain.StakingToken, expiryHeight = expiryHeight, receiveAmount = receiveAmount)
 
-        val checkAndAdd = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = nftOwner.ownerId, fromAddress = fromAddress, timeoutHeight = timeoutHeight, txType = constants.Transaction.User.SECONDARY_MARKET_SELL)
-              secondaryMarketSellTx <- Service.addWithNoneStatus(txHash = txHash, nft = nft, sellerId = nftOwner.ownerId, quantity = quantity, denom = constants.Blockchain.StakingToken, expiryHeight = expiryHeight, receiveAmount = receiveAmount)
-            } yield (userTransaction, secondaryMarketSellTx)
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
-        }
-
-        for {
-          (userTransaction, secondaryMarketSellTx) <- checkAndAdd
-        } yield (userTransaction, txRawBytes, secondaryMarketSellTx)
-      }
-
-      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
+      val userTx = utilitiesTransaction.doUserTx(messages = messages, gasPrice = gasPrice, accountId = nftOwner.ownerId, fromAddress = fromAddress, ecKey = ecKey, masterTxFunction = masterTxFunc)
 
       for {
-        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-        nft <- nft
-        (userTransaction, txRawBytes, secondaryMarketSellTx) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase), nft, nftOwner)
-        updatedUserTransaction <- broadcastTxAndUpdate(userTransaction, txRawBytes)
-      } yield (updatedUserTransaction, secondaryMarketSellTx)
+        (userTx, orderId) <- userTx
+      } yield (userTx, orderId)
     }
 
     private def updateForExpiredOrders() = {
@@ -204,14 +180,11 @@ class SecondaryMarketSellTransactions @Inject()(
 
       def markOnExpiry(orderIds: Seq[String]) = masterSecondaryMarkets.Service.markOnExpiry(orderIds)
 
-      (for {
+      for {
         allOrderIds <- allOrderIds
         existingOrderIds <- filterExistingOrderIds(allOrderIds)
         _ <- markOnExpiry(allOrderIds.diff(existingOrderIds))
       } yield ()
-        ).recover {
-        case exception: Exception => logger.error(exception.getLocalizedMessage)
-      }
     }
 
     val scheduler: Scheduler = new Scheduler {
@@ -239,7 +212,7 @@ class SecondaryMarketSellTransactions @Inject()(
 
               def updateAnalytics(collectionId: String) = collectionsAnalysis.Utility.onCreateSecondaryMarket(collectionId, totalListed = secondaryMarketSellTx.quantity.toInt, listingPrice = secondaryMarketSellTx.getPrice)
 
-              (for {
+              for {
                 _ <- markSuccess
                 nft <- nft
                 _ <- updateNFTOwner
@@ -247,10 +220,6 @@ class SecondaryMarketSellTransactions @Inject()(
                 _ <- updateAnalytics(nft.collectionId)
                 _ <- sendNotifications(nft)
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
             } else {
               val markFailed = Service.markFailed(secondaryMarketSellTx.txHash)
               val nft = masterNFTs.Service.tryGet(secondaryMarketSellTx.nftId)
@@ -258,16 +227,12 @@ class SecondaryMarketSellTransactions @Inject()(
 
               def sendNotifications(nft: NFT) = utilitiesNotification.send(secondaryMarketSellTx.sellerId, constants.Notification.SECONDARY_MARKET_CREATION_FAILED, nft.name)(s"'${nft.id}'")
 
-              (for {
+              for {
                 _ <- markFailed
                 _ <- markMaster
                 nft <- nft
                 _ <- sendNotifications(nft)
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
             }
           } else Future()
 
@@ -283,7 +248,8 @@ class SecondaryMarketSellTransactions @Inject()(
           _ <- checkAndUpdate(secondaryMarketSellTxs)
           _ <- checkExpiredOrders
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case baseException: BaseException => baseException.notifyLog("[PANIC]")
+            logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
         }
 
         Await.result(forComplete, Duration.Inf)

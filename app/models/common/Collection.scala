@@ -14,6 +14,8 @@ object Collection {
 
     def toMesaProperty: MesaProperty = MesaProperty(id = this.getPropertyID, dataID = utilities.Properties.getDataID(`type` = this.`type`, value = this.defaultValue))
 
+    def getBondedWeight: Int = if (this.meta) this.toMetaProperty.getBondedWeight else this.toMesaProperty.getBondedWeight
+
   }
 
   implicit val propertyWrites: Writes[Property] = Json.writes[Property]

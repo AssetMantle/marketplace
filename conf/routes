@@ -44,6 +44,7 @@ POST        /changeActiveKey                                   controllers.Accou
 
 GET         /walletPopup                                       controllers.WalletController.walletPopup()
 GET         /wrappedTokenBalance                               controllers.WalletController.wrappedTokenBalance()
+GET         /walletBalance                                     controllers.WalletController.balance(address: String)
 GET         /walletPopupKeys                                   controllers.WalletController.walletPopupKeys()
 
 GET         /collections                                       controllers.CollectionController.viewCollections()
@@ -137,7 +138,6 @@ GET         /viewMnemonics                                     controllers.Setti
 POST        /viewMnemonics                                     controllers.SettingController.viewMnemonics()
 GET         /deleteKey                                         controllers.SettingController.deleteKeyForm(address: String)
 POST        /deleteKey                                         controllers.SettingController.deleteKey()
-GET         /walletBalance                                     controllers.SettingController.walletBalance(address: String)
 GET         /provisionAddress                                  controllers.SettingController.provisionAddressForm(address: String)
 POST        /provisionAddress                                  controllers.SettingController.provisionAddress()
 
@@ -229,7 +229,6 @@ POST        /deleteWhitelist                                   controllers.White
 #POST        /changeManagedToUnmanaged        controllers.ProfileController.changeManagedToUnmanaged()
 
 GET         /gasTokenPrice                                     controllers.WalletController.gasTokenPrice()
-GET         /addressBalance                                    controllers.WalletController.balance(address: String)
 GET         /sendCoin                                          controllers.WalletController.sendCoinForm()
 POST        /sendCoin                                          controllers.WalletController.sendCoin()
 GET         /wrapCoin                                          controllers.WalletController.wrapCoinForm()

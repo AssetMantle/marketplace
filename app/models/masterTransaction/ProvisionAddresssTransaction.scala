@@ -1,6 +1,7 @@
 package models.masterTransaction
 
 import constants.Scheduler
+import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.masterTransaction.ProvisionAddressTransactions.ProvisionAddressTransactionTable
@@ -52,6 +53,7 @@ class ProvisionAddressTransactions @Inject()(
                                               protected val dbConfigProvider: DatabaseConfigProvider,
                                               blockchainIdentities: blockchain.Identities,
                                               utilitiesOperations: utilities.Operations,
+                                              utilitiesTransaction: utilities.Transaction,
                                               masterKeys: master.Keys,
                                               utilitiesNotification: utilities.Notification,
                                               userTransactions: UserTransactions,
@@ -81,45 +83,18 @@ class ProvisionAddressTransactions @Inject()(
 
   object Utility {
 
+    implicit val txUtil: TxUtil = TxUtil("PROVISION_ADDRESS", 150000)
+
     def transaction(fromAddress: String, accountId: String, toAddress: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
+      val messages = Seq(utilities.BlockchainTransaction.getProvisionMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(accountId), toAddress = toAddress))
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = Seq(utilities.BlockchainTransaction.getProvisionMsg(
-            fromAddress = fromAddress,
-            fromID = utilities.Identity.getMantlePlaceIdentityID(accountId),
-            toAddress = toAddress
-          )),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultProvisionGasLimit),
-          gasLimit = constants.Transaction.DefaultProvisionGasLimit,
-          account = bcAccount,
-          ecKey = ecKey,
-          timeoutHeight = timeoutHeight)
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, accountId = accountId, toAddress = toAddress)
 
-        val checkAndAdd = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = accountId, fromAddress = fromAddress, timeoutHeight = timeoutHeight, txType = constants.Transaction.User.PROVISION_ADDRESS)
-              _ <- Service.addWithNoneStatus(txHash = txHash, accountId = accountId, toAddress = toAddress)
-            } yield userTransaction
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
-        }
-
-        for {
-          provisionAddress <- checkAndAdd
-        } yield (provisionAddress, txRawBytes)
-      }
-
-      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
+      val userTx = utilitiesTransaction.doUserTx(messages = messages, gasPrice = gasPrice, accountId = accountId, fromAddress = fromAddress, ecKey = ecKey, masterTxFunction = masterTxFunc)
 
       for {
-        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-        (userTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedUserTransaction <- broadcastTxAndUpdate(userTransaction, txRawBytes)
-      } yield updatedUserTransaction
+        (userTx, _) <- userTx
+      } yield userTx
     }
 
     val scheduler: Scheduler = new Scheduler {
@@ -137,29 +112,21 @@ class ProvisionAddressTransactions @Inject()(
               val updateMaster = masterKeys.Service.markAddressProvisioned(accountId = provisionAddressTx.accountId, address = provisionAddressTx.toAddress)
               val sendNotification = utilitiesNotification.send(accountID = provisionAddressTx.accountId, notification = constants.Notification.ADDRESS_PROVISIONED_SUCCESSFULLY, provisionAddressTx.toAddress)("")
 
-              (for {
+              for {
                 _ <- markSuccess
                 _ <- updateMaster
                 _ <- sendNotification
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
             } else {
               val markMasterFailed = Service.markFailed(provisionAddressTx.txHash)
               val updateMaster = masterKeys.Service.markAddressProvisionFailed(accountId = provisionAddressTx.accountId, address = provisionAddressTx.toAddress)
               val sendNotification = utilitiesNotification.send(accountID = provisionAddressTx.accountId, notification = constants.Notification.ADDRESS_PROVISIONED_FAILED, provisionAddressTx.toAddress)("")
 
-              (for {
+              for {
                 _ <- markMasterFailed
                 _ <- updateMaster
                 _ <- sendNotification
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
             }
           } else Future()
 
@@ -174,7 +141,8 @@ class ProvisionAddressTransactions @Inject()(
           provisionAddressTxs <- provisionAddressTxs
           _ <- checkAndUpdate(provisionAddressTxs)
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case baseException: BaseException => baseException.notifyLog("[PANIC]")
+            logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
         }
 
         Await.result(forComplete, Duration.Inf)

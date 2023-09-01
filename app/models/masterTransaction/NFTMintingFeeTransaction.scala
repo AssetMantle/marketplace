@@ -1,6 +1,7 @@
 package models.masterTransaction
 
 import constants.Scheduler
+import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.common.Coin
@@ -57,6 +58,7 @@ class NFTMintingFeeTransactions @Inject()(
                                            utilitiesOperations: utilities.Operations,
                                            masterCollections: master.Collections,
                                            masterNFTs: master.NFTs,
+                                           utilitiesTransaction: utilities.Transaction,
                                            masterNFTOwners: master.NFTOwners,
                                            utilitiesNotification: utilities.Notification,
                                            userTransactions: UserTransactions,
@@ -84,41 +86,20 @@ class NFTMintingFeeTransactions @Inject()(
   }
 
   object Utility {
+
+    implicit val txUtil: TxUtil = TxUtil("NFT_MINTING_FEE", 150000)
+
     def transaction(accountId: String, nft: NFT, fromAddress: String, amount: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
-      val latestHeightAccountUnconfirmedTxs = userTransactions.Utility.getLatestHeightAccountAndUnconfirmedTxs(fromAddress)
 
-      def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val timeoutHeight = latestBlockHeight + constants.Transaction.TimeoutHeight
-        val (txRawBytes, _) = utilities.BlockchainTransaction.getTxRawBytesWithSignedMemo(
-          messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = constants.Secret.mintAssetWallet.address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount)))),
-          fee = utilities.BlockchainTransaction.getFee(gasPrice = gasPrice, gasLimit = constants.Transaction.DefaultMintAssetGasLimit),
-          gasLimit = constants.Transaction.DefaultMintAssetGasLimit,
-          account = bcAccount,
-          ecKey = ecKey,
-          timeoutHeight = timeoutHeight)
-        val txHash = utilities.Secrets.sha256HashHexString(txRawBytes)
+      val messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = constants.Secret.mintAssetWallet.address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount))))
 
-        val checkAndAdd = {
-          if (!unconfirmedTxHashes.contains(txHash)) {
-            for {
-              userTransaction <- userTransactions.Service.addWithNoneStatus(txHash = txHash, accountId = accountId, fromAddress = fromAddress, timeoutHeight = timeoutHeight, txType = constants.Transaction.User.NFT_MINTING_FEE)
-              _ <- Service.addWithNoneStatus(accountId = accountId, collectionId = nft.collectionId, txHash = txHash, nftId = nft.id)
-            } yield userTransaction
-          } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
-        }
+      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(accountId = accountId, collectionId = nft.collectionId, txHash = txHash, nftId = nft.id)
 
-        for {
-          userTransaction <- checkAndAdd
-        } yield (userTransaction, txRawBytes)
-      }
-
-      def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
+      val userTx = utilitiesTransaction.doUserTx(messages = messages, gasPrice = gasPrice, accountId = accountId, fromAddress = fromAddress, ecKey = ecKey, masterTxFunction = masterTxFunc)
 
       for {
-        (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-        (userTransaction, txRawBytes) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-        updatedUserTransaction <- broadcastTxAndUpdate(userTransaction, txRawBytes)
-      } yield updatedUserTransaction
+        (userTx, _) <- userTx
+      } yield userTx
     }
 
     val scheduler: Scheduler = new Scheduler {
@@ -142,16 +123,12 @@ class NFTMintingFeeTransactions @Inject()(
                 utilitiesNotification.send(nftMintingFeeTransaction.accountId, constants.Notification.NFT_MINTING_FEE_TRANSACTION_SUCCESSFUL, messageParameter)(s"'${nft.id}'")
               }
 
-              (for {
+              for {
                 _ <- markSuccess
                 _ <- markMintReady
                 nft <- nft
                 _ <- sendNotifications(mintingNFTs.head, nft)
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
             } else {
               val mintingNFTs = Service.getByTxHash(txHash)
               val markMasterFailed = Service.markFailed(txHash)
@@ -160,15 +137,11 @@ class NFTMintingFeeTransactions @Inject()(
                 utilitiesNotification.send(mintingNFT.accountId, constants.Notification.NFT_MINTING_FEE_TRANSACTION_SUCCESSFUL)("")
               }
 
-              (for {
+              for {
                 mintingNFTs <- mintingNFTs
                 _ <- markMasterFailed
                 _ <- sendNotifications(mintingNFTs.head)
               } yield ()
-                ).recover {
-                case exception: Exception => logger.error(exception.getLocalizedMessage)
-                  logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
-              }
             }
           } else Future()
 
@@ -183,7 +156,8 @@ class NFTMintingFeeTransactions @Inject()(
           nftMintingFeeTxs <- nftMintingFeeTxs
           _ <- checkAndUpdate(nftMintingFeeTxs)
         } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.logMessage)
+          case baseException: BaseException => baseException.notifyLog("[PANIC]")
+            logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")
         }
 
         Await.result(forComplete, Duration.Inf)

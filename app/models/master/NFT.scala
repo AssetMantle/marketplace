@@ -5,6 +5,7 @@ import models.master.NFTs.NFTTable
 import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import schema.data.base.NumberData
 import schema.id.base.{AssetID, HashID}
 import schema.list.PropertyList
 import schema.property.base.{MesaProperty, MetaProperty}
@@ -30,20 +31,19 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getS3Url: String = constants.CommonConfig.AmazonS3.s3BucketURL + this.getAwsKey
 
-  def getServiceEndPoint: String = if (constants.CommonConfig.WebAppUrl.endsWith("/")) constants.CommonConfig.WebAppUrl + "nftResource/" + this.id
-  else constants.CommonConfig.WebAppUrl + "/nftResource/" + this.id
+  def getServiceEndPoint: String = "https://marketplace.assetmantle.one/nftResource/" + this.id + "." + this.fileExtension
 
-  def getImmutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && !x.mutable && x.nftId == this.id).map(_.toMetaProperty) ++ utilities.Properties.getNFTDefaultImmutableMetaProperties(name = this.name, collectionName = collection.name, fileHash = this.getFileHashID, bondAmount = collection.getBondAmount.value.toLong, creatorID = collection.creatorId, fileExtension = this.fileExtension, endPoint = this.getServiceEndPoint)
+  def getImmutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && !x.mutable && x.nftId == this.id).map(_.toMetaProperty) ++ utilities.Properties.getNFTDefaultImmutableMetaProperties(name = this.name, collectionName = collection.name, fileHash = this.getFileHashID, creatorID = collection.creatorId, fileExtension = this.fileExtension, endPoint = this.getServiceEndPoint)
 
   def getImmutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && !x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 
-  def getMutableMetaProperties(nftProperties: Seq[NFTProperty]): Seq[MetaProperty] = nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty)
+  def getMutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty) ++ Seq(schema.constants.Properties.BondAmountProperty.mutate(NumberData(collection.getTotalWeight * constants.Blockchain.BondRate)).asInstanceOf[MetaProperty])
 
   def getMutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 
   def getImmutables(nftProperties: Seq[NFTProperty], collection: Collection): Immutables = Immutables(PropertyList(this.getImmutableMetaProperties(nftProperties, collection) ++ this.getImmutableProperties(nftProperties)))
 
-  def getMutables(nftProperties: Seq[NFTProperty]): Mutables = Mutables(PropertyList(this.getMutableMetaProperties(nftProperties) ++ this.getMutableProperties(nftProperties)))
+  def getMutables(nftProperties: Seq[NFTProperty], collection: Collection): Mutables = Mutables(PropertyList(this.getMutableMetaProperties(nftProperties, collection) ++ this.getMutableProperties(nftProperties)))
 
   def serialize: NFTs.NFTSerialized = NFTs.NFTSerialized(
     id = this.id, assetId = this.assetId, collectionId = this.collectionId, name = this.name, description = this.description, totalSupply = BigDecimal(this.totalSupply), isMinted = this.isMinted, mintReady = this.mintReady, fileExtension = this.fileExtension.toLowerCase, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
