@@ -1,0 +1,12 @@
+@import controllers.actions.LoginState
+
+@(totalListed: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+
+<div class="sticky-top item-sticky">
+    <div class="card rightInfoCard">
+        <div class="d-flex flex-column gap-1">
+            <div class="analysisTitle">@Messages(constants.View.TOTAL_LISTED)</div>
+            <div class="analysisValue">@totalListed</div>
+        </div>
+    </div>
+</div>

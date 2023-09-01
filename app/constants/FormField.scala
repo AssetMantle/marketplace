@@ -116,6 +116,9 @@ object FormField {
   val MARK_ALL_NOTIFICATION_READ: BooleanFormField = BooleanFormField("MARK_ALL_NOTIFICATION_READ")
   val MINT_NFT: BooleanFormField = BooleanFormField("MINT_NFT")
   val FRACTIONALIZED_NFT: BooleanFormField = BooleanFormField("FRACTIONALIZED_NFT")
+  val COLLECTION_CAPABILITY_FRACTIONALISABLE: BooleanFormField = BooleanFormField("COLLECTION_CAPABILITY_FRACTIONALISABLE")
+  val COLLECTION_CAPABILITY_LOCKABLE: BooleanFormField = BooleanFormField("COLLECTION_CAPABILITY_LOCKABLE")
+  val COLLECTION_CAPABILITY_BURNABLE: BooleanFormField = BooleanFormField("COLLECTION_CAPABILITY_BURNABLE")
 
   // LongFormField
   val SELL_QUANTITY: LongFormField = LongFormField("SELL_QUANTITY", 1, Long.MaxValue)

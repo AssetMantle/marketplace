@@ -283,3 +283,23 @@ function updateExplorerContainer(creatorId){
         loadFirstCreatedCollections(creatorId);
     }
 }
+
+// Capabilities
+$(".capabilityHeader .options input[type='checkbox']").change(function () {
+    let parentElement = $(this).closest(".singleCapability");
+    if ($(this).is(":checked")) {
+        $(parentElement).find(".capabilityBody").slideDown();
+    } else {
+        $(parentElement).find(".capabilityBody").slideUp();
+    }
+});
+
+$(".capabilityBody .requirementOption .options input[type='checkbox']").change(function () {
+    let parentElement = $(this).closest(".capabilityBody");
+    if ($(this).is(":checked")) {
+        $(parentElement).find(".optionInputField").show();
+    } else {
+        $(parentElement).find(".optionInputField").hide();
+        $(parentElement).find(".optionInputField input").val("");
+    }
+});

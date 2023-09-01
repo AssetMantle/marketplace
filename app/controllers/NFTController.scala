@@ -59,17 +59,22 @@ class NFTController @Inject()(
 
   implicit val callbackOnSessionTimeout: Call = routes.CollectionController.viewCollections()
 
-  def viewNFT(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def viewNFT(nftId: String, activeTab: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val nft = masterNFTs.Service.tryGet(nftId)
         (for {
           nft <- nft
-        } yield Ok(views.html.nft.viewNft(nft))
+        } yield Ok(views.html.nft.viewNft(nft, activeTab))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
     }
+  }
+
+  def overview(nftId: String, activeTab: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.nft.detail.view(nftId = nftId, activeTab = activeTab)))
   }
 
   def details(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
@@ -86,11 +91,26 @@ class NFTController @Inject()(
           nftProperties <- nftProperties
           liked <- liked
           collection <- getCollection(nft.collectionId)
-        } yield Ok(views.html.nft.detail.view(collection, nft, nftProperties, liked))
+        } yield Ok(views.html.nft.detail.overview(collection, nft, nftProperties, liked))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
     }
+  }
+
+  def trade(nftId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.nft.detail.trade(nftId = nftId)))
+  }
+
+  def sellOrders(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.nft.detail.sellOrders()))
+  }
+
+  def yourOrders(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.nft.detail.yourOrders()))
   }
 
   def marketListings(nftId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {

@@ -166,6 +166,14 @@ class SecondaryMarkets @Inject()(
     def getAllOrderIDs: Future[Seq[String]] = customQuery(tableQuery.map(_.orderId).result)
 
     def getByOrderId(orderId: OrderID): Future[Option[SecondaryMarket]] = filter(_.orderId === orderId.asString).map(_.headOption.map(_.deserialize))
+
+    def getCollectionBySeller(sellerId: String, pageNumber: Int): Future[Seq[String]] = filterAndSortWithPagination(_.sellerId === sellerId)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.collectionId))
+
+    def totalOnSellBySeller(sellerId: String): Future[Int] = filterAndCount(_.sellerId === sellerId)
+
+    def totalOnSellBySellerAndCollection(sellerId: String, collectionId: String): Future[Int] = filterAndCount(x => x.sellerId === sellerId && x.collectionId === collectionId)
+
+    def getByCollectionSellerAndPageNumber(sellerId: String, collectionId: String, pageNumber: Int): Future[Seq[SecondaryMarket]] = filterAndSortWithPagination(x => x.sellerId === sellerId && x.collectionId === collectionId)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage).map(_.map(_.deserialize()))
   }
 
 }

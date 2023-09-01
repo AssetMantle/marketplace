@@ -85,8 +85,8 @@ GET         /collectedCollectionPerPage                        controllers.Colle
 GET         /collectedCollectionNFTs                           controllers.CollectedController.collectionNFTs(accountId: String, collectionId: String)
 GET         /profile/:accountId/COLLECTED/:collectionId        controllers.CollectedController.viewCollectionNFTs(accountId: String, collectionId: String)
 GET         /collectedNFTsPerPage                              controllers.CollectedController.collectionNFTsPerPage(accountId: String, collectionId: String, pageNumber: Int)
-GET         /collectedCardInfo                                 controllers.CollectedController.commonCardInfo(collectionID: String, accountID: String)
-GET         /collectedCollectionTopRightCard                   controllers.CollectedController.topRightCard(collectionID: String, accountID: String)
+GET         /collectedCardInfo                                 controllers.CollectedController.collectionCardInfo(collectionID: String, accountID: String)
+GET         /collectedCollectionTopRightCard                   controllers.CollectedController.sectionTopRightCard(collectionID: String, accountID: String)
 
 GET         /wishlistSection                                   controllers.WishlistController.wishlistSection(accountId: String)
 GET         /wishListCollectionPerPage                         controllers.WishlistController.collectionPerPage(accountId: String, pageNumber: Int)
@@ -97,7 +97,9 @@ GET         /wishListNFTsPerPage                               controllers.Wishl
 POST        /addToWishList                                     controllers.WishlistController.add()
 POST        /deleteFromWishList                                controllers.WishlistController.delete()
 
-GET         /nft/:id                                           controllers.NFTController.viewNFT(id: String)
+#GET         /nft/:id                                           controllers.NFTController.viewNFT(id: String)
+GET         /nft/:id/:activeTab                                controllers.NFTController.viewNFT(id: String, activeTab: String)
+GET         /nft/:id                                           controllers.NFTController.viewNFT(id: String, activeTab: String ?= "OVERVIEW")
 GET         /nftDetails                                        controllers.NFTController.details(nftId: String)
 GET         /nftDetailViewLeftCards                            controllers.NFTController.detailViewLeftCards(nftId: String)
 GET         /nftInfo                                           controllers.NFTController.info(nftId: String)
@@ -124,6 +126,10 @@ GET         /mintNFT                                           controllers.NFTCo
 POST        /mintNFT                                           controllers.NFTController.mint()
 GET         /transferNFT                                       controllers.NFTController.transferForm(nftId: String)
 POST        /transferNFT                                       controllers.NFTController.transfer()
+GET         /overviewSection                                   controllers.NFTController.overview(nftId: String, activeTab: String)
+GET         /tradeSection                                      controllers.NFTController.trade(nftId: String)
+GET         /sellOrders                                        controllers.NFTController.sellOrders()
+GET         /yourOrders                                        controllers.NFTController.yourOrders()
 
 GET         /settings                                          controllers.SettingController.viewSettings()
 GET         /profileSettings                                   controllers.SettingController.settings()
@@ -209,6 +215,15 @@ GET         /cancelSecondaryMarket                             controllers.Secon
 POST        /cancelSecondaryMarket                             controllers.SecondaryMarketController.cancel()
 GET         /buySecondaryMarket                                controllers.SecondaryMarketController.buyForm(secondaryMarketId: String)
 POST        /buySecondaryMarket                                controllers.SecondaryMarketController.buy()
+
+GET         /listedSection                                     controllers.SecondaryMarketController.listedSection(accountId: String)
+GET         /listedCollectionPerPage                           controllers.SecondaryMarketController.listedCollectionPerPage(accountId: String, pageNumber: Int)
+GET         /listedCollectionNFTs                              controllers.SecondaryMarketController.listedCollectionNFTs(accountId: String, collectionId: String)
+GET         /profile/:accountId/LISTED/:collectionId           controllers.SecondaryMarketController.viewListedCollectionNFTs(accountId: String, collectionId: String)
+GET         /listedNFTsPerPage                                 controllers.SecondaryMarketController.listedCollectionNFTsPerPage(accountId: String, collectionId: String, pageNumber: Int)
+GET         /listedCardInfo                                    controllers.SecondaryMarketController.listedCollectionCardInfo(collectionID: String, accountID: String)
+GET         /listedSectionCollectionTopRightCard               controllers.SecondaryMarketController.listedSectionCollectionTopRightCard(collectionID: String, accountID: String)
+
 
 GET         /unwrapToken                                       controllers.WalletController.unwrapTokenForm()
 POST        /unwrapToken                                       controllers.WalletController.unwrapToken()

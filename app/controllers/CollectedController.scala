@@ -101,7 +101,7 @@ class CollectedController @Inject()(
     }
   }
 
-  def commonCardInfo(collectionID: String, accountID: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+  def collectionCardInfo(collectionID: String, accountID: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val totalOwned = masterNFTOwners.Service.countCollectionOwnedNFTs(accountId = accountID, collectionID = collectionID)
@@ -117,7 +117,7 @@ class CollectedController @Inject()(
     }
   }
 
-  def topRightCard(collectionID: String, accountID: String): Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
+  def sectionTopRightCard(collectionID: String, accountID: String): Action[AnyContent] = withoutLoginActionAsync { implicit optionalLoginState =>
     implicit request =>
       val totalOwned = masterNFTOwners.Service.countCollectionOwnedNFTs(accountId = accountID, collectionID = collectionID)
 

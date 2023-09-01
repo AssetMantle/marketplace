@@ -1,0 +1,39 @@
+@import controllers.actions.LoginState
+
+@(accountId: String, collection: master.Collection, collectionCoverFile: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+<div class="item item-center nftContainer">
+    <div class="profileCover">
+        <div class="profileCoverContainer skeletonLoadContainer" id="collectionUncompressedCoverImage_@collection.id">
+            @collection.getCoverFileURL.fold{
+                <img src="@routes.Assets.versioned("images/defaultCollectionCover.png")"/>
+            }{uri =>
+                <img src="@uri">
+            }
+        </div>
+    </div>
+    <div class="profile-card">
+        <div class="profiles-container">
+            <div class="nft-list">
+                <div class="nft-list-container">
+                    <div id="nftsPerPage" class="row m-0 nftsPerPage">
+                    </div>
+                </div>
+                    <!-- Loader -->
+                <div class="loading">
+                    <div class="ball"></div>
+                    <div class="ball"></div>
+                    <div class="ball"></div>
+                </div>
+                    <!-- End -->
+            </div>
+        </div>
+    </div>
+</div>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/profile/listed/nftLoadMore.js")" type="text/javascript"></script>
+<script>
+     loadFirstListedNFTs('@accountId', '@collection.id');
+     checkAndPushState(jsRoutes.controllers.SecondaryMarketController.viewListedCollectionNFTs('@accountId', '@collection.id').url, ('@accountId' + '/LISTED/' + '@collection.id'), "listedCollection");
+     window.onscroll = function() { loadListedNftOnScroll('@{accountId}', '@{collection.id}'); }
+     showLoader();
+</script>
