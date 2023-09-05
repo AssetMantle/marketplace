@@ -1097,6 +1097,7 @@ TRANSACTION_STATUS=Status
 FRACTIONALIZED_NFT=Will the NFTs be fractionalized?
 FRACTIONALIZED_NFT_WARNING=Fractionalization here means dividing a single NFT into multiple pieces. This cannot be changed later for the collection.
 RESPONSE.FAILURE.COLLECTION_PROPERTIES_CONTAINS_RESTRICTED_PROPERTIES=Restricted properties cannot be used.
+NO_TRANSACTION_FOUND=No transaction found
 REGEX_ERROR.NFT_TAGS=Only A-Z, a-z,0-9, and ._!- are allowed
 TOTAL_OWNERS=Total Owners
 NOTIFICATION.TEST.TITLE=Test Notif

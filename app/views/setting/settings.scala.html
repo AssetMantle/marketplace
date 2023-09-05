@@ -53,7 +53,7 @@
                         </div>
                         @if(key.encryptedPrivateKey.nonEmpty && key.identityIssued.getOrElse(false)) {
                             @if(key.active) {
-                                <input type="radio" name="walletAddress" class='activeKey' id="@key.address" onclick="changeActive('@key.address')"/>
+                                <input type="radio" name="walletAddress" class='activeKey' id="settings_@key.address" onclick="changeActive('settings_@key.address')"/>
                             } else {
                                 <input type="radio" name="walletAddress" id="@key.address" onclick="changeActive('@key.address')"/>
                             }
