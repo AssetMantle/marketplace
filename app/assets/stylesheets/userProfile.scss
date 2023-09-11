@@ -139,6 +139,12 @@
           &:focus{
             outline: none;
           }
+          &.activeKey{
+            border-color: var(--default);
+            &::before{
+              transform: scale(1);
+            }
+          }
         }
       }
       &.active{
@@ -780,6 +786,26 @@
               td{
                 &.tableFieldName{
                   cursor: pointer;
+                }
+              }
+            }
+          }
+        }
+        #userTransactions{
+          .tableFieldHash{min-width: 360px;max-width: 360px;}
+          .tableFieldType{min-width: 210px;}
+          .tableFieldDuration{min-width: 136px;}
+          .tableFieldStatus{min-width: 100px;}
+          tbody{
+            tr {
+              td{
+                &.tableFieldHash{
+                  @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--dark));
+                  cursor: pointer;
+                  a {
+                    @include setFont(var(--font-type-2), normal, 400, 12px, 14px, var(--dark));
+                    cursor: pointer;
+                  }
                 }
               }
             }

@@ -2,14 +2,27 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
-<div>
-    <tr>
-        <th>@Messages(constants.View.TRANSACTION_HASH)</th>
-        <th>@Messages(constants.View.TRANSACTION_TYPE)</th>
-        <th>@Messages(constants.View.TRANSACTION_TIME)</th>
-        <th>@Messages(constants.View.TRANSACTION_STATUS)</th>
-        <th></th>
-    </tr>
-    <div id="userTransactionsPerPage"></div>
+<div class="contentBody overflow-auto">
+    <div class="container contentTableContainer" id="userTransactions">
+        <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <div class="table-responsive">
+                    <table class="table contentTable mb-0">
+                        <thead>
+                            <tr>
+                                <th class="tableFieldHash">@Messages(constants.View.TRANSACTION_HASH)</th>
+                                <th class="text-center tableFieldType">@Messages(constants.View.TRANSACTION_TYPE)</th>
+                                <th class="text-center tableFieldStatus">@Messages(constants.View.TRANSACTION_STATUS)</th>
+                                <th class="text-center tableFieldDuration">@Messages(constants.View.TRANSACTION_TIME)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTransactionsPerPage">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+<script src="@utilities.PublicResource.getVersionedRoute("javascripts/profile/transactions/transactions.js")"></script>
     <script>componentResource('userTransactionsPerPage', jsRoutes.controllers.ProfileController.transactionsPerPage(1))</script>
