@@ -14,16 +14,21 @@
         </div>
         <div class="d-flex gap-2 align-items-center flex-grow-1 userDetails">
             <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="40" height="40"/>
-            <div class="ms-2 d-flex flex-column justify-content-between">
+            <div class="ms-2 justify-content-between d-flex gap-2 align-items-center flex-grow-1">
                 <a href="@routes.ProfileController.viewProfile(loginState.username, constants.View.COLLECTED)" class="p-0 profileItemLink">
                     <div class="userName">
-                    @commonStringValue(message = loginState.username, id = utilities.IdGenerator.getRandomHexadecimal, length = 20, showToolTip = false)
+                    @commonStringValue(message = loginState.username, id = utilities.IdGenerator.getRandomHexadecimal, length = 18, showToolTip = false)
                     </div>
+                </a>
+                <a href="" target="_blank" class="p-0 lh-sm">
+                    <i class="bi bi-arrow-up-right iconDefault"></i>
                 </a>
             </div>
         </div>
         <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="userBalance" id="walletTradeBalance">0 wMNTL</div>
+            <div class="userBalance" id="walletTradeBalance">
+                <span class="start">0</span><span class="end"> wMNTL</span>
+            </div>
             <div class="d-flex gap-2">
                 <div class="primaryIconButton">
                     <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.WRAP_COIN.get, ""))" class="p-0">
