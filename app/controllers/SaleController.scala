@@ -293,7 +293,7 @@ class SaleController @Inject()(
               if (sale.startTimeEpoch > utilities.Date.currentEpoch) Option(constants.Response.SALE_NOT_STARTED) else None,
               if (utilities.Date.currentEpoch >= sale.endTimeEpoch) Option(constants.Response.SALE_EXPIRED) else None,
               if (balance == MicroNumber.zero || balance <= (sale.price * buySaleNFTData.buyNFTs)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
-              if (buySaleNFTData.mintOnSuccess && (balance - (buySaleNFTData.buyNFTs * collection.getBondAmount) <= MicroNumber.zero)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (buySaleNFTData.mintOnSuccess && (balance - nfts.map(_.getBondAmount(collection)).sum <= MicroNumber.zero)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if ((countBuyerNFTsFromSale + buySaleNFTData.buyNFTs) > sale.maxMintPerAccount) Option(constants.Response.MAXIMUM_NFT_MINT_PER_ACCOUNT_REACHED) else None,
               if (buySaleNFTData.mintOnSuccess && nfts.map(_.isMinted.getOrElse(true)).exists(identity)) Option(constants.Response.NFT_ALREADY_MINTED) else None,
               if (nfts.exists(_.isMinted.getOrElse(true))) Option(constants.Response.NFT_ALREADY_MINTED) else None,
@@ -306,12 +306,11 @@ class SaleController @Inject()(
                 sellerAccountId = sellerKey.accountId,
                 saleId = sale.id,
                 mintOnSuccess = buySaleNFTData.mintOnSuccess,
-                nftIds = nftOwners.map(_.nftId),
+                nfts = nfts,
                 fromAddress = buyerKey.address,
                 collection = collection,
                 toAddress = sellerKey.address,
                 amount = sale.price * buySaleNFTData.buyNFTs,
-                gasLimit = constants.Transaction.DefaultSendCoinGasAmount,
                 gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(buyerKey.encryptedPrivateKey, buySaleNFTData.password))
               )

@@ -1,8 +1,7 @@
+@import utilities.MicroNumber
 @import views.html.base.form._
 @import views.nft.companion.Mint
-@import models.master.Collection
-
-@(mintForm: Form[Mint.Data] = Mint.form, nftId: String, collection: Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(mintForm: Form[Mint.Data] = Mint.form, nftId: String, bondAmount: Long)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.NFT_MINT, mintForm) {
     @commonInputText(mintForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> "readonly")
@@ -15,7 +14,7 @@
                             <tr>
                                 <td class="text-left tableLabel">@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_BONDING_AMOUNT)</td>
                                 <td class="text-center tableValue">
-                                    <span class="BondingUnitCost">@collection.getBondAmount.toString</span> $MNTL
+                                    <span class="BondingUnitCost">@(bondAmount / MicroNumber.factor)</span> $MNTL
                                 </td>
                             </tr>
                         </tbody>

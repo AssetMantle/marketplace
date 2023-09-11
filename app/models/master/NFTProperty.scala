@@ -87,8 +87,6 @@ class NFTProperties @Inject()(
 
     def deleteByNFTId(nftId: String): Future[Int] = filterAndDelete(_.nftId === nftId)
 
-    def tryGet(nftId: String, name: String): Future[NFTProperty] = tryGetById1Id2Id3(id1 = nftId, id2 = name, id3 = constants.NFT.Data.STRING)
-
     def updateMultiple(properties: Seq[NFTProperty]): Future[Int] = upsertMultiple(properties)
 
   }

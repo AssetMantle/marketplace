@@ -17,7 +17,8 @@ import views.collection.companion._
 import java.io.File
 import java.nio.file.Files
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class CollectionController @Inject()(
@@ -406,12 +407,58 @@ class CollectionController @Inject()(
       }
   }
 
+  def setCapabilitiesForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id)
+      (for {
+        collectionDraft <- collectionDraft
+      } yield if (collectionDraft.creatorId == loginState.username) Ok(views.html.collection.setCapabilities(collectionDraft = collectionDraft)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def setCapabilities(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      SetCapabilities.form.bindFromRequest().fold(
+        formWithErrors => {
+          val collectionDraftId = formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, "")
+          val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(collectionDraftId)
+          (for {
+            collectionDraft <- collectionDraft
+          } yield if (collectionDraft.creatorId == loginState.username) BadRequest(views.html.collection.setCapabilities(formWithErrors, collectionDraft)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        },
+        setCapabilitiesData => {
+          val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(setCapabilitiesData.collectionId)
+
+          def update(collectionDraft: CollectionDraft) = if (collectionDraft.creatorId == loginState.username) {
+            masterTransactionCollectionDrafts.Service.addProperties(collectionDraft.copy(properties = collectionDraft.getPropertiesWithoutCapabilities), setCapabilitiesData.getProperties)
+          } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+
+          (for {
+            collectionDraft <- collectionDraft
+            _ <- update(collectionDraft)
+          } yield PartialContent(views.html.collection.defineProperties(collectionDraft = collectionDraft))
+            ).recover {
+            case baseException: BaseException => try {
+              BadRequest(views.html.collection.setCapabilities(SetCapabilities.form.withGlobalError(baseException.failure.message), Await.result(collectionDraft, Duration.Inf)))
+            } catch {
+              case _: Exception => InternalServerError
+            }
+          }
+        }
+      )
+  }
+
   def definePropertiesForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id)
       (for {
         collectionDraft <- collectionDraft
-      } yield if (collectionDraft.creatorId == loginState.username) Ok(views.html.collection.defineProperties(collectionDraftId = id, collectionDraft = Option(collectionDraft))) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+      } yield if (collectionDraft.creatorId == loginState.username) Ok(views.html.collection.defineProperties(collectionDraft = collectionDraft)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
@@ -425,36 +472,46 @@ class CollectionController @Inject()(
           val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(collectionDraftId)
           (for {
             collectionDraft <- collectionDraft
-          } yield if (collectionDraft.creatorId == loginState.username) BadRequest(views.html.collection.defineProperties(formWithErrors, collectionDraftId, Option(collectionDraft))) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+          } yield if (collectionDraft.creatorId == loginState.username) BadRequest(views.html.collection.defineProperties(formWithErrors, collectionDraft)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
           }
         },
         definePropertiesData => {
-          val update = masterTransactionCollectionDrafts.Service.updateProperties(definePropertiesData.collectionId, definePropertiesData.getSerializableProperties)
+          def getCollectionDraft = masterTransactionCollectionDrafts.Service.tryGet(definePropertiesData.collectionId)
 
-          def saveCollection(collectionDraft: CollectionDraft) = if (!definePropertiesData.saveAsDraft) {
-            val add = masterCollections.Service.add(collectionDraft.toCollection())
+          def update(collectionDraft: CollectionDraft) = if (collectionDraft.creatorId == loginState.username) {
+            masterTransactionCollectionDrafts.Service.addProperties(collectionDraft.copy(properties = collectionDraft.getCapabilities), definePropertiesData.getSerializableProperties())
+          } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
 
-            def deleteDraft() = masterTransactionCollectionDrafts.Service.delete(collectionDraft.id)
+          def saveCollection = if (!definePropertiesData.saveAsDraft) {
+            def add(collectionDraft: CollectionDraft) = masterCollections.Service.add(collectionDraft.toCollection())
+
+            def deleteDraft(collectionDraft: CollectionDraft) = masterTransactionCollectionDrafts.Service.delete(collectionDraft.id)
 
             def updateAccountToCreator() = masterAccounts.Service.updateAccountToCreator(loginState.username)
 
             for {
-              _ <- add
+              collectionDraft <- getCollectionDraft
+              _ <- add(collectionDraft)
               _ <- updateAccountToCreator()
-              _ <- deleteDraft()
+              _ <- deleteDraft(collectionDraft)
               _ <- collectionsAnalysis.Utility.onNewCollection(collectionDraft.id)
               _ <- utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.COLLECTION_CREATED, collectionDraft.name)(s"'${collectionDraft.id}'")
             } yield ()
           } else Future("")
 
           (for {
-            collectionDraft <- update
-            _ <- saveCollection(collectionDraft)
+            collectionDraft <- getCollectionDraft
+            _ <- update(collectionDraft)
+            _ <- saveCollection
           } yield PartialContent(views.html.collection.createSuccessful(collectionDraft, definePropertiesData.saveAsDraft))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.collection.defineProperties(DefineProperties.form.withGlobalError(baseException.failure.message), definePropertiesData.collectionId, None))
+            case baseException: BaseException => try {
+              BadRequest(views.html.collection.defineProperties(DefineProperties.form.withGlobalError(baseException.failure.message), Await.result(getCollectionDraft, Duration.Inf)))
+            } catch {
+              case _: Exception => InternalServerError
+            }
           }
         }
       )

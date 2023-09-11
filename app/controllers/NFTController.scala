@@ -512,7 +512,7 @@ class NFTController @Inject()(
       for {
         nft <- nft
         collection <- collection(nft.collectionId)
-      } yield if (!nft.isMinted.getOrElse(true)) Ok(views.html.nft.mint(nftId = nftId, collection = collection))
+      } yield if (!nft.isMinted.getOrElse(true)) Ok(views.html.nft.mint(nftId = nftId, bondAmount = nft.getBondAmount(collection)))
       else BadRequest(constants.Response.NFT_ALREADY_MINTED.message)
   }
 
@@ -528,7 +528,7 @@ class NFTController @Inject()(
           for {
             nft <- nft
             collection <- collection(nft.collectionId)
-          } yield BadRequest(views.html.nft.mint(formWithErrors, nftId, collection))
+          } yield BadRequest(views.html.nft.mint(formWithErrors, nftId, nft.getBondAmount(collection)))
         },
         mintData => {
           val nft = masterNFTs.Service.tryGet(mintData.nftId)
@@ -541,7 +541,7 @@ class NFTController @Inject()(
           def verifyAndTx(verifyPassword: Boolean, balance: MicroNumber, key: Key, nft: NFT, nftOwner: NFTOwner, collection: Collection) = {
             val errors = Seq(
               if (nftOwner.saleId.nonEmpty || nftOwner.publicListingId.nonEmpty) Option(constants.Response.NFT_ON_SALE_CANNOT_BE_MINTED) else None,
-              if (balance <= collection.getBondAmount) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (balance <= nft.getBondAmount(collection)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (nft.isMinted.getOrElse(true)) Option(constants.Response.NFT_ALREADY_MINTED) else None,
               if (nft.totalSupply != nftOwner.quantity) Option(constants.Response.NFT_TOTAL_SUPPLY_AND_OWNED_DIFFERENT) else None,
@@ -551,7 +551,7 @@ class NFTController @Inject()(
                 accountId = loginState.username,
                 nft = nft,
                 fromAddress = loginState.address,
-                amount = collection.getBondAmount,
+                amount = nft.getBondAmount(collection),
                 gasPrice = constants.Transaction.DefaultGasPrice,
                 ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, mintData.password))
               )
@@ -571,7 +571,7 @@ class NFTController @Inject()(
               try {
                 val nftToMint = Await.result(nft, Duration.Inf)
                 val collectionForBonding = Await.result(collection(nftToMint.collectionId), Duration.Inf)
-                BadRequest(views.html.nft.mint(mintForm = Mint.form.withGlobalError(baseException.failure.message), nftId = mintData.nftId, collection = collectionForBonding))
+                BadRequest(views.html.nft.mint(mintForm = Mint.form.withGlobalError(baseException.failure.message), nftId = mintData.nftId, nftToMint.getBondAmount(collectionForBonding)))
               } catch {
                 case exception: Exception => logger.error(exception.getLocalizedMessage)
                   BadRequest

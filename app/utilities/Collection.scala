@@ -16,11 +16,6 @@ object Collection {
 
   def getOldNFTFileAwsKey(collectionId: String, fileName: String): String = collectionId + nfts + fileName
 
-  def getTotalBondAmount(immutables: Immutables, mutables: Mutables, bondRate: Int): BigInt = {
-    val totalWeight = mutables.propertyList.properties.map(_.getBondedWeight).sum + immutables.propertyList.properties.map(_.getBondedWeight).sum
-    BigInt(totalWeight * bondRate)
-  }
-
   // TODO BondRate from parameters
   def getClassificationID(immutables: Immutables, mutables: Mutables): ClassificationID = schema.utilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
 }

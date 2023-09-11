@@ -50,6 +50,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.uploadCollectionFileForm,
         routes.javascript.CollectionController.storeCollectionFile,
         routes.javascript.CollectionController.uploadCollectionFile,
+        routes.javascript.CollectionController.setCapabilitiesForm,
         routes.javascript.CollectionController.definePropertiesForm,
         routes.javascript.CollectionController.deleteDraftForm,
         routes.javascript.CollectionController.deleteDraft,

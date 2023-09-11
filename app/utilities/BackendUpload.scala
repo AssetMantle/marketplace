@@ -59,6 +59,8 @@ class BackendUpload @Inject()(
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = BigDecimal(value).toString)
       } else if (propertyType == constants.NFT.Data.NUMBER) {
         commonCollection.Property(name = name, `type` = propertyType, defaultValue = BigInt(value).toString)
+      } else if (propertyType == constants.NFT.Data.HEIGHT) {
+        commonCollection.Property(name = name, `type` = propertyType, defaultValue = value.toLong.toString)
       } else constants.Response.INVALID_NFT_PROPERTY.throwBaseException()
     }
 
@@ -75,6 +77,7 @@ class BackendUpload @Inject()(
         case constants.NFT.Data.DECIMAL => Try(BigDecimal(this.value)).isSuccess
         case constants.NFT.Data.NUMBER => Try(BigInt(this.value)).isSuccess
         case constants.NFT.Data.BOOLEAN => Try(this.value.toBoolean).isSuccess || (this.value == constants.NFT.Data.TRUE || this.value == constants.NFT.Data.FALSE)
+        case constants.NFT.Data.HEIGHT => Try(this.value.toLong).isSuccess && this.value.toLong >= -1
         case _ => false
       }
       if (conversionTry) master.NFTProperty(nftId = nftID, name = name, `type` = propertyType, value = value, meta = true, mutable = false)
@@ -107,6 +110,7 @@ class BackendUpload @Inject()(
           else if (y.`type` == constants.NFT.Data.NUMBER) Try(BigInt(x.value)).isSuccess
           else if (y.`type` == constants.NFT.Data.BOOLEAN) (x.value == constants.NFT.Data.SMALL_TRUE || x.value == constants.NFT.Data.TRUE || x.value == constants.NFT.Data.SMALL_FALSE || x.value == constants.NFT.Data.FALSE)
           else if (y.`type` == constants.NFT.Data.STRING) true
+          else if (y.`type` == constants.NFT.Data.HEIGHT) Try(x.value.toLong).isSuccess && x.value.toLong >= -1
           else false
         })
       }).forall(identity)
@@ -131,7 +135,7 @@ class BackendUpload @Inject()(
         try {
           val awsKey = utilities.NFT.getAWSKey(fileName = newFileName)
           if (!utilities.AmazonS3.exists(awsKey)) utilities.AmazonS3.uploadFile(awsKey, nftImageFile)
-          val nftOld = master.NFT(id = fileHash, collectionId = uploadCollection.id, name = nftDetails.name, description = nftDetails.description, totalSupply = 1, isMinted = Option(false), fileExtension = uploadCollection.nftFormat, mintReady = false, assetId = None)
+          val nftOld = master.NFT(id = fileHash, collectionId = uploadCollection.id, name = nftDetails.name, description = nftDetails.description, totalSupply = 1, isMinted = Option(false), fileExtension = uploadCollection.nftFormat, mintReady = false, assetId = None, customBondAmount = None)
           val assetID = nftOld.getAssetID(nftDetails.properties.map(_.toProperty(fileHash, collection)), collection)
           val nft = nftOld.copy(assetId = Option(assetID.asString))
           Await.result(masterNFTs.Service.add(nft), Duration.Inf)

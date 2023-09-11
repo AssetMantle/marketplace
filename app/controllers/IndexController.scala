@@ -116,7 +116,7 @@ class IndexController @Inject()(
     defineAssetTransactions.Utility.scheduler,
     issueIdentityTransactions.Utility.scheduler,
     masterTransactionLatestBlocks.Utility.scheduler,
-    mintAssetTransactions.Utility.scheduler,
+//    mintAssetTransactions.Utility.scheduler,
     nftMintingFeeTransactions.Utility.scheduler,
     nftTransferTransactions.Utility.scheduler,
     provisionAddressTransactions.Utility.scheduler,

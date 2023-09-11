@@ -16,6 +16,8 @@ object Collection {
 
     def getBondedWeight: Int = if (this.meta) this.toMetaProperty.getBondedWeight else this.toMesaProperty.getBondedWeight
 
+    def validate: Boolean = if (this.defaultValue != "") constants.NFT.Data.isCastable(`type` = this.`type`, value = this.defaultValue) else true
+
   }
 
   implicit val propertyWrites: Writes[Property] = Json.writes[Property]

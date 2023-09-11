@@ -88,6 +88,10 @@ object FormField {
   val SALE_BUY_NFT_NUMBER: IntFormField = IntFormField("SALE_BUY_NFT_NUMBER", 1, 100000)
   val PUBLIC_LISTING_BUY_NFT_NUMBER: IntFormField = IntFormField("PUBLIC_LISTING_BUY_NFT_NUMBER", 1, 100000)
   val SECONDARY_MARKET_END_HOURS: IntFormField = IntFormField("SECONDARY_MARKET_END_HOURS", 1, constants.Blockchain.MaxOrderHours)
+  val COLLECTION_FRACTIONALIZED_DEFAULT: IntFormField = IntFormField("COLLECTION_FRACTIONALIZED_DEFAULT", 1, Int.MaxValue)
+  val COLLECTION_LOCKABLE_DEFAULT: IntFormField = IntFormField("COLLECTION_LOCKABLE_DEFAULT", -1, Int.MaxValue)
+  val COLLECTION_CUSTOM_BURNABLE_DEFAULT: IntFormField = IntFormField("COLLECTION_CUSTOM_BURNABLE_DEFAULT", -1, Int.MaxValue)
+  val COLLECTION_CUSTOM_BOND_AMOUNT_DEFAULT: IntFormField = IntFormField("COLLECTION_CUSTOM_BOND_AMOUNT_DEFAULT", 1, Int.MaxValue)
 
   // DoubleFormField
   val GAS_PRICE: BigDecimalFormField = BigDecimalFormField("GAS_PRICE", constants.Transaction.LowGasPrice, constants.Transaction.HighGasPrice)
@@ -115,16 +119,23 @@ object FormField {
   val CREATE_COLLECTION_MOU: BooleanFormField = BooleanFormField("CREATE_COLLECTION_MOU")
   val MARK_ALL_NOTIFICATION_READ: BooleanFormField = BooleanFormField("MARK_ALL_NOTIFICATION_READ")
   val MINT_NFT: BooleanFormField = BooleanFormField("MINT_NFT")
-  val FRACTIONALIZED_NFT: BooleanFormField = BooleanFormField("FRACTIONALIZED_NFT")
-  val COLLECTION_CAPABILITY_FRACTIONALISABLE: BooleanFormField = BooleanFormField("COLLECTION_CAPABILITY_FRACTIONALISABLE")
-  val COLLECTION_CAPABILITY_LOCKABLE: BooleanFormField = BooleanFormField("COLLECTION_CAPABILITY_LOCKABLE")
-  val COLLECTION_CAPABILITY_BURNABLE: BooleanFormField = BooleanFormField("COLLECTION_CAPABILITY_BURNABLE")
+  val COLLECTION_FRACTIONALIZED_ENABLE: BooleanFormField = BooleanFormField("COLLECTION_FRACTIONALIZED_ENABLE")
+  val COLLECTION_FRACTIONALIZED_MUTABLE: BooleanFormField = BooleanFormField("COLLECTION_FRACTIONALIZED_MUTABLE")
+  val COLLECTION_FRACTIONALIZED_HIDDEN: BooleanFormField = BooleanFormField("COLLECTION_FRACTIONALIZED_HIDDEN")
+  val COLLECTION_LOCKABLE_ENABLE: BooleanFormField = BooleanFormField("COLLECTION_LOCKABLE_ENABLE")
+  val COLLECTION_LOCKABLE_MUTABLE: BooleanFormField = BooleanFormField("COLLECTION_LOCKABLE_ENABLE")
+  val COLLECTION_LOCKABLE_HIDDEN: BooleanFormField = BooleanFormField("COLLECTION_LOCKABLE_ENABLE")
+  val COLLECTION_CUSTOM_BURNABLE_ENABLE: BooleanFormField = BooleanFormField("COLLECTION_CUSTOM_BURNABLE_ENABLE")
+  val COLLECTION_CUSTOM_BURNABLE_MUTABLE: BooleanFormField = BooleanFormField("COLLECTION_CUSTOM_BURNABLE_MUTABLE")
+  val COLLECTION_CUSTOM_BURNABLE_HIDDEN: BooleanFormField = BooleanFormField("COLLECTION_CUSTOM_BURNABLE_HIDDEN")
+  val COLLECTION_CUSTOM_BOND_AMOUNT_ENABLE: BooleanFormField = BooleanFormField("COLLECTION_CUSTOM_BOND_AMOUNT_ENABLE")
 
   // LongFormField
   val SELL_QUANTITY: LongFormField = LongFormField("SELL_QUANTITY", 1, Long.MaxValue)
   val BUY_QUANTITY: LongFormField = LongFormField("BUY_QUANTITY", 1, Long.MaxValue)
 
   // SelectFormField
+  // Not adding Height type for user
   val COLLECTION_PROPERTY_TYPE: SelectFormField = SelectFormField("COLLECTION_PROPERTY_TYPE", Seq(constants.NFT.Data.STRING, constants.NFT.Data.NUMBER, constants.NFT.Data.DECIMAL, constants.NFT.Data.BOOLEAN))
 
   // CustomSelect

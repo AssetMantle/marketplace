@@ -20,7 +20,24 @@ case class CollectionDraft(id: String, creatorId: String, name: String, descript
 
   def getInstagram: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.INSTAGRAM).map(_.url)
 
-  def toCollection(public: Boolean = false): Collection = Collection(id = id, creatorId = creatorId, classificationId = None, name = name, description = description, socialProfiles = socialProfiles, nsfw = nsfw, properties = Option(this.properties), profileFileName = this.profileFileName, coverFileName = this.coverFileName, public = public, royalty = royalty, isDefined = Option(false), defineAsset = false, rank = Int.MaxValue, onSecondaryMarket = false, showAll = false)
+  def toCollection(public: Boolean = false): Collection = Collection(
+    id = id,
+    creatorId = creatorId,
+    classificationId = None,
+    name = name,
+    description = description,
+    socialProfiles = socialProfiles,
+    nsfw = nsfw,
+    properties = Option(this.properties),
+    profileFileName = this.profileFileName,
+    coverFileName = this.coverFileName,
+    public = public,
+    royalty = royalty,
+    isDefined = Option(false),
+    defineAsset = false,
+    rank = Int.MaxValue,
+    onSecondaryMarket = false,
+    showAll = false)
 
   def getProfileFileURL: Option[String] = this.profileFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getOthersFileAwsKey(collectionId = this.id, fileName = x))
 
@@ -37,16 +54,44 @@ case class CollectionDraft(id: String, creatorId: String, name: String, descript
     profileFileName = this.profileFileName,
     coverFileName = this.coverFileName,
     royalty = this.royalty,
-    createdBy = this.createdBy,
-    createdOnMillisEpoch = this.createdOnMillisEpoch,
-    updatedBy = this.updatedBy,
-    updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+    createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+
+  def isFractionalized: Boolean = this.getSupply.isDefined
+
+  lazy val getSupply: Option[Property] = this.properties.find(_.name == schema.constants.Properties.SupplyProperty.id.keyID.value)
+
+  def isLockable: Boolean = this.getLockable.isDefined
+
+  lazy val getLockable: Option[Property] = this.properties.find(_.name == schema.constants.Properties.LockHeightProperty.id.keyID.value)
+
+  def customBurnEnabled: Boolean = this.getBurnHeight.isDefined
+
+  lazy val getBurnHeight: Option[Property] = this.properties.find(_.name == schema.constants.Properties.BurnHeightProperty.id.keyID.value)
+
+  def customBondAmountEnabled: Boolean = this.getCustomBondAmount.isDefined
+
+  lazy val getCustomBondAmount: Option[Property] = this.properties.find(_.name == schema.constants.Properties.BondAmountProperty.id.keyID.value)
+
+  lazy val getCapabilities: Seq[Property] = Seq(this.getSupply, this.getLockable, this.getBurnHeight, this.getCustomBondAmount).flatten
+
+  lazy val getPropertiesWithoutCapabilities: Seq[Property] = this.properties.filterNot(x => this.getCapabilities.map(_.name).contains(x.name))
 }
 
 private[masterTransaction] object CollectionDrafts {
 
   case class CollectionDraftSerialized(id: String, creatorId: String, name: String, description: String, socialProfiles: String, nsfw: Boolean, properties: String, profileFileName: Option[String], coverFileName: Option[String], royalty: BigDecimal, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
-    def deserialize()(implicit module: String, logger: Logger): CollectionDraft = CollectionDraft(id = id, creatorId = creatorId, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), nsfw = nsfw, properties = utilities.JSON.convertJsonStringToObject[Seq[Property]](properties), profileFileName = profileFileName, coverFileName = coverFileName, royalty = royalty, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): CollectionDraft = CollectionDraft(
+      id = id,
+      creatorId = creatorId,
+      name = name,
+      description = description,
+      socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles),
+      nsfw = nsfw,
+      properties = utilities.JSON.convertJsonStringToObject[Seq[Property]](properties),
+      profileFileName = profileFileName,
+      coverFileName = coverFileName,
+      royalty = royalty,
+      createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
   class CollectionDraftTable(tag: Tag) extends Table[CollectionDraftSerialized](tag, "CollectionDraft") with ModelTable[String] {
@@ -149,13 +194,7 @@ class CollectionDrafts @Inject()(
       } yield ()
     }
 
-    def updateProperties(id: String, properties: Seq[Property]): Future[CollectionDraft] = {
-      val collectionDraft = tryGet(id)
-      for {
-        collectionDraft <- collectionDraft
-        _ <- updateById(collectionDraft.copy(properties = properties).serialize())
-      } yield collectionDraft.copy(properties = properties)
-    }
+    def addProperties(collectionDraft: CollectionDraft, properties: Seq[Property]): Future[Unit] = updateById(collectionDraft.copy(properties = collectionDraft.properties ++ properties).serialize())
 
     def totalDrafts(creatorId: String): Future[Int] = filterAndCount(_.creatorId === creatorId)
 

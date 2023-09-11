@@ -8,7 +8,6 @@ import views.profile.whitelist.{companion => whitelist}
 import views.publicListing.{companion => publicListing}
 import views.sale.{companion => sale}
 import views.setting.companion._
-import views.wallet.companion.SendCoin
 
 object FormConstraint {
   val passwordSymbols = "!@#$%^&*._-"
@@ -92,13 +91,14 @@ object FormConstraint {
       if (propertyData.propertyType == constants.NFT.Data.BOOLEAN && propertyData.defaultValue.isDefined && !(propertyData.defaultValue.getOrElse("") == constants.NFT.Data.TRUE || propertyData.defaultValue.getOrElse("") == constants.NFT.Data.FALSE)) Option(ValidationError(constants.Response.INVALID_DEFAULT_VALUE.message)) else None,
       if (propertyData.propertyType == constants.NFT.Data.DECIMAL && propertyData.defaultValue.isDefined && propertyData.defaultValue.getOrElse("0").toDoubleOption.isEmpty) Option(ValidationError(constants.Response.INVALID_DEFAULT_VALUE.message)) else None,
       if (propertyData.propertyType == constants.NFT.Data.NUMBER && propertyData.defaultValue.isDefined && propertyData.defaultValue.getOrElse("0").toLongOption.isEmpty) Option(ValidationError(constants.Response.INVALID_DEFAULT_VALUE.message)) else None,
+      if (propertyData.propertyType == constants.NFT.Data.HEIGHT && propertyData.defaultValue.isDefined && propertyData.defaultValue.getOrElse("0").toLongOption.isEmpty) Option(ValidationError(constants.Response.INVALID_DEFAULT_VALUE.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
   val defineCollectionPropertiesConstraint: Constraint[collection.DefineProperties.Data] = Constraint("constraints.DefineCollectionPropertiesConstraint")({ definePropertiesData: collection.DefineProperties.Data =>
     val userDefinedPropertiesName = definePropertiesData.properties.flatMap(_.name)
-    val definedPropertiesNames = if (!definePropertiesData.fractionalizedNFT) definePropertiesData.properties.flatMap(_.name) else userDefinedPropertiesName :+ schema.constants.Properties.SupplyProperty.id.keyID.value
+    val definedPropertiesNames = definePropertiesData.properties.flatMap(_.name)
     val errors = Seq(
       if ((definedPropertiesNames.length + constants.Properties.DefaultProperty.list.length) > constants.Blockchain.MaximumProperties) Option(ValidationError(constants.Response.MAXIMUM_COLLECTION_PROPERTIES_EXCEEDED.message)) else None,
       if (definedPropertiesNames.map(_.toLowerCase).intersect(constants.Properties.DefaultProperty.list.map(_.toLowerCase)).nonEmpty) Option(ValidationError(constants.Response.COLLECTION_PROPERTIES_CONTAINS_DEFAULT_PROPERTIES.message)) else None,

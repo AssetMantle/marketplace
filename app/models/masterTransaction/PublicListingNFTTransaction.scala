@@ -142,13 +142,13 @@ class PublicListingNFTTransactions @Inject()(
   object Utility {
     implicit val txUtil: TxUtil = TxUtil("PUBLIC_SALE", 300000)
 
-    def transaction(buyerAccountId: String, sellerAccountId: String, nftIds: Seq[String], publicListingId: String, mintOnSuccess: Boolean, fromAddress: String, collection: Collection, toAddress: String, amount: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(buyerAccountId: String, sellerAccountId: String, nfts: Seq[NFT], publicListingId: String, mintOnSuccess: Boolean, fromAddress: String, collection: Collection, toAddress: String, amount: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
       val messages = if (mintOnSuccess) Seq(
         utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount))),
-        utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = constants.Secret.mintAssetWallet.address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = nftIds.length * collection.getBondAmount)))
+        utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = constants.Secret.mintAssetWallet.address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = nfts.map(_.getBondAmount(collection)).sum)))
       ) else Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount))))
 
-      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nftIds, publicListingId = publicListingId, mintOnSuccess = mintOnSuccess)
+      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(buyerAccountId = buyerAccountId, sellerAccountId = sellerAccountId, txHash = txHash, nftIds = nfts.map(_.id), publicListingId = publicListingId, mintOnSuccess = mintOnSuccess)
 
       val userTx = utilitiesTransaction.doUserTx(messages = messages, gasPrice = gasPrice, accountId = buyerAccountId, fromAddress = fromAddress, ecKey = ecKey, masterTxFunction = masterTxFunc)
 

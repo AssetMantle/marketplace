@@ -2,6 +2,7 @@
 @import views.sale.companion.BuySaleNFT
 @import views.html.base.buttons._
 @import models.master.{Sale, Collection}
+@import utilities.MicroNumber
 
 @(buySaleNFTForm: Form[BuySaleNFT.Data] = BuySaleNFT.form, sale: Sale, collection: Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -56,7 +57,7 @@
                                     <tr id="bondingAmountContainer">
                                         <td class="text-left tableLabel">@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_BONDING_AMOUNT)</td>
                                         <td class="text-center tableValue">
-                                            <span class="BondingUnitCost">@collection.getBondAmount.toBigDecimal</span> $MNTL
+                                            <span class="BondingUnitCost">@(collection.getBondAmount/MicroNumber.factor)</span> $MNTL
                                         </td>
                                         <td class="text-center tableValue">
                                             <span class="quantity">00</span>

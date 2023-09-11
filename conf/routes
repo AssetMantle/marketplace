@@ -64,6 +64,8 @@ GET         /createCollection                                  controllers.Colle
 POST        /createCollection                                  controllers.CollectionController.create()
 GET         /editCollection                                    controllers.CollectionController.editForm(id: String)
 POST        /editCollection                                    controllers.CollectionController.edit()
+GET         /setCapabilities                                   controllers.CollectionController.setCapabilitiesForm(id: String)
+POST        /setCapabilities                                   controllers.CollectionController.setCapabilities()
 GET         /defineProperties                                  controllers.CollectionController.definePropertiesForm(id: String)
 POST        /defineProperties                                  controllers.CollectionController.defineProperties()
 GET         /deleteCollectionDraft                             controllers.CollectionController.deleteDraftForm(collectionId: String)

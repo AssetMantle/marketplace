@@ -16,12 +16,14 @@ case class NFTDraft(id: String, collectionId: String, name: Option[String], desc
 
   def getSupply: Long = this.properties.fold(1L)(_.find(_.name == schema.constants.Properties.SupplyProperty.id.keyID.value).fold(1L)(_.valueAsString.toLong))
 
+  def getBondAmount(collection: Collection): Long = this.properties.fold(collection.getBondAmount)(_.find(_.name == schema.constants.Properties.BondAmountProperty.id.keyID.value).fold(collection.getBondAmount)(_.valueAsString.toLong))
+
   def getFileHash: String = id
 
   def getFileName: String = this.id + "." + this.fileExtension
 
   def toNFT(collection: Collection): NFT = {
-    val nft = NFT(id = id, assetId = None, fileExtension = fileExtension, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), totalSupply = this.getSupply, isMinted = Option(false), mintReady = false)
+    val nft = NFT(id = id, assetId = None, fileExtension = fileExtension, collectionId = collectionId, name = name.getOrElse(""), description = description.getOrElse(""), totalSupply = this.getSupply, customBondAmount = Option(this.getBondAmount(collection)), isMinted = Option(false), mintReady = false)
     nft.copy(assetId = Option(nft.getAssetID(this.getNFTProperties, collection).asString))
   }
 

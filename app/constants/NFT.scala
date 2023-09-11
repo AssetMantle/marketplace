@@ -16,7 +16,9 @@ object NFT {
     val BOOLEAN = "BOOLEAN"
     val NUMBER = "NUMBER"
     val DECIMAL = "DECIMAL"
+    val HEIGHT = "HEIGHT"
 
+    // Not adding HEIGHT to prevent users
     val TypesList: Seq[String] = Seq(STRING, NUMBER, BOOLEAN, DECIMAL)
 
     val TRUE = "TRUE"
@@ -31,6 +33,7 @@ object NFT {
       case constants.NFT.Data.NUMBER => Try(BigInt(value)).isSuccess
       case constants.NFT.Data.BOOLEAN => constants.NFT.Data.isBooleanType(value)
       case constants.NFT.Data.DECIMAL => Try(BigDecimal(value)).isSuccess
+      case constants.NFT.Data.HEIGHT => Try(value.toLong).isSuccess && value.toLong >= -1
       case _ => false
     }
   }

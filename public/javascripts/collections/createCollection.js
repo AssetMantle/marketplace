@@ -239,8 +239,12 @@ $(".selectedBooleanType").each((index,element)=>{
     $(element).text(valueToShow);
 });
 
-function setDefinePropertyBackButton(collectionId){
+function setSetCapabilitiesBackButton(collectionId){
     $("#modalBackButton").attr("onclick", `getForm(jsRoutes.controllers.CollectionController.uploadCollectionDraftFilesForm('${collectionId}'))`);
+}
+
+function setDefinePropertyBackButton(collectionId){
+    $("#modalBackButton").attr("onclick", `getForm(jsRoutes.controllers.CollectionController.setCapabilitiesForm('${collectionId}'))`);
 }
 
 flag1 = 0;

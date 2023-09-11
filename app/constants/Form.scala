@@ -25,6 +25,7 @@ object Form {
 
   val CREATE_COLLECTION: Form = Form("CREATE_COLLECTION", routes.javascript.CollectionController.createForm, routes.CollectionController.create())
   val EDIT_COLLECTION: Form = Form("EDIT_COLLECTION", routes.javascript.CollectionController.editForm, routes.CollectionController.edit())
+  val SET_COLLECTION_CAPABILITIES: Form = Form("SET_COLLECTION_CAPABILITIES", routes.javascript.CollectionController.setCapabilitiesForm, routes.CollectionController.setCapabilities())
   val DEFINE_COLLECTION_PROPERTIES: Form = Form("DEFINE_COLLECTION_PROPERTIES", routes.javascript.CollectionController.definePropertiesForm, routes.CollectionController.defineProperties())
 
   val ADD_MANAGED_KEY: Form = Form("ADD_MANAGED_KEY", routes.javascript.SettingController.addManagedKeyForm, routes.SettingController.addManagedKey())

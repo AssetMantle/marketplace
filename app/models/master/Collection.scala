@@ -6,33 +6,30 @@ import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import schema.data.base.NumberData
 import schema.id.base.{ClassificationID, IdentityID}
 import schema.property.base.{MesaProperty, MetaProperty}
 import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
-import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 case class Collection(id: String, creatorId: String, classificationId: Option[String], name: String, description: String, socialProfiles: Seq[SocialProfile], nsfw: Boolean, properties: Option[Seq[Property]], profileFileName: Option[String], coverFileName: Option[String], public: Boolean, royalty: BigDecimal, isDefined: Option[Boolean], defineAsset: Boolean, rank: Int, onSecondaryMarket: Boolean, showAll: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def getBondAmount: MicroNumber = MicroNumber(utilities.Collection.getTotalBondAmount(this.getImmutables, this.getMutables, constants.Blockchain.BondRate))
-
   def getRoyaltyFee: BigDecimal = this.royalty
 
   def getCreatorIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.creatorId)
 
+  // This is to avoid infinite recursive
   private def getMutableMetaPropertiesWithoutBond: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty)
 
-  def getTotalWeight: Long = this.getImmutables.getTotalBondWeight + Mutables(this.getMutableMetaPropertiesWithoutBond ++ this.getMutableProperties).getTotalBondWeight + schema.constants.Properties.BondAmountProperty.getBondedWeight
+  private def getTotalWeight: Long = this.getImmutables.getTotalBondWeight + Mutables(this.getMutableMetaPropertiesWithoutBond ++ this.getMutableProperties).getTotalBondWeight + schema.constants.Properties.BondAmountProperty.getBondedWeight
 
   def getImmutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && !x.mutable).map(_.toMetaProperty) ++ utilities.Properties.getCollectionDefaultImmutableMetaProperties(collectionName = this.name, creatorID = this.creatorId)
 
   def getImmutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && !x.mutable).map(_.toMesaProperty)
 
-  def getMutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty) ++ Seq(schema.constants.Properties.BondAmountProperty.mutate(NumberData(this.getTotalWeight * constants.Blockchain.BondRate)).asInstanceOf[MetaProperty])
+  def getMutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty)
 
   def getMutableProperties: Seq[MesaProperty] = this.properties.get.filter(x => !x.meta && x.mutable).map(_.toMesaProperty)
 
@@ -41,8 +38,6 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
   def getMutables: Mutables = Mutables(this.getMutableMetaProperties ++ this.getMutableProperties)
 
   def getClassificationID: ClassificationID = utilities.Collection.getClassificationID(immutables = this.getImmutables, mutables = this.getMutables)
-
-  def isFractionalized: Boolean = this.properties.fold(false)(_.exists(_.name == schema.constants.Properties.SupplyProperty.id.keyID.value))
 
   def serialize(): Collections.CollectionSerialized = Collections.CollectionSerialized(
     id = this.id,
@@ -79,6 +74,24 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
 
   def getCoverFileURL: Option[String] = this.coverFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getOthersFileAwsKey(collectionId = this.id, fileName = x))
 
+  def isFractionalized: Boolean = this.getSupply.isDefined
+
+  def getSupply: Option[Property] = this.properties.fold[Option[Property]](None)(_.find(_.name == schema.constants.Properties.SupplyProperty.id.keyID.value))
+
+  def isLockable: Boolean = this.getLockable.isDefined
+
+  def getLockable: Option[Property] = this.properties.fold[Option[Property]](None)(_.find(_.name == schema.constants.Properties.LockHeightProperty.id.keyID.value))
+
+  def customBurnEnabled: Boolean = this.getBurnHeight.isDefined
+
+  def getBurnHeight: Option[Property] = this.properties.fold[Option[Property]](None)(_.find(_.name == schema.constants.Properties.BurnHeightProperty.id.keyID.value))
+
+  def customBondAmountEnabled: Boolean = this.getBondAmountProperty.isDefined
+
+  def getBondAmountProperty: Option[Property] = this.properties.fold[Option[Property]](None)(_.find(_.name == schema.constants.Properties.BondAmountProperty.id.keyID.value))
+
+  def getBondAmount: Long = if (this.customBondAmountEnabled) this.getBondAmountProperty.fold(0L)(x => if (x.defaultValue != "") x.defaultValue.toLong else 0L)
+  else this.getTotalWeight * constants.Blockchain.BondRate
 }
 
 private[master] object Collections {

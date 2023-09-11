@@ -15,7 +15,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class NFT(id: String, assetId: Option[String], collectionId: String, name: String, description: String, totalSupply: BigInt, isMinted: Option[Boolean], mintReady: Boolean, fileExtension: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class NFT(id: String, assetId: Option[String], collectionId: String, name: String, description: String, totalSupply: BigInt, customBondAmount: Option[Long], isMinted: Option[Boolean], mintReady: Boolean, fileExtension: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def getFileHash: String = id
 
@@ -37,7 +37,7 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getImmutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && !x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 
-  def getMutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty) ++ Seq(schema.constants.Properties.BondAmountProperty.mutate(NumberData(collection.getTotalWeight * constants.Blockchain.BondRate)).asInstanceOf[MetaProperty])
+  def getMutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty) ++ Seq(schema.constants.Properties.BondAmountProperty.mutate(NumberData(this.getBondAmount(collection))).asInstanceOf[MetaProperty])
 
   def getMutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 
@@ -46,25 +46,27 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
   def getMutables(nftProperties: Seq[NFTProperty], collection: Collection): Mutables = Mutables(PropertyList(this.getMutableMetaProperties(nftProperties, collection) ++ this.getMutableProperties(nftProperties)))
 
   def serialize: NFTs.NFTSerialized = NFTs.NFTSerialized(
-    id = this.id, assetId = this.assetId, collectionId = this.collectionId, name = this.name, description = this.description, totalSupply = BigDecimal(this.totalSupply), isMinted = this.isMinted, mintReady = this.mintReady, fileExtension = this.fileExtension.toLowerCase, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+    id = this.id, assetId = this.assetId, collectionId = this.collectionId, name = this.name, description = this.description, totalSupply = BigDecimal(this.totalSupply), customBondAmount = this.customBondAmount, isMinted = this.isMinted, mintReady = this.mintReady, fileExtension = this.fileExtension.toLowerCase, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
   )
 
   def isImageType: Boolean = constants.File.ALL_IMAGES_WITH_GIF.contains(this.fileExtension)
 
   def isAudioType: Boolean = constants.File.ALL_AUDIO.contains(this.fileExtension)
 
+  def getBondAmount(collection: Collection): Long = if (this.customBondAmount.isDefined) this.customBondAmount.get else collection.getBondAmount
+
 }
 
 private[master] object NFTs {
 
-  case class NFTSerialized(id: String, assetId: Option[String], collectionId: String, name: String, description: String, totalSupply: BigDecimal, isMinted: Option[Boolean], mintReady: Boolean, fileExtension: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
+  case class NFTSerialized(id: String, assetId: Option[String], collectionId: String, name: String, description: String, totalSupply: BigDecimal, customBondAmount: Option[Long], isMinted: Option[Boolean], mintReady: Boolean, fileExtension: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
-    def deserialize()(implicit module: String, logger: Logger): NFT = NFT(id = this.id, assetId = this.assetId, collectionId = this.collectionId, name = this.name, description = this.description, totalSupply = this.totalSupply.toBigInt, isMinted = this.isMinted, mintReady = this.mintReady, fileExtension = this.fileExtension, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): NFT = NFT(id = this.id, assetId = this.assetId, collectionId = this.collectionId, name = this.name, description = this.description, totalSupply = this.totalSupply.toBigInt, customBondAmount = this.customBondAmount, isMinted = this.isMinted, mintReady = this.mintReady, fileExtension = this.fileExtension, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch)
   }
 
   class NFTTable(tag: Tag) extends Table[NFTSerialized](tag, "NFT") with ModelTable[String] {
 
-    def * = (id, assetId.?, collectionId, name, description, totalSupply, isMinted.?, mintReady, fileExtension, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTSerialized.tupled, NFTSerialized.unapply)
+    def * = (id, assetId.?, collectionId, name, description, totalSupply, customBondAmount.?, isMinted.?, mintReady, fileExtension, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (NFTSerialized.tupled, NFTSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -77,6 +79,8 @@ private[master] object NFTs {
     def description = column[String]("description")
 
     def totalSupply = column[BigDecimal]("totalSupply")
+
+    def customBondAmount = column[Long]("customBondAmount")
 
     def isMinted = column[Boolean]("isMinted")
 

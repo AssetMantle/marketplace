@@ -25,7 +25,7 @@
         </div>
     </div>
 }
-@if(propertyType == constants.NFT.Data.NUMBER || constants.NFT.Data.DECIMAL) {
+@if(propertyType == constants.NFT.Data.NUMBER || propertyType == constants.NFT.Data.DECIMAL || propertyType == constants.NFT.Data.HEIGHT) {
     <div class="mb-0 commonInputInt w-100">
         <div class="fieldContainer">
             <dt><label for="fieldValue_@index">@label</label></dt>
