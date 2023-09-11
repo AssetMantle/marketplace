@@ -12,28 +12,10 @@ object Transaction {
 
   val AdminTxGasPrice = 0.0001
   val Commission: BigDecimal = 0.00
-  val DefaultSendCoinGasAmount = 120000
-  val DefaultIssueIdentityGasLimit = 120000
-  val DefaultDefineAssetGasLimit = 150000
-  val DefaultMintAssetGasLimit = 150000
-  val DefaultPutOrderGasLimit = 150000
-  val DefaultUnwrapGasLimit = 120000
-  val DefaultWrapGasLimit = 120000
-  val DefaultCancelOrderGasLimit = 150000
-  val DefaultGetOrderGasLimit = 150000
   val DefaultGasPrice: BigDecimal = BigDecimal(0)
-  val DefaultProvisionGasLimit = 120000
-  val DefaultNFTTransferGasLimit = 120000
   val TimeoutHeight = 100
 
   case class TxUtil(txType: String, gasLimit: Int)
-
-  object Admin {
-    object Campaign {
-      val MINT_NFT_AIRDROP = "MINT_NFT_AIRDROP"
-    }
-
-  }
 
   // TODO Remove after migration
   object User {

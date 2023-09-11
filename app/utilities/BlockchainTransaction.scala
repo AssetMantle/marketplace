@@ -4,6 +4,7 @@ import com.assetmantle.modules.assets.transactions.{unwrap, wrap, define => asse
 import com.assetmantle.modules.identities.transactions.{issue, provision, unprovision}
 import com.assetmantle.modules.orders.transactions.{get, put, cancel => orderCancel}
 import com.cosmos.bank.v1beta1.MsgSend
+import com.cosmos.authz.v1beta1.MsgExec
 import com.cosmos.crypto.secp256k1.PubKey
 import com.cosmos.tx.v1beta1._
 import com.google.protobuf.{ByteString, Any => protoBufAny}
@@ -221,6 +222,14 @@ object BlockchainTransaction {
       .setToID(toID.asProtoIdentityID)
       .setAssetID(assetId.asProtoAssetID)
       .setValue(amount.toString())
+      .build().toByteString)
+    .build()
+
+  def getExecuteMsg(fromAddress: String, messages: Seq[protoBufAny]): protoBufAny = protoBufAny.newBuilder()
+    .setTypeUrl(schema.constants.Messages.EXECUTE_AUTHORIZATION)
+    .setValue(MsgExec.newBuilder()
+      .setGrantee(fromAddress)
+      .addAllMsgs(messages.asJava)
       .build().toByteString)
     .build()
 }

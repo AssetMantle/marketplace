@@ -143,7 +143,7 @@ class WalletController @Inject()(
           split <- split
         } yield Ok(s"${utilities.NumericOperation.formatNumber(split.fold(MicroNumber.zero)(_.getBalanceAsMicroNumber))} wMNTL")
           ).recover {
-          case _: BaseException => BadRequest("0")
+          case _: BaseException => BadRequest("0 wMNTL")
         }
     }
   }
