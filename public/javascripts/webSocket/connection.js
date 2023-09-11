@@ -37,7 +37,7 @@ function onMessage(event) {
     let receivedData = JSON.parse(event.data);
     switch (receivedData.messageType) {
         case 'NOTIFICATION':
-            showSnackbar(receivedData.messageValue.title, receivedData.messageValue.message, receivedData.messageValue.notificationType);
+            showSnackbar(receivedData.messageValue.title, receivedData.messageValue.message, receivedData.messageValue.notificationType.toLowerCase());
             break;
         default :
             console.log("Unknown Message Type");
