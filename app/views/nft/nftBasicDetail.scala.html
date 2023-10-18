@@ -6,7 +6,7 @@
 @(nftBasicDetailForm: Form[NFTBasicDetail.Data] = NFTBasicDetail.form, collectionId: String, nftId: String, optionalNFTDraft: Option[NFTDraft])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.NFT_BASIC_DETAIL, nftBasicDetailForm, submitDisable = !(optionalNFTDraft.isDefined && optionalNFTDraft.get.name.isDefined)) {
-    @multiStepNavigator(Seq(Messages(constants.View.COLLECTION_STEPPER_IMAGE_UPLOAD),Messages(constants.View.COLLECTION_STEPPER_BASIC_INFORMATION) ,Messages(constants.View.COLLECTION_STEPPER_CAPABILITIES), Messages(constants.View.COLLECTION_STEPPER_PROPERTIES)), defaultSelected = 1)
+    @multiStepNavigator(Seq(Messages(constants.View.COLLECTION_STEPPER_IMAGE_UPLOAD),Messages(constants.View.COLLECTION_STEPPER_BASIC_INFORMATION), Messages(constants.View.COLLECTION_STEPPER_PROPERTIES)), defaultSelected = 1)
     <div class="createNft">
     <span class="createNftSelectCollection">@Messages(constants.View.CREATE_NFT_FIELD_SELECT_COLLECTION_LABEL)</span>
     <div class="mt-2">

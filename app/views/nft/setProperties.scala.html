@@ -8,7 +8,7 @@
 @(setPropertiesForm: Form[SetProperties.Data] = SetProperties.form, collection: Collection, nftId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.NFT_SET_PROPERTIES, setPropertiesForm, showBackButton = true, callBackFunction = JavaScript(s"""updateNFTContainer('${collection.id}')""")) {
-    @multiStepNavigator(Seq(Messages(constants.View.COLLECTION_STEPPER_IMAGE_UPLOAD),Messages(constants.View.COLLECTION_STEPPER_BASIC_INFORMATION) ,Messages(constants.View.COLLECTION_STEPPER_CAPABILITIES), Messages(constants.View.COLLECTION_STEPPER_PROPERTIES)), defaultSelected = 3)
+    @multiStepNavigator(Seq(Messages(constants.View.COLLECTION_STEPPER_IMAGE_UPLOAD),Messages(constants.View.COLLECTION_STEPPER_BASIC_INFORMATION), Messages(constants.View.COLLECTION_STEPPER_PROPERTIES)), defaultSelected = 3)
     @commonInputText(setPropertiesForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collection.id, Symbol("containerDivClass") -> "hidden")
     @commonInputText(setPropertiesForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden")
     @commonCheckbox(setPropertiesForm, constants.FormField.SAVE_NFT_DRAFT, Symbol("containerDivClass") -> "hidden")
