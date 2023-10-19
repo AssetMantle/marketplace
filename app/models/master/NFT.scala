@@ -12,14 +12,17 @@ import schema.property.base.{MesaProperty, MetaProperty}
 import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
 
+import javax.xml.bind.DatatypeConverter
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 case class NFT(id: String, assetId: Option[String], collectionId: String, name: String, description: String, totalSupply: BigInt, customBondAmount: Option[Long], isMinted: Option[Boolean], mintReady: Boolean, fileExtension: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def getFileHash: String = id
+  def getFileHash: String = this.id
 
-  def getFileHashID: HashID = HashID(ByteString.fromHex(this.id).toByteArray)
+  def getExplorerUrl = s"https://explorer.assetmantle.one/document/${this.getAssetID.asString}"
+
+  def getFileHashID: HashID = HashID(DatatypeConverter.parseHexBinary(this.id))
 
   def getFileName: String = this.id + "." + this.fileExtension
 
@@ -37,7 +40,7 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getImmutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && !x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 
-  def getMutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty) ++ Seq(schema.constants.Properties.BondAmountProperty.mutate(NumberData(this.getBondAmount(collection))).asInstanceOf[MetaProperty])
+  def getMutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty) :+ schema.constants.Properties.BondAmountProperty.copy(data = NumberData(this.getBondAmount(collection)))
 
   def getMutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 
@@ -127,7 +130,7 @@ class NFTs @Inject()(
 
     def getByIds(ids: Seq[String]): Future[Seq[NFT]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
 
-    def getForMinting: Future[Seq[NFT]] = filter(x => x.mintReady && !x.isMinted).map(_.take(300)).map(_.map(_.deserialize))
+    def getForMinting(definedClasses: Seq[String]): Future[Seq[NFT]] = filter(x => x.mintReady && x.collectionId.inSet(definedClasses) && !x.isMinted).map(_.take(300)).map(_.map(_.deserialize))
 
     def deleteCollections(collectionIds: Seq[String]): Future[Int] = filterAndDelete(_.collectionId.inSet(collectionIds))
 

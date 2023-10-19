@@ -101,7 +101,7 @@ class MintAssetTransactions @Inject()(
 
     implicit val txUtil: TxUtil = TxUtil("MINT_ASSET", 150000)
 
-    private def transaction(nftIDs: Seq[String]): Future[BlockchainTransaction] = {
+    private def transaction(nftIDs: Seq[String]): Future[AdminTransaction] = {
       val nfts = masterNFTs.Service.getByIds(nftIDs)
       val nftOwners = masterNFTOwners.Service.getByIds(nftIDs)
       val nftProperties = masterNFTProperties.Service.get(nftIDs)
@@ -151,7 +151,9 @@ class MintAssetTransactions @Inject()(
 
     private def mintAssets(): Future[Unit] = {
       val anyPendingTx = Service.checkAnyPendingTx
-      val nfts = masterNFTs.Service.getForMinting
+      val definedAssets = masterCollections.Service.getDefined
+
+      def nfts(definedAssets: Seq[String]) = masterNFTs.Service.getForMinting(definedAssets)
 
       def filterAlreadyMintedNFTs(nfts: Seq[NFT]) = {
         val assetIDs = nfts.map(_.getAssetID.asString)
@@ -188,10 +190,11 @@ class MintAssetTransactions @Inject()(
       } else Future("")
 
       for {
-        nfts <- nfts
-        mintAssets <- filterAlreadyMintedNFTs(nfts.filter(x => !x.isMinted.getOrElse(true)))
+        definedAssets <- definedAssets
+        nfts <- nfts(definedAssets)
+        unmintedAssets <- filterAlreadyMintedNFTs(nfts.filter(x => !x.isMinted.getOrElse(true)))
         anyPendingTx <- anyPendingTx
-        txHash <- doTx(mintAssets, anyPendingTx)
+        txHash <- doTx(unmintedAssets, anyPendingTx)
       } yield if (txHash != "") logger.info("MINT_ASSET: " + txHash + " ( " + nfts.map(_.assetId).mkString(",") + " )")
     }
 

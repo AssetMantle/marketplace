@@ -1,9 +1,9 @@
 @import controllers.actions.LoginState
-@import models.master.Collection
+@import models.master.{Collection, NFTOwner}
 @import views.html.base.commonStringValue
-@import models.master.NFTOwner
+@import models.master.SecondaryMarket
 
-@(nft: master.NFT, collection: Collection, nftOwner: Option[NFTOwner], numberOfOwners: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(nft: master.NFT, collection: Collection, nftOwner: Option[NFTOwner], numberOfOwners: Int, secondaryMarket: Option[SecondaryMarket])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
         <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_COLLECTION_TITLE)</div>
@@ -14,7 +14,7 @@
                 <img src="@uri">
             }
             <div class="badgeText">
-                @commonStringValue(message = collection.name, id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
+            @commonStringValue(message = collection.name, id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
             </div>
         </div>
         <div class="separator"></div>
@@ -27,18 +27,26 @@
         </div>
         <div class="separator"></div>
         <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_OWNER_TITLE)</div>
-        @if(numberOfOwners == 1) {
-            <div class="d-flex gap-2 align-items-center badgeImageText" onclick="viewProfile('@nftOwner.fold("")(_.ownerId)/@constants.View.COLLECTED')">
+        @if(nft.totalSupply == 1) {
+            <div class="d-flex gap-2 align-items-center badgeImageText" onclick="viewProfile('@nftOwner.fold(secondaryMarket.fold("")(_.sellerId))(_.ownerId)/@constants.View.COLLECTED')">
                 <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
                 <div class="badgeText">
-                    @commonStringValue(message = nftOwner.fold("")(_.ownerId), id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
+                    @if(secondaryMarket.isDefined) {
+                        @commonStringValue(message = s"${nftOwner.fold(secondaryMarket.fold("")(_.sellerId))(_.ownerId)} [${Messages(constants.View.LISTED)}]", id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
+                    } else {
+                        @commonStringValue(message = nftOwner.fold(secondaryMarket.fold("")(_.sellerId))(_.ownerId), id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
+                    }
                 </div>
             </div>
         } else {
             <div class="d-flex gap-2 align-items-center badgeImageText">
                 <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
                 <div class="badgeText">
-                @commonStringValue(message = s"${numberOfOwners.toString} owners", id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
+                    @if(secondaryMarket.isDefined) {
+                        @commonStringValue(message = s"${numberOfOwners.toString} owners [${Messages(constants.View.LISTED)}]", id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
+                    } else {
+                        @commonStringValue(message = s"${numberOfOwners.toString} owners", id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
+                    }
                 </div>
             </div>
         }

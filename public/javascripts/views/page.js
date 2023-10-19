@@ -95,10 +95,16 @@ function viewCreatedCollection(lastPart) {
     componentResource('centerContent', jsRoutes.controllers.CollectionController.collectionNFTs(accountId, collectionId));
 }
 
-function viewNFT(nftId, activeTab) {
+function viewNFT(lastPart) {
+    let nftId = lastPart.split("/")[0];
+    let activeTab = lastPart.split("/")[1];
+    if (activeTab !== undefined) {
+        componentResource('centerContent', jsRoutes.controllers.NFTController.overview(nftId, activeTab));
+    } else {
+        componentResource('centerContent', jsRoutes.controllers.NFTController.overview(nftId, 'OVERVIEW'));
+    }
     $('#bannerContent').html('');
     componentResource('leftContent', jsRoutes.controllers.NFTController.detailViewLeftCards(nftId));
-    componentResource('centerContent', jsRoutes.controllers.NFTController.overview(nftId, activeTab));
     componentResource('rightContent', jsRoutes.controllers.NFTController.detailViewRightCards(nftId));
     // checkAndPushState(jsRoutes.controllers.NFTController.viewNFT(nftId).url, nftId, "nft");
 }

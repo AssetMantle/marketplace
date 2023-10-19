@@ -1,0 +1,27 @@
+@import controllers.actions.LoginState
+@import models.blockchain.Order
+@import models.master.SecondaryMarket
+@import views.html.base.buttons.commonPrimaryButton
+
+@(secondaryMarkets: Seq[SecondaryMarket], orders: Seq[Order], latestBlock: Int, tokenPrice: Double, page: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@if(secondaryMarkets.isEmpty) {
+
+} else {
+    @secondaryMarkets.sortBy(_.price).zipWithIndex.map { case (secondaryMarket, index) =>
+    <tr>
+        <td class="tableFieldName">
+            <div class="d-flex gap-2 align-items-center">
+                <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="35" height="35"/>
+                @(index + 1) @secondaryMarket.sellerId
+            </div>
+        </td>
+        <td class="text-center tableFieldPrice">@secondaryMarket.price</td>
+        <td class="text-center tableFieldAmount">@secondaryMarket.quantity</td>
+        <td class="text-center tableFieldTotal">@secondaryMarket.getTotal</td>
+        <td class="tableFieldAction">
+        @commonPrimaryButton(Messages(constants.View.CANCEL_ORDER), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.cancelForm('${secondaryMarket.nftId}', '${secondaryMarket.id}'))"), Symbol("class") -> "mt-4")
+    </td>
+    </tr>
+    }
+}

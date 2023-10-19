@@ -432,19 +432,20 @@ class CollectionController @Inject()(
           }
         },
         setCapabilitiesData => {
-          val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(setCapabilitiesData.collectionId)
+          def getCollectionDraft = masterTransactionCollectionDrafts.Service.tryGet(setCapabilitiesData.collectionId)
 
           def update(collectionDraft: CollectionDraft) = if (collectionDraft.creatorId == loginState.username) {
             masterTransactionCollectionDrafts.Service.addProperties(collectionDraft.copy(properties = collectionDraft.getPropertiesWithoutCapabilities), setCapabilitiesData.getProperties)
           } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
 
           (for {
-            collectionDraft <- collectionDraft
+            collectionDraft <- getCollectionDraft
             _ <- update(collectionDraft)
-          } yield PartialContent(views.html.collection.defineProperties(collectionDraft = collectionDraft))
+            updatedCollectionDraft <- getCollectionDraft
+          } yield PartialContent(views.html.collection.defineProperties(collectionDraft = updatedCollectionDraft))
             ).recover {
             case baseException: BaseException => try {
-              BadRequest(views.html.collection.setCapabilities(SetCapabilities.form.withGlobalError(baseException.failure.message), Await.result(collectionDraft, Duration.Inf)))
+              BadRequest(views.html.collection.setCapabilities(SetCapabilities.form.withGlobalError(baseException.failure.message), Await.result(getCollectionDraft, Duration.Inf)))
             } catch {
               case _: Exception => InternalServerError
             }

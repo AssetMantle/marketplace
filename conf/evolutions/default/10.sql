@@ -12,6 +12,19 @@ ALTER TABLE BLOCKCHAIN_TRANSACTION."SendCoin"
 ALTER TABLE MASTER."NFT"
     ADD COLUMN IF NOT EXISTS "customBondAmount" BIGINT DEFAULT null;
 
+ALTER TABLE MASTER."PublicListing"
+    ADD COLUMN IF NOT EXISTS "soldOut" BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE HISTORY."MasterPublicListing"
+    ADD COLUMN IF NOT EXISTS "soldOut" BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE MASTER."Sale"
+    ADD COLUMN IF NOT EXISTS "soldOut" BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE HISTORY."MasterSale"
+    ADD COLUMN IF NOT EXISTS "soldOut" BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE MASTER."NFT"
+    ADD COLUMN IF NOT EXISTS "customBondAmount" BIGINT DEFAULT null;
+
 ALTER TABLE MASTER_TRANSACTION."PublicListingNFTTransaction"
     DROP CONSTRAINT IF EXISTS "PublicListingNFTTransaction_buyerAccountId_sellerAccountId__key";
 
@@ -270,7 +283,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NFTTransferTransaction"
     "txHash"               VARCHAR NOT NULL,
     "nftId"                VARCHAR NOT NULL,
     "fromId"               VARCHAR NOT NULL,
-    "quantity"             INTEGER NOT NULL,
+    "quantity"             NUMERIC NOT NULL,
     "toIdentityId"         VARCHAR NOT NULL,
     "toAccountId"          VARCHAR,
     "status"               BOOLEAN,
@@ -313,7 +326,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SecondaryMarketSellTransaction"
     "txHash"               VARCHAR NOT NULL,
     "nftId"                VARCHAR NOT NULL,
     "sellerId"             VARCHAR NOT NULL,
-    "orderId"              VARCHAR NOT NULL UNIQUE,
+    "secondaryMarketId"    VARCHAR NOT NULL UNIQUE,
     "quantity"             NUMERIC NOT NULL,
     "expiryHeight"         BIGINT  NOT NULL,
     "denom"                VARCHAR NOT NULL,
@@ -324,9 +337,10 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SecondaryMarketSellTransaction"
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
     PRIMARY KEY ("txHash"),
-    UNIQUE ("nftId", "orderId"),
-    UNIQUE ("sellerId", "orderId"),
-    UNIQUE ("txHash", "sellerId")
+    UNIQUE ("nftId", "secondaryMarketId"),
+    UNIQUE ("sellerId", "secondaryMarketId"),
+    UNIQUE ("txHash", "secondaryMarketId")
+
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SendCoinTransaction"

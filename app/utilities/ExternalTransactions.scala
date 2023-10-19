@@ -258,11 +258,13 @@ class ExternalTransactions @Inject()(
       val endHours = ((msg.getExpiryHeight.getValue - txHeight) * constants.Blockchain.MaxOrderHours) / constants.Blockchain.MaxOrderExpiry
       val secondaryMarket = SecondaryMarket(id = secondaryMarketId, orderId = orderID.asString, nftId = nft.get.id, collectionId = nft.get.collectionId, sellerId = account.get.id, quantity = BigInt(msg.getMakerSplit), price = MicroNumber(BigDecimal(msg.getTakerSplit).toBigInt), denom = constants.Blockchain.StakingToken, endHours = endHours.toInt, externallyMade = true, completed = false, cancelled = false, expired = false, status = Option(true))
       val add = masterSecondaryMarkets.Service.add(secondaryMarket)
+      val collection = masterCollections.Service.markListedOnSecondaryMarket(nft.get.collectionId)
 
-      def updateOwner() = masterNFTOwners.Service.onSecondaryMarket(nftOwner.get.nftId, secondaryMarketId, sellQuantity = BigInt(msg.getMakerSplit))
+      def updateOwner() = masterNFTOwners.Service.onSecondaryMarket(nftId = nftOwner.get.nftId, ownerId = secondaryMarket.sellerId, sellQuantity = BigInt(msg.getMakerSplit))
 
       for {
         _ <- add
+        _ <- collection
         _ <- updateOwner()
       } yield ()
     } else Future(0)

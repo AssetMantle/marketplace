@@ -44,7 +44,6 @@ object Form {
   val ADD_FROM_NFT_OWNERS: Form = Form("ADD_FROM_NFT_OWNERS", routes.javascript.WhitelistController.addFromNFTOwnersForm, routes.WhitelistController.addFromNFTOwners())
 
   val NFT_BASIC_DETAIL: Form = Form("NFT_BASIC_DETAIL", routes.javascript.NFTController.basicDetailsForm, routes.NFTController.basicDetails())
-  val NFT_TAGS: Form = Form("NFT_TAGS", routes.javascript.NFTController.tagsForm, routes.NFTController.tags())
   val NFT_SET_PROPERTIES: Form = Form("NFT_SET_PROPERTIES", routes.javascript.NFTController.setPropertiesForm, routes.NFTController.setProperties())
   val NFT_MINT: Form = Form("NFT_MINT", routes.javascript.NFTController.mintForm, routes.NFTController.mint())
   val NFT_TRANSFER: Form = Form("NFT_TRANSFER", routes.javascript.NFTController.transferForm, routes.NFTController.transfer())

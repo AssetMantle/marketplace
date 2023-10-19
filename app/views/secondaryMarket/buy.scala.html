@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
-@import views.html.base.form._
-@import views.secondaryMarket.companion.Buy
 @import models.master.{Collection, SecondaryMarket}
 @import views.html.base.buttons._
+@import views.html.base.form._
+@import views.secondaryMarket.companion.Buy
 
 @(buyForm: Form[Buy.Data] = Buy.form, secondaryMarket: SecondaryMarket, collection: Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
@@ -145,7 +145,7 @@
         </div>
     </div>
     <div class="horizontal-align mb-0">
-        @commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideModalScreen('#secondaryMarketInvoice', '#secondaryMarketForm'); showSubmitButton(); computeInvoice();"), Symbol("id") -> "secondaryMarketNextButton", Symbol("class") -> "disable")
+    @commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideModalScreen('#secondaryMarketInvoice', '#secondaryMarketForm'); showSubmitButton(); computeInvoice();"), Symbol("id") -> "secondaryMarketNextButton", Symbol("class") -> "disable")
     </div>
 }
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/secondaryMarket/buy.js")" type="text/javascript"></script>

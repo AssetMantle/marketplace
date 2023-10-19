@@ -74,7 +74,13 @@ class NFTController @Inject()(
 
   def overview(nftId: String, activeTab: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.nft.detail.view(nftId = nftId, activeTab = activeTab)))
+      val nft = masterNFTs.Service.tryGet(nftId)
+      (for {
+        nft <- nft
+      } yield Ok(views.html.nft.detail.view(nftId = nftId, totalSupply = nft.totalSupply, activeTab = activeTab))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def details(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
@@ -103,31 +109,45 @@ class NFTController @Inject()(
       Future(Ok(views.html.nft.detail.trade(nftId = nftId)))
   }
 
-  def sellOrders(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def sellOrders(nftId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.nft.detail.sellOrders()))
+      Future(Ok(views.html.nft.detail.sellOrders(nftId)))
   }
 
-  def yourOrders(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def sellOrdersPerPage(nftId: String, pageNumber: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.nft.detail.yourOrders()))
+      val secondaryMarkets = masterSecondaryMarkets.Service.getByNFTIdAndPageNumber(nftId = nftId, pageNumber = pageNumber)
+
+      def orders(secondaryMarkets: Seq[SecondaryMarket]) = blockchainOrders.Service.get(secondaryMarkets.map(_.orderId))
+
+      (for {
+        secondaryMarkets <- secondaryMarkets
+        orders <- orders(secondaryMarkets)
+      } yield Ok(views.html.nft.detail.sellOrdersPerPage(secondaryMarkets.sortBy(_.price), orders, blockchainBlocks.Service.getLatestHeight, masterTransactionTokenPrices.Service.getLatestPrice, pageNumber))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
-  def marketListings(nftId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val secondaryMarkets = masterSecondaryMarkets.Service.getByNFTIdAndPageNumber(nftId, pageNumber)
+  def yourOrders(nftId: String): Action[AnyContent] = withLoginAction { implicit loginState =>
+    implicit request =>
+      implicit val optionalLoginState: Option[LoginState] = Option(loginState)
+      Ok(views.html.nft.detail.yourOrders(nftId))
+  }
 
-        def orders(secondaryMarkets: Seq[SecondaryMarket]) = blockchainOrders.Service.get(secondaryMarkets.map(_.orderId))
+  def yourOrdersPerPage(nftId: String, pageNumber: Int): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val secondaryMarkets = masterSecondaryMarkets.Service.getByNFTIdAndSellerIdAndPageNumber(nftId = nftId, sellerId = loginState.username, pageNumber = pageNumber)
 
-        (for {
-          secondaryMarkets <- secondaryMarkets
-          orders <- orders(secondaryMarkets)
-        } yield Ok(views.html.nft.detail.secondaryMarkets(secondaryMarkets.sortBy(_.price), orders, blockchainBlocks.Service.getLatestHeight, masterTransactionTokenPrices.Service.getLatestPrice))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
+      def orders(secondaryMarkets: Seq[SecondaryMarket]) = blockchainOrders.Service.get(secondaryMarkets.map(_.orderId))
+
+      (for {
+        secondaryMarkets <- secondaryMarkets
+        orders <- orders(secondaryMarkets)
+      } yield Ok(views.html.nft.detail.yourOrdersPerPage(secondaryMarkets.sortBy(_.price), orders, blockchainBlocks.Service.getLatestHeight, masterTransactionTokenPrices.Service.getLatestPrice, pageNumber))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def detailViewLeftCards(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
@@ -158,6 +178,7 @@ class NFTController @Inject()(
       implicit request =>
         val nft = masterNFTs.Service.tryGet(nftId)
         val countOwners = masterNFTOwners.Service.countOwners(nftId)
+        val secondaryMarket = masterSecondaryMarkets.Service.getByNFTIdAndLowestPrice(nftId)
 
         def nftOwner(countOwners: Int): Future[Option[NFTOwner]] = if (countOwners == 1) {
           masterNFTOwners.Service.getByNFTID(nftId = nftId).map(Option(_))
@@ -170,7 +191,8 @@ class NFTController @Inject()(
           countOwners <- countOwners
           nftOwner <- nftOwner(countOwners)
           collection <- collection(nft.collectionId)
-        } yield Ok(views.html.nft.detail.collectionInfo(nft, collection, nftOwner, countOwners))
+          secondaryMarket <- secondaryMarket
+        } yield Ok(views.html.nft.detail.collectionInfo(nft, collection, nftOwner, countOwners, secondaryMarket))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -331,54 +353,17 @@ class NFTController @Inject()(
 
         },
         basicDetailsData => {
-          val isOwner = masterCollections.Service.isOwner(id = basicDetailsData.collectionId, accountId = loginState.username)
+          val collection = masterCollections.Service.tryGet(id = basicDetailsData.collectionId)
 
-          def update(isOwner: Boolean) = if (isOwner) masterTransactionNFTDrafts.Service.updateNameDescription(id = basicDetailsData.nftId, name = basicDetailsData.name, description = basicDetailsData.description)
-          else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
-
-          (for {
-            isOwner <- isOwner
-            nftDraft <- update(isOwner)
-          } yield PartialContent(views.html.nft.tags(collectionId = basicDetailsData.collectionId, nftId = nftDraft.id, tags = nftDraft.tagNames.getOrElse(Seq.empty[String])))
-            ).recover {
-            case baseException: BaseException => BadRequest(views.html.nft.nftBasicDetail(NFTBasicDetail.form.withGlobalError(baseException.failure.message), collectionId = basicDetailsData.collectionId, nftId = basicDetailsData.nftId, None))
-          }
-        }
-      )
-  }
-
-  def tagsForm(collectionId: String, nftId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val isOwner = masterCollections.Service.isOwner(id = collectionId, accountId = loginState.username)
-      val nftDraft = masterTransactionNFTDrafts.Service.get(nftId)
-      (for {
-        isOwner <- isOwner
-        nftDraft <- nftDraft
-      } yield if (isOwner) Ok(views.html.nft.tags(collectionId = collectionId, nftId = nftId, tags = nftDraft.fold[Seq[String]](Seq())(_.tagNames.getOrElse(Seq.empty[String]))))
-      else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
-        ).recover {
-        case baseException: BaseException => BadRequest(baseException.failure.message)
-      }
-  }
-
-  def tags(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      views.nft.companion.NFTTags.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(views.html.nft.tags(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.NFT_TAGS.name, "").split(","))))
-        },
-        tagsData => {
-          val collection = masterCollections.Service.tryGet(id = tagsData.collectionId)
-
-          def update(collection: Collection) = if (collection.creatorId == loginState.username) masterTransactionNFTDrafts.Service.updateTagNames(id = tagsData.nftId, tagNames = tagsData.getTags)
+          def update(isOwner: Boolean) = if (isOwner) masterTransactionNFTDrafts.Service.updateBasicAndTags(id = basicDetailsData.nftId, name = basicDetailsData.name, description = basicDetailsData.description, tags = basicDetailsData.getTags)
           else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
 
           (for {
             collection <- collection
-            _ <- update(collection)
-          } yield PartialContent(views.html.nft.setProperties(collection = collection, nftId = tagsData.nftId))
+            nftDraft <- update(collection.creatorId == loginState.username)
+          } yield PartialContent(views.html.nft.setProperties(collection = collection, nftId = nftDraft.id))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.nft.tags(views.nft.companion.NFTTags.form.withGlobalError(baseException.failure.message), collectionId = tagsData.collectionId, nftId = tagsData.nftId, tags = tagsData.getTags))
+            case baseException: BaseException => BadRequest(views.html.nft.nftBasicDetail(NFTBasicDetail.form.withGlobalError(baseException.failure.message), collectionId = basicDetailsData.collectionId, nftId = basicDetailsData.nftId, None))
           }
         }
       )
@@ -593,7 +578,6 @@ class NFTController @Inject()(
           Future(BadRequest(views.html.nft.transfer(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.NFT_ID.name, ""))))
         },
         transferData => {
-          val quantity = 1 // TODO
           val nft = masterNFTs.Service.tryGet(transferData.nftId)
           val nftOwner = masterNFTOwners.Service.tryGet(nftId = transferData.nftId, ownerId = loginState.username)
           val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = transferData.password)
@@ -602,10 +586,11 @@ class NFTController @Inject()(
 
           def verifyAndTx(verifyPassword: Boolean, balance: MicroNumber, key: Key, nft: NFT, nftOwner: NFTOwner, toAccountExists: Boolean) = {
             val errors = Seq(
+              if (nftOwner.ownerId != loginState.username) Option(constants.Response.NOT_NFT_OWNER) else None,
               if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (!nft.isMinted.getOrElse(false)) Option(constants.Response.NFT_NOT_MINTED) else None,
-              if (quantity > nftOwner.quantity) Option(constants.Response.INSUFFICIENT_NFT_BALANCE) else None,
+              if (transferData.amount > nftOwner.quantity) Option(constants.Response.INSUFFICIENT_NFT_BALANCE) else None,
               if (!toAccountExists) Option(constants.Response.TO_ACCOUNT_ID_DOES_NOT_EXISTS) else None,
               if (transferData.toAccountId == loginState.username) Option(constants.Response.CANNOT_SEND_TO_YOURSELF) else None,
             ).flatten
@@ -614,7 +599,7 @@ class NFTController @Inject()(
               masterTransactionNFTTransferTransactions.Utility.transaction(
                 nft = nft,
                 fromId = loginState.username,
-                quantity = quantity,
+                quantity = transferData.amount,
                 fromAddress = key.address,
                 toAccountId = transferData.toAccountId,
                 gasPrice = constants.Transaction.DefaultGasPrice,

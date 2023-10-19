@@ -88,13 +88,6 @@
             </div>
         </div>
     </div>
-
-    @if(collection.isFractionalized && nft.isMinted.getOrElse(false)) {
-        <div id="marketListings"></div>
-        <script>
-                componentResource('marketListings', jsRoutes.controllers.NFTController.marketListings('@nft.id'));
-        </script>
-    }
 </div>
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/view.js")" type="text/javascript"></script>
 <script>

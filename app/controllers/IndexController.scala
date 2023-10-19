@@ -73,6 +73,7 @@ class IndexController @Inject()(
   }
 
   try {
+    starter.start()
     Await.result(masterSecrets.Utility.setAll(), Duration.Inf)
     println(constants.Secret.issueIdentityWallet.address)
     println(constants.Secret.defineAssetWallet.address)
@@ -83,14 +84,6 @@ class IndexController @Inject()(
     Await.result(nftPublicListings.Utility.migrate, Duration.Inf)
     Await.result(nftSales.Utility.migrate, Duration.Inf)
     Await.result(sendCoins.Utility.migrate, Duration.Inf)
-  } catch {
-    case exception: Exception => logger.error(exception.getLocalizedMessage)
-  }
-  starter.changeAwsKey()
-
-  //  starter.start()
-
-  try {
     Await.result(starter.updateIdentityIDs(), Duration.Inf)
     Await.result(starter.updateAssetIDs(), Duration.Inf)
     Await.result(starter.markMintReady(), Duration.Inf)
@@ -98,6 +91,7 @@ class IndexController @Inject()(
   } catch {
     case exception: Exception => logger.error(exception.getLocalizedMessage)
   }
+  starter.changeAwsKey()
 
   utilities.Scheduler.startSchedulers(
     // blockchain
@@ -115,8 +109,7 @@ class IndexController @Inject()(
     cancelOrderTransactions.Utility.scheduler,
     defineAssetTransactions.Utility.scheduler,
     issueIdentityTransactions.Utility.scheduler,
-    masterTransactionLatestBlocks.Utility.scheduler,
-//    mintAssetTransactions.Utility.scheduler,
+    mintAssetTransactions.Utility.scheduler,
     nftMintingFeeTransactions.Utility.scheduler,
     nftTransferTransactions.Utility.scheduler,
     provisionAddressTransactions.Utility.scheduler,
@@ -130,6 +123,7 @@ class IndexController @Inject()(
     unprovisionAddressTransactions.Utility.scheduler,
     unwrapTransactions.Utility.scheduler,
     wrapTransactions.Utility.scheduler,
+    masterTransactionLatestBlocks.Utility.scheduler,
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())

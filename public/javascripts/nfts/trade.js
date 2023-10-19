@@ -1,20 +1,17 @@
-function resetSellOrderPage() {
-    componentResource("tradeSectionContent", jsRoutes.controllers.NFTController.sellOrders());
+function resetSellOrderPage(nftId) {
+    componentResource("tradeSectionContent", jsRoutes.controllers.NFTController.sellOrders(nftId, 1));
 }
 
-function resetYourOrderPage() {
-    componentResource("tradeSectionContent", jsRoutes.controllers.NFTController.yourOrders());
+function resetYourOrderPage(nftId) {
+    componentResource("tradeSectionContent", jsRoutes.controllers.NFTController.yourOrders(nftId, 1));
 }
 
-function showTradeScreen(screenID) {
-    switch (screenID) {
-        case "sellOrder":
-            $(".contentContainer .contentTitle .title .titleLabel").text("Sell Orders");
-            resetSellOrderPage();
-            break;
-        case "yourOrder":
-            $(".contentContainer .contentTitle .title .titleLabel").text("Your Orders");
-            resetYourOrderPage();
-            break;
-    }
+function showSellOrders(nftId) {
+    $(".contentContainer .contentTitle .title .titleLabel").text("Sell Orders");
+    resetSellOrderPage(nftId);
+}
+
+function showYourOrders(nftId) {
+    $(".contentContainer .contentTitle .title .titleLabel").text("Your Orders");
+    resetYourOrderPage(nftId);
 }

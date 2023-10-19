@@ -9,9 +9,10 @@ object Transfer {
     mapping(
       constants.FormField.NFT_ID.mapping,
       constants.FormField.TO_ACCOUNT_ID.mapping,
+      constants.FormField.NFT_TRANSFER_AMOUNT.mapping,
       constants.FormField.PASSWORD.mapping,
     )(Data.apply)(Data.unapply))
 
-  case class Data(nftId: String, toAccountId: String, password: String)
+  case class Data(nftId: String, toAccountId: String, amount: Long, password: String)
 
 }

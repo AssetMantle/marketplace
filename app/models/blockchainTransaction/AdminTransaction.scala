@@ -16,9 +16,11 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class AdminTransaction(txHash: String, fromAddress: String, status: Option[Boolean], timeoutHeight: Int, log: Option[String], txHeight: Option[Int], txType: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction with Entity[String] {
+case class AdminTransaction(txHash: String, fromAddress: String, status: Option[Boolean], timeoutHeight: Int, log: Option[String], txHeight: Option[Int], txType: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with BlockchainTransaction[AdminTransaction] with Entity[String] {
 
   def id: String = txHash
+
+  def withUpdatedLog(log: Option[String]): AdminTransaction = this.copy(status = if (log.isDefined) Option(false) else None, log = log)
 }
 
 private[blockchainTransaction] object AdminTransactions {
@@ -90,7 +92,7 @@ class AdminTransactions @Inject()(
 
     def markFailedWithLog(txHash: String, log: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(x => (x.status, x.log)).update((false, log)))
 
-    def markFailedWithLog(txHashes: Seq[String], log: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash.inSet(txHashes)).map(x => (x.status, x.log)).update((false, log)))
+    def markFailedTxsWithLog(txHashes: Seq[String], log: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash.inSet(txHashes)).map(x => (x.status, x.log)).update((false, log)))
 
     def getAllPendingStatus: Future[Seq[AdminTransaction]] = filter(_.status.?.isEmpty)
 
@@ -99,28 +101,6 @@ class AdminTransactions @Inject()(
   }
 
   object Utility {
-
-
-    def broadcastTxAndUpdate(adminTransaction: AdminTransaction, txRawBytes: Array[Byte]): Future[AdminTransaction] = {
-
-      val broadcastTx = broadcastTxSync.Service.get(adminTransaction.getTxRawAsHexString(txRawBytes))
-
-      def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = {
-        val log = if (errorResponse.nonEmpty) Option(errorResponse.get.error.data)
-        else if (successResponse.nonEmpty && successResponse.get.result.code != 0) Option(successResponse.get.result.log)
-        else None
-
-        val updateUserTx = if (log.nonEmpty) Service.markFailedWithLog(adminTransaction.txHash, log.get) else Future()
-        for {
-          _ <- updateUserTx
-        } yield adminTransaction.copy(status = if (log.isDefined) Option(false) else None, log = log)
-      }
-
-      for {
-        (successResponse, errorResponse) <- broadcastTx
-        updatedAdminTransaction <- update(successResponse, errorResponse)
-      } yield updatedAdminTransaction
-    }
 
     val scheduler: Scheduler = new Scheduler {
       val name: String = module
@@ -144,7 +124,7 @@ class AdminTransactions @Inject()(
         def markFailedTimedOut(adminTransactions: Seq[AdminTransaction], allTxs: Seq[Transaction]) = if (adminTransactions.nonEmpty) {
           val notFoundTxHashes = adminTransactions.map(_.txHash).diff(allTxs.map(_.hash))
           val timedoutFailedTxs = adminTransactions.filter(x => notFoundTxHashes.contains(x.txHash) && x.timeoutHeight > 0 && blockchainBlocks.Service.getLatestHeight > x.timeoutHeight).map(_.txHash)
-          if (timedoutFailedTxs.nonEmpty) Service.markFailedWithLog(timedoutFailedTxs, constants.Response.TRANSACTION_BROADCASTING_FAILED_AND_TIMED_OUT.message) else Future(0)
+          if (timedoutFailedTxs.nonEmpty) Service.markFailedTxsWithLog(timedoutFailedTxs, constants.Response.TRANSACTION_BROADCASTING_FAILED_AND_TIMED_OUT.message) else Future(0)
         } else Future(0)
 
         val forComplete = (for {

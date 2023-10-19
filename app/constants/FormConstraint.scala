@@ -108,9 +108,9 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val nftTagsConstraint: Constraint[NFTTags.Data] = Constraint("constraints.NFTTagsConstraint")({ nftTagsData: NFTTags.Data =>
-    if (nftTagsData.tags != "") {
-      val tags = nftTagsData.tags.split(constants.NFT.Tags.Separator)
+  val NFTBasicDetailConstraint: Constraint[NFTBasicDetail.Data] = Constraint("constraints.NFTBasicDetail")({ nftBasicDetail: NFTBasicDetail.Data =>
+    if (nftBasicDetail.tags != "") {
+      val tags = nftBasicDetail.tags.split(constants.NFT.Tags.Separator)
       val errors = Seq(
         if (tags.length > constants.NFT.Tags.MaximumAllowed) Option(ValidationError(constants.Response.MAXIMUM_NFT_TAGS_EXCEEDED.message)) else None,
         if (tags.exists(x => x.length < constants.NFT.Tags.MinimumLength || x.length > constants.NFT.Tags.MaximumLength)) Option(ValidationError(constants.Response.INVALID_NFT_TAGS_LENGTH.message)) else None,

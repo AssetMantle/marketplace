@@ -75,7 +75,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.NFTController.viewNFT,
         routes.javascript.NFTController.details,
-        routes.javascript.NFTController.marketListings,
         routes.javascript.NFTController.detailViewLeftCards,
         routes.javascript.NFTController.detailViewRightCards,
         routes.javascript.NFTController.info,
@@ -87,7 +86,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.uploadNFTFile,
         routes.javascript.NFTController.basicDetailsForm,
         routes.javascript.NFTController.setPropertiesForm,
-        routes.javascript.NFTController.tagsForm,
         routes.javascript.NFTController.deleteDraftForm,
         routes.javascript.NFTController.deleteDraft,
         routes.javascript.NFTController.price,
@@ -96,7 +94,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.overview,
         routes.javascript.NFTController.trade,
         routes.javascript.NFTController.sellOrders,
+        routes.javascript.NFTController.sellOrdersPerPage,
         routes.javascript.NFTController.yourOrders,
+        routes.javascript.NFTController.yourOrdersPerPage,
 
         routes.javascript.SettingController.viewSettings,
         routes.javascript.SettingController.settings,

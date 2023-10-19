@@ -6,6 +6,7 @@ import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
+import schema.data.base.NumberData
 import schema.id.base.{ClassificationID, IdentityID}
 import schema.property.base.{MesaProperty, MetaProperty}
 import schema.qualified.{Immutables, Mutables}
@@ -20,10 +21,7 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
 
   def getCreatorIdentityID: IdentityID = utilities.Identity.getMantlePlaceIdentityID(this.creatorId)
 
-  // This is to avoid infinite recursive
-  private def getMutableMetaPropertiesWithoutBond: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && x.mutable).map(_.toMetaProperty)
-
-  private def getTotalWeight: Long = this.getImmutables.getTotalBondWeight + Mutables(this.getMutableMetaPropertiesWithoutBond ++ this.getMutableProperties).getTotalBondWeight + schema.constants.Properties.BondAmountProperty.getBondedWeight
+  def getTotalWeight: Long = (this.properties.get.map(_.toMetaProperty) ++ utilities.Properties.getCollectionDefaultImmutableMetaProperties(collectionName = this.name, creatorID = this.creatorId)).map(_.getBondedWeight).sum
 
   def getImmutableMetaProperties: Seq[MetaProperty] = this.properties.get.filter(x => x.meta && !x.mutable).map(_.toMetaProperty) ++ utilities.Properties.getCollectionDefaultImmutableMetaProperties(collectionName = this.name, creatorID = this.creatorId)
 
@@ -37,7 +35,7 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
 
   def getMutables: Mutables = Mutables(this.getMutableMetaProperties ++ this.getMutableProperties)
 
-  def getClassificationID: ClassificationID = utilities.Collection.getClassificationID(immutables = this.getImmutables, mutables = this.getMutables)
+  def getClassificationID: ClassificationID = utilities.Collection.getClassificationID(immutables = this.getImmutables, mutables = this.getMutables.add(Seq(schema.constants.Properties.BondAmountProperty.copy(data = NumberData(this.getBondAmount)))))
 
   def serialize(): Collections.CollectionSerialized = Collections.CollectionSerialized(
     id = this.id,
@@ -229,6 +227,8 @@ class Collections @Inject()(
     def getAllPublic: Future[Seq[Collection]] = filter(_.public).map(_.map(_.deserialize))
 
     def getSecondaryMarketByPageNumber(pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(_.onSecondaryMarket)(_.rank)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.deserialize))
+
+    def getDefined: Future[Seq[String]] = filter(_.isDefined).map(_.map(_.id))
 
   }
 }

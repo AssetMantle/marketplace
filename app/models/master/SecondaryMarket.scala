@@ -16,7 +16,7 @@ case class SecondaryMarket(id: String, orderId: String, nftId: String, collectio
 
   def getOrderID: OrderID = OrderID(HashID(utilities.Secrets.base64URLDecode(this.orderId)))
 
-  def getReceiveAmount: BigInt = this.quantity * this.price.value
+  def getTotal: BigInt = this.quantity * this.price.value
 
   def serialize(): SecondaryMarkets.SecondaryMarketSerialized = SecondaryMarkets.SecondaryMarketSerialized(
     id = this.id,
@@ -129,13 +129,15 @@ class SecondaryMarkets @Inject()(
 
     def get(ids: Seq[String]): Future[Seq[SecondaryMarket]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
 
-    def updateOrderID(secondaryMarketID: String, orderId: OrderID): Future[Int] = customUpdate(tableQuery.filter(_.id === secondaryMarketID).map(_.orderId).update(orderId.asString))
-
     def getByNFTIdAndLowestPrice(nftId: String): Future[Option[SecondaryMarket]] = filterAndSort(x => x.nftId === nftId && !x.completed && !x.cancelled && !x.expired && x.status)(_.price).map(_.headOption.map(_.deserialize))
 
     def getByNFTIdAndSellerId(nftId: String, sellerId: String): Future[Seq[SecondaryMarket]] = filter(x => x.nftId === nftId && x.sellerId === sellerId && !x.completed && !x.cancelled && !x.expired && x.status).map(_.map(_.deserialize))
 
+    def getByNFTIdAndSellerIdAndPageNumber(nftId: String, sellerId: String, pageNumber: Int): Future[Seq[SecondaryMarket]] = filterAndSortWithPagination(x => x.nftId === nftId && x.sellerId === sellerId && !x.completed && !x.cancelled && !x.expired && x.status)(_.price)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage).map(_.map(_.deserialize))
+
     def getByNFTIdAndPageNumber(nftId: String, pageNumber: Int): Future[Seq[SecondaryMarket]] = filterAndSortWithPagination(x => x.nftId === nftId && !x.completed && !x.cancelled && !x.expired && x.status)(_.price)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage).map(_.map(_.deserialize))
+
+    def nftExists(nftId: String): Future[Boolean] = filterAndExists(_.nftId === nftId)
 
     def delete(secondaryMarketId: String): Future[Int] = deleteById(secondaryMarketId)
 
@@ -145,7 +147,9 @@ class SecondaryMarkets @Inject()(
 
     def total: Future[Int] = countTotal()
 
-    def markOnOrderCreationFailed(orderIDs: Seq[OrderID]): Future[Int] = customUpdate(tableQuery.filter(_.orderId.inSet(orderIDs.map(_.asString))).map(_.status).update(false))
+    def markOnOrderCreationFailed(secondaryMarketIds: Seq[String]): Future[Int] = customUpdate(tableQuery.filter(_.id.inSet(secondaryMarketIds)).map(_.status).update(false))
+
+    def markSecondaryMarketCreated(id: String): Future[Int] = customUpdate(tableQuery.filter(_.id === id).map(_.status).update(true))
 
     def getFailedOrders: Future[Seq[SecondaryMarket]] = filter(!_.status).map(_.map(_.deserialize))
 
