@@ -16,7 +16,7 @@ case class SecondaryMarket(id: String, orderId: String, nftId: String, collectio
 
   def getOrderID: OrderID = OrderID(HashID(utilities.Secrets.base64URLDecode(this.orderId)))
 
-  def getTotal: BigInt = this.quantity * this.price.value
+  def getTotal: MicroNumber = MicroNumber(this.quantity * this.price.value)
 
   def serialize(): SecondaryMarkets.SecondaryMarketSerialized = SecondaryMarkets.SecondaryMarketSerialized(
     id = this.id,

@@ -322,10 +322,10 @@ class SecondaryMarketController @Inject()(
           def checkAlreadySold(secondaryMarket: SecondaryMarket) = secondaryMarketBuyTxs.Utility.checkAlreadySold(nftId = buyData.nftId, secondaryMarket = secondaryMarket)
 
           def validateAndTransfer(secondaryMarketSellTx: SecondaryMarketSellTransaction, verifyPassword: Boolean, secondaryMarket: SecondaryMarket, buyerKey: Key, balance: MicroNumber, split: Option[Split], collection: Collection, checkAlreadySold: Boolean, creatorAddress: String) = {
-            val royaltyFees = MicroNumber(collection.royalty * BigDecimal(secondaryMarket.getTotal))
+            val royaltyFees = MicroNumber(collection.royalty * secondaryMarket.getTotal.toBigDecimal)
             val errors = Seq(
               if (secondaryMarket.sellerId == loginState.username) Option(constants.Response.CANNOT_SELL_TO_YOURSELF) else None,
-              if (balance == MicroNumber.zero || balance <= (MicroNumber(secondaryMarket.getTotal) - split.fold(MicroNumber.zero)(_.getBalanceAsMicroNumber) + royaltyFees)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (balance == MicroNumber.zero || balance <= (secondaryMarket.getTotal - split.fold(MicroNumber.zero)(_.getBalanceAsMicroNumber) + royaltyFees)) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
               if (secondaryMarket.orderId.isEmpty || !secondaryMarketSellTx.status.getOrElse(false)) Option(constants.Response.ORDER_NOT_CREATED_ON_BLOCKCHAIN) else None,
