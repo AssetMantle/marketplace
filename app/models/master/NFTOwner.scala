@@ -122,6 +122,7 @@ class NFTOwners @Inject()(
 
     def deleteByNFT(nftId: String): Future[Int] = filterAndDelete(_.nftId === nftId)
 
+    def getAllByCollectionID(collectionID: String): Future[Seq[NFTOwner]] = filter(_.collectionId === collectionID).map(_.map(_.deserialize()))
 
     // From sale whole quantity gets transferred since cannot mint to multiple accounts
     def markNFTSoldFromSale(nftId: String, saleId: String, sellerAccountId: String, buyerAccountId: String): Future[Unit] = {
@@ -143,6 +144,10 @@ class NFTOwners @Inject()(
         _ <- verifyAndUpdate(nftOwner)
       } yield ()
     }
+
+    def checkAnyPublicListingSaleExists(publicListingId: String): Future[Boolean] = filterAndExists(_.publicListingId === publicListingId)
+
+    def checkAnySaleExists(saleId: String): Future[Boolean] = filterAndExists(_.saleId === saleId)
 
     // From sale whole quantity gets transferred since cannot mint to multiple accounts
     def markNFTSoldFromPublicListing(nftId: String, publicListingId: String, sellerAccountId: String, buyerAccountId: String): Future[Unit] = {
@@ -241,7 +246,7 @@ class NFTOwners @Inject()(
 
     def getByNFTID(nftId: String): Future[NFTOwner] = filterHead(_.nftId === nftId).map(_.deserialize)
 
-    def onSuccessfulNFTTransfer(nftId: String, fromOwnerID: String, quantity: Int, toOwnerID: String): Future[Unit] = {
+    def onSuccessfulNFTTransfer(nftId: String, fromOwnerID: String, quantity: Long, toOwnerID: String): Future[Unit] = {
       val fromNFTOwner = tryGet(nftId = nftId, ownerId = fromOwnerID)
       val toNFTOwner = get(nftId = nftId, ownerId = toOwnerID)
 

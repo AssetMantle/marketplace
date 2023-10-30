@@ -73,6 +73,7 @@ class IndexController @Inject()(
   }
 
   try {
+    starter.start()
     Await.result(masterSecrets.Utility.setAll(), Duration.Inf)
     println(constants.Secret.issueIdentityWallet.address)
     println(constants.Secret.defineAssetWallet.address)
@@ -83,14 +84,6 @@ class IndexController @Inject()(
     Await.result(nftPublicListings.Utility.migrate, Duration.Inf)
     Await.result(nftSales.Utility.migrate, Duration.Inf)
     Await.result(sendCoins.Utility.migrate, Duration.Inf)
-  } catch {
-    case exception: Exception => logger.error(exception.getLocalizedMessage)
-  }
-  starter.changeAwsKey()
-
-  //  starter.start()
-
-  try {
     Await.result(starter.updateIdentityIDs(), Duration.Inf)
     Await.result(starter.updateAssetIDs(), Duration.Inf)
     Await.result(starter.markMintReady(), Duration.Inf)
@@ -98,14 +91,19 @@ class IndexController @Inject()(
   } catch {
     case exception: Exception => logger.error(exception.getLocalizedMessage)
   }
+  starter.changeAwsKey()
 
+  // Starts in given order wise
   utilities.Scheduler.startSchedulers(
-    // blockchain
+    masterTransactionSessionTokens.Utility.scheduler,
     blockchainBlocks.Utility.scheduler,
-    // blockchainTransaction
+    masterTransactionLatestBlocks.Utility.scheduler,
     adminTransactions.Utility.scheduler,
     userTransactions.Utility.scheduler,
-    // campaign
+    issueIdentityTransactions.Utility.scheduler,
+    secondaryMarketBuyTransactions.Utility.scheduler,
+    secondaryMarketSellTransactions.Utility.scheduler,
+    sendCoinTransactions.Utility.scheduler,
     mintNFTAirDrops.Utility.scheduler,
     // history
     historyMasterPublicListings.Utility.scheduler,
@@ -114,18 +112,12 @@ class IndexController @Inject()(
     // masterTransaction
     cancelOrderTransactions.Utility.scheduler,
     defineAssetTransactions.Utility.scheduler,
-    issueIdentityTransactions.Utility.scheduler,
-    masterTransactionLatestBlocks.Utility.scheduler,
 //    mintAssetTransactions.Utility.scheduler,
     nftMintingFeeTransactions.Utility.scheduler,
     nftTransferTransactions.Utility.scheduler,
     provisionAddressTransactions.Utility.scheduler,
     publicListingNFTTransactions.Utility.scheduler,
     saleNFTTransactions.Utility.scheduler,
-    masterTransactionSessionTokens.Utility.scheduler,
-    secondaryMarketBuyTransactions.Utility.scheduler,
-    secondaryMarketSellTransactions.Utility.scheduler,
-    sendCoinTransactions.Utility.scheduler,
     masterTransactionTokenPrices.Utility.scheduler,
     unprovisionAddressTransactions.Utility.scheduler,
     unwrapTransactions.Utility.scheduler,

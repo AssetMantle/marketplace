@@ -114,6 +114,7 @@ function fetchWrappedTokenBalance() {
         async: true,
         statusCode: {
             200: function (data) {
+                console.log(data);
                 $('#walletTradeBalance').html(data);
             },
             400: function (data) {

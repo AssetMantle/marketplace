@@ -1,0 +1,10 @@
+@import views.html.base.form._
+@import models.master.Collection
+@import views.collection.companion.UpdateRoyalty
+
+@(updateRoyaltyForm: Form[UpdateRoyalty.Data] = UpdateRoyalty.form, collection: Collection)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.UPDATE_ROYALTY, updateRoyaltyForm) {
+    @commonInputText(updateRoyaltyForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collection.id, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
+    @commonInputBigDecimal(updateRoyaltyForm, constants.FormField.COLLECTION_ROYALTY, Symbol("value") -> collection.royalty)
+}

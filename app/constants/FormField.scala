@@ -133,6 +133,7 @@ object FormField {
   // LongFormField
   val SELL_QUANTITY: LongFormField = LongFormField("SELL_QUANTITY", 1, Long.MaxValue)
   val BUY_QUANTITY: LongFormField = LongFormField("BUY_QUANTITY", 1, Long.MaxValue)
+  val NFT_TRANSFER_AMOUNT: LongFormField = LongFormField("NFT_TRANSFER_AMOUNT", 1, Long.MaxValue)
 
   // SelectFormField
   // Not adding Height type for user

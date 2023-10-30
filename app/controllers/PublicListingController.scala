@@ -208,63 +208,59 @@ class PublicListingController @Inject()(
       )
   }
 
-  def editForm(publicListingId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def stopForm(publicListingId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      //      val publicListing = masterPublicListings.Service.tryGet(publicListingId)
-      //
-      //      (for {
-      //        publicListing <- publicListing
-      //      } yield Ok(views.html.publicListing.edit(publicListing = publicListing))
-      //        ).recover {
-      //        case baseException: BaseException => BadRequest(baseException.failure.message)
-      //      }
-      Future(BadRequest)
+      val publicListing = masterPublicListings.Service.tryGet(publicListingId)
+
+      (for {
+        publicListing <- publicListing
+      } yield Ok(views.html.publicListing.stop(publicListing = publicListing))
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
   }
 
-  def edit(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def stop(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      EditPublicListing.form.bindFromRequest().fold(
+      StopPublicListing.form.bindFromRequest().fold(
         formWithErrors => {
           val publicListing = masterPublicListings.Service.tryGet(formWithErrors.data.getOrElse(constants.FormField.PUBLIC_LISTING_ID.name, ""))
 
           for {
             publicListing <- publicListing
-          } yield BadRequest(views.html.publicListing.edit(formWithErrors, publicListing))
+          } yield BadRequest(views.html.publicListing.stop(formWithErrors, publicListing))
         },
-        editData => {
-          val publicListing = masterPublicListings.Service.tryGet(editData.publicListingId)
+        stopData => {
+          val publicListing = masterPublicListings.Service.tryGet(stopData.publicListingId)
 
           def collection(id: String) = masterCollections.Service.tryGet(id = id)
 
-          def editPublicListing(collection: Collection, publicListing: PublicListing) = {
+          def stopPublicListing(collection: Collection, publicListing: PublicListing) = {
             val errors = Seq(
               if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
               if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
+              if (utilities.Date.currentEpoch >= publicListing.endTimeEpoch) Option(constants.Response.SALE_EXPIRED) else None,
             ).flatten
             if (errors.isEmpty) {
               for {
-                _ <- masterPublicListings.Service.update(publicListing.copy(maxMintPerAccount = editData.maxMintPerAccount, startTimeEpoch = editData.startEpoch, endTimeEpoch = editData.endEpoch, price = editData.price))
+                _ <- masterPublicListings.Service.markStop(stopData.publicListingId)
               } yield ()
             } else errors.head.throwBaseException()
           }
 
-          def sendNotification(collection: Collection) = utilitiesNotification.send(loginState.username, notification = constants.Notification.PUBLIC_LISTING_ON_COLLECTION, collection.name)(s"'${collection.id}'")
-
           (for {
             publicListing <- publicListing
             collection <- collection(publicListing.collectionId)
-            _ <- editPublicListing(collection = collection, publicListing)
-            _ <- sendNotification(collection)
-            _ <- collectionsAnalysis.Utility.onEditPublicListing(collection.id, listingPrice = editData.price)
-          } yield PartialContent(views.html.publicListing.editSuccessful())
+            _ <- stopPublicListing(collection, publicListing)
+          } yield PartialContent(views.html.publicListing.stopSuccessful())
             ).recover {
             case baseException: BaseException => {
               try {
-                val publicListing = masterPublicListings.Service.tryGet(editData.publicListingId)
+                val publicListing = masterPublicListings.Service.tryGet(stopData.publicListingId)
 
                 val result = for {
                   publicListing <- publicListing
-                } yield BadRequest(views.html.publicListing.edit(EditPublicListing.form.withGlobalError(baseException.failure.message), publicListing))
+                } yield BadRequest(views.html.publicListing.stop(StopPublicListing.form.withGlobalError(baseException.failure.message), publicListing))
                 Await.result(result, Duration.Inf)
               } catch {
                 case baseException: BaseException => BadRequest(baseException.failure.message)
@@ -336,6 +332,7 @@ class PublicListingController @Inject()(
               if (nfts.exists(_.isMinted.getOrElse(true))) Option(constants.Response.NFT_ALREADY_MINTED) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
+              if (publicListing.isOver) Option(constants.Response.SALE_STOPPED_OR_OVER) else None,
             ).flatten
             if (errors.isEmpty) {
               masterTransactionPublicListingNFTTransactions.Utility.transaction(

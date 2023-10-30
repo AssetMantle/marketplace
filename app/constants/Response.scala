@@ -146,7 +146,7 @@ object Response {
   val INVALID_QUANTITY_FOR_NFT_SECONDARY_MARKET: Failure = Failure("INVALID_QUANTITY_FOR_NFT_SECONDARY_MARKET")
   val TRANSACTION_HEIGHT_NOT_FOUND: Failure = Failure("TRANSACTION_HEIGHT_NOT_FOUND")
   val NFT_ON_SALE_CANNOT_BE_MINTED: Failure = Failure("NFT_ON_SALE_CANNOT_BE_MINTED")
-
+  val SALE_STOPPED_OR_OVER: Failure = Failure("SALE_STOPPED_OR_OVER")
   val SECRET_KEY_ID_NOT_FOUND: Failure = Failure("SECRET_KEY_ID_NOT_FOUND")
 
   case class Failure(private val response: String) {

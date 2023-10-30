@@ -15,15 +15,17 @@
                         <div class="subMenu">
                             <div class="subMenuList">
                                 <div class="subMenuItem">
-                                    <a onclick="showTradeScreen('sellOrder')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
+                                    <a onclick="showSellOrders('@nftId')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
                                         <div class="subMenuItemLabel">@Messages(constants.View.SELL_ORDERS)</div>
                                     </a>
                                 </div>
-                                <div class="subMenuItem">
-                                    <a onclick="showTradeScreen('yourOrder')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
-                                        <div class="subMenuItemLabel">@Messages(constants.View.YOUR_ORDERS)</div>
-                                    </a>
-                                </div>
+                                @if(optionalLoginState.isDefined) {
+                                    <div class="subMenuItem">
+                                        <a onclick="showYourOrders('@nftId')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
+                                            <div class="subMenuItemLabel">@Messages(constants.View.YOUR_ORDERS)</div>
+                                        </a>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </li>
@@ -40,4 +42,4 @@
     <div id="tradeSectionContent"></div>
 </div>
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/trade.js")"></script>
-<script>showTradeScreen('sellOrder');</script>
+<script>showSellOrders('@nftId');</script>

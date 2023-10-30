@@ -2,7 +2,6 @@ package utilities
 
 import akka.stream.scaladsl.{FileIO, Source}
 import akka.util.ByteString
-import exceptions.BaseException
 import org.apache.commons.io.FileUtils
 import play.api.Logger
 import views.base.companion.UploadFile.UploadFile

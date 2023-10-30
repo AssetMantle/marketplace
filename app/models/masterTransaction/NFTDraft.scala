@@ -128,11 +128,11 @@ class NFTDrafts @Inject()(
 
     def getByIds(ids: Seq[String]): Future[Seq[NFTDraft]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
 
-    def updateNameDescription(id: String, name: String, description: String): Future[NFTDraft] = {
+    def updateBasicAndTags(id: String, name: String, description: String, tags: Option[Seq[String]]): Future[NFTDraft] = {
       val draft = tryGet(id)
       for {
         draft <- draft
-        _ <- updateById(draft.copy(name = Option(name), description = Option(description)).serialize())
+        _ <- updateById(draft.copy(name = Option(name), description = Option(description), tagNames = tags).serialize())
       } yield draft.copy(name = Option(name), description = Option(description))
     }
 

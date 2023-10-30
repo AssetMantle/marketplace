@@ -5,7 +5,7 @@ import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.common.Coin
-import models.master.{Collection, NFT}
+import models.master.{Collection, NFT, Sale}
 import models.masterTransaction.SaleNFTTransactions.SaleNFTTransactionTable
 import models.traits._
 import models.{analytics, master}
@@ -148,7 +148,7 @@ class SaleNFTTransactions @Inject()(
 
     implicit val txUtil: TxUtil = TxUtil("WHITELIST_SALE", 300000)
 
-    def transaction(buyerAccountId: String, sellerAccountId: String, nfts: Seq[NFT], saleId: String, mintOnSuccess: Boolean, fromAddress: String, collection: Collection, toAddress: String, amount: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(buyerAccountId: String, sellerAccountId: String, nfts: Seq[NFT], saleId: String, mintOnSuccess: Boolean, fromAddress: String, collection: Collection, toAddress: String, amount: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[UserTransaction] = {
       val messages = if (mintOnSuccess) Seq(
         utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount))),
         utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = constants.Secret.mintAssetWallet.address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = nfts.map(_.getBondAmount(collection)).sum)))
@@ -191,6 +191,8 @@ class SaleNFTTransactions @Inject()(
                 utilitiesNotification.send(boughtNFT.buyerAccountId, constants.Notification.BUYER_BUY_NFT_SUCCESSFUL_FROM_SALE, count.toString)(s"'${boughtNFT.buyerAccountId}', '${constants.View.COLLECTED}'")
               }
 
+              def checkSale(sale: Sale) = masterSales.Utility.checkSale(sale)
+
               for {
                 _ <- markMasterSuccess
                 _ <- transferNFTOwnership(boughtNFTs)
@@ -199,6 +201,7 @@ class SaleNFTTransactions @Inject()(
                 nft <- nft
                 _ <- analysisUpdate(nft, sale.price, boughtNFTs.length)
                 _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
+                _ <- checkSale(sale)
               } yield ()
             } else {
               val boughtNFTs = Service.getByTxHash(userTransaction.txHash)

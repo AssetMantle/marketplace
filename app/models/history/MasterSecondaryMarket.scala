@@ -179,9 +179,9 @@ class MasterSecondaryMarkets @Inject()(
         val expiredOrders = masterSecondaryMarkets.Service.getExpiredOrders
         val failedOrders = masterSecondaryMarkets.Service.getFailedOrders
 
-        def sellTxWithPendingStatus(orderIds: Seq[String]) = secondaryMarketSellTransactions.Service.checkAnyPendingTx(orderIds)
+        def sellTxWithPendingStatus(secondaryMarketIds: Seq[String]) = secondaryMarketSellTransactions.Service.checkAnyPendingTx(secondaryMarketIds)
 
-        def buyTxWithPendingStatus(orderIds: Seq[String]) = secondaryMarketBuyTransactions.Service.checkAnyPendingTx(orderIds)
+        def buyTxWithPendingStatus(secondaryMarketIds: Seq[String]) = secondaryMarketBuyTransactions.Service.checkAnyPendingTx(secondaryMarketIds)
 
         def removeOrdersFromMarket(txWithPendingStatus: Seq[String], unfilteredDeleteSecondaryMarkets: Seq[master.SecondaryMarket]) = utilitiesOperations.traverse(unfilteredDeleteSecondaryMarkets.filterNot(x => txWithPendingStatus.contains(x.id))) { secondaryMarket =>
           removeFromSecondaryMarket(secondaryMarket)
@@ -196,8 +196,8 @@ class MasterSecondaryMarkets @Inject()(
           cancelledOrders <- cancelledOrders
           expiredOrders <- expiredOrders
           failedOrders <- failedOrders
-          sellTxWithPendingStatus <- sellTxWithPendingStatus(completedOrders.map(_.orderId) ++ cancelledOrders.map(_.orderId) ++ expiredOrders.map(_.orderId) ++ failedOrders.map(_.orderId))
-          buyTxWithPendingStatus <- buyTxWithPendingStatus(completedOrders.map(_.orderId) ++ cancelledOrders.map(_.orderId) ++ expiredOrders.map(_.orderId) ++ failedOrders.map(_.orderId))
+          sellTxWithPendingStatus <- sellTxWithPendingStatus(completedOrders.map(_.id) ++ cancelledOrders.map(_.id) ++ expiredOrders.map(_.id) ++ failedOrders.map(_.id))
+          buyTxWithPendingStatus <- buyTxWithPendingStatus(completedOrders.map(_.id) ++ cancelledOrders.map(_.id) ++ expiredOrders.map(_.id) ++ failedOrders.map(_.id))
           _ <- removeOrdersFromMarket(sellTxWithPendingStatus ++ buyTxWithPendingStatus, cancelledOrders ++ expiredOrders)
           _ <- deleteOrders(sellTxWithPendingStatus ++ buyTxWithPendingStatus, completedOrders ++ failedOrders)
         } yield ()).recover {

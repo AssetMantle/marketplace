@@ -6,16 +6,20 @@ import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchain.Account
 import models.blockchainTransaction.{AdminTransaction, AdminTransactions, UserTransaction, UserTransactions}
+import models.traits.BlockchainTransaction
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import queries.blockchain.{GetABCIInfo, GetAccount, GetUnconfirmedTxs}
 import queries.responses.blockchain.UnconfirmedTxsResponse
+import transactions.blockchain.BroadcastTxSync
+import transactions.responses.blockchain.BroadcastTxSyncResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class Transaction @Inject()(
+                             broadcastTxSync: BroadcastTxSync,
                              getUnconfirmedTxs: GetUnconfirmedTxs,
                              getAccount: GetAccount,
                              getAbciInfo: GetABCIInfo,
@@ -65,12 +69,13 @@ class Transaction @Inject()(
 
         def addToMasterTransaction(txHash: String) = masterTxFunction(txHash)
 
-        def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
+        //        def broadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = userTransactions.Utility.broadcastTxAndUpdate(userTransaction, txRawBytes)
+        def doBroadcastTxAndUpdate(userTransaction: UserTransaction, txRawBytes: Array[Byte]) = broadcastTxAndUpdate(userTransaction, txRawBytes, userTransactions.Service.markFailedWithLog).map(_.asInstanceOf[UserTransaction])
 
         for {
           userTx <- userTx
           masterTxValue <- addToMasterTransaction(txHash)
-          updatedUserTransaction <- broadcastTxAndUpdate(userTx, txRawBytes)
+          updatedUserTransaction <- doBroadcastTxAndUpdate(userTx, txRawBytes)
         } yield (updatedUserTransaction, masterTxValue)
       } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
     }
@@ -100,20 +105,22 @@ class Transaction @Inject()(
 
         def addToMasterTransaction(txHash: String) = masterTxFunction(txHash)
 
-        def broadcastTxAndUpdate(adminTx: AdminTransaction, txRawBytes: Array[Byte]) = adminTransactions.Utility.broadcastTxAndUpdate(adminTx, txRawBytes)
+        //        def broadcastTxAndUpdate(adminTx: AdminTransaction, txRawBytes: Array[Byte]) = adminTransactions.Utility.broadcastTxAndUpdate(adminTx, txRawBytes)
+
+        def doBroadcastTxAndUpdate(adminTx: AdminTransaction, txRawBytes: Array[Byte]) = broadcastTxAndUpdate(adminTx, txRawBytes, adminTransactions.Service.markFailedWithLog).map(_.asInstanceOf[AdminTransaction])
 
         for {
           adminTx <- adminTx
           masterTxValue <- addToMasterTransaction(txHash)
-          updatedUserTransaction <- broadcastTxAndUpdate(adminTx, txRawBytes)
+          updatedUserTransaction <- doBroadcastTxAndUpdate(adminTx, txRawBytes)
         } yield (updatedUserTransaction, masterTxValue)
       } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
     }
 
     (for {
       (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-      (updatedUserTransaction, masterTxValue) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-    } yield (updatedUserTransaction, masterTxValue)
+      (updatedAdminTransaction, masterTxValue) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+    } yield (updatedAdminTransaction, masterTxValue)
       ).recover {
       case baseException: BaseException => baseException.notifyLog()
         throw baseException
@@ -122,6 +129,27 @@ class Transaction @Inject()(
         failure.getBaseException(exception).notifyLog()
         failure.throwBaseException(exception)
     }
+  }
+
+  def broadcastTxAndUpdate[T <: BlockchainTransaction[T]](bcTx: T, txRawBytes: Array[Byte], markFailedWithLog: (String, String) => Future[Int]): Future[T] = {
+
+    val broadcastTx = broadcastTxSync.Service.get(bcTx.getTxRawAsHexString(txRawBytes))
+
+    def update(successResponse: Option[BroadcastTxSyncResponse.Response], errorResponse: Option[BroadcastTxSyncResponse.ErrorResponse]) = {
+      val log = if (errorResponse.nonEmpty) Option(errorResponse.get.error.data)
+      else if (successResponse.nonEmpty && successResponse.get.result.code != 0) Option(successResponse.get.result.log)
+      else None
+
+      val updateTx = if (log.nonEmpty) markFailedWithLog(bcTx.txHash, log.get) else Future(0)
+      for {
+        _ <- updateTx
+      } yield bcTx.withUpdatedLog(log)
+    }
+
+    for {
+      (successResponse, errorResponse) <- broadcastTx
+      updatedUserTransaction <- update(successResponse, errorResponse)
+    } yield updatedUserTransaction
   }
 
 }

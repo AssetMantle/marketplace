@@ -101,7 +101,7 @@ class SecondaryMarketBuyTransactions @Inject()(
   object Utility {
     implicit val txUtil: TxUtil = TxUtil("SECONDARY_MARKET_BUY", 300000)
 
-    def transaction(nftID: String, buyerId: String, fromAddress: String, secondaryMarket: SecondaryMarket, gasPrice: BigDecimal, ecKey: ECKey, split: Option[Split], royaltyFees: MicroNumber, creatorAddress: String): Future[BlockchainTransaction] = {
+    def transaction(nftID: String, buyerId: String, fromAddress: String, secondaryMarket: SecondaryMarket, gasPrice: BigDecimal, ecKey: ECKey, split: Option[Split], royaltyFees: MicroNumber, creatorAddress: String): Future[UserTransaction] = {
 
       val messages = Seq(
         utilities.BlockchainTransaction.getWrapTokenMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(buyerId), coins = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber(secondaryMarket.price.value * secondaryMarket.quantity) - split.fold(MicroNumber.zero)(_.getBalanceAsMicroNumber)))),

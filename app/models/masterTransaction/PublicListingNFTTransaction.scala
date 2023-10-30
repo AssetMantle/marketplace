@@ -5,7 +5,7 @@ import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.common.Coin
-import models.master.{Collection, NFT}
+import models.master.{Collection, NFT, PublicListing}
 import models.masterTransaction.PublicListingNFTTransactions.PublicListingNFTTransactionTable
 import models.traits._
 import models.{analytics, master}
@@ -142,7 +142,7 @@ class PublicListingNFTTransactions @Inject()(
   object Utility {
     implicit val txUtil: TxUtil = TxUtil("PUBLIC_SALE", 300000)
 
-    def transaction(buyerAccountId: String, sellerAccountId: String, nfts: Seq[NFT], publicListingId: String, mintOnSuccess: Boolean, fromAddress: String, collection: Collection, toAddress: String, amount: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(buyerAccountId: String, sellerAccountId: String, nfts: Seq[NFT], publicListingId: String, mintOnSuccess: Boolean, fromAddress: String, collection: Collection, toAddress: String, amount: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[UserTransaction] = {
       val messages = if (mintOnSuccess) Seq(
         utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = amount))),
         utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = constants.Secret.mintAssetWallet.address, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = nfts.map(_.getBondAmount(collection)).sum)))
@@ -185,6 +185,8 @@ class PublicListingNFTTransactions @Inject()(
                 utilitiesNotification.send(boughtNFT.buyerAccountId, constants.Notification.BUYER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING, count.toString)(s"'${boughtNFT.buyerAccountId}', '${constants.View.COLLECTED}'")
               }
 
+              def checkPublicListing(publicListing: PublicListing) = masterPublicListings.Utility.checkPublicListing(publicListing)
+
               for {
                 _ <- markSuccess
                 publicListing <- publicListing
@@ -193,6 +195,7 @@ class PublicListingNFTTransactions @Inject()(
                 nft <- nft
                 _ <- analysisUpdate(nft, boughtNFTs.length, publicListing.price)
                 _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
+                _ <- checkPublicListing(publicListing)
               } yield ()
             } else {
               val boughtNFTs = Service.getByTxHash(txHash)

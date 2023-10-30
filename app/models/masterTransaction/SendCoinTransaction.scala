@@ -110,7 +110,7 @@ class SendCoinTransactions @Inject()(
 
     implicit val txUtil: TxUtil = TxUtil("SEND_COIN", 120000)
 
-    def transaction(fromAccountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(fromAccountId: String, fromAddress: String, toAddress: String, amount: Seq[Coin], gasPrice: BigDecimal, ecKey: ECKey): Future[UserTransaction] = {
       val messages = Seq(utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = toAddress, amount = amount))
 
       def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, fromAccountId = fromAccountId, toAddress = toAddress, toAccountId = None, amount = amount)

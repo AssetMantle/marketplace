@@ -314,6 +314,54 @@ class CollectionController @Inject()(
       )
   }
 
+  def updateRoyaltyForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val collection = masterCollections.Service.tryGet(id)
+      (for {
+        collection <- collection
+      } yield if (collection.creatorId == loginState.username) Ok(views.html.collection.updateRoyalty(collection = collection)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def updateRoyalty(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      UpdateRoyalty.form.bindFromRequest().fold(
+        formWithErrors => {
+          val collection = masterCollections.Service.tryGet(formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))
+          (for {
+            collection <- collection
+          } yield if (collection.creatorId == loginState.username) BadRequest(views.html.collection.updateRoyalty(formWithErrors, collection)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        },
+        updateRoyaltyData => {
+          val collection = masterCollections.Service.tryGet(updateRoyaltyData.collectionId)
+
+          def update(collection: Collection) = {
+            val errors = Seq(
+              if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None
+            ).flatten
+            if (errors.isEmpty) {
+              for {
+                _ <- masterCollections.Service.update(collection.copy(royalty = updateRoyaltyData.royalty / 100))
+              } yield ()
+            } else errors.head.throwBaseException()
+          }
+
+          (for {
+            collection <- collection
+            _ <- update(collection)
+          } yield Ok(views.html.collection.updateRoyaltySuccess(updateRoyaltyData.royalty.toString()))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.collection.edit(Edit.form.withGlobalError(baseException.failure.message), None))
+          }
+        }
+      )
+  }
+
   def uploadCollectionDraftFilesForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id)
@@ -432,19 +480,20 @@ class CollectionController @Inject()(
           }
         },
         setCapabilitiesData => {
-          val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(setCapabilitiesData.collectionId)
+          def getCollectionDraft = masterTransactionCollectionDrafts.Service.tryGet(setCapabilitiesData.collectionId)
 
           def update(collectionDraft: CollectionDraft) = if (collectionDraft.creatorId == loginState.username) {
             masterTransactionCollectionDrafts.Service.addProperties(collectionDraft.copy(properties = collectionDraft.getPropertiesWithoutCapabilities), setCapabilitiesData.getProperties)
           } else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
 
           (for {
-            collectionDraft <- collectionDraft
+            collectionDraft <- getCollectionDraft
             _ <- update(collectionDraft)
-          } yield PartialContent(views.html.collection.defineProperties(collectionDraft = collectionDraft))
+            updatedCollectionDraft <- getCollectionDraft
+          } yield PartialContent(views.html.collection.defineProperties(collectionDraft = updatedCollectionDraft))
             ).recover {
             case baseException: BaseException => try {
-              BadRequest(views.html.collection.setCapabilities(SetCapabilities.form.withGlobalError(baseException.failure.message), Await.result(collectionDraft, Duration.Inf)))
+              BadRequest(views.html.collection.setCapabilities(SetCapabilities.form.withGlobalError(baseException.failure.message), Await.result(getCollectionDraft, Duration.Inf)))
             } catch {
               case _: Exception => InternalServerError
             }

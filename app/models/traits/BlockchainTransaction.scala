@@ -1,6 +1,6 @@
 package models.traits
 
-trait BlockchainTransaction {
+trait BlockchainTransaction[T] {
 
   val txHash: String
   val status: Option[Boolean]
@@ -9,4 +9,6 @@ trait BlockchainTransaction {
   val log: Option[String]
 
   def getTxRawAsHexString(txRawBytes: Array[Byte]): String = txRawBytes.map("%02x".format(_)).mkString.toUpperCase
+
+  def withUpdatedLog(log: Option[String]): T
 }

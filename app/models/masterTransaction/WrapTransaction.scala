@@ -91,7 +91,7 @@ class WrapTransactions @Inject()(
   object Utility {
     implicit val txUtil: TxUtil = TxUtil("WRAP", 150000)
 
-    def transaction(fromAddress: String, accountId: String, coin: Coin, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(fromAddress: String, accountId: String, coin: Coin, gasPrice: BigDecimal, ecKey: ECKey): Future[UserTransaction] = {
       val messages = Seq(utilities.BlockchainTransaction.getWrapTokenMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(accountId), coins = Seq(coin)))
 
       def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, denom = coin.denom, amount = coin.amount.toMicroBigDecimal, accountId = accountId)

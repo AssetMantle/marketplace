@@ -1,8 +1,8 @@
 @import views.html.base.modal._
-@import models.traits.BlockchainTransaction
+@import models.blockchainTransaction.UserTransaction
 @import models.master.NFT
 
-@(blockchainTx: BlockchainTransaction, tweetURI: Option[String] = None, nfts: Seq[NFT] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(blockchainTx: UserTransaction, tweetURI: Option[String] = None, nfts: Seq[NFT] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @if(nfts.nonEmpty) {
     @views.html.base.commonNFTReveal(nfts.map(_.getS3Url))

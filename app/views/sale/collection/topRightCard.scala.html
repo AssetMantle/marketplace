@@ -1,8 +1,7 @@
 @import controllers.actions.LoginState
 @import models.analytics.CollectionAnalysis
-@import models.master.{Collection, PublicListing, Sale}
+@import models.master.{Collection, Sale}
 @import views.html.base.buttons._
-@import views.html.collection.details._
 
 @(collectionAnalysis: CollectionAnalysis, collection: Collection, sale: Sale, isMember: Boolean, whitelistSaleSold: Long, tokenPrice: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
 
@@ -47,7 +46,6 @@
                 </div>
             </div>
         </div>
-
         <div class="analysisValue mb-2 mt-4">@Messages(constants.View.COLLECTION_SALE_PRICE)</div>
         <div class="d-flex flex-row gap-1 priceHolder">
             <img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/>
@@ -81,6 +79,9 @@
                 @if(isMember && sale.getStatus.id == constants.Sale.LIVE.id) {
                     <div class="separator"></div>
                     @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SaleController.buySaleNFTForm('${sale.id}'))"), Symbol("class") -> "mt-4")
+                }
+                @if(optionalLoginState.isDefined && collection.creatorId == optionalLoginState.get.username) {
+                    @commonPrimaryButton(Messages(constants.Form.STOP_WHITELIST_SALE.button), JavaScript(s"getForm(jsRoutes.controllers.SaleController.stopForm('${sale.id}'))"), Symbol("class") -> "mt-4")
                 }
             }
         }

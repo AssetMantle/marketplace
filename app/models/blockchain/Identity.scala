@@ -87,6 +87,8 @@ class Identities @Inject()(
 
     def get(id: Array[Byte]): Future[Option[Identity]] = getById(id)
 
+    def fetchAll: Future[Seq[Identity]] = getAll
+
     def getIDsAlreadyExists(ids: Seq[String]): Future[Seq[String]] = filter(_.idString.inSet(ids)).map(_.map(_.idString))
 
     def tryGet(id: String): Future[Identity] = tryGetById(utilities.Secrets.base64URLDecode(id))

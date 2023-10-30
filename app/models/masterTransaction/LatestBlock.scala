@@ -19,7 +19,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{Duration, FiniteDuration, SECONDS}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
@@ -131,6 +131,7 @@ class LatestBlocks @Inject()(
 
     val scheduler: Scheduler = new Scheduler {
       val name: String = module
+      override val initialDelay: FiniteDuration = Duration.create(60, SECONDS)
 
       def runner(): Unit = {
         val latestBlockchainHeight = blockchainBlocks.Service.getLatestHeight

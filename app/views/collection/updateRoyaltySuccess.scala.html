@@ -1,0 +1,6 @@
+@import controllers.actions.LoginState
+@import views.html.base.modal._
+
+@(royalty: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@successModal(heading = constants.View.UPDATE_ROYALTY_SUCCESS_TITLE, subHeading = constants.View.UPDATE_ROYALTY_SUCCESS_SUBTITLE, royalty)

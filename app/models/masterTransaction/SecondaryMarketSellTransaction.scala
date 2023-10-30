@@ -12,7 +12,7 @@ import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.data.base.{HeightData, NumberData}
-import schema.id.base.{AssetID, HashID, OrderID}
+import schema.id.base.{AssetID, OrderID}
 import schema.types.Height
 import slick.jdbc.H2Profile.api._
 import utilities.MicroNumber
@@ -21,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class SecondaryMarketSellTransaction(txHash: String, nftId: String, sellerId: String, orderId: OrderID, quantity: BigInt, expiryHeight: Long, denom: String, receiveAmount: BigInt, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class SecondaryMarketSellTransaction(txHash: String, nftId: String, sellerId: String, secondaryMarketId: String, quantity: BigInt, expiryHeight: Long, denom: String, receiveAmount: BigInt, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def getMakerSplit: NumberData = NumberData(this.quantity)
 
@@ -33,17 +33,8 @@ case class SecondaryMarketSellTransaction(txHash: String, nftId: String, sellerI
 
   def getTakerAssetID: AssetID = schema.document.CoinAsset.getCoinAssetID(this.denom)
 
-  def getOrderID(nftAssetID: AssetID): OrderID = utilities.Order.getOrderID(
-    makerID = utilities.Identity.getMantlePlaceIdentityID(this.sellerId),
-    makerAssetID = nftAssetID,
-    makerSplit = this.getMakerSplit,
-    expiryHeight = this.getExpiryHeightData,
-    takerAssetID = this.getTakerAssetID,
-    takerSplit = this.getTakerSplit
-  )
-
   def serialize: SecondaryMarketSellTransactions.SecondaryMarketSellTransactionSerialized = SecondaryMarketSellTransactions.SecondaryMarketSellTransactionSerialized(
-    txHash = this.txHash, nftId = this.nftId, sellerId = this.sellerId, orderId = this.orderId.asString, quantity = BigDecimal(this.quantity.toString()), expiryHeight = this.expiryHeight, denom = this.denom, receiveAmount = BigDecimal(this.receiveAmount.toString()), status = this.status, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+    txHash = this.txHash, nftId = this.nftId, sellerId = this.sellerId, secondaryMarketId = this.secondaryMarketId, quantity = BigDecimal(this.quantity.toString()), expiryHeight = this.expiryHeight, denom = this.denom, receiveAmount = BigDecimal(this.receiveAmount.toString()), status = this.status, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
   )
 
   def getExpiryFromNow(latestBlock: Int): Long = ((this.expiryHeight - latestBlock) * constants.Blockchain.MaxOrderHours) / constants.Blockchain.MaxOrderExpiry
@@ -51,18 +42,18 @@ case class SecondaryMarketSellTransaction(txHash: String, nftId: String, sellerI
 
 private[masterTransaction] object SecondaryMarketSellTransactions {
 
-  case class SecondaryMarketSellTransactionSerialized(txHash: String, nftId: String, sellerId: String, orderId: String, quantity: BigDecimal, expiryHeight: Long, denom: String, receiveAmount: BigDecimal, status: Option[Boolean], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
+  case class SecondaryMarketSellTransactionSerialized(txHash: String, nftId: String, sellerId: String, secondaryMarketId: String, quantity: BigDecimal, expiryHeight: Long, denom: String, receiveAmount: BigDecimal, status: Option[Boolean], createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) extends Entity[String] {
     def id: String = txHash
 
     def deserialize()(implicit module: String, logger: Logger): SecondaryMarketSellTransaction = SecondaryMarketSellTransaction(
-      txHash = this.txHash, nftId = this.nftId, sellerId = this.sellerId, orderId = OrderID(HashID(utilities.Secrets.base64URLDecode(this.orderId))), quantity = this.quantity.toBigInt, expiryHeight = this.expiryHeight, denom = this.denom, receiveAmount = this.receiveAmount.toBigInt, status = this.status, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+      txHash = this.txHash, nftId = this.nftId, sellerId = this.sellerId, secondaryMarketId = this.secondaryMarketId, quantity = this.quantity.toBigInt, expiryHeight = this.expiryHeight, denom = this.denom, receiveAmount = this.receiveAmount.toBigInt, status = this.status, createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
     )
 
   }
 
   class SecondaryMarketSellTransactionTable(tag: Tag) extends Table[SecondaryMarketSellTransactionSerialized](tag, "SecondaryMarketSellTransaction") with ModelTable[String] {
 
-    def * = (txHash, nftId, sellerId, orderId, quantity, expiryHeight, denom, receiveAmount, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SecondaryMarketSellTransactionSerialized.tupled, SecondaryMarketSellTransactionSerialized.unapply)
+    def * = (txHash, nftId, sellerId, secondaryMarketId, quantity, expiryHeight, denom, receiveAmount, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SecondaryMarketSellTransactionSerialized.tupled, SecondaryMarketSellTransactionSerialized.unapply)
 
     def txHash = column[String]("txHash", O.PrimaryKey)
 
@@ -70,7 +61,7 @@ private[masterTransaction] object SecondaryMarketSellTransactions {
 
     def sellerId = column[String]("sellerId")
 
-    def orderId = column[String]("orderId", O.Unique)
+    def secondaryMarketId = column[String]("secondaryMarketId", O.Unique)
 
     def quantity = column[BigDecimal]("quantity")
 
@@ -121,35 +112,25 @@ class SecondaryMarketSellTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, nft: NFT, sellerId: String, quantity: BigInt, denom: String, receiveAmount: BigInt, expiryHeight: Long): Future[String] = {
-      val orderId = utilities.Order.getOrderID(
-        makerID = utilities.Identity.getMantlePlaceIdentityID(sellerId),
-        makerAssetID = nft.getAssetID,
-        makerSplit = NumberData(quantity),
-        expiryHeight = HeightData(expiryHeight),
-        takerAssetID = schema.document.CoinAsset.getCoinAssetID(denom),
-        takerSplit = NumberData(receiveAmount)
-      )
-      create(SecondaryMarketSellTransaction(txHash = txHash, nftId = nft.id, sellerId = sellerId, orderId = orderId, quantity = quantity, expiryHeight = expiryHeight, denom = denom, receiveAmount = receiveAmount, status = None).serialize).map(_.orderId)
-    }
+    def addWithNoneStatus(txHash: String, nft: NFT, sellerId: String, quantity: BigInt, denom: String, receiveAmount: BigInt, expiryHeight: Long, secondaryMarketId: String): Future[String] = create(SecondaryMarketSellTransaction(txHash = txHash, nftId = nft.id, sellerId = sellerId, secondaryMarketId = secondaryMarketId, quantity = quantity, expiryHeight = expiryHeight, denom = denom, receiveAmount = receiveAmount, status = None).serialize).map(_.txHash)
 
-    def getByTxHash(txHash: String): Future[Seq[SecondaryMarketSellTransaction]] = filter(_.txHash === txHash).map(_.map(_.deserialize))
+    def getByTxHash(txHash: String): Future[Seq[SecondaryMarketSellTransaction]] = filter(_.txHash === txHash).map(_.map(_.deserialize()))
 
-    def tryGetByNFTAndOrderId(nftId: String, orderId: String): Future[SecondaryMarketSellTransaction] = filterHead(x => x.nftId === nftId && x.orderId === orderId).map(_.deserialize)
+    def tryGetByNFTAndSecondaryMarketId(nftId: String, secondaryMarketId: String): Future[SecondaryMarketSellTransaction] = filterHead(x => x.nftId === nftId && x.secondaryMarketId === secondaryMarketId).map(_.deserialize)
 
     def markSuccess(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(true))
 
     def markFailed(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.txHash === txHash).map(_.status).update(false))
 
-    def getAllPendingStatus: Future[Seq[SecondaryMarketSellTransaction]] = filter(_.status.?.isEmpty).map(_.map(_.deserialize))
+    def getAllPendingStatus: Future[Seq[SecondaryMarketSellTransaction]] = filter(_.status.?.isEmpty).map(_.map(_.deserialize()))
 
-    def checkAnyPendingTx(orderIds: Seq[String]): Future[Seq[String]] = customQuery(tableQuery.filter(x => x.orderId.inSet(orderIds) && x.status.?.isEmpty).map(_.orderId).distinct.result)
+    def checkAnyPendingTx(secondaryMarketIds: Seq[String]): Future[Seq[String]] = customQuery(tableQuery.filter(x => x.secondaryMarketId.inSet(secondaryMarketIds) && x.status.?.isEmpty).map(_.secondaryMarketId).distinct.result)
   }
 
   object Utility {
     implicit val txUtil: TxUtil = TxUtil("SECONDARY_MARKET_SELL", 300000)
 
-    def transaction(nft: NFT, nftOwner: NFTOwner, quantity: Long, fromAddress: String, endHours: Int, price: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[(BlockchainTransaction, String)] = {
+    def transaction(secondaryMarketId: String, nft: NFT, nftOwner: NFTOwner, quantity: Long, fromAddress: String, endHours: Int, price: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[(UserTransaction, OrderID)] = {
       val expiryHeight = ((constants.Blockchain.MaxOrderExpiry * endHours) / constants.Blockchain.MaxOrderHours).toLong
       val makerID = utilities.Identity.getMantlePlaceIdentityID(nftOwner.ownerId)
       val takerAssetID = constants.Blockchain.StakingTokenAssetID
@@ -164,13 +145,23 @@ class SecondaryMarketSellTransactions @Inject()(
         takerSplit = NumberData(receiveAmount),
       ))
 
-      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, nft = nft, sellerId = nftOwner.ownerId, quantity = quantity, denom = constants.Blockchain.StakingToken, expiryHeight = expiryHeight, receiveAmount = receiveAmount)
+      def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, nft = nft, sellerId = nftOwner.ownerId, quantity = quantity, denom = constants.Blockchain.StakingToken, expiryHeight = expiryHeight, receiveAmount = receiveAmount, secondaryMarketId = secondaryMarketId)
 
       val userTx = utilitiesTransaction.doUserTx(messages = messages, gasPrice = gasPrice, accountId = nftOwner.ownerId, fromAddress = fromAddress, ecKey = ecKey, masterTxFunction = masterTxFunc)
 
       for {
-        (userTx, orderId) <- userTx
-      } yield (userTx, orderId)
+        (userTx, txHash) <- userTx
+      } yield {
+        val orderId = utilities.Order.getOrderID(
+          makerID = utilities.Identity.getMantlePlaceIdentityID(nftOwner.ownerId),
+          makerAssetID = nft.getAssetID,
+          makerSplit = NumberData(quantity),
+          expiryHeight = HeightData(expiryHeight),
+          takerAssetID = schema.document.CoinAsset.getCoinAssetID(constants.Blockchain.StakingToken),
+          takerSplit = NumberData(receiveAmount)
+        )
+        (userTx, orderId)
+      }
     }
 
     private def updateForExpiredOrders() = {
@@ -204,6 +195,7 @@ class SecondaryMarketSellTransactions @Inject()(
             if (userTransaction.status.get) {
               val markSuccess = Service.markSuccess(secondaryMarketSellTx.txHash)
               val nft = masterNFTs.Service.tryGet(secondaryMarketSellTx.nftId)
+              val markSecondaryMarket = masterSecondaryMarkets.Service.markSecondaryMarketCreated(secondaryMarketSellTx.secondaryMarketId)
               val updateNFTOwner = masterNFTOwners.Service.onSecondaryMarket(nftId = secondaryMarketSellTx.nftId, ownerId = secondaryMarketSellTx.sellerId, sellQuantity = secondaryMarketSellTx.quantity)
 
               def sendNotifications(nft: NFT) = utilitiesNotification.send(secondaryMarketSellTx.sellerId, constants.Notification.SECONDARY_MARKET_CREATION_SUCCESSFUL, nft.name)(s"'${nft.id}'")
@@ -216,6 +208,7 @@ class SecondaryMarketSellTransactions @Inject()(
                 _ <- markSuccess
                 nft <- nft
                 _ <- updateNFTOwner
+                _ <- markSecondaryMarket
                 _ <- markCollectionOnSecondaryMarket(nft.collectionId)
                 _ <- updateAnalytics(nft.collectionId)
                 _ <- sendNotifications(nft)
@@ -223,7 +216,7 @@ class SecondaryMarketSellTransactions @Inject()(
             } else {
               val markFailed = Service.markFailed(secondaryMarketSellTx.txHash)
               val nft = masterNFTs.Service.tryGet(secondaryMarketSellTx.nftId)
-              val markMaster = masterSecondaryMarkets.Service.markOnOrderCreationFailed(secondaryMarketSellTxs.filter(_.txHash == secondaryMarketSellTx.txHash).map(_.orderId))
+              val markMaster = masterSecondaryMarkets.Service.markOnOrderCreationFailed(secondaryMarketSellTxs.filter(_.txHash == secondaryMarketSellTx.txHash).map(_.secondaryMarketId))
 
               def sendNotifications(nft: NFT) = utilitiesNotification.send(secondaryMarketSellTx.sellerId, constants.Notification.SECONDARY_MARKET_CREATION_FAILED, nft.name)(s"'${nft.id}'")
 

@@ -28,7 +28,7 @@
                                         <i class="bi bi-info-circle iconWhite"></i>
                                     </div>
                                     <div>
-                                        <div class="mb-2 title">@Messages(notification.title)</div>
+                                        <div class="mb-2 title">@Messages(notification.getTitle)</div>
                                         <div class="mb-2 description">@Messages(notification.message, notification.messageParameters: _*)</div>
                                         <div id="notificationDateTime_@notification.id" class="dateTime">@notification.createdOnMillisEpoch</div>
                                     </div>

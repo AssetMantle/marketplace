@@ -85,7 +85,7 @@ class ProvisionAddressTransactions @Inject()(
 
     implicit val txUtil: TxUtil = TxUtil("PROVISION_ADDRESS", 150000)
 
-    def transaction(fromAddress: String, accountId: String, toAddress: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(fromAddress: String, accountId: String, toAddress: String, gasPrice: BigDecimal, ecKey: ECKey): Future[UserTransaction] = {
       val messages = Seq(utilities.BlockchainTransaction.getProvisionMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(accountId), toAddress = toAddress))
 
       def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, accountId = accountId, toAddress = toAddress)

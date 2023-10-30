@@ -19,6 +19,6 @@ object CreateCollectionSale {
 
   case class Data(collectionId: String, nftForSale: Int, maxMintPerAccount: Int, whitelistId: String, price: MicroNumber, startEpoch: Int, endEpoch: Int) {
 
-    def toNewSale: Sale = Sale(id = utilities.IdGenerator.getRandomHexadecimal, whitelistId = whitelistId, collectionId = collectionId, numberOfNFTs = nftForSale, maxMintPerAccount = maxMintPerAccount, price = price, denom = constants.Blockchain.StakingToken, startTimeEpoch = startEpoch, endTimeEpoch = endEpoch)
+    def toNewSale: Sale = Sale(id = utilities.IdGenerator.getRandomHexadecimal, whitelistId = whitelistId, collectionId = collectionId, numberOfNFTs = nftForSale, maxMintPerAccount = maxMintPerAccount, price = price, denom = constants.Blockchain.StakingToken, startTimeEpoch = startEpoch, endTimeEpoch = endEpoch, isOver = false)
   }
 }

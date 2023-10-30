@@ -108,9 +108,9 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val nftTagsConstraint: Constraint[NFTTags.Data] = Constraint("constraints.NFTTagsConstraint")({ nftTagsData: NFTTags.Data =>
-    if (nftTagsData.tags != "") {
-      val tags = nftTagsData.tags.split(constants.NFT.Tags.Separator)
+  val NFTBasicDetailConstraint: Constraint[NFTBasicDetail.Data] = Constraint("constraints.NFTBasicDetail")({ nftBasicDetail: NFTBasicDetail.Data =>
+    if (nftBasicDetail.tags != "") {
+      val tags = nftBasicDetail.tags.split(constants.NFT.Tags.Separator)
       val errors = Seq(
         if (tags.length > constants.NFT.Tags.MaximumAllowed) Option(ValidationError(constants.Response.MAXIMUM_NFT_TAGS_EXCEEDED.message)) else None,
         if (tags.exists(x => x.length < constants.NFT.Tags.MinimumLength || x.length > constants.NFT.Tags.MaximumLength)) Option(ValidationError(constants.Response.INVALID_NFT_TAGS_LENGTH.message)) else None,
@@ -133,14 +133,6 @@ object FormConstraint {
     val errors = Seq(
       if (createPublicListingData.startEpoch >= createPublicListingData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
       if (createPublicListingData.startEpoch < (utilities.Date.currentEpoch - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
-    ).flatten
-    if (errors.isEmpty) Valid else Invalid(errors)
-  })
-
-  val editPublicListing: Constraint[publicListing.EditPublicListing.Data] = Constraint("constraints.EditPublicListing")({ editPublicListingData: publicListing.EditPublicListing.Data =>
-    val errors = Seq(
-      if (editPublicListingData.startEpoch >= editPublicListingData.endEpoch) Option(ValidationError(constants.Response.START_TIME_GREATER_THAN_EQUAL_TO_END_TIME.message)) else None,
-      if (editPublicListingData.startEpoch < (utilities.Date.currentEpoch - 1800)) Option(ValidationError(constants.Response.START_TIME_LESS_THAN_CURRENT_TIME.message)) else None,
     ).flatten
     if (errors.isEmpty) Valid else Invalid(errors)
   })

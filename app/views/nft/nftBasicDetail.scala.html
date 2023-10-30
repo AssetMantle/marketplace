@@ -7,32 +7,6 @@
 
 @commonForm(constants.Form.NFT_BASIC_DETAIL, nftBasicDetailForm, submitDisable = !(optionalNFTDraft.isDefined && optionalNFTDraft.get.name.isDefined)) {
     @multiStepNavigator(Seq(Messages(constants.View.COLLECTION_STEPPER_IMAGE_UPLOAD),Messages(constants.View.COLLECTION_STEPPER_BASIC_INFORMATION), Messages(constants.View.COLLECTION_STEPPER_PROPERTIES)), defaultSelected = 1)
-    <div class="createNft">
-    <span class="createNftSelectCollection">@Messages(constants.View.CREATE_NFT_FIELD_SELECT_COLLECTION_LABEL)</span>
-    <div class="mt-2">
-        <div class="dropdown" id="collectionIdList">
-            <input type="hidden" class="dp-input" value=""/>
-            <div class="dropdownHead" onclick="showOptions(this)">
-                <div class="currentSelected">@Messages(constants.View.CREATE_NFT_FIELD_SELECT_COLLECTION)</div>
-            </div>
-            <div class="dropdownBody">
-                <div class="dropdownBodyInner">
-@*                @collectionList.zipWithIndex.map { case (option, index) =>*@
-@*                <div class="dropdownItem" value="@option._1" onclick="setOption(this);*@
-@*                setCollectionId(this);">@option._2*@
-@*                </div>*@
-@*                }*@
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="mt-2">
-        <div class="footerMessage">
-            <span>@Messages(constants.View.CREATE_NFT_NEW_COLLECTION_LABEL)</span>
-            <a class="link" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.CREATE_COLLECTION.get, ""))">@Messages(constants.View.CREATE_NFT_NEW_COLLECTION_LINK)</a>
-        </div>
-    </div>
-    </div>
     @if(optionalNFTDraft.isDefined && optionalNFTDraft.get.name.isDefined && optionalNFTDraft.get.description.isDefined) {
         @commonInputText(nftBasicDetailForm, constants.FormField.NFT_NAME, Symbol("value") -> optionalNFTDraft.get.name.get)
         @commonDescriptionText(nftBasicDetailForm, constants.FormField.NFT_DESCRIPTION, Symbol("value") -> optionalNFTDraft.get.description.get)
@@ -40,6 +14,7 @@
         @commonInputText(nftBasicDetailForm, constants.FormField.NFT_NAME)
         @commonDescriptionText(nftBasicDetailForm, constants.FormField.NFT_DESCRIPTION)
     }
+    @commonInputText(nftBasicDetailForm, constants.FormField.NFT_TAGS, Symbol("class") -> "hidden"))
     <div class="hashtagWrapper">
         <div class="content">
             <label for="hashtagField">@Messages(constants.View.CREATE_NFT_TAG_LABEL)</label>
@@ -53,5 +28,12 @@
     </div>
     @commonInputText(nftBasicDetailForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> "readonly")
     @commonInputText(nftBasicDetailForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> "readonly")
+}
+@if(optionalNFTDraft.isDefined && optionalNFTDraft.get.tagNames.isDefined) {
+    @optionalNFTDraft.get.tagNames.get.foreach { tag =>
+        <script>
+                addProperty('@tag');
+        </script>
+    }
 }
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/createNft.js")"></script>

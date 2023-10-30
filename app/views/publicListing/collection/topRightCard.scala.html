@@ -82,6 +82,8 @@
                     @if(optionalLoginState.isDefined) {
                         @if(optionalLoginState.get.username != collection.creatorId) {
                             @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.PublicListingController.buyNFTForm('${publicListing.id}'))"), Symbol("class") -> "mt-4")
+                        } else {
+                            @commonPrimaryButton(Messages(constants.Form.STOP_PUBLIC_LISTING.button), JavaScript(s"getForm(jsRoutes.controllers.PublicListingController.stopForm('${publicListing.id}'))"), Symbol("class") -> "mt-4")
                         }
                     } else {
                         @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.AccountController.signInWithCallbackForm('/collection/${collection.id}'))"), Symbol("class") -> "mt-4")

@@ -17,7 +17,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class NFTTransferTransaction(txHash: String, nftId: String, fromId: String, quantity: Int, toIdentityId: String, toAccountId: Option[String], status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
+case class NFTTransferTransaction(txHash: String, nftId: String, fromId: String, quantity: Long, toIdentityId: String, toAccountId: Option[String], status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
 
   def id: String = txHash
 
@@ -35,7 +35,7 @@ private[masterTransaction] object NFTTransferTransactions {
 
     def fromId = column[String]("fromId")
 
-    def quantity = column[Int]("quantity")
+    def quantity = column[Long]("quantity")
 
     def toIdentityId = column[String]("toIdentityId")
 
@@ -81,7 +81,7 @@ class NFTTransferTransactions @Inject()(
 
   object Service {
 
-    def addWithNoneStatus(txHash: String, nftId: String, fromId: String, quantity: Int, toIdentityId: String, toAccountId: String): Future[String] = create(NFTTransferTransaction(txHash = txHash, nftId = nftId, fromId = fromId, quantity = quantity, toIdentityId = toIdentityId, toAccountId = Option(toAccountId), status = None)).map(_.id)
+    def addWithNoneStatus(txHash: String, nftId: String, fromId: String, quantity: Long, toIdentityId: String, toAccountId: String): Future[String] = create(NFTTransferTransaction(txHash = txHash, nftId = nftId, fromId = fromId, quantity = quantity, toIdentityId = toIdentityId, toAccountId = Option(toAccountId), status = None)).map(_.id)
 
     def getByTxHash(txHash: String): Future[Seq[NFTTransferTransaction]] = filter(_.txHash === txHash)
 
@@ -97,7 +97,7 @@ class NFTTransferTransactions @Inject()(
 
     implicit val txUtil: TxUtil = TxUtil("NFT_TRANSFER", 150000)
 
-    def transaction(nft: NFT, fromId: String, quantity: Int, fromAddress: String, toAccountId: String, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(nft: NFT, fromId: String, quantity: Long, fromAddress: String, toAccountId: String, gasPrice: BigDecimal, ecKey: ECKey): Future[UserTransaction] = {
       val messages = Seq(utilities.BlockchainTransaction.getAssetSendMsg(fromID = utilities.Identity.getMantlePlaceIdentityID(fromId), fromAddress = fromAddress, toID = utilities.Identity.getMantlePlaceIdentityID(toAccountId), assetId = nft.getAssetID, amount = quantity))
 
       def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, nftId = nft.id, fromId = fromId, quantity = quantity, toIdentityId = utilities.Identity.getMantlePlaceIdentityID(toAccountId).asString, toAccountId = toAccountId)

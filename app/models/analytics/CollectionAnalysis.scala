@@ -177,15 +177,6 @@ class CollectionsAnalysis @Inject()(
       } yield ()
     }
 
-    def onEditPublicListing(collectionId: String, listingPrice: MicroNumber): Future[Unit] = {
-      val collectionAnalysis = Service.tryGet(collectionId)
-
-      for {
-        collectionAnalysis <- collectionAnalysis
-        _ <- Service.update(collectionAnalysis.copy(publicListingPrice = listingPrice))
-      } yield ()
-    }
-
     def onSuccessfulSell(collectionId: String, price: MicroNumber, quantity: Int): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
 

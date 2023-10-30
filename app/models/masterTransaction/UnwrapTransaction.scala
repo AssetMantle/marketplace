@@ -102,7 +102,7 @@ class UnwrapTransactions @Inject()(
 
     implicit val txUtil: TxUtil = TxUtil("UNWRAP", 150000)
 
-    def transaction(fromAddress: String, accountId: String, amount: BigInt, gasPrice: BigDecimal, ecKey: ECKey): Future[BlockchainTransaction] = {
+    def transaction(fromAddress: String, accountId: String, amount: BigInt, gasPrice: BigDecimal, ecKey: ECKey): Future[UserTransaction] = {
       val messages = Seq(utilities.BlockchainTransaction.getUnwrapTokenMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(accountId), coins = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber(amount)))))
 
       def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, assetId = constants.Blockchain.StakingTokenAssetID, amount = amount, accountId = accountId)
