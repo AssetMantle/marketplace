@@ -5,7 +5,7 @@ import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.common.Coin
-import models.master.{Collection, NFT}
+import models.master.{Collection, NFT, PublicListing}
 import models.masterTransaction.PublicListingNFTTransactions.PublicListingNFTTransactionTable
 import models.traits._
 import models.{analytics, master}
@@ -185,7 +185,7 @@ class PublicListingNFTTransactions @Inject()(
                 utilitiesNotification.send(boughtNFT.buyerAccountId, constants.Notification.BUYER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING, count.toString)(s"'${boughtNFT.buyerAccountId}', '${constants.View.COLLECTED}'")
               }
 
-              def checkPublicListing = masterPublicListings.Utility.checkPublicListing(boughtNFTs.head.publicListingId)
+              def checkPublicListing(publicListing: PublicListing) = masterPublicListings.Utility.checkPublicListing(publicListing)
 
               for {
                 _ <- markSuccess
@@ -195,7 +195,7 @@ class PublicListingNFTTransactions @Inject()(
                 nft <- nft
                 _ <- analysisUpdate(nft, boughtNFTs.length, publicListing.price)
                 _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
-                _ <- checkPublicListing
+                _ <- checkPublicListing(publicListing)
               } yield ()
             } else {
               val boughtNFTs = Service.getByTxHash(txHash)

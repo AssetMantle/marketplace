@@ -5,7 +5,7 @@ import constants.Transaction.TxUtil
 import exceptions.BaseException
 import models.blockchainTransaction.{UserTransaction, UserTransactions}
 import models.common.Coin
-import models.master.{Collection, NFT}
+import models.master.{Collection, NFT, Sale}
 import models.masterTransaction.SaleNFTTransactions.SaleNFTTransactionTable
 import models.traits._
 import models.{analytics, master}
@@ -191,7 +191,7 @@ class SaleNFTTransactions @Inject()(
                 utilitiesNotification.send(boughtNFT.buyerAccountId, constants.Notification.BUYER_BUY_NFT_SUCCESSFUL_FROM_SALE, count.toString)(s"'${boughtNFT.buyerAccountId}', '${constants.View.COLLECTED}'")
               }
 
-              def checkSales = masterSales.Utility.checkSale(boughtNFTs.head.saleId)
+              def checkSale(sale: Sale) = masterSales.Utility.checkSale(sale)
 
               for {
                 _ <- markMasterSuccess
@@ -201,7 +201,7 @@ class SaleNFTTransactions @Inject()(
                 nft <- nft
                 _ <- analysisUpdate(nft, sale.price, boughtNFTs.length)
                 _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
-                _ <- checkSales
+                _ <- checkSale(sale)
               } yield ()
             } else {
               val boughtNFTs = Service.getByTxHash(userTransaction.txHash)

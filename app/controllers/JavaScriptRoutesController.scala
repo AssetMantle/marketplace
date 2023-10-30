@@ -56,6 +56,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.deleteDraft,
         routes.javascript.CollectionController.countForCreatorNotForSell,
         routes.javascript.CollectionController.genesisTypeForm,
+        routes.javascript.CollectionController.updateRoyaltyForm,
 
         routes.javascript.CollectedController.collectedSection,
         routes.javascript.CollectedController.collectionPerPage,
@@ -131,7 +132,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.PublicListingController.collectionTopRightCard,
         routes.javascript.PublicListingController.createPublicListingForm,
         routes.javascript.PublicListingController.buyNFTForm,
-        routes.javascript.PublicListingController.editForm,
+        routes.javascript.PublicListingController.stopForm,
 
         routes.javascript.SaleController.viewCollections,
         routes.javascript.SaleController.collectionsSection,
@@ -141,6 +142,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SaleController.collectionTopRightCard,
         routes.javascript.SaleController.createCollectionSaleForm,
         routes.javascript.SaleController.buySaleNFTForm,
+        routes.javascript.SaleController.stopForm,
 
         routes.javascript.SecondaryMarketController.viewCollections,
         routes.javascript.SecondaryMarketController.viewCollection,

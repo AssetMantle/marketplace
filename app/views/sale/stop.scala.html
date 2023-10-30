@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import models.master.Sale
+@import views.html.base.form._
+@import views.html.base.info.commonMicroNumber
+@import views.sale.companion.StopSale
+
+@(saleStopForm: Form[StopSale.Data] = StopSale.form, sale: Sale)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonForm(constants.Form.STOP_WHITELIST_SALE, saleStopForm, submitDisable = false) {
+    @commonInputText(saleStopForm, constants.FormField.SALE_ID, Symbol("value") -> sale.id, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> true)
+    @constants.View.PRICE : @commonMicroNumber(sale.price, "MNTL")
+    @constants.View.COLLECTION_MAXIMUM_MINT_PER_USER : @sale.maxMintPerAccount
+    @constants.View.SALE_START_TIME : @sale.startTimeEpoch
+    @constants.View.SALE_ENDS_IN : @sale.endTimeEpoch
+}

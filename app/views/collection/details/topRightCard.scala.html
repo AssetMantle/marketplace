@@ -1,8 +1,7 @@
 @import controllers.actions.LoginState
 @import models.analytics.CollectionAnalysis
-@import models.master.{Collection, PublicListing, Sale}
+@import models.master.Collection
 @import views.html.base.buttons._
-@import views.html.collection.details._
 
 @(collectionAnalysis: CollectionAnalysis, collection: Collection, earlyAccessCreated: Boolean, launchpadCreated: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
 

@@ -1,0 +1,15 @@
+@import models.master.PublicListing
+@import views.html.base.form._
+@import views.html.base.info.commonMicroNumber
+@import views.publicListing.companion.StopPublicListing
+@import controllers.actions.LoginState
+
+@(stopPublicListingForm: Form[StopPublicListing.Data] = StopPublicListing.form, publicListing: PublicListing)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+    @commonForm(constants.Form.STOP_PUBLIC_LISTING, stopPublicListingForm, submitDisable = false) {
+        @commonInputText(stopPublicListingForm, constants.FormField.PUBLIC_LISTING_ID, Symbol("value") -> publicListing.id, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> true)
+        @constants.View.PRICE : @commonMicroNumber(publicListing.price, "MNTL")
+        @constants.View.COLLECTION_MAXIMUM_MINT_PER_USER : @publicListing.maxMintPerAccount
+        @constants.View.SALE_START_TIME : @publicListing.startTimeEpoch
+        @constants.View.SALE_ENDS_IN : @publicListing.endTimeEpoch
+    }

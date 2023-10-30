@@ -1,0 +1,6 @@
+@import controllers.actions.LoginState
+@import views.html.base.modal._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@successModal(heading = constants.View.STOP_WHITELIST_SALE_SUCCESS_TITLE, subHeading = constants.View.STOP_WHITELIST_SALE_SUCCESS_SUBTITLE)

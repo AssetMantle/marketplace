@@ -314,6 +314,54 @@ class CollectionController @Inject()(
       )
   }
 
+  def updateRoyaltyForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val collection = masterCollections.Service.tryGet(id)
+      (for {
+        collection <- collection
+      } yield if (collection.creatorId == loginState.username) Ok(views.html.collection.updateRoyalty(collection = collection)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def updateRoyalty(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      UpdateRoyalty.form.bindFromRequest().fold(
+        formWithErrors => {
+          val collection = masterCollections.Service.tryGet(formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))
+          (for {
+            collection <- collection
+          } yield if (collection.creatorId == loginState.username) BadRequest(views.html.collection.updateRoyalty(formWithErrors, collection)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+            ).recover {
+            case baseException: BaseException => BadRequest(baseException.failure.message)
+          }
+        },
+        updateRoyaltyData => {
+          val collection = masterCollections.Service.tryGet(updateRoyaltyData.collectionId)
+
+          def update(collection: Collection) = {
+            val errors = Seq(
+              if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None
+            ).flatten
+            if (errors.isEmpty) {
+              for {
+                _ <- masterCollections.Service.update(collection.copy(royalty = updateRoyaltyData.royalty / 100))
+              } yield ()
+            } else errors.head.throwBaseException()
+          }
+
+          (for {
+            collection <- collection
+            _ <- update(collection)
+          } yield Ok(views.html.collection.updateRoyaltySuccess(updateRoyaltyData.royalty.toString()))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.collection.edit(Edit.form.withGlobalError(baseException.failure.message), None))
+          }
+        }
+      )
+  }
+
   def uploadCollectionDraftFilesForm(id: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id)

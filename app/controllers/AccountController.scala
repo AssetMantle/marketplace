@@ -187,7 +187,7 @@ class AccountController @Inject()(
                   implicit val loginState: LoginState = LoginState(username = signInData.username, address = key.get.address, accountType = account.accountType)
                   val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.upsert(id = loginState.username, token = signInData.pushNotificationToken)
                   val result = if (signInData.callbackUrl != "/") withUsernameToken.InternalRedirectOnSubmitForm(signInData.callbackUrl)
-                  else withUsernameToken.Ok(views.html.publicListing.viewCollections())
+                  else withUsernameToken.Ok(views.html.secondaryMarket.viewCollections())
                   for {
                     _ <- pushNotificationTokenUpdate
                     result <- result

@@ -93,13 +93,17 @@ class IndexController @Inject()(
   }
   starter.changeAwsKey()
 
+  // Starts in given order wise
   utilities.Scheduler.startSchedulers(
-    // blockchain
+    masterTransactionSessionTokens.Utility.scheduler,
     blockchainBlocks.Utility.scheduler,
-    // blockchainTransaction
+    masterTransactionLatestBlocks.Utility.scheduler,
     adminTransactions.Utility.scheduler,
     userTransactions.Utility.scheduler,
-    // campaign
+    issueIdentityTransactions.Utility.scheduler,
+    secondaryMarketBuyTransactions.Utility.scheduler,
+    secondaryMarketSellTransactions.Utility.scheduler,
+    sendCoinTransactions.Utility.scheduler,
     mintNFTAirDrops.Utility.scheduler,
     // history
     historyMasterPublicListings.Utility.scheduler,
@@ -108,22 +112,16 @@ class IndexController @Inject()(
     // masterTransaction
     cancelOrderTransactions.Utility.scheduler,
     defineAssetTransactions.Utility.scheduler,
-    issueIdentityTransactions.Utility.scheduler,
-    mintAssetTransactions.Utility.scheduler,
+//    mintAssetTransactions.Utility.scheduler,
     nftMintingFeeTransactions.Utility.scheduler,
     nftTransferTransactions.Utility.scheduler,
     provisionAddressTransactions.Utility.scheduler,
     publicListingNFTTransactions.Utility.scheduler,
     saleNFTTransactions.Utility.scheduler,
-    masterTransactionSessionTokens.Utility.scheduler,
-    secondaryMarketBuyTransactions.Utility.scheduler,
-    secondaryMarketSellTransactions.Utility.scheduler,
-    sendCoinTransactions.Utility.scheduler,
     masterTransactionTokenPrices.Utility.scheduler,
     unprovisionAddressTransactions.Utility.scheduler,
     unwrapTransactions.Utility.scheduler,
     wrapTransactions.Utility.scheduler,
-    masterTransactionLatestBlocks.Utility.scheduler,
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())

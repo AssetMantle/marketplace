@@ -1111,6 +1111,21 @@ NO_NFTS_LISTED=No NFT Found
 TOTAL_LISTED=Total Listed
 LISTED=Listed
 TOTAL_SUPPLY=Total Supply
+STOP_PUBLIC_LISTING_SUCCESS_TITLE=Public Sale Stopped
+STOP_PUBLIC_LISTING_SUCCESS_SUBTITLE=Create new sale to start it again
+STOP_WHITELIST_SALE_SUCCESS_TITLE=Whitelist Sale Stopped
+STOP_WHITELIST_SALE_SUCCESS_SUBTITLE=Create new sale to start it again
+UPDATE_ROYALTY_SUCCESS_TITLE=Royalty Updated Successfully
+UPDATE_ROYALTY_SUCCESS_SUBTITLE=You will now receive {0}% commission in secondary market
+FORM.STOP_PUBLIC_LISTING.TITLE=Stop Public Sale
+FORM.STOP_PUBLIC_LISTING.SUBTITLE=Once stopped, you will have to create new sale.
+FORM.STOP_PUBLIC_LISTING.SUBMIT=Proceed
+FORM.STOP_PUBLIC_LISTING.BUTTON=Stop Sale
+RESPONSE.FAILURE.SALE_EXPIRED=Sale already expired!
+FORM.STOP_WHITELIST_SALE.TITLE=Stop Whitelist Sale
+FORM.STOP_WHITELIST_SALE.SUBTITLE=Once stopped, you will have to create new sale.
+FORM.STOP_WHITELIST_SALE.SUBMIT=Proceed
+FORM.STOP_WHITELIST_SALE.BUTTON=Stop Sale
 
 # NFT Trade
 SELL_ORDERS=Sell Orders

@@ -25,6 +25,7 @@ object Form {
 
   val CREATE_COLLECTION: Form = Form("CREATE_COLLECTION", routes.javascript.CollectionController.createForm, routes.CollectionController.create())
   val EDIT_COLLECTION: Form = Form("EDIT_COLLECTION", routes.javascript.CollectionController.editForm, routes.CollectionController.edit())
+  val UPDATE_ROYALTY: Form = Form("UPDATE_ROYALTY", routes.javascript.CollectionController.updateRoyaltyForm, routes.CollectionController.updateRoyalty())
   val SET_COLLECTION_CAPABILITIES: Form = Form("SET_COLLECTION_CAPABILITIES", routes.javascript.CollectionController.setCapabilitiesForm, routes.CollectionController.setCapabilities())
   val DEFINE_COLLECTION_PROPERTIES: Form = Form("DEFINE_COLLECTION_PROPERTIES", routes.javascript.CollectionController.definePropertiesForm, routes.CollectionController.defineProperties())
 
@@ -49,10 +50,11 @@ object Form {
   val NFT_TRANSFER: Form = Form("NFT_TRANSFER", routes.javascript.NFTController.transferForm, routes.NFTController.transfer())
 
   val CREATE_WHITELIST_SALE: Form = Form("CREATE_WHITELIST_SALE", routes.javascript.SaleController.createCollectionSaleForm, routes.SaleController.createCollectionSale())
+  val STOP_WHITELIST_SALE: Form = Form("STOP_WHITELIST_SALE", routes.javascript.SaleController.stopForm, routes.SaleController.stop())
   val BUY_NFT_SALE: Form = Form("BUY_NFT_SALE", routes.javascript.SaleController.buySaleNFTForm, routes.SaleController.buySaleNFT())
 
   val CREATE_PUBLIC_LISTING: Form = Form("CREATE_PUBLIC_LISTING", routes.javascript.PublicListingController.createPublicListingForm, routes.PublicListingController.createPublicListing())
-  val EDIT_PUBLIC_LISTING: Form = Form("EDIT_PUBLIC_LISTING", routes.javascript.PublicListingController.editForm, routes.PublicListingController.edit())
+  val STOP_PUBLIC_LISTING: Form = Form("STOP_PUBLIC_LISTING", routes.javascript.PublicListingController.stopForm, routes.PublicListingController.stop())
   val BUY_NFT_PUBLIC_LISTING: Form = Form("BUY_NFT_PUBLIC_LISTING", routes.javascript.PublicListingController.buyNFTForm, routes.PublicListingController.buyNFT())
 
   val CREATE_SECONDARY_MARKET: Form = Form("CREATE_SECONDARY_MARKET", routes.javascript.SecondaryMarketController.createForm, routes.SecondaryMarketController.create())

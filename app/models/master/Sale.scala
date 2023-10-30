@@ -11,10 +11,10 @@ import utilities.MicroNumber
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Sale(id: String, whitelistId: String, collectionId: String, numberOfNFTs: Long, maxMintPerAccount: Long, price: MicroNumber, denom: String, startTimeEpoch: Long, endTimeEpoch: Long, soldOut: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class Sale(id: String, whitelistId: String, collectionId: String, numberOfNFTs: Long, maxMintPerAccount: Long, price: MicroNumber, denom: String, startTimeEpoch: Long, endTimeEpoch: Long, isOver: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def getStatus(allSold: Boolean): constants.Sale.Status = {
-    val currentEpoch = System.currentTimeMillis() / 1000
+    val currentEpoch = utilities.Date.currentEpoch
     if (allSold && currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.Sale.SOLD_OUT // Sold out
     else if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.Sale.LIVE // Live
     else if (currentEpoch >= this.endTimeEpoch) constants.Sale.ENDED // Expired
@@ -22,7 +22,7 @@ case class Sale(id: String, whitelistId: String, collectionId: String, numberOfN
   }
 
   def getStatus: constants.Sale.Status = {
-    val currentEpoch = System.currentTimeMillis() / 1000
+    val currentEpoch = utilities.Date.currentEpoch
     if (currentEpoch >= this.startTimeEpoch && currentEpoch < this.endTimeEpoch) constants.Sale.LIVE
     else if (currentEpoch >= this.endTimeEpoch) constants.Sale.ENDED
     else constants.Sale.NOT_STARTED
@@ -38,7 +38,7 @@ case class Sale(id: String, whitelistId: String, collectionId: String, numberOfN
     denom = this.denom,
     startTimeEpoch = this.startTimeEpoch,
     endTimeEpoch = this.endTimeEpoch,
-    soldOut = this.soldOut,
+    isOver = this.isOver,
     createdBy = this.createdBy,
     createdOnMillisEpoch = this.createdOnMillisEpoch,
     updatedBy = this.updatedBy,
@@ -54,7 +54,7 @@ case class Sale(id: String, whitelistId: String, collectionId: String, numberOfN
     denom = this.denom,
     startTimeEpoch = this.startTimeEpoch,
     endTimeEpoch = this.endTimeEpoch,
-    soldOut = this.soldOut,
+    isOver = this.isOver,
     createdBy = this.createdBy,
     createdOnMillisEpoch = this.createdOnMillisEpoch,
     updatedBy = this.updatedBy,
@@ -62,14 +62,14 @@ case class Sale(id: String, whitelistId: String, collectionId: String, numberOfN
 }
 
 private[master] object Sales {
-  case class SaleSerialized(id: String, whitelistId: String, collectionId: String, numberOfNFTs: Long, maxMintPerAccount: Long, price: BigDecimal, denom: String, startTimeEpoch: Long, endTimeEpoch: Long, soldOut: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
+  case class SaleSerialized(id: String, whitelistId: String, collectionId: String, numberOfNFTs: Long, maxMintPerAccount: Long, price: BigDecimal, denom: String, startTimeEpoch: Long, endTimeEpoch: Long, isOver: Boolean, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
-    def deserialize()(implicit module: String, logger: Logger): Sale = Sale(id = id, whitelistId = whitelistId, collectionId = collectionId, numberOfNFTs = numberOfNFTs, maxMintPerAccount = maxMintPerAccount, price = MicroNumber(price), denom = denom, startTimeEpoch = startTimeEpoch, endTimeEpoch = endTimeEpoch, soldOut = soldOut, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): Sale = Sale(id = id, whitelistId = whitelistId, collectionId = collectionId, numberOfNFTs = numberOfNFTs, maxMintPerAccount = maxMintPerAccount, price = MicroNumber(price), denom = denom, startTimeEpoch = startTimeEpoch, endTimeEpoch = endTimeEpoch, isOver = isOver, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
   class SaleTable(tag: Tag) extends Table[SaleSerialized](tag, "Sale") with ModelTable[String] {
 
-    def * = (id, whitelistId, collectionId, numberOfNFTs, maxMintPerAccount, price, denom, startTimeEpoch, endTimeEpoch, soldOut, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SaleSerialized.tupled, SaleSerialized.unapply)
+    def * = (id, whitelistId, collectionId, numberOfNFTs, maxMintPerAccount, price, denom, startTimeEpoch, endTimeEpoch, isOver, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SaleSerialized.tupled, SaleSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -89,7 +89,7 @@ private[master] object Sales {
 
     def endTimeEpoch = column[Long]("endTimeEpoch")
 
-    def soldOut = column[Boolean]("soldOut")
+    def isOver = column[Boolean]("isOver")
 
     def createdBy = column[String]("createdBy")
 
@@ -133,14 +133,16 @@ class Sales @Inject()(
       filter(x => x.startTimeEpoch <= currentEpoch && x.endTimeEpoch > currentEpoch).map(_.map(_.id))
     }
 
-    def getForDeletion: Future[Seq[Sale]] = filter(x => x.endTimeEpoch <= (utilities.Date.currentEpoch - constants.Date.DaySeconds) || x.soldOut).map(_.map(_.deserialize))
+    def getForDeletion: Future[Seq[Sale]] = filter(x => x.endTimeEpoch <= (utilities.Date.currentEpoch - constants.Date.DaySeconds) || x.isOver).map(_.map(_.deserialize))
 
     def getIdsCurrentOnSaleByWhitelistIds(whitelistIds: Seq[String]): Future[Seq[String]] = {
       val currentEpoch = utilities.Date.currentEpoch
       filter(x => x.whitelistId.inSet(whitelistIds) && x.endTimeEpoch > currentEpoch).map(_.map(_.id))
     }
 
-    def markSold(id: String): Future[Int] = customUpdate(tableQuery.filter(_.id === id).map(_.soldOut).update(true))
+    def markSoldOut(id: String): Future[Int] = customUpdate(tableQuery.filter(_.id === id).map(_.isOver).update(true))
+
+    def markStop(id: String): Future[Int] = customUpdate(tableQuery.filter(_.id === id).map(_.isOver).update(true))
 
     def getSaleByCollectionId(collectionId: String): Future[Option[Sale]] = filter(_.collectionId === collectionId).map(_.map(_.deserialize).headOption)
 
@@ -159,10 +161,10 @@ class Sales @Inject()(
 
   object Utility {
 
-    def checkSale(saleId: String): Future[Unit] = {
-      val notAllSold = masterNFTOwners.Service.checkAnySaleExists(saleId)
+    def checkSale(sale: Sale): Future[Unit] = {
+      val notAllSold = masterNFTOwners.Service.checkAnySaleExists(sale.id)
 
-      def checkAndMarkSold(notAllSold: Boolean) = if (!notAllSold) Service.markSold(saleId) else Future(0)
+      def checkAndMarkSold(notAllSold: Boolean) = if (!notAllSold && (utilities.Date.currentEpoch + 86400) >= sale.endTimeEpoch) Service.markSoldOut(sale.id) else Future(0)
 
       for {
         notAllSold <- notAllSold

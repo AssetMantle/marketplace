@@ -71,6 +71,8 @@ POST        /defineProperties                                  controllers.Colle
 GET         /deleteCollectionDraft                             controllers.CollectionController.deleteDraftForm(collectionId: String)
 POST        /deleteCollectionDraft                             controllers.CollectionController.deleteDraft()
 GET         /genesisTypeForm                                   controllers.CollectionController.genesisTypeForm()
+GET         /updateRoyalty                                     controllers.CollectionController.updateRoyaltyForm(id: String)
+POST        /updateRoyalty                                     controllers.CollectionController.updateRoyalty()
 
 GET         /uploadCollectionDraftFilesForm                    controllers.CollectionController.uploadCollectionDraftFilesForm(id: String)
 GET         /uploadCollectionDraftFileForm                     controllers.CollectionController.uploadCollectionDraftFileForm(id: String, documentType: String)
@@ -186,8 +188,8 @@ GET         /earlyAccessCollectionNFTs                         controllers.Publi
 GET         /earlyAccessCollectionTopRightCard                 controllers.PublicListingController.collectionTopRightCard(id: String)
 GET         /createPublicListing                               controllers.PublicListingController.createPublicListingForm(collectionId: Option[String])
 POST        /createPublicListing                               controllers.PublicListingController.createPublicListing()
-GET         /editPublicListing                                 controllers.PublicListingController.editForm(publicListingId: String)
-POST        /editPublicListing                                 controllers.PublicListingController.edit()
+GET         /stopPublicListing                                 controllers.PublicListingController.stopForm(publicListingId: String)
+POST        /stopPublicListing                                 controllers.PublicListingController.stop()
 
 GET         /buyPublicListingNFT                               controllers.PublicListingController.buyNFTForm(publicListingId: String)
 POST        /buyPublicListingNFT                               controllers.PublicListingController.buyNFT()
@@ -202,6 +204,8 @@ GET         /createSale                                        controllers.SaleC
 POST        /createSale                                        controllers.SaleController.createCollectionSale()
 GET         /buySaleNFT                                        controllers.SaleController.buySaleNFTForm(saleId: String)
 POST        /buySaleNFT                                        controllers.SaleController.buySaleNFT()
+GET         /stopSale                                          controllers.SaleController.stopForm(saleId: String)
+POST        /stopSale                                          controllers.SaleController.stop()
 
 GET         /market                                            controllers.SecondaryMarketController.viewCollections()
 GET         /secondaryMarketCollectionsSection                 controllers.SecondaryMarketController.collectionsSection()

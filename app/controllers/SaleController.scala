@@ -299,6 +299,7 @@ class SaleController @Inject()(
               if (nfts.exists(_.isMinted.getOrElse(true))) Option(constants.Response.NFT_ALREADY_MINTED) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
+              if (sale.isOver) Option(constants.Response.SALE_STOPPED_OR_OVER) else None,
             ).flatten
             if (errors.isEmpty) {
               masterTransactionSaleNFTTransactions.Utility.transaction(
@@ -349,6 +350,69 @@ class SaleController @Inject()(
                 }
               }
               Await.result(badResult, Duration.Inf)
+            }
+          }
+        }
+      )
+  }
+
+  def stopForm(saleId: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val sale = masterSales.Service.tryGet(saleId)
+
+      (for {
+        sale <- sale
+      } yield Ok(views.html.sale.stop(sale = sale))
+        ).recover {
+        case baseException: BaseException => BadRequest(baseException.failure.message)
+      }
+  }
+
+  def stop(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      StopSale.form.bindFromRequest().fold(
+        formWithErrors => {
+          val sale = masterSales.Service.tryGet(formWithErrors.data.getOrElse(constants.FormField.PUBLIC_LISTING_ID.name, ""))
+
+          for {
+            sale <- sale
+          } yield BadRequest(views.html.sale.stop(formWithErrors, sale))
+        },
+        stopData => {
+          val sale = masterSales.Service.tryGet(stopData.saleId)
+
+          def collection(id: String) = masterCollections.Service.tryGet(id = id)
+
+          def stopSale(collection: Collection, sale: Sale) = {
+            val errors = Seq(
+              if (collection.creatorId != loginState.username) Option(constants.Response.NOT_COLLECTION_OWNER) else None,
+              if (!collection.public) Option(constants.Response.COLLECTION_NOT_PUBLIC) else None,
+              if (utilities.Date.currentEpoch >= sale.endTimeEpoch) Option(constants.Response.SALE_EXPIRED) else None,
+            ).flatten
+            if (errors.isEmpty) {
+              for {
+                _ <- masterSales.Service.markStop(stopData.saleId)
+              } yield ()
+            } else errors.head.throwBaseException()
+          }
+
+          (for {
+            sale <- sale
+            collection <- collection(sale.collectionId)
+            _ <- stopSale(collection, sale)
+          } yield PartialContent(views.html.sale.stopSuccessful())
+            ).recover {
+            case baseException: BaseException => {
+              try {
+                val sale = masterSales.Service.tryGet(stopData.saleId)
+
+                val result = for {
+                  sale <- sale
+                } yield BadRequest(views.html.sale.stop(StopSale.form.withGlobalError(baseException.failure.message), sale))
+                Await.result(result, Duration.Inf)
+              } catch {
+                case baseException: BaseException => BadRequest(baseException.failure.message)
+              }
             }
           }
         }
