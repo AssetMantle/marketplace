@@ -42,6 +42,6 @@ object NFT {
 
   object Sale {
     val MaxSaleAmount: BigDecimal = BigDecimal("1000000000")
-    val MaxCreatorFee: BigDecimal = BigDecimal("40")
+    val MaxCreatorFee: BigDecimal = BigDecimal("0.4")
   }
 }

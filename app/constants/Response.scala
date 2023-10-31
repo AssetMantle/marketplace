@@ -4,6 +4,8 @@ import exceptions.BaseException
 import play.api.Logger
 import play.api.routing.JavaScriptReverseRoute
 
+import scala.concurrent.{ExecutionContext, Future}
+
 object Response {
 
   private val PREFIX = "RESPONSE."
@@ -159,6 +161,8 @@ object Response {
     def getBaseException(exception: Exception = null)(implicit module: String, logger: Logger) = new BaseException(this, exception)
 
     def throwBaseException(exception: Exception = null)(implicit module: String, logger: Logger) = throw this.getBaseException(exception)
+
+    def throwFutureBaseException(exception: Exception = null)(implicit module: String, logger: Logger, executionContext: ExecutionContext) = Future(throw this.getBaseException(exception))
   }
 
   class Warning(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

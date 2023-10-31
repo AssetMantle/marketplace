@@ -157,7 +157,7 @@ object FormField {
   // RadioFormField
 
   // BigDecimalFormField
-  val COLLECTION_ROYALTY: BigDecimalFormField = BigDecimalFormField("COLLECTION_ROYALTY", 0.0, constants.NFT.Sale.MaxCreatorFee)
+  val COLLECTION_ROYALTY: BigDecimalFormField = BigDecimalFormField("COLLECTION_ROYALTY", 0.0, constants.NFT.Sale.MaxCreatorFee * 100)
 
   case class StringFormField(name: String, minimumLength: Int, maximumLength: Int, regularExpression: RegularExpression = RegularExpression.ANY_STRING, errorMessage: String = "REGULAR_EXPRESSION_VALIDATION_FAILED") {
     val placeHolder: String = PLACEHOLDER_PREFIX + name

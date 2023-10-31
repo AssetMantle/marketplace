@@ -271,12 +271,14 @@ class CollectionController @Inject()(
           Future(BadRequest(views.html.collection.create(formWithErrors, 0)))
         },
         createData => {
+          //          val collectionDraft = if (loginState.isVerifiedCreator) masterTransactionCollectionDrafts.Service.add(name = createData.name, description = createData.description, socialProfiles = createData.getSocialProfiles, creatorId = loginState.username, nsfw = createData.nsfw, royalty = createData.royalty / 100)
+          //          else constants.Response.NOT_VERIFIED_CREATOR.throwFutureBaseException()
+
           val collectionDraft = masterTransactionCollectionDrafts.Service.add(name = createData.name, description = createData.description, socialProfiles = createData.getSocialProfiles, creatorId = loginState.username, nsfw = createData.nsfw, royalty = createData.royalty / 100)
 
           (for {
             collectionDraft <- collectionDraft
-          } yield PartialContent(views.html.collection.uploadDraftFile(collectionDraft = collectionDraft))
-            ).recover {
+          } yield PartialContent(views.html.collection.uploadDraftFile(collectionDraft = collectionDraft))).recover {
             case baseException: BaseException => BadRequest(views.html.collection.create(Create.form.withGlobalError(baseException.failure.message), 0))
           }
         }
