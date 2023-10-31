@@ -3,7 +3,9 @@
 @import models.master.NFTOwner
 @import views.html.base.commonStringValue
 @import views.html.base.form._
-@(collection: master.Collection, nft: master.NFT, liked: Option[Boolean], onClickFunction: JavaScript, nftOwner: Option[NFTOwner], draft: Boolean = false)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@import models.master.SecondaryMarket
+
+@(collection: master.Collection, nft: master.NFT, liked: Option[Boolean], onClickFunction: JavaScript, nftOwner: Option[NFTOwner], secondaryMarket: Option[SecondaryMarket], tokenPrice: Double, draft: Boolean = false)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 @if(draft) {
     <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 draftNft">
@@ -95,8 +97,8 @@
         <div class="d-flex justify-content-between">
             <div class="d-flex flex-row gap-1 align-items-center mt-3">
                 <div class=""><img class="align-middle" src="@routes.Assets.versioned("images/NFTCard/token.png")" width="24" height="27"/></div>
-                <div id="price_@nft.getFileHash" class="nft-mantle-price">--</div>
-                <div id="dollarPrice_@nft.getFileHash" class="nft-dollar-price">($--)</div>
+                <div id="price_@nft.getFileHash" class="nft-mantle-price">@secondaryMarket.fold("--")(_.price.formatNumber())</div>
+                <div id="dollarPrice_@nft.getFileHash" class="nft-dollar-price">@secondaryMarket.fold("(--)")(x => s"(${utilities.NumericOperation.formatNumber(x.price * tokenPrice)} $$)")</div>
             </div>
             @if(loginState.nonEmpty) {
                 <div class="d-flex align-items-center gap-1 mt-3">

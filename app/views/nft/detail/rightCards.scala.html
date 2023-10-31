@@ -8,9 +8,13 @@
 <div class="d-flex flex-column gap-3 sticky-top item-sticky">
     <div class="sticky-top item-sticky">
         <div class="card rightInfoCard">
-            <div class="d-flex flex-column gap-1">
+            <div class="d-flex flex-column gap-1 mt-2">
                 <div class="analysisTitle">@Messages(constants.View.TOTAL_SUPPLY)</div>
                 <div class="analysisValue">@nft.totalSupply</div>
+            </div>
+            <div class="d-flex flex-column gap-1 mt-2">
+                <div class="analysisTitle">@Messages(constants.View.COLLECTION_ROYALTY_FEES)</div>
+                <div class="analysisValue">@(collection.royalty * 100) %</div>
             </div>
             @if(nft.totalSupply == 1) {
                 @if(optionalLoginState.isDefined) {

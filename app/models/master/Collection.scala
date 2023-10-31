@@ -6,7 +6,6 @@ import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import schema.data.base.NumberData
 import schema.id.base.{ClassificationID, IdentityID}
 import schema.property.base.{MesaProperty, MetaProperty}
 import schema.qualified.{Immutables, Mutables}
@@ -35,7 +34,7 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
 
   def getMutables: Mutables = Mutables(this.getMutableMetaProperties ++ this.getMutableProperties)
 
-  def getClassificationID: ClassificationID = utilities.Collection.getClassificationID(immutables = this.getImmutables, mutables = this.getMutables.add(Seq(schema.constants.Properties.BondAmountProperty.copy(data = NumberData(this.getBondAmount)))))
+  def getClassificationID: ClassificationID = if (this.classificationId.isEmpty) utilities.Collection.generateClassificationID(this) else ClassificationID(this.classificationId.get)
 
   def serialize(): Collections.CollectionSerialized = Collections.CollectionSerialized(
     id = this.id,
@@ -185,6 +184,8 @@ class Collections @Inject()(
     def get(id: String): Future[Option[Collection]] = getById(id).map(_.map(_.deserialize))
 
     def tryGet(id: String): Future[Collection] = tryGetById(id).map(_.deserialize)
+
+    def getByClassificationId(classificationID: ClassificationID): Future[Option[Collection]] = filter(_.classificationId === classificationID.asString).map(_.headOption.map(_.deserialize()))
 
     def getPublicByPageNumber(pageNumber: Int): Future[Seq[Collection]] = filterAndSortWithPagination(_.public)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.deserialize))
 

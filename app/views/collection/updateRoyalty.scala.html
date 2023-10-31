@@ -6,5 +6,5 @@
 
 @commonForm(constants.Form.UPDATE_ROYALTY, updateRoyaltyForm) {
     @commonInputText(updateRoyaltyForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collection.id, Symbol("readonly") -> "readonly", Symbol("containerDivClass") -> "hidden")
-    @commonInputBigDecimal(updateRoyaltyForm, constants.FormField.COLLECTION_ROYALTY, Symbol("value") -> collection.royalty)
+    @commonInputBigDecimal(updateRoyaltyForm, constants.FormField.COLLECTION_ROYALTY, Symbol("value") -> (collection.royalty * 100))
 }

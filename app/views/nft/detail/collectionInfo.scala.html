@@ -26,27 +26,23 @@
             </div>
         </div>
         <div class="separator"></div>
-        <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_OWNER_TITLE)</div>
+        @if(secondaryMarket.isDefined) {
+            <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_OWNER_TITLE) [@Messages(constants.View.LISTED)]</div>
+        } else {
+            <div class="title">@Messages(constants.View.NFT_DETAIL_CARD_OWNER_TITLE)</div>
+        }
         @if(nft.totalSupply == 1) {
             <div class="d-flex gap-2 align-items-center badgeImageText" onclick="viewProfile('@nftOwner.fold(secondaryMarket.fold("")(_.sellerId))(_.ownerId)/@constants.View.COLLECTED')">
                 <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
                 <div class="badgeText">
-                    @if(secondaryMarket.isDefined) {
-                        @commonStringValue(message = s"${nftOwner.fold(secondaryMarket.fold("")(_.sellerId))(_.ownerId)} [${Messages(constants.View.LISTED)}]", id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
-                    } else {
-                        @commonStringValue(message = nftOwner.fold(secondaryMarket.fold("")(_.sellerId))(_.ownerId), id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
-                    }
+                @commonStringValue(message = nftOwner.fold(secondaryMarket.fold("")(_.sellerId))(_.ownerId), id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
                 </div>
             </div>
         } else {
             <div class="d-flex gap-2 align-items-center badgeImageText">
                 <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")"/>
                 <div class="badgeText">
-                    @if(secondaryMarket.isDefined) {
-                        @commonStringValue(message = s"${numberOfOwners.toString} owners [${Messages(constants.View.LISTED)}]", id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
-                    } else {
-                        @commonStringValue(message = s"${numberOfOwners.toString} owners", id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
-                    }
+                @commonStringValue(message = s"${numberOfOwners.toString} owners", id = utilities.IdGenerator.getRandomHexadecimal, length = 16, showToolTip = false)
                 </div>
             </div>
         }

@@ -20,24 +20,26 @@ case class CollectionDraft(id: String, creatorId: String, name: String, descript
 
   def getInstagram: Option[String] = this.socialProfiles.find(_.name == constants.Collection.SocialProfile.INSTAGRAM).map(_.url)
 
-  def toCollection(public: Boolean = false): Collection = Collection(
-    id = id,
-    creatorId = creatorId,
-    classificationId = None,
-    name = name,
-    description = description,
-    socialProfiles = socialProfiles,
-    nsfw = nsfw,
-    properties = Option(this.properties),
-    profileFileName = this.profileFileName,
-    coverFileName = this.coverFileName,
-    public = public,
-    royalty = royalty,
-    isDefined = Option(false),
-    defineAsset = false,
-    rank = Int.MaxValue,
-    onSecondaryMarket = false,
-    showAll = false)
+  def toCollection(public: Boolean = false): Collection = {
+    Collection(
+      id = id,
+      creatorId = creatorId,
+      classificationId = None,
+      name = name,
+      description = description,
+      socialProfiles = socialProfiles,
+      nsfw = nsfw,
+      properties = Option(this.properties),
+      profileFileName = this.profileFileName,
+      coverFileName = this.coverFileName,
+      public = public,
+      royalty = royalty,
+      isDefined = Option(false),
+      defineAsset = false,
+      rank = Int.MaxValue,
+      onSecondaryMarket = false,
+      showAll = false)
+  }
 
   def getProfileFileURL: Option[String] = this.profileFileName.map(x => constants.CommonConfig.AmazonS3.s3BucketURL + utilities.Collection.getOthersFileAwsKey(collectionId = this.id, fileName = x))
 

@@ -184,7 +184,7 @@ class SaleNFTTransactions @Inject()(
                 masterNFTOwners.Service.markNFTSoldFromSale(nftId = boughtNFT.nftId, saleId = boughtNFT.saleId, sellerAccountId = boughtNFT.sellerAccountId, buyerAccountId = boughtNFT.buyerAccountId)
               }
 
-              def analysisUpdate(nft: NFT, price: MicroNumber, quantity: Int) = collectionsAnalysis.Utility.onSuccessfulSell(collectionId = nft.collectionId, price = price, quantity = quantity)
+              def analysisUpdate(nft: NFT, price: MicroNumber, quantity: Int) = collectionsAnalysis.Utility.onSuccessfulSellFromSale(collectionId = nft.collectionId, price = price, quantity = quantity)
 
               def sendNotifications(boughtNFT: SaleNFTTransaction, count: Int) = {
                 utilitiesNotification.send(boughtNFT.sellerAccountId, constants.Notification.SELLER_BUY_NFT_SUCCESSFUL_FROM_SALE, count.toString)("")

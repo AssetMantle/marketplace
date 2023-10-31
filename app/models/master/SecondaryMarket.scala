@@ -129,6 +129,8 @@ class SecondaryMarkets @Inject()(
 
     def get(ids: Seq[String]): Future[Seq[SecondaryMarket]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
 
+    def getBySortedNFTIDs(nftIds: Seq[String]): Future[Seq[SecondaryMarket]] = filter(_.nftId.inSet(nftIds)).map(_.map(_.deserialize)).map(_.sortBy(_.price))
+
     def getByNFTIdAndLowestPrice(nftId: String): Future[Option[SecondaryMarket]] = filterAndSort(x => x.nftId === nftId && !x.completed && !x.cancelled && !x.expired && x.status)(_.price).map(_.headOption.map(_.deserialize))
 
     def getByNFTIdAndSellerId(nftId: String, sellerId: String): Future[Seq[SecondaryMarket]] = filter(x => x.nftId === nftId && x.sellerId === sellerId && !x.completed && !x.cancelled && !x.expired && x.status).map(_.map(_.deserialize))
@@ -140,6 +142,8 @@ class SecondaryMarkets @Inject()(
     def nftExists(nftId: String): Future[Boolean] = filterAndExists(_.nftId === nftId)
 
     def delete(secondaryMarketId: String): Future[Int] = deleteById(secondaryMarketId)
+
+    def getFloorPriceForCollection(collectionId: String): Future[MicroNumber] = filterAndSortHead(x => x.collectionId === collectionId && !x.completed && !x.cancelled && !x.expired && x.status)(_.price).map(_.deserialize().price)
 
     def existByCollectionId(collectionId: String): Future[Boolean] = filterAndExists(_.collectionId === collectionId)
 

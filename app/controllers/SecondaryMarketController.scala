@@ -118,7 +118,8 @@ class SecondaryMarketController @Inject()(
       implicit request =>
         val collection = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterCollections.Service.tryGet(id)
-        val secondaryMarkets = masterSecondaryMarkets.Service.getByCollectionId(id, pageNumber)
+        val secondaryMarkets = masterSecondaryMarkets.Service.getByCollectionId(id, pageNumber).map(_.sortBy(_.price))
+        val tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice
 
         def nfts(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds)
 
@@ -137,7 +138,7 @@ class SecondaryMarketController @Inject()(
           secondaryMarkets <- secondaryMarkets
           nfts <- nfts(secondaryMarkets.map(_.nftId))
           (nftOwners, likedNFTs) <- getOwnersAndLiked(secondaryMarkets.map(_.nftId))
-        } yield Ok(views.html.base.commonNFTsPerPage(collection, nfts, nftOwners, likedNFTs, Seq(), pageNumber))
+        } yield Ok(views.html.base.commonNFTsPerPage(collection, nfts, nftOwners, likedNFTs, Seq(), pageNumber, secondaryMarkets, showCreatorSection = false, tokenPrice = tokenPrice))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -148,9 +149,11 @@ class SecondaryMarketController @Inject()(
     withoutLoginActionAsync { implicit optionalLoginState =>
       implicit request =>
         val collectionAnalysis = collectionsAnalysis.Service.tryGet(id)
+        val collection = masterCollections.Service.tryGet(id)
         (for {
+          collection <- collection
           collectionAnalysis <- collectionAnalysis
-        } yield Ok(views.html.secondaryMarket.collection.topRightCard(collectionAnalysis))
+        } yield Ok(views.html.secondaryMarket.collection.topRightCard(collection, collectionAnalysis))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -459,7 +462,8 @@ class SecondaryMarketController @Inject()(
       implicit request =>
         val collection = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterCollections.Service.tryGet(collectionId)
-        val secondaryMarkets = masterSecondaryMarkets.Service.getByCollectionSellerAndPageNumber(sellerId = accountId, collectionId = collectionId, pageNumber = pageNumber)
+        val secondaryMarkets = masterSecondaryMarkets.Service.getByCollectionSellerAndPageNumber(sellerId = accountId, collectionId = collectionId, pageNumber = pageNumber).map(_.sortBy(_.price))
+        val tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice
 
         def getNFTs(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds)
 
@@ -470,7 +474,7 @@ class SecondaryMarketController @Inject()(
           secondaryMarkets <- secondaryMarkets
           nfts <- getNFTs(secondaryMarkets.map(_.nftId))
           nftsLiked <- getNFTsLiked(secondaryMarkets.map(_.nftId))
-        } yield Ok(views.html.base.commonNFTsPerPage(collection, nfts, Seq(), nftsLiked, Seq(), pageNumber))
+        } yield Ok(views.html.base.commonNFTsPerPage(collection, nfts, Seq(), nftsLiked, Seq(), pageNumber, secondaryMarkets, showCreatorSection = false, tokenPrice = tokenPrice))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

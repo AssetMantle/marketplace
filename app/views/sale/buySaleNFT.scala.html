@@ -14,10 +14,10 @@
                 @commonInputInt(buySaleNFTForm, constants.FormField.SALE_BUY_NFT_NUMBER, Symbol("value") -> 1)
             </div>
         </div>
+        @commonInputPassword(buySaleNFTForm, constants.FormField.PASSWORD)
         <div class="mb-2">
             @commonToggleButton(buySaleNFTForm, constants.FormField.MINT_NFT)
         </div>
-        @commonInputPassword(buySaleNFTForm, constants.FormField.PASSWORD)
     </div>
 
     <div id="launchpadInvoice" style="display: none;">
@@ -57,7 +57,7 @@
                                     <tr id="bondingAmountContainer">
                                         <td class="text-left tableLabel">@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_BONDING_AMOUNT)</td>
                                         <td class="text-center tableValue">
-                                            <span class="BondingUnitCost">@(collection.getBondAmount/MicroNumber.factor)</span> $MNTL
+                                            <span class="BondingUnitCost">@(BigDecimal(collection.getBondAmount)/MicroNumber.factor)</span> $MNTL
                                         </td>
                                         <td class="text-center tableValue">
                                             <span class="quantity">00</span>
@@ -141,12 +141,12 @@
             </div>
         </div>
 
-        <div class="d-flex align-items-center gap-2 form-information-message mt-3">
-            <div class="form-information-icon">
-                <i class="bi bi-info-circle iconDefault iconSmall"></i>
-            </div>
-            <div class="form-information-text">@Messages(constants.View.NFT_INVOICE_TABLE_INFO_MESSAGE)</div>
-        </div>
+@*        <div class="d-flex align-items-center gap-2 form-information-message mt-3">*@
+@*            <div class="form-information-icon">*@
+@*                <i class="bi bi-info-circle iconDefault iconSmall"></i>*@
+@*            </div>*@
+@*            <div class="form-information-text">@Messages(constants.View.NFT_INVOICE_TABLE_INFO_MESSAGE)</div>*@
+@*        </div>*@
 
     </div>
     <div class="horizontal-align mb-0">

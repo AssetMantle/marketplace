@@ -1,7 +1,8 @@
 @import controllers.actions.LoginState
 @import models.analytics.CollectionAnalysis
+@import models.master.Collection
 
-@(collectionAnalysis: CollectionAnalysis)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+@(collection: Collection, collectionAnalysis: CollectionAnalysis)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
 
 <div class="sticky-top item-sticky">
     <div class="card rightInfoCard">
@@ -14,8 +15,22 @@
             <div class="analysisValue">@utilities.NumericOperation.formatNumber(collectionAnalysis.totalSold)</div>
         </div>
         <div class="d-flex flex-column gap-1 mt-3">
+            <div class="analysisTitle">@Messages(constants.View.COLLECTION_TOTAL_FLOOR_PRICE)</div>
+            <div class="analysisValue">@utilities.NumericOperation.formatNumber(collectionAnalysis.floorPrice) $MNTL</div>
+        </div>
+        <div class="d-flex flex-column gap-1 mt-3">
             <div class="analysisTitle">@Messages(constants.View.COLLECTION_TOTAL_VOLUME_TRADE)</div>
             <div class="analysisValue">@utilities.NumericOperation.formatNumber(collectionAnalysis.totalVolumeTraded) $MNTL</div>
+        </div>
+        <div class="d-flex flex-column gap-1 mt-3">
+            <div class="analysisTitle">@Messages(constants.View.COLLECTION_ROYALTY_FEES)</div>
+            <div class="analysisValue d-flex align-items-center justify-content-between">@utilities.NumericOperation.formatNumber(collection.royalty * 100) %
+                @if(optionalLoginState.isDefined && optionalLoginState.get.username == collection.creatorId) {
+                    <span><button onclick="getForm(jsRoutes.controllers.CollectionController.updateRoyaltyForm('@collection.id'))" class="p-0 lh-sm bg-transparent border-0">
+                        <i class="bi bi-pencil iconDefault"></i>
+                    </button></span>
+                }
+            </div>
         </div>
     </div>
 </div>

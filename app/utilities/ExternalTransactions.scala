@@ -26,6 +26,7 @@ class ExternalTransactions @Inject()(
                                       blockchainBlocks: blockchain.Blocks,
                                       blockchainOrders: blockchain.Orders,
                                       blockchainSplits: blockchain.Splits,
+                                      blockchainParameters: blockchain.Parameters,
                                       collectionsAnalysis: CollectionsAnalysis,
                                       masterAccounts: master.Accounts,
                                       masterBurntNFTs: master.BurntNFTs,
@@ -225,7 +226,15 @@ class ExternalTransactions @Inject()(
     val secondaryMarket = masterSecondaryMarkets.Service.getByOrderId(OrderID(msg.getOrderID))
 
     def update(secondaryMarket: Option[SecondaryMarket]) = if (secondaryMarket.isDefined) {
-      masterSecondaryMarkets.Service.markOnCancellation(secondaryMarket.get.id)
+      val updateMarket = masterSecondaryMarkets.Service.markOnCancellation(secondaryMarket.get.id)
+
+      def updateAnalytics() = collectionsAnalysis.Utility.onCancelSecondaryMarket(secondaryMarket.get.collectionId, 1)
+
+      for {
+        _ <- updateMarket
+        _ <- updateAnalytics()
+      } yield Future(1)
+
     } else Future(0)
 
     for {
@@ -259,6 +268,7 @@ class ExternalTransactions @Inject()(
       val secondaryMarket = SecondaryMarket(id = secondaryMarketId, orderId = orderID.asString, nftId = nft.get.id, collectionId = nft.get.collectionId, sellerId = account.get.id, quantity = BigInt(msg.getMakerSplit), price = MicroNumber(BigDecimal(msg.getTakerSplit).toBigInt), denom = constants.Blockchain.StakingToken, endHours = endHours.toInt, externallyMade = true, completed = false, cancelled = false, expired = false, status = Option(true))
       val add = masterSecondaryMarkets.Service.add(secondaryMarket)
       val collection = masterCollections.Service.markListedOnSecondaryMarket(nft.get.collectionId)
+      val updateAnalytics = collectionsAnalysis.Utility.onCreateSecondaryMarket(nft.get.collectionId, totalListed = 1, listingPrice = secondaryMarket.price)
 
       def updateOwner() = masterNFTOwners.Service.onSecondaryMarket(nftId = nftOwner.get.nftId, ownerId = secondaryMarket.sellerId, sellQuantity = BigInt(msg.getMakerSplit))
 
@@ -266,6 +276,7 @@ class ExternalTransactions @Inject()(
         _ <- add
         _ <- collection
         _ <- updateOwner()
+        _ <- updateAnalytics
       } yield ()
     } else Future(0)
 
@@ -281,14 +292,19 @@ class ExternalTransactions @Inject()(
   def onGetOrder(msg: orderTransactions.get.Message): Future[Unit] = {
     val blockchainOrder = blockchainOrders.Service.tryGet(OrderID(msg.getOrderID))
     val account = masterAccounts.Service.getByIdentityId(IdentityID(msg.getFromID))
+    val secondaryMarket = masterSecondaryMarkets.Service.getByOrderId(OrderID(msg.getOrderID))
 
     def nft(assetID: AssetID, account: Option[Account]) = if (account.isDefined) masterNFTs.Service.getByAssetId(assetID.asString) else Future(None)
+
+    def updateAnalytics(secondaryMarket: Option[SecondaryMarket]) = if (secondaryMarket.isDefined) collectionsAnalysis.Utility.onSuccessfulBuyFromMarket(secondaryMarket.get.collectionId, secondaryMarket.get.price, 1) else Future()
 
     for {
       blockchainOrder <- blockchainOrder
       account <- account
       nft <- nft(blockchainOrder.getMakerAssetID, account)
       _ <- updateNFTOwner(nft, account)
+      secondaryMarket <- secondaryMarket
+      _ <- updateAnalytics(secondaryMarket)
     } yield ()
   }
 

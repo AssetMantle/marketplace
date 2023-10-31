@@ -4,24 +4,27 @@ function showSubmitButton() {
     $("#launchpadNextButton").hide();
     $("#formSubmitButton").show();
     $(".quantity").text($("#SALE_BUY_NFT_NUMBER").val());
-    if($("#MINT_NFT").is(":checked")){
+    if ($("#MINT_NFT").is(":checked")) {
         $("#bondingAmountContainer").show();
     }
 }
 
-$("#PASSWORD").on("keyup",function(){
-    if($("#PASSWORD").val() !== ""){
+$("#PASSWORD").on("keyup", function () {
+    if ($("#PASSWORD").val() !== "") {
         $("#launchpadNextButton").removeClass("disable");
-    }else{
+    } else {
         $("#launchpadNextButton").addClass("disable");
     }
 });
 
-function computeInvoice(){
+function computeInvoice() {
     let quantity = parseInt($("#SALE_BUY_NFT_NUMBER").val());
-    let listedUnitCost = parseFloat($(".listedUnitCost").text().replace(",",""));
+    let listedUnitCost = parseFloat($(".listedUnitCost").text().replace(",", ""));
     let listedAmount = listedUnitCost * quantity;
-    let BondingUnitCost = parseFloat($(".BondingUnitCost").text().replace(",",""));
+    let BondingUnitCost = 0.0;
+    if ($("#MINT_NFT").is(":checked")) {
+        BondingUnitCost = parseFloat($(".BondingUnitCost").text().replace(",", ""));
+    }
     let BondingAmount = BondingUnitCost * quantity;
     let commissionRate = parseFloat($(".commissionRate").text());
     let commissionAmount = parseFloat((listedAmount * commissionRate) / 100);

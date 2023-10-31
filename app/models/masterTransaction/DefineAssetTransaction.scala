@@ -111,8 +111,8 @@ class DefineAssetTransactions @Inject()(
       val anyPendingTx = Service.checkAnyPendingTx
 
       def filterAlreadyDefined(collections: Seq[Collection]) = {
-        val classificationIDs = collections.map(_.getClassificationID)
-        val existingClassificationIDsString = blockchainClassifications.Service.getIDsAlreadyExists(classificationIDs.map(_.asString))
+        val classificationIDs = collections.map(_.getClassificationID.asString)
+        val existingClassificationIDsString = blockchainClassifications.Service.getIDsAlreadyExists(classificationIDs)
 
         def updateMasterKeys(collectionIds: Seq[String]) = if (collectionIds.nonEmpty) masterCollections.Service.markAsDefined(collectionIds) else Future(0)
 

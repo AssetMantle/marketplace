@@ -14,7 +14,7 @@
         @commonInputText(nftBasicDetailForm, constants.FormField.NFT_NAME)
         @commonDescriptionText(nftBasicDetailForm, constants.FormField.NFT_DESCRIPTION)
     }
-    @commonInputText(nftBasicDetailForm, constants.FormField.NFT_TAGS, Symbol("class") -> "hidden"))
+    @commonInputText(nftBasicDetailForm, constants.FormField.NFT_TAGS, Symbol("class") -> "hidden")
     <div class="hashtagWrapper">
         <div class="content">
             <label for="hashtagField">@Messages(constants.View.CREATE_NFT_TAG_LABEL)</label>
@@ -29,11 +29,9 @@
     @commonInputText(nftBasicDetailForm, constants.FormField.COLLECTION_ID, Symbol("value") -> collectionId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> "readonly")
     @commonInputText(nftBasicDetailForm, constants.FormField.NFT_ID, Symbol("value") -> nftId, Symbol("containerDivClass") -> "hidden", Symbol("readonly") -> "readonly")
 }
-@if(optionalNFTDraft.isDefined && optionalNFTDraft.get.tagNames.isDefined) {
-    @optionalNFTDraft.get.tagNames.get.foreach { tag =>
-        <script>
-                addProperty('@tag');
-        </script>
-    }
-}
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/createNft.js")"></script>
+@if(optionalNFTDraft.isDefined && optionalNFTDraft.get.tagNames.isDefined) {
+    <script>
+            addDraftTags('@optionalNFTDraft.get.tagNames.get.mkString(",")')
+    </script>
+}

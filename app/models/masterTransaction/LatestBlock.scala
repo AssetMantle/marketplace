@@ -87,6 +87,8 @@ class LatestBlocks @Inject()(
         stdMsg.getTypeUrl match {
           case schema.constants.Messages.SEND_COIN => utilitiesExternalTransactions.onSendCoin(bankTx.MsgSend.parseFrom(stdMsg.getValue))
           case schema.constants.Messages.RECV_PACKET => utilitiesExternalTransactions.onIBCReceive(channelTx.MsgRecvPacket.parseFrom(stdMsg.getValue))
+          case schema.constants.Messages.ASSET_DEFINE => Future()// No way to do so because bondRate parameters can be changed if we add all classification id before generated
+          case schema.constants.Messages.ASSET_MINT => Future() // No asset define
           case schema.constants.Messages.ASSET_BURN => utilitiesExternalTransactions.onBurnNFT(assetTransactions.burn.Message.parseFrom(stdMsg.getValue), txHash)
           case schema.constants.Messages.ASSET_MUTATE => utilitiesExternalTransactions.onMutateNFT(assetTransactions.mutate.Message.parseFrom(stdMsg.getValue))
           case schema.constants.Messages.ASSET_RENUMERATE => utilitiesExternalTransactions.onRenumerateNFT(assetTransactions.renumerate.Message.parseFrom(stdMsg.getValue))

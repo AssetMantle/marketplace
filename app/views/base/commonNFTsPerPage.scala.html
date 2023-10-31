@@ -1,11 +1,11 @@
-@import controllers.actions.LoginState
-@import master.{Collection, NFT, NFTOwner}
-@import models.masterTransaction.NFTDraft
 @import views.html.nft.commonNFTCard
+@import controllers.actions.LoginState
+@import master.{Collection, NFT, NFTOwner, SecondaryMarket}
+@import models.masterTransaction.NFTDraft
 
-@(collection: Collection, nfts: Seq[NFT], nftOwners: Seq[NFTOwner], likedNFTIds: Seq[String], nftDrafts: Seq[NFTDraft], pageNumber: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+@(collection: Collection, nfts: Seq[NFT], nftOwners: Seq[NFTOwner], likedNFTIds: Seq[String], nftDrafts: Seq[NFTDraft], pageNumber: Int, secondaryMarkets: Seq[SecondaryMarket], showCreatorSection: Boolean, tokenPrice: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
-@if(loginState.fold("")(_.username) == collection.creatorId && pageNumber == 1) {
+@if(loginState.fold("")(_.username) == collection.creatorId && pageNumber == 1 && showCreatorSection) {
     <div class="singleNFTCard col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-3 createNFTCard" onclick="getForm(jsRoutes.controllers.NFTController.uploadNFTFileForm('@collection.id'))">
         <div class="card border-0 h-100 d-flex justify-content-between" style="cursor: pointer;">
             <div class="createNFTBadge">
@@ -22,16 +22,16 @@
         </div>
     </div>
     @nftDrafts.map { nftDraft =>
-        @commonNFTCard(collection, nftDraft.toNFT(collection = collection), None, JavaScript(s"getForm(jsRoutes.controllers.NFTController.basicDetailsForm('${nftDraft.collectionId}','${nftDraft.id}'))"), None, draft = true)
+        @commonNFTCard(collection, nftDraft.toNFT(collection = collection), None, JavaScript(s"getForm(jsRoutes.controllers.NFTController.basicDetailsForm('${nftDraft.collectionId}','${nftDraft.id}'))"), None, None, tokenPrice, draft = true)
     }
 }
 
 @if(nfts.nonEmpty) {
     @nfts.map { nft =>
         @if(loginState.isEmpty) {
-            @commonNFTCard(collection, nft, None, JavaScript(s"viewNFT('${nft.id}', '${constants.View.OVERVIEW}')"), nftOwners.find(_.nftId == nft.id))
+            @commonNFTCard(collection, nft, None, JavaScript(s"viewNFT('${nft.id}', '${constants.View.OVERVIEW}')"), nftOwners.find(_.nftId == nft.id), secondaryMarkets.find(_.nftId == nft.id), tokenPrice)
         } else {
-            @commonNFTCard(collection, nft, Option(likedNFTIds.contains(nft.id)), JavaScript(s"viewNFT('${nft.id}', '${constants.View.OVERVIEW}')"), nftOwners.find(_.nftId == nft.id))
+            @commonNFTCard(collection, nft, Option(likedNFTIds.contains(nft.id)), JavaScript(s"viewNFT('${nft.id}', '${constants.View.OVERVIEW}')"), nftOwners.find(_.nftId == nft.id), secondaryMarkets.find(_.nftId == nft.id), tokenPrice)
         }
     }
 } else {

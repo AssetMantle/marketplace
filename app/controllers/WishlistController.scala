@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
-import models.master
+import models.{master, masterTransaction}
 import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -24,6 +24,8 @@ class WishlistController @Inject()(
                                     masterWishLists: master.WishLists,
                                     masterCollections: master.Collections,
                                     masterNFTs: master.NFTs,
+                                    masterSecondaryMarkets: master.SecondaryMarkets,
+                                    masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                   )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   implicit val logger: Logger = Logger(this.getClass)
@@ -84,6 +86,9 @@ class WishlistController @Inject()(
         val collection = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterCollections.Service.tryGet(collectionId)
         val nftIds = masterWishLists.Service.getByCollectionAndPageNumber(accountId = accountId, collectionId = collectionId, pageNumber = pageNumber, perPage = constants.CommonConfig.Pagination.NFTsPerPage)
+        val tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice
+
+        def secondaryMarkets(nftIds: Seq[String]) = masterSecondaryMarkets.Service.getBySortedNFTIDs(nftIds)
 
         def getNFTs(nftIds: Seq[String]) = masterNFTs.Service.getByIds(nftIds)
 
@@ -91,7 +96,8 @@ class WishlistController @Inject()(
           collection <- collection
           nftIds <- nftIds
           nfts <- getNFTs(nftIds)
-        } yield Ok(views.html.base.commonNFTsPerPage(collection, nfts, Seq(), nftIds, Seq(), pageNumber))
+          secondaryMarkets <- secondaryMarkets(nftIds)
+        } yield Ok(views.html.base.commonNFTsPerPage(collection, nfts, Seq(), nftIds, Seq(), pageNumber, secondaryMarkets, showCreatorSection = false, tokenPrice = tokenPrice))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

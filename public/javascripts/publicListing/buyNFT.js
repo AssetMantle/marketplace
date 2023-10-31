@@ -4,7 +4,7 @@ function showSubmitButton() {
     $("#publicListingNextButton").hide();
     $("#formSubmitButton").show();
     $(".quantity").text($("#PUBLIC_LISTING_BUY_NFT_NUMBER").val());
-    if($("#MINT_NFT").is(":checked")){
+    if ($("#MINT_NFT").is(":checked")) {
         $("#bondingAmountContainer").show();
     }
 }
@@ -21,11 +21,11 @@ function computeInvoice() {
     let quantity = parseInt($("#PUBLIC_LISTING_BUY_NFT_NUMBER").val());
     let listedUnitCost = parseFloat($(".listedUnitCost").text().replace(",", ""));
     let listedAmount = listedUnitCost * quantity;
-    console.log($(".BondingUnitCost").text())
-    let BondingUnitCost = parseFloat($(".BondingUnitCost").text().replace(",", ""));
+    let BondingUnitCost = 0.0;
+    if ($("#MINT_NFT").is(":checked")) {
+        BondingUnitCost = parseFloat($(".BondingUnitCost").text().replace(",", ""));
+    }
     let BondingAmount = BondingUnitCost * quantity;
-    console.log(BondingUnitCost);
-    console.log(BondingAmount);
     let commissionRate = parseFloat($(".commissionRate").text());
     let commissionAmount = parseFloat((listedAmount * commissionRate) / 100);
     let subTotal = listedAmount + BondingAmount + commissionAmount;

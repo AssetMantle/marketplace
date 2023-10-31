@@ -210,7 +210,7 @@ class SaleController @Inject()(
             unmintedNFTs <- unmintedNFTs
             countNFts <- countNFts(unmintedNFTs)
             _ <- addToSale(collection = collection, countNFts = countNFts, saleExistOnCollection = saleExistOnCollection, collectionAnalysis = collectionAnalysis, unmintedNFTs = unmintedNFTs)
-            _ <- collectionsAnalysis.Utility.onCreateSale(collection.id, totalListed = createData.nftForSale, salePrice = createData.price)
+            _ <- collectionsAnalysis.Utility.onCreateSale(collection.id, salePrice = createData.price)
           } yield {
             sendNotifications(whitelistMembers, collection.name)
             PartialContent(views.html.sale.createSuccessful())

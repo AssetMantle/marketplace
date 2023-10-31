@@ -7,7 +7,7 @@ import models.blockchainTransaction.UserTransaction
 import models.master.SecondaryMarket
 import models.masterTransaction.CancelOrderTransactions.CancelOrderTransactionTable
 import models.traits._
-import models.{blockchain, blockchainTransaction, master}
+import models.{analytics, blockchain, blockchainTransaction, master}
 import org.bitcoinj.core.ECKey
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -56,6 +56,7 @@ class CancelOrderTransactions @Inject()(
                                          blockchainIdentities: blockchain.Identities,
                                          masterSecondaryMarkets: master.SecondaryMarkets,
                                          masterNFTs: master.NFTs,
+                                         collectionsAnalysis: analytics.CollectionsAnalysis,
                                          utilitiesOperations: utilities.Operations,
                                          utilitiesNotification: utilities.Notification,
                                          utilitiesTransaction: utilities.Transaction,
@@ -112,13 +113,20 @@ class CancelOrderTransactions @Inject()(
           def onTxComplete(userTx: UserTransaction) = if (userTx.status.isDefined) {
             if (userTx.status.get) {
               val markSuccess = Service.markSuccess(cancelOrderTx.txHash)
-              val markOnCancellation = masterSecondaryMarkets.Service.markOnCancellation(cancelOrderTx.secondaryMarketId)
+              val secondaryMarket = masterSecondaryMarkets.Service.tryGet(cancelOrderTx.secondaryMarketId)
+
+              def markOnCancellation = masterSecondaryMarkets.Service.markOnCancellation(cancelOrderTx.secondaryMarketId)
+
               val sendNotifications = utilitiesNotification.send(cancelOrderTx.sellerId, constants.Notification.CANCEL_ORDER_SUCCESSFUL)("")
+
+              def updateAnalytics(secondaryMarket: SecondaryMarket) = collectionsAnalysis.Utility.onCancelSecondaryMarket(secondaryMarket.collectionId, 1)
 
               for {
                 _ <- markSuccess
+                secondaryMarket <- secondaryMarket
                 _ <- markOnCancellation
                 _ <- sendNotifications
+                _ <- updateAnalytics(secondaryMarket)
               } yield ()
 
             } else {

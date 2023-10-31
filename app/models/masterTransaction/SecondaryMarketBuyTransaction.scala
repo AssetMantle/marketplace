@@ -142,6 +142,8 @@ class SecondaryMarketBuyTransactions @Inject()(
 
               def onSuccessfulBuy(collection: master.Collection, secondaryMarket: SecondaryMarket) = masterNFTOwners.Service.onSuccessfulBuyFromSecondaryMarket(nftId = secondaryMarketBuyTx.nftId, collection = collection, totalSold = secondaryMarket.quantity, buyerId = secondaryMarketBuyTx.buyerId)
 
+              def updateAnalytics(secondaryMarket: SecondaryMarket) = collectionsAnalysis.Utility.onSuccessfulBuyFromMarket(secondaryMarket.collectionId, secondaryMarket.price, 1)
+
               def sendNotifications(sellerId: String, nft: NFT) = {
                 utilitiesNotification.send(sellerId, constants.Notification.SELLER_TAKE_ORDER_SUCCESSFUL, nft.name)("")
                 utilitiesNotification.send(secondaryMarketBuyTx.buyerId, constants.Notification.BUYER_TAKE_ORDER_SUCCESSFUL, nft.name)(s"'${secondaryMarketBuyTx.buyerId}', '${constants.View.COLLECTED}'")
@@ -155,6 +157,7 @@ class SecondaryMarketBuyTransactions @Inject()(
                 _ <- onSuccessfulBuy(collection, secondaryMarket)
                 _ <- updateSecondaryMarket()
                 _ <- sendNotifications(secondaryMarket.sellerId, nft)
+                _ <- updateAnalytics(secondaryMarket)
               } yield ()
             } else {
               val markFailed = Service.markFailed(secondaryMarketBuyTx.txHash)

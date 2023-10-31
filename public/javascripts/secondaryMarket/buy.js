@@ -5,17 +5,17 @@ function showSubmitButton() {
     $("#formSubmitButton").show();
 }
 
-$("#PASSWORD").on("keyup",function(){
-    if($("#PASSWORD").val() !== ""){
+$("#PASSWORD").on("keyup", function () {
+    if ($("#PASSWORD").val() !== "") {
         $("#secondaryMarketNextButton").removeClass("disable");
-    }else{
+    } else {
         $("#secondaryMarketNextButton").addClass("disable");
     }
 });
 
-function computeInvoice(){
+function computeInvoice() {
     let quantity = parseInt($("#quantity").text());
-    let listedUnitCost = parseFloat($(".listedUnitCost").text().replace(",",""));
+    let listedUnitCost = parseFloat($(".listedUnitCost").text().replace(",", ""));
     let listedAmount = listedUnitCost * quantity;
     let commissionRate = parseFloat($(".commissionRate").text());
     let commissionAmount = parseFloat((listedAmount * commissionRate) / 100);

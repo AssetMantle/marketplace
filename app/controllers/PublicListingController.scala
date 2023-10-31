@@ -188,7 +188,7 @@ class PublicListingController @Inject()(
             countNFts <- countNFts(unmintedNFTs)
             _ <- addToPublicListing(countNFts = countNFts, collection = collection, collectionAnalysis = collectionAnalysis, unmintedNFTs = unmintedNFTs)
             _ <- sendNotification(collection.name)
-            _ <- collectionsAnalysis.Utility.onCreatePublicListing(collection.id, totalListed = createData.numberOfNFTs, listingPrice = createData.price)
+            _ <- collectionsAnalysis.Utility.onCreatePublicListing(collection.id, listingPrice = createData.price)
           } yield PartialContent(views.html.publicListing.createSuccessful())
             ).recover {
             case baseException: BaseException => {

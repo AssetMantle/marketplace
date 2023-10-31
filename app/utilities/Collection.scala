@@ -1,5 +1,7 @@
 package utilities
 
+import models.master.Collection
+import schema.data.base.NumberData
 import schema.id.base.ClassificationID
 import schema.qualified.{Immutables, Mutables}
 
@@ -18,4 +20,7 @@ object Collection {
 
   // TODO BondRate from parameters
   def getClassificationID(immutables: Immutables, mutables: Mutables): ClassificationID = schema.utilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
+
+  def generateClassificationID(collection: Collection): ClassificationID = getClassificationID(immutables = collection.getImmutables, mutables = collection.getMutables.add(Seq(schema.constants.Properties.BondAmountProperty.copy(data = NumberData(collection.getBondAmount)))))
+
 }

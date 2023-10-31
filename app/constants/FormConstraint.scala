@@ -112,6 +112,7 @@ object FormConstraint {
     if (nftBasicDetail.tags != "") {
       val tags = nftBasicDetail.tags.split(constants.NFT.Tags.Separator)
       val errors = Seq(
+        if (tags.exists(_.contains(","))) Option(ValidationError(constants.Response.INVALID_NFT_TAG.message)) else None,
         if (tags.length > constants.NFT.Tags.MaximumAllowed) Option(ValidationError(constants.Response.MAXIMUM_NFT_TAGS_EXCEEDED.message)) else None,
         if (tags.exists(x => x.length < constants.NFT.Tags.MinimumLength || x.length > constants.NFT.Tags.MaximumLength)) Option(ValidationError(constants.Response.INVALID_NFT_TAGS_LENGTH.message)) else None,
         if (tags.distinct.length != tags.length) Option(ValidationError(constants.Response.REPEATED_NFT_TAGS.message)) else None,

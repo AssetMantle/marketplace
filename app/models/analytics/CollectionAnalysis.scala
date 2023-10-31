@@ -109,6 +109,7 @@ private[analytics] object CollectionsAnalysis {
 class CollectionsAnalysis @Inject()(
                                      masterCollections: Collections,
                                      masterNFTs: NFTs,
+                                     masterSecondaryMarkets: SecondaryMarkets,
                                      protected val dbConfigProvider: DatabaseConfigProvider,
                                    )(implicit val executionContext: ExecutionContext)
   extends GenericDaoImpl[CollectionsAnalysis.CollectionAnalysisTable, CollectionsAnalysis.CollectionAnalysisSerialized, String]() {
@@ -145,21 +146,21 @@ class CollectionsAnalysis @Inject()(
       } yield ()
     }
 
-    def onCreateSale(collectionId: String, totalListed: Long, salePrice: MicroNumber): Future[Unit] = {
+    def onCreateSale(collectionId: String, salePrice: MicroNumber): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
 
       for {
         collectionAnalysis <- collectionAnalysis
-        _ <- Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed + totalListed, salePrice = salePrice))
+        _ <- Service.update(collectionAnalysis.copy(salePrice = salePrice))
       } yield ()
     }
 
-    def onCreatePublicListing(collectionId: String, totalListed: Long, listingPrice: MicroNumber): Future[Unit] = {
+    def onCreatePublicListing(collectionId: String, listingPrice: MicroNumber): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
 
       for {
         collectionAnalysis <- collectionAnalysis
-        _ <- Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed + totalListed, publicListingPrice = listingPrice))
+        _ <- Service.update(collectionAnalysis.copy(publicListingPrice = listingPrice))
       } yield ()
     }
 
@@ -177,7 +178,32 @@ class CollectionsAnalysis @Inject()(
       } yield ()
     }
 
-    def onSuccessfulSell(collectionId: String, price: MicroNumber, quantity: Int): Future[Unit] = {
+    def onSuccessfulBuyFromMarket(collectionId: String, price: MicroNumber, quantity: Int): Future[Unit] = {
+      val collectionAnalysis = Service.tryGet(collectionId)
+      val floorPrice = masterSecondaryMarkets.Service.getFloorPriceForCollection(collectionId)
+      for {
+        collectionAnalysis <- collectionAnalysis
+        floorPrice <- floorPrice
+        _ <- Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed - 1, floorPrice = floorPrice, totalTraded = collectionAnalysis.totalTraded + quantity, totalSold = collectionAnalysis.totalSold + quantity, totalVolumeTraded = collectionAnalysis.totalVolumeTraded + (price * quantity)))
+      } yield ()
+    }
+
+    def onCancelSecondaryMarket(collectionId: String, totalRemoved: Int): Future[Unit] = {
+      val collectionAnalysis = Service.tryGet(collectionId)
+      val floorPrice = masterSecondaryMarkets.Service.getFloorPriceForCollection(collectionId)
+
+      def update(collectionAnalysis: CollectionAnalysis, floorPrice: MicroNumber) = {
+        Service.update(collectionAnalysis.copy(listed = collectionAnalysis.listed - totalRemoved, floorPrice = floorPrice))
+      }
+
+      for {
+        collectionAnalysis <- collectionAnalysis
+        floorPrice <- floorPrice
+        _ <- update(collectionAnalysis, floorPrice)
+      } yield ()
+    }
+
+    def onSuccessfulSellFromSale(collectionId: String, price: MicroNumber, quantity: Int): Future[Unit] = {
       val collectionAnalysis = Service.tryGet(collectionId)
 
       for {

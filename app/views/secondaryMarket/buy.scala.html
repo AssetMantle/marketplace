@@ -10,11 +10,6 @@
     <div id="secondaryMarketForm">
         @commonInputText(buyForm, constants.FormField.NFT_ID, Symbol("value") -> secondaryMarket.nftId, Symbol("containerDivClass") -> "hidden")
         @commonInputText(buyForm, constants.FormField.SECONDARY_MARKET_ID, Symbol("value") -> secondaryMarket.id, Symbol("containerDivClass") -> "hidden")
-@*//        @if(secondaryMarket.quantity > 1) {*@
-@*//            @commonInputLong(buyForm, constants.FormField.BUY_QUANTITY)*@
-@*//        } else {*@
-@*//            @commonInputLong(buyForm, constants.FormField.BUY_QUANTITY, Symbol("value") -> 1, Symbol("containerDivClass") -> "hidden")*@
-@*//        }*@
         @commonInputPassword(buyForm, constants.FormField.PASSWORD)
     </div>
 
@@ -137,12 +132,12 @@
             </div>
         </div>
 
-        <div class="d-flex align-items-center gap-2 form-information-message mt-3">
-            <div class="form-information-icon">
-                <i class="bi bi-info-circle iconDefault iconSmall"></i>
-            </div>
-            <div class="form-information-text">@Messages(constants.View.NFT_INVOICE_TABLE_INFO_MESSAGE)</div>
-        </div>
+@*        <div class="d-flex align-items-center gap-2 form-information-message mt-3">*@
+@*            <div class="form-information-icon">*@
+@*                <i class="bi bi-info-circle iconDefault iconSmall"></i>*@
+@*            </div>*@
+@*            <div class="form-information-text">@Messages(constants.View.NFT_INVOICE_TABLE_INFO_MESSAGE)</div>*@
+@*        </div>*@
     </div>
     <div class="horizontal-align mb-0">
     @commonPrimaryButton(constants.View.NEXT, JavaScript(s"showHideModalScreen('#secondaryMarketInvoice', '#secondaryMarketForm'); showSubmitButton(); computeInvoice();"), Symbol("id") -> "secondaryMarketNextButton", Symbol("class") -> "disable")

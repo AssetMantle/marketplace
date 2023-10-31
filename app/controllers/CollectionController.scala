@@ -44,6 +44,7 @@ class CollectionController @Inject()(
                                       masterWhitelistMembers: master.WhitelistMembers,
                                       masterWishLists: master.WishLists,
                                       utilitiesNotification: utilities.Notification,
+                                      masterSecondaryMarkets: master.SecondaryMarkets,
                                     )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   implicit val logger: Logger = Logger(this.getClass)
@@ -127,10 +128,13 @@ class CollectionController @Inject()(
       implicit request =>
         val collection = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException()
         else masterCollections.Service.tryGet(id)
+        val tokenPrice = masterTransactionTokenPrices.Service.getLatestPrice
 
         def getNFTs(creatorId: String) = if (optionalLoginState.fold("")(_.username) == creatorId || pageNumber == 1) masterNFTs.Service.getByPageNumber(id, pageNumber) else Future(Seq())
 
         def nftDrafts(collection: Collection) = if (optionalLoginState.fold("")(_.username) == collection.creatorId) masterTransactionNFTDrafts.Service.getAllForCollection(id) else Future(Seq())
+
+        def secondaryMarkets(nftIds: Seq[String]) = masterSecondaryMarkets.Service.getBySortedNFTIDs(nftIds)
 
         def getOwnersAndLiked(nftIds: Seq[String]) = if (optionalLoginState.isDefined && nftIds.nonEmpty) {
           val nftOwners = masterNFTOwners.Service.getByOwnerAndIds(ownerId = optionalLoginState.get.username, nftIDs = nftIds)
@@ -147,7 +151,8 @@ class CollectionController @Inject()(
           nfts <- getNFTs(collection.creatorId)
           (nftOwners, likedNFTs) <- getOwnersAndLiked(nfts.map(_.id))
           nftDrafts <- nftDrafts(collection)
-        } yield Ok(views.html.base.commonNFTsPerPage(collection, nfts, nftOwners, likedNFTs, nftDrafts, pageNumber))
+          secondaryMarkets <- secondaryMarkets(nfts.map(_.id))
+        } yield Ok(views.html.base.commonNFTsPerPage(collection, nfts, nftOwners, likedNFTs, nftDrafts, pageNumber, secondaryMarkets, showCreatorSection = true, tokenPrice = tokenPrice))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
