@@ -32,12 +32,12 @@
             <div class="d-flex gap-2">
                 <div class="primaryIconButton">
                     <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.WRAP_COIN.get, ""))" class="p-0">
-                        <i class="bi bi-arrow-down-left"></i>
+                        <img src="@routes.Assets.versioned("images/icon/unwrapBlack.svg")">
                     </a>
                 </div>
                 <div class="secondaryIconButton">
-                    <a class="p-0" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.UNWRAP_TOKEN.get, s"'${loginState.address}'"))">
-                        <i class="bi bi-arrow-up-right"></i>
+                    <a class="p-0 d-flex align-items-center" style="padding-top: 2px!important;" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.UNWRAP_TOKEN.get, s"'${loginState.address}'"))">
+                        <img src="@routes.Assets.versioned("images/icon/wrapYellow.svg")">
                     </a>
                 </div>
             </div>
