@@ -290,7 +290,7 @@ class CollectionController @Inject()(
       val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(id)
       (for {
         collectionDraft <- collectionDraft
-      } yield if (collectionDraft.creatorId == loginState.username) Ok(views.html.collection.edit(collectionDraft = Option(collectionDraft))) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+      } yield if (collectionDraft.creatorId == loginState.username) Ok(views.html.collection.edit(collectionDraft = collectionDraft)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
         ).recover {
         case baseException: BaseException => BadRequest(baseException.failure.message)
       }
@@ -303,19 +303,26 @@ class CollectionController @Inject()(
           val collectionDraft = masterTransactionCollectionDrafts.Service.tryGet(formWithErrors.data.getOrElse(constants.FormField.COLLECTION_ID.name, ""))
           (for {
             collectionDraft <- collectionDraft
-          } yield if (collectionDraft.creatorId == loginState.username) BadRequest(views.html.collection.edit(formWithErrors, Option(collectionDraft))) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
+          } yield if (collectionDraft.creatorId == loginState.username) BadRequest(views.html.collection.edit(formWithErrors, collectionDraft)) else constants.Response.NOT_COLLECTION_OWNER.throwBaseException()
             ).recover {
             case baseException: BaseException => BadRequest(baseException.failure.message)
           }
         },
         editData => {
-          val update = masterTransactionCollectionDrafts.Service.checkOwnerAndUpdate(id = editData.collectionId, name = editData.name, description = editData.description, socialProfiles = editData.getSocialProfiles, creatorId = loginState.username, nsfw = editData.nsfw, royalty = editData.royalty)
+          val update = masterTransactionCollectionDrafts.Service.checkOwnerAndUpdate(id = editData.collectionId, name = editData.name, description = editData.description, socialProfiles = editData.getSocialProfiles, creatorId = loginState.username, nsfw = editData.nsfw, royalty = editData.royalty / 100)
 
           (for {
             collectionDraft <- update
           } yield PartialContent(views.html.collection.uploadDraftFile(collectionDraft = collectionDraft))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.collection.edit(Edit.form.withGlobalError(baseException.failure.message), None))
+            case baseException: BaseException => {
+              try {
+                val collectionDraft = Await.result(masterTransactionCollectionDrafts.Service.tryGet(editData.collectionId), constants.Time.FiveSecond)
+                BadRequest(views.html.collection.edit(Edit.form.withGlobalError(baseException.failure.message), collectionDraft))
+              } catch {
+                case exception: Exception => BadRequest(views.html.collection.edit(Edit.form.withGlobalError(exception.getLocalizedMessage), CollectionDraft("", "", "", "", Seq(), false, Seq(), None, None, 0)))
+              }
+            }
           }
         }
       )
@@ -363,7 +370,9 @@ class CollectionController @Inject()(
             _ <- update(collection)
           } yield Ok(views.html.collection.updateRoyaltySuccess(updateRoyaltyData.royalty.toString()))
             ).recover {
-            case baseException: BaseException => BadRequest(views.html.collection.edit(Edit.form.withGlobalError(baseException.failure.message), None))
+            case baseException: BaseException => {
+              BadRequest(views.html.collection.updateRoyalty(UpdateRoyalty.form.withGlobalError(baseException.failure.message), Await.result(collection, constants.Time.FiveSecond)))
+            }
           }
         }
       )

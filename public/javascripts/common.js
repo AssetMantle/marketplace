@@ -1,6 +1,6 @@
 // Goto top on load
 document.onload = function () {
-    window.scrollTo({ top:0, left:0, behavior: "instant"});
+    window.scrollTo({top: 0, left: 0, behavior: "instant"});
 }
 
 // Hide modal backdrop
@@ -53,7 +53,7 @@ function showOptions(current) {
         $(current).addClass("active");
     }
 
-    var parent = findParent($(current), "dropdown");
+    let parent = findParent($(current), "dropdown");
 
     $(parent).toggleClass("is-open");
     if ($(parent).hasClass("is-open"))
@@ -63,14 +63,14 @@ function showOptions(current) {
 }
 
 function findParent(element, parentclass) {
-    for (var i = 0; i < 10; i++) {
+    for (let i = 0; i < 10; i++) {
         if ($(element).hasClass(parentclass)) return $(element); else element = $(element).parent();
     }
 }
 
 function setOption(currentOption) {
-    var parent = findParent($(currentOption), "dropdown");
-    var selectedItem = $(currentOption);
+    let parent = findParent($(currentOption), "dropdown");
+    let selectedItem = $(currentOption);
 
     $(parent).removeClass("is-open");
     $(".dropdownHead").removeClass("active");
@@ -91,7 +91,7 @@ function addressShorter(message, fieldId, length) {
 
 // Copy to Clipboard
 function copyToClipboard(e) {
-    var copyText = $(e).prevAll('.username-data').attr("data-value");
+    let copyText = $(e).prevAll('.username-data').attr("data-value");
     navigator.clipboard.writeText(copyText);
 }
 
@@ -221,20 +221,20 @@ function setGasOption(element, value) {
 }
 
 // Sharable Link
-function setSharableLink(imageUrl){
-    if(imageUrl !== "") {
+function setSharableLink(imageUrl) {
+    if (imageUrl !== "") {
         $('meta[name=sharableImage]').attr('content', imageUrl);
     }
 }
 
-function setSoldNFTProgressBar(){
+function setSoldNFTProgressBar() {
     let progressBar = document.querySelector('.progressBar > span');
     let totalNFTs = progressBar.getAttribute("data-totalNFT");
     let soldNFTs = progressBar.getAttribute("data-soldNFT");
-    let progress = (soldNFTs*100) / totalNFTs;
+    let progress = (soldNFTs * 100) / totalNFTs;
     let soldPercentage = document.querySelector(".analysisTitle .analysisPercentage")
-    soldPercentage.textContent = "("+progress.toFixed(2)+"%)";
-    for(let i = 0; i < progress; i++) {
+    soldPercentage.textContent = "(" + progress.toFixed(2) + "%)";
+    for (let i = 0; i < progress; i++) {
         progressBar.style.width = i + '%';
     }
 }
@@ -248,13 +248,13 @@ function showLoader() {
 }
 
 // Banner
-function setBanner(){
+function setBanner() {
     $("#bannerContent").html("").html($(".bannerContainer"));
 }
 
 // Audio NFT
 // Set Audio Duration
-function setDuration(e){
+function setDuration(e) {
     event.preventDefault();
     let player = $(e).closest(".audioNftContainer").find(".audioPlayer");
     $(".time .length").text(getTimeCodeFromNum($(player)[0].duration));
@@ -267,22 +267,22 @@ function playToggle(e) {
     let buttonIcon = $(e).find("i");
     if ($(player)[0].paused === false) {
         $(player)[0].pause();
-        $(buttonIcon).attr("class","bi bi-play");
+        $(buttonIcon).attr("class", "bi bi-play");
     } else {
         $(player)[0].play();
-        $(buttonIcon).attr("class","bi bi-pause");
+        $(buttonIcon).attr("class", "bi bi-pause");
     }
-    if($(".timelineContainer").length) {
+    if ($(".timelineContainer").length) {
         setInterval(() => {
             let progressBar = $(e).closest(".controls").find(".progress");
-            $(progressBar).css("width",$(player)[0].currentTime / $(player)[0].duration * 100 + "%");
+            $(progressBar).css("width", $(player)[0].currentTime / $(player)[0].duration * 100 + "%");
             $(".time .current").text(getTimeCodeFromNum($(player)[0].currentTime));
         }, 100);
     }
 }
 
 // Audio Volume
-function setVolume(e){
+function setVolume(e) {
     event.preventDefault();
     let player = $(e).closest(".audioNftContainer").find(".audioPlayer");
     let buttonIcon = $(e).closest(".volumeContainer").find("i");
@@ -290,20 +290,18 @@ function setVolume(e){
     const newVolume = event.offsetX / parseInt(sliderWidth);
     $(player)[0].volume = newVolume;
     $(player)[0].muted = false;
-    if(newVolume >= 0.5){
-        $(buttonIcon).attr("class","bi bi-volume-up");
-    }
-    else if(newVolume < 0.5 && newVolume > 0){
-        $(buttonIcon).attr("class","bi bi-volume-down");
-    }
-    else{
-        $(buttonIcon).attr("class","bi bi-volume-mute");
+    if (newVolume >= 0.5) {
+        $(buttonIcon).attr("class", "bi bi-volume-up");
+    } else if (newVolume < 0.5 && newVolume > 0) {
+        $(buttonIcon).attr("class", "bi bi-volume-down");
+    } else {
+        $(buttonIcon).attr("class", "bi bi-volume-mute");
     }
     $(e).find(".volumePercentage").css("width", newVolume * 100 + '%');
 }
 
 // Mute/Unmute Audio
-function muteVolume(e){
+function muteVolume(e) {
     event.preventDefault();
     let player = $(e).closest(".audioNftContainer").find(".audioPlayer");
     let buttonIcon = $(e).closest(".volumeContainer").find("i");
@@ -311,24 +309,22 @@ function muteVolume(e){
 
     $(player)[0].muted = !$(player)[0].muted;
     if ($(player)[0].muted) {
-        $(buttonIcon).attr("class","bi bi-volume-mute");
+        $(buttonIcon).attr("class", "bi bi-volume-mute");
         $(volumeSeekBar).css("width", '0%');
     } else {
-        if($(player)[0].volume >= 0.5){
-            $(buttonIcon).attr("class","bi bi-volume-up");
+        if ($(player)[0].volume >= 0.5) {
+            $(buttonIcon).attr("class", "bi bi-volume-up");
+        } else if ($(player)[0].volume < 0.5 && $(player)[0].volume > 0) {
+            $(buttonIcon).attr("class", "bi bi-volume-down");
+        } else {
+            $(buttonIcon).attr("class", "bi bi-volume-mute");
         }
-        else if($(player)[0].volume < 0.5 && $(player)[0].volume > 0){
-            $(buttonIcon).attr("class","bi bi-volume-down");
-        }
-        else{
-            $(buttonIcon).attr("class","bi bi-volume-mute");
-        }
-        $(volumeSeekBar).css("width", $(player)[0].volume * 100 +'%');
+        $(volumeSeekBar).css("width", $(player)[0].volume * 100 + '%');
     }
 }
 
 // Audio Timeline
-function skipAudio(e){
+function skipAudio(e) {
     event.preventDefault();
     let player = $(e).closest(".audioNftContainer").find(".audioPlayer");
     const timelineWidth = window.getComputedStyle(e).width;
@@ -351,14 +347,14 @@ function getTimeCodeFromNum(num) {
 }
 
 // Reset Audio Player
-function resetAudioPlayer(e){
+function resetAudioPlayer(e) {
     let player = $(e);
     let buttonIcon = $(e).next(".controls").find(".playButton i");
     if ($(player)[0].ended) {
-        $(buttonIcon).attr("class","bi bi-play");
+        $(buttonIcon).attr("class", "bi bi-play");
     }
 
-    if($(".timelineContainer").length) {
+    if ($(".timelineContainer").length) {
         let progressBar = $(e).next(".controls").find(".timelineContainer .timeline .progress");
         // console.log($(player)[0].currentTime);
         // console.log($(player)[0].duration * 100);

@@ -50,6 +50,7 @@ class IndexController @Inject()(
                                  wrapTransactions: masterTransaction.WrapTransactions,
                                  provisionAddressTransactions: masterTransaction.ProvisionAddressTransactions,
                                  unprovisionAddressTransactions: masterTransaction.UnprovisionAddressTransactions,
+                                 revealPropertyTransactions: masterTransaction.RevealPropertyTransactions,
                                  userTransactions: UserTransactions,
                                  adminTransactions: AdminTransactions,
                                  masterSecrets: master.Secrets,
@@ -112,7 +113,7 @@ class IndexController @Inject()(
     // masterTransaction
     cancelOrderTransactions.Utility.scheduler,
     defineAssetTransactions.Utility.scheduler,
-//    mintAssetTransactions.Utility.scheduler,
+    mintAssetTransactions.Utility.scheduler,
     nftMintingFeeTransactions.Utility.scheduler,
     nftTransferTransactions.Utility.scheduler,
     provisionAddressTransactions.Utility.scheduler,
@@ -122,6 +123,7 @@ class IndexController @Inject()(
     unprovisionAddressTransactions.Utility.scheduler,
     unwrapTransactions.Utility.scheduler,
     wrapTransactions.Utility.scheduler,
+    revealPropertyTransactions.Utility.scheduler,
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())

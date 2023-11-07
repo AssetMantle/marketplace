@@ -28,7 +28,7 @@ object Scheduler {
 
   def shutdownListener()(implicit executionContext: ExecutionContext): () => Future[Done] = () => {
     signalReceived = true
-    Thread.sleep(20000)
+    Thread.sleep(constants.CommonConfig.WaitTillShutdown)
     Future(Done.done())
   }
 

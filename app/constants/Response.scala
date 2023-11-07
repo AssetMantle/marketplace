@@ -152,6 +152,7 @@ object Response {
   val NFT_ON_SALE_CANNOT_BE_MINTED: Failure = Failure("NFT_ON_SALE_CANNOT_BE_MINTED")
   val SALE_STOPPED_OR_OVER: Failure = Failure("SALE_STOPPED_OR_OVER")
   val SECRET_KEY_ID_NOT_FOUND: Failure = Failure("SECRET_KEY_ID_NOT_FOUND")
+  val PROPERTY_ALREADY_REVEALED: Failure = Failure("PROPERTY_ALREADY_REVEALED")
 
   case class Failure(private val response: String) {
     def message: String = PREFIX + FAILURE_PREFIX + response

@@ -1,0 +1,10 @@
+@import views.html.base.form._
+@import views.nft.companion.RevealProperty
+
+@(revealForm: Form[RevealProperty.Data] = RevealProperty.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.REVEAL_PROPERTY, revealForm) {
+    @commonSelect(revealForm, constants.FormField.COLLECTION_PROPERTY_TYPE)
+    @commonInputText(revealForm, constants.FormField.NFT_PROPERTY_VALUE)
+    @commonInputPassword(revealForm, constants.FormField.PASSWORD)
+}

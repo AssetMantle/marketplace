@@ -12,4 +12,6 @@ case class LoginState(username: String, address: String, accountType: String) {
 
   def getIdentityId: String = utilities.Identity.getMantlePlaceIdentityID(this.username).asString
 
+  def getExplorerUrl: String = s"${constants.CommonConfig.ExplorerUrl}/document/${this.getIdentityId}"
+
 }

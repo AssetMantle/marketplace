@@ -91,7 +91,6 @@ object FormField {
   val COLLECTION_FRACTIONALIZED_DEFAULT: IntFormField = IntFormField("COLLECTION_FRACTIONALIZED_DEFAULT", 1, Int.MaxValue)
   val COLLECTION_LOCKABLE_DEFAULT: IntFormField = IntFormField("COLLECTION_LOCKABLE_DEFAULT", -1, Int.MaxValue)
   val COLLECTION_CUSTOM_BURNABLE_DEFAULT: IntFormField = IntFormField("COLLECTION_CUSTOM_BURNABLE_DEFAULT", -1, Int.MaxValue)
-  val COLLECTION_CUSTOM_BOND_AMOUNT_DEFAULT: IntFormField = IntFormField("COLLECTION_CUSTOM_BOND_AMOUNT_DEFAULT", 1, Int.MaxValue)
 
   // DoubleFormField
   val GAS_PRICE: BigDecimalFormField = BigDecimalFormField("GAS_PRICE", constants.Transaction.LowGasPrice, constants.Transaction.HighGasPrice)
@@ -149,6 +148,7 @@ object FormField {
   val NFT_WHITELIST_SALE_PRICE: MicroNumberFormField = MicroNumberFormField("NFT_WHITELIST_SALE_PRICE", MicroNumber.smallest, MicroNumber(Int.MaxValue), 6)
   val PUBLIC_LISTING_PRICE: MicroNumberFormField = MicroNumberFormField("PUBLIC_LISTING_PRICE", MicroNumber.smallest, MicroNumber(Int.MaxValue), 6)
   val SECONDARY_MARKET_PRICE: MicroNumberFormField = MicroNumberFormField("SECONDARY_MARKET_PRICE", MicroNumber.smallest, MicroNumber(Int.MaxValue), 6)
+  val COLLECTION_CUSTOM_BOND_AMOUNT_DEFAULT: MicroNumberFormField = MicroNumberFormField("COLLECTION_CUSTOM_BOND_AMOUNT_DEFAULT", 1, MicroNumber(Int.MaxValue), 6)
 
   // NestedFormField
   val COLLECTION_PROPERTIES: NestedFormField = NestedFormField("COLLECTION_PROPERTIES")

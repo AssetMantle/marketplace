@@ -1,11 +1,14 @@
 function emptyCallBack() {
-    console.log("emptyCallBack");
 }
 
-function submitForm(refreshOverlay, source, targetID, callback = emptyCallBack) {
+function defaultCheckBeforeSubmit() {
+    return true;
+}
+
+function submitForm(refreshOverlay, source, targetID, checkBeforeSubmit = defaultCheckBeforeSubmit, callback = emptyCallBack) {
     const target = '#' + targetID;
     const form = $(source).closest("form");
-    if (validateForm(form)) {
+    if (validateForm(form) && checkBeforeSubmit()) {
         const result = $(target);
         $.ajax({
             type: 'POST',
@@ -64,9 +67,13 @@ function submitForm(refreshOverlay, source, targetID, callback = emptyCallBack) 
     }
 }
 
-function onKeyPress(event, refreshOverlay, source, targetID) {
+function onKeyPress(event, refreshOverlay, source, targetID, runBeforeSubmit) {
+    console.log('onKeyPress')
     if (event.keyCode === 13) {
         event.preventDefault();
+        console.log('runBeforeSubmit 1');
+        runBeforeSubmit();
+        console.log('runBeforeSubmit 2');
         submitForm(refreshOverlay, source, targetID);
     }
 }
@@ -74,9 +81,9 @@ function onKeyPress(event, refreshOverlay, source, targetID) {
 function onKeyUp(source, submitButtonId) {
     const form = $(source).closest("form");
     let allFiled = checkAllFieldsFilled(form);
-    if(allFiled){
+    if (allFiled) {
         $('#' + submitButtonId).removeClass("disable");
-    } else{
+    } else {
         $('#' + submitButtonId).addClass("disable");
     }
 }

@@ -3,6 +3,7 @@ package views.collection.companion
 import models.common.{Collection => commonCollection}
 import play.api.data.Form
 import play.api.data.Forms.mapping
+import utilities.MicroNumber
 
 object SetCapabilities {
 
@@ -44,7 +45,7 @@ object SetCapabilities {
                    customBurnableDefault: Option[Int],
 
                    customBondAmount: Boolean,
-                   customBondAmountDefault: Option[Int],
+                   customBondAmountDefault: Option[MicroNumber],
                  ) {
 
     def getProperties: Seq[commonCollection.Property] = {
@@ -52,7 +53,7 @@ object SetCapabilities {
       if (this.fractionalized) properties = properties :+ commonCollection.Property(name = schema.constants.Properties.SupplyProperty.id.keyID.value, `type` = constants.NFT.Data.NUMBER, defaultValue = this.fractionalizedDefault.fold("")(_.toString), meta = !this.fractionalizedHidden, mutable = this.fractionalizedMutable)
       if (this.lockable) properties = properties :+ commonCollection.Property(name = schema.constants.Properties.LockHeightProperty.id.keyID.value, `type` = constants.NFT.Data.HEIGHT, defaultValue = this.lockableDefault.fold("")(_.toString), meta = !this.lockableHidden, mutable = this.lockableMutable)
       if (this.customBurnable) properties = properties :+ commonCollection.Property(name = schema.constants.Properties.BurnHeightProperty.id.keyID.value, `type` = constants.NFT.Data.HEIGHT, defaultValue = this.customBurnableDefault.fold("")(_.toString), meta = !this.customBurnableHidden, mutable = this.customBurnableMutable)
-      if (this.customBondAmount) properties = properties :+ commonCollection.Property(name = schema.constants.Properties.BondAmountProperty.id.keyID.value, `type` = constants.NFT.Data.NUMBER, defaultValue = this.customBondAmountDefault.fold("")(_.toString), meta = true, mutable = false)
+      if (this.customBondAmount) properties = properties :+ commonCollection.Property(name = schema.constants.Properties.BondAmountProperty.id.keyID.value, `type` = constants.NFT.Data.NUMBER, defaultValue = this.customBondAmountDefault.fold("")(_.value.toString()), meta = true, mutable = false)
       properties
     }
   }

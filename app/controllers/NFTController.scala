@@ -11,6 +11,7 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import schema.data.Data
 import utilities.MicroNumber
 import views.base.companion.UploadFile
 import views.nft.companion._
@@ -37,6 +38,7 @@ class NFTController @Inject()(
                                blockchainBlocks: blockchain.Blocks,
                                blockchainOrders: blockchain.Orders,
                                blockchainAssets: blockchain.Assets,
+                               blockchainMetas: blockchain.Metas,
                                masterNFTs: master.NFTs,
                                masterSales: master.Sales,
                                masterNFTOwners: master.NFTOwners,
@@ -51,6 +53,7 @@ class NFTController @Inject()(
                                masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                masterTransactionNFTMintingFeeTransactions: masterTransaction.NFTMintingFeeTransactions,
                                masterTransactionNFTTransferTransactions: masterTransaction.NFTTransferTransactions,
+                               masterTransactionRevealPropertyTransactions: masterTransaction.RevealPropertyTransactions,
                              )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   implicit val logger: Logger = Logger(this.getClass)
@@ -618,6 +621,57 @@ class NFTController @Inject()(
           } yield PartialContent(views.html.transactionSuccessful(blockchainTransaction))
             ).recover {
             case baseException: BaseException => BadRequest(views.html.nft.transfer(Transfer.form.withGlobalError(baseException.failure.message), transferData.nftId))
+          }
+        }
+      )
+  }
+
+  def revealPropertyForm(): Action[AnyContent] = withLoginAction { implicit loginState =>
+    implicit request =>
+      Ok(views.html.nft.reveal())
+  }
+
+  def revealProperty(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      RevealProperty.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.nft.reveal(formWithErrors)))
+        },
+        revealPropertyData => {
+          val data = Future(revealPropertyData.getData())
+
+          def checkPropertyExists(data: Data) = blockchainMetas.Service.get(data.getDataID)
+
+          val verifyPassword = masterKeys.Service.validateActiveKeyUsernamePasswordAndGet(username = loginState.username, password = revealPropertyData.password)
+          val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
+
+          def verifyAndTx(verifyPassword: Boolean, balance: MicroNumber, key: Key, propertyExists: Boolean) = {
+            val errors = Seq(
+              if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
+              if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
+              if (propertyExists) Option(constants.Response.PROPERTY_ALREADY_REVEALED) else None,
+            ).flatten
+
+            if (errors.isEmpty) {
+              masterTransactionRevealPropertyTransactions.Utility.transaction(
+                fromAddress = key.address,
+                accountId = loginState.username,
+                data = revealPropertyData.getData(),
+                gasPrice = constants.Transaction.DefaultGasPrice,
+                ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, revealPropertyData.password))
+              )
+            } else errors.head.throwBaseException()
+          }
+
+          (for {
+            data <- data
+            checkPropertyExists <- checkPropertyExists(data)
+            (verified, key) <- verifyPassword
+            balance <- balance
+            blockchainTransaction <- verifyAndTx(verifyPassword = verified, balance = balance, key = key, checkPropertyExists.isDefined)
+          } yield PartialContent(views.html.transactionSuccessful(blockchainTransaction))
+            ).recover {
+            case baseException: BaseException => BadRequest(views.html.nft.reveal(RevealProperty.form.withGlobalError(baseException.failure.message)))
           }
         }
       )

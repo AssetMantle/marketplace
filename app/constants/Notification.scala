@@ -71,6 +71,9 @@ object Notification {
   val ADDRESS_UNPROVISIONED_SUCCESSFULLY: Notification = Notification("ADDRESS_UNPROVISIONED_SUCCESSFULLY", sendEmail = false, sendPushNotification = false, sendSMS = false, sendToClient = true, notificationType = Type.SUCCESS, route = Option(routes.javascript.SettingController.viewSettings))
   val ADDRESS_UNPROVISIONED_FAILED: Notification = Notification("ADDRESS_UNPROVISIONED_FAILED", sendEmail = false, sendPushNotification = false, sendSMS = false, sendToClient = true, notificationType = Type.FAILURE, route = Option(routes.javascript.SettingController.viewSettings))
 
+  val PROPERTY_REVEALED_SUCCESSFULLY: Notification = Notification("PROPERTY_REVEALED_SUCCESSFULLY", sendEmail = false, sendPushNotification = false, sendSMS = false, sendToClient = true, notificationType = Type.SUCCESS, route = Option(routes.javascript.SettingController.viewSettings))
+  val PROPERTY_REVEALED_FAILED: Notification = Notification("PROPERTY_REVEALED_FAILED", sendEmail = false, sendPushNotification = false, sendSMS = false, sendToClient = true, notificationType = Type.FAILURE, route = Option(routes.javascript.SettingController.viewSettings))
+
   val UNWRAPPED_TOKEN_SUCCESSFULLY: Notification = Notification("UNWRAPPED_TOKEN_SUCCESSFULLY", sendEmail = false, sendPushNotification = true, sendSMS = false, sendToClient = true, notificationType = Type.SUCCESS, route = None)
   val UNWRAPPED_TOKEN_FAILED: Notification = Notification("UNWRAPPED_TOKEN_FAILED", sendEmail = false, sendPushNotification = true, sendSMS = false, sendToClient = true, notificationType = Type.FAILURE, route = None)
   val WRAPPED_TOKEN_SUCCESSFULLY: Notification = Notification("WRAPPED_TOKEN_SUCCESSFULLY", sendEmail = false, sendPushNotification = true, sendSMS = false, sendToClient = true, notificationType = Type.SUCCESS, route = None)

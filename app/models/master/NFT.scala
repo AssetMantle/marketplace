@@ -20,7 +20,7 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getFileHash: String = this.id
 
-  def getExplorerUrl = s"https://explorer.assetmantle.one/document/${this.getAssetID.asString}"
+  def getExplorerUrl = s"${constants.CommonConfig.ExplorerUrl}/document/${this.getAssetID.asString}"
 
   def getFileHashID: HashID = HashID(DatatypeConverter.parseHexBinary(this.id))
 

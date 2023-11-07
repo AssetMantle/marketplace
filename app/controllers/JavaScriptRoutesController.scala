@@ -98,6 +98,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NFTController.sellOrdersPerPage,
         routes.javascript.NFTController.yourOrders,
         routes.javascript.NFTController.yourOrdersPerPage,
+        routes.javascript.NFTController.revealPropertyForm,
 
         routes.javascript.SettingController.viewSettings,
         routes.javascript.SettingController.settings,

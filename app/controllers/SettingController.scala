@@ -244,25 +244,26 @@ class SettingController @Inject()(
           Future(BadRequest(views.html.setting.deleteKey(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.WALLET_ADDRESS.name, ""))))
         },
         deleteKeyData => {
-          val validateAndGetKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = deleteKeyData.address, password = deleteKeyData.password)
+          val validateAndGetTxKey = masterKeys.Service.validateUsernamePasswordAndGetKey(username = loginState.username, address = loginState.address, password = deleteKeyData.password)
+          val deleteKey = masterKeys.Service.tryGet(accountId = loginState.username, address = deleteKeyData.address)
           val balance = blockchainBalances.Service.getTokenBalance(loginState.address)
 
-          def delete(validated: Boolean, key: master.Key, balance: MicroNumber) = {
+          def delete(validated: Boolean, txKey: master.Key, balance: MicroNumber, deleteKey: master.Key) = {
             val errors = Seq(
-              if (key.active) Option(constants.Response.CANNOT_DELETE_ACTIVE_KEY) else None,
+              if (deleteKey.active) Option(constants.Response.CANNOT_DELETE_ACTIVE_KEY) else None,
               if (!validated) Option(constants.Response.INVALID_PASSWORD) else None,
               if (balance == MicroNumber.zero) Option(constants.Response.INSUFFICIENT_BALANCE) else None,
-              if (key.identityIssued.isEmpty) Option(constants.Response.KEY_PROVISION_STATE_UNKNOWN) else None,
+              if (deleteKey.identityIssued.isEmpty) Option(constants.Response.KEY_PROVISION_STATE_UNKNOWN) else None,
             ).flatten
 
             if (errors.isEmpty) {
-              if (key.identityIssued.getOrElse(true)) {
+              if (deleteKey.identityIssued.getOrElse(true)) {
                 val blockchainTransaction = masterTransactionUnprovisionAddressTransactions.Utility.transaction(
                   fromAddress = loginState.address,
                   accountId = loginState.username,
                   toAddress = deleteKeyData.address,
                   gasPrice = constants.Transaction.DefaultGasPrice,
-                  ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(key.encryptedPrivateKey, deleteKeyData.password))
+                  ecKey = ECKey.fromPrivate(utilities.Secrets.decryptData(txKey.encryptedPrivateKey, deleteKeyData.password))
                 )
                 for {
                   blockchainTransaction <- blockchainTransaction
@@ -277,9 +278,10 @@ class SettingController @Inject()(
           }
 
           (for {
-            (validated, key) <- validateAndGetKey
+            (validated, txKey) <- validateAndGetTxKey
+            deleteKey <- deleteKey
             balance <- balance
-            result <- delete(validated, key, balance)
+            result <- delete(validated, txKey, balance, deleteKey)
           } yield result
             ).recover {
             case baseException: BaseException => BadRequest(views.html.setting.deleteKey(DeleteKey.form.withGlobalError(baseException.failure.message), deleteKeyData.address))

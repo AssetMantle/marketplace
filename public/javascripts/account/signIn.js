@@ -20,26 +20,29 @@ $(document).ready(function () {
 function activeButton() {
     let signInUsername = $("#signInUsername").val();
     let signInPassword = $("#signInPassword").val();
-    if (signInUsername !== "" && signInPassword !== "" && reCaptchaFlag === true) {
+    if (signInUsername !== "" && signInPassword !== "" && reCaptchaFlag) {
         $("#FORM_SIGN_IN_WITH_CALLBACK_SUBMIT").removeClass("disable");
     } else {
         $("#FORM_SIGN_IN_WITH_CALLBACK_SUBMIT").addClass("disable");
     }
 }
 
-$("#signInUsername, #signInPassword").on("input", function()
-{
+$("#signInUsername, #signInPassword").on("input", function () {
     activeButton();
 });
 
-var onSubmit = function(token) {
+function signInCheckBeforeSubmit() {
+    return reCaptchaFlag;
+}
+
+const onSubmit = function (token) {
     reCaptchaFlag = true;
     activeButton();
 };
 
 <!-- Google reCaptcha -->
 function CaptchaCallback() {
-    if ( $('#myRecaptcha').length ) {
-        grecaptcha.render('myRecaptcha', {'sitekey' : '6LfhFrwnAAAAAKKOVgEAdCHHtgalQj0PosHPn8Xu','callback' : onSubmit});
+    if ($('#myRecaptcha').length) {
+        grecaptcha.render('myRecaptcha', {'sitekey': '6LfhFrwnAAAAAKKOVgEAdCHHtgalQj0PosHPn8Xu', 'callback': onSubmit});
     }
 }

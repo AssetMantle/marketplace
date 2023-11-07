@@ -1,4 +1,5 @@
 @import controllers.actions.LoginState
+@import views.html.base.buttons._
 
 @(totalCollected: Int, totalCollectionCreated: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 <div class="sticky-top item-sticky">
@@ -25,6 +26,11 @@
 @*                </div>*@
 @*                <div class="mt-1 statsValue">00</div>*@
 @*            </div>*@
+
+
+            <div class="d-flex justify-content-center">
+            @commonTertiaryButton(constants.Form.REVEAL_PROPERTY.button, JavaScript(s"getForm(${utilities.JsRoutes.getJsRouteString(constants.Form.REVEAL_PROPERTY.get, "")})"), None, None, None)
+            </div>
         </div>
     </div>
 </div>

@@ -20,8 +20,8 @@
                     @commonStringValue(message = loginState.username, id = utilities.IdGenerator.getRandomHexadecimal, length = 18, showToolTip = false)
                     </div>
                 </a>
-                <a href="" target="_blank" class="p-0 lh-sm">
-                    <i class="bi bi-arrow-up-right iconDefault"></i>
+                <a href="@loginState.getExplorerUrl" target="_blank" class="p-0 lh-sm">
+                    <i class="bi bi-globe iconDefault"></i>
                 </a>
             </div>
         </div>
@@ -31,12 +31,12 @@
             </div>
             <div class="d-flex gap-2">
                 <div class="primaryIconButton">
-                    <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.WRAP_COIN.get, ""))" class="p-0">
+                    <a onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.UNWRAP_TOKEN.get, ""))" class="p-0">
                         <img src="@routes.Assets.versioned("images/icon/unwrapBlack.svg")">
                     </a>
                 </div>
                 <div class="secondaryIconButton">
-                    <a class="p-0 d-flex align-items-center" style="padding-top: 2px!important;" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.UNWRAP_TOKEN.get, s"'${loginState.address}'"))">
+                    <a class="p-0 d-flex align-items-center" style="padding-top: 2px!important;" onclick="getForm(@utilities.JsRoutes.getJsRouteString(constants.Form.WRAP_COIN.get, ""))">
                         <img src="@routes.Assets.versioned("images/icon/wrapYellow.svg")">
                     </a>
                 </div>

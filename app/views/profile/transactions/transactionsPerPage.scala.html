@@ -7,7 +7,7 @@
 @if(userTransactions.nonEmpty){
     @userTransactions.map { userTransaction =>
         <tr>
-            <td class="tableFieldHash"><a target=”_blank” href="https://explorer.assetmantle.one/transactions/@userTransaction.txHash">@userTransaction.txHash</a></td>
+            <td class="tableFieldHash"><a target=”_blank” href="@userTransaction.getTxUrl">@userTransaction.txHash</a></td>
             <td class="text-center tableFieldType">@Messages(userTransaction.txType)</td>
             <td class="text-center tableFieldStatus">@if(userTransaction.status.isEmpty) {
 

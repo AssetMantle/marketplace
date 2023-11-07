@@ -24,11 +24,14 @@
         </div>
         <div class="d-flex flex-row align-items-center flex-wrap infoField">
             <div class="ps-0 ps-xl-4 ms-0 ms-xl-1 pe-2 fieldLabel">@Messages(constants.View.PROFILE_IDENTITY_ADDRESS)</div>
-            <div class=" fieldValue username-data" data-value="@loginState.getIdentityId">
-                @loginState.getIdentityId
-            </div>
-            <div class="m-0 ms-2 mt-2 mt-xl-0 mt-md-2 iconContainer" onclick="copyToClipboard(this); showSnackbar('', '@Messages(constants.View.ADDRESS_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
+            <div class="flex-grow-1 fieldValue username-data" data-value="@loginState.getIdentityId">@loginState.getIdentityId</div>
+            <div class="m-0 me-2 mt-2 mt-xl-0 mt-md-2 iconContainer" onclick="copyToClipboard(this); showSnackbar('', '@Messages(constants.View.ADDRESS_COPIED)', '@Messages(constants.View.NOTIFICATION_TITLE_INFO)');">
                 <i class="bi bi-files iconDefault iconMedium copyIcon"></i>
+            </div>
+            <div class="m-0 me-2 mt-2 mt-xl-0 mt-md-2">
+                <a href="@loginState.getExplorerUrl" target="_blank">
+                    <i class="bi bi-arrow-up-right iconDefault iconMedium"></i>
+                </a>
             </div>
         </div>
     </div>

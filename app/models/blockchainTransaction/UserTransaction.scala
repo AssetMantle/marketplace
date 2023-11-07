@@ -21,6 +21,8 @@ case class UserTransaction(txHash: String, accountId: String, fromAddress: Strin
   def id: String = txHash
 
   def withUpdatedLog(log: Option[String]): UserTransaction = this.copy(status = if (log.isDefined) Option(false) else None, log = log)
+
+  def getTxUrl: String = s"${constants.CommonConfig.ExplorerUrl}/transactions/${this.txHash}"
 }
 
 private[blockchainTransaction] object UserTransactions {

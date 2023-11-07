@@ -133,6 +133,8 @@ GET         /sellOrders                                        controllers.NFTCo
 GET         /sellOrdersPerPage                                 controllers.NFTController.sellOrdersPerPage(nftId: String, pageNumber: Int)
 GET         /yourOrders                                        controllers.NFTController.yourOrders(nftId: String)
 GET         /yourOrderPerPage                                  controllers.NFTController.yourOrdersPerPage(nftId: String,pageNumber: Int)
+GET         /revealProperty                                    controllers.NFTController.revealPropertyForm()
+POST        /revealProperty                                    controllers.NFTController.revealProperty()
 
 GET         /settings                                          controllers.SettingController.viewSettings()
 GET         /profileSettings                                   controllers.SettingController.settings()

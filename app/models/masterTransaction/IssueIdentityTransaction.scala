@@ -89,7 +89,7 @@ class IssueIdentityTransactions @Inject()(
 
   object Utility {
 
-    implicit val txUtil: TxUtil = TxUtil("ISSUE_IDENTITY", 100000)
+    implicit val txUtil: TxUtil = TxUtil("ISSUE_IDENTITY", 120000)
 
     def transaction(accountIdAddress: Map[String, Seq[String]]): Future[AdminTransaction] = {
       val messages = accountIdAddress.keys.map(x => utilities.BlockchainTransaction.getIssueIdentityMsgWithAuthentication(

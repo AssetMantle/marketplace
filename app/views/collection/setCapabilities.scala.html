@@ -211,9 +211,9 @@
                                     </div>
                                     <div class="options">
                                     @if(collectionDraft.customBurnEnabled && !collectionDraft.getBurnHeight.get.meta) {
-                                        @commonToggleButton(setCapabilitiesForm, constants.FormField.COLLECTION_CUSTOM_BURNABLE_HIDDEN)
-                                    } else {
                                         @commonToggleButton(setCapabilitiesForm, constants.FormField.COLLECTION_CUSTOM_BURNABLE_HIDDEN, Symbol("checked") -> "checked")
+                                    } else {
+                                        @commonToggleButton(setCapabilitiesForm, constants.FormField.COLLECTION_CUSTOM_BURNABLE_HIDDEN)
                                     }
                                     </div>
                                 </div>
@@ -283,9 +283,9 @@
                                 </div>
                                 <div class="mb-3 optionInputField" style="display: none;">
                                 @if(collectionDraft.customBondAmountEnabled && collectionDraft.getCustomBondAmount.get.defaultValue != "") {
-                                    @commonInputInt(setCapabilitiesForm, constants.FormField.COLLECTION_CUSTOM_BOND_AMOUNT_DEFAULT, Symbol("required") -> false, Symbol("class") -> "fixedValueField", Symbol("value") -> collectionDraft.getCustomBondAmount.get.defaultValue)
+                                    @commonInputMicroNumber(setCapabilitiesForm, constants.FormField.COLLECTION_CUSTOM_BOND_AMOUNT_DEFAULT, Symbol("required") -> false, Symbol("class") -> "fixedValueField", Symbol("value") -> collectionDraft.getCustomBondAmount.get.defaultValue)
                                 } else {
-                                    @commonInputInt(setCapabilitiesForm, constants.FormField.COLLECTION_CUSTOM_BOND_AMOUNT_DEFAULT, Symbol("required") -> false, Symbol("class") -> "fixedValueField")
+                                    @commonInputMicroNumber(setCapabilitiesForm, constants.FormField.COLLECTION_CUSTOM_BOND_AMOUNT_DEFAULT, Symbol("required") -> false, Symbol("class") -> "fixedValueField")
                                 }
                                 </div>
                             </div>
