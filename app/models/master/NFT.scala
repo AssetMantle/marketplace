@@ -150,7 +150,7 @@ class NFTs @Inject()(
 
     def getRandomNFTs(collectionId: String, n: Int, filterOut: Seq[String]): Future[Seq[NFT]] = filter(x => x.collectionId === collectionId && !x.id.inSet(filterOut)).map(util.Random.shuffle(_).take(n)).map(_.map(_.deserialize))
 
-    def getUnmintedNFTIDs(collectionId: String): Future[Seq[String]] = customQuery(tableQuery.filter(x => x.collectionId === collectionId && !x.isMinted.?.getOrElse(true)).map(_.id).result)
+    def getUnmintedNFTIDs(collectionId: String): Future[Seq[String]] = customQuery(tableQuery.filter(x => x.collectionId === collectionId && (!x.isMinted.?.getOrElse(true)) || !x.mintReady).map(_.id).result)
 
     def getByAssetId(assetId: AssetID): Future[Option[NFT]] = filter(_.assetId === assetId.asString).map(_.headOption).map(_.map(_.deserialize))
 
