@@ -57,7 +57,7 @@
                                     <tr id="bondingAmountContainer">
                                         <td class="text-left tableLabel">@Messages(constants.View.NFT_INVOICE_TABLE_FIELD_BONDING_AMOUNT)</td>
                                         <td class="text-center tableValue">
-                                            <span class="BondingUnitCost">@(BigDecimal(collection.getBondAmount)/MicroNumber.factor)</span> $MNTL
+                                            <span class="BondingUnitCost">@(BigDecimal(collection.getBaseDenomBondAmount)/MicroNumber.factor)</span> $MNTL
                                         </td>
                                         <td class="text-center tableValue">
                                             <span class="quantity">00</span>

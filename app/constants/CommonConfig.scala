@@ -11,7 +11,6 @@ object CommonConfig {
   val LogLang: Lang = Lang(config.get[String]("play.log.lang"))
   val WebAppUrl: String = config.get[String]("webApp.url")
   val WebAppCacheDuration: Duration = Duration(config.get[Int]("webApp.cacheDuration"), MILLISECONDS)
-  val DefaultPublicFolder: String = config.get[String]("webApp.defaultPublicFolder")
   val PushNotificationURL: String = config.get[String]("webApp.pushNotification.url")
   val PushNotificationAuthorizationKey: String = config.get[String]("webApp.pushNotification.authorizationKey")
   val AppVersion: String = config.get[String]("app.version")

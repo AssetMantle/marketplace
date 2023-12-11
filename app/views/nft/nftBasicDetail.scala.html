@@ -6,7 +6,7 @@
 @(nftBasicDetailForm: Form[NFTBasicDetail.Data] = NFTBasicDetail.form, collectionId: String, nftId: String, optionalNFTDraft: Option[NFTDraft])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.NFT_BASIC_DETAIL, nftBasicDetailForm, submitDisable = !(optionalNFTDraft.isDefined && optionalNFTDraft.get.name.isDefined)) {
-    @multiStepNavigator(Seq(Messages(constants.View.COLLECTION_STEPPER_IMAGE_UPLOAD),Messages(constants.View.COLLECTION_STEPPER_BASIC_INFORMATION), Messages(constants.View.COLLECTION_STEPPER_PROPERTIES)), defaultSelected = 1)
+    @multiStepNavigator(Seq(Messages(constants.View.NFT_STEPPER_FILE),Messages(constants.View.COLLECTION_STEPPER_BASIC_INFORMATION), Messages(constants.View.COLLECTION_STEPPER_PROPERTIES)), defaultSelected = 1)
     @if(optionalNFTDraft.isDefined && optionalNFTDraft.get.name.isDefined && optionalNFTDraft.get.description.isDefined) {
         @commonInputText(nftBasicDetailForm, constants.FormField.NFT_NAME, Symbol("value") -> optionalNFTDraft.get.name.get)
         @commonDescriptionText(nftBasicDetailForm, constants.FormField.NFT_DESCRIPTION, Symbol("value") -> optionalNFTDraft.get.description.get)

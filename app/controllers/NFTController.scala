@@ -401,7 +401,7 @@ class NFTController @Inject()(
           val collection = masterCollections.Service.tryGet(id = setPropertiesData.collectionId)
 
           def update(collection: Collection) = if (collection.creatorId == loginState.username) {
-            val updateDraft = masterTransactionNFTDrafts.Service.updateProperties(setPropertiesData.nftId, setPropertiesData.getNFTProperties(collection.properties.getOrElse(Seq())))
+            val updateDraft = masterTransactionNFTDrafts.Service.updateProperties(setPropertiesData.nftId, setPropertiesData.getNFTProperties(collection.properties.getOrElse(Seq()), collection))
 
             def addToNFT(nftDraft: NFTDraft) = if (!setPropertiesData.saveNFTDraft) {
               val add = masterNFTs.Service.add(nftDraft.toNFT(collection = collection))
@@ -500,7 +500,7 @@ class NFTController @Inject()(
       for {
         nft <- nft
         collection <- collection(nft.collectionId)
-      } yield if (!nft.isMinted.getOrElse(true)) Ok(views.html.nft.mint(nftId = nftId, bondAmount = nft.getBondAmount(collection)))
+      } yield if (!nft.isMinted.getOrElse(true)) Ok(views.html.nft.mint(nftId = nftId, bondAmount = nft.getBaseDenomBondAmount(collection)))
       else BadRequest(constants.Response.NFT_ALREADY_MINTED.message)
   }
 
@@ -516,7 +516,7 @@ class NFTController @Inject()(
           for {
             nft <- nft
             collection <- collection(nft.collectionId)
-          } yield BadRequest(views.html.nft.mint(formWithErrors, nftId, nft.getBondAmount(collection)))
+          } yield BadRequest(views.html.nft.mint(formWithErrors, nftId, nft.getBaseDenomBondAmount(collection)))
         },
         mintData => {
           val nft = masterNFTs.Service.tryGet(mintData.nftId)
@@ -559,7 +559,7 @@ class NFTController @Inject()(
               try {
                 val nftToMint = Await.result(nft, Duration.Inf)
                 val collectionForBonding = Await.result(collection(nftToMint.collectionId), Duration.Inf)
-                BadRequest(views.html.nft.mint(mintForm = Mint.form.withGlobalError(baseException.failure.message), nftId = mintData.nftId, nftToMint.getBondAmount(collectionForBonding)))
+                BadRequest(views.html.nft.mint(mintForm = Mint.form.withGlobalError(baseException.failure.message), nftId = mintData.nftId, nftToMint.getBaseDenomBondAmount(collectionForBonding)))
               } catch {
                 case exception: Exception => logger.error(exception.getLocalizedMessage)
                   BadRequest

@@ -1,47 +1,53 @@
 @(propertyType: String, propertyValue: String, index: Number, label: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@if(propertyType == constants.NFT.Data.BOOLEAN) {
-    <div class="mb-0 commonInputInt w-100">
-        <div class="fieldContainer">
-            <dt><label for="fieldValue_@index">@label</label></dt>
-            <dd class="mt-2">
-                <div class="dropdown" id="booleanOptionList">
-                    <input type="hidden" class="dp-input" value=""/>
-                    <div class="dropdownHead" onclick="showOptions(this)">
-                    @if(propertyValue.nonEmpty) {
-                        <div class="currentSelected">@propertyValue</div>
-                    }else{
-                        <div class="currentSelected">@Messages(constants.View.NFT_PROPERTY_BOOLEAN_FIELD_LABEL)</div>
-                    }
-                    </div>
-                    <div class="dropdownBody">
-                        <div class="dropdownBodyInner">
-                            <div class="dropdownItem" value="@constants.NFT.Data.TRUE" onclick="setOption(this); setBooleanValue(@index, '@constants.NFT.Data.TRUE');">@Messages(constants.View.TRUE)</div>
-                            <div class="dropdownItem" value="@constants.NFT.Data.FALSE" onclick="setOption(this); setBooleanValue(@index, '@constants.NFT.Data.FALSE');">@Messages(constants.View.FALSE)</div>
+    @if(propertyType == constants.NFT.Data.BOOLEAN) {
+        <div class="mb-0 commonInputInt w-100">
+            <div class="fieldContainer">
+                <dt><label for="fieldValue_@index">@label (@Messages(propertyType))</label></dt>
+                <dd class="mt-2">
+                    <div class="dropdown" id="booleanOptionList">
+                        <input type="hidden" class="dp-input" value=""/>
+                        <div class="dropdownHead" onclick="showOptions(this)">
+                        @if(propertyValue.nonEmpty) {
+                            <div class="currentSelected">@propertyValue</div>
+                        } else {
+                            <div class="currentSelected">@Messages(constants.View.NFT_PROPERTY_BOOLEAN_FIELD_LABEL)</div>
+                        }
+                        </div>
+                        <div class="dropdownBody">
+                            <div class="dropdownBodyInner">
+                                <div class="dropdownItem" value="@constants.NFT.Data.TRUE" onclick="setOption(this);
+                                setBooleanValue(@index, '@constants.NFT.Data.TRUE');">@Messages(constants.View.TRUE)</div>
+                                <div class="dropdownItem" value="@constants.NFT.Data.FALSE" onclick="setOption(this);
+                                setBooleanValue(@index, '@constants.NFT.Data.FALSE');">@Messages(constants.View.FALSE)</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </dd>
+                </dd>
+            </div>
         </div>
-    </div>
-}
-@if(propertyType == constants.NFT.Data.NUMBER || propertyType == constants.NFT.Data.DECIMAL || propertyType == constants.NFT.Data.HEIGHT) {
-    <div class="mb-0 commonInputInt w-100">
-        <div class="fieldContainer">
-            <dt><label for="fieldValue_@index">@label</label></dt>
-            <dd>
-                <input type="number" id="fieldValue_@index" name="fieldValue_@index" value="@propertyValue" class="am-input" onkeyup="setNonBooleanValue(@index, event)"/>
-            </dd>
+    }
+    @if(propertyType == constants.NFT.Data.NUMBER || propertyType == constants.NFT.Data.DECIMAL || propertyType == constants.NFT.Data.HEIGHT) {
+        <div class="mb-0 commonInputInt w-100">
+            <div class="fieldContainer">
+                @if(label == schema.constants.Properties.BondAmountProperty.id.keyID.value) {
+                    <dt><label for="fieldValue_@index">@label (@Messages(constants.View.CUSTOM_BOND_AMOUNT_IN_UMNTL))</label></dt>
+                } else {
+                    <dt><label for="fieldValue_@index">@label (@Messages(propertyType))</label></dt>
+                }
+                <dd>
+                    <input type="number" id="fieldValue_@index" name="fieldValue_@index" value="@propertyValue" class="am-input" onkeyup="setNonBooleanValue(@index, event)"/>
+                </dd>
+            </div>
         </div>
-    </div>
-}
-@if(propertyType == constants.NFT.Data.STRING) {
-    <div class="mb-0 commonInputInt w-100">
-        <div class="fieldContainer">
-            <dt><label for="fieldValue_@index">@label</label></dt>
-            <dd>
-                <input type="text" id="fieldValue_@index" name="fieldValue_@index" value="@propertyValue" class="am-input" onkeyup="setNonBooleanValue(@index, event)"/>
-            </dd>
+    }
+    @if(propertyType == constants.NFT.Data.STRING) {
+        <div class="mb-0 commonInputInt w-100">
+            <div class="fieldContainer">
+                <dt><label for="fieldValue_@index">@label (@Messages(propertyType))</label></dt>
+                <dd>
+                    <input type="text" id="fieldValue_@index" name="fieldValue_@index" value="@propertyValue" class="am-input" onkeyup="setNonBooleanValue(@index, event)"/>
+                </dd>
+            </div>
         </div>
-    </div>
-}
+    }

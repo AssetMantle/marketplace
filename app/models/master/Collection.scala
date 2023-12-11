@@ -10,6 +10,7 @@ import schema.id.base.{ClassificationID, IdentityID}
 import schema.property.base.{MesaProperty, MetaProperty}
 import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
+import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -83,11 +84,13 @@ case class Collection(id: String, creatorId: String, classificationId: Option[St
 
   def getBurnHeight: Option[Property] = this.properties.fold[Option[Property]](None)(_.find(_.name == schema.constants.Properties.BurnHeightProperty.id.keyID.value))
 
-  def customBondAmountEnabled: Boolean = this.getBondAmountProperty.isDefined
+  lazy val customBondAmountEnabled: Boolean = this.getBondAmountProperty.isDefined
+
+  def getMinimumBondAmount: MicroNumber = MicroNumber(BigDecimal(this.getTotalWeight * constants.Blockchain.BondRate) / MicroNumber.factor)
 
   def getBondAmountProperty: Option[Property] = this.properties.fold[Option[Property]](None)(_.find(_.name == schema.constants.Properties.BondAmountProperty.id.keyID.value))
 
-  def getBondAmount: Long = if (this.customBondAmountEnabled) this.getBondAmountProperty.fold(0L)(x => if (x.defaultValue != "") x.defaultValue.toLong else 0L)
+  def getBaseDenomBondAmount: Long = if (this.customBondAmountEnabled) this.getBondAmountProperty.fold(0L)(x => if (x.defaultValue != "") x.defaultValue.toLong else 0L)
   else this.getTotalWeight * constants.Blockchain.BondRate
 }
 

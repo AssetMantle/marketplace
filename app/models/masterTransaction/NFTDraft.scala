@@ -16,7 +16,7 @@ case class NFTDraft(id: String, collectionId: String, name: Option[String], desc
 
   def getSupply: Long = this.properties.fold(1L)(_.find(_.name == schema.constants.Properties.SupplyProperty.id.keyID.value).fold(1L)(_.valueAsString.toLong))
 
-  def getBondAmount(collection: Collection): Long = this.properties.fold(collection.getBondAmount)(_.find(_.name == schema.constants.Properties.BondAmountProperty.id.keyID.value).fold(collection.getBondAmount)(_.valueAsString.toLong))
+  def getBondAmount(collection: Collection): Long = this.properties.fold(collection.getBaseDenomBondAmount)(_.find(_.name == schema.constants.Properties.BondAmountProperty.id.keyID.value).fold(collection.getBaseDenomBondAmount)(_.valueAsString.toLong))
 
   def getFileHash: String = id
 

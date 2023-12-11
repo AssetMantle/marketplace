@@ -21,6 +21,6 @@ object Collection {
   // TODO BondRate from parameters
   def getClassificationID(immutables: Immutables, mutables: Mutables): ClassificationID = schema.utilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
 
-  def generateClassificationID(collection: Collection): ClassificationID = getClassificationID(immutables = collection.getImmutables, mutables = collection.getMutables.add(Seq(schema.constants.Properties.BondAmountProperty.copy(data = NumberData(collection.getBondAmount)))))
+  def generateClassificationID(collection: Collection): ClassificationID = getClassificationID(immutables = collection.getImmutables, mutables = collection.getMutables.remove(Seq(schema.constants.Properties.BondAmountProperty)).add(Seq(schema.constants.Properties.BondAmountProperty.copy(data = NumberData(collection.getMinimumBondAmount.value)))))
 
 }

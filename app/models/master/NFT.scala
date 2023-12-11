@@ -1,6 +1,5 @@
 package models.master
 
-import com.google.protobuf.ByteString
 import models.master.NFTs.NFTTable
 import models.traits._
 import play.api.Logger
@@ -11,9 +10,10 @@ import schema.list.PropertyList
 import schema.property.base.{MesaProperty, MetaProperty}
 import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
+import utilities.MicroNumber
 
-import javax.xml.bind.DatatypeConverter
 import javax.inject.{Inject, Singleton}
+import javax.xml.bind.DatatypeConverter
 import scala.concurrent.{ExecutionContext, Future}
 
 case class NFT(id: String, assetId: Option[String], collectionId: String, name: String, description: String, totalSupply: BigInt, customBondAmount: Option[Long], isMinted: Option[Boolean], mintReady: Boolean, fileExtension: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
@@ -40,7 +40,7 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getImmutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && !x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 
-  def getMutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty) :+ schema.constants.Properties.BondAmountProperty.copy(data = NumberData(this.getBondAmount(collection)))
+  def getMutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] =if (collection.customBondAmountEnabled) nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty) else nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty) :+ schema.constants.Properties.BondAmountProperty.copy(data = NumberData(this.getBaseDenomBondAmount(collection)))
 
   def getMutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 
@@ -56,7 +56,9 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def isAudioType: Boolean = constants.File.ALL_AUDIO.contains(this.fileExtension)
 
-  def getBondAmount(collection: Collection): Long = if (this.customBondAmount.isDefined) this.customBondAmount.get else collection.getBondAmount
+  def getBaseDenomBondAmount(collection: Collection): Long = if (this.customBondAmount.isDefined) this.customBondAmount.get else collection.getBaseDenomBondAmount
+
+  def getBondAmount(collection: Collection): MicroNumber = MicroNumber(BigDecimal(this.getBaseDenomBondAmount(collection)) / MicroNumber.factor)
 
 }
 
