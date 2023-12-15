@@ -26,10 +26,10 @@ ALTER TABLE MASTER."NFT"
     ADD COLUMN IF NOT EXISTS "customBondAmount" BIGINT DEFAULT null;
 
 ALTER TABLE MASTER_TRANSACTION."PublicListingNFTTransaction"
-    DROP CONSTRAINT IF EXISTS "PublicListingNFTTransaction_buyerAccountId_sellerAccountId__key";
+    DROP CONSTRAINT IF EXISTS PublicListingNFTTransaction_TxHash;
 
 ALTER TABLE MASTER_TRANSACTION."SaleNFTTransaction"
-    DROP CONSTRAINT IF EXISTS "BuyNFTTransaction_buyerAccountId_sellerAccountId_txHash_nft_key";
+    DROP CONSTRAINT IF EXISTS BuyNFTTransaction_TxHash;
 
 UPDATE MASTER."NFTProperty"
 SET "name" = regexp_replace("name", '-', '', 'g');
