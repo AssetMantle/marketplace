@@ -13,10 +13,6 @@ function showPassword() {
     }
 }
 
-$(document).ready(function () {
-    $('#FORM_SIGN_IN_WITH_CALLBACK_SUBMIT').addClass("disable");
-})
-
 function activeButton() {
     let signInUsername = $("#signInUsername").val();
     let signInPassword = $("#signInPassword").val();
@@ -46,3 +42,7 @@ function CaptchaCallback() {
         grecaptcha.render('myRecaptcha', {'sitekey': '6LfhFrwnAAAAAKKOVgEAdCHHtgalQj0PosHPn8Xu', 'callback': onSubmit});
     }
 }
+
+$(document).ready(function () {
+    $('#FORM_SIGN_IN_WITH_CALLBACK_SUBMIT').addClass("disable");
+})

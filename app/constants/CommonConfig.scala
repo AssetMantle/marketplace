@@ -24,6 +24,10 @@ object CommonConfig {
 
   def fixedDelay: Int = config.get[Int]("scheduler.fixedDelay")
 
+  object Campaign {
+    val nftMintAirDropEnabled: Boolean = config.get[Boolean]("webApp.campaign.enableNFTMintAirDrop")
+  }
+
   object Blockchain {
     case class IBCDenom(hash: String, name: String)
 

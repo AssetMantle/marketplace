@@ -19,6 +19,7 @@
         <entry key="BLOCKCHAIN_STAKING_DENOM" value="umntl" />
         <entry key="BLOCKCHAIN_UPGRADE_HEIGHT" value="1" />
         <entry key="COLLECTION_PATH" value="$USER_HOME$/collections" />
+        <entry key="ENABLE_NFT_MINT_AIRDROP" value="false" />
         <entry key="EXPLORER_POSTGRES_DB" value="assetMantle" />
         <entry key="EXPLORER_POSTGRES_PASSWORD" value="assetMantle" />
         <entry key="EXPLORER_POSTGRES_URL" value="localhost:5432" />

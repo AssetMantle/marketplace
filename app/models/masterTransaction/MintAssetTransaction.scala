@@ -220,7 +220,7 @@ class MintAssetTransactions @Inject()(
               }
             } else Future(Seq())
 
-            def checkForAirDrop(nftIDs: Seq[String]) = {
+            def checkForAirDrop(nftIDs: Seq[String]) = if (constants.CommonConfig.Campaign.nftMintAirDropEnabled) {
               val ineligibles = campaignIneligibleMintNFTAirDrops.Service.getIneligibles(nftIDs)
 
               def toBeDropped(ineligibles: Seq[String]) = campaignMintNFTAirDrops.Service.filterExisting(mintAssetTxs.filterNot(x => ineligibles.contains(x.nftID)).filter(_.txHash == txHash).map(_.toAccountID))
@@ -235,7 +235,7 @@ class MintAssetTransactions @Inject()(
                 keys <- keys(toBeDropped)
                 _ <- add(keys)
               } yield ()
-            }
+            } else Future()
 
             for {
               _ <- markSuccess

@@ -68,7 +68,7 @@ class MintNFTAirDrops @Inject()(
 
   object Service {
 
-    def addForDropping(accountIdsAddressMap: Map[String, String], eligibilityTxHash: String): Future[Int] = create(accountIdsAddressMap.map(x => MintNFTAirDrop(accountId = x._1, address = x._2, eligibilityTxHash = eligibilityTxHash, airdropTxHash = None, status = false)).toSeq)
+    def addForDropping(accountIdsAddressMap: Map[String, String], eligibilityTxHash: String): Future[Int] = if (constants.CommonConfig.Campaign.nftMintAirDropEnabled) create(accountIdsAddressMap.map(x => MintNFTAirDrop(accountId = x._1, address = x._2, eligibilityTxHash = eligibilityTxHash, airdropTxHash = None, status = false)).toSeq) else Future(0)
 
     def updateDropTxHash(accountId: String, airDropTxHash: String): Future[String] = customUpdate(tableQuery.filter(_.accountId === accountId).map(_.airdropTxHash).update(airDropTxHash)).map(_.toString)
 

@@ -130,8 +130,8 @@ class SecondaryMarketSellTransactions @Inject()(
   object Utility {
     implicit val txUtil: TxUtil = TxUtil("SECONDARY_MARKET_SELL", 300000)
 
-    def transaction(secondaryMarketId: String, nft: NFT, nftOwner: NFTOwner, quantity: Long, fromAddress: String, endHours: Int, price: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey): Future[(UserTransaction, OrderID)] = {
-      val expiryHeight = ((constants.Blockchain.MaxOrderExpiry * endHours) / constants.Blockchain.MaxOrderHours).toLong
+    def transaction(secondaryMarketId: String, nft: NFT, nftOwner: NFTOwner, quantity: Long, fromAddress: String, endHours: Int, price: MicroNumber, gasPrice: BigDecimal, ecKey: ECKey, latestHeight: Long): Future[(UserTransaction, OrderID)] = {
+      val expiryHeight = latestHeight + ((constants.Blockchain.MaxOrderExpiry * endHours) / constants.Blockchain.MaxOrderHours).toLong
       val makerID = utilities.Identity.getMantlePlaceIdentityID(nftOwner.ownerId)
       val takerAssetID = constants.Blockchain.StakingTokenAssetID
       val receiveAmount = price.value * quantity

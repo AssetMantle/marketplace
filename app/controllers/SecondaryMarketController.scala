@@ -12,6 +12,7 @@ import play.api.Logger
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import queries.blockchain.GetABCIInfo
 import utilities.MicroNumber
 import views.secondaryMarket.companion.{Buy, Cancel, CreateSecondaryMarket}
 
@@ -44,6 +45,7 @@ class SecondaryMarketController @Inject()(
                                            masterTransactionCancelOrderTransactions: masterTransaction.CancelOrderTransactions,
                                            utilitiesNotification: utilities.Notification,
                                            utilitiesOperations: utilities.Operations,
+                                           getAbciInfo: GetABCIInfo,
                                          )(implicit executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   implicit val logger: Logger = Logger(this.getClass)
@@ -201,9 +203,12 @@ class SecondaryMarketController @Inject()(
             ).flatten
             if (errors.isEmpty) {
               val secondaryMarketId = utilities.IdGenerator.getRandomHexadecimal
+              val abciInfo = getAbciInfo.Service.get
+
               for {
+                abciInfo <- abciInfo
                 // This can throw failed to create failed to create SecondaryMarketSellTx due to unique order id constraint, key already exists only when node connected is not generating blocks
-                (tx, orderId) <- secondaryMarketSellTxs.Utility.transaction(secondaryMarketId = secondaryMarketId, nft = nft, nftOwner = nftOwner, fromAddress = loginState.address, quantity = createData.sellQuantity, endHours = createData.endHours, price = createData.price, gasPrice = constants.Transaction.DefaultGasPrice, ecKey = activeKey.getECKey(createData.password).get)
+                (tx, orderId) <- secondaryMarketSellTxs.Utility.transaction(secondaryMarketId = secondaryMarketId, nft = nft, nftOwner = nftOwner, fromAddress = loginState.address, quantity = createData.sellQuantity, endHours = createData.endHours, price = createData.price, gasPrice = constants.Transaction.DefaultGasPrice, ecKey = activeKey.getECKey(createData.password).get, latestHeight = abciInfo.result.response.last_block_height.toLong)
                 _ <- masterSecondaryMarkets.Service.add(createData.toNewSecondaryMarket(id = secondaryMarketId, collectionId = nftOwner.collectionId, sellerId = loginState.username, orderId = orderId.asString))
               } yield tx
             } else errors.head.throwBaseException()
