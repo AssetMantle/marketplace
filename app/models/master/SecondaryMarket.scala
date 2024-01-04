@@ -135,9 +135,9 @@ class SecondaryMarkets @Inject()(
 
     def getByNFTIdAndSellerId(nftId: String, sellerId: String): Future[Seq[SecondaryMarket]] = filter(x => x.nftId === nftId && x.sellerId === sellerId && !x.completed && !x.cancelled && !x.expired && x.status).map(_.map(_.deserialize))
 
-    def getByNFTIdAndSellerIdAndPageNumber(nftId: String, sellerId: String, pageNumber: Int): Future[Seq[SecondaryMarket]] = filterAndSortWithPagination(x => x.nftId === nftId && x.sellerId === sellerId && !x.completed && !x.cancelled && !x.expired && x.status)(_.price)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage).map(_.map(_.deserialize))
+    def getByNFTIdAndSellerIdAndPageNumber(nftId: String, sellerId: String, pageNumber: Int): Future[Seq[SecondaryMarket]] = filterAndSortWithPagination(x => x.nftId === nftId && x.sellerId === sellerId && !x.completed && !x.cancelled && !x.expired && x.status)(_.price)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.OrdersPerPage, limit = constants.CommonConfig.Pagination.OrdersPerPage).map(_.map(_.deserialize))
 
-    def getByNFTIdAndPageNumber(nftId: String, pageNumber: Int): Future[Seq[SecondaryMarket]] = filterAndSortWithPagination(x => x.nftId === nftId && !x.completed && !x.cancelled && !x.expired && x.status)(_.price)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage).map(_.map(_.deserialize))
+    def getByNFTIdAndPageNumber(nftId: String, pageNumber: Int): Future[Seq[SecondaryMarket]] = filterAndSortWithPagination(x => x.nftId === nftId && !x.completed && !x.cancelled && !x.expired && x.status)(_.price)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.OrdersPerPage, limit = constants.CommonConfig.Pagination.OrdersPerPage).map(_.map(_.deserialize))
 
     def nftExists(nftId: String): Future[Boolean] = filterAndExists(_.nftId === nftId)
 
@@ -147,9 +147,13 @@ class SecondaryMarkets @Inject()(
 
     def existByCollectionId(collectionId: String): Future[Boolean] = filterAndExists(_.collectionId === collectionId)
 
-    def getByCollectionId(collectionId: String, pageNumber: Int): Future[Seq[SecondaryMarket]] = filterAndSortWithPagination(_.collectionId === collectionId)(_.price)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage).map(_.map(_.deserialize))
+    def getByCollectionId(collectionId: String, pageNumber: Int): Future[Seq[SecondaryMarket]] = filterAndSortWithPagination(_.collectionId === collectionId)(_.price)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.deserialize))
 
     def total: Future[Int] = countTotal()
+
+    def totalForNFT(nftId: String): Future[Int] = filterAndCount(_.nftId === nftId)
+
+    def totalYourOrders(nftId: String, sellerId: String): Future[Int] = filterAndCount(x => x.nftId === nftId && x.sellerId === sellerId)
 
     def markOnOrderCreationFailed(secondaryMarketIds: Seq[String]): Future[Int] = customUpdate(tableQuery.filter(_.id.inSet(secondaryMarketIds)).map(_.status).update(false))
 
@@ -181,7 +185,7 @@ class SecondaryMarkets @Inject()(
 
     def totalOnSellBySellerAndCollection(sellerId: String, collectionId: String): Future[Int] = filterAndCount(x => x.sellerId === sellerId && x.collectionId === collectionId)
 
-    def getByCollectionSellerAndPageNumber(sellerId: String, collectionId: String, pageNumber: Int): Future[Seq[SecondaryMarket]] = filterAndSortWithPagination(x => x.sellerId === sellerId && x.collectionId === collectionId)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.NFTsPerPage, limit = constants.CommonConfig.Pagination.NFTsPerPage).map(_.map(_.deserialize()))
+    def getByCollectionSellerAndPageNumber(sellerId: String, collectionId: String, pageNumber: Int): Future[Seq[SecondaryMarket]] = filterAndSortWithPagination(x => x.sellerId === sellerId && x.collectionId === collectionId)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.deserialize()))
   }
 
 }

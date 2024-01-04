@@ -112,45 +112,60 @@ class NFTController @Inject()(
       Future(Ok(views.html.nft.detail.trade(nftId = nftId)))
   }
 
-  def sellOrders(nftId: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      Future(Ok(views.html.nft.detail.sellOrders(nftId)))
+  def sellOrders(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val totalOrders = masterSecondaryMarkets.Service.totalForNFT(nftId)
+
+        for {
+          totalOrders <- totalOrders
+        } yield Ok(views.html.nft.detail.sellOrders(nftId, totalOrders))
+    }
   }
 
-  def sellOrdersPerPage(nftId: String, pageNumber: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val secondaryMarkets = masterSecondaryMarkets.Service.getByNFTIdAndPageNumber(nftId = nftId, pageNumber = pageNumber)
+  def sellOrdersPerPage(nftId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val secondaryMarkets = masterSecondaryMarkets.Service.getByNFTIdAndPageNumber(nftId = nftId, pageNumber = pageNumber)
 
-      def orders(secondaryMarkets: Seq[SecondaryMarket]) = blockchainOrders.Service.get(secondaryMarkets.map(_.orderId))
+        def orders(secondaryMarkets: Seq[SecondaryMarket]) = blockchainOrders.Service.get(secondaryMarkets.map(_.orderId))
 
-      (for {
-        secondaryMarkets <- secondaryMarkets
-        orders <- orders(secondaryMarkets)
-      } yield Ok(views.html.nft.detail.sellOrdersPerPage(secondaryMarkets.sortBy(_.price), orders, blockchainBlocks.Service.getLatestHeight, masterTransactionTokenPrices.Service.getLatestPrice, pageNumber))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
+        (for {
+          secondaryMarkets <- secondaryMarkets
+          orders <- orders(secondaryMarkets)
+        } yield Ok(views.html.nft.detail.sellOrdersPerPage(secondaryMarkets.sortBy(_.price), orders, blockchainBlocks.Service.getLatestHeight, masterTransactionTokenPrices.Service.getLatestPrice, pageNumber))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
   }
 
-  def yourOrders(nftId: String): Action[AnyContent] = withLoginAction { implicit loginState =>
-    implicit request =>
-      implicit val optionalLoginState: Option[LoginState] = Option(loginState)
-      Ok(views.html.nft.detail.yourOrders(nftId))
+  def yourOrders(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        implicit val optionalLoginState: Option[LoginState] = Option(loginState)
+        val totalOrders = masterSecondaryMarkets.Service.totalYourOrders(nftId = nftId, sellerId = loginState.username)
+        for {
+          totalOrders <- totalOrders
+        } yield Ok(views.html.nft.detail.yourOrders(nftId, totalOrders))
+    }
   }
 
-  def yourOrdersPerPage(nftId: String, pageNumber: Int): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val secondaryMarkets = masterSecondaryMarkets.Service.getByNFTIdAndSellerIdAndPageNumber(nftId = nftId, sellerId = loginState.username, pageNumber = pageNumber)
+  def yourOrdersPerPage(nftId: String, pageNumber: Int): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val secondaryMarkets = masterSecondaryMarkets.Service.getByNFTIdAndSellerIdAndPageNumber(nftId = nftId, sellerId = loginState.username, pageNumber = pageNumber)
 
-      def orders(secondaryMarkets: Seq[SecondaryMarket]) = blockchainOrders.Service.get(secondaryMarkets.map(_.orderId))
+        def orders(secondaryMarkets: Seq[SecondaryMarket]) = blockchainOrders.Service.get(secondaryMarkets.map(_.orderId))
 
-      (for {
-        secondaryMarkets <- secondaryMarkets
-        orders <- orders(secondaryMarkets)
-      } yield Ok(views.html.nft.detail.yourOrdersPerPage(secondaryMarkets.sortBy(_.price), orders, blockchainBlocks.Service.getLatestHeight, masterTransactionTokenPrices.Service.getLatestPrice, pageNumber))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
+        (for {
+          secondaryMarkets <- secondaryMarkets
+          orders <- orders(secondaryMarkets)
+        } yield Ok(views.html.nft.detail.yourOrdersPerPage(secondaryMarkets.sortBy(_.price), orders, blockchainBlocks.Service.getLatestHeight, masterTransactionTokenPrices.Service.getLatestPrice, pageNumber))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
   }
 
   def detailViewLeftCards(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {

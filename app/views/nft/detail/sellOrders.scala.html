@@ -1,19 +1,20 @@
 @import controllers.actions.LoginState
+@import views.html.base.buttons._
 
-@(nftId: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
+@(nftId: String, totalOrders: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
 
 <div class="contentBody">
-    <div class="container contentTableContainer" id="tradeSellOrders">
+    <div class="container contentTableContainer" id="createdWhitelists">
         <div class="row">
             <div class="col-sm-12 col-md-12">
                 <div class="table-responsive">
                     <table class="table contentTable">
                         <thead>
                             <tr>
-                                <th class="tableFieldName">@Messages(constants.View.TRADE_TABLE_TITLE_NAME)</th>
-                                <th class="text-center tableFieldPrice">@Messages(constants.View.TRADE_TABLE_TITLE_PRICE)</th>
-                                <th class="text-center tableFieldAmount">@Messages(constants.View.TRADE_TABLE_TITLE_AMOUNT)</th>
-                                <th class="text-center tableFieldTotal">@Messages(constants.View.TRADE_TABLE_TITLE_TOTAL)</th>
+                                <th class="text-end">@Messages(constants.View.TRADE_TABLE_TITLE_NAME)</th>
+                                <th class="text-end">@Messages(constants.View.TRADE_TABLE_TITLE_PRICE)</th>
+                                <th class="text-end">@Messages(constants.View.TRADE_TABLE_TITLE_AMOUNT)</th>
+                                <th class="text-end">@Messages(constants.View.TRADE_TABLE_TITLE_TOTAL)</th>
                                 <th class="tableFieldAction"></th>
                             </tr>
                         </thead>
@@ -24,6 +25,10 @@
         </div>
     </div>
 </div>
+<div id="createdWhitelistPagination" class="mt-0 horizontal-align">
+    @commonPaginationButton(constants.View.BACK, JavaScript(s"sellOrdersPaginationOnBack('${nftId}')"), icon = "bi-chevron-left", size = "small", iconFirst = true, Symbol("id") -> "sellOrdersPaginationBack", Symbol("class") -> "mt-4")
+    @commonPaginationButton(constants.View.NEXT, JavaScript(s"sellOrdersPaginationOnNext('${nftId}', ${totalOrders}, ${constants.CommonConfig.Pagination.OrdersPerPage})"), icon = "bi-chevron-right", size = "small", iconFirst = false, Symbol("id") -> "sellOrdersPaginationNext", Symbol("class") -> "mt-4")
+</div>
 <script>
-        componentResource('tradeSellOrdersTableBody', jsRoutes.controllers.NFTController.sellOrdersPerPage('@nftId', 1))
+        sellOrdersPaginationOnNext('@nftId', @totalOrders, @constants.CommonConfig.Pagination.OrdersPerPage);
 </script>

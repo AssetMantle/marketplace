@@ -16,6 +16,7 @@
                 <div class="analysisTitle">@Messages(constants.View.COLLECTION_ROYALTY_FEES)</div>
                 <div class="analysisValue">@(collection.royalty * 100) %</div>
             </div>
+            <div class="separator"></div>
             @if(nft.totalSupply == 1) {
                 @if(optionalLoginState.isDefined) {
                     @if(userNFTOwner.isDefined && optionalLoginState.get.username == userNFTOwner.get.ownerId) {

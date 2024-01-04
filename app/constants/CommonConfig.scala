@@ -59,6 +59,7 @@ object CommonConfig {
     val NFTsPerPage: Int = config.get[Int]("webApp.nftsPerPage")
     val WhitelistPerPage: Int = config.get[Int]("webApp.whitelistPerPage")
     val NotificationsPerPage: Int = config.get[Int]("webApp.notificationsPerPage")
+    val OrdersPerPage: Int = config.get[Int]("webApp.ordersPerPage")
   }
 
   val MaxCollectionDrafts: Int = config.get[Int]("webApp.maxCollectionDrafts")

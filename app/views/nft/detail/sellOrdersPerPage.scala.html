@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import models.blockchain.Order
 @import models.master.SecondaryMarket
-@import views.html.base.buttons.commonPrimaryButton
+@import views.html.base.buttons.commonTertiaryButton
 
 @(secondaryMarkets: Seq[SecondaryMarket], orders: Seq[Order], latestBlock: Int, tokenPrice: Double, page: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, optionalLoginState: Option[LoginState])
 
@@ -13,22 +13,21 @@
         <td class="tableFieldName">
             <div class="d-flex gap-2 align-items-center">
                 <img src="@routes.Assets.versioned("images/defaultCollectionProfile.png")" class="rounded-circle" width="35" height="35"/>
-                @(index + 1) @secondaryMarket.sellerId
+                @secondaryMarket.sellerId
             </div>
         </td>
-        <td class="text-center tableFieldPrice">@secondaryMarket.price</td>
-        <td class="text-center tableFieldAmount">@secondaryMarket.quantity</td>
-        <td class="text-center tableFieldTotal">@secondaryMarket.getTotal</td>
+        <td class="text-end tableFieldPrice">@secondaryMarket.price</td>
+        <td class="text-end tableFieldAmount">@secondaryMarket.quantity</td>
+        <td class="text-end tableFieldTotal">@secondaryMarket.getTotal</td>
         <td class="tableFieldAction">
             @if(optionalLoginState.isDefined) {
                 @if(optionalLoginState.get.username == secondaryMarket.sellerId) {
-                    @commonPrimaryButton(Messages(constants.View.CANCEL_ORDER), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.cancelForm('${secondaryMarket.nftId}', '${secondaryMarket.id}'))"), Symbol("class") -> "mt-4")
+                    @commonTertiaryButton(constants.View.CANCEL_ORDER, JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.cancelForm('${secondaryMarket.nftId}', '${secondaryMarket.id}'))"), None, None, None)
                 } else {
-                    @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.buyForm('${secondaryMarket.id}'))"), Symbol("class") -> "mt-4")
+                    @commonTertiaryButton(constants.View.BUYNOW, JavaScript(s"getForm(jsRoutes.controllers.SecondaryMarketController.buyForm('${secondaryMarket.id}'))"), None, None, None)
                 }
-
             } else {
-                @commonPrimaryButton(Messages(constants.View.BUYNOW), JavaScript(s"getForm(jsRoutes.controllers.AccountController.signInWithCallbackForm('/market/${secondaryMarket.nftId}/TRADE'))"), Symbol("class") -> "mt-4")
+                @commonTertiaryButton(constants.View.CANCEL_ORDER, JavaScript(s"getForm(jsRoutes.controllers.AccountController.signInWithCallbackForm('/market/${secondaryMarket.nftId}/TRADE'))"), None, None, None)
             }
         </td>
     </tr>

@@ -15,13 +15,13 @@
                         <div class="subMenu">
                             <div class="subMenuList">
                                 <div class="subMenuItem">
-                                    <a onclick="showSellOrders('@nftId')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
+                                    <a onclick="showSellOrders('@nftId', '@Messages(constants.View.SELL_ORDERS)')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
                                         <div class="subMenuItemLabel">@Messages(constants.View.SELL_ORDERS)</div>
                                     </a>
                                 </div>
                                 @if(optionalLoginState.isDefined) {
                                     <div class="subMenuItem">
-                                        <a onclick="showYourOrders('@nftId')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
+                                        <a onclick="showYourOrders('@nftId', '@Messages(constants.View.YOUR_ORDERS)')" class="d-flex flex-row align-items-center p-0 subMenuItemLink">
                                             <div class="subMenuItemLabel">@Messages(constants.View.YOUR_ORDERS)</div>
                                         </a>
                                     </div>
@@ -42,4 +42,4 @@
     <div id="tradeSectionContent"></div>
 </div>
 <script src="@utilities.PublicResource.getVersionedRoute("javascripts/nfts/trade.js")"></script>
-<script>showSellOrders('@nftId');</script>
+<script>showSellOrders('@nftId', '@Messages(constants.View.SELL_ORDERS)');</script>
