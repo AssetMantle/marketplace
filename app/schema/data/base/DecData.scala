@@ -46,7 +46,7 @@ case class DecData(value: BigDecimal) extends ListableData {
       else if (this.getValue == (-1 * constants.DecDataMaxValue)) "--".getBytes
       else {
         val f = java.lang.String.format("%18s", this.getValue.abs.toString.split("\\.").head).replace(" ", "0")
-        val l = java.lang.String.format("%-18s", this.getValue.abs.toString.split("\\.").last).replace(" ", "0")
+        val l = java.lang.String.format("%-18s", constants.DecStringFormat.format(this.getValue.abs).split("\\.").last).replace(" ", "0")
         if (this.getValue < 0) "-".getBytes ++ (f + "." + l).getBytes
         else (f + "." + l).getBytes
       }

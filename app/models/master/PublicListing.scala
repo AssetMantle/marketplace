@@ -115,6 +115,8 @@ class PublicListings @Inject()(
 
     def get(ids: Seq[String]): Future[Seq[PublicListing]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
 
+    def tryGetByCollectionId(collectionId: String): Future[PublicListing] = filterHead(_.collectionId === collectionId).map(_.deserialize)
+
     def getLivePublicListingIDs: Future[Seq[String]] = {
       val currentEpoch = utilities.Date.currentEpoch
       filter(x => x.startTimeEpoch <= currentEpoch && x.endTimeEpoch > currentEpoch).map(_.map(_.id))

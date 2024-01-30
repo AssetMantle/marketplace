@@ -48,6 +48,7 @@ class NFTController @Inject()(
                                masterWhitelists: master.Whitelists,
                                masterWhitelistMembers: master.WhitelistMembers,
                                masterSecondaryMarkets: master.SecondaryMarkets,
+                               masterPublicListings: master.PublicListings,
                                utilitiesNotification: utilities.Notification,
                                masterTransactionNFTDrafts: masterTransaction.NFTDrafts,
                                masterTransactionTokenPrices: masterTransaction.TokenPrices,
@@ -492,14 +493,14 @@ class NFTController @Inject()(
   def price(nftId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req, cacheWithUsername = false), constants.CommonConfig.WebAppCacheDuration) {
     withoutLoginActionAsync { implicit optionalLoginState =>
       implicit request =>
-        val saleId = masterNFTOwners.Service.getSaleId(nftId)
+        val nft = masterNFTs.Service.tryGet(nftId)
 
-        def price(saleId: Option[String]) = saleId.fold(Future("--"))(x => masterSales.Service.tryGet(x).map(_.price.toString))
+        def collectionAnalysis(collectionId: String) = collectionsAnalysis.Service.tryGet(collectionId)
 
         (for {
-          saleId <- saleId
-          price <- price(saleId)
-        } yield Ok(price)
+          nft <- nft
+          collectionAnalysis <- collectionAnalysis(nft.collectionId)
+        } yield Ok(collectionAnalysis.floorPrice.toString)
           ).recover {
           case _: BaseException => BadRequest("--")
         }

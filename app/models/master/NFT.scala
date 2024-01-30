@@ -40,7 +40,7 @@ case class NFT(id: String, assetId: Option[String], collectionId: String, name: 
 
   def getImmutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && !x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 
-  def getMutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] =if (collection.customBondAmountEnabled) nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty) else nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty) :+ schema.constants.Properties.BondAmountProperty.copy(data = NumberData(this.getBaseDenomBondAmount(collection)))
+  def getMutableMetaProperties(nftProperties: Seq[NFTProperty], collection: Collection): Seq[MetaProperty] = if (collection.customBondAmountEnabled) nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty) else nftProperties.filter(x => x.meta && x.mutable && x.nftId == this.id).map(_.toMetaProperty) :+ schema.constants.Properties.BondAmountProperty.copy(data = NumberData(this.getBaseDenomBondAmount(collection)))
 
   def getMutableProperties(nftProperties: Seq[NFTProperty]): Seq[MesaProperty] = nftProperties.filter(x => !x.meta && x.mutable && x.nftId == this.id).map(_.toMesaProperty)
 
@@ -119,6 +119,8 @@ class NFTs @Inject()(
     def add(nft: NFT): Future[String] = create(nft.serialize).map(_.id)
 
     def tryGet(nftId: String): Future[NFT] = tryGetById(nftId).map(_.deserialize)
+
+    def get(id: String): Future[Option[NFT]] = getById(id).map(_.map(_.deserialize()))
 
     def getAllIdsForCollection(collectionId: String): Future[Seq[String]] = filter(_.collectionId === collectionId).map(_.map(_.id))
 

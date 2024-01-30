@@ -122,6 +122,8 @@ class Sales @Inject()(
 
     def tryGet(id: String): Future[Sale] = filterHead(_.id === id).map(_.deserialize)
 
+    def tryGetByCollectionId(collectionId: String): Future[Sale] = filterHead(_.collectionId === collectionId).map(_.deserialize)
+
     def get(ids: Seq[String]): Future[Seq[Sale]] = filter(_.id.inSet(ids)).map(_.map(_.deserialize))
 
     def getByWhitelistId(whitelistId: String): Future[Seq[Sale]] = filter(_.whitelistId === whitelistId).map(_.map(_.deserialize))

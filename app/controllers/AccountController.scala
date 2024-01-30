@@ -126,7 +126,7 @@ class AccountController @Inject()(
     implicit request =>
       SignInWithCallback.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.account.signInWithCallback(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CALLBACK_URL.name, routes.PublicListingController.viewCollections().url))))
+          Future(BadRequest(views.html.account.signInWithCallback(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CALLBACK_URL.name, routes.SecondaryMarketController.viewCollections().url))))
         },
         signInData => {
           val masterAccount = masterAccounts.Service.tryGet(signInData.username)

@@ -103,10 +103,13 @@ class SecondaryMarketBuyTransactions @Inject()(
 
     def transaction(nftID: String, buyerId: String, fromAddress: String, secondaryMarket: SecondaryMarket, gasPrice: BigDecimal, ecKey: ECKey, split: Option[Split], royaltyFees: MicroNumber, creatorAddress: String): Future[UserTransaction] = {
 
-      val messages = Seq(
+      val messages = if (royaltyFees > MicroNumber.zero) Seq(
         utilities.BlockchainTransaction.getWrapTokenMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(buyerId), coins = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber(secondaryMarket.price.value * secondaryMarket.quantity) - split.fold(MicroNumber.zero)(_.getBalanceAsMicroNumber)))),
         utilities.BlockchainTransaction.getGetOrderMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(buyerId), orderID = secondaryMarket.getOrderID),
         utilities.BlockchainTransaction.getSendCoinMsgAsAny(fromAddress = fromAddress, toAddress = creatorAddress, amount = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = royaltyFees))))
+      else Seq(
+        utilities.BlockchainTransaction.getWrapTokenMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(buyerId), coins = Seq(Coin(denom = constants.Blockchain.StakingToken, amount = MicroNumber(secondaryMarket.price.value * secondaryMarket.quantity) - split.fold(MicroNumber.zero)(_.getBalanceAsMicroNumber)))),
+        utilities.BlockchainTransaction.getGetOrderMsg(fromAddress = fromAddress, fromID = utilities.Identity.getMantlePlaceIdentityID(buyerId), orderID = secondaryMarket.getOrderID))
 
       def masterTxFunc(txHash: String) = Service.addWithNoneStatus(txHash = txHash, nftId = nftID, buyerId = buyerId, secondaryMarketId = secondaryMarket.id)
 
