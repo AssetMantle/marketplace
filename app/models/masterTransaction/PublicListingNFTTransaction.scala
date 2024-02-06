@@ -185,8 +185,6 @@ class PublicListingNFTTransactions @Inject()(
                 utilitiesNotification.send(boughtNFT.buyerAccountId, constants.Notification.BUYER_BUY_NFT_SUCCESSFUL_FROM_PUBLIC_LISTING, count.toString)(s"'${boughtNFT.buyerAccountId}', '${constants.View.COLLECTED}'")
               }
 
-              def checkPublicListing(publicListing: PublicListing) = masterPublicListings.Utility.checkPublicListing(publicListing)
-
               for {
                 _ <- markSuccess
                 publicListing <- publicListing
@@ -195,7 +193,6 @@ class PublicListingNFTTransactions @Inject()(
                 nft <- nft
                 _ <- analysisUpdate(nft, boughtNFTs.length, publicListing.price)
                 _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
-                _ <- checkPublicListing(publicListing)
               } yield ()
             } else {
               val boughtNFTs = Service.getByTxHash(txHash)

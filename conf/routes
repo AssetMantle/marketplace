@@ -59,7 +59,7 @@ GET         /collectionAnalysis                                controllers.Colle
 GET         /commonCardInfo                                    controllers.CollectionController.commonCardInfo(id: String, statusId: Int)
 GET         /created                                           controllers.CollectionController.createdSection(accountId: String)
 GET         /createdCollectionPerPage                          controllers.CollectionController.createdCollectionPerPage(accountId: String, pageNumber: Int)
-GET         /countForCreatorNotForSell                         controllers.CollectionController.countForCreatorNotForSell(collectionId: String, accountId: String)
+GET         /countNFTForPrimarySale                            controllers.CollectionController.countNFTForPrimarySale(collectionId: String)
 GET         /createCollection                                  controllers.CollectionController.createForm()
 POST        /createCollection                                  controllers.CollectionController.create()
 GET         /editCollection                                    controllers.CollectionController.editForm(id: String)

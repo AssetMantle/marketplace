@@ -332,7 +332,7 @@ class PublicListingController @Inject()(
               if (nfts.exists(_.isMinted.getOrElse(true))) Option(constants.Response.NFT_ALREADY_MINTED) else None,
               if (!verifyPassword) Option(constants.Response.INVALID_PASSWORD) else None,
               if (checkAlreadySold) Option(constants.Response.NFT_ALREADY_SOLD) else None,
-              if (publicListing.isOver) Option(constants.Response.SALE_STOPPED_OR_OVER) else None,
+              if (publicListing.stopped) Option(constants.Response.SALE_STOPPED_OR_OVER) else None,
             ).flatten
             if (errors.isEmpty) {
               masterTransactionPublicListingNFTTransactions.Utility.transaction(

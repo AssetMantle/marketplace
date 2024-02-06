@@ -27,7 +27,7 @@ object Identity {
 
   def getNote4MesaProperty(value: String): Property = MesaProperty(note4PropertyID, StringData(value).getDataID)
 
-  val bondAmountMetaProperty: Property = MetaProperty(schema.constants.Properties.BondAmountProperty.id, NumberData(4096L))
+  val bondAmountMetaProperty: Property = MetaProperty(schema.constants.Properties.BondAmountProperty.id, NumberData(4104L))
 
   def getImmutableMetas(id: String): Immutables = Immutables(PropertyList(Seq(originMetaProperty, getIDMetaProperty(id))))
 

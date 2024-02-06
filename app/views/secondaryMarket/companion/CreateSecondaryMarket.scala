@@ -17,7 +17,7 @@ object CreateSecondaryMarket {
 
   case class Data(nftId: String, sellQuantity: Long, price: MicroNumber, endHours: Int, password: String) {
 
-    def toNewSecondaryMarket(id: String, collectionId: String, sellerId: String, orderId: String): SecondaryMarket = SecondaryMarket(id = id, orderId = orderId, nftId = this.nftId, collectionId = collectionId, sellerId = sellerId, price = this.price, quantity = this.sellQuantity, denom = constants.Blockchain.StakingToken, endHours = this.endHours, externallyMade = false, completed = false, cancelled = false, expired = false, status = None)
+    def toNewSecondaryMarket(id: String, collectionId: String, sellerId: String, orderId: String): SecondaryMarket = SecondaryMarket(id = id, orderId = orderId, nftId = this.nftId, collectionId = collectionId, sellerId = sellerId, price = this.price, quantity = this.sellQuantity, denom = constants.Blockchain.StakingToken, endsIn = this.endHours * 3600L, externallyMade = false, completed = false, cancelled = false, expired = false, status = None)
 
   }
 }

@@ -54,7 +54,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.CollectionController.definePropertiesForm,
         routes.javascript.CollectionController.deleteDraftForm,
         routes.javascript.CollectionController.deleteDraft,
-        routes.javascript.CollectionController.countForCreatorNotForSell,
+        routes.javascript.CollectionController.countNFTForPrimarySale,
         routes.javascript.CollectionController.genesisTypeForm,
         routes.javascript.CollectionController.updateRoyaltyForm,
 

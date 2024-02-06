@@ -191,8 +191,6 @@ class SaleNFTTransactions @Inject()(
                 utilitiesNotification.send(boughtNFT.buyerAccountId, constants.Notification.BUYER_BUY_NFT_SUCCESSFUL_FROM_SALE, count.toString)(s"'${boughtNFT.buyerAccountId}', '${constants.View.COLLECTED}'")
               }
 
-              def checkSale(sale: Sale) = masterSales.Utility.checkSale(sale)
-
               for {
                 _ <- markMasterSuccess
                 _ <- transferNFTOwnership(boughtNFTs)
@@ -201,7 +199,6 @@ class SaleNFTTransactions @Inject()(
                 nft <- nft
                 _ <- analysisUpdate(nft, sale.price, boughtNFTs.length)
                 _ <- sendNotifications(boughtNFTs.head, boughtNFTs.length)
-                _ <- checkSale(sale)
               } yield ()
             } else {
               val boughtNFTs = Service.getByTxHash(userTransaction.txHash)

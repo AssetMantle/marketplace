@@ -368,7 +368,7 @@ class CollectionController @Inject()(
           (for {
             collection <- collection
             _ <- update(collection)
-          } yield Ok(views.html.collection.updateRoyaltySuccess(updateRoyaltyData.royalty.toString()))
+          } yield PartialContent(views.html.collection.updateRoyaltySuccess(utilities.NumericOperation.formatNumber(updateRoyaltyData.royalty)))
             ).recover {
             case baseException: BaseException => {
               BadRequest(views.html.collection.updateRoyalty(UpdateRoyalty.form.withGlobalError(baseException.failure.message), Await.result(collection, constants.Time.FiveSecond)))
@@ -605,23 +605,25 @@ class CollectionController @Inject()(
       )
   }
 
-  def countForCreatorNotForSell(collectionId: String, accountId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
+  def countNFTForPrimarySale(collectionId: String): EssentialAction = cached(req => utilities.Session.getSessionCachingKey(req), constants.CommonConfig.WebAppCacheDuration) {
+    withLoginActionAsync { implicit loginState =>
       implicit request =>
+        val collection = masterCollections.Service.tryGet(collectionId)
         val unmintedNFTs = masterNFTs.Service.getUnmintedNFTIDs(collectionId)
 
-        def countNFTs(umintedNFTs: Seq[String]) = masterNFTOwners.Service.countForCreatorForPrimarySale(collectionId = collectionId, creatorId = accountId, unmintedNFTs = umintedNFTs)
+        def countNFTs(umintedNFTs: Seq[String]) = masterNFTOwners.Service.countForCreatorForPrimarySale(collectionId = collectionId, creatorId = loginState.username, unmintedNFTs = umintedNFTs)
 
         val collectionAnalysis = collectionsAnalysis.Service.tryGet(collectionId)
 
-        def maxSellAllowed(collectionAnalysis: CollectionAnalysis) = if (collectionAnalysis.totalNFTs <= 50) collectionAnalysis.totalNFTs else (collectionAnalysis.totalNFTs / 10)
+        def maxSellAllowed(collectionAnalysis: CollectionAnalysis) = if (collectionAnalysis.totalNFTs <= 50) collectionAnalysis.totalNFTs else collectionAnalysis.totalNFTs / 10
 
         (for {
+          collection <- collection
           unmintedNFTs <- unmintedNFTs
           countNFTs <- countNFTs(unmintedNFTs)
           collectionAnalysis <- collectionAnalysis
         } yield {
-          Ok(maxSellAllowed(collectionAnalysis).min(countNFTs).toString)
+          Ok(if (collection.creatorId == loginState.username) maxSellAllowed(collectionAnalysis).min(countNFTs).toString else "0")
         }
           ).recover {
           case _: BaseException => BadRequest("0")

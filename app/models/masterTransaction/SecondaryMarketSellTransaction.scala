@@ -164,28 +164,12 @@ class SecondaryMarketSellTransactions @Inject()(
       }
     }
 
-    private def updateForExpiredOrders() = {
-      val allOrderIds = masterSecondaryMarkets.Service.getAllOrderIDs
-
-      def filterExistingOrderIds(allOrderIds: Seq[String]) = blockchainOrders.Service.filterExistingIds(allOrderIds)
-
-      def markOnExpiry(orderIds: Seq[String]) = masterSecondaryMarkets.Service.markOnExpiry(orderIds)
-
-      for {
-        allOrderIds <- allOrderIds
-        existingOrderIds <- filterExistingOrderIds(allOrderIds)
-        _ <- markOnExpiry(allOrderIds.diff(existingOrderIds))
-      } yield ()
-    }
-
     val scheduler: Scheduler = new Scheduler {
       val name: String = module
 
       //      override val initialDelay: FiniteDuration = constants.Scheduler.QuarterHour
 
       def runner(): Unit = {
-
-        val checkExpiredOrders = updateForExpiredOrders()
         val secondaryMarketSellTxs = Service.getAllPendingStatus
 
         def checkAndUpdate(secondaryMarketSellTxs: Seq[SecondaryMarketSellTransaction]) = utilitiesOperations.traverse(secondaryMarketSellTxs) { secondaryMarketSellTx =>
@@ -239,7 +223,6 @@ class SecondaryMarketSellTransactions @Inject()(
         val forComplete = (for {
           secondaryMarketSellTxs <- secondaryMarketSellTxs
           _ <- checkAndUpdate(secondaryMarketSellTxs)
-          _ <- checkExpiredOrders
         } yield ()).recover {
           case baseException: BaseException => baseException.notifyLog("[PANIC]")
             logger.error("[PANIC] Something is seriously wrong with logic. Code should not reach here.")

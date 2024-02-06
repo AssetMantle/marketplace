@@ -29,6 +29,7 @@ class IndexController @Inject()(
                                  historyMasterPublicListings: history.MasterPublicListings,
                                  historyMasterSecondaryMarkets: history.MasterSecondaryMarkets,
                                  nftPublicListings: blockchainTransaction.NFTPublicListings,
+                                 masterSecondaryMarkets: master.SecondaryMarkets,
                                  sendCoins: blockchainTransaction.SendCoins,
                                  sendCoinTransactions: masterTransaction.SendCoinTransactions,
                                  nftSales: blockchainTransaction.NFTSales,
@@ -106,6 +107,8 @@ class IndexController @Inject()(
     secondaryMarketSellTransactions.Utility.scheduler,
     sendCoinTransactions.Utility.scheduler,
     mintNFTAirDrops.Utility.scheduler,
+    //master
+    masterSecondaryMarkets.Utility.scheduler,
     // history
     historyMasterPublicListings.Utility.scheduler,
     historyMasterSales.Utility.scheduler,

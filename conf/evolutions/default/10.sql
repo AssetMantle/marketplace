@@ -13,14 +13,14 @@ ALTER TABLE MASTER."NFT"
     ADD COLUMN IF NOT EXISTS "customBondAmount" BIGINT DEFAULT null;
 
 ALTER TABLE MASTER."PublicListing"
-    ADD COLUMN IF NOT EXISTS "isOver" BOOLEAN NOT NULL DEFAULT FALSE;
+    ADD COLUMN IF NOT EXISTS "stopped" BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE HISTORY."MasterPublicListing"
-    ADD COLUMN IF NOT EXISTS "isOver" BOOLEAN NOT NULL DEFAULT FALSE;
+    ADD COLUMN IF NOT EXISTS "stopped" BOOLEAN NOT NULL DEFAULT FALSE;
 
 ALTER TABLE MASTER."Sale"
-    ADD COLUMN IF NOT EXISTS "isOver" BOOLEAN NOT NULL DEFAULT FALSE;
+    ADD COLUMN IF NOT EXISTS "stopped" BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE HISTORY."MasterSale"
-    ADD COLUMN IF NOT EXISTS "isOver" BOOLEAN NOT NULL DEFAULT FALSE;
+    ADD COLUMN IF NOT EXISTS "stopped" BOOLEAN NOT NULL DEFAULT FALSE;
 
 ALTER TABLE MASTER."NFT"
     ADD COLUMN IF NOT EXISTS "customBondAmount" BIGINT DEFAULT null;
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS HISTORY."MasterSecondaryMarket"
     "quantity"             NUMERIC NOT NULL,
     "price"                NUMERIC NOT NULL,
     "denom"                VARCHAR NOT NULL,
-    "endHours"             INTEGER NOT NULL,
+    "endsIn"               BIGINT  NOT NULL,
     "externallyMade"       BOOLEAN NOT NULL,
     "completed"            BOOLEAN NOT NULL,
     "cancelled"            BOOLEAN NOT NULL,
@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS MASTER."SecondaryMarket"
     "quantity"             NUMERIC NOT NULL,
     "price"                NUMERIC NOT NULL,
     "denom"                VARCHAR NOT NULL,
-    "endHours"             INTEGER NOT NULL,
+    "endsIn"               INTEGER NOT NULL,
     "externallyMade"       BOOLEAN NOT NULL,
     "completed"            BOOLEAN NOT NULL,
     "cancelled"            BOOLEAN NOT NULL,

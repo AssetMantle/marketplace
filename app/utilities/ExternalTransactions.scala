@@ -264,8 +264,8 @@ class ExternalTransactions @Inject()(
 
     def update(nft: Option[NFT], account: Option[Account], nftOwner: Option[NFTOwner], blockchainOrder: Option[Order]) = if (nft.isDefined && account.isDefined && nftOwner.isDefined && AssetID(msg.getTakerAssetID).asString == constants.Blockchain.StakingTokenAssetID.asString && blockchainOrder.isDefined && constants.SecondaryMarket.AssetTokensAllowed.map(_.asString).contains(takerAssetID.asString)) {
       val secondaryMarketId = utilities.IdGenerator.getRandomHexadecimal
-      val endHours = ((msg.getExpiryHeight.getValue - txHeight) * constants.Blockchain.MaxOrderHours) / constants.Blockchain.MaxOrderExpiry
-      val secondaryMarket = SecondaryMarket(id = secondaryMarketId, orderId = orderID.asString, nftId = nft.get.id, collectionId = nft.get.collectionId, sellerId = account.get.id, quantity = BigInt(msg.getMakerSplit), price = MicroNumber(BigDecimal(msg.getTakerSplit).toBigInt), denom = constants.Blockchain.StakingToken, endHours = endHours.toInt, externallyMade = true, completed = false, cancelled = false, expired = false, status = Option(true))
+      val endsIn = (((msg.getExpiryHeight.getValue - txHeight) * constants.Blockchain.MaxOrderHours) / constants.Blockchain.MaxOrderExpiry) * 3600L
+      val secondaryMarket = SecondaryMarket(id = secondaryMarketId, orderId = orderID.asString, nftId = nft.get.id, collectionId = nft.get.collectionId, sellerId = account.get.id, quantity = BigInt(msg.getMakerSplit), price = MicroNumber(BigDecimal(msg.getTakerSplit).toBigInt), denom = constants.Blockchain.StakingToken, endsIn = endsIn, externallyMade = true, completed = false, cancelled = false, expired = false, status = Option(true))
       val add = masterSecondaryMarkets.Service.add(secondaryMarket)
       val collection = masterCollections.Service.markListedOnSecondaryMarket(nft.get.collectionId)
       val updateAnalytics = collectionsAnalysis.Utility.onCreateSecondaryMarket(nft.get.collectionId, totalListed = 1, listingPrice = secondaryMarket.price)

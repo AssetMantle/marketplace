@@ -1,8 +1,10 @@
 package models.master
 
-import models.history
+import constants.Scheduler
+import exceptions.BaseException
 import models.master.SecondaryMarkets.SecondaryMarketTable
 import models.traits._
+import models.{blockchain, history}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.id.base.{HashID, OrderID}
@@ -10,9 +12,10 @@ import slick.jdbc.H2Profile.api._
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class SecondaryMarket(id: String, orderId: String, nftId: String, collectionId: String, sellerId: String, quantity: BigInt, price: MicroNumber, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class SecondaryMarket(id: String, orderId: String, nftId: String, collectionId: String, sellerId: String, quantity: BigInt, price: MicroNumber, denom: String, endsIn: Long, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def getOrderID: OrderID = OrderID(HashID(utilities.Secrets.base64URLDecode(this.orderId)))
 
@@ -27,7 +30,7 @@ case class SecondaryMarket(id: String, orderId: String, nftId: String, collectio
     quantity = BigDecimal(this.quantity),
     price = this.price.toBigDecimal,
     denom = this.denom,
-    endHours = this.endHours,
+    endsIn = this.endsIn,
     externallyMade = this.externallyMade,
     completed = this.completed,
     cancelled = this.cancelled,
@@ -47,7 +50,7 @@ case class SecondaryMarket(id: String, orderId: String, nftId: String, collectio
     quantity = this.quantity,
     price = this.price,
     denom = this.denom,
-    endHours = this.endHours,
+    endsIn = this.endsIn,
     externallyMade = this.externallyMade,
     completed = this.completed,
     cancelled = this.cancelled,
@@ -60,14 +63,14 @@ case class SecondaryMarket(id: String, orderId: String, nftId: String, collectio
 }
 
 private[master] object SecondaryMarkets {
-  case class SecondaryMarketSerialized(id: String, orderId: String, nftId: String, collectionId: String, sellerId: String, quantity: BigDecimal, price: BigDecimal, denom: String, endHours: Int, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
+  case class SecondaryMarketSerialized(id: String, orderId: String, nftId: String, collectionId: String, sellerId: String, quantity: BigDecimal, price: BigDecimal, denom: String, endsIn: Long, externallyMade: Boolean, completed: Boolean, cancelled: Boolean, expired: Boolean, status: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Entity[String] {
 
-    def deserialize()(implicit module: String, logger: Logger): SecondaryMarket = SecondaryMarket(id = id, orderId = orderId, nftId = nftId, collectionId = collectionId, sellerId = sellerId, quantity = this.quantity.toBigInt, price = MicroNumber(price), denom = denom, endHours = endHours, externallyMade = externallyMade, completed = completed, cancelled = cancelled, expired = expired, status = status, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+    def deserialize()(implicit module: String, logger: Logger): SecondaryMarket = SecondaryMarket(id = id, orderId = orderId, nftId = nftId, collectionId = collectionId, sellerId = sellerId, quantity = this.quantity.toBigInt, price = MicroNumber(price), denom = denom, endsIn = endsIn, externallyMade = externallyMade, completed = completed, cancelled = cancelled, expired = expired, status = status, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
   class SecondaryMarketTable(tag: Tag) extends Table[SecondaryMarketSerialized](tag, "SecondaryMarket") with ModelTable[String] {
 
-    def * = (id, orderId, nftId, collectionId, sellerId, quantity, price, denom, endHours, externallyMade, completed, cancelled, expired, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SecondaryMarketSerialized.tupled, SecondaryMarketSerialized.unapply)
+    def * = (id, orderId, nftId, collectionId, sellerId, quantity, price, denom, endsIn, externallyMade, completed, cancelled, expired, status.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SecondaryMarketSerialized.tupled, SecondaryMarketSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -85,7 +88,7 @@ private[master] object SecondaryMarkets {
 
     def denom = column[String]("denom")
 
-    def endHours = column[Int]("endHours")
+    def endsIn = column[Long]("endsIn")
 
     def externallyMade = column[Boolean]("externallyMade")
 
@@ -109,6 +112,7 @@ private[master] object SecondaryMarkets {
 
 @Singleton
 class SecondaryMarkets @Inject()(
+                                  blockchainOrders: blockchain.Orders,
                                   protected val dbConfigProvider: DatabaseConfigProvider,
                                 )(implicit val executionContext: ExecutionContext)
   extends GenericDaoImpl[SecondaryMarkets.SecondaryMarketTable, SecondaryMarkets.SecondaryMarketSerialized, String]() {
@@ -173,7 +177,7 @@ class SecondaryMarkets @Inject()(
 
     def getExpiredOrders: Future[Seq[SecondaryMarket]] = filter(_.expired).map(_.map(_.deserialize))
 
-    def getByPageNumber(pageNumber: Int): Future[Seq[SecondaryMarket]] = sortWithPagination(_.endHours)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.deserialize))
+    def getByPageNumber(pageNumber: Int): Future[Seq[SecondaryMarket]] = sortWithPagination(_.endsIn)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.deserialize))
 
     def getAllOrderIDs: Future[Seq[String]] = customQuery(tableQuery.map(_.orderId).result)
 
@@ -186,6 +190,34 @@ class SecondaryMarkets @Inject()(
     def totalOnSellBySellerAndCollection(sellerId: String, collectionId: String): Future[Int] = filterAndCount(x => x.sellerId === sellerId && x.collectionId === collectionId)
 
     def getByCollectionSellerAndPageNumber(sellerId: String, collectionId: String, pageNumber: Int): Future[Seq[SecondaryMarket]] = filterAndSortWithPagination(x => x.sellerId === sellerId && x.collectionId === collectionId)(_.createdOnMillisEpoch)(offset = (pageNumber - 1) * constants.CommonConfig.Pagination.CollectionsPerPage, limit = constants.CommonConfig.Pagination.CollectionsPerPage).map(_.map(_.deserialize()))
+
+    def getExpectedExpiryOrders: Future[Seq[SecondaryMarket]] = filter(x => (x.createdOnMillisEpoch + (x.endsIn * 1000L)) > utilities.Date.currentMillisEpoch).map(_.map(_.deserialize()))
+  }
+
+  object Utility {
+
+    val scheduler: Scheduler = new Scheduler {
+      val name: String = module
+
+      def runner(): Unit = {
+        val expectedExpiry = Service.getExpectedExpiryOrders
+
+        def filterExpired(expectedExpired: Seq[SecondaryMarket]) = blockchainOrders.Service.filterExistingIds(expectedExpired.map(_.orderId)).map(x => expectedExpired.filterNot(y => x.contains(y.orderId)))
+
+        def markExpired(expired: Seq[SecondaryMarket]) = Service.markOnExpiry(expired.map(_.id))
+
+        val forComplete = (for {
+          expectedExpiry <- expectedExpiry
+          expiredOrders <- filterExpired(expectedExpiry)
+          _ <- markExpired(expiredOrders)
+        } yield ()).recover {
+          case _: BaseException => logger.error("FAILED_IN_" + module)
+        }
+
+        Await.result(forComplete, Duration.Inf)
+      }
+    }
+
   }
 
 }
