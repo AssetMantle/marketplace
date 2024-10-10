@@ -24,6 +24,7 @@ class AccountController @Inject()(
                                    masterKeys: master.Keys,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                    masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
+                                   nameTransactions: masterTransaction.NameTransactions,
                                    withUsernameToken: WithUsernameToken,
                                    withLoginActionAsync: WithLoginActionAsync,
                                    utilitiesNotification: utilities.Notification,
@@ -282,11 +283,14 @@ class AccountController @Inject()(
   }
 
   def checkUsernameAvailable(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
+    implicit request => {
       val verifiedMnemonicExists = masterKeys.Service.checkVerifiedKeyExists(username)
+      val usernameExists = nameTransactions.Service.findByUsername(username)
       for {
         verifiedMnemonicExists <- verifiedMnemonicExists
-      } yield if (!verifiedMnemonicExists) Ok else NoContent
+        usernameExists <- usernameExists
+      } yield if (!verifiedMnemonicExists && usernameExists.isEmpty) Ok else NoContent
+    }
   }
 
   def forgetPasswordForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
